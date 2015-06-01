@@ -1,0 +1,158 @@
+* Zero page
+
+0020  WNDLFT
+0021  WNDWDTH
+0022  WNDTOP
+0023  WNDBTM
+0024  CH
+0025  CV
+0026  GBAS-LO
+0027  GBAS-HI
+0028  BAS-LO
+0029  BAS-HI
+0032  INVFLG
+0035  YSAV1
+0036  CSWL
+0037  CSHW
+0044  A5L - volume number?
+004E  RND-LO
+004F  RND-HI
+0050  LINNUM
+0073  HIMEM
+009D  FAC
+009E  FAC mantissa hi order
+009F  FAC mantissa mid order hi
+00B1  CHRGET
+00B7  CHRGOT
+00B8  TXTPTR
+
+0200  Input buffer
+
+03D0  Applesoft warm start
+03EA  VECT
+A56E  catalog routine
+
+C000  KYBD - last key pressed
+C010  STROBE - Clear KYBD
+C050  TXTCLR - Display Graphics
+C051  TXTSET - Display Text
+C052  MIXCLR - Display Full Screen
+C053  MIXSET - Display Split Screen
+C054  TXTPAGE1 - Display Page 1
+C055  TXTPAGE2 - If 80STORE Off: Display Page 2, If 80STORE On: Read/Write Aux Display Mem
+C056  LORES - Display LoRes Graphics
+C057  HIRES - Display HiRes Graphics
+
+C080  Read RAM bank 2; no write
+C081  ROMIN - Read ROM; write RAM bank 2
+C082  Read ROM; no write
+C083  LCBANK2 - Read/write RAM bank 2
+C084  Read RAM bank 2; no write
+C085  ROMIN - Read ROM; write RAM bank 2
+C086  Read ROM; no write
+C087  LCBANK2 - Read/write RAM bank 2
+C088  Read RAM bank 1; no write
+C089  Read ROM; write RAM bank 1
+C08A  Read ROM; no write
+C08B  Read/write RAM bank 1
+C08C  Read RAM bank 1; no write
+C08D  Read ROM; write RAM bank 1
+C08E  Read ROM; no write
+C08F  Read/write RAM bank 1
+
+D52C  INLIN numeric input
+DB3A  STROUT - output a string
+DB5C  output a character
+DD67  FRMNUM
+DD7B  FRMEVAL
+DEBE  CHKCOM
+DEC0  SYNCHR
+DEC9  syntax error
+DFE3  PTRGET
+
+E053  find a variable
+E10C  convert FP to INT
+E2F2  convert ACC to FP
+E301  SNGFLT
+E3E7  FPSTR2
+E6F8  GETBYTE
+E74C  COMBYTE
+E752  GETADR - get from FAC to LINNUM
+E7A7  FSUB
+E7BE  FADD
+E8D5  OVERFLOW
+E913  ONE
+E941  FLOG
+E97F  FMULT
+E9E3  CONUPK
+EA39  MUL10
+EA66  FDIV
+EAE1  DIVERR
+EAF9  MOVEFM - move (A,Y) to FAC
+EB2B  MOVEMF
+EB93  FLOAT
+EBA0  FLOAT1 - integer to FAC ($9D-$A2)
+EBB2  FCOMP
+EBF2  QINT
+EC23  FINT
+EC4A  FIN
+ED24  LINPRNT - print a decimal number
+ED2E  PRNTFAC
+ED34  FOUT - FAC to FBUFFR ($100-$110)
+EE8D  SQR
+EE97  FPWRT
+EED0  NEGOP
+EF09  FEXP
+EFAE  RND
+EFEA  FCOS
+EFF1  FSIN
+
+F03A  FTAN
+F066  PIHALF
+F09E  FATN
+F411  map x,y location on hi-res 1 ??
+F467  LEFT EQU
+F48A  RIGHT EQU
+F4D5  UP EQU
+F504  DOWN EQU
+F6B9  HFNS
+F940  PRINTYX
+F941  PRINTAX - print a hex number
+FAA6  reboot DOS
+FAFF  0 = Autostart ROM, 1 = Old Monitor
+FB1E  PREAD - read game paddle
+FB2F  initialise text screen
+FB39  text mode - SETTXT
+FB5B  TABV - monitor tab routine
+FC66  CURSDWN - move cursor down
+FBF4  CURSRIT - move cursor right
+FC10  CURSLFT - move cursor left
+FC1A  CURSUP - move cursor up
+FB6F  set powerup checksum
+FBC1  BASCALC - calculate video address
+FBDD  BEEP
+FC22  VTAB
+FC42  CLREOP - clear to end of page
+FC58  HOME - clear screen
+FC62  CR
+FC9C  CLREOL
+FCA8  WAIT 1/2(26+27A+5A^2) microseconds
+FD0C  RDKEY - Blink cursor
+FD1B  KEYIN - Increment RNDL,H while polling keyboard
+FD35  RDCHAR - Call RDKEY
+FD6A  GETLN
+FD75  NXTCHAR
+FD8B  CROUT1 - generate a return with clear
+FDDA  PRBYTE - print A in hex
+FDED  COUT - output a character
+FDF0  COUT1 - output a character to screen
+FD8E  CROUT - generate a return
+FE2C  move a block of memory
+FE89  disconnect DOS from I/O links
+FE93  disconnect DOS from I/O links
+FF3A  BELL
+FF3F  SAVE
+FF4A  RESTORE
+FF59  Monitor cold entry point
+FFA7  GETNUM - move num to A2L.A2H
+FFC7  ZMODE - monitor get ASCII return

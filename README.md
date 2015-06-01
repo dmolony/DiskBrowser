@@ -13,3 +13,10 @@
 - Track and sector display
 - Dual DOS disks
 
+####Images
+#####Disk listing
+#####Disk contents
+#####Hard disk
+#####Pascal code
+#####Zork
+#####Wizardry

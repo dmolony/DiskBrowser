@@ -73,7 +73,12 @@ class DiskLegendPanel extends JPanel
 
       // draw the colour
       g.setColor (type.colour);
-      g.fillRect (x + 2, y + 2, layoutDetails.block.width - 3, layoutDetails.block.height - 3);
+      if (false)
+        g.fillRect (x + 2, y + 2, layoutDetails.block.width - 3,
+                    layoutDetails.block.height - 3);
+      else
+        g.fillRect (x + 1, y + 1, layoutDetails.block.width - 2,
+                    layoutDetails.block.height - 2);
 
       // draw the text
       g.setColor (Color.BLACK);
@@ -84,13 +89,13 @@ class DiskLegendPanel extends JPanel
     int val = disk.falseNegativeBlocks ();
     if (val > 0)
     {
-      g.drawString (val + " empty sector" + (val == 1 ? "" : "s") + " marked as unavailable",
-                    10, y);
+      g.drawString (val + " empty sector" + (val == 1 ? "" : "s")
+          + " marked as unavailable", 10, y);
       y += lineHeight;
     }
     val = disk.falsePositiveBlocks ();
     if (val > 0)
-      g.drawString (val + " used sector" + (val == 1 ? "" : "s") + " marked as available", 10,
-                    y);
+      g.drawString (val + " used sector" + (val == 1 ? "" : "s") + " marked as available",
+                    10, y);
   }
 }

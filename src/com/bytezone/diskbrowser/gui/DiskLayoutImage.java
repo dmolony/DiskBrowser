@@ -1,12 +1,18 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
@@ -17,7 +23,7 @@ import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 
-class DiskLayoutImage extends JComponent implements Scrollable
+class DiskLayoutImage extends JPanel implements Scrollable
 {
   static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
   FormattedDisk disk;
@@ -82,8 +88,8 @@ class DiskLayoutImage extends JComponent implements Scrollable
     super.paintComponent (g);
 
     // why doesn't linux do this?
-    g.setColor (Color.WHITE);
-    g.fillRect (0, 0, getWidth (), getHeight ());
+    //    g.setColor (Color.WHITE);
+    //    g.fillRect (0, 0, getWidth (), getHeight ());
 
     if (disk == null)
       return;
@@ -92,9 +98,9 @@ class DiskLayoutImage extends JComponent implements Scrollable
 
     Point p1 = new Point (clipRect.x / bw * bw, clipRect.y / bh * bh);
     Point p2 =
-          new Point ((clipRect.x + clipRect.width - 1) / bw * bw, (clipRect.y
-                + clipRect.height - 1)
-                / bh * bh);
+        new Point ((clipRect.x + clipRect.width - 1) / bw * bw, (clipRect.y
+            + clipRect.height - 1)
+            / bh * bh);
 
     //    System.out.printf ("gw=%d, gh=%d, bw=%d, bh=%d%n", gw, gh, bw, bh);
     // int totalBlocks = 0;
@@ -123,12 +129,11 @@ class DiskLayoutImage extends JComponent implements Scrollable
   }
 
   private void drawBlock (Graphics2D g, int blockNo, int x, int y, boolean flagFree,
-        boolean selected)
+      boolean selected)
   {
     SectorType type = disk.getSectorType (blockNo);
     int offset = (bw - 4) / 2 + 1;
 
-    //    Rectangle rect = new Rectangle (x, y, bw, bh);
     Rectangle rect = new Rectangle (x, y, bw, bh);
     //    System.out.printf ("Rect: %4d %4d %4d %4d%n", x, y, bw, bh);
 
@@ -144,7 +149,12 @@ class DiskLayoutImage extends JComponent implements Scrollable
     if (type.colour != Color.WHITE)
     {
       g.setColor (type.colour);
-      g.fillRect (rect.x + 2, rect.y + 2, rect.width - 3, rect.height - 3);
+      // this is weird, the retina OSX screen needs the second fillRect
+      // see also DiskLegendPanel.paint()
+      if (false)
+        g.fillRect (rect.x + 2, rect.y + 2, rect.width - 3, rect.height - 3);
+      else
+        g.fillRect (rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
     }
 
     // draw an indicator in free blocks
@@ -164,8 +174,9 @@ class DiskLayoutImage extends JComponent implements Scrollable
 
   private Color getContrastColor (SectorType type)
   {
-    if (type.colour == Color.WHITE || type.colour == Color.YELLOW || type.colour == Color.PINK
-          || type.colour == Color.CYAN || type.colour == Color.ORANGE)
+    if (type.colour == Color.WHITE || type.colour == Color.YELLOW
+        || type.colour == Color.PINK || type.colour == Color.CYAN
+        || type.colour == Color.ORANGE)
       return Color.BLACK;
     return Color.WHITE;
   }
@@ -177,15 +188,15 @@ class DiskLayoutImage extends JComponent implements Scrollable
   }
 
   @Override
-  public int
-        getScrollableUnitIncrement (Rectangle visibleRect, int orientation, int direction)
+  public int getScrollableUnitIncrement (Rectangle visibleRect, int orientation,
+      int direction)
   {
     return orientation == SwingConstants.HORIZONTAL ? bw : bh;
   }
 
   @Override
-  public int
-        getScrollableBlockIncrement (Rectangle visibleRect, int orientation, int direction)
+  public int getScrollableBlockIncrement (Rectangle visibleRect, int orientation,
+      int direction)
   {
     return orientation == SwingConstants.HORIZONTAL ? bw * 4 : bh * 10;
   }
@@ -214,7 +225,7 @@ class DiskLayoutImage extends JComponent implements Scrollable
   private void fireSectorSelectionEvent ()
   {
     SectorSelectedEvent event =
-          new SectorSelectedEvent (this, selectionHandler.getHighlights (), disk);
+        new SectorSelectedEvent (this, selectionHandler.getHighlights (), disk);
     fireSectorSelectionEvent (event);
   }
 
@@ -222,7 +233,7 @@ class DiskLayoutImage extends JComponent implements Scrollable
   {
     event.redo = redo;
     SectorSelectionListener[] listeners =
-          (listenerList.getListeners (SectorSelectionListener.class));
+        (listenerList.getListeners (SectorSelectionListener.class));
     for (SectorSelectionListener listener : listeners)
       listener.sectorSelected (event);
   }

@@ -41,15 +41,18 @@ class ProdosCatalogSector extends AbstractSector
       // first byte contains the file type (left nybble) and name length (right nybble)
       int fileType = (buffer[i] & 0xF0) >> 4;
       int nameLength = buffer[i] & 0x0F;
+      String hex1 = String.format ("%02X", buffer[i] & 0xF0);
+      String hex2 = String.format ("%02X", nameLength);
 
       // deleted files set file type and name length to zero, but the file name is still valid
-      String typeText = fileType + " = " + getType (buffer[i]);
+      String typeText = hex1 + " = " + getType (buffer[i]);
       if (fileType == 0)
         addText (text, buffer, i, 1, typeText + " : " + getDeletedName (i + 1));
       else
-        addText (text, buffer, i, 1, typeText + ", " + nameLength + " = Name length");
+        addText (text, buffer, i, 1, typeText + ", " + hex2 + " = Name length");
 
-      addText (text, buffer, i + 1, 4, HexFormatter.getString (buffer, i + 1, nameLength));
+      addText (text, buffer, i + 1, 4,
+               HexFormatter.getString (buffer, i + 1, nameLength));
 
       switch (fileType)
       {
@@ -81,8 +84,8 @@ class ProdosCatalogSector extends AbstractSector
   {
     StringBuilder text = new StringBuilder ();
     int fileType = HexFormatter.intValue (buffer[offset + 16]);
-    addText (text, buffer, offset + 16, 1, "File type (" + ProdosConstants.fileTypes[fileType]
-          + ")");
+    addText (text, buffer, offset + 16, 1,
+             "File type (" + ProdosConstants.fileTypes[fileType] + ")");
     addTextAndDecimal (text, buffer, offset + 17, 2, "Key pointer");
     addTextAndDecimal (text, buffer, offset + 19, 2, "Blocks used");
     addTextAndDecimal (text, buffer, offset + 21, 3, "EOF");
@@ -92,8 +95,8 @@ class ProdosCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, offset + 28, 1, "Version");
     addText (text, buffer, offset + 29, 1, "Minimum version");
     addText (text, buffer, offset + 30, 1, "Access");
-    addTextAndDecimal (text, buffer, offset + 31, 2, "Auxilliary type - "
-          + getAuxilliaryText (fileType));
+    addTextAndDecimal (text, buffer, offset + 31, 2,
+                       "Auxilliary type - " + getAuxilliaryText (fileType));
     GregorianCalendar modified = HexFormatter.getAppleDate (buffer, offset + 33);
     String dateM = modified == null ? "" : ProdosDisk.df.format (modified.getTime ());
     addText (text, buffer, offset + 33, 4, "Modification date : " + dateM);

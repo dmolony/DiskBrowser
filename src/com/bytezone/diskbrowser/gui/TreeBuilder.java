@@ -4,7 +4,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -25,8 +32,8 @@ public class TreeBuilder
 {
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
   private static final boolean FULL_TREE = false;
-  private static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv", "2mg",
-                                                              "d13", "sdk", "gz");
+  private static final List<String> suffixes =
+      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "d13", "sdk", "gz");
 
   FileComparator fc = new FileComparator ();
   JTree tree;
@@ -35,14 +42,15 @@ public class TreeBuilder
 
   Map<String, Integer> totalFiles = new TreeMap<String, Integer> ();
 
-  Map<String, List<DiskDetails>> duplicateDisks = new TreeMap<String, List<DiskDetails>> ();
+  Map<String, List<DiskDetails>> duplicateDisks =
+      new TreeMap<String, List<DiskDetails>> ();
   Map<String, File> diskNames = new HashMap<String, File> ();
   Map<Long, List<File>> dosMap = new TreeMap<Long, List<File>> ();
 
   public TreeBuilder (File folder)
   {
-    assert (folder.exists ());
-    assert (folder.isDirectory ());
+    assert(folder.exists ());
+    assert(folder.isDirectory ());
 
     long start = System.currentTimeMillis ();
 
@@ -54,12 +62,12 @@ public class TreeBuilder
     tree = new JTree (treeModel);
 
     long duration = System.currentTimeMillis () - start;
-    System.out
-          .printf ("Tree building took %,d milliseconds for %,d disk%s and %,d folder%s%n",
-                   duration, totalDisks, (totalDisks == 1 ? "" : "s"), totalFolders,
-                   (totalFolders == 1 ? "" : "s"));
+    System.out.printf (
+                       "Tree building took %,d milliseconds for %,d disk%s and %,d folder%s%n",
+                       duration, totalDisks, (totalDisks == 1 ? "" : "s"), totalFolders,
+                       (totalFolders == 1 ? "" : "s"));
 
-    treeModel.setAsksAllowsChildren (true); // allows empty nodes to appear as folders
+    treeModel.setAsksAllowsChildren (true);// allows empty nodes to appear as folders
     setDiskIcon ("/com/bytezone/diskbrowser/icons/disk.png");
     ((FileNode) root.getUserObject ()).disks = totalDisks;
 
@@ -102,7 +110,7 @@ public class TreeBuilder
         totalFolders++;
 
         if (FULL_TREE)
-          addFiles (newNode, file); // recursion!
+          addFiles (newNode, file);// recursion!
         continue;
       }
 
@@ -123,7 +131,7 @@ public class TreeBuilder
       }
 
       if (file.length () != 143360 && file.length () != 116480 && file.length () != 819264
-            && file.length () < 200000)
+          && file.length () < 200000)
       {
         String name = file.getName ().toLowerCase ();
         if (!name.endsWith (".sdk") && !name.endsWith (".dsk.gz"))
@@ -179,9 +187,9 @@ public class TreeBuilder
       {
         diskList = new ArrayList<DiskDetails> ();
         duplicateDisks.put (file.getName (), diskList);
-        diskList.add (new DiskDetails (diskNames.get (file.getName ()))); // add the original
+        diskList.add (new DiskDetails (diskNames.get (file.getName ())));// add the original
       }
-      diskList.add (new DiskDetails (file)); // add the duplicate
+      diskList.add (new DiskDetails (file));// add the duplicate
     }
     else
       diskNames.put (file.getName (), file);
@@ -203,7 +211,8 @@ public class TreeBuilder
     if (url != null)
     {
       ImageIcon icon = new ImageIcon (url);
-      DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) tree.getCellRenderer ();
+      DefaultTreeCellRenderer renderer =
+          (DefaultTreeCellRenderer) tree.getCellRenderer ();
       renderer.setLeafIcon (icon);
       tree.setCellRenderer (renderer);
       tree.setRowHeight (18);
@@ -273,9 +282,8 @@ public class TreeBuilder
     {
       String name = file.getName ();
       if (name.length () > MAX_NAME_LENGTH)
-        name =
-              name.substring (0, PREFIX_LENGTH) + "..."
-                    + name.substring (name.length () - SUFFIX_LENGTH);
+        name = name.substring (0, PREFIX_LENGTH) + "..."
+            + name.substring (name.length () - SUFFIX_LENGTH);
       if (showDisks && disks > 0)
         return String.format ("%s (%,d)", name, disks);
       return name;
@@ -288,9 +296,9 @@ public class TreeBuilder
 
       text.append ("Directory : " + file.getAbsolutePath () + "\n\n");
       text.append ("D         File names                       "
-            + "      Date               Size  Type\n");
+          + "      Date               Size  Type\n");
       text.append ("-  ----------------------------------------"
-            + "  -----------  --------------  ---------\n");
+          + "  -----------  --------------  ---------\n");
       for (File f : file.listFiles ())
       {
         String name = f.getName ();
@@ -301,8 +309,9 @@ public class TreeBuilder
         int pos = name.lastIndexOf ('.');
         String type = pos > 0 && !f.isDirectory () ? name.substring (pos) : "";
         String size = f.isDirectory () ? "" : String.format ("%,14d", f.length ());
-        text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n", f.isDirectory () ? "D"
-              : " ", name, sdf.format (d), size, type));
+        text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n",
+                                    f.isDirectory () ? "D" : " ", name, sdf.format (d),
+                                    size, type));
       }
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);

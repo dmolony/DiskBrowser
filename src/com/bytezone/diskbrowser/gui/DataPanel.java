@@ -1,12 +1,23 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -15,10 +26,10 @@ import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 
-class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelectionListener,
-      SectorSelectionListener,
-      //      PreferenceChangeListener, 
-      FileNodeSelectionListener, FontChangeListener
+class DataPanel extends JTabbedPane
+    implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
+    //      PreferenceChangeListener, 
+    FileNodeSelectionListener, FontChangeListener
 {
   private static final int TEXT_WIDTH = 65;
 
@@ -30,7 +41,7 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelect
   JScrollPane imagePane;
 
   JTextArea formattedText;
-  ImagePanel imagePanel; // internal class
+  ImagePanel imagePanel;// internal class
 
   boolean imageVisible = false;
 
@@ -58,11 +69,10 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelect
     formattedText = new JTextArea (10, TEXT_WIDTH);
     formattedPane = setPanel (formattedText, "Formatted");
     formattedText.setLineWrap (mh.lineWrapItem.isSelected ());
-    formattedText
-          .setText ("Please use the 'File->Set root folder' command to "
-                + "\ntell DiskBrowser where your Apple disks are located."
-                + "\n\nTo see the contents of a disk in more detail, double-click"
-                + "\nthe disk. You will then be able to select individual files to view completely.");
+    formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
+        + "\ntell DiskBrowser where your Apple disks are located."
+        + "\n\nTo see the contents of a disk in more detail, double-click"
+        + "\nthe disk. You will then be able to select individual files to view completely.");
 
     hexText = new JTextArea (10, TEXT_WIDTH);
     setPanel (hexText, "Hex dump");
@@ -72,9 +82,9 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelect
 
     imagePanel = new ImagePanel ();
     imagePane =
-          new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    // imagePane.getVerticalScrollBar ().setUnitIncrement (font.getSize ());
+        new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            // imagePane.getVerticalScrollBar ().setUnitIncrement (font.getSize ());
 
     //    setTabsFont (font);
     //    this.setMinimumSize (new Dimension (800, 200));
@@ -136,8 +146,8 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelect
   public String getCurrentText ()
   {
     int index = getSelectedIndex ();
-    return index == 0 ? formattedText.getText () : index == 1 ? hexText.getText ()
-          : disassemblyText.getText ();
+    return index == 0 ? formattedText.getText ()
+        : index == 1 ? hexText.getText () : disassemblyText.getText ();
   }
 
   private JScrollPane setPanel (JTextArea outputPanel, String tabName)
@@ -146,9 +156,9 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelect
     outputPanel.setMargin (new Insets (5, 5, 5, 5));
 
     JScrollPane outputScrollPane =
-          new JScrollPane (outputPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    outputScrollPane.setBorder (null); // remove the ugly default border
+        new JScrollPane (outputPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    outputScrollPane.setBorder (null);// remove the ugly default border
     add (outputScrollPane, tabName);
     return outputScrollPane;
   }
@@ -274,7 +284,8 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener, FileSelect
       {
         Graphics2D g2 = ((Graphics2D) g);
         g2.transform (AffineTransform.getScaleInstance (scale, scale));
-        g2.drawImage (image, (getWidth () - image.getWidth () * scale) / 2 / scale, 4, this);
+        g2.drawImage (image, (getWidth () - image.getWidth () * scale) / 2 / scale, 4,
+                      this);
       }
     }
   }

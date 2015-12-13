@@ -63,7 +63,7 @@ public abstract class AbstractSector implements DataSource
     text.append (title + newLine2);
     text.append ("Offset    Value         Description" + newLine);
     text.append ("=======   ===========   "
-          + "===============================================================" + newLine);
+        + "===============================================================" + newLine);
     return text;
   }
 
@@ -86,16 +86,17 @@ public abstract class AbstractSector implements DataSource
     switch (size)
     {
       case 1:
-        text.append (String
-              .format ("%03X       %02X            %s%n", offset, b[offset], desc));
+        text.append (String.format ("%03X       %02X            %s%n", offset, b[offset],
+                                    desc));
         break;
       case 2:
-        text.append (String.format ("%03X-%03X   %02X %02X         %s%n", offset, offset + 1,
-                                    b[offset], b[offset + 1], desc));
+        text.append (String.format ("%03X-%03X   %02X %02X         %s%n", offset,
+                                    offset + 1, b[offset], b[offset + 1], desc));
         break;
       case 3:
         text.append (String.format ("%03X-%03X   %02X %02X %02X      %s%n", offset,
-                                    offset + 2, b[offset], b[offset + 1], b[offset + 2], desc));
+                                    offset + 2, b[offset], b[offset + 1], b[offset + 2],
+                                    desc));
         break;
       case 4:
         text.append (String.format ("%03X-%03X   %02X %02X %02X %02X   %s%n", offset,
@@ -108,16 +109,15 @@ public abstract class AbstractSector implements DataSource
   }
 
   protected void addTextAndDecimal (StringBuilder text, byte[] b, int offset, int size,
-        String desc)
+      String desc)
   {
     if (size == 1)
       desc += " (" + (b[offset] & 0xFF) + ")";
     else if (size == 2)
       desc += " (" + ((b[offset + 1] & 0xFF) * 256 + (b[offset] & 0xFF)) + ")";
     else if (size == 3)
-      desc +=
-            String.format (" (%,d)", ((b[offset + 2] & 0xFF) * 65536)
-                  + ((b[offset + 1] & 0xFF) * 256) + (b[offset] & 0xFF));
+      desc += String.format (" (%,d)", ((b[offset + 2] & 0xFF) * 65536)
+          + ((b[offset + 1] & 0xFF) * 256) + (b[offset] & 0xFF));
     addText (text, b, offset, size, desc);
   }
 }

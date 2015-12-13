@@ -23,8 +23,8 @@ public class BootSector extends AbstractSector
     {
       // The first byte in the buffer is the number of sectors to read in (minus 1)
       int sectors = buffer[0] & 0xFF;
-      //      System.out.printf ("Sectors to read : %d%n", (sectors + 1));
-      if (sectors > 0 && sectors < 10)      // probably not what I think it is
+      System.out.printf ("Sectors to read : %d%n", (sectors + 1));
+      if (false)      // probably not what I think it is
       {
         int bufferSize = buffer.length * (sectors + 1);
         byte[] newBuffer = new byte[bufferSize];

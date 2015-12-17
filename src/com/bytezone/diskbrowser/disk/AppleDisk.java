@@ -23,21 +23,21 @@ public class AppleDisk implements Disk
   static final int MAX_INTERLEAVE = 3;
 
   public final File path;
-  private final byte[] diskBuffer; // contains the disk contents in memory
+  private final byte[] diskBuffer;        // contains the disk contents in memory
 
-  private final int tracks; // usually 35 for floppy disks
-  private int sectors; // 8 or 16
-  private int blocks; // 280 or 560
+  private final int tracks;               // usually 35 for floppy disks
+  private int sectors;                    // 8 or 16
+  private int blocks;                     // 280 or 560
 
-  private final int trackSize; // 4096
-  public int sectorSize; // 256 or 512
+  private final int trackSize;            // 4096
+  public int sectorSize;                  // 256 or 512
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
-        { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, // Dos
-         { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 }, // Prodos
-         { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 }, // Infocom
-         { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } }; // CPM
+      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // Dos
+        { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos
+        { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
+        { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
 
   private boolean[] hasData;
   private ActionListener actionListenerList;
@@ -57,7 +57,7 @@ public class AppleDisk implements Disk
     if (pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
     {
       byte[] buffer = getPrefix (path);
-      this.blocks = HexFormatter.intValue (buffer[20], buffer[21]); // 1600
+      this.blocks = HexFormatter.intValue (buffer[20], buffer[21]);       // 1600
       this.sectorSize = 512;
       this.trackSize = 8 * sectorSize;
       tracks = this.blocks / 8;
@@ -66,7 +66,7 @@ public class AppleDisk implements Disk
     }
     else if (pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("HDV"))
     {
-      this.blocks = (int) path.length () / 4096 * 8;    // reduces blocks to a legal multiple
+      this.blocks = (int) path.length () / 4096 * 8; // reduces blocks to a legal multiple
       this.sectorSize = 512;
       this.trackSize = sectors * sectorSize;
     }
@@ -312,7 +312,8 @@ public class AppleDisk implements Disk
   public DiskAddress getDiskAddress (int track, int sector)
   {
     // should this return null for invalid addresses?
-    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", " + sector;
+    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", "
+        + sector;
     return new AppleDiskAddress (track, sector, this);
   }
 
@@ -355,25 +356,22 @@ public class AppleDisk implements Disk
     assert da.getDisk () == this : "Disk address not applicable to this disk";
     assert sectorSize == 256 || sectorSize == 512 : "Invalid sector size : " + sectorSize;
     assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
-          + interleave;
+        + interleave;
     int diskOffset;
 
     if (sectorSize == 256)
     {
-      diskOffset =
-            da.getTrack () * trackSize + interleaveSector[interleave][da.getSector ()]
-                  * sectorSize;
+      diskOffset = da.getTrack () * trackSize
+          + interleaveSector[interleave][da.getSector ()] * sectorSize;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, sectorSize);
     }
     else if (sectorSize == 512)
     {
-      diskOffset =
-            da.getTrack () * trackSize + interleaveSector[interleave][da.getSector () * 2]
-                  * 256;
+      diskOffset = da.getTrack () * trackSize
+          + interleaveSector[interleave][da.getSector () * 2] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, 256);
-      diskOffset =
-            da.getTrack () * trackSize + interleaveSector[interleave][da.getSector () * 2 + 1]
-                  * 256;
+      diskOffset = da.getTrack () * trackSize
+          + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + 256, 256);
     }
   }
@@ -393,8 +391,8 @@ public class AppleDisk implements Disk
   public void notifyListeners (String text)
   {
     if (actionListenerList != null)
-      actionListenerList.actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED,
-            text));
+      actionListenerList
+          .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
   }
 
   public AppleFileSource getDetails ()

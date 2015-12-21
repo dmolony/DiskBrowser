@@ -39,6 +39,11 @@ public class AppleDisk implements Disk
         { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
         { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
 
+  // Info from http://www.applelogic.org/TheAppleIIEGettingStarted.html
+  // Block:    0 1 2 3 4 5 6 7 8 9 A B C D E F
+  // Position: 0 8 1 9 2 A 3 B 4 C 5 D 6 E 7 F    - Prodos (.PO disks)
+  // Position: 0 7 E 6 D 5 C 4 B 3 A 2 9 1 8 F    - Dos    (.DO disks)
+
   private boolean[] hasData;
   private ActionListener actionListenerList;
   private List<DiskAddress> blockList;

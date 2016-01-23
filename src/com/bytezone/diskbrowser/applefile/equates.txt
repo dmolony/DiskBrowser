@@ -153,6 +153,7 @@ FE93  disconnect DOS from I/O links
 FF3A  BELL
 FF3F  SAVE
 FF4A  RESTORE
+FF58  RTS - jump to <address on stack> + 1
 FF59  Monitor cold entry point
 FFA7  GETNUM - move num to A2L.A2H
 FFC7  ZMODE - monitor get ASCII return

@@ -2,7 +2,12 @@ package com.bytezone.diskbrowser.applefile;
 
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,16 +16,18 @@ import com.bytezone.diskbrowser.applefile.VisicalcSpreadsheet.VisicalcCell;
 
 public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 {
-  private static final Pattern addressPattern = Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3}):");
-  private static final Pattern cellContents = Pattern
-        .compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
+  private static final Pattern addressPattern =
+      Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3}):");
+  private static final Pattern cellContents =
+      Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
   private static final Pattern functionPattern = Pattern
-        .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)");
+      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)");
 
   private final Map<Integer, VisicalcCell> sheet = new TreeMap<Integer, VisicalcCell> ();
   private final Map<String, Double> functions = new HashMap<String, Double> ();
 
   final List<String> lines = new ArrayList<String> ();
+  private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   VisicalcCell currentCell = null;
   int columnWidth = 12;
   char defaultFormat;
@@ -62,6 +69,73 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   //  /WV             Window Vertical (split on cursor column)
   //  /WH             Window Horizontal (split on cursor row)
 
+  /*
+  from: Apple II TextFiles
+  http://www.textfiles.com/apple/
+    
+                   
+                      *----------------------*
+                       VISICALC COMMAND CHART
+                           BY: NIGHT HAWK
+                      *----------------------*
+  
+  /B   SET AN ENTRY TO BLANK
+  
+  /C   CLEARS THE SHEET, SETTING ALL ENTRIES TO BLANK
+  
+  /D   DELETES THE ROW(/DR) OR COLUMN(/DC) ON WHICH THE CURSOR
+       LIES.
+  
+  /E   ALLOWS EDITING OF THE ENTRY CONTENTS OF ANY ENTRY POSITION
+       BY REDISPLAYING IT ON THE EDIT LINE. USE <- -> KEYS & ESC.
+  
+  /F   SETS THE DISPLAY FORMAT OF AN ENTRY TO ONE OF THE FOLLOWING
+       FORMATS:
+  
+       /FG  GENERAL
+  
+           /FI  INTEGER
+           /F$  DOLLAR AND CENTS
+           /FL  LEFT JUSTIFIED
+           /FR  RIGHT JUSTIFIED
+           /F* GRAPH
+           /FD DEFAULT
+  
+  /G   GLOBAL COMMANDS. THESE APPLY TO THE ENTIRE SHEET OR WINDOW.
+  
+           /GC  SETS COLUMN WIDTH
+           /GF  SETS THE GLOBAL DEFAULT FORMAT
+           /GO  SETS THE ORDER OF RECALCULATION TO BE DOWN THE
+                COLUMNS OR ACROSS THE ROWS
+           /GR  SETS RECALCULATION TO BE AUTOMATIC(/GRA) OR MANUAL(/GRM).
+  
+  /I   INSERTS A ROW(/IR) OR A COLUMN(/IC)
+  /M   MOVES AN ENTIRE ROW OR COLUMN TO A NEW POSITION.
+  /P   PRINT COMMAND
+  /R   REPLICATE COMMAND
+  /S   STORAGE COMMANDS ARE AS FOLLOWS:
+  
+      /SS SAVE
+      /SL LOAD
+      /SD DELETES SPECIFIED FILE ON DISK
+      /SI  INITIALIZE A DISK ON SPECIFIED DRIVE
+      /SQ  QUITS VISICALC
+  
+  /T   SETS A HORIZONTAL TITLE AREA(/TH), A VERTICAL TITLE AREA
+       (/TV), SET BOTH A HORIZONTAL & VERTICAL TITLE AREA(/TB)
+       OR RESETS THE WINDOWS TO HAVE NO TITLE AREAS(/TN)
+  /V   DISPLAYS VISICALC'S VERSION NUMBER ON THE PROMPT LINE
+  /W   WINDOW CONTROL
+  
+      /WH  HORIZONTAL WINDOW
+      /WV  VERTICAL WINDOW
+      /W1  RETURNS SCREEN TO ONE WINDOW
+      /WS  SYNCHRONIZED WINDOWS
+      /WU  UNSYNCHRONIZED
+  
+  /-  REPEATING LABEL
+  */
+
   public VisicalcSpreadsheet (byte[] buffer)
   {
     int ptr = 0;
@@ -80,6 +154,9 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     if (false)
       for (VisicalcCell cell : sheet.values ())
         System.out.println (cell);
+
+    for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
+      System.out.printf ("Width of column %3d: %d%n", entry.getKey (), entry.getValue ());
   }
 
   public void add (String command)
@@ -123,10 +200,26 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
         case 'G':
           System.out.println ("  Global command: " + data);
-          if (data.charAt (1) == 'C')
-            columnWidth = Integer.parseInt (data.substring (2));
-          else if (data.charAt (1) == 'F')
-            defaultFormat = data.charAt (2);
+          try
+          {
+            if (data.charAt (1) == 'C')
+            {
+              if (data.charAt (2) == 'C')
+              {
+                int width = Integer.parseInt (data.substring (3));
+                int column = currentCell.address.column;
+                columnWidths.put (column, width);
+              }
+              else
+                columnWidth = Integer.parseInt (data.substring (2));
+            }
+            else if (data.charAt (1) == 'F')
+              defaultFormat = data.charAt (2);
+          }
+          catch (NumberFormatException e)
+          {
+            System.out.printf ("NFE: %s%n", data.substring (2));
+          }
           break;
 
         case 'T':
@@ -239,6 +332,10 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     //   @TAN
     //   @ATAN
 
+    // Unimplemented functions found so far:
+    //  @IF
+    //  @ISERROR
+
     functions.put (function, result);
     return result;
   }
@@ -274,11 +371,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   public String getCells ()
   {
     StringBuilder text = new StringBuilder ();
-
-    String format = String.format ("%%-%d.%ds", columnWidth, columnWidth);
-    String currencyFormat = String.format ("%%%d.%ds", columnWidth, columnWidth);
-    String integerFormat = String.format ("%%%d.0f", columnWidth);
-    String numberFormat = String.format ("%%%d.3f", columnWidth);
+    String longLine = "                                                     "
+        + "                                                                 ";
 
     DecimalFormat nf = new DecimalFormat ("$#####0.00");
     //    NumberFormat nf = NumberFormat.getCurrencyInstance ();
@@ -296,22 +390,41 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
       while (lastColumn < cell.address.column - 1)
       {
-        text.append ("                       ".substring (0, columnWidth));
+        int width = columnWidth;
+        if (columnWidths.containsKey (cell.address.column))
+          width = columnWidths.get (cell.address.column);
+        text.append (longLine.substring (0, width));
         ++lastColumn;
       }
       lastColumn = cell.address.column;
 
+      int colWidth = columnWidth;
+      if (columnWidths.containsKey (cell.address.column))
+        colWidth = columnWidths.get (cell.address.column);
+
       if (cell.hasValue ())
       {
         if (defaultFormat == 'I')
+        {
+          String integerFormat = String.format ("%%%d.0f", colWidth);
           text.append (String.format (integerFormat, cell.getValue ()));
+        }
         else if (defaultFormat == '$')
+        {
+          String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
           text.append (String.format (currencyFormat, nf.format (cell.getValue ())));
+        }
         else
+        {
+          String numberFormat = String.format ("%%%d.3f", colWidth);
           text.append (String.format (numberFormat, cell.getValue ()));
+        }
       }
       else
+      {
+        String format = String.format ("%%-%d.%ds", colWidth, colWidth);
         text.append (String.format (format, cell.value ()));
+      }
     }
     return text.toString ();
   }
@@ -375,7 +488,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         return value;
 
       double result = 0.0;
-      double interim;
+      double interim = 0.0;
 
       Matcher m = cellContents.matcher (formula);
       while (m.find ())
@@ -386,7 +499,14 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         if (m.group (3) != null)                            // address
           interim = parent.getValue (m.group (3));
         else if (m.group (4) != null)                       // constant
-          interim = Double.parseDouble (m.group (4));
+          try
+          {
+            interim = Double.parseDouble (m.group (4));
+          }
+          catch (NumberFormatException e)
+          {
+            System.out.printf ("NFE: %s%n", m.group (4));
+          }
         else
           interim = parent.evaluateFunction (m.group (5));         // function
 
@@ -428,13 +548,15 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     @Override
     public String toString ()
     {
-      String value =
-            repeatingChar == 0 ? label == null ? formula == null ? ", Value: " + this.value
-                  : ", Frmla: " + formula : ", Label: " + label : ", Rpeat: " + repeatingChar;
+      String value = repeatingChar == 0 ? label == null
+          ? formula == null ? ", Value: " + this.value : ", Frmla: " + formula
+          : ", Label: " + label : ", Rpeat: " + repeatingChar;
       String format = this.format == 0 ? "" : ", Format: " + this.format;
       String width = this.width == 0 ? "" : ", Width: " + this.width;
-      String columnWidth = this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
-      return String.format ("[Cell:%5s%s%s%s%s]", address, format, width, columnWidth, value);
+      String columnWidth =
+          this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
+      return String.format ("[Cell:%5s%s%s%s%s]", address, format, width, columnWidth,
+                            value);
     }
 
     @Override
@@ -511,7 +633,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       int col1 = column / 26;
       int col2 = column % 26;
       String col =
-            col1 > 0 ? (char) ('@' + col1) + ('A' + col2) + "" : (char) ('A' + col2) + "";
+          col1 > 0 ? (char) ('@' + col1) + ('A' + col2) + "" : (char) ('A' + col2) + "";
       text = col + (row + 1);
     }
 

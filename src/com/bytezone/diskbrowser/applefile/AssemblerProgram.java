@@ -9,13 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.gui.DiskBrowser;
 
 public class AssemblerProgram extends AbstractFile
 {
+  private static Map<Integer, String> equates;
+
   private final int loadAddress;
   private int executeOffset;
-  private static Map<Integer, String> equates;
+
+  private byte[] extraBuffer;
+  //  private int offset;
+  //  private int length;
 
   public AssemblerProgram (String name, byte[] buffer, int address)
   {
@@ -32,6 +38,39 @@ public class AssemblerProgram extends AbstractFile
     this.executeOffset = executeOffset;
   }
 
+  public void setExtraBuffer (byte[] fullBuffer, int offset, int length)
+  {
+    this.extraBuffer = new byte[length];
+    System.arraycopy (fullBuffer, offset, extraBuffer, 0, length);
+  }
+
+  @Override
+  public String getHexDump ()
+  {
+    String text = super.getHexDump ();
+
+    if (extraBuffer == null)
+      return text;
+
+    return text + "\n\n"
+        + HexFormatter.format (extraBuffer, 0, extraBuffer.length, buffer.length);
+  }
+
+  @Override
+  public String getAssembler ()
+  {
+    String text = super.getAssembler ();
+
+    if (extraBuffer == null)
+      return text;
+
+    String extraName = String.format ("%s (extra)", name);
+    AssemblerProgram assemblerProgram =
+        new AssemblerProgram (extraName, extraBuffer, buffer.length);
+
+    return text + "\n\n" + assemblerProgram.getText ();
+  }
+
   @Override
   public String getText ()
   {
@@ -45,10 +84,10 @@ public class AssemblerProgram extends AbstractFile
       pgm.append (String.format ("Entry   : $%04X%n", (loadAddress + executeOffset)));
     pgm.append (String.format ("%n"));
 
-    return pgm.append (getStringBuilder ()).toString ();
+    return pgm.append (getStringBuilder2 ()).toString ();
   }
 
-  public StringBuilder getStringBuilder ()
+  private StringBuilder getStringBuilder ()
   {
     if (true)
       return getStringBuilder2 ();
@@ -58,7 +97,8 @@ public class AssemblerProgram extends AbstractFile
     int ptr = executeOffset;
     int address = loadAddress + executeOffset;
 
-    // if the assembly doesn't start at the beginning, just dump the bytes that are skipped
+    // if the assembly doesn't start at the beginning, just dump the bytes that 
+    // are skipped
     for (int i = 0; i < executeOffset; i++)
       pgm.append (String.format ("%04X: %02X%n", (loadAddress + i), buffer[i]));
 
@@ -88,7 +128,7 @@ public class AssemblerProgram extends AbstractFile
       }
 
       if (cmd.target > 0
-            && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
+          && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
       {
         while (line.length () < 40)
           line.append (" ");
@@ -115,12 +155,13 @@ public class AssemblerProgram extends AbstractFile
     return pgm;
   }
 
-  public StringBuilder getStringBuilder2 ()
+  private StringBuilder getStringBuilder2 ()
   {
     StringBuilder pgm = new StringBuilder ();
     List<AssemblerStatement> lines = getLines ();
 
-    // if the assembly doesn't start at the beginning, just dump the bytes that are skipped
+    // if the assembly doesn't start at the beginning, just dump the bytes that 
+    // are skipped
     for (int i = 0; i < executeOffset; i++)
       pgm.append (String.format ("    %04X: %02X%n", (loadAddress + i), buffer[i]));
 
@@ -128,7 +169,8 @@ public class AssemblerProgram extends AbstractFile
     {
       StringBuilder line = new StringBuilder ();
 
-      line.append (String.format ("%3.3s %04X: %02X ", getArrow (cmd), cmd.address, cmd.value));
+      line.append (String.format ("%3.3s %04X: %02X ", getArrow (cmd), cmd.address,
+                                  cmd.value));
 
       if (cmd.size > 1)
         line.append (String.format ("%02X ", cmd.operand1));
@@ -146,7 +188,7 @@ public class AssemblerProgram extends AbstractFile
       }
 
       if (cmd.target > 0
-            && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
+          && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
       {
         while (line.length () < 40)
           line.append (" ");
@@ -174,7 +216,8 @@ public class AssemblerProgram extends AbstractFile
   private List<AssemblerStatement> getLines ()
   {
     List<AssemblerStatement> lines = new ArrayList<AssemblerStatement> ();
-    Map<Integer, AssemblerStatement> linesMap = new HashMap<Integer, AssemblerStatement> ();
+    Map<Integer, AssemblerStatement> linesMap =
+        new HashMap<Integer, AssemblerStatement> ();
     List<Integer> targets = new ArrayList<Integer> ();
 
     int ptr = executeOffset;
@@ -195,7 +238,7 @@ public class AssemblerProgram extends AbstractFile
         cmd.size = 1;
 
       if (cmd.target >= loadAddress && cmd.target < (loadAddress + buffer.length)
-            && (cmd.value == 0x4C || cmd.value == 0x6C || cmd.value == 0x20))
+          && (cmd.value == 0x4C || cmd.value == 0x6C || cmd.value == 0x20))
         targets.add (cmd.target);
       if (cmd.offset != 0)
         targets.add (cmd.address + cmd.offset + 2);
@@ -220,7 +263,7 @@ public class AssemblerProgram extends AbstractFile
     if (cmd.value == 0x4C || cmd.value == 0x6C || cmd.value == 0x60 || cmd.offset != 0)
       arrow = "<--";
     if (cmd.value == 0x20 &&    // JSR
-          cmd.target >= loadAddress && cmd.target < (loadAddress + buffer.length))
+        cmd.target >= loadAddress && cmd.target < (loadAddress + buffer.length))
       arrow = "<--";
     if (cmd.isTarget)
       if (arrow.isEmpty ())
@@ -230,18 +273,12 @@ public class AssemblerProgram extends AbstractFile
     return arrow;
   }
 
-  @Override
-  public String getAssembler ()
-  {
-    return getStringBuilder ().toString ();
-  }
-
   private void getEquates ()
   {
     equates = new HashMap<Integer, String> ();
     DataInputStream inputEquates =
-          new DataInputStream (DiskBrowser.class.getClassLoader ()
-                .getResourceAsStream ("com/bytezone/diskbrowser/applefile/equates.txt"));
+        new DataInputStream (DiskBrowser.class.getClassLoader ()
+            .getResourceAsStream ("com/bytezone/diskbrowser/applefile/equates.txt"));
     BufferedReader in = new BufferedReader (new InputStreamReader (inputEquates));
 
     String line;

@@ -27,7 +27,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   protected final List<DiskAddress> dataSectors = new ArrayList<DiskAddress> ();
   protected final List<DiskAddress> tsSectors = new ArrayList<DiskAddress> ();
 
-  public AbstractCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
+  public AbstractCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector,
+      byte[] entryBuffer)
   {
     this.dosDisk = dosDisk;
     this.disk = dosDisk.getDisk ();
@@ -58,9 +59,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
     name = getName ("", entryBuffer);
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
-    String base =
-          String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
-                         (entryBuffer[33] & 0xFF));
+    String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
+                                 (entryBuffer[33] & 0xFF));
     catalogName = getName (base, entryBuffer);
   }
 
@@ -140,6 +140,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
     try
     {
+      byte[] exactBuffer;
+      byte[] extraBuffer = new byte[0];
+
       switch (this.fileType)
       {
         case Text:
@@ -148,12 +151,14 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           else
             appleFile = new TextFile (name, buffer);
           break;
+
         case IntegerBasic:
           reportedLength = HexFormatter.intValue (buffer[0], buffer[1]);
-          byte[] exactBuffer = new byte[reportedLength];
+          exactBuffer = new byte[reportedLength];
           System.arraycopy (buffer, 2, exactBuffer, 0, reportedLength);
           appleFile = new IntegerBasicProgram (name, exactBuffer);
           break;
+
         case ApplesoftBasic:
           reportedLength = HexFormatter.intValue (buffer[0], buffer[1]);
           exactBuffer = new byte[reportedLength];
@@ -163,8 +168,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           //          appleFile = new ApplesoftBasicProgram (name, exactBuffer);
           appleFile = new BasicProgram (name, exactBuffer);
           break;
-        case Binary: // binary file
-        case Relocatable: // relocatable binary file
+
+        case Binary:                        // binary file
+        case Relocatable:                   // relocatable binary file
           if (buffer.length == 0)
             appleFile = new AssemblerProgram (name, buffer, 0);
           else
@@ -174,15 +180,21 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             if (reportedLength == 0)
             {
               System.out.println (name.trim () + " reported length : 0 - reverting to "
-                    + (buffer.length - 4));
+                  + (buffer.length - 4));
               reportedLength = buffer.length - 4;
             }
 
             // buffer is a multiple of the block size, so it usually needs to be reduced
             if ((reportedLength + 4) <= buffer.length)
+            {
               exactBuffer = new byte[reportedLength];
+              //              extraBuffer = new byte[buffer.length - reportedLength - 4];
+              //              System.arraycopy (buffer, reportedLength + 4, extraBuffer, 0,
+              //                                extraBuffer.length);
+            }
             else
-              exactBuffer = new byte[buffer.length - 4]; // reported length is too long
+              exactBuffer = new byte[buffer.length - 4];  // reported length is too long
+
             System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
 
             if (ShapeTable.isShapeTable (exactBuffer))
@@ -192,7 +204,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             else if (loadAddress == 0x2000 || loadAddress == 0x4000)
             {
               if ((reportedLength > 0x1F00 && reportedLength <= 0x4000)
-                    || ((name.equals ("FLY LOGO") && reportedLength == 0x14FA)))
+                  || ((name.equals ("FLY LOGO") && reportedLength == 0x14FA)))
                 appleFile = new HiResImage (name, exactBuffer);
               //            else if 
               //              appleFile = new HiResImage (name, unscrunch (exactBuffer));
@@ -202,24 +214,34 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             else if (name.endsWith (".S"))
               appleFile = new MerlinSource (name, exactBuffer);
             else
+            {
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
+              if (exactBuffer.length < buffer.length + 4)
+                ((AssemblerProgram) appleFile)
+                    .setExtraBuffer (buffer, reportedLength + 4,
+                                     buffer.length - reportedLength - 4);
+            }
           }
           break;
-        case SS: // what is this?
+
+        case SS:                                          // what is this?
           System.out.println ("SS file");
           appleFile = new DefaultAppleFile (name, buffer);
           break;
-        case AA: // what is this?
+
+        case AA:                                          // what is this?
           System.out.println ("AA file");
           appleFile = new DefaultAppleFile (name, buffer);
           break;
-        case BB: // what is this?
+
+        case BB:                                          // what is this?
           int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
           reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
           exactBuffer = new byte[reportedLength];
           System.arraycopy (buffer, 4, exactBuffer, 0, reportedLength);
           appleFile = new SimpleText2 (name, exactBuffer, loadAddress);
           break;
+
         default:
           System.out.println ("Unknown file type : " + fileType);
           appleFile = new DefaultAppleFile (name, buffer);

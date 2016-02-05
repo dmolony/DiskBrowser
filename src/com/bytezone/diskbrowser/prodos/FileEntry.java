@@ -32,7 +32,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private boolean invalid;
 
   public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
-        int parentBlock)
+      int parentBlock)
   {
     super (fDisk, entryBuffer);
     this.parentDirectory = parent;
@@ -265,13 +265,20 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new SimpleText (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer))
             file = new HiResImage (name, exactBuffer);
-          else if ((endOfFile == 0x1FF8 || endOfFile == 0x1FFF || endOfFile == 0x2000 || endOfFile == 0x4000)
-                && (auxType == 0x1FFF || auxType == 0x2000 || auxType == 0x4000))
+          else if ((endOfFile == 0x1FF8 || endOfFile == 0x1FFF || endOfFile == 0x2000
+              || endOfFile == 0x4000)
+              && (auxType == 0x1FFF || auxType == 0x2000 || auxType == 0x4000))
             file = new HiResImage (name, exactBuffer);
           else if (endOfFile == 38400 && name.startsWith ("LVL."))
             file = new LodeRunner (name, exactBuffer);
           else
+          {
             file = new AssemblerProgram (name, exactBuffer, auxType);
+            if (exactBuffer.length < buffer.length)
+              ((AssemblerProgram) file)
+                  .setExtraBuffer (buffer, exactBuffer.length,
+                                   buffer.length - exactBuffer.length);
+          }
           break;
         case FILE_TYPE_TEXT:
           assert auxType == 0; // auxType > 0 handled above
@@ -288,9 +295,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
         case FILE_TYPE_DIRECTORY:
           VolumeDirectoryHeader vdh = ((ProdosDisk) parentDisk).vdh;
-          file =
-                new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks,
-                      vdh.freeBlocks, vdh.usedBlocks);
+          file = new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks,
+              vdh.freeBlocks, vdh.usedBlocks);
           break;
         case FILE_TYPE_APPLESOFT_BASIC_VARS:
           if (endOfFile == 0)
@@ -328,9 +334,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         default:
           System.out.format ("Unknown file type : %02X%n", fileType);
           if (fileType == 0xB3)
-            file =
-                  new DefaultAppleFile (name, exactBuffer,
-                        "S16 Apple IIgs Application Program");
+            file = new DefaultAppleFile (name, exactBuffer,
+                "S16 Apple IIgs Application Program");
           else
             file = new DefaultAppleFile (name, exactBuffer);
       }
@@ -370,7 +375,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     byte[] mainIndexBuffer = disk.readSector (keyPtr);
     for (int i = 0; i < 256; i++)
     {
-      int indexBlock = HexFormatter.intValue (mainIndexBuffer[i], mainIndexBuffer[i + 256]);
+      int indexBlock =
+          HexFormatter.intValue (mainIndexBuffer[i], mainIndexBuffer[i + 256]);
       if (indexBlock > 0)
         logicalBlock = readIndexBlock (indexBlock, addresses, buffers, logicalBlock);
       else
@@ -378,7 +384,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         if (addresses.size () > 0)
         {
           byte[] tempBuffer = disk.readSectors (addresses);
-          buffers.add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
+          buffers.add (new TextBuffer (tempBuffer, auxType,
+              logicalBlock - addresses.size ()));
           addresses.clear ();
         }
         logicalBlock += 256;
@@ -497,7 +504,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   }
 
   private int readIndexBlock (int indexBlock, List<DiskAddress> addresses,
-        List<TextBuffer> buffers, int logicalBlock)
+      List<TextBuffer> buffers, int logicalBlock)
   {
     byte[] indexBuffer = disk.readSector (indexBlock);
     for (int j = 0; j < 256; j++)
@@ -508,7 +515,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       else if (addresses.size () > 0)
       {
         byte[] tempBuffer = disk.readSectors (addresses);
-        buffers.add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
+        buffers
+            .add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
         addresses.clear ();
       }
       logicalBlock++;
@@ -549,12 +557,14 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     // String locked = (access == 0x01) ? "*" : " ";
     String locked = (access == 0x00) ? "*" : " ";
     if (true)
-      return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType], blocksUsed,
-                            locked) + name;
+      return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType],
+                            blocksUsed, locked)
+          + name;
     String timeC = created == null ? "" : ProdosDisk.df.format (created.getTime ());
     String timeF = modified == null ? "" : ProdosDisk.df.format (modified.getTime ());
     return String.format ("%s %s%-30s %3d %,10d %15s %15s",
-                          ProdosConstants.fileTypes[fileType], locked, parentDirectory.name
-                                + "/" + name, blocksUsed, endOfFile, timeC, timeF);
+                          ProdosConstants.fileTypes[fileType], locked,
+                          parentDirectory.name + "/" + name, blocksUsed, endOfFile, timeC,
+                          timeF);
   }
 }

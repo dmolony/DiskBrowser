@@ -45,28 +45,34 @@ public class AssemblerProgram extends AbstractFile
   @Override
   public String getHexDump ()
   {
-    String text = super.getHexDump ();
+    //    String text = super.getHexDump ();
+    String text = HexFormatter.format (buffer, 0, buffer.length, loadAddress);
 
     if (extraBuffer.length == 0)
       return text;
 
-    return text + "\n\n"
-        + HexFormatter.format (extraBuffer, 0, extraBuffer.length, buffer.length);
+    return text + "\n\n" + HexFormatter.format (extraBuffer, 0, extraBuffer.length,
+                                                loadAddress + buffer.length);
   }
 
   @Override
   public String getAssembler ()
   {
-    String text = super.getAssembler ();
+    //    String text = super.getAssembler ();
+    if (buffer == null)
+      return "No buffer";
+    if (assembler == null)
+      this.assembler = new AssemblerProgram (name, buffer, loadAddress);
+    //    return assembler.getText ();
 
     if (extraBuffer.length == 0)
-      return text;
+      return assembler.getText ();
 
     String extraName = String.format ("%s (extra)", name);
     AssemblerProgram assemblerProgram =
-        new AssemblerProgram (extraName, extraBuffer, buffer.length);
+        new AssemblerProgram (extraName, extraBuffer, loadAddress + buffer.length);
 
-    return text + "\n\n" + assemblerProgram.getText ();
+    return assembler.getText () + "\n\n" + assemblerProgram.getText ();
   }
 
   @Override

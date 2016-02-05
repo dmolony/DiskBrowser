@@ -19,9 +19,7 @@ public class AssemblerProgram extends AbstractFile
   private final int loadAddress;
   private int executeOffset;
 
-  private byte[] extraBuffer;
-  //  private int offset;
-  //  private int length;
+  private byte[] extraBuffer = new byte[0];
 
   public AssemblerProgram (String name, byte[] buffer, int address)
   {
@@ -49,7 +47,7 @@ public class AssemblerProgram extends AbstractFile
   {
     String text = super.getHexDump ();
 
-    if (extraBuffer == null)
+    if (extraBuffer.length == 0)
       return text;
 
     return text + "\n\n"
@@ -61,7 +59,7 @@ public class AssemblerProgram extends AbstractFile
   {
     String text = super.getAssembler ();
 
-    if (extraBuffer == null)
+    if (extraBuffer.length == 0)
       return text;
 
     String extraName = String.format ("%s (extra)", name);
@@ -262,8 +260,7 @@ public class AssemblerProgram extends AbstractFile
     String arrow = "";
     if (cmd.value == 0x4C || cmd.value == 0x6C || cmd.value == 0x60 || cmd.offset != 0)
       arrow = "<--";
-    if (cmd.value == 0x20 &&    // JSR
-        cmd.target >= loadAddress && cmd.target < (loadAddress + buffer.length))
+    if (cmd.value == 0x20 && isLocal (cmd.target))    // JSR
       arrow = "<--";
     if (cmd.isTarget)
       if (arrow.isEmpty ())
@@ -271,6 +268,12 @@ public class AssemblerProgram extends AbstractFile
       else
         arrow = "<->";
     return arrow;
+  }
+
+  private boolean isLocal (int target)
+  {
+    return target >= loadAddress
+        && target < loadAddress + buffer.length + extraBuffer.length;
   }
 
   private void getEquates ()

@@ -2,28 +2,64 @@ package com.bytezone.diskbrowser.applefile;
 
 public interface ApplesoftConstants
 {
-  String[] tokens = { "END", "FOR ", "NEXT ", "DATA ", "INPUT ", "DEL", "DIM ", "READ ", "GR",
-                     "TEXT", "PR#", "IN#", "CALL ", "PLOT", "HLIN ", "VLIN ", "HGR2", "HGR",
-                     "HCOLOR=", "HPLOT ", "DRAW ", "XDRAW ", "HTAB ", "HOME", "ROT=", "SCALE=",
-                     "SHLOAD", "TRACE", "NOTRACE", "NORMAL", "INVERSE", "FLASH", "COLOR=", "POP",
-                     "VTAB ", "HIMEM:", "LOMEM:", "ONERR ", "RESUME", "RECALL", "STORE", "SPEED=",
-                     "LET ", "GOTO ", "RUN", "IF ", "RESTORE", "& ", "GOSUB ", "RETURN", "REM ",
-                     "STOP", "ON ", "WAIT", "LOAD", "SAVE", "DEF", "POKE ", "PRINT ", "CONT",
-                     "LIST", "CLEAR", "GET ", "NEW", "TAB(", "TO ", "FN", "SPC(", "THEN ", "AT ",
-                     "NOT ", "STEP ", "+ ", "- ", "* ", "/ ", "^ ", "AND ", "OR ", "> ", "= ",
-                     "< ", "SGN", "INT", "ABS", "USR", "FRE", "SCRN(", "PDL", "POS ", "SQR", "RND",
-                     "LOG", "EXP", "COS", "SIN", "TAN", "ATN", "PEEK", "LEN", "STR$", "VAL", "ASC",
-                     "CHR$", "LEFT$", "RIGHT$", "MID$" };
+  String[] tokens = { //
+                     "END", "FOR ", "NEXT ", "DATA ",           // 0x80 - 0x83
+                     "INPUT ", "DEL", "DIM ", "READ ",          // 0x84 - 0x87
+                     "GR", "TEXT", "PR#", "IN#",                // 0x88 - 0x8B
+                     "CALL ", "PLOT", "HLIN ", "VLIN ",         // 0x8C - 0x8F
+                     "HGR2", "HGR", "HCOLOR=", "HPLOT ",        // 0x90
+                     "DRAW ", "XDRAW ", "HTAB ", "HOME",        // 0x94
+                     "ROT=", "SCALE=", "SHLOAD", "TRACE",       // 0x98
+                     "NOTRACE", "NORMAL", "INVERSE", "FLASH",   // 0x9C
+                     "COLOR=", "POP", "VTAB ", "HIMEM:",        // 0x9F
+                     "LOMEM:", "ONERR ", "RESUME", "RECALL",    // 0xA0
+                     "STORE", "SPEED=", "LET ", "GOTO ",        // 0xA4
+                     "RUN", "IF ", "RESTORE", "& ",             // 0xA8
+                     "GOSUB ", "RETURN", "REM ", "STOP",        // 0xAC
+                     "ON ", "WAIT", "LOAD", "SAVE",             // 0xB0
+                     "DEF", "POKE ", "PRINT ", "CONT",          // 0xB4
+                     "LIST", "CLEAR", "GET ", "NEW",            // 0xB8
+                     "TAB(", "TO ", "FN", "SPC(",               // 0xBC
+                     "THEN ", "AT ", "NOT ", "STEP ",           // 0xC0
+                     "+ ", "- ", "* ", "/ ",                    // 0xC4
+                     "^ ", "AND ", "OR ", "> ",                 // 0xC8
+                     "= ", "< ", "SGN", "INT",                  // 0xCC
+                     "ABS", "USR", "FRE", "SCRN(",              // 0xD0
+                     "PDL", "POS ", "SQR", "RND",               // 0xD4
+                     "LOG", "EXP", "COS", "SIN",                // 0xD8
+                     "TAN", "ATN", "PEEK", "LEN",               // 0xDC
+                     "STR$", "VAL", "ASC", "CHR$",              // 0xE0 - 0xE3
+                     "LEFT$", "RIGHT$", "MID$", "",             // 0xE4 - 0xE7
+                     "", "", "", "",                            // 0xE8 - 0xEB
+                     "", "", "", "",                            // 0xEC - 0xEF
+                     "ELSE", "MOD", "INC", "DEC",               // 0xF0 - 0xF3
+                     "DEEK", "DOKE", "REPEAT", "UNTIL",         // 0xF4 - 0xF7
+                     "", "", "", "",                            // 0xF8 - 0xFB
+                     "", "", "", "",                            // 0xFC - 0xFF
+  };
 
-  int[] tokenAddresses = { 0xD870, 0xD766, 0xDCF9, 0xD995, 0xDBB2, 0xF331, 0xDFD9, 0xDBE2, 0xF390,
-                          0xF399, 0xF1E5, 0xF1DE, 0xF1D5, 0xF225, 0xF232, 0xF241, 0xF3D8, 0xF3E2,
-                          0xF6E9, 0xF6FE, 0xF769, 0xF76F, 0xF7E7, 0xFC58, 0xF721, 0xF727, 0xF775,
-                          0xF26D, 0xF26F, 0xF273, 0xF277, 0xF280, 0xF24F, 0xD96B, 0xF256, 0xF286,
-                          0xF2A6, 0xF2CB, 0xF318, 0xF3BC, 0xF39F, 0xF262, 0xDA46, 0xD93E, 0xD912,
-                          0xD9C9, 0xD849, 0x03F5, 0xD921, 0xD96B, 0xD9DC, 0xD86E, 0xD9EC, 0xE784,
-                          0xD8C9, 0xD8B0, 0xE313, 0xE77B, 0xFDAD5, 0xD896, 0xD6A5, 0xD66A, 0xDBA0,
-                          0xD649, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xEB90,
-                          0xEC23, 0xEBAF, 0x000A, 0xE2DE, 0xD412, 0xDFCD, 0xE2FF, 0xEE8D, 0xEFAE,
-                          0xE941, 0xEF09, 0xEFEA, 0xEFF1, 0xF03A, 0xF09E, 0xE764, 0xE6D6, 0xE3C5,
-                          0xE707, 0xE6E5, 0xE646, 0xE65A, 0xE686, 0xE691 };
+  int[] tokenAddresses =
+      { 0xD870, 0xD766, 0xDCF9, 0xD995, 0xDBB2, 0xF331, 0xDFD9, 0xDBE2, 0xF390, 0xF399,
+        0xF1E5, 0xF1DE, 0xF1D5, 0xF225, 0xF232, 0xF241, 0xF3D8, 0xF3E2, 0xF6E9, 0xF6FE,
+        0xF769, 0xF76F, 0xF7E7, 0xFC58, 0xF721, 0xF727, 0xF775, 0xF26D, 0xF26F, 0xF273,
+        0xF277, 0xF280, 0xF24F, 0xD96B, 0xF256, 0xF286, 0xF2A6, 0xF2CB, 0xF318, 0xF3BC,
+        0xF39F, 0xF262, 0xDA46, 0xD93E, 0xD912, 0xD9C9, 0xD849, 0x03F5, 0xD921, 0xD96B,
+        0xD9DC, 0xD86E, 0xD9EC, 0xE784, 0xD8C9, 0xD8B0, 0xE313, 0xE77B, 0xFDAD5, 0xD896,
+        0xD6A5, 0xD66A, 0xDBA0, 0xD649, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0xEB90, 0xEC23, 0xEBAF, 0x000A, 0xE2DE, 0xD412, 0xDFCD, 0xE2FF, 0xEE8D, 0xEFAE,
+        0xE941, 0xEF09, 0xEFEA, 0xEFF1, 0xF03A, 0xF09E, 0xE764, 0xE6D6, 0xE3C5, 0xE707,
+        0xE6E5, 0xE646, 0xE65A, 0xE686, 0xE691 };
 }
+
+/*
+https://groups.google.com/forum/#!topic/comp.sys.apple2/_lQ2-l9i5cw
+NEW Applesoft tokens
+$F0 - ELSE
+$F1 - MOD
+$F2 - INC - as in Increment, so instead of A=A+1: use INC A
+$F3 - DEC - opposite of INC
+$F4 - DEEK - two-byte PEEK
+$F5 - DOKE - two-byte POKE
+$F6 - REPEAT
+$F7 - UNTIL
+*/

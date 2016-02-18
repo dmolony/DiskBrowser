@@ -18,14 +18,14 @@ public class HiResImage extends AbstractFile
   public HiResImage (String name, byte[] buffer)
   {
     super (name, buffer);
-    if (name.equals ("FLY LOGO") || name.equals ("BIGBAT.PAC"))   // && reportedLength == 0x14FA)
+    if (name.equals ("FLY LOGO") || name.equals ("BIGBAT.PAC"))
     {
       this.buffer = unscrunch (buffer);
     }
     if (isGif (buffer))
       makeGif ();
     else
-      makeScreen1 (buffer);
+      makeScreen3 (buffer);
   }
 
   public HiResImage (String name, byte[] buffer, int fileType, int auxType)
@@ -34,12 +34,12 @@ public class HiResImage extends AbstractFile
     this.fileType = fileType;
     this.auxType = auxType;
 
-    if (fileType == 192 && auxType == 1)
+    if (fileType == 0xC0 && auxType == 1)
     {
       unpackedBuffer = unpackBytes (buffer);
       makeScreen2 (unpackedBuffer);
     }
-    if (fileType == 192 && auxType == 2)
+    if (fileType == 0xC0 && auxType == 2)
     {
       System.out.println ("yippee - Preferred picture format - " + name);
     }
@@ -114,6 +114,61 @@ public class HiResImage extends AbstractFile
       }
   }
 
+  private void makeScreen3 (byte[] buffer)
+  {
+    int rows = buffer.length <= 8192 ? 192 : 384;
+    //    image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_INDEXED);
+    image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
+
+    DataBuffer db = image.getRaster ().getDataBuffer ();
+
+    int element = 0;
+
+    int[] line = new int[280];
+    int linePtr = 0;
+
+    for (int z = 0; z < rows / 192; z++)
+      for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 8; j++)
+          for (int k = 0; k < 8; k++)
+          {
+            int base = i * 0x28 + j * 0x80 + k * 0x400 + z * 0x2000;
+            int max = Math.min (base + 40, buffer.length);
+
+            for (int ptr = base; ptr < max; ptr++)
+            {
+              int colourBit = buffer[ptr] & 0x80;
+              int value = buffer[ptr] & 0x7F;
+
+              for (int px = 0; px < 7; px++)
+                line[linePtr++] =
+                    getColour ((value >> px) & 0x01, (ptr + px) % 2, colourBit);
+            }
+
+            for (int x = 1; x < line.length; x++)
+              if (line[x] != 0 && line[x - 1] != 0)
+              {
+                line[x] = 0xFFFFFF;                 // white
+                line[x - 1] = 0xFFFFFF;             // white
+              }
+
+            for (int pixel : line)
+              db.setElem (element++, pixel);
+            linePtr = 0;
+          }
+  }
+
+  private int getColour (int val, int column, int colourBit)
+  {
+    if (val == 0)
+      return 0;                                             // black
+
+    if (column == 0)
+      return colourBit == 0 ? 0xBB66FF : 0x0000FF;          // violet / blue
+    else
+      return colourBit == 0 ? 0x00FF00 : 0xFF0000;          // green / red
+  }
+
   // Beagle Bros routine to expand a hi-res screen
   private byte[] unscrunch (byte[] src)
   {
@@ -124,7 +179,6 @@ public class HiResImage extends AbstractFile
     //    while (p1 < dst.length && p2 < src.length)
     while (p1 < dst.length)
     {
-      //      System.out.printf ("%04X  %04X%n", p1, p2);
       byte b = src[p2++];
       if ((b == (byte) 0x80) || (b == (byte) 0xFF))
       {

@@ -45,7 +45,9 @@ public class AssemblerProgram extends AbstractFile
   @Override
   public String getHexDump ()
   {
-    //    String text = super.getHexDump ();
+    // It might be useful to add opt-O to change the offset. Sometimes it's useful
+    // to see the hex dump offset from zero, other times it's better to use the
+    // load address.
     String text = HexFormatter.format (buffer, 0, buffer.length, loadAddress);
 
     if (extraBuffer.length == 0)

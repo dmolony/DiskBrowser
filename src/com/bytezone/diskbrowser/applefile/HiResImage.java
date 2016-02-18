@@ -24,8 +24,10 @@ public class HiResImage extends AbstractFile
     }
     if (isGif (buffer))
       makeGif ();
+    else if (true)
+      drawColour (buffer);
     else
-      makeScreen3 (buffer);
+      drawMonochrome (buffer);
   }
 
   public HiResImage (String name, byte[] buffer, int fileType, int auxType)
@@ -45,7 +47,7 @@ public class HiResImage extends AbstractFile
     }
   }
 
-  private void makeScreen1 (byte[] buffer)
+  private void drawMonochrome (byte[] buffer)
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_GRAY);
@@ -80,44 +82,9 @@ public class HiResImage extends AbstractFile
           }
   }
 
-  private void makeScreen2 (byte[] buffer)
-  {
-    //    System.out.println (HexFormatter.format (buffer, 32000, 640));
-    //    for (int table = 0; table < 200; table++)
-    //    {
-    //      System.out.println (HexFormatter.format (buffer, ptr, 32));
-    //      for (int color = 0; color < 16; color++)
-    //      {
-    //        int red = buffer[ptr++] & 0x0F;
-    //        int green = (buffer[ptr] & 0xF0) >> 4;
-    //        int blue = buffer[ptr++] & 0x0F;
-    //        Color c = new Color (red, green, blue);
-    //      }
-    //    }
-
-    image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
-    DataBuffer db = image.getRaster ().getDataBuffer ();
-
-    int element = 0;
-    int ptr = 0;
-    for (int row = 0; row < 200; row++)
-      for (int col = 0; col < 160; col++)
-      {
-        int pix1 = (buffer[ptr] & 0xF0) >> 4;
-        int pix2 = buffer[ptr] & 0x0F;
-        if (pix1 > 0)
-          db.setElem (element, 255);
-        if (pix2 > 0)
-          db.setElem (element + 1, 255);
-        element += 2;
-        ptr++;
-      }
-  }
-
-  private void makeScreen3 (byte[] buffer)
+  private void drawColour (byte[] buffer)
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
-    //    image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_INDEXED);
     image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
 
     DataBuffer db = image.getRaster ().getDataBuffer ();
@@ -167,6 +134,40 @@ public class HiResImage extends AbstractFile
       return colourBit == 0 ? 0xBB66FF : 0x0000FF;          // violet / blue
     else
       return colourBit == 0 ? 0x00FF00 : 0xFF0000;          // green / red
+  }
+
+  private void makeScreen2 (byte[] buffer)
+  {
+    //    System.out.println (HexFormatter.format (buffer, 32000, 640));
+    //    for (int table = 0; table < 200; table++)
+    //    {
+    //      System.out.println (HexFormatter.format (buffer, ptr, 32));
+    //      for (int color = 0; color < 16; color++)
+    //      {
+    //        int red = buffer[ptr++] & 0x0F;
+    //        int green = (buffer[ptr] & 0xF0) >> 4;
+    //        int blue = buffer[ptr++] & 0x0F;
+    //        Color c = new Color (red, green, blue);
+    //      }
+    //    }
+
+    image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
+    DataBuffer db = image.getRaster ().getDataBuffer ();
+
+    int element = 0;
+    int ptr = 0;
+    for (int row = 0; row < 200; row++)
+      for (int col = 0; col < 160; col++)
+      {
+        int pix1 = (buffer[ptr] & 0xF0) >> 4;
+        int pix2 = buffer[ptr] & 0x0F;
+        if (pix1 > 0)
+          db.setElem (element, 255);
+        if (pix2 > 0)
+          db.setElem (element + 1, 255);
+        element += 2;
+        ptr++;
+      }
   }
 
   // Beagle Bros routine to expand a hi-res screen

@@ -38,8 +38,13 @@ public class AssemblerProgram extends AbstractFile
 
   public void setExtraBuffer (byte[] fullBuffer, int offset, int length)
   {
-    this.extraBuffer = new byte[length];
-    System.arraycopy (fullBuffer, offset, extraBuffer, 0, length);
+    if (length >= 0)
+    {
+      this.extraBuffer = new byte[length];
+      System.arraycopy (fullBuffer, offset, extraBuffer, 0, length);
+    }
+    else
+      System.out.println ("Invalid length in setExtraBuffer() : " + length);
   }
 
   @Override

@@ -73,7 +73,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   }
 
   private void processDirectoryBlock (int block, FileEntry parent,
-        DefaultMutableTreeNode parentNode)
+      DefaultMutableTreeNode parentNode)
   {
     DirectoryHeader localHeader = null;
     SectorType currentSectorType = null;
@@ -83,8 +83,9 @@ public class ProdosDisk extends AbstractFormattedDisk
       byte[] sectorBuffer = disk.readSector (block);
       sectorTypes[block] = currentSectorType;
 
-      for (int ptr = 4, max = disk.getBlockSize () - ProdosConstants.ENTRY_SIZE; ptr < max; ptr +=
-            ProdosConstants.ENTRY_SIZE)
+      for (int ptr = 4, max =
+          disk.getBlockSize () - ProdosConstants.ENTRY_SIZE; ptr < max; ptr +=
+              ProdosConstants.ENTRY_SIZE)
       {
         int storageType = (sectorBuffer[ptr] & 0xF0) >> 4;
         if (storageType == 0) // deleted or unused
@@ -154,7 +155,12 @@ public class ProdosDisk extends AbstractFormattedDisk
   {
     byte[] buffer = disk.readSector (2);          // Prodos KEY BLOCK
     if (debug)
+    {
       System.out.println (HexFormatter.format (buffer));
+      System.out.printf ("Entry length   : %02X%n", buffer[0x23]);
+      System.out.printf ("Entry per block: %02X%n", buffer[0x24]);
+      System.out.printf ("Bit map block  : %02X%02X%n", buffer[0x27], buffer[0x28]);
+    }
 
     // check entry length and entries per block
     if (buffer[0x23] != 0x27 || buffer[0x24] != 0x0D)
@@ -175,7 +181,8 @@ public class ProdosDisk extends AbstractFormattedDisk
   @Override
   public AppleFileSource getCatalog ()
   {
-    return new DefaultAppleFileSource ("Catalog", headerEntries.get (0).getDataSource (), this);
+    return new DefaultAppleFileSource ("Catalog", headerEntries.get (0).getDataSource (),
+        this);
   }
 
   @Override
@@ -185,9 +192,8 @@ public class ProdosDisk extends AbstractFormattedDisk
     String newLine = String.format ("%n");
 
     VolumeDirectoryHeader volumeDirectory = (VolumeDirectoryHeader) headerEntries.get (0);
-    String timeC =
-          volumeDirectory.created == null ? "" : df
-                .format (volumeDirectory.created.getTime ());
+    String timeC = volumeDirectory.created == null ? ""
+        : df.format (volumeDirectory.created.getTime ());
     text.append ("Volume name        : " + volumeDirectory.name + newLine);
     text.append ("Creation date      : " + timeC + newLine);
     text.append ("ProDOS version     : " + volumeDirectory.version + newLine);

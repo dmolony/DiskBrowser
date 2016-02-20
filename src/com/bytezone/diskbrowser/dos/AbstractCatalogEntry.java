@@ -216,10 +216,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             else
             {
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
-              if (exactBuffer.length < buffer.length + 4)
+              //    System.out.printf ("%d %d%n", exactBuffer.length, reportedLength);
+              if ((exactBuffer.length + 4) < buffer.length)
                 ((AssemblerProgram) appleFile)
-                    .setExtraBuffer (buffer, reportedLength + 4,
-                                     buffer.length - reportedLength - 4);
+                    .setExtraBuffer (buffer, exactBuffer.length + 4,
+                                     buffer.length - (exactBuffer.length + 4));
             }
           }
           break;

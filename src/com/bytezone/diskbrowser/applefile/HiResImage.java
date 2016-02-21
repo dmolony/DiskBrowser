@@ -11,16 +11,25 @@ import com.bytezone.diskbrowser.HexFormatter;
 
 public class HiResImage extends AbstractFile
 {
-  private static final int[][] colours = { { 0x000000, 0xBB66FF, 0x00FF00, 0xFFFFFF },
-                                           { 0x000000, 0x0000FF, 0xFF0000, 0xFFFFFF } };
+  private static final int WHITE = 0xFFFFFF;
+  private static final int BLACK = 0x000000;
+  private static final int RED = 0xFF0000;
+  private static final int GREEN = 0x00FF00;
+  private static final int BLUE = 0x0000FF;
+  private static final int VIOLET = 0xBB66FF;
+  private static final int[][] colours = { { VIOLET, GREEN }, { BLUE, RED } };
 
-  int fileType;
-  int auxType;
-  byte[] unpackedBuffer;
+  private static int[] line = new int[280];
+
+  private int fileType;
+  private int auxType;
+  private byte[] unpackedBuffer;
+  private static boolean colourQuirks;
 
   public HiResImage (String name, byte[] buffer)
   {
     super (name, buffer);
+
     if (name.equals ("FLY LOGO") || name.equals ("BIGBAT.PAC"))
     {
       this.buffer = unscrunch (buffer);
@@ -48,6 +57,20 @@ public class HiResImage extends AbstractFile
     {
       System.out.println ("yippee - Preferred picture format - " + name);
     }
+  }
+
+  public static void setDefaultColourQuirks (boolean value)
+  {
+    colourQuirks = value;
+  }
+
+  public void setColourQuirks (boolean value)
+  {
+    if (colourQuirks == value)
+      return;
+
+    colourQuirks = value;
+    drawColour (buffer);
   }
 
   private void drawMonochrome (byte[] buffer)
@@ -91,74 +114,6 @@ public class HiResImage extends AbstractFile
     image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
 
     DataBuffer db = image.getRaster ().getDataBuffer ();
-    int[][] colours = { { 0xBB66FF, 0x00FF00 }, { 0x0000FF, 0xFF0000 } };
-
-    int element = 0;
-
-    int[] line = new int[280];
-    int linePtr = 0;
-
-    for (int z = 0; z < rows / 192; z++)
-    {
-      int zz = z * 0x2000;
-      for (int i = 0; i < 3; i++)
-      {
-        int ii = zz + i * 0x28;
-        for (int j = 0; j < 8; j++)
-        {
-          int jj = ii + j * 0x80;
-          for (int k = 0; k < 8; k++)
-          {
-            int base = jj + k * 0x400;
-            int max = Math.min (base + 40, buffer.length);
-
-            for (int ptr = base; ptr < max; ptr++)
-            {
-              int colourBit = (buffer[ptr] & 0x80) >> 7;
-              int value = buffer[ptr] & 0x7F;
-
-              for (int px = 0; px < 7; px++)
-              {
-                int val = (value >> px) & 0x01;
-                int column = (ptr + px) % 2;
-                line[linePtr++] = val == 0 ? 0 : colours[colourBit][column];
-              }
-            }
-
-            // convert ALL consecutive ON pixels to white
-            for (int x = 0; x < line.length - 1; x++)
-              if (line[x] != 0 && line[x + 1] != 0)
-                line[x] = line[x + 1] = 0xFFFFFF;
-
-            // convert single coloured pixels to double - this can be ugly
-            if (false)
-            {
-              for (int x = 0; x < line.length - 1; x += 2)
-                if (line[x] != 0 && line[x] != 0xFFFFFF && line[x + 1] == 0)
-                  line[x + 1] = line[x];
-                else if (line[x] == 0 && line[x + 1] != 0 && line[x + 1] != 0xFFFFFF)
-                  line[x] = line[x + 1];
-            }
-
-            for (int pixel : line)
-              db.setElem (element++, pixel);
-            linePtr = 0;
-          }
-        }
-      }
-
-    }
-  }
-
-  private void drawSolidColour (byte[] buffer)
-  {
-    int rows = buffer.length <= 8192 ? 192 : 384;
-    image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
-
-    DataBuffer db = image.getRaster ().getDataBuffer ();
-    int[][] colours = { { 0x000000, 0xBB66FF, 0x00FF00, 0xFFFFFF },
-                        { 0x000000, 0x0000FF, 0xFF0000, 0xFFFFFF } };
-
     int element = 0;
 
     for (int z = 0; z < rows / 192; z++)
@@ -167,33 +122,69 @@ public class HiResImage extends AbstractFile
           for (int k = 0; k < 8; k++)
           {
             int base = i * 0x28 + j * 0x80 + k * 0x400 + z * 0x2000;
-            int max = Math.min (base + 40, buffer.length);
-
-            for (int ptr = base; ptr < max; ptr += 2)
-            {
-              int colourBit1 = (buffer[ptr] & 0x80) >> 7;
-              int colourBit2 = (buffer[ptr + 1] & 0x80) >> 7;
-
-              int value = ((buffer[ptr + 1] & 0x7F) << 7) + (buffer[ptr] & 0x7F);
-
-              for (int px = 0; px < 7; px++)
-              {
-                int val = value & 0x03;
-                value >>= 2;
-                int colour = 0;
-
-                if (px <= 2)
-                  colour = colours[colourBit1][val];
-                else if (px == 3)
-                  colour = colours[val >= 2 ? colourBit1 : colourBit2][val];
-                else
-                  colour = colours[colourBit2][val];
-
-                db.setElem (element++, colour);
-                db.setElem (element++, colour);
-              }
-            }
+            element = drawLine (db, element, base);
           }
+  }
+
+  private int drawLine (DataBuffer db, int element, int base)
+  {
+    int max = Math.min (base + 40, buffer.length);
+    int linePtr = 0;
+
+    for (int ptr = base; ptr < max; ptr++)
+    {
+      int colourBit = (buffer[ptr] & 0x80) >> 7;
+      int value = buffer[ptr] & 0x7F;
+
+      for (int px = 0; px < 7; px++)
+      {
+        int val = (value >> px) & 0x01;
+        int column = (ptr + px) % 2;
+        line[linePtr++] = val == 0 ? 0 : colours[colourBit][column];
+      }
+    }
+
+    // convert ALL consecutive ON pixels to white
+    for (int x = 0; x < line.length - 1; x++)
+      if (line[x] != BLACK && line[x + 1] != BLACK)
+        line[x] = line[x + 1] = WHITE;
+
+    // convert WOZ quirks
+    if (colourQuirks)
+    {
+      for (int x = 0; x < line.length - 4; x++)
+      {
+        if (line[x + 1] == BLACK)
+        {
+          // V-B-V-B -> V-V-V-B
+          if (line[x + 3] == BLACK && line[x] == line[x + 2] && line[x] != BLACK
+              && line[x] != WHITE)
+            line[x + 1] = line[x];
+
+          // V-B-W-W -> V-V-W-W
+          if (line[x] != BLACK && line[x] != WHITE && line[x + 3] == WHITE
+              && line[x + 2] == WHITE)
+            line[x + 1] = line[x];
+        }
+        if (line[x + 2] == BLACK)
+        {
+          // B-G-B-G -> B-G-G-G
+          if (line[x] == BLACK && line[x + 1] == line[x + 3] && line[x + 1] != WHITE
+              && line[x + 1] != BLACK)
+            line[x + 2] = line[x + 1];
+
+          // W-W-B-G -> W-W-G-G
+          if (line[x] == WHITE && line[x + 1] == WHITE && line[x + 3] != BLACK
+              && line[x + 3] != WHITE)
+            line[x + 2] = line[x + 3];
+        }
+      }
+    }
+
+    for (int pixel : line)
+      db.setElem (element++, pixel);
+
+    return element;
   }
 
   private void makeScreen2 (byte[] buffer)

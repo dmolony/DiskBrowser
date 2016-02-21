@@ -7,17 +7,23 @@ import java.util.prefs.Preferences;
 
 import javax.swing.*;
 
-import com.bytezone.common.*;
+import com.bytezone.common.EnvironmentAction;
+import com.bytezone.common.FontAction;
+import com.bytezone.common.OSXAdapter;
+import com.bytezone.common.Platform;
 import com.bytezone.common.QuitAction.QuitListener;
+import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
-public class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitListener
+public class MenuHandler
+    implements DiskSelectionListener, FileSelectionListener, QuitListener
 {
   private static final String PREFS_LINE_WRAP = "line wrap";
   private static final String PREFS_SHOW_CATALOG = "show catalog";
   private static final String PREFS_SHOW_LAYOUT = "show layout";
   private static final String PREFS_SHOW_FREE_SECTORS = "show free sectors";
+  private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
 
   FormattedDisk currentDisk;
 
@@ -40,8 +46,8 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
   FontAction fontAction;
 
   // Format menu items
-  JMenuItem lineWrapItem = new JCheckBoxMenuItem ("Line wrap");
-  JMenuItem showLayoutItem = new JCheckBoxMenuItem ("Show layout panel");
+  final JMenuItem lineWrapItem = new JCheckBoxMenuItem ("Line wrap");
+  final JMenuItem showLayoutItem = new JCheckBoxMenuItem ("Show layout panel");
   JMenuItem showCatalogItem = new JCheckBoxMenuItem ("Show catalog panel");
   JMenuItem showFreeSectorsItem = new JCheckBoxMenuItem ("Show free sectors");
 
@@ -51,6 +57,8 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
   JMenuItem interleave1Item = new JRadioButtonMenuItem (new InterleaveAction (1));
   JMenuItem interleave2Item = new JRadioButtonMenuItem (new InterleaveAction (2));
   JMenuItem interleave3Item = new JRadioButtonMenuItem (new InterleaveAction (3));
+
+  JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
 
   public MenuHandler (Preferences prefs)
   {
@@ -73,9 +81,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     JMenuItem fontItem = new JMenuItem (fontAction);
     fileMenu.add (fontItem);
     fontAction.setSampleText ("120  FOR Z = 14 TO 24:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
-          + "  PRINT AB$:\n" + "  FOR TI = 1 TO 50:\n" + "  NEXT :\n" + "  POKE 0,Z + 40:\n"
-          + "  POKE 1,9:\n" + "  CALL MU:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
-          + "  PRINT SPC(12):\n" + "NEXT :\n" + "VTAB 5:\n" + "HTAB 24:\n" + "PRINT AB$\n");
+        + "  PRINT AB$:\n" + "  FOR TI = 1 TO 50:\n" + "  NEXT :\n" + "  POKE 0,Z + 40:\n"
+        + "  POKE 1,9:\n" + "  CALL MU:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
+        + "  PRINT SPC(12):\n" + "NEXT :\n" + "VTAB 5:\n" + "HTAB 24:\n" + "PRINT AB$\n");
 
     if (false)
     {
@@ -97,6 +105,8 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     formatMenu.addSeparator ();
     formatMenu.add (sector256Item);
     formatMenu.add (sector512Item);
+    formatMenu.addSeparator ();
+    formatMenu.add (colourQuirksItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -105,10 +115,6 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     sector512Item.setActionCommand ("512");
     sector512Item.setAccelerator (KeyStroke.getKeyStroke ("alt 5"));
 
-    lineWrapItem.setAccelerator (KeyStroke.getKeyStroke ("alt W"));
-    printItem.setAccelerator (KeyStroke.getKeyStroke ("control P"));
-
-    //    		ButtonGroup dosGroup = new ButtonGroup ();
     ButtonGroup sectorGroup = new ButtonGroup ();
     ButtonGroup interleaveGroup = new ButtonGroup ();
 
@@ -126,6 +132,8 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     showLayoutItem.setSelected (prefs.getBoolean (PREFS_SHOW_LAYOUT, true));
     showCatalogItem.setSelected (prefs.getBoolean (PREFS_SHOW_CATALOG, true));
     showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
+    colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
+    HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -135,14 +143,11 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
       try
       {
         if (functionName.equals ("about"))
-          OSXAdapter.setAboutHandler (action,
-                                      action.getClass ().getDeclaredMethod (functionName,
-                                                                            (Class[]) null));
+          OSXAdapter.setAboutHandler (action, action.getClass ()
+              .getDeclaredMethod (functionName, (Class[]) null));
         else if (functionName.equals ("prefs"))
-          OSXAdapter.setPreferencesHandler (action,
-                                            action.getClass ()
-                                                  .getDeclaredMethod (functionName,
-                                                                      (Class[]) null));
+          OSXAdapter.setPreferencesHandler (action, action.getClass ()
+              .getDeclaredMethod (functionName, (Class[]) null));
       }
       catch (Exception e)
       {
@@ -182,6 +187,7 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     prefs.putBoolean (PREFS_SHOW_LAYOUT, showLayoutItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CATALOG, showCatalogItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
+    prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
   }
 
   @Override
@@ -247,7 +253,12 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
   }
 
   @Override
-  public void restore (Preferences preferences)
+  public void restore (Preferences prefs)
   {
+    //    lineWrapItem.setSelected (prefs.getBoolean (PREFS_LINE_WRAP, true));
+    //    showLayoutItem.setSelected (prefs.getBoolean (PREFS_SHOW_LAYOUT, true));
+    //    showCatalogItem.setSelected (prefs.getBoolean (PREFS_SHOW_CATALOG, true));
+    //    showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
+    //    colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
   }
 }

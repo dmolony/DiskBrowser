@@ -1,28 +1,18 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
+import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 
@@ -41,7 +31,7 @@ class DataPanel extends JTabbedPane
   JScrollPane imagePane;
 
   JTextArea formattedText;
-  ImagePanel imagePanel;// internal class
+  ImagePanel imagePanel;                        // internal class
 
   boolean imageVisible = false;
 
@@ -57,10 +47,11 @@ class DataPanel extends JTabbedPane
   public DataPanel (MenuHandler mh, Preferences prefs)
   {
     //    String dataFontName =
-    //          prefs.get (PreferencesDialog.prefsDataFont, PreferencesDialog.defaultFontName);
+    //    prefs.get (PreferencesDialog.prefsDataFont, PreferencesDialog.defaultFontName);
     //    System.out.println (dataFontName);
     //    int dataFontSize =
-    //          prefs.getInt (PreferencesDialog.prefsDataFontSize, PreferencesDialog.defaultFontSize);
+    //  prefs.getInt (PreferencesDialog.prefsDataFontSize, 
+    // PreferencesDialog.defaultFontSize);
     //    font = new Font (dataFontName, Font.PLAIN, dataFontSize);
 
     this.menuHandler = mh;
@@ -133,6 +124,17 @@ class DataPanel extends JTabbedPane
     });
 
     mh.lineWrapItem.setAction (new LineWrapAction (formattedText));
+    mh.colourQuirksItem.setAction (new ColourQuirksAction (this));
+  }
+
+  public void setColourQuirks (boolean value)
+  {
+    if (currentDataSource instanceof HiResImage)
+    {
+      HiResImage image = (HiResImage) currentDataSource;
+      image.setColourQuirks (value);
+      imagePanel.setImage (image.getImage ());
+    }
   }
 
   private void setTabsFont (Font font)
@@ -158,7 +160,7 @@ class DataPanel extends JTabbedPane
     JScrollPane outputScrollPane =
         new JScrollPane (outputPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    outputScrollPane.setBorder (null);// remove the ugly default border
+    outputScrollPane.setBorder (null);              // remove the ugly default border
     add (outputScrollPane, tabName);
     return outputScrollPane;
   }
@@ -171,7 +173,7 @@ class DataPanel extends JTabbedPane
       formattedText.setText ("");
       hexText.setText ("");
       disassemblyText.setText ("");
-      checkImage ();
+      removeImage ();
       return;
     }
 
@@ -206,9 +208,7 @@ class DataPanel extends JTabbedPane
 
     BufferedImage image = dataSource.getImage ();
     if (image == null)
-    {
-      checkImage ();
-    }
+      removeImage ();
     else
     {
       imagePanel.setImage (image);
@@ -224,7 +224,7 @@ class DataPanel extends JTabbedPane
     }
   }
 
-  private void checkImage ()
+  private void removeImage ()
   {
     if (imageVisible)
     {
@@ -326,7 +326,8 @@ class DataPanel extends JTabbedPane
   //    if (evt.getKey ().equals (PreferencesDialog.prefsDataFont))
   //      font = new Font (evt.getNewValue (), Font.PLAIN, font.getSize ());
   //    if (evt.getKey ().equals (PreferencesDialog.prefsDataFontSize))
-  //      font = new Font (font.getFontName (), Font.PLAIN, Integer.parseInt (evt.getNewValue ()));
+  //      font = new Font (font.getFontName (), 
+  // Font.PLAIN, Integer.parseInt (evt.getNewValue ()));
   //    setTabsFont (font);
   //  }
 

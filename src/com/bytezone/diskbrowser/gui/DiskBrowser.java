@@ -47,18 +47,21 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // create and add the right-hand disk layout panel
     DiskLayoutPanel diskLayoutPanel = new DiskLayoutPanel ();
-    JPanel layoutBorderPanel = addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
+    JPanel layoutBorderPanel =
+        addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
     // create actions
-    RootDirectoryAction rootDirectoryAction = new RootDirectoryAction (null, catalogPanel);
+    RootDirectoryAction rootDirectoryAction =
+        new RootDirectoryAction (null, catalogPanel);
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
     AbstractAction print = new PrintAction (dataPanel);
     AboutAction aboutAction = new AboutAction ();
-    HideCatalogAction hideCatalogAction = new HideCatalogAction (this, catalogBorderPanel);
+    HideCatalogAction hideCatalogAction =
+        new HideCatalogAction (this, catalogBorderPanel);
     HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
     ShowFreeSectorsAction showFreeAction =
-          new ShowFreeSectorsAction (menuHandler, diskLayoutPanel);
+        new ShowFreeSectorsAction (menuHandler, diskLayoutPanel);
     DuplicateAction duplicateAction = new DuplicateAction ();
     CloseTabAction closeTabAction = new CloseTabAction (catalogPanel);
 
@@ -149,8 +152,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   @Override
   public void diskSelected (DiskSelectedEvent e)
   {
-    setTitle (windowTitle + e.getFormattedDisk () == null ? "" : e.getFormattedDisk ()
-          .getName ());
+    setTitle (windowTitle + e.getFormattedDisk () == null ? ""
+        : e.getFormattedDisk ().getName ());
   }
 
   public static void main (String[] args)

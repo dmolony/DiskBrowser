@@ -145,38 +145,37 @@ public class HiResImage extends AbstractFile
     }
 
     // convert ALL consecutive ON pixels to white
-    for (int x = 0; x < line.length - 1; x++)
-      if (line[x] != BLACK && line[x + 1] != BLACK)
-        line[x] = line[x + 1] = WHITE;
+    if (true)
+      for (int x = 0; x < line.length - 1; x++)
+        if (line[x] != BLACK && line[x + 1] != BLACK)
+          //        if (isColoured (line[x]) && isColoured (line[x + 1]))
+          line[x] = line[x + 1] = WHITE;
 
     // convert WOZ quirks
     if (colourQuirks)
     {
-      for (int x = 0; x < line.length - 4; x++)
+      for (int x = 0; x < line.length - 3; x++)
       {
-        if (line[x + 1] == BLACK)
-        {
-          // V-B-V-B -> V-V-V-B
-          if (line[x + 3] == BLACK && line[x] == line[x + 2] && line[x] != BLACK
-              && line[x] != WHITE)
-            line[x + 1] = line[x];
+        int px0 = line[x];
+        int px1 = line[x + 1];
+        int px2 = line[x + 2];
+        int px3 = line[x + 3];
 
-          // V-B-W-W -> V-V-W-W
-          if (line[x] != BLACK && line[x] != WHITE && line[x + 3] == WHITE
-              && line[x + 2] == WHITE)
-            line[x + 1] = line[x];
+        if (px1 == BLACK)
+        {
+          if (px3 == BLACK && px0 == px2 && isColoured (px0))           //     V-B-V-B
+            line[x + 1] = px0;                                          // --> V-V-V-B
+
+          else if (px3 == WHITE && px2 == WHITE && isColoured (px0))    //     V-B-W-W
+            line[x + 1] = px0;                                          // --> V-V-W-W
         }
-        if (line[x + 2] == BLACK)
+        else if (px2 == BLACK)
         {
-          // B-G-B-G -> B-G-G-G
-          if (line[x] == BLACK && line[x + 1] == line[x + 3] && line[x + 1] != WHITE
-              && line[x + 1] != BLACK)
-            line[x + 2] = line[x + 1];
+          if (px0 == BLACK && px1 == px3 && isColoured (px3))           //     B-G-B-G 
+            line[x + 2] = px3;                                          // --> B-G-G-G
 
-          // W-W-B-G -> W-W-G-G
-          if (line[x] == WHITE && line[x + 1] == WHITE && line[x + 3] != BLACK
-              && line[x + 3] != WHITE)
-            line[x + 2] = line[x + 3];
+          else if (px0 == WHITE && px1 == WHITE && isColoured (px3))    //     W-W-B-G
+            line[x + 2] = px3;                                          // --> W-W-G-G
         }
       }
     }
@@ -185,6 +184,11 @@ public class HiResImage extends AbstractFile
       db.setElem (element++, pixel);
 
     return element;
+  }
+
+  private boolean isColoured (int pixel)
+  {
+    return pixel != BLACK && pixel != WHITE;
   }
 
   private void makeScreen2 (byte[] buffer)

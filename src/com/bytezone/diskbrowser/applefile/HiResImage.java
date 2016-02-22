@@ -133,7 +133,7 @@ public class HiResImage extends AbstractFile
       {
         colourBits[linePtr] = colourBit;        // store the colour bit
         int val = (value >> px) & 0x01;         // get the next pixel to draw
-        int column = (ptr * 7 + px) % 2;        // is it in an odd or even column?
+        int column = (ptr + px) % 2;            // is it in an odd or even column?
         line[linePtr++] = val == 0 ? 0 :        // black pixel
             colours[colourBit][column];         // coloured pixel - use palette
       }
@@ -141,15 +141,15 @@ public class HiResImage extends AbstractFile
 
     // convert consecutive ON pixels to white
     if (true)
-      for (int x = 0; x < line.length - 1; x++)
+      for (int x = 1; x < line.length; x++)     // skip first pixel, refer back
       {
-        if (matchColourBits && colourBits[x] != colourBits[x + 1])
+        if (matchColourBits && colourBits[x - 1] != colourBits[x])
           continue;                   // only modify values with matching colour bits
 
-        int px0 = line[x];
-        int px1 = line[x + 1];
+        int px0 = line[x - 1];
+        int px1 = line[x];
         if (px0 != BLACK && px1 != BLACK)
-          line[x] = line[x + 1] = WHITE;
+          line[x - 1] = line[x] = WHITE;
       }
 
     // optionally do physics
@@ -164,29 +164,29 @@ public class HiResImage extends AbstractFile
 
   private void applyColourQuirks ()
   {
-    for (int x = 0; x < line.length - 3; x++)
+    for (int x = 3; x < line.length; x++)     // skip first three pixels, refer back
     {
-      if (matchColourBits && colourBits[x] != colourBits[x + 3])
+      if (matchColourBits && colourBits[x - 3] != colourBits[x])
         continue;                   // only modify values with matching colour bits
 
-      int px0 = line[x];
-      int px1 = line[x + 1];
-      int px2 = line[x + 2];
-      int px3 = line[x + 3];
+      int px0 = line[x - 3];
+      int px1 = line[x - 2];
+      int px2 = line[x - 1];
+      int px3 = line[x];
 
       if (px1 == BLACK)
       {
         if (px3 == BLACK && px0 == px2 && isColoured (px0))           //     V-B-V-B
-          line[x + 1] = px0;                                          // --> V-V-V-B
+          line[x - 2] = px0;                                          // --> V-V-V-B
         else if (px3 == WHITE && px2 == WHITE && isColoured (px0))    //     V-B-W-W
-          line[x + 1] = px0;                                          // --> V-V-W-W
+          line[x - 2] = px0;                                          // --> V-V-W-W
       }
       else if (px2 == BLACK)
       {
         if (px0 == BLACK && px1 == px3 && isColoured (px3))           //     B-G-B-G 
-          line[x + 2] = px3;                                          // --> B-G-G-G
+          line[x - 1] = px3;                                          // --> B-G-G-G
         else if (px0 == WHITE && px1 == WHITE && isColoured (px3))    //     W-W-B-G
-          line[x + 2] = px3;                                          // --> W-W-G-G
+          line[x - 1] = px3;                                          // --> W-W-G-G
       }
     }
   }

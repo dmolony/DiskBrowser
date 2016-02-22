@@ -19,26 +19,27 @@ public class HiResImage extends AbstractFile
   private static final int VIOLET = 0xBB66FF;
   private static final int[][] colours = { { VIOLET, GREEN }, { BLUE, RED } };
 
-  private static int[] line = new int[280];
-  private static int[] colourBits = new int[280];
+  private static boolean colourQuirks;
+  private static boolean matchColourBits = true;
+  private static boolean drawColour = true;
+
+  private final int[] line = new int[280];
+  private final int[] colourBits = new int[280];
 
   private int fileType;
   private int auxType;
   private byte[] unpackedBuffer;
-  private static boolean colourQuirks;
-  private static boolean checkingColourBits = true;
 
   public HiResImage (String name, byte[] buffer)
   {
     super (name, buffer);
 
     if (name.equals ("FLY LOGO") || name.equals ("BIGBAT.PAC"))
-    {
       this.buffer = unscrunch (buffer);
-    }
+
     if (isGif (buffer))
       makeGif ();
-    else if (true)
+    else if (drawColour)
       drawColour (buffer);
     else
       drawMonochrome (buffer);
@@ -55,10 +56,9 @@ public class HiResImage extends AbstractFile
       unpackedBuffer = unpackBytes (buffer);
       makeScreen2 (unpackedBuffer);
     }
+
     if (fileType == 0xC0 && auxType == 2)
-    {
       System.out.println ("yippee - Preferred picture format - " + name);
-    }
   }
 
   public static void setDefaultColourQuirks (boolean value)
@@ -68,7 +68,7 @@ public class HiResImage extends AbstractFile
 
   public void setColourQuirks (boolean value)
   {
-    if (colourQuirks == value)
+    if (colourQuirks == value || !drawColour)
       return;
 
     colourQuirks = value;
@@ -79,32 +79,23 @@ public class HiResImage extends AbstractFile
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_GRAY);
-
     DataBuffer db = image.getRaster ().getDataBuffer ();
-
     int element = 0;
-    byte[] mask = { 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 
-    for (int z = 0; z < rows / 192; z++)
+    for (int page = 0; page < rows / 192; page++)
       for (int i = 0; i < 3; i++)
         for (int j = 0; j < 8; j++)
           for (int k = 0; k < 8; k++)
           {
-            int base = i * 0x28 + j * 0x80 + k * 0x400 + z * 0x2000;
+            int base = page * 0x2000 + i * 0x28 + j * 0x80 + k * 0x400;
             int max = Math.min (base + 40, buffer.length);
             for (int ptr = base; ptr < max; ptr++)
             {
-              byte val = buffer[ptr];
-              if (val == 0) // no pixels set
+              int value = buffer[ptr] & 0x7F;
+              for (int px = 0; px < 7; px++)
               {
-                element += 7;
-                continue;
-              }
-              for (int bit = 6; bit >= 0; bit--)
-              {
-                if ((val & mask[bit]) > 0)
-                  db.setElem (element, 255);
-                element++;
+                int val = (value >> px) & 0x01;         // get the next pixel to draw
+                db.setElem (element++, val == 0 ? 0 : 255);
               }
             }
           }
@@ -114,7 +105,6 @@ public class HiResImage extends AbstractFile
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
-
     DataBuffer db = image.getRaster ().getDataBuffer ();
     int element = 0;
 
@@ -153,7 +143,7 @@ public class HiResImage extends AbstractFile
     if (true)
       for (int x = 0; x < line.length - 1; x++)
       {
-        if (checkingColourBits && colourBits[x] != colourBits[x + 1])
+        if (matchColourBits && colourBits[x] != colourBits[x + 1])
           continue;                   // only modify values with matching colour bits
 
         int px0 = line[x];
@@ -176,7 +166,7 @@ public class HiResImage extends AbstractFile
   {
     for (int x = 0; x < line.length - 3; x++)
     {
-      if (checkingColourBits && colourBits[x] != colourBits[x + 3])
+      if (matchColourBits && colourBits[x] != colourBits[x + 3])
         continue;                   // only modify values with matching colour bits
 
       int px0 = line[x];
@@ -278,8 +268,6 @@ public class HiResImage extends AbstractFile
     byte[] newBuf = new byte[32768];
     byte[] fourBuf = new byte[4];
 
-    //    System.out.println (HexFormatter.format (buffer));
-
     int ptr = 0, newPtr = 0;
     while (ptr < buffer.length)
     {
@@ -376,6 +364,7 @@ public class HiResImage extends AbstractFile
   {
     if (buffer.length < 6)
       return false;
+
     String text = new String (buffer, 0, 6);
     return text.equals ("GIF89a") || text.equals ("GIF87a");
   }

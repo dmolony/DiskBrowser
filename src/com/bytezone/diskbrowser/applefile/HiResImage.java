@@ -20,11 +20,13 @@ public class HiResImage extends AbstractFile
   private static final int[][] colours = { { VIOLET, GREEN }, { BLUE, RED } };
 
   private static int[] line = new int[280];
+  private static int[] colourBits = new int[280];
 
   private int fileType;
   private int auxType;
   private byte[] unpackedBuffer;
   private static boolean colourQuirks;
+  private static boolean checkingColourBits = true;
 
   public HiResImage (String name, byte[] buffer)
   {
@@ -116,17 +118,18 @@ public class HiResImage extends AbstractFile
     DataBuffer db = image.getRaster ().getDataBuffer ();
     int element = 0;
 
-    for (int z = 0; z < rows / 192; z++)
+    for (int page = 0; page < rows / 192; page++)
       for (int i = 0; i < 3; i++)
         for (int j = 0; j < 8; j++)
           for (int k = 0; k < 8; k++)
           {
-            int base = i * 0x28 + j * 0x80 + k * 0x400 + z * 0x2000;
-            element = drawLine (db, element, base);
+            fillLine (page * 0x2000 + i * 0x28 + j * 0x80 + k * 0x400);
+            for (int pixel : line)
+              db.setElem (element++, pixel);
           }
   }
 
-  private int drawLine (DataBuffer db, int element, int base)
+  private void fillLine (int base)
   {
     int max = Math.min (base + 40, buffer.length);
     int linePtr = 0;
@@ -138,57 +141,64 @@ public class HiResImage extends AbstractFile
 
       for (int px = 0; px < 7; px++)
       {
-        int val = (value >> px) & 0x01;
-        int column = (ptr + px) % 2;
-        line[linePtr++] = val == 0 ? 0 : colours[colourBit][column];
+        colourBits[linePtr] = colourBit;        // store the colour bit
+        int val = (value >> px) & 0x01;         // get the next pixel to draw
+        int column = (ptr * 7 + px) % 2;        // is it in an odd or even column?
+        line[linePtr++] = val == 0 ? 0 :        // black pixel
+            colours[colourBit][column];         // coloured pixel - use palette
       }
     }
 
-    // convert ALL consecutive ON pixels to white
+    // convert consecutive ON pixels to white
     if (true)
       for (int x = 0; x < line.length - 1; x++)
-        if (line[x] != BLACK && line[x + 1] != BLACK)
-          //        if (isColoured (line[x]) && isColoured (line[x + 1]))
-          line[x] = line[x + 1] = WHITE;
-
-    // convert WOZ quirks
-    if (colourQuirks)
-    {
-      for (int x = 0; x < line.length - 3; x++)
       {
+        if (checkingColourBits && colourBits[x] != colourBits[x + 1])
+          continue;                   // only modify values with matching colour bits
+
         int px0 = line[x];
         int px1 = line[x + 1];
-        int px2 = line[x + 2];
-        int px3 = line[x + 3];
-
-        if (px1 == BLACK)
-        {
-          if (px3 == BLACK && px0 == px2 && isColoured (px0))           //     V-B-V-B
-            line[x + 1] = px0;                                          // --> V-V-V-B
-
-          else if (px3 == WHITE && px2 == WHITE && isColoured (px0))    //     V-B-W-W
-            line[x + 1] = px0;                                          // --> V-V-W-W
-        }
-        else if (px2 == BLACK)
-        {
-          if (px0 == BLACK && px1 == px3 && isColoured (px3))           //     B-G-B-G 
-            line[x + 2] = px3;                                          // --> B-G-G-G
-
-          else if (px0 == WHITE && px1 == WHITE && isColoured (px3))    //     W-W-B-G
-            line[x + 2] = px3;                                          // --> W-W-G-G
-        }
+        if (px0 != BLACK && px1 != BLACK)
+          line[x] = line[x + 1] = WHITE;
       }
-    }
 
-    for (int pixel : line)
-      db.setElem (element++, pixel);
-
-    return element;
+    // optionally do physics
+    if (colourQuirks)
+      applyColourQuirks ();
   }
 
   private boolean isColoured (int pixel)
   {
     return pixel != BLACK && pixel != WHITE;
+  }
+
+  private void applyColourQuirks ()
+  {
+    for (int x = 0; x < line.length - 3; x++)
+    {
+      if (checkingColourBits && colourBits[x] != colourBits[x + 3])
+        continue;                   // only modify values with matching colour bits
+
+      int px0 = line[x];
+      int px1 = line[x + 1];
+      int px2 = line[x + 2];
+      int px3 = line[x + 3];
+
+      if (px1 == BLACK)
+      {
+        if (px3 == BLACK && px0 == px2 && isColoured (px0))           //     V-B-V-B
+          line[x + 1] = px0;                                          // --> V-V-V-B
+        else if (px3 == WHITE && px2 == WHITE && isColoured (px0))    //     V-B-W-W
+          line[x + 1] = px0;                                          // --> V-V-W-W
+      }
+      else if (px2 == BLACK)
+      {
+        if (px0 == BLACK && px1 == px3 && isColoured (px3))           //     B-G-B-G 
+          line[x + 2] = px3;                                          // --> B-G-G-G
+        else if (px0 == WHITE && px1 == WHITE && isColoured (px3))    //     W-W-B-G
+          line[x + 2] = px3;                                          // --> W-W-G-G
+      }
+    }
   }
 
   private void makeScreen2 (byte[] buffer)

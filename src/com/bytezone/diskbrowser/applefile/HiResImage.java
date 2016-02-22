@@ -21,7 +21,7 @@ public class HiResImage extends AbstractFile
 
   private static boolean colourQuirks;
   private static boolean matchColourBits = true;
-  private static boolean drawColour = true;
+  private static boolean monochrome;
 
   private final int[] line = new int[280];
   private final int[] colourBits = new int[280];
@@ -39,10 +39,10 @@ public class HiResImage extends AbstractFile
 
     if (isGif (buffer))
       makeGif ();
-    else if (drawColour)
-      drawColour (buffer);
-    else
+    else if (monochrome)
       drawMonochrome (buffer);
+    else
+      drawColour (buffer);
   }
 
   public HiResImage (String name, byte[] buffer, int fileType, int auxType)
@@ -66,13 +66,30 @@ public class HiResImage extends AbstractFile
     colourQuirks = value;
   }
 
+  public static void setDefaultMonochrome (boolean value)
+  {
+    monochrome = value;
+  }
+
   public void setColourQuirks (boolean value)
   {
-    if (colourQuirks == value || !drawColour)
+    if (colourQuirks == value || monochrome)
       return;
 
     colourQuirks = value;
     drawColour (buffer);
+  }
+
+  public void setMonochrome (boolean value)
+  {
+    if (monochrome == value)
+      return;
+
+    monochrome = value;
+    if (monochrome)
+      drawMonochrome (buffer);
+    else
+      drawColour (buffer);
   }
 
   private void drawMonochrome (byte[] buffer)

@@ -24,6 +24,7 @@ public class MenuHandler
   private static final String PREFS_SHOW_LAYOUT = "show layout";
   private static final String PREFS_SHOW_FREE_SECTORS = "show free sectors";
   private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
+  private static final String PREFS_MONOCHROME = "monochrome";
 
   FormattedDisk currentDisk;
 
@@ -59,6 +60,7 @@ public class MenuHandler
   JMenuItem interleave3Item = new JRadioButtonMenuItem (new InterleaveAction (3));
 
   JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
+  JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
 
   public MenuHandler (Preferences prefs)
   {
@@ -107,6 +109,7 @@ public class MenuHandler
     formatMenu.add (sector512Item);
     formatMenu.addSeparator ();
     formatMenu.add (colourQuirksItem);
+    formatMenu.add (monochromeItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -133,7 +136,10 @@ public class MenuHandler
     showCatalogItem.setSelected (prefs.getBoolean (PREFS_SHOW_CATALOG, true));
     showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
+    monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
+
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
+    HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -188,6 +194,7 @@ public class MenuHandler
     prefs.putBoolean (PREFS_SHOW_CATALOG, showCatalogItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
     prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
+    prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
   }
 
   @Override

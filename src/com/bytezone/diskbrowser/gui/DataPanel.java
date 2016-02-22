@@ -125,6 +125,7 @@ class DataPanel extends JTabbedPane
 
     mh.lineWrapItem.setAction (new LineWrapAction (formattedText));
     mh.colourQuirksItem.setAction (new ColourQuirksAction (this));
+    mh.monochromeItem.setAction (new MonochromeAction (this));
   }
 
   public void setColourQuirks (boolean value)
@@ -133,6 +134,16 @@ class DataPanel extends JTabbedPane
     {
       HiResImage image = (HiResImage) currentDataSource;
       image.setColourQuirks (value);
+      imagePanel.setImage (image.getImage ());
+    }
+  }
+
+  public void setMonochrome (boolean value)
+  {
+    if (currentDataSource instanceof HiResImage)
+    {
+      HiResImage image = (HiResImage) currentDataSource;
+      image.setMonochrome (value);
       imagePanel.setImage (image.getImage ());
     }
   }

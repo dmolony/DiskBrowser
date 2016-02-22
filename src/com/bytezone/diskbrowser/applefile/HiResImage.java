@@ -79,7 +79,7 @@ public class HiResImage extends AbstractFile
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_GRAY);
-    DataBuffer db = image.getRaster ().getDataBuffer ();
+    DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
     int element = 0;
 
     for (int page = 0; page < rows / 192; page++)
@@ -94,8 +94,8 @@ public class HiResImage extends AbstractFile
               int value = buffer[ptr] & 0x7F;
               for (int px = 0; px < 7; px++)
               {
-                int val = (value >> px) & 0x01;         // get the next pixel to draw
-                db.setElem (element++, val == 0 ? 0 : 255);
+                int val = (value >> px) & 0x01;
+                dataBuffer.setElem (element++, val == 0 ? 0 : 255);
               }
             }
           }
@@ -105,7 +105,7 @@ public class HiResImage extends AbstractFile
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
-    DataBuffer db = image.getRaster ().getDataBuffer ();
+    DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
     int element = 0;
 
     for (int page = 0; page < rows / 192; page++)
@@ -115,7 +115,7 @@ public class HiResImage extends AbstractFile
           {
             fillLine (page * 0x2000 + i * 0x28 + j * 0x80 + k * 0x400);
             for (int pixel : line)
-              db.setElem (element++, pixel);
+              dataBuffer.setElem (element++, pixel);
           }
   }
 
@@ -227,11 +227,10 @@ public class HiResImage extends AbstractFile
   // Beagle Bros routine to expand a hi-res screen
   private byte[] unscrunch (byte[] src)
   {
-    //    byte[] dst = new byte[src.length < 0x2000 ? 0x2000 : 0x4000];
     byte[] dst = new byte[0x2000];
     int p1 = 0;
     int p2 = 0;
-    //    while (p1 < dst.length && p2 < src.length)
+
     while (p1 < dst.length)
     {
       byte b = src[p2++];

@@ -17,10 +17,10 @@ public class HiResImage extends AbstractFile
   private static final int GREEN = 0x00FF00;
   private static final int BLUE = 0x0000FF;
   private static final int VIOLET = 0xBB66FF;
-  private static final int[][] colours = { { VIOLET, GREEN }, { BLUE, RED } };
+  private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
 
   private static boolean colourQuirks;
-  private static boolean matchColourBits = true;
+  private static boolean matchColourBits = false;
   private static boolean drawColour = true;
 
   private final int[] line = new int[280];
@@ -135,22 +135,21 @@ public class HiResImage extends AbstractFile
         int val = (value >> px) & 0x01;         // get the next pixel to draw
         int column = (ptr + px) % 2;            // is it in an odd or even column?
         line[linePtr++] = val == 0 ? 0 :        // black pixel
-            colours[colourBit][column];         // coloured pixel - use palette
+            palette[colourBit][column];         // coloured pixel - use lookup table
       }
     }
 
     // convert consecutive ON pixels to white
-    if (true)
-      for (int x = 1; x < line.length; x++)     // skip first pixel, refer back
-      {
-        if (matchColourBits && colourBits[x - 1] != colourBits[x])
-          continue;                   // only modify values with matching colour bits
+    for (int x = 1; x < line.length; x++)       // skip first pixel, refer back
+    {
+      if (matchColourBits && colourBits[x - 1] != colourBits[x])
+        continue;                   // only modify values with matching colour bits
 
-        int px0 = line[x - 1];
-        int px1 = line[x];
-        if (px0 != BLACK && px1 != BLACK)
-          line[x - 1] = line[x] = WHITE;
-      }
+      int px0 = line[x - 1];
+      int px1 = line[x];
+      if (px0 != BLACK && px1 != BLACK)
+        line[x - 1] = line[x] = WHITE;
+    }
 
     // optionally do physics
     if (colourQuirks)

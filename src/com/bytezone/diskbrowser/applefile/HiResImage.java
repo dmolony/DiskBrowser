@@ -73,11 +73,13 @@ public class HiResImage extends AbstractFile
 
   public void setColourQuirks (boolean value)
   {
-    if (colourQuirks == value || monochrome)
+    if (colourQuirks == value)
       return;
 
     colourQuirks = value;
-    drawColour (buffer);
+
+    if (!monochrome)
+      drawColour (buffer);
   }
 
   public void setMonochrome (boolean value)

@@ -37,6 +37,11 @@ public class HiResImage extends AbstractFile
     if (name.equals ("FLY LOGO") || name.equals ("BIGBAT.PAC"))
       this.buffer = unscrunch (buffer);
 
+    draw ();
+  }
+
+  private void draw ()
+  {
     if (isGif (buffer))
       makeGif ();
     else if (monochrome)
@@ -79,7 +84,7 @@ public class HiResImage extends AbstractFile
     colourQuirks = value;
 
     if (!monochrome)
-      drawColour (buffer);
+      draw ();
   }
 
   public void setMonochrome (boolean value)
@@ -88,10 +93,7 @@ public class HiResImage extends AbstractFile
       return;
 
     monochrome = value;
-    if (monochrome)
-      drawMonochrome (buffer);
-    else
-      drawColour (buffer);
+    draw ();
   }
 
   private void drawMonochrome (byte[] buffer)
@@ -184,7 +186,7 @@ public class HiResImage extends AbstractFile
   {
     for (int x = 3; x < line.length; x++)     // skip first three pixels, refer back
     {
-      if (matchColourBits && colourBits[x - 3] != colourBits[x])
+      if (matchColourBits && colourBits[x - 2] != colourBits[x - 1])
         continue;                   // only modify values with matching colour bits
 
       int px0 = line[x - 3];

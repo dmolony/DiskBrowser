@@ -20,7 +20,7 @@ import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
 public class DiskFactory
 {
-  private static boolean debug = false;
+  private static boolean debug = true;
 
   private DiskFactory ()
   {
@@ -178,8 +178,11 @@ public class DiskFactory
       else if (checksum == 3028642627L || checksum == 2070151659L)
         disk = checkInfocomDisk (file);
 
-      else if (checksum == 1212926910L || checksum == 1365043894L)
+      else if (checksum == 1212926910L || checksum == 1365043894L
+          || checksum == 2128073918L)
         disk = checkCPMDisk (file);
+
+      //      System.out.println (checksum);
 
       if (disk != null)
       {

@@ -3,7 +3,6 @@ package com.bytezone.diskbrowser.cpm;
 import java.awt.Color;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
 import com.bytezone.diskbrowser.disk.AppleDisk;
@@ -53,10 +52,11 @@ public class CPMDisk extends AbstractFormattedDisk
           return false;
         if (buffer[i] == 0)
         {
-          String filename = HexFormatter.getString (buffer, i + 1, 8);
-          String filetype = HexFormatter.getString (buffer, i + 9, 3);
-          String bytes = HexFormatter.getHexString (buffer, i + 12, 20);
-          System.out.println (filename + "  " + filetype + "  " + bytes);
+          //          String filename = HexFormatter.getString (buffer, i + 1, 8);
+          //          String filetype = HexFormatter.getString (buffer, i + 9, 3);
+          //          String bytes = HexFormatter.getHexString (buffer, i + 12, 20);
+          //          System.out.println (filename + "  " + filetype + "  " + bytes);
+          System.out.println (new DirectoryEntry (buffer, i));
         }
       }
     }

@@ -26,7 +26,7 @@ public class IconFile extends AbstractFile
     while (true)
     {
       int dataLen = HexFormatter.getWord (buffer, ptr);
-      if (dataLen == 0)
+      if (dataLen == 0 || (dataLen + ptr) > buffer.length)
         break;
       icons.add (new Icon (buffer, ptr));
       ptr += dataLen;
@@ -146,7 +146,7 @@ public class IconFile extends AbstractFile
 
     /*
         Offset  Color   RGB  Mini-Palette
-
+    
         0       Black   000    0
         1       Blue    00F    1
         2       Yellow  FF0    2
@@ -166,16 +166,16 @@ public class IconFile extends AbstractFile
         15      White   FFF    3
         
     The displayMode word bits are defined as:
-
+    
     Bit 0       selectedIconBit    1 = invert image before copying
     Bit 1       openIconBit        1 = copy light-gray pattern instead of image
     Bit 2       offLineBit         1 = AND light-gray pattern to image being copied
     Bits 3-7    reserved.
     Bits 8-11   foreground color to apply to black part of black & white icons
     Bits 12-15  background color to apply to white part of black & white icons
-
+    
     Bits 0-2 can occur at once and are tested in the order 1-2-0.
-
+    
     "Color is only applied to the black and white icons if bits 15-8 are not all 0.
     Colored pixels in an icon are inverted by black pixels becoming white and any
     other color of pixel becoming black."

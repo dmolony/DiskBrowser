@@ -279,6 +279,8 @@ class DataPanel extends JTabbedPane
 
       if (width < 400)
         scale = (400 - 1) / width + 1;
+      else
+        scale = 1;
       if (scale > 4)
         scale = 4;
 

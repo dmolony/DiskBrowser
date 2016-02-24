@@ -20,7 +20,7 @@ public class HiResImage extends AbstractFile
   private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
 
   private static boolean colourQuirks;
-  private static boolean matchColourBits = true;
+  private static boolean matchColourBits = false;
   private static boolean monochrome;
 
   private final int[] line = new int[280];

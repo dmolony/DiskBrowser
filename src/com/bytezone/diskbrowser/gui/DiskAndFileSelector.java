@@ -82,7 +82,7 @@ class DiskAndFileSelector
     FileNodeSelectedEvent e = new FileNodeSelectedEvent (this, node);
     e.redo = redo;
     FileNodeSelectionListener[] listeners =
-          (listenerList.getListeners (FileNodeSelectionListener.class));
+        (listenerList.getListeners (FileNodeSelectionListener.class));
     for (FileNodeSelectionListener listener : listeners)
       listener.fileNodeSelected (e);
   }
@@ -91,7 +91,7 @@ class DiskAndFileSelector
   {
     if (disk == currentDisk)
     {
-      System.out.println ("Disk event duplicated");
+      //      System.out.println ("Disk event duplicated");
       return;
     }
 
@@ -104,7 +104,7 @@ class DiskAndFileSelector
     DiskSelectedEvent e = new DiskSelectedEvent (this, disk);
     e.redo = redo;
     DiskSelectionListener[] listeners =
-          (listenerList.getListeners (DiskSelectionListener.class));
+        (listenerList.getListeners (DiskSelectionListener.class));
     for (DiskSelectionListener listener : listeners)
       listener.diskSelected (e);
     currentDisk = disk;
@@ -131,7 +131,7 @@ class DiskAndFileSelector
     FileSelectedEvent e = new FileSelectedEvent (this, file);
     e.redo = redo;
     FileSelectionListener[] listeners =
-          (listenerList.getListeners (FileSelectionListener.class));
+        (listenerList.getListeners (FileSelectionListener.class));
     for (FileSelectionListener listener : listeners)
       listener.fileSelected (e);
   }

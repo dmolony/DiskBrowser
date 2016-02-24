@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.FileFormatException;
 import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
@@ -24,6 +25,7 @@ public class AppleDisk implements Disk
 
   public final File path;
   private final byte[] diskBuffer;        // contains the disk contents in memory
+  private int skip = 0;
 
   private final int tracks;               // usually 35 for floppy disks
   private int sectors;                    // 8 or 16
@@ -48,6 +50,8 @@ public class AppleDisk implements Disk
   private ActionListener actionListenerList;
   private List<DiskAddress> blockList;
 
+  private final boolean debug = false;
+
   public AppleDisk (File path, int tracks, int sectors) throws FileFormatException
   {
     assert (path.exists ()) : "No such path :" + path.getAbsolutePath ();
@@ -55,19 +59,64 @@ public class AppleDisk implements Disk
     assert (path.length () <= Integer.MAX_VALUE) : "File too large";
     assert (path.length () != 0) : "File empty";
 
-    int skip = 0;
-
     String name = path.getName ();
     int pos = name.lastIndexOf ('.');
-    if (pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
+
+    byte[] buffer = getPrefix (path);         // HDV could be a 2mg
+    String prefix = new String (buffer, 0, 4);
+
+    if ((pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
+        || "2IMG".equals (prefix))
+    //      if ("2IMG".equals (prefix))
     {
-      byte[] buffer = getPrefix (path);
-      this.blocks = HexFormatter.intValue (buffer[20], buffer[21]);       // 1600
-      this.sectorSize = 512;
-      this.trackSize = 8 * sectorSize;
-      tracks = this.blocks / 8;
-      sectors = 8;
-      skip = HexFormatter.intValue (buffer[8], buffer[9]);
+      if (debug)
+        System.out.println (Utility.toHex (buffer));
+
+      // http://apple2.org.za/gswv/a2zine/Docs/DiskImage_2MG_Info.txt
+      if ("2IMG".equals (prefix))
+      {
+
+        if (debug)
+        {
+          String creator = new String (buffer, 4, 4);
+          System.out.printf ("Prefix    : %s%n", prefix);
+          System.out.printf ("Creator   : %s%n", creator);
+          int headerSize = Utility.getWord (buffer, 8);
+          System.out.printf ("Header    : %d%n", headerSize);
+          int version = Utility.getWord (buffer, 10);
+          System.out.printf ("Version   : %d%n", version);
+          System.out.printf ("Format    : %02X%n", buffer[12]);
+        }
+
+        int diskData = Utility.getLong (buffer, 28);
+        if (debug)
+          System.out.printf ("Data size : %08X (%,d)%n", diskData, diskData);
+        blocks = HexFormatter.intValue (buffer[20], buffer[21]);       // 1600
+        if (debug)
+          System.out.printf ("Blocks    : %,d%n", blocks);
+
+        int format = buffer[12] & 0xFF;
+        //        if (blocks == 0 && format == 1)
+        {
+          this.blocks = diskData / 4096 * 8; // reduces blocks to a legal multiple
+          if (debug)
+            System.out.printf ("Blocks    : %,d%n", blocks);
+        }
+
+        this.sectorSize = 512;
+        this.trackSize = 8 * sectorSize;
+        skip = Utility.getWord (buffer, 8);
+
+        tracks = blocks / 8;          // change parameter
+        sectors = 8;                  // change parameter
+      }
+      else
+      {
+        System.out.println ("Not a 2mg file");
+        this.blocks = (int) path.length () / 4096 * 8; // reduces blocks to a legal multiple
+        this.sectorSize = 512;
+        this.trackSize = sectors * sectorSize;
+      }
     }
     else if (pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("HDV"))
     {
@@ -84,6 +133,9 @@ public class AppleDisk implements Disk
 
     if (false)
     {
+      System.out.println ();
+      System.out.printf ("File name   : %s%n", path.getName ());
+      System.out.printf ("File size   : %,d%n", path.length ());
       System.out.println ("Tracks      : " + tracks);
       System.out.println ("Sectors     : " + sectors);
       System.out.println ("Blocks      : " + blocks);
@@ -107,6 +159,12 @@ public class AppleDisk implements Disk
 
     diskBuffer = new byte[tracks * sectors * sectorSize];
     hasData = new boolean[blocks];
+
+    if (debug)
+    {
+      System.out.printf ("DiskBuffer size : %,d%n", diskBuffer.length);
+      System.out.printf ("Skip size       : %,d%n", skip);
+    }
 
     try
     {
@@ -139,14 +197,18 @@ public class AppleDisk implements Disk
       e.printStackTrace ();
       System.exit (1);
     }
+
     return buffer;
   }
 
   private void checkSectorsForData ()
   {
-    blockList = null; // force blockList to be rebuilt with the correct number/size of blocks
+    // force blockList to be rebuilt with the correct number/size of blocks
+    blockList = null;
+
     for (DiskAddress da : this)
     {
+      //      System.out.println (da);
       byte[] buffer = readSector (da);
       hasData[da.getBlock ()] = false;
       for (int i = 0; i < sectorSize; i++)
@@ -430,6 +492,7 @@ public class AppleDisk implements Disk
       for (int block = 0; block < blocks; block++)
         blockList.add (new AppleDiskAddress (block, this));
     }
+
     return blockList.iterator ();
   }
 

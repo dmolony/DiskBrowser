@@ -99,12 +99,29 @@ public class DiskFactory
     FormattedDisk disk2 = null;
 
     if (suffix.equals ("hdv"))
-      return checkHardDisk (file);
+    {
+      ProdosDisk prodosDisk = checkHardDisk (file);
+      if (prodosDisk != null)
+        return prodosDisk;
+
+      disk2 = check2mgDisk (file);
+      if (disk2 != null)
+        return disk2;
+
+      AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
+      return new DataDisk (appleDisk);
+    }
 
     if (suffix.equals ("2mg"))
-      return check2mgDisk (file);
+    {
+      disk2 = check2mgDisk (file);
+      if (disk2 != null)
+        return disk2;
 
-    //    if (((suffix.equals ("po") || suffix.equals ("dsk")) && file.length () > 116480))
+      AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
+      return new DataDisk (appleDisk);
+    }
+
     if (((suffix.equals ("po") || suffix.equals ("dsk")) && file.length () > 143360))
     {
       disk = checkHardDisk (file);
@@ -113,6 +130,11 @@ public class DiskFactory
         if (compressed)
           disk.setOriginalPath (p);
         return disk;
+      }
+      else
+      {
+        AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
+        return new DataDisk (appleDisk);
       }
     }
 
@@ -267,8 +289,8 @@ public class DiskFactory
     if ((file.length () % 512) != 0)
     {
       if (debug)
-        System.out.printf ("file length not divisible by 512 : %d%n%", file.length ());
-      return null;
+        System.out.printf ("file length not divisible by 512 : %,d%n", file.length ());
+      //      return null;
     }
 
     // assumes a track is 4096 bytes
@@ -301,7 +323,7 @@ public class DiskFactory
     }
 
     if (debug)
-      System.out.println ("Not a Prodos hard disk");
+      System.out.println ("Not a Prodos hard disk\n");
 
     return null;
   }
@@ -322,6 +344,7 @@ public class DiskFactory
     }
     if (debug)
       System.out.println ("Not a Prodos 2mg disk");
+
     return null;
   }
 

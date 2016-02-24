@@ -6,8 +6,8 @@ import java.util.GregorianCalendar;
 
 public class HexFormatter
 {
-  private static String[] hex = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B",
-                                 "C", "D", "E", "F" };
+  private static String[] hex =
+      { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
   private static MathContext mathContext = new MathContext (9);
 
   public static String format (byte[] buffer)
@@ -31,13 +31,13 @@ public class HexFormatter
   }
 
   public static String formatNoHeader (byte[] buffer, int offset, int length,
-        int startingAddress)
+      int startingAddress)
   {
     return format (buffer, offset, length, false, startingAddress);
   }
 
   public static String format (byte[] buffer, int offset, int length, boolean header,
-        int startingAddress)
+      int startingAddress)
   {
     StringBuffer line = new StringBuffer ();
     int[] freq = new int[256];
@@ -106,7 +106,8 @@ public class HexFormatter
         if (freq[i] > 0)
         {
           totalBits += (Integer.bitCount (i) * freq[i]);
-          line.append (String.format ("%02X  %3d   %d%n", i, freq[i], Integer.bitCount (i)));
+          line.append (String.format ("%02X  %3d   %d%n", i, freq[i],
+                                      Integer.bitCount (i)));
         }
       line.append (String.format ("%nTotal bits : %d%n", totalBits));
     }
@@ -221,7 +222,7 @@ public class HexFormatter
   }
 
   public static String getHexStringReversed (byte[] buffer, int offset, int length,
-        boolean space)
+      boolean space)
   {
     StringBuilder hex = new StringBuilder ();
     for (int i = length - 1; i >= 0; i--)
@@ -356,8 +357,8 @@ public class HexFormatter
     int exponent = HexFormatter.intValue (buffer[offset]) - 0x80;
 
     int mantissa =
-          (buffer[offset + 1] & 0x7F) * 0x1000000 + intValue (buffer[offset + 2]) * 0x10000
-                + intValue (buffer[offset + 3]) * 0x100 + intValue (buffer[offset + 4]);
+        (buffer[offset + 1] & 0x7F) * 0x1000000 + intValue (buffer[offset + 2]) * 0x10000
+            + intValue (buffer[offset + 3]) * 0x100 + intValue (buffer[offset + 4]);
 
     int weight1 = 1;
     long weight2 = 2147483648L;
@@ -381,9 +382,8 @@ public class HexFormatter
     if (exponent == 0)
       return 0.0;
 
-    int mantissa =
-          (buffer[ptr + 1] & 0x7F) << 24 | (buffer[ptr + 2] & 0xFF) << 16
-                | (buffer[ptr + 3] & 0xFF) << 8 | (buffer[ptr + 4] & 0xFF);
+    int mantissa = (buffer[ptr + 1] & 0x7F) << 24 | (buffer[ptr + 2] & 0xFF) << 16
+        | (buffer[ptr + 3] & 0xFF) << 8 | (buffer[ptr + 4] & 0xFF);
     boolean negative = (buffer[ptr + 1] & 0x80) > 0;
     double value = 0.5;
     for (int i = 2, weight = 0x40000000; i <= 32; i++, weight >>>= 1)

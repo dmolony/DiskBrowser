@@ -27,7 +27,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     totalBlocks = HexFormatter.intValue (entryBuffer[37], entryBuffer[38]);
     if (totalBlocks == 0xFFFF | totalBlocks == 0x7FFF)
       totalBlocks = (int) disk.getFile ().length () / 4096 * 8;   // ignore extra bytes
-      //    totalBitMapBlocks = (totalBlocks * 8 - 1) / 4096 + 1;
+    //    totalBitMapBlocks = (totalBlocks * 8 - 1) / 4096 + 1;
     totalBitMapBlocks = (totalBlocks - 1) / 512 + 1;
 
     int block = 2;
@@ -56,8 +56,9 @@ class VolumeDirectoryHeader extends DirectoryHeader
     }
 
     block = 0;
-    int max = (totalBlocks - 1) / 8 + 1;   // bytes required for sector map
-    //    int max = (disk.getTotalBlocks () - 1) / 8 + 1;   // bytes required for sector map
+    //    int max = (totalBlocks - 1) / 8 + 1;   // bytes required for sector map
+    // nb disk may be truncated, so use actual number of blocks
+    int max = (disk.getTotalBlocks () - 1) / 8 + 1;   // bytes required for sector map
 
     for (int i = 0; i < max; i++)
     {
@@ -99,7 +100,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
       offset += 507;
     }
     return new ProdosDirectory (parentDisk, name, fullBuffer, totalBlocks, freeBlocks,
-          usedBlocks);
+        usedBlocks);
   }
 
   @Override

@@ -1,5 +1,8 @@
 package com.bytezone.diskbrowser.cpm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DirectoryEntry
@@ -12,6 +15,7 @@ public class DirectoryEntry
   private final int s2;
   private final int rc;
   private final byte[] blockList = new byte[16];
+  private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
 
   public DirectoryEntry (byte[] buffer, int offset)
   {
@@ -31,6 +35,11 @@ public class DirectoryEntry
         && type.equals (directoryEntry.type);
   }
 
+  public void add (DirectoryEntry entry)
+  {
+    entries.add (entry);
+  }
+
   @Override
   public String toString ()
   {
@@ -47,6 +56,12 @@ public class DirectoryEntry
 
     String bytes = HexFormatter.getHexString (blockList, 0, 16);
     text.append (String.format ("Allocation ..... %s%n", bytes));
+
+    for (DirectoryEntry entry : entries)
+    {
+      bytes = HexFormatter.getHexString (entry.blockList, 0, 16);
+      text.append (String.format ("                 %s%n", bytes));
+    }
 
     return text.toString ();
   }

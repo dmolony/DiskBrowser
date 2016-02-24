@@ -32,16 +32,15 @@ public class DirectoryEntry
 
     text.append (String.format ("User number .... %d%n", userNumber));
     text.append (String.format ("File name ...... %s%n", name + "." + type));
-    //    text.append (String.format ("File type ...... %s%n", type));
     text.append (String.format ("Extents lo ..... %d%n", ex));
     text.append (String.format ("Extents hi ..... %d%n", s2));
     text.append (String.format ("Reserved ....... %d%n", s1));
 
     int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);
     text.append (String.format ("Records ........ %02X  (%d)%n", rc, blocks));
-    text.append (String
-        .format ("Allocation ..... %s%n",
-                 HexFormatter.formatNoHeader (blockList, 0, 16).subSequence (8, 55)));
+
+    String bytes = HexFormatter.getHexString (blockList, 0, 16);
+    text.append (String.format ("Allocation ..... %s%n", bytes));
 
     return text.toString ();
   }

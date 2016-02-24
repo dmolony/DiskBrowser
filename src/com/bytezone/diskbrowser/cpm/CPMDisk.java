@@ -16,6 +16,8 @@ public class CPMDisk extends AbstractFormattedDisk
   public final SectorType catalogSector = new SectorType ("Catalog", green);
   public final SectorType cpmSector = new SectorType ("CPM", Color.lightGray);
 
+  private int version;      // http://www.seasip.info/Cpm/format22.html
+
   public CPMDisk (Disk disk)
   {
     super (disk);
@@ -25,6 +27,11 @@ public class CPMDisk extends AbstractFormattedDisk
     byte[] sectorBuffer = disk.readSector (0, 0); // Boot sector
     bootSector = new BootSector (disk, sectorBuffer, "CPM");
     sectorTypes[0] = cpmSector;
+
+    byte[] buffer = disk.readSector (0, 8);
+    String text = new String (buffer, 16, 24);
+    if ("DIR ERA TYPESAVEREN USER".equals (text))
+      version = buffer[41] & 0xFF;
 
     for (int sector = 0; sector < 8; sector++)
     {
@@ -43,21 +50,27 @@ public class CPMDisk extends AbstractFormattedDisk
   {
     disk.setInterleave (3);
 
+    byte[] buffer = disk.readSector (0, 8);
+    String text = new String (buffer, 16, 24);
+    System.out.println (text);
+    if ("DIR ERA TYPESAVEREN USER".equals (text))
+      return true;
+
+    buffer = disk.readSector (0, 4);
+    text = new String (buffer, 16, 24);
+    System.out.println (text);
+    if ("DIR ERA TYPESAVEREN USER".equals (text))
+      return true;
+
     for (int sector = 0; sector < 8; sector++)
     {
-      byte[] buffer = disk.readSector (3, sector);
+      buffer = disk.readSector (3, sector);
       for (int i = 0; i < buffer.length; i += 32)
       {
         if (buffer[i] != 0 && buffer[i] != (byte) 0xE5)
           return false;
         if (buffer[i] == 0)
-        {
-          //          String filename = HexFormatter.getString (buffer, i + 1, 8);
-          //          String filetype = HexFormatter.getString (buffer, i + 9, 3);
-          //          String bytes = HexFormatter.getHexString (buffer, i + 12, 20);
-          //          System.out.println (filename + "  " + filetype + "  " + bytes);
           System.out.println (new DirectoryEntry (buffer, i));
-        }
       }
     }
 

@@ -178,9 +178,9 @@ public class DiskFactory
       else if (checksum == 3028642627L || checksum == 2070151659L)
         disk = checkInfocomDisk (file);
 
-      else if (checksum == 1212926910L || checksum == 1365043894L
-          || checksum == 2128073918L)
-        disk = checkCPMDisk (file);
+      //      else if (checksum == 1212926910L || checksum == 1365043894L
+      //          || checksum == 2128073918L)
+      //        disk = checkCPMDisk (file);
 
       //      System.out.println (checksum);
 
@@ -219,6 +219,9 @@ public class DiskFactory
 
     if (disk == null)
       disk = checkPascalDisk (file);
+
+    if (disk == null)
+      disk = checkCPMDisk (file);
 
     if (disk == null)
     {

@@ -1,15 +1,6 @@
 package com.bytezone.diskbrowser.prodos;
 
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_DIRECTORY_HEADER;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_FREE;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_GSOS_EXTENDED_FILE;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_PASCAL_ON_PROFILE;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_SAPLING;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_SEEDLING;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_SUBDIRECTORY;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_SUBDIRECTORY_HEADER;
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.TYPE_TREE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.*;
 
 import java.util.GregorianCalendar;
 

@@ -13,12 +13,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
-import com.bytezone.diskbrowser.disk.AppleDisk;
-import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
-import com.bytezone.diskbrowser.disk.Disk;
-import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.disk.SectorType;
+import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
 
 public class InfocomDisk extends AbstractFormattedDisk

@@ -6,10 +6,10 @@ import java.util.TreeMap;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class CodeManager extends AbstractFile
 {

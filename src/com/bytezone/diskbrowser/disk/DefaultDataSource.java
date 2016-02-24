@@ -5,8 +5,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DefaultDataSource implements DataSource
 {

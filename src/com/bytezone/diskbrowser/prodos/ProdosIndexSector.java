@@ -1,8 +1,8 @@
 package com.bytezone.diskbrowser.prodos;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class ProdosIndexSector extends AbstractSector
 {

@@ -3,13 +3,13 @@ package com.bytezone.diskbrowser.dos;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.dos.DosDisk.FileType;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 abstract class AbstractCatalogEntry implements AppleFileSource
 {

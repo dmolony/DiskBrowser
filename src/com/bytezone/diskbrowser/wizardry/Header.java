@@ -5,12 +5,12 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Header
 {

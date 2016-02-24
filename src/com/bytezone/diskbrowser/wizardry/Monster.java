@@ -4,8 +4,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Monster extends AbstractFile implements Comparable<Monster>
 {

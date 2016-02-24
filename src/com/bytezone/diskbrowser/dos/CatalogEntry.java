@@ -1,8 +1,8 @@
 package com.bytezone.diskbrowser.dos;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.dos.DosDisk.FileType;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class CatalogEntry extends AbstractCatalogEntry
 {

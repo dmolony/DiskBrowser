@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.cpm;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DirectoryEntry
 {
@@ -23,6 +23,12 @@ public class DirectoryEntry
     s1 = buffer[offset + 14] & 0xFF;
     rc = buffer[offset + 15] & 0xFF;
     System.arraycopy (buffer, offset + 16, blockList, 0, 16);
+  }
+
+  public boolean matches (DirectoryEntry directoryEntry)
+  {
+    return userNumber == directoryEntry.userNumber && name.equals (directoryEntry.name)
+        && type.equals (directoryEntry.type);
   }
 
   @Override

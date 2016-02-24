@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Dictionary extends AbstractFile
 {

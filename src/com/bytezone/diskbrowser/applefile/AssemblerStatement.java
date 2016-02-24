@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AssemblerStatement
 {

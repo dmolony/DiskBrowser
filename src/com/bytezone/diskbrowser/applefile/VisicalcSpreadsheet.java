@@ -11,8 +11,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.VisicalcSpreadsheet.VisicalcCell;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 {

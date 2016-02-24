@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class MazeCell
 {

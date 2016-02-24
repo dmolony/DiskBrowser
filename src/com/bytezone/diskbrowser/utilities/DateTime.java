@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser;
+package com.bytezone.diskbrowser.utilities;
 
 class DateTime
 {

@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser;
+package com.bytezone.diskbrowser.utilities;
 
 import java.util.ArrayList;
 import java.util.List;

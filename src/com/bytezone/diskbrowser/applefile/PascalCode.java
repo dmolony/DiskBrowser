@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class PascalCode extends AbstractFile implements PascalConstants, Iterable<PascalSegment>
 {

@@ -7,12 +7,12 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.wizardry.Character.Attributes;
 import com.bytezone.diskbrowser.wizardry.Character.Statistics;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;

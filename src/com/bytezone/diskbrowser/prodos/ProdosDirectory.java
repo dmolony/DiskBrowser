@@ -2,9 +2,9 @@ package com.bytezone.diskbrowser.prodos;
 
 import java.util.GregorianCalendar;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class ProdosDirectory extends AbstractFile
 {

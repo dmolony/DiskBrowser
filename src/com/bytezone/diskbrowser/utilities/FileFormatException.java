@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser;
+package com.bytezone.diskbrowser.utilities;
 
 public class FileFormatException extends RuntimeException
 {

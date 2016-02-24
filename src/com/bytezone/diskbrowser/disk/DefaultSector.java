@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.disk;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DefaultSector extends AbstractSector
 {

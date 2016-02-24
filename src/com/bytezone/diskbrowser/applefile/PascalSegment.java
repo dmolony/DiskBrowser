@@ -3,8 +3,8 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.FileFormatException;
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class PascalSegment extends AbstractFile implements PascalConstants
 {

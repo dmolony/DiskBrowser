@@ -3,8 +3,8 @@ package com.bytezone.diskbrowser.appleworks;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AppleworksSSFile extends AbstractFile
 {

@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.applefile;
 
 import java.util.*;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class BasicProgram extends AbstractFile
 {

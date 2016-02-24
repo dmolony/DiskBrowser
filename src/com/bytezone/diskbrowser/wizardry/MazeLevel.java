@@ -6,8 +6,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class MazeLevel extends AbstractFile
 {

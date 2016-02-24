@@ -22,11 +22,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.bytezone.diskbrowser.FileFormatException;
 import com.bytezone.diskbrowser.disk.AppleDisk;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskFactory;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
 
 public class TreeBuilder
 {

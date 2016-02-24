@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class WizardryTitle extends AbstractFile
 {

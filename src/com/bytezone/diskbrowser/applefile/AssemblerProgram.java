@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.gui.DiskBrowser;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AssemblerProgram extends AbstractFile
 {

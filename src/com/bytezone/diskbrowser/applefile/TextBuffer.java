@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // only used by Prodos text files - note the fixed block size of 512 - bad!
 public class TextBuffer

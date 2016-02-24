@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Character extends AbstractFile
 {

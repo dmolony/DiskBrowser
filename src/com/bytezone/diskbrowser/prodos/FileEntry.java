@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // - Set sector types for each used sector
 // - Populate dataBlocks, indexBlocks, catalogBlock and masterIndexBlock

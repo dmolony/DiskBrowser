@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class ProdosDisk extends AbstractFormattedDisk
 {

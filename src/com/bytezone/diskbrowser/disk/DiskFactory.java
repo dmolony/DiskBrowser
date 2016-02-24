@@ -9,13 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 
-import com.bytezone.diskbrowser.FileFormatException;
-import com.bytezone.diskbrowser.NuFX;
 import com.bytezone.diskbrowser.cpm.CPMDisk;
 import com.bytezone.diskbrowser.dos.DosDisk;
 import com.bytezone.diskbrowser.infocom.InfocomDisk;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.NuFX;
 import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
 public class DiskFactory

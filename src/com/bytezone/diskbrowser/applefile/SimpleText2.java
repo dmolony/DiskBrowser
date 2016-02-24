@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class SimpleText2 extends AbstractFile
 {

@@ -3,8 +3,8 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.PascalCodeStatement.Jump;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class PascalProcedure
 {

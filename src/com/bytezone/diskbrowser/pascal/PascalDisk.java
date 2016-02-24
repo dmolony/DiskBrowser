@@ -8,10 +8,10 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class PascalDisk extends AbstractFormattedDisk
 {

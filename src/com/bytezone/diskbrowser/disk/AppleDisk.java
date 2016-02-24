@@ -14,9 +14,9 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 import com.bytezone.common.Utility;
-import com.bytezone.diskbrowser.FileFormatException;
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AppleDisk implements Disk
 {

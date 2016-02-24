@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.infocom;
 
 import java.util.*;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Grammar extends InfocomAbstractFile
 {

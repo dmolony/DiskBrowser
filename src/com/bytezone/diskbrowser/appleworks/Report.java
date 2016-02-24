@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.appleworks;
 
-import com.bytezone.diskbrowser.HexFormatter;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 abstract class Report
 {

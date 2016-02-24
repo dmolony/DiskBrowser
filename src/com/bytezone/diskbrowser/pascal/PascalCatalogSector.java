@@ -3,9 +3,9 @@ package com.bytezone.diskbrowser.pascal;
 import java.text.DateFormat;
 import java.util.GregorianCalendar;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class PascalCatalogSector extends AbstractSector
 {

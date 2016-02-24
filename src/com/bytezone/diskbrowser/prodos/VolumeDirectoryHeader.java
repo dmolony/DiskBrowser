@@ -3,9 +3,9 @@ package com.bytezone.diskbrowser.prodos;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 /*
  * There is only one of these - it is always the first entry in the first block.

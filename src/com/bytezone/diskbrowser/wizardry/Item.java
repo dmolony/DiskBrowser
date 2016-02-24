@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.wizardry;
 
-import com.bytezone.diskbrowser.HexFormatter;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Item extends AbstractFile implements Comparable<Item>
 {

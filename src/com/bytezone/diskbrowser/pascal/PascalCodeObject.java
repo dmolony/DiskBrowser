@@ -49,6 +49,15 @@ class PascalCodeObject implements AppleFileSource
   }
 
   @Override
+  public boolean contains (DiskAddress da)
+  {
+    for (DiskAddress sector : blocks)
+      if (sector.compareTo (da) == 0)
+        return true;
+    return false;
+  }
+
+  @Override
   public String getUniqueName ()
   {
     return segment.name; // this should be fileName/segmentName

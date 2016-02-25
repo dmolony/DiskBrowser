@@ -29,7 +29,6 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   protected ActionListener actionListenerList;
   protected JTree catalogTree;
   protected Path originalPath;
-  //  protected String originalName;
 
   protected List<SectorType> sectorTypesList = new ArrayList<SectorType> ();
   protected List<AppleFileSource> fileEntries = new ArrayList<AppleFileSource> ();
@@ -40,7 +39,6 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
   public final SectorType emptySector = new SectorType ("Unused (empty)", Color.white);
   public final SectorType usedSector = new SectorType ("Unused (data)", Color.yellow);
-  //  public final SectorType dosSector = new SectorType ("DOS", Color.lightGray);
 
   protected int falsePositives;
   protected int falseNegatives;
@@ -304,6 +302,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   @Override
   public String getSectorFilename (DiskAddress da)
   {
+    for (AppleFileSource entry : fileEntries)
+      if (entry.contains (da))
+        return (entry).getUniqueName ();
+
     return "unknown";
   }
 

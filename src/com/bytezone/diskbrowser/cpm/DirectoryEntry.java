@@ -81,6 +81,15 @@ public class DirectoryEntry implements AppleFileSource
     }
   }
 
+  @Override
+  public boolean contains (DiskAddress da)
+  {
+    for (DiskAddress sector : blocks)
+      if (sector.compareTo (da) == 0)
+        return true;
+    return false;
+  }
+
   public String line ()
   {
     int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);

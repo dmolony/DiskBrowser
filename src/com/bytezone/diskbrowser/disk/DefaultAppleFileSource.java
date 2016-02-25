@@ -35,7 +35,7 @@ public class DefaultAppleFileSource implements AppleFileSource
   }
 
   public DefaultAppleFileSource (String title, DataSource file, FormattedDisk owner,
-        List<DiskAddress> blocks)
+      List<DiskAddress> blocks)
   {
     this (title, file, owner);
     this.blocks = blocks;
@@ -50,16 +50,19 @@ public class DefaultAppleFileSource implements AppleFileSource
       ((DefaultDataSource) file).buffer = owner.getDisk ().readSectors (blocks);
   }
 
+  @Override
   public DataSource getDataSource ()
   {
     return file;
   }
 
+  @Override
   public FormattedDisk getFormattedDisk ()
   {
     return owner;
   }
 
+  @Override
   public List<DiskAddress> getSectors ()
   {
     return blocks;
@@ -77,12 +80,22 @@ public class DefaultAppleFileSource implements AppleFileSource
 
     if (title.length () > MAX_NAME_LENGTH)
       return title.substring (0, PREFIX_LENGTH) + "..."
-            + title.substring (title.length () - SUFFIX_LENGTH);
+          + title.substring (title.length () - SUFFIX_LENGTH);
     return title;
   }
 
+  @Override
   public String getUniqueName ()
   {
     return title;
+  }
+
+  @Override
+  public boolean contains (DiskAddress diskAddress)
+  {
+    for (DiskAddress da : blocks)
+      if (da.compareTo (diskAddress) == 0)
+        return true;
+    return false;
   }
 }

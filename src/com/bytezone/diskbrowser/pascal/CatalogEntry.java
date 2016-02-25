@@ -37,7 +37,8 @@ abstract class CatalogEntry implements AppleFileSource
       blocks.add (disk.getDiskAddress (i));
   }
 
-  boolean contains (DiskAddress da)
+  @Override
+  public boolean contains (DiskAddress da)
   {
     for (DiskAddress sector : blocks)
       if (sector.compareTo (da) == 0)

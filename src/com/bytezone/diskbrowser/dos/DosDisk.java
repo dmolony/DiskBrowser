@@ -337,14 +337,14 @@ public class DosDisk extends AbstractFormattedDisk
     return super.getFormattedSector (da);
   }
 
-  @Override
-  public String getSectorFilename (DiskAddress da)
-  {
-    for (AppleFileSource ce : fileEntries)
-      if (((CatalogEntry) ce).contains (da))
-        return ((CatalogEntry) ce).name;
-    return null;
-  }
+  //  @Override
+  //  public String getSectorFilename (DiskAddress da)
+  //  {
+  //    for (AppleFileSource ce : fileEntries)
+  //      if (((CatalogEntry) ce).contains (da))
+  //        return ((CatalogEntry) ce).name;
+  //    return null;
+  //  }
 
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)

@@ -48,4 +48,13 @@ abstract class CatalogEntry implements AppleFileSource
   {
     return parentDisk;
   }
+
+  @Override
+  public boolean contains (DiskAddress da)
+  {
+    for (DiskAddress sector : dataBlocks)
+      if (sector.compareTo (da) == 0)
+        return true;
+    return false;
+  }
 }

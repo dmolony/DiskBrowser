@@ -234,14 +234,14 @@ public class ProdosDisk extends AbstractFormattedDisk
     return super.getFormattedSector (da);
   }
 
-  @Override
-  public String getSectorFilename (DiskAddress da)
-  {
-    for (AppleFileSource fe : fileEntries)
-      if (((FileEntry) fe).contains (da))
-        return ((FileEntry) fe).getUniqueName ();
-    return null;
-  }
+  //  @Override
+  //  public String getSectorFilename (DiskAddress da)
+  //  {
+  //    for (AppleFileSource fe : fileEntries)
+  //      if (((FileEntry) fe).contains (da))
+  //        return ((FileEntry) fe).getUniqueName ();
+  //    return null;
+  //  }
 
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)

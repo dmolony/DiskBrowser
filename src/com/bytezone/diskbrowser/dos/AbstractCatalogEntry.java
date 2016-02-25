@@ -257,7 +257,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return appleFile;
   }
 
-  boolean contains (DiskAddress da)
+  @Override
+  public boolean contains (DiskAddress da)
   {
     for (DiskAddress sector : tsSectors)
       if (sector.compareTo (da) == 0)

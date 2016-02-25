@@ -35,9 +35,6 @@ public class CPMDisk extends AbstractFormattedDisk
     getDisk ().setEmptyByte ((byte) 0xE5);
     setSectorTypes ();
 
-    //    byte[] sectorBuffer = disk.readSector (0, 0); // Boot sector
-    //    bootSector = new BootSector (disk, sectorBuffer, "CPM");
-
     byte[] buffer = disk.readSector (0, 8);
     String text = new String (buffer, 16, 24);
     if ("DIR ERA TYPESAVEREN USER".equals (text))
@@ -48,9 +45,12 @@ public class CPMDisk extends AbstractFormattedDisk
     for (int sector = 0; sector < 8; sector++)
     {
       DiskAddress da = disk.getDiskAddress (3, sector);
-      sectorTypes[da.getBlock ()] = catalogSector;
+      if (disk.isSectorEmpty (da))
+        break;
 
+      sectorTypes[da.getBlock ()] = catalogSector;
       buffer = disk.readSector (da);
+
       for (int i = 0; i < buffer.length; i += 32)
       {
         if (buffer[i] != 0 && buffer[i] != (byte) 0xE5)
@@ -60,7 +60,8 @@ public class CPMDisk extends AbstractFormattedDisk
           DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
           SectorType sectorType = getSectorType (entry.getType ());
           for (DiskAddress block : entry.getSectors ())
-            sectorTypes[block.getBlock ()] = sectorType;
+            if (!disk.isSectorEmpty (block))
+              sectorTypes[block.getBlock ()] = sectorType;
 
           DirectoryEntry parent = findParent (entry);
           if (parent == null)
@@ -76,7 +77,7 @@ public class CPMDisk extends AbstractFormattedDisk
       }
     }
 
-    root.setUserObject (getCatalog ());
+    root.setUserObject (getCatalog ());         // override the disk's default display
     makeNodeVisible (root.getFirstLeaf ());
   }
 

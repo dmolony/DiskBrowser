@@ -50,7 +50,10 @@ public class DirectoryEntry implements AppleFileSource
 
       int blockNumber = b * 4 + 48;
       for (int i = 0; i < 4; i++)
-        blocks.add (new AppleDiskAddress (blockNumber + i, disk));
+      {
+        AppleDiskAddress da = new AppleDiskAddress (blockNumber + i, disk);
+        blocks.add (da);
+      }
     }
   }
 

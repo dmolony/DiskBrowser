@@ -158,7 +158,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
         (DefaultMutableTreeNode) catalogTree.getModel ().getRoot ();
     DefaultAppleFileSource afs =
         new DefaultAppleFileSource (getName (), disk.toString (), this);
-    root.setUserObject (afs);
+    if (root.getUserObject () == null)
+      root.setUserObject (afs);
   }
 
   @Override

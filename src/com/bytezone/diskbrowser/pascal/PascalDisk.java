@@ -3,12 +3,14 @@ package com.bytezone.diskbrowser.pascal;
 import java.awt.Color;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.applefile.BootSector;
+import com.bytezone.diskbrowser.applefile.PascalCode;
+import com.bytezone.diskbrowser.applefile.PascalSegment;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -20,7 +22,7 @@ public class PascalDisk extends AbstractFormattedDisk
   private final VolumeEntry volume;
   private final PascalCatalogSector diskCatalogSector;
 
-  private final String[] fileTypes =
+  final String[] fileTypes =
       { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
   SectorType diskBootSector = new SectorType ("Boot", Color.lightGray);
@@ -53,7 +55,7 @@ public class PascalDisk extends AbstractFormattedDisk
     byte[] data = new byte[CATALOG_ENTRY_SIZE];
     System.arraycopy (buffer, 0, data, 0, CATALOG_ENTRY_SIZE);
 
-    volume = new VolumeEntry (data);
+    volume = new VolumeEntry (this, data);
 
     for (int i = 0; i < 2; i++)
       if (!disk.isSectorEmpty (i))
@@ -93,9 +95,10 @@ public class PascalDisk extends AbstractFormattedDisk
       int ptr = i * CATALOG_ENTRY_SIZE;
       data = new byte[CATALOG_ENTRY_SIZE];
       System.arraycopy (buffer, ptr, data, 0, CATALOG_ENTRY_SIZE);
-      FileEntry fe = new FileEntry (data);
+      FileEntry fe = new FileEntry (this, data);
       fileEntries.add (fe);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fe);
+
       if (fe.fileType == 2) // PascalCode
       {
         node.setAllowsChildren (true);
@@ -104,7 +107,7 @@ public class PascalDisk extends AbstractFormattedDisk
         {
           //					List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
           DefaultMutableTreeNode segmentNode =
-              new DefaultMutableTreeNode (new PascalCodeObject (ps, fe.firstBlock));
+              new DefaultMutableTreeNode (new PascalCodeObject (this, ps, fe.firstBlock));
           node.add (segmentNode);
           segmentNode.setAllowsChildren (false);
         }
@@ -257,246 +260,5 @@ public class PascalDisk extends AbstractFormattedDisk
         .format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
                  (volume.totalBlocks - usedBlocks), usedBlocks, volume.totalBlocks));
     return new DefaultAppleFileSource (volume.name, text.toString (), this);
-  }
-
-  private abstract class CatalogEntry implements AppleFileSource
-  {
-    String name;
-    int firstBlock;
-    int lastBlock;                      // block AFTER last used block
-    int fileType;
-    GregorianCalendar date;
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
-    AbstractFile file;
-
-    public CatalogEntry (byte[] buffer)
-    {
-      firstBlock = HexFormatter.intValue (buffer[0], buffer[1]);
-      lastBlock = HexFormatter.intValue (buffer[2], buffer[3]);
-      //			fileType = HexFormatter.intValue (buffer[4], buffer[5]);
-      fileType = buffer[4] & 0x0F;
-      name = HexFormatter.getPascalString (buffer, 6);
-
-      for (int i = firstBlock; i < lastBlock; i++)
-        blocks.add (disk.getDiskAddress (i));
-    }
-
-    private boolean contains (DiskAddress da)
-    {
-      for (DiskAddress sector : blocks)
-        if (sector.compareTo (da) == 0)
-          return true;
-      return false;
-    }
-
-    @Override
-    public String toString ()
-    {
-      int size = lastBlock - firstBlock;
-      return String.format ("%03d  %s  %-15s", size, fileTypes[fileType], name);
-    }
-
-    @Override
-    public List<DiskAddress> getSectors ()
-    {
-      List<DiskAddress> sectors = new ArrayList<DiskAddress> (blocks);
-      return sectors;
-    }
-
-    @Override
-    public FormattedDisk getFormattedDisk ()
-    {
-      return PascalDisk.this;
-    }
-
-    @Override
-    public String getUniqueName ()
-    {
-      return name;
-    }
-  }
-
-  private class VolumeEntry extends CatalogEntry
-  {
-    int totalFiles;
-    int totalBlocks;
-
-    public VolumeEntry (byte[] buffer)
-    {
-      super (buffer);
-
-      totalBlocks = HexFormatter.intValue (buffer[14], buffer[15]);
-      totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
-      firstBlock = HexFormatter.intValue (buffer[18], buffer[19]);
-      date = HexFormatter.getPascalDate (buffer, 20);
-
-      //      for (int i = firstBlock; i < lastBlock; i++)
-      //        sectorType[i] = catalogSector;
-    }
-
-    @Override
-    public AbstractFile getDataSource ()
-    {
-      //      System.out.println ("in Volume Entry **********************");
-      if (file != null)
-        return file;
-
-      byte[] buffer = disk.readSectors (blocks);
-      file = new DefaultAppleFile (name, buffer);
-
-      return file;
-    }
-  }
-
-  private class FileEntry extends CatalogEntry
-  {
-    int bytesUsedInLastBlock;
-
-    public FileEntry (byte[] buffer)
-    {
-      super (buffer);
-
-      bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
-      date = HexFormatter.getPascalDate (buffer, 24);
-
-      for (int i = firstBlock; i < lastBlock; i++)
-        switch (fileType)
-        {
-          case 2:
-            sectorTypes[i] = codeSector;
-            break;
-          case 3:
-            sectorTypes[i] = textSector;
-            break;
-          case 4:
-            sectorTypes[i] = infoSector;
-            break;
-          case 5:
-            sectorTypes[i] = dataSector;
-            break;
-          case 6:
-            sectorTypes[i] = grafSector;
-            break;
-          case 7:
-            sectorTypes[i] = fotoSector;
-            break;
-          default:
-            System.out.println ("Unknown pascal file type : " + fileType);
-            sectorTypes[i] = dataSector;
-            break;
-        }
-    }
-
-    @Override
-    public AbstractFile getDataSource ()
-    {
-      if (file != null)
-        return file;
-
-      byte[] buffer = getExactBuffer ();
-
-      //      try
-      {
-        switch (fileType)
-        {
-          case 3:
-            file = new PascalText (name, buffer);
-            break;
-          case 2:
-            file = new PascalCode (name, buffer);
-            break;
-          case 4:
-            file = new PascalInfo (name, buffer);
-            break;
-          case 0:
-            // volume
-            break;
-          case 5:
-            // data
-            if (name.equals ("SYSTEM.CHARSET"))
-            {
-              file = new Charset (name, buffer);
-              break;
-            }
-            if (name.equals ("WT")) // only testing
-            {
-              file = new WizardryTitle (name, buffer);
-              break;
-            }
-            // intentional fall-through
-          default:
-            // unknown
-            file = new DefaultAppleFile (name, buffer);
-        }
-      }
-      //      catch (Exception e)
-      //      {
-      //        file = new ErrorMessageFile (name, buffer, e);
-      //        e.printStackTrace ();
-      //      }
-      return file;
-    }
-
-    private byte[] getExactBuffer ()
-    {
-      byte[] buffer = disk.readSectors (blocks);
-      byte[] exactBuffer;
-      if (bytesUsedInLastBlock < 512)
-      {
-        int exactLength = buffer.length - 512 + bytesUsedInLastBlock;
-        exactBuffer = new byte[exactLength];
-        System.arraycopy (buffer, 0, exactBuffer, 0, exactLength);
-      }
-      else
-        exactBuffer = buffer;
-      return exactBuffer;
-    }
-  }
-
-  class PascalCodeObject implements AppleFileSource
-  {
-    private final AbstractFile segment;
-    private final List<DiskAddress> blocks;
-
-    public PascalCodeObject (PascalSegment segment, int firstBlock)
-    {
-      this.segment = segment;
-      this.blocks = new ArrayList<DiskAddress> ();
-
-      int lo = firstBlock + segment.blockNo;
-      int hi = lo + (segment.size - 1) / 512;
-      for (int i = lo; i <= hi; i++)
-        blocks.add (disk.getDiskAddress (i));
-    }
-
-    @Override
-    public DataSource getDataSource ()
-    {
-      return segment;
-    }
-
-    @Override
-    public FormattedDisk getFormattedDisk ()
-    {
-      return PascalDisk.this;
-    }
-
-    @Override
-    public List<DiskAddress> getSectors ()
-    {
-      return blocks;
-    }
-
-    @Override
-    public String getUniqueName ()
-    {
-      return segment.name; // this should be fileName/segmentName
-    }
-
-    @Override
-    public String toString ()
-    {
-      return segment.name;
-    }
   }
 }

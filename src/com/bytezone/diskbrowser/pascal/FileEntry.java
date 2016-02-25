@@ -50,45 +50,36 @@ class FileEntry extends CatalogEntry
 
     byte[] buffer = getExactBuffer ();
 
-    //      try
+    switch (fileType)
     {
-      switch (fileType)
-      {
-        case 3:
-          file = new PascalText (name, buffer);
-          break;
-        case 2:
-          file = new PascalCode (name, buffer);
-          break;
-        case 4:
-          file = new PascalInfo (name, buffer);
-          break;
-        case 0:
-          // volume
-          break;
-        case 5:
-          // data
-          if (name.equals ("SYSTEM.CHARSET"))
-          {
-            file = new Charset (name, buffer);
-            break;
-          }
-          if (name.equals ("WT")) // only testing
-          {
-            file = new WizardryTitle (name, buffer);
-            break;
-          }
-          // intentional fall-through
-        default:
-          // unknown
+      case 3:
+        file = new PascalText (name, buffer);
+        break;
+
+      case 2:
+        file = new PascalCode (name, buffer);
+        break;
+
+      case 4:
+        file = new PascalInfo (name, buffer);
+        break;
+
+      case 0:                                           // volume
+        break;
+
+      case 5:                                           // data
+        if (name.equals ("SYSTEM.CHARSET"))
+          file = new Charset (name, buffer);
+        else if (name.equals ("WT"))                    // only testing
+          file = new WizardryTitle (name, buffer);
+        else
           file = new DefaultAppleFile (name, buffer);
-      }
+        break;
+
+      default:                                          // unknown
+        file = new DefaultAppleFile (name, buffer);
     }
-    //      catch (Exception e)
-    //      {
-    //        file = new ErrorMessageFile (name, buffer, e);
-    //        e.printStackTrace ();
-    //      }
+
     return file;
   }
 
@@ -96,6 +87,7 @@ class FileEntry extends CatalogEntry
   {
     byte[] buffer = parent.getDisk ().readSectors (blocks);
     byte[] exactBuffer;
+
     if (bytesUsedInLastBlock < 512)
     {
       int exactLength = buffer.length - 512 + bytesUsedInLastBlock;
@@ -104,6 +96,7 @@ class FileEntry extends CatalogEntry
     }
     else
       exactBuffer = buffer;
+
     return exactBuffer;
   }
 }

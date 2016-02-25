@@ -14,14 +14,23 @@ public class CPMDisk extends AbstractFormattedDisk
   private final Color green = new Color (0, 200, 0);
   public final SectorType catalogSector = new SectorType ("Catalog", green);
   public final SectorType cpmSector = new SectorType ("CPM", Color.lightGray);
+  public final SectorType comSector = new SectorType ("COM", Color.red);
+  public final SectorType dataSector = new SectorType ("Data", Color.blue);
+  public final SectorType docSector = new SectorType ("DOC", Color.cyan);
+  public final SectorType xxxSector = new SectorType ("xxx", Color.gray);
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
 
   public CPMDisk (Disk disk)
   {
     super (disk);
+
     sectorTypesList.add (catalogSector);
     sectorTypesList.add (cpmSector);
+    sectorTypesList.add (comSector);
+    sectorTypesList.add (dataSector);
+    sectorTypesList.add (xxxSector);
+    sectorTypesList.add (docSector);
 
     byte[] sectorBuffer = disk.readSector (0, 0); // Boot sector
     bootSector = new BootSector (disk, sectorBuffer, "CPM");
@@ -47,6 +56,10 @@ public class CPMDisk extends AbstractFormattedDisk
         if (buffer[i] == 0)
         {
           DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
+          SectorType sectorType = getSectorType (entry.getType ());
+          for (DiskAddress block : entry.getSectors ())
+            sectorTypes[block.getBlock ()] = sectorType;
+
           DirectoryEntry parent = findParent (entry);
           if (parent == null)
           {
@@ -63,6 +76,16 @@ public class CPMDisk extends AbstractFormattedDisk
 
     root.setUserObject (getCatalog ());
     makeNodeVisible (root.getFirstLeaf ());
+  }
+
+  private SectorType getSectorType (String type)
+  {
+    if ("COM".equals (type))
+      return comSector;
+    if ("DOC".equals (type))
+      return docSector;
+
+    return dataSector;
   }
 
   @Override
@@ -84,10 +107,11 @@ public class CPMDisk extends AbstractFormattedDisk
   public AppleFileSource getCatalog ()
   {
     String newLine = String.format ("%n");
-    String line = "----  ---------  ----  ----  ----" + newLine;
+    String line = "----  ---------  ----  ----  ----   ----------------------------"
+        + "-------------------" + newLine;
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
-    text.append ("User  Name       Type  Exts  Size" + newLine);
+    text.append ("User  Name       Type  Exts  Size     Blocks" + newLine);
     text.append (line);
 
     for (AppleFileSource entry : fileEntries)
@@ -95,6 +119,7 @@ public class CPMDisk extends AbstractFormattedDisk
       text.append (((DirectoryEntry) entry).line ());
       text.append (newLine);
     }
+    text.append (line);
 
     return new DefaultAppleFileSource ("CPM Disk ", text.toString (), this);
   }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.disk.AppleDiskAddress;
+import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.DataSource;
@@ -21,6 +23,7 @@ public class DirectoryEntry implements AppleFileSource
   private final int rc;
   private final byte[] blockList = new byte[16];
   private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
+  private final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
 
   public DirectoryEntry (CPMDisk parent, byte[] buffer, int offset)
   {
@@ -33,6 +36,22 @@ public class DirectoryEntry implements AppleFileSource
     s1 = buffer[offset + 14] & 0xFF;
     rc = buffer[offset + 15] & 0xFF;
     System.arraycopy (buffer, offset + 16, blockList, 0, 16);
+
+    Disk disk = parent.getDisk ();
+    for (byte b : blockList)
+    {
+      if (b == 0)
+        break;
+
+      int blockNumber = b * 4 + 48;
+      for (int i = 0; i < 4; i++)
+        blocks.add (new AppleDiskAddress (blockNumber + i, disk));
+    }
+  }
+
+  public String getType ()
+  {
+    return type;
   }
 
   public boolean matches (DirectoryEntry directoryEntry)
@@ -44,13 +63,33 @@ public class DirectoryEntry implements AppleFileSource
   public void add (DirectoryEntry entry)
   {
     entries.add (entry);
+
+    Disk disk = parent.getDisk ();
+    for (byte b : entry.blockList)
+    {
+      if (b == 0)
+        break;
+
+      int blockNumber = b * 4 + 48;
+      for (int i = 0; i < 4; i++)
+        blocks.add (new AppleDiskAddress (blockNumber + i, disk));
+    }
   }
 
   public String line ()
   {
     int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);
-    return String.format ("%3d   %-8s   %-3s   %3d   %3d", userNumber, name, type,
-                          entries.size () + 1, blocks);
+    String bytes = HexFormatter.getHexString (blockList, 0, 16);
+    bytes = bytes.replaceAll ("00", "  ");
+    String text = String.format ("%3d   %-8s   %-3s   %3d   %3d    %s", userNumber, name,
+                                 type, entries.size () + 1, blocks, bytes);
+    for (DirectoryEntry entry : entries)
+    {
+      bytes = HexFormatter.getHexString (entry.blockList, 0, 16);
+      bytes = bytes.replaceAll ("00", "  ");
+      text = text + String.format ("%n%-36.36s%s", "", bytes);
+    }
+    return text;
   }
 
   public String toDetailedString ()
@@ -93,7 +132,7 @@ public class DirectoryEntry implements AppleFileSource
   @Override
   public List<DiskAddress> getSectors ()
   {
-    return null;
+    return blocks;
   }
 
   @Override

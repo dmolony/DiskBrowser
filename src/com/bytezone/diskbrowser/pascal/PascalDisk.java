@@ -355,6 +355,7 @@ public class PascalDisk extends AbstractFormattedDisk
     public FileEntry (byte[] buffer)
     {
       super (buffer);
+
       bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
       date = HexFormatter.getPascalDate (buffer, 24);
 

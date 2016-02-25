@@ -20,8 +20,8 @@ public class PascalDisk extends AbstractFormattedDisk
   private final VolumeEntry volume;
   private final PascalCatalogSector diskCatalogSector;
 
-  private final String[] fileTypes = { "Volume", "Xdsk", "Code", "Text", "Info", "Data",
-                                      "Graf", "Foto", "SecureDir" };
+  private final String[] fileTypes =
+      { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
   SectorType diskBootSector = new SectorType ("Boot", Color.lightGray);
   SectorType catalogSector = new SectorType ("Catalog", Color.magenta);
@@ -104,7 +104,7 @@ public class PascalDisk extends AbstractFormattedDisk
         {
           //					List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
           DefaultMutableTreeNode segmentNode =
-                new DefaultMutableTreeNode (new PascalCodeObject (ps, fe.firstBlock));
+              new DefaultMutableTreeNode (new PascalCodeObject (ps, fe.firstBlock));
           node.add (segmentNode);
           segmentNode.setAllowsChildren (false);
         }
@@ -229,13 +229,15 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String newLine2 = newLine + newLine;
-    String line = "----   ---------------   ----   --------  -------   ----   ----" + newLine;
+    String line =
+        "----   ---------------   ----   --------  -------   ----   ----" + newLine;
     String date = volume.date == null ? "--" : df.format (volume.date.getTime ());
     StringBuilder text = new StringBuilder ();
     text.append ("Disk : " + disk.getFile ().getAbsolutePath () + newLine2);
     text.append ("Volume : " + volume.name + newLine);
     text.append ("Date   : " + date + newLine2);
-    text.append ("Blks   Name              Type     Date     Length   Frst   Last" + newLine);
+    text.append ("Blks   Name              Type     Date     Length   Frst   Last"
+        + newLine);
     text.append (line);
 
     int usedBlocks = 6;
@@ -247,13 +249,13 @@ public class PascalDisk extends AbstractFormattedDisk
       date = ce.date == null ? "--" : df.format (ce.date.getTime ());
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
       text.append (String.format (" %3d   %-15s   %s   %8s %,8d   $%03X   $%03X%n", size,
-                                  ce.name, fileTypes[ce.fileType], date, bytes, ce.firstBlock,
-                                  ce.lastBlock));
+                                  ce.name, fileTypes[ce.fileType], date, bytes,
+                                  ce.firstBlock, ce.lastBlock));
     }
     text.append (line);
-    text.append (String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
-                                (volume.totalBlocks - usedBlocks), usedBlocks,
-                                volume.totalBlocks));
+    text.append (String
+        .format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
+                 (volume.totalBlocks - usedBlocks), usedBlocks, volume.totalBlocks));
     return new DefaultAppleFileSource (volume.name, text.toString (), this);
   }
 
@@ -261,7 +263,7 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     String name;
     int firstBlock;
-    int lastBlock; // block AFTER last used block
+    int lastBlock;                      // block AFTER last used block
     int fileType;
     GregorianCalendar date;
     List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
@@ -322,6 +324,7 @@ public class PascalDisk extends AbstractFormattedDisk
     public VolumeEntry (byte[] buffer)
     {
       super (buffer);
+
       totalBlocks = HexFormatter.intValue (buffer[14], buffer[15]);
       totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
       firstBlock = HexFormatter.intValue (buffer[18], buffer[19]);
@@ -334,12 +337,13 @@ public class PascalDisk extends AbstractFormattedDisk
     @Override
     public AbstractFile getDataSource ()
     {
-      System.out.println ("in Volume Entry **********************");
+      //      System.out.println ("in Volume Entry **********************");
       if (file != null)
         return file;
 
       byte[] buffer = disk.readSectors (blocks);
       file = new DefaultAppleFile (name, buffer);
+
       return file;
     }
   }

@@ -11,6 +11,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DirectoryEntry implements AppleFileSource
 {
+  private final CPMDisk parent;
   private final int userNumber;
   private final String name;
   private final String type;
@@ -21,8 +22,9 @@ public class DirectoryEntry implements AppleFileSource
   private final byte[] blockList = new byte[16];
   private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
 
-  public DirectoryEntry (byte[] buffer, int offset)
+  public DirectoryEntry (CPMDisk parent, byte[] buffer, int offset)
   {
+    this.parent = parent;
     userNumber = buffer[offset] & 0xFF;
     name = new String (buffer, offset + 1, 8).trim ();
     type = new String (buffer, offset + 9, 3).trim ();
@@ -46,11 +48,12 @@ public class DirectoryEntry implements AppleFileSource
 
   public String line ()
   {
-    return name + "." + type;
+    int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);
+    return String.format ("%3d   %-8s   %-3s   %3d   %3d", userNumber, name, type,
+                          entries.size () + 1, blocks);
   }
 
-  @Override
-  public String toString ()
+  public String toDetailedString ()
   {
     StringBuilder text = new StringBuilder ();
 
@@ -96,6 +99,12 @@ public class DirectoryEntry implements AppleFileSource
   @Override
   public FormattedDisk getFormattedDisk ()
   {
-    return null;
+    return parent;
+  }
+
+  @Override
+  public String toString ()
+  {
+    return name + "." + type;
   }
 }

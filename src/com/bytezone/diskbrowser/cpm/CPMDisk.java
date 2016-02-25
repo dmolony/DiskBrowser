@@ -1,8 +1,9 @@
 package com.bytezone.diskbrowser.cpm;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
@@ -15,7 +16,6 @@ public class CPMDisk extends AbstractFormattedDisk
   public final SectorType cpmSector = new SectorType ("CPM", Color.lightGray);
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
-  private final List<DirectoryEntry> directoryEntries = new ArrayList<DirectoryEntry> ();
 
   public CPMDisk (Disk disk)
   {
@@ -32,6 +32,8 @@ public class CPMDisk extends AbstractFormattedDisk
     if ("DIR ERA TYPESAVEREN USER".equals (text))
       version = buffer[41] & 0xFF;
 
+    DefaultMutableTreeNode root = getCatalogTreeRoot ();
+
     for (int sector = 0; sector < 8; sector++)
     {
       DiskAddress da = disk.getDiskAddress (3, sector);
@@ -44,16 +46,23 @@ public class CPMDisk extends AbstractFormattedDisk
           break;
         if (buffer[i] == 0)
         {
-          DirectoryEntry entry = new DirectoryEntry (buffer, i);
+          DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
           DirectoryEntry parent = findParent (entry);
           if (parent == null)
-            directoryEntries.add (entry);
+          {
+            fileEntries.add (entry);
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode (entry);
+            root.add (node);
+            node.setAllowsChildren (false);
+          }
           else
             parent.add (entry);
         }
       }
     }
-    //    listEntries ();
+
+    root.setUserObject (getCatalog ());
+    makeNodeVisible (root.getFirstLeaf ());
   }
 
   @Override
@@ -62,19 +71,12 @@ public class CPMDisk extends AbstractFormattedDisk
     return null;
   }
 
-  public void listEntries ()
-  {
-    for (DirectoryEntry entry : directoryEntries)
-      System.out.println (entry);
-  }
-
   private DirectoryEntry findParent (DirectoryEntry child)
   {
-    for (DirectoryEntry entry : directoryEntries)
-    {
-      if (entry.matches (child))
-        return entry;
-    }
+    for (AppleFileSource entry : fileEntries)
+      if (((DirectoryEntry) entry).matches (child))
+        return (DirectoryEntry) entry;
+
     return null;
   }
 
@@ -82,15 +84,15 @@ public class CPMDisk extends AbstractFormattedDisk
   public AppleFileSource getCatalog ()
   {
     String newLine = String.format ("%n");
-    String line = "---  ---------  ----" + newLine;
+    String line = "----  ---------  ----  ----  ----" + newLine;
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
-    text.append ("User  Name    Type" + newLine);
+    text.append ("User  Name       Type  Exts  Size" + newLine);
     text.append (line);
 
-    for (DirectoryEntry entry : directoryEntries)
+    for (AppleFileSource entry : fileEntries)
     {
-      text.append (entry.line ());
+      text.append (((DirectoryEntry) entry).line ());
       text.append (newLine);
     }
 

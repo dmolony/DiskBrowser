@@ -4,12 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
-import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
-import com.bytezone.diskbrowser.disk.AppleDisk;
-import com.bytezone.diskbrowser.disk.Disk;
-import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.disk.SectorType;
+import com.bytezone.diskbrowser.disk.*;
 
 public class CPMDisk extends AbstractFormattedDisk
 {
@@ -56,7 +53,7 @@ public class CPMDisk extends AbstractFormattedDisk
         }
       }
     }
-    listEntries ();
+    //    listEntries ();
   }
 
   @Override
@@ -81,19 +78,36 @@ public class CPMDisk extends AbstractFormattedDisk
     return null;
   }
 
+  @Override
+  public AppleFileSource getCatalog ()
+  {
+    String newLine = String.format ("%n");
+    String line = "---  ---------  ----" + newLine;
+    StringBuilder text = new StringBuilder ();
+    text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
+    text.append ("User  Name    Type" + newLine);
+    text.append (line);
+
+    for (DirectoryEntry entry : directoryEntries)
+    {
+      text.append (entry.line ());
+      text.append (newLine);
+    }
+
+    return new DefaultAppleFileSource ("CPM Disk ", text.toString (), this);
+  }
+
   public static boolean isCorrectFormat (AppleDisk disk)
   {
     disk.setInterleave (3);
 
     byte[] buffer = disk.readSector (0, 8);
     String text = new String (buffer, 16, 24);
-    System.out.println (text);
     if ("DIR ERA TYPESAVEREN USER".equals (text))
       return true;
 
     buffer = disk.readSector (0, 4);
     text = new String (buffer, 16, 24);
-    System.out.println (text);
     if ("DIR ERA TYPESAVEREN USER".equals (text))
       return true;
 
@@ -105,8 +119,6 @@ public class CPMDisk extends AbstractFormattedDisk
         int val = buffer[i] & 0xFF;
         if (val > 31 && val != 0xE5)
           return false;
-        //        if (buffer[i] == 0)
-        //          System.out.println (new DirectoryEntry (buffer, i));
       }
     }
 

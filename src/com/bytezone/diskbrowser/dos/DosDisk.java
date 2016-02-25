@@ -49,10 +49,10 @@ public class DosDisk extends AbstractFormattedDisk
     sectorTypesList.add (tsListSector);
     sectorTypesList.add (dataSector);
 
-    byte[] sectorBuffer = disk.readSector (0, 0); // Boot sector
+    byte[] sectorBuffer = disk.readSector (0, 0);               // Boot sector
     bootSector = new BootSector (disk, sectorBuffer, "DOS");
 
-    sectorBuffer = disk.readSector (CATALOG_TRACK, 0); // VTOC
+    sectorBuffer = disk.readSector (CATALOG_TRACK, 0);          // VTOC
     dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer);
 
     DiskAddress catalogStart = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
@@ -92,7 +92,8 @@ public class DosDisk extends AbstractFormattedDisk
       // See beautifulboot.dsk.
       if (sectorBuffer[0] != 0 && (sectorBuffer[0] & 0xFF) != 0xFF && false)
       {
-        System.out.println ("Dos catalog sector buffer byte #0 invalid : " + sectorBuffer[0]);
+        System.out
+            .println ("Dos catalog sector buffer byte #0 invalid : " + sectorBuffer[0]);
         break;
       }
 
@@ -132,7 +133,8 @@ public class DosDisk extends AbstractFormattedDisk
 
         if (entry[0] == (byte) 0xFF) // deleted file
         {
-          DeletedCatalogEntry deletedCatalogEntry = new DeletedCatalogEntry (this, da, entry);
+          DeletedCatalogEntry deletedCatalogEntry =
+              new DeletedCatalogEntry (this, da, entry);
           deletedFileEntries.add (deletedCatalogEntry);
           DefaultMutableTreeNode node = new DefaultMutableTreeNode (deletedCatalogEntry);
           node.setAllowsChildren (false);
@@ -341,8 +343,8 @@ public class DosDisk extends AbstractFormattedDisk
     if (type == catalogSector)
       return new DosCatalogSector (disk, buffer);
     if (type == dataSector)
-      return new DefaultSector ("Data Sector at " + address + " : " + getSectorFilename (da),
-            disk, buffer);
+      return new DefaultSector (
+          "Data Sector at " + address + " : " + getSectorFilename (da), disk, buffer);
     if (type == dosSector)
       return new DefaultSector ("DOS sector at " + address, disk, buffer);
     return super.getFormattedSector (da);
@@ -369,35 +371,34 @@ public class DosDisk extends AbstractFormattedDisk
   public AppleFileSource getCatalog ()
   {
     String newLine = String.format ("%n");
-    String line =
-          "- --- ---  ------------------------------  -----  -------------"
-                + "  -- ----  ----------------" + newLine;
+    String line = "- --- ---  ------------------------------  -----  -------------"
+        + "  -- ----  ----------------" + newLine;
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
     text.append ("L Typ Len  Name                            Addr"
-          + "   Length         TS Data  Comment" + newLine);
+        + "   Length         TS Data  Comment" + newLine);
     text.append (line);
 
     for (AppleFileSource ce : fileEntries)
       text.append (((CatalogEntry) ce).getDetails () + newLine);
 
     text.append (line);
-    text.append (String
-          .format ("           Free sectors: %3d    Used sectors: %3d    Total sectors: %3d",
-                   dosVTOCSector.freeSectors, dosVTOCSector.usedSectors,
-                   (dosVTOCSector.freeSectors + dosVTOCSector.usedSectors)));
+    text.append (String.format (
+                                "           Free sectors: %3d    Used sectors: %3d    Total sectors: %3d",
+                                dosVTOCSector.freeSectors, dosVTOCSector.usedSectors,
+                                (dosVTOCSector.freeSectors + dosVTOCSector.usedSectors)));
     if (dosVTOCSector.freeSectors != freeSectors)
-      text.append (String
-            .format ("%nActual:    Free sectors: %3d    Used sectors: %3d    Total sectors: %3d",
-                     freeSectors, usedSectors, (usedSectors + freeSectors)));
+      text.append (String.format (
+                                  "%nActual:    Free sectors: %3d    Used sectors: %3d    Total sectors: %3d",
+                                  freeSectors, usedSectors, (usedSectors + freeSectors)));
     return new DefaultAppleFileSource ("Volume " + dosVTOCSector.volume, text.toString (),
-          this);
+        this);
   }
 
   private AppleFileSource getDeletedList ()
   {
     StringBuilder text =
-          new StringBuilder ("List of files that were deleted from this disk\n");
+        new StringBuilder ("List of files that were deleted from this disk\n");
 
     for (AppleFileSource afs : deletedFileEntries)
       text.append (((DeletedCatalogEntry) afs).getDetails () + "\n");

@@ -3,9 +3,13 @@ package com.bytezone.diskbrowser.cpm;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class DirectoryEntry
+public class DirectoryEntry implements AppleFileSource
 {
   private final int userNumber;
   private final String name;
@@ -40,6 +44,11 @@ public class DirectoryEntry
     entries.add (entry);
   }
 
+  public String line ()
+  {
+    return name + "." + type;
+  }
+
   @Override
   public String toString ()
   {
@@ -64,5 +73,29 @@ public class DirectoryEntry
     }
 
     return text.toString ();
+  }
+
+  @Override
+  public String getUniqueName ()
+  {
+    return name + "." + type;
+  }
+
+  @Override
+  public DataSource getDataSource ()
+  {
+    return null;
+  }
+
+  @Override
+  public List<DiskAddress> getSectors ()
+  {
+    return null;
+  }
+
+  @Override
+  public FormattedDisk getFormattedDisk ()
+  {
+    return null;
   }
 }

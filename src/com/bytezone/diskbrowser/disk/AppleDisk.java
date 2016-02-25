@@ -25,7 +25,6 @@ public class AppleDisk implements Disk
 
   public final File path;
   private final byte[] diskBuffer;        // contains the disk contents in memory
-  private int skip = 0;
 
   private final int tracks;               // usually 35 for floppy disks
   private int sectors;                    // 8 or 16
@@ -64,6 +63,7 @@ public class AppleDisk implements Disk
 
     byte[] buffer = getPrefix (path);         // HDV could be a 2mg
     String prefix = new String (buffer, 0, 4);
+    int skip = 0;
 
     if ((pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
         || "2IMG".equals (prefix))
@@ -424,19 +424,19 @@ public class AppleDisk implements Disk
     assert sectorSize == 256 || sectorSize == 512 : "Invalid sector size : " + sectorSize;
     assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
         + interleave;
-    int diskOffset;
 
     if (sectorSize == 256)
     {
-      diskOffset = da.getTrack () * trackSize
+      int diskOffset = da.getTrack () * trackSize
           + interleaveSector[interleave][da.getSector ()] * sectorSize;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, sectorSize);
     }
     else if (sectorSize == 512)
     {
-      diskOffset = da.getTrack () * trackSize
+      int diskOffset = da.getTrack () * trackSize
           + interleaveSector[interleave][da.getSector () * 2] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, 256);
+
       diskOffset = da.getTrack () * trackSize
           + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + 256, 256);

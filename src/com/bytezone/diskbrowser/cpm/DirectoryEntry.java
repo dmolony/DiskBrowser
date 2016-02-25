@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
@@ -13,6 +14,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DirectoryEntry implements AppleFileSource
 {
+  private final Disk disk;
   private final CPMDisk parent;
   private final int userNumber;
   private final String name;
@@ -24,10 +26,13 @@ public class DirectoryEntry implements AppleFileSource
   private final byte[] blockList = new byte[16];
   private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
   private final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+  private DataSource appleFile;
 
   public DirectoryEntry (CPMDisk parent, byte[] buffer, int offset)
   {
     this.parent = parent;
+    disk = parent.getDisk ();
+
     userNumber = buffer[offset] & 0xFF;
     name = new String (buffer, offset + 1, 8).trim ();
     type = new String (buffer, offset + 9, 3).trim ();
@@ -86,8 +91,9 @@ public class DirectoryEntry implements AppleFileSource
     for (DirectoryEntry entry : entries)
     {
       bytes = HexFormatter.getHexString (entry.blockList, 0, 16);
-      bytes = bytes.replaceAll ("00", "  ");
-      text = text + String.format ("%n%-36.36s%s", "", bytes);
+      bytes = bytes.replaceAll ("00", "  ").trim ();
+      if (!bytes.isEmpty ())
+        text = text + String.format ("%n%-36.36s%s", "", bytes);
     }
     return text;
   }
@@ -126,7 +132,17 @@ public class DirectoryEntry implements AppleFileSource
   @Override
   public DataSource getDataSource ()
   {
-    return null;
+    if (appleFile != null)
+      return appleFile;
+
+    byte[] buffer = disk.readSectors (blocks);
+    if (buffer.length == 0)
+    {
+      appleFile = new DefaultAppleFile (name, buffer);
+      return appleFile;
+    }
+    appleFile = new DefaultAppleFile (name, buffer);
+    return appleFile;
   }
 
   @Override

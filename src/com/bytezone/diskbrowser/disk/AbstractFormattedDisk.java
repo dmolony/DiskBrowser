@@ -76,7 +76,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
      * have to append their catalog entries to this node.
      */
     DefaultAppleFileSource afs =
-          new DefaultAppleFileSource (getName (), disk.toString (), this);
+        new DefaultAppleFileSource (getName (), disk.toString (), this);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (afs);
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     catalogTree = new JTree (treeModel);
@@ -95,7 +95,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     });
   }
 
-  private void setSectorTypes ()
+  protected void setSectorTypes ()
   {
     sectorTypes = new SectorType[disk.getTotalBlocks ()];
 
@@ -156,9 +156,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   {
     this.originalPath = path;
 
-    DefaultMutableTreeNode root = (DefaultMutableTreeNode) catalogTree.getModel ().getRoot ();
+    DefaultMutableTreeNode root =
+        (DefaultMutableTreeNode) catalogTree.getModel ().getRoot ();
     DefaultAppleFileSource afs =
-          new DefaultAppleFileSource (getName (), disk.toString (), this);
+        new DefaultAppleFileSource (getName (), disk.toString (), this);
     root.setUserObject (afs);
   }
 
@@ -215,8 +216,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
   public void makeNodeVisible (DefaultMutableTreeNode node)
   {
-    catalogTree.makeVisible (new TreePath (((DefaultTreeModel) catalogTree.getModel ())
-          .getPathToRoot (node)));
+    catalogTree.makeVisible (new TreePath (
+        ((DefaultTreeModel) catalogTree.getModel ()).getPathToRoot (node)));
   }
 
   protected DefaultMutableTreeNode findNode (DefaultMutableTreeNode node, String name)
@@ -344,7 +345,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public boolean stillAvailable (DiskAddress da)
   {
     return sectorTypes[da.getBlock ()] == usedSector
-          || sectorTypes[da.getBlock ()] == emptySector;
+        || sectorTypes[da.getBlock ()] == emptySector;
   }
 
   @Override
@@ -405,7 +406,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public void notifyListeners (String text)
   {
     if (actionListenerList != null)
-      actionListenerList.actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED,
-            text));
+      actionListenerList
+          .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
   }
 }

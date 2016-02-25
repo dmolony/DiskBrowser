@@ -17,8 +17,6 @@ public class DosDisk extends AbstractFormattedDisk
   private static final int ENTRY_SIZE = 35;
   private static final int CATALOG_TRACK = 17;
 
-  //  private static final boolean CHECK_SELF_POINTER = true;
-
   private final DosVTOCSector dosVTOCSector;
   private final Color green = new Color (0, 200, 0);
   private final DefaultMutableTreeNode volumeNode;
@@ -158,9 +156,6 @@ public class DosDisk extends AbstractFormattedDisk
       //      int thisBlock = da.getBlock ();
       da = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
-      //      if (CHECK_SELF_POINTER && da.getBlock () == thisBlock)
-      //        break;
-
     } while (da.getBlock () != 0);
 
     // add up all the free and used sectors, and label DOS sectors while we're here
@@ -248,12 +243,10 @@ public class DosDisk extends AbstractFormattedDisk
     //    if (buffer[1] != 0x11) // first catalog track
     //      return 0;
 
-    if (buffer[53] != 16 && buffer[53] != 13) // tracks per sector
-    {
-      // System.out.println ("VTOC tracks per sector : " + (buffer[53 & 0xFF]));
+    if (buffer[53] != 16 && buffer[53] != 13)         // tracks per sector
       return 0;
-    }
-    if (buffer[49] < -1 || buffer[49] > 1) // direction of next file save
+
+    if (buffer[49] < -1 || buffer[49] > 1)            // direction of next file save
     {
       System.out.println ("Bad direction : " + buffer[49]);
       // Visicalc data disk had 0xF8
@@ -279,7 +272,6 @@ public class DosDisk extends AbstractFormattedDisk
 
     do
     {
-      //      System.out.printf ("%5d %s%n", catalogBlocks, da);
       if (!disk.isValidAddress (da))
         break;
 
@@ -293,8 +285,6 @@ public class DosDisk extends AbstractFormattedDisk
       if (!disk.isValidAddress (buffer[1], buffer[2]))
       {
         System.out.printf ("Invalid address : %02X / %02X%n", buffer[1], buffer[2]);
-        //        System.out.println (HexFormatter.format (buffer));
-        //        System.out.println (da);
         break;
       }
 
@@ -308,9 +298,6 @@ public class DosDisk extends AbstractFormattedDisk
 
       //      int thisBlock = da.getBlock ();
       da = disk.getDiskAddress (buffer[1], buffer[2]);
-
-      //      if (CHECK_SELF_POINTER && da.getBlock () == thisBlock)
-      //        break;
 
     } while (da.getBlock () != 0);
 

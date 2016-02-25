@@ -6,18 +6,18 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.disk.*;
 
 public class CPMDisk extends AbstractFormattedDisk
 {
   private final Color green = new Color (0, 200, 0);
+
   public final SectorType catalogSector = new SectorType ("Catalog", green);
-  public final SectorType cpmSector = new SectorType ("CPM", Color.lightGray);
+  public final SectorType prnSector = new SectorType ("PRN", Color.lightGray);
   public final SectorType comSector = new SectorType ("COM", Color.red);
   public final SectorType dataSector = new SectorType ("Data", Color.blue);
   public final SectorType docSector = new SectorType ("DOC", Color.cyan);
-  public final SectorType xxxSector = new SectorType ("xxx", Color.gray);
+  public final SectorType basSector = new SectorType ("BAS", Color.gray);
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
 
@@ -26,15 +26,17 @@ public class CPMDisk extends AbstractFormattedDisk
     super (disk);
 
     sectorTypesList.add (catalogSector);
-    sectorTypesList.add (cpmSector);
+    sectorTypesList.add (prnSector);
     sectorTypesList.add (comSector);
     sectorTypesList.add (dataSector);
-    sectorTypesList.add (xxxSector);
+    sectorTypesList.add (basSector);
     sectorTypesList.add (docSector);
 
-    byte[] sectorBuffer = disk.readSector (0, 0); // Boot sector
-    bootSector = new BootSector (disk, sectorBuffer, "CPM");
-    sectorTypes[0] = cpmSector;
+    getDisk ().setEmptyByte ((byte) 0xE5);
+    setSectorTypes ();
+
+    //    byte[] sectorBuffer = disk.readSector (0, 0); // Boot sector
+    //    bootSector = new BootSector (disk, sectorBuffer, "CPM");
 
     byte[] buffer = disk.readSector (0, 8);
     String text = new String (buffer, 16, 24);
@@ -84,6 +86,10 @@ public class CPMDisk extends AbstractFormattedDisk
       return comSector;
     if ("DOC".equals (type))
       return docSector;
+    if ("BAS".equals (type))
+      return basSector;
+    if ("PRN".equals (type))
+      return prnSector;
 
     return dataSector;
   }
@@ -91,6 +97,8 @@ public class CPMDisk extends AbstractFormattedDisk
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
   {
+    if (fileEntries.size () > 0 && fileEntries.size () > fileNo)
+      return fileEntries.get (fileNo).getSectors ();
     return null;
   }
 

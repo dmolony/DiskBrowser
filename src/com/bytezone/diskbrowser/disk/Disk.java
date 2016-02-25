@@ -8,17 +8,19 @@ public interface Disk extends Iterable<DiskAddress>
 {
   public long getBootChecksum ();
 
-  public int getTotalBlocks (); // blocks per disk - usually 560 or 280
+  public void setEmptyByte (byte value);
 
-  public int getTotalTracks (); // usually 35
+  public int getTotalBlocks ();                 // blocks per disk - usually 560 or 280
 
-  public int getBlockSize (); // bytes per block - 256 or 512
+  public int getTotalTracks ();                 // usually 35
+
+  public int getBlockSize ();                   // bytes per block - 256 or 512
 
   public void setBlockSize (int blockSize);
 
-  public int getTrackSize (); // bytes per track - 4096
+  public int getTrackSize ();                   // bytes per track - 4096
 
-  public int getSectorsPerTrack (); // 8 or 16
+  public int getSectorsPerTrack ();             // 8 or 16
 
   public void setInterleave (int interleave);
 

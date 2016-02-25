@@ -46,6 +46,8 @@ public class AppleDisk implements Disk
   // Position: 0 7 E 6 D 5 C 4 B 3 A 2 9 1 8 F    - Dos    (.DO disks)
 
   private boolean[] hasData;
+  private byte emptyByte = 0;
+
   private ActionListener actionListenerList;
   private List<DiskAddress> blockList;
 
@@ -212,7 +214,7 @@ public class AppleDisk implements Disk
       byte[] buffer = readSector (da);
       hasData[da.getBlock ()] = false;
       for (int i = 0; i < sectorSize; i++)
-        if (buffer[i] != 0)
+        if (buffer[i] != emptyByte)
         {
           hasData[da.getBlock ()] = true;
           break;
@@ -293,7 +295,7 @@ public class AppleDisk implements Disk
     int bufferOffset = 0;
     for (DiskAddress da : daList)
     {
-      if (da != null) // text files may have gaps
+      if (da != null)                               // text files may have gaps
         readBuffer (da, buffer, bufferOffset);
       bufferOffset += sectorSize;
     }
@@ -503,5 +505,12 @@ public class AppleDisk implements Disk
     Checksum checksum = new CRC32 ();
     checksum.update (buffer, 0, buffer.length);
     return checksum.getValue ();
+  }
+
+  @Override
+  public void setEmptyByte (byte value)
+  {
+    emptyByte = value;
+    checkSectorsForData ();
   }
 }

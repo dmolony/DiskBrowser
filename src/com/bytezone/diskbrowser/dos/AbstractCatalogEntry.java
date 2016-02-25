@@ -13,14 +13,14 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 abstract class AbstractCatalogEntry implements AppleFileSource
 {
-  Disk disk;
-  DosDisk dosDisk;
-  String name;
-  String catalogName;
+  protected Disk disk;
+  protected DosDisk dosDisk;
+  protected String name;
+  protected String catalogName;
 
-  FileType fileType;
-  int reportedSize;
-  boolean locked;
+  protected FileType fileType;
+  protected int reportedSize;
+  protected boolean locked;
   protected DataSource appleFile;
 
   protected DiskAddress catalogSectorDA;

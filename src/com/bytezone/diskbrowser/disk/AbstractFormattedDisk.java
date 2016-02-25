@@ -24,7 +24,7 @@ import com.bytezone.diskbrowser.gui.DataSource;
 public abstract class AbstractFormattedDisk implements FormattedDisk
 {
   protected Disk disk;
-  protected FormattedDisk parent; // used by Dual-dos disks
+  protected FormattedDisk parent;                 // used by Dual-dos disks
 
   protected ActionListener actionListenerList;
   protected JTree catalogTree;
@@ -287,7 +287,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     if (sectorType == usedSector)
       return new DefaultSector ("Orphan sector at " + address, disk, buffer);
 
-    return new DefaultSector ("Data sector at " + address, disk, buffer);
+    String name = getSectorFilename (da);
+    if (!name.isEmpty ())
+      name = " : " + name;
+    return new DefaultSector ("Data sector at " + address + name, disk, buffer);
   }
 
   /*
@@ -306,7 +309,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
       if (entry.contains (da))
         return (entry).getUniqueName ();
 
-    return "unknown";
+    return "";
   }
 
   @Override

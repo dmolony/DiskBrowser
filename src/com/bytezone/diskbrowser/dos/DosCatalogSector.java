@@ -6,10 +6,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class DosCatalogSector extends AbstractSector
 {
-  private static final String[] fileTypes = { "Text file", "Integer Basic program",
-                                             "Applesoft Basic program", "Binary file",
-                                             "SS file", "Relocatable file", "AA file",
-                                             "BB file" };
+  private static final String[] fileTypes =
+      { "Text file", "Integer Basic program", "Applesoft Basic program", "Binary file",
+        "SS file", "Relocatable file", "AA file", "BB file" };
   private static int CATALOG_ENTRY_SIZE = 35;
 
   public DosCatalogSector (Disk disk, byte[] buffer)
@@ -33,12 +32,9 @@ class DosCatalogSector extends AbstractSector
       {
         if (buffer[i] == (byte) 0xFF)
         {
-          addText (text,
-                   buffer,
-                   i + 0,
-                   2,
+          addText (text, buffer, i + 0, 2,
                    "DEL: file @ " + HexFormatter.format2 (buffer[i + 32]) + " "
-                         + HexFormatter.format2 (buffer[i + 1]));
+                       + HexFormatter.format2 (buffer[i + 1]));
           addText (text, buffer, i + 2, 1, "DEL: File type " + getType (buffer[i + 2]));
           if (buffer[i + 3] == 0)
             addText (text, buffer, i + 3, 4, "");

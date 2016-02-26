@@ -70,7 +70,6 @@ public abstract class AbstractSector implements DataSource
   @Override
   public JComponent getComponent ()
   {
-    System.out.println ("In AbstractSector.getComponent()");
     JPanel panel = new JPanel ();
     return panel;
   }

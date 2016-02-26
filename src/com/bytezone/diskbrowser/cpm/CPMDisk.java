@@ -7,6 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.*;
+import com.bytezone.diskbrowser.gui.DataSource;
 
 public class CPMDisk extends AbstractFormattedDisk
 {
@@ -113,14 +114,27 @@ public class CPMDisk extends AbstractFormattedDisk
   }
 
   @Override
+  public DataSource getFormattedSector (DiskAddress da)
+  {
+    SectorType type = sectorTypes[da.getBlock ()];
+    byte[] buffer = disk.readSector (da);
+
+    if (type == catalogSector)
+      return new CPMCatalogSector (disk, buffer);
+
+    return super.getFormattedSector (da);
+  }
+
+  @Override
   public AppleFileSource getCatalog ()
   {
     String newLine = String.format ("%n");
-    String line = "----  ---------  ----  ----  ----   ----------------------------"
-        + "-------------------" + newLine;
+    String line =
+        "----  ---------  ---   --   --   --   --   ----------------------------"
+            + "-------------------" + newLine;
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
-    text.append ("User  Name       Type  Exts  Size     Blocks" + newLine);
+    text.append ("User  Name       Typ   Ex   S2   S1   RC   Blocks" + newLine);
     text.append (line);
 
     for (AppleFileSource entry : fileEntries)

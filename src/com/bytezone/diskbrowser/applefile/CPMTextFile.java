@@ -35,7 +35,7 @@ public class CPMTextFile extends AbstractFile
 
     int max = buffer.length - 1;
     while (ptr < max && buffer[ptr] != 0x0D && buffer[ptr + 1] != 0x0A)
-      line.append ((char) buffer[ptr++]);
+      line.append ((char) (buffer[ptr++] & 0x7F));
 
     return line.toString ();
   }

@@ -162,7 +162,15 @@ public class DirectoryEntry implements AppleFileSource
     byte[] exactBuffer = new byte[len];
     System.arraycopy (buffer, 0, exactBuffer, 0, len);
 
-    if ("ASM".equals (type))
+    int max = Math.min (256, exactBuffer.length);
+    int count = 0;
+    for (int i = 1; i < max; i++)
+    {
+      if (exactBuffer[i - 1] == 0x0D && exactBuffer[i] == 0x0A)
+        ++count;
+    }
+
+    if ("ASM".equals (type) || "DOC".equals (type) || "TXT".equals (type) || count > 0)
       appleFile = new CPMTextFile (name, exactBuffer);
     else
       appleFile = new DefaultAppleFile (name, exactBuffer, "CPM File : " + type);

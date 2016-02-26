@@ -146,11 +146,11 @@ public class AppleDisk implements Disk
       System.out.println ();
     }
 
-    if (sectorSize != 256 && sectorSize != 512)
-    {
-      System.out.println ("Invalid sector size : " + sectorSize);
-      new Exception ().printStackTrace ();
-    }
+    //    if (sectorSize != 256 && sectorSize != 512)
+    //    {
+    //      System.out.println ("Invalid sector size : " + sectorSize);
+    //      new Exception ().printStackTrace ();
+    //    }
 
     if (sectorSize != 256 && sectorSize != 512)
       throw new FileFormatException ("Invalid sector size : " + sectorSize);

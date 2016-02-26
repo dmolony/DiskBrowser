@@ -112,7 +112,7 @@ public class DosDisk extends AbstractFormattedDisk
 
     // same loop, but now all the catalog sectors are properly flagged
     da = disk.getDiskAddress (catalogStart.getBlock ());
-    loop: do
+    do
     {
       if (!disk.isValidAddress (da))
         break;
@@ -122,9 +122,8 @@ public class DosDisk extends AbstractFormattedDisk
 
       for (int ptr = 11; ptr < 256; ptr += ENTRY_SIZE)
       {
-        if (sectorBuffer[ptr] == 0) // empty slot, no more catalog entries
+        if (sectorBuffer[ptr] == 0)         // empty slot, no more catalog entries
           continue;
-        //          break loop;
 
         byte[] entry = new byte[ENTRY_SIZE];
         System.arraycopy (sectorBuffer, ptr, entry, 0, ENTRY_SIZE);
@@ -153,7 +152,6 @@ public class DosDisk extends AbstractFormattedDisk
       if (!disk.isValidAddress (track, sector))
         break;
 
-      //      int thisBlock = da.getBlock ();
       da = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
     } while (da.getBlock () != 0);
@@ -337,15 +335,6 @@ public class DosDisk extends AbstractFormattedDisk
     return super.getFormattedSector (da);
   }
 
-  //  @Override
-  //  public String getSectorFilename (DiskAddress da)
-  //  {
-  //    for (AppleFileSource ce : fileEntries)
-  //      if (((CatalogEntry) ce).contains (da))
-  //        return ((CatalogEntry) ce).name;
-  //    return null;
-  //  }
-
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
   {
@@ -371,12 +360,14 @@ public class DosDisk extends AbstractFormattedDisk
 
     text.append (line);
     text.append (String.format (
-                                "           Free sectors: %3d    Used sectors: %3d    Total sectors: %3d",
+                                "           Free sectors: %3d    "
+                                    + "Used sectors: %3d    Total sectors: %3d",
                                 dosVTOCSector.freeSectors, dosVTOCSector.usedSectors,
                                 (dosVTOCSector.freeSectors + dosVTOCSector.usedSectors)));
     if (dosVTOCSector.freeSectors != freeSectors)
       text.append (String.format (
-                                  "%nActual:    Free sectors: %3d    Used sectors: %3d    Total sectors: %3d",
+                                  "%nActual:    Free sectors: %3d    "
+                                      + "Used sectors: %3d    Total sectors: %3d",
                                   freeSectors, usedSectors, (usedSectors + freeSectors)));
     return new DefaultAppleFileSource ("Volume " + dosVTOCSector.volume, text.toString (),
         this);

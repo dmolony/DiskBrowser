@@ -141,7 +141,6 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     try
     {
       byte[] exactBuffer;
-      byte[] extraBuffer = new byte[0];
 
       switch (this.fileType)
       {

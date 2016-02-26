@@ -148,12 +148,24 @@ public class DirectoryEntry implements AppleFileSource
       return appleFile;
 
     byte[] buffer = disk.readSectors (blocks);
+
     if (buffer.length == 0)
     {
       appleFile = new DefaultAppleFile (name, buffer);
       return appleFile;
     }
-    appleFile = new DefaultAppleFile (name, buffer);
+
+    DirectoryEntry entry = rc == 0x80 ? entries.get (entries.size () - 1) : this;
+    int len = (entry.ex * 128 + entry.rc) * 128;
+
+    byte[] exactBuffer = new byte[len];
+    System.arraycopy (buffer, 0, exactBuffer, 0, len);
+
+    if ("ASM".equals (type))
+      appleFile = new TextFile (name, exactBuffer);
+    else
+      appleFile = new DefaultAppleFile (name, exactBuffer, "CPM File : " + type);
+
     return appleFile;
   }
 

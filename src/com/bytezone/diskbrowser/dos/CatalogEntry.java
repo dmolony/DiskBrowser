@@ -65,7 +65,8 @@ class CatalogEntry extends AbstractCatalogEntry
               dosDisk.sectorTypes[da.getBlock ()] = dosDisk.dataSector;
             else
             {
-              System.out.print ("Attempt to assign Data sector to occupied sector : " + da);
+              System.out
+                  .print ("Attempt to assign Data sector to occupied sector : " + da);
               System.out.println (" from " + name);
             }
           }
@@ -75,7 +76,8 @@ class CatalogEntry extends AbstractCatalogEntry
         if (da == null)
         {
           System.out.print ("Next T/S list in sector " + da);
-          System.out.printf (" is invalid : %02X, %02X%n", sectorBuffer[1], sectorBuffer[2]);
+          System.out.printf (" is invalid : %02X, %02X%n", sectorBuffer[1],
+                             sectorBuffer[2]);
           break;
         }
       }
@@ -104,11 +106,10 @@ class CatalogEntry extends AbstractCatalogEntry
       switch (fileType)
       {
         case IntegerBasic:
-          //          length = HexFormatter.intValue (buffer[0], buffer[1]);
-          //          break;
         case ApplesoftBasic:
           length = HexFormatter.intValue (buffer[0], buffer[1]);
           break;
+
         default:
           address = HexFormatter.intValue (buffer[0], buffer[1]);
           length = HexFormatter.intValue (buffer[2], buffer[3]);
@@ -127,9 +128,9 @@ class CatalogEntry extends AbstractCatalogEntry
       message += "Bad size (" + reportedSize + ") ";
     if (dataSectors.size () == 0)
       message += "No data ";
-    return String.format ("%1s  %1s  %03d  %-30.30s  %-5s  %-13s  %2d %3d   %s", lockedFlag,
-                          getFileType (), actualSize, name, addressText, lengthText,
-                          tsSectors.size (), (dataSectors.size () - textFileGaps),
-                          message.trim ());
+    return String.format ("%1s  %1s  %03d  %-30.30s  %-5s  " + "%-13s  %2d %3d   %s",
+                          lockedFlag, getFileType (), actualSize, name, addressText,
+                          lengthText, tsSectors.size (),
+                          (dataSectors.size () - textFileGaps), message.trim ());
   }
 }

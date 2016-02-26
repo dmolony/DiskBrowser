@@ -126,9 +126,6 @@ public class CPMDisk extends AbstractFormattedDisk
     if (type == catalogSector)
       return new CPMCatalogSector (disk, buffer);
 
-    //    if (type == asmSector)
-    //      return new ASMSector (disk, buffer);
-
     return super.getFormattedSector (da);
   }
 

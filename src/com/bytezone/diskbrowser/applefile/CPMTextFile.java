@@ -1,11 +1,9 @@
-package com.bytezone.diskbrowser.cpm;
+package com.bytezone.diskbrowser.applefile;
 
-import com.bytezone.diskbrowser.applefile.AbstractFile;
-
-public class TextFile extends AbstractFile
+public class CPMTextFile extends AbstractFile
 {
 
-  public TextFile (String name, byte[] buffer)
+  public CPMTextFile (String name, byte[] buffer)
   {
     super (name, buffer);
   }

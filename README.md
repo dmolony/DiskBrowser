@@ -12,6 +12,7 @@
 - Compressed disks - ShrinkIt, gzip
 - Track and sector display
 - Dual DOS disks
+- CPM disks
 
 ####Images
 #####Disk listing

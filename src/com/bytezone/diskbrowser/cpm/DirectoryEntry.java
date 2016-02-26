@@ -98,10 +98,14 @@ public class DirectoryEntry implements AppleFileSource
     int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);
     String bytes = HexFormatter.getHexString (blockList, 0, 16);
     bytes = bytes.replaceAll ("00", "  ");
+
     String text = String.format ("%3d   %-8s   %-3s   %02X   %02X   %02X   %02X   %s",
                                  userNumber, name, type, ex, s2, s1, rc, bytes);
     for (DirectoryEntry entry : entries)
       text = text + "\n" + entry.line ();
+
+    if (ex != 0)
+      text = "                    " + text.substring (20);
 
     return text;
   }

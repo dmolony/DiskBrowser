@@ -134,11 +134,11 @@ public class CPMDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String line =
-        "----  ---------  ---   --   --   --   --   ----------------------------"
+        "----  ---------  --- - -  --   --   --   --   ----------------------------"
             + "-------------------" + newLine;
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
-    text.append ("User  Name       Typ   Ex   S2   S1   RC   Blocks" + newLine);
+    text.append ("User  Name       Typ R S  Ex   S2   S1   RC   Blocks" + newLine);
     text.append (line);
 
     for (AppleFileSource entry : fileEntries)

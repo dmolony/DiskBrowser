@@ -22,10 +22,31 @@ public class CPMCatalogSector extends AbstractSector
       if (buffer[i] == (byte) 0xE5)
         break;
 
+      boolean readOnly = (buffer[i + 9] & 0x80) != 0;
+      boolean systemFile = (buffer[i + 10] & 0x80) != 0;
+      String type;
+      String extra;
+
+      if (readOnly || systemFile)
+      {
+        byte[] typeBuffer = new byte[3];
+        typeBuffer[0] = (byte) (buffer[i + 9] & 0x7F);
+        typeBuffer[1] = (byte) (buffer[i + 10] & 0x7F);
+        typeBuffer[2] = buffer[i + 11];
+        type = new String (typeBuffer).trim ();
+        extra = String.format (" (%s%s)", readOnly ? "read only" : "",
+                               systemFile ? "system file" : "");
+      }
+      else
+      {
+        type = new String (buffer, i + 9, 3).trim ();
+        extra = "";
+      }
+
       addText (text, buffer, i, 1, "User number");
       addText (text, buffer, i + 1, 4, "File name : " + new String (buffer, i + 1, 8));
       addText (text, buffer, i + 5, 4, "");
-      addText (text, buffer, i + 9, 3, "File type : " + new String (buffer, i + 9, 3));
+      addText (text, buffer, i + 9, 3, "File type : " + type + extra);
       addText (text, buffer, i + 12, 1, "Extent counter LO");
       addText (text, buffer, i + 13, 1, "Reserved");
       addText (text, buffer, i + 14, 1, "Extent counter HI");

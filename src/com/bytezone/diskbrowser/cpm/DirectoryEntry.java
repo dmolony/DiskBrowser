@@ -28,15 +28,30 @@ public class DirectoryEntry implements AppleFileSource
   private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
   private final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
   private DataSource appleFile;
+  private final boolean readOnly;
+  private final boolean systemFile;
 
   public DirectoryEntry (CPMDisk parent, byte[] buffer, int offset)
   {
     this.parent = parent;
     disk = parent.getDisk ();
 
+    readOnly = (buffer[offset + 9] & 0x80) != 0;
+    systemFile = (buffer[offset + 10] & 0x80) != 0;
+
+    if (readOnly || systemFile)
+    {
+      byte[] typeBuffer = new byte[3];
+      typeBuffer[0] = (byte) (buffer[offset + 9] & 0x7F);
+      typeBuffer[1] = (byte) (buffer[offset + 10] & 0x7F);
+      typeBuffer[2] = buffer[offset + 11];
+      type = new String (typeBuffer).trim ();
+    }
+    else
+      type = new String (buffer, offset + 9, 3).trim ();
+
     userNumber = buffer[offset] & 0xFF;
     name = new String (buffer, offset + 1, 8).trim ();
-    type = new String (buffer, offset + 9, 3).trim ();
     ex = buffer[offset + 12] & 0xFF;
     s2 = buffer[offset + 13] & 0xFF;
     s1 = buffer[offset + 14] & 0xFF;
@@ -100,8 +115,12 @@ public class DirectoryEntry implements AppleFileSource
     String bytes = HexFormatter.getHexString (blockList, 0, 16);
     bytes = bytes.replaceAll ("00", "  ");
 
-    String text = String.format ("%3d   %-8s   %-3s   %02X   %02X   %02X   %02X   %s",
-                                 userNumber, name, type, ex, s2, s1, rc, bytes);
+    char ro = readOnly ? '*' : ' ';
+    char sf = systemFile ? '*' : ' ';
+
+    String text =
+        String.format ("%3d   %-8s   %-3s %s %s  %02X   %02X   %02X   %02X   %s",
+                       userNumber, name, type, ro, sf, ex, s2, s1, rc, bytes);
     for (DirectoryEntry entry : entries)
       text = text + "\n" + entry.line ();
 
@@ -170,7 +189,12 @@ public class DirectoryEntry implements AppleFileSource
         ++count;
     }
 
-    if ("ASM".equals (type) || "DOC".equals (type) || "TXT".equals (type) || count > 0)
+    if ("COM".equals (type))
+      appleFile = new DefaultAppleFile (name, exactBuffer, "COM File");
+    else if ("DVR".equals (type))
+      appleFile = new DefaultAppleFile (name, exactBuffer, "DVR File");
+    else if ("ASM".equals (type) || "DOC".equals (type) || "TXT".equals (type)
+        || count > 2)
       appleFile = new CPMTextFile (name, exactBuffer);
     else
       appleFile = new DefaultAppleFile (name, exactBuffer, "CPM File : " + type);

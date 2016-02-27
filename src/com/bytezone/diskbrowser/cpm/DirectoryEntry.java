@@ -64,12 +64,15 @@ public class DirectoryEntry implements AppleFileSource
       if (b == 0)
         break;
 
-      int blockNumber = b * 4 + 48;
+      int blockNumber;
+
+      if ((b & 0x80) == 0)
+        blockNumber = (b * 4 + 48);
+      else
+        blockNumber = (b & 0x7F) * 4;
+
       for (int i = 0; i < 4; i++)
-      {
-        AppleDiskAddress da = new AppleDiskAddress (blockNumber + i, disk);
-        blocks.add (da);
-      }
+        blocks.add (new AppleDiskAddress (blockNumber + i, disk));
     }
   }
 

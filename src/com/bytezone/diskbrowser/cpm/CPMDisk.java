@@ -56,27 +56,26 @@ public class CPMDisk extends AbstractFormattedDisk
 
       for (int i = 0; i < buffer.length; i += 32)
       {
-        if (buffer[i] != 0 && buffer[i] != (byte) 0xE5)
+        int val = buffer[i] & 0xFF;
+        if (val == 0xE5)
           break;
-        if (buffer[i] == 0)
-        {
-          DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
-          SectorType sectorType = getSectorType (entry.getType ());
-          for (DiskAddress block : entry.getSectors ())
-            if (!disk.isSectorEmpty (block))
-              sectorTypes[block.getBlock ()] = sectorType;
 
-          DirectoryEntry parent = findParent (entry);
-          if (parent == null)
-          {
-            fileEntries.add (entry);
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode (entry);
-            root.add (node);
-            node.setAllowsChildren (false);
-          }
-          else
-            parent.add (entry);
+        DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
+        SectorType sectorType = getSectorType (entry.getType ());
+        for (DiskAddress block : entry.getSectors ())
+          if (!disk.isSectorEmpty (block))
+            sectorTypes[block.getBlock ()] = sectorType;
+
+        DirectoryEntry parent = findParent (entry);
+        if (parent == null)
+        {
+          fileEntries.add (entry);
+          DefaultMutableTreeNode node = new DefaultMutableTreeNode (entry);
+          root.add (node);
+          node.setAllowsChildren (false);
         }
+        else
+          parent.add (entry);
       }
     }
 
@@ -175,6 +174,13 @@ public class CPMDisk extends AbstractFormattedDisk
           return true;
         if (val > 31)
           return false;
+        for (int j = 1; j <= 8; j++)
+        {
+          val = buffer[i + j] & 0xFF;
+          //          System.out.printf ("%3d %s%n", val, (char) val);
+          if (val < 32 || val > 126)
+            return false;
+        }
       }
     }
 

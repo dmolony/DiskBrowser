@@ -171,7 +171,9 @@ public class CPMDisk extends AbstractFormattedDisk
       for (int i = 0; i < buffer.length; i += 32)
       {
         int val = buffer[i] & 0xFF;
-        if (val > 31 && val != 0xE5)
+        if (val == 0xE5)
+          return true;
+        if (val > 31)
           return false;
       }
     }

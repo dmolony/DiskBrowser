@@ -10,322 +10,316 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Character extends AbstractFile
 {
-	private final Attributes attributes;
-	private final Statistics stats;
-	int scenario;
+  private final Attributes attributes;
+  private final Statistics stats;
+  int scenario;
 
-	private final Collection<Spell> spellBook = new ArrayList<Spell> ();
-	private final Collection<Baggage> baggageList = new ArrayList<Baggage> ();
+  private final Collection<Spell> spellBook = new ArrayList<Spell> ();
+  private final Collection<Baggage> baggageList = new ArrayList<Baggage> ();
 
-	static String[] races = { "No race", "Human", "Elf", "Dwarf", "Gnome", "Hobbit" };
-	static String[] alignments = { "Unalign", "Good", "Neutral", "Evil" };
-	static String[] types =
-				{ "Fighter", "Mage", "Priest", "Thief", "Bishop", "Samurai", "Lord", "Ninja" };
-	static String[] statuses =
-				{ "OK", "Afraid", "Asleep", "Paralyze", "Stoned", "Dead", "Ashes", "Lost" };
+  static String[] races = { "No race", "Human", "Elf", "Dwarf", "Gnome", "Hobbit" };
+  static String[] alignments = { "Unalign", "Good", "Neutral", "Evil" };
+  static String[] types =
+      { "Fighter", "Mage", "Priest", "Thief", "Bishop", "Samurai", "Lord", "Ninja" };
+  static String[] statuses =
+      { "OK", "Afraid", "Asleep", "Paralyze", "Stoned", "Dead", "Ashes", "Lost" };
 
-	public Character (String name, byte[] buffer, int scenario)
-	{
-		super (name, buffer);
-		this.scenario = scenario;
+  public Character (String name, byte[] buffer, int scenario)
+  {
+    super (name, buffer);
+    this.scenario = scenario;
 
-		attributes = new Attributes ();
-		stats = new Statistics ();
+    attributes = new Attributes ();
+    stats = new Statistics ();
 
-		stats.race = races[HexFormatter.intValue (buffer[34])];
-		stats.typeInt = HexFormatter.intValue (buffer[36]);
-		stats.type = types[stats.typeInt];
-		stats.ageInWeeks = HexFormatter.intValue (buffer[38], buffer[39]);
-		stats.statusValue = buffer[40];
-		stats.status = statuses[stats.statusValue];
-		stats.alignment = alignments[HexFormatter.intValue (buffer[42])];
+    stats.race = races[HexFormatter.intValue (buffer[34])];
+    stats.typeInt = HexFormatter.intValue (buffer[36]);
+    stats.type = types[stats.typeInt];
+    stats.ageInWeeks = HexFormatter.intValue (buffer[38], buffer[39]);
+    stats.statusValue = buffer[40];
+    stats.status = statuses[stats.statusValue];
+    stats.alignment = alignments[HexFormatter.intValue (buffer[42])];
 
-		stats.gold =
-					HexFormatter.intValue (buffer[52], buffer[53])
-								+ HexFormatter.intValue (buffer[54], buffer[55]) * 10000;
-		stats.experience =
-					HexFormatter.intValue (buffer[124], buffer[125])
-								+ HexFormatter.intValue (buffer[126], buffer[127]) * 10000;
-		stats.level = HexFormatter.intValue (buffer[132], buffer[133]);
+    stats.gold = HexFormatter.intValue (buffer[52], buffer[53])
+        + HexFormatter.intValue (buffer[54], buffer[55]) * 10000;
+    stats.experience = HexFormatter.intValue (buffer[124], buffer[125])
+        + HexFormatter.intValue (buffer[126], buffer[127]) * 10000;
+    stats.level = HexFormatter.intValue (buffer[132], buffer[133]);
 
-		stats.hitsLeft = HexFormatter.intValue (buffer[134], buffer[135]);
-		stats.hitsMax = HexFormatter.intValue (buffer[136], buffer[137]);
-		stats.armourClass = buffer[176];
+    stats.hitsLeft = HexFormatter.intValue (buffer[134], buffer[135]);
+    stats.hitsMax = HexFormatter.intValue (buffer[136], buffer[137]);
+    stats.armourClass = buffer[176];
 
-		attributes.strength = HexFormatter.intValue (buffer[44]) % 16;
-		if (attributes.strength < 3)
-			attributes.strength += 16;
-		attributes.array[0] = attributes.strength;
+    attributes.strength = HexFormatter.intValue (buffer[44]) % 16;
+    if (attributes.strength < 3)
+      attributes.strength += 16;
+    attributes.array[0] = attributes.strength;
 
-		int i1 = HexFormatter.intValue (buffer[44]) / 16;
-		int i2 = HexFormatter.intValue (buffer[45]) % 4;
-		attributes.intelligence = i1 / 2 + i2 * 8;
-		attributes.array[1] = attributes.intelligence;
+    int i1 = HexFormatter.intValue (buffer[44]) / 16;
+    int i2 = HexFormatter.intValue (buffer[45]) % 4;
+    attributes.intelligence = i1 / 2 + i2 * 8;
+    attributes.array[1] = attributes.intelligence;
 
-		attributes.piety = HexFormatter.intValue (buffer[45]) / 4;
-		attributes.array[2] = attributes.piety;
+    attributes.piety = HexFormatter.intValue (buffer[45]) / 4;
+    attributes.array[2] = attributes.piety;
 
-		attributes.vitality = HexFormatter.intValue (buffer[46]) % 16;
-		if (attributes.vitality < 3)
-			attributes.vitality += 16;
-		attributes.array[3] = attributes.vitality;
+    attributes.vitality = HexFormatter.intValue (buffer[46]) % 16;
+    if (attributes.vitality < 3)
+      attributes.vitality += 16;
+    attributes.array[3] = attributes.vitality;
 
-		int a1 = HexFormatter.intValue (buffer[46]) / 16;
-		int a2 = HexFormatter.intValue (buffer[47]) % 4;
-		attributes.agility = a1 / 2 + a2 * 8;
-		attributes.array[4] = attributes.agility;
+    int a1 = HexFormatter.intValue (buffer[46]) / 16;
+    int a2 = HexFormatter.intValue (buffer[47]) % 4;
+    attributes.agility = a1 / 2 + a2 * 8;
+    attributes.array[4] = attributes.agility;
 
-		attributes.luck = HexFormatter.intValue (buffer[47]) / 4;
-		attributes.array[5] = attributes.luck;
-	}
+    attributes.luck = HexFormatter.intValue (buffer[47]) / 4;
+    attributes.array[5] = attributes.luck;
+  }
 
-	public void linkItems (List<Item> itemList)
-	{
-		boolean equipped;
-		boolean identified;
-		int totItems = buffer[58];
-		stats.assetValue = 0;
+  public void linkItems (List<Item> itemList)
+  {
+    boolean equipped;
+    boolean identified;
+    int totItems = buffer[58];
+    stats.assetValue = 0;
 
-		for (int ptr = 60; totItems > 0; ptr += 8, totItems--)
-		{
-			int itemID = HexFormatter.intValue (buffer[ptr + 6]);
-			if (scenario == 3)
-				itemID = (itemID + 24) % 256;
-			if (itemID >= 0 && itemID < itemList.size ())
-			{
-				Item item = itemList.get (itemID);
-				equipped = (buffer[ptr] == 1);
-				identified = (buffer[ptr + 4] == 1);
-				baggageList.add (new Baggage (item, equipped, identified));
-				stats.assetValue += item.getCost ();
-				item.partyOwns++;
-			}
-			else
-				System.out.println (name + " ItemID : " + itemID + " is outside range 0:"
-							+ itemList.size ());
-		}
-	}
+    for (int ptr = 60; totItems > 0; ptr += 8, totItems--)
+    {
+      int itemID = HexFormatter.intValue (buffer[ptr + 6]);
+      if (scenario == 3)
+        itemID = (itemID + 24) % 256;
+      if (itemID >= 0 && itemID < itemList.size ())
+      {
+        Item item = itemList.get (itemID);
+        equipped = (buffer[ptr] == 1);
+        identified = (buffer[ptr + 4] == 1);
+        baggageList.add (new Baggage (item, equipped, identified));
+        stats.assetValue += item.getCost ();
+        item.partyOwns++;
+      }
+      else
+        System.out.println (name + " ItemID : " + itemID + " is outside range 0:"
+            + (itemList.size () - 1));
+    }
+  }
 
-	public void linkSpells (List<Spell> spellList)
-	{
-		for (int i = 138; i < 145; i++)
-		{
-			for (int bit = 0; bit < 8; bit++)
-			{
-				byte b = buffer[i];
-				if (((b >>> bit) & 1) == 1)
-				{
-					int index = (i - 138) * 8 + bit;
-					if (index > 0 && index <= spellList.size ())
-						spellBook.add (spellList.get (index - 1));
-					else
-						System.out.println (name + " SpellID : " + index + " is outside range 0:"
-									+ spellList.size ());
-				}
-			}
-		}
-	}
+  public void linkSpells (List<Spell> spellList)
+  {
+    for (int i = 138; i < 145; i++)
+      for (int bit = 0; bit < 8; bit++)
+        if (((buffer[i] >>> bit) & 1) == 1)
+        {
+          int index = (i - 138) * 8 + bit;
+          if (index > 0 && index <= spellList.size ())
+            spellBook.add (spellList.get (index - 1));
+          else
+            System.out.println (name + " SpellID : " + index + " is outside range 1:"
+                + spellList.size ());
+        }
+  }
 
-	@Override
-	public String getText ()
-	{
-		StringBuilder text = new StringBuilder ();
+  @Override
+  public String getText ()
+  {
+    StringBuilder text = new StringBuilder ();
 
-		text.append ("Character name ..... " + name);
-		text.append ("\n\nRace ............... " + stats.race);
-		text.append ("\nType ............... " + stats.type);
-		text.append ("\nAlignment .......... " + stats.alignment);
-		text.append ("\nStatus ............. " + stats.status);
-		//    text.append ("\nType ............... " + stats.typeInt);
-		//    text.append ("\nStatus ............. " + stats.statusValue);
-		text.append ("\nGold ............... " + String.format ("%,d", stats.gold));
-		text.append ("\nExperience ......... " + String.format ("%,d", stats.experience));
-		text.append ("\nNext level ......... " + String.format ("%,d", stats.nextLevel));
-		text.append ("\nLevel .............. " + stats.level);
-		text.append ("\nAge in weeks ....... "
-					+ String.format ("%,d  (%d)", stats.ageInWeeks, (stats.ageInWeeks / 52)));
-		text.append ("\nHit points left .... " + stats.hitsLeft);
-		text.append ("\nMaximum hits ....... " + stats.hitsMax);
-		text.append ("\nArmour class ....... " + stats.armourClass);
-		text.append ("\nAsset value ........ " + String.format ("%,d", stats.assetValue));
-		text.append ("\nAwards ............. " + isWinner ());
-		text.append ("\nOut ................ " + isOut ());
-		text.append ("\n\nStrength ........... " + attributes.strength);
-		text.append ("\nIntelligence ....... " + attributes.intelligence);
-		text.append ("\nPiety .............. " + attributes.piety);
-		text.append ("\nVitality ........... " + attributes.vitality);
-		text.append ("\nAgility ............ " + attributes.agility);
-		text.append ("\nLuck ............... " + attributes.luck);
+    text.append ("Character name ..... " + name);
+    text.append ("\n\nRace ............... " + stats.race);
+    text.append ("\nType ............... " + stats.type);
+    text.append ("\nAlignment .......... " + stats.alignment);
+    text.append ("\nStatus ............. " + stats.status);
+    //    text.append ("\nType ............... " + stats.typeInt);
+    //    text.append ("\nStatus ............. " + stats.statusValue);
+    text.append ("\nGold ............... " + String.format ("%,d", stats.gold));
+    text.append ("\nExperience ......... " + String.format ("%,d", stats.experience));
+    text.append ("\nNext level ......... " + String.format ("%,d", stats.nextLevel));
+    text.append ("\nLevel .............. " + stats.level);
+    text.append ("\nAge in weeks ....... "
+        + String.format ("%,d  (%d)", stats.ageInWeeks, (stats.ageInWeeks / 52)));
+    text.append ("\nHit points left .... " + stats.hitsLeft);
+    text.append ("\nMaximum hits ....... " + stats.hitsMax);
+    text.append ("\nArmour class ....... " + stats.armourClass);
+    text.append ("\nAsset value ........ " + String.format ("%,d", stats.assetValue));
+    text.append ("\nAwards ............. " + isWinner ());
+    text.append ("\nOut ................ " + isOut ());
+    text.append ("\n\nStrength ........... " + attributes.strength);
+    text.append ("\nIntelligence ....... " + attributes.intelligence);
+    text.append ("\nPiety .............. " + attributes.piety);
+    text.append ("\nVitality ........... " + attributes.vitality);
+    text.append ("\nAgility ............ " + attributes.agility);
+    text.append ("\nLuck ............... " + attributes.luck);
 
-		int[] spellPoints = getMageSpellPoints ();
-		text.append ("\n\nMage spell points ..");
-		for (int i = 0; i < spellPoints.length; i++)
-			text.append (" " + spellPoints[i]);
+    int[] spellPoints = getMageSpellPoints ();
+    text.append ("\n\nMage spell points ..");
+    for (int i = 0; i < spellPoints.length; i++)
+      text.append (" " + spellPoints[i]);
 
-		spellPoints = getPriestSpellPoints ();
-		text.append ("\nPriest spell points ");
-		for (int i = 0; i < spellPoints.length; i++)
-			text.append (" " + spellPoints[i]);
+    spellPoints = getPriestSpellPoints ();
+    text.append ("\nPriest spell points ");
+    for (int i = 0; i < spellPoints.length; i++)
+      text.append (" " + spellPoints[i]);
 
-		text.append ("\n\nSpells :");
-		for (Spell s : spellBook)
-			text.append ("\n" + s);
+    text.append ("\n\nSpells :");
+    for (Spell s : spellBook)
+      text.append ("\n" + s);
 
-		text.append ("\n\nItems :");
-		for (Baggage b : baggageList)
-			text.append ("\n" + b);
+    text.append ("\n\nItems :");
+    for (Baggage b : baggageList)
+      text.append ("\n" + b);
 
-		return text.toString ();
-	}
+    return text.toString ();
+  }
 
-	public void linkExperience (ExperienceLevel exp)
-	{
-		stats.nextLevel = exp.getExperiencePoints (stats.level);
-	}
+  public void linkExperience (ExperienceLevel exp)
+  {
+    stats.nextLevel = exp.getExperiencePoints (stats.level);
+  }
 
-	public int[] getMageSpellPoints ()
-	{
-		int[] spells = new int[7];
+  public int[] getMageSpellPoints ()
+  {
+    int[] spells = new int[7];
 
-		for (int i = 0; i < 7; i++)
-			spells[i] = buffer[146 + i * 2];
+    for (int i = 0; i < 7; i++)
+      spells[i] = buffer[146 + i * 2];
 
-		return spells;
-	}
+    return spells;
+  }
 
-	public int[] getPriestSpellPoints ()
-	{
-		int[] spells = new int[7];
+  public int[] getPriestSpellPoints ()
+  {
+    int[] spells = new int[7];
 
-		for (int i = 0; i < 7; i++)
-			spells[i] = buffer[160 + i * 2];
+    for (int i = 0; i < 7; i++)
+      spells[i] = buffer[160 + i * 2];
 
-		return spells;
-	}
+    return spells;
+  }
 
-	public Long getNextLevel ()
-	{
-		return stats.nextLevel;
-	}
+  public Long getNextLevel ()
+  {
+    return stats.nextLevel;
+  }
 
-	// this is temporary until I have more data
-	public String isWinner ()
-	{
-		int v1 = buffer[206];
-		int v2 = buffer[207];
-		if (v1 == 0x01)
-			return ">";
-		if (v1 == 0x00 && v2 == 0x00)
-			return "";
-		if (v1 == 0x00 && v2 == 0x20)
-			return "D";
-		if (v1 == 0x20 && v2 == 0x20)
-			return "*D";
-		if (v1 == 0x21 && v2 == 0x60)
-			return ">*DG";
-		if (v1 == 0x21 && v2 == 0x28)
-			return ">*KD";
-		return "Unknown : " + v1 + " " + v2;
-	}
+  // this is temporary until I have more data
+  public String isWinner ()
+  {
+    int v1 = buffer[206];
+    int v2 = buffer[207];
+    if (v1 == 0x01)
+      return ">";
+    if (v1 == 0x00 && v2 == 0x00)
+      return "";
+    if (v1 == 0x00 && v2 == 0x20)
+      return "D";
+    if (v1 == 0x20 && v2 == 0x20)
+      return "*D";
+    if (v1 == 0x21 && v2 == 0x60)
+      return ">*DG";
+    if (v1 == 0x21 && v2 == 0x28)
+      return ">*KD";
+    return "Unknown : " + v1 + " " + v2;
+  }
 
-	public boolean isOut ()
-	{
-		return (buffer[32] == 1);
-	}
+  public boolean isOut ()
+  {
+    return (buffer[32] == 1);
+  }
 
-	public String getType ()
-	{
-		return stats.type;
-	}
+  public String getType ()
+  {
+    return stats.type;
+  }
 
-	public String getRace ()
-	{
-		return stats.race;
-	}
+  public String getRace ()
+  {
+    return stats.race;
+  }
 
-	public String getAlignment ()
-	{
-		return stats.alignment;
-	}
+  public String getAlignment ()
+  {
+    return stats.alignment;
+  }
 
-	public Attributes getAttributes ()
-	{
-		return attributes;
-	}
+  public Attributes getAttributes ()
+  {
+    return attributes;
+  }
 
-	public Statistics getStatistics ()
-	{
-		return stats;
-	}
+  public Statistics getStatistics ()
+  {
+    return stats;
+  }
 
-	public Iterator<Baggage> getBaggage ()
-	{
-		return baggageList.iterator ();
-	}
+  public Iterator<Baggage> getBaggage ()
+  {
+    return baggageList.iterator ();
+  }
 
-	public Iterator<Spell> getSpells ()
-	{
-		return spellBook.iterator ();
-	}
+  public Iterator<Spell> getSpells ()
+  {
+    return spellBook.iterator ();
+  }
 
-	@Override
-	public String toString ()
-	{
-		return name;
-	}
+  @Override
+  public String toString ()
+  {
+    return name;
+  }
 
-	public class Baggage
-	{
-		public Item item;
-		public boolean equipped;
-		public boolean identified;
+  public class Baggage
+  {
+    public Item item;
+    public boolean equipped;
+    public boolean identified;
 
-		public Baggage (Item item, boolean equipped, boolean identified)
-		{
-			this.item = item;
-			this.equipped = equipped;
-			this.identified = identified;
-		}
+    public Baggage (Item item, boolean equipped, boolean identified)
+    {
+      this.item = item;
+      this.equipped = equipped;
+      this.identified = identified;
+    }
 
-		@Override
-		public String toString ()
-		{
-			return String.format ("%s%-15s (%d)", equipped ? "*" : " ", item.name, item.getCost ());
-		}
-	}
+    @Override
+    public String toString ()
+    {
+      return String.format ("%s%-15s (%d)", equipped ? "*" : " ", item.name,
+                            item.getCost ());
+    }
+  }
 
-	public class Statistics implements Cloneable
-	{
-		public String race;
-		public String type;
-		public String alignment;
-		public String status;
-		public int typeInt;
-		public int statusValue;
-		public int gold;
-		public int experience;
-		public long nextLevel;
-		public int level;
-		public int ageInWeeks;
-		public int hitsLeft;
-		public int hitsMax;
-		public int armourClass;
-		public int assetValue;
-	}
+  public class Statistics implements Cloneable
+  {
+    public String race;
+    public String type;
+    public String alignment;
+    public String status;
+    public int typeInt;
+    public int statusValue;
+    public int gold;
+    public int experience;
+    public long nextLevel;
+    public int level;
+    public int ageInWeeks;
+    public int hitsLeft;
+    public int hitsMax;
+    public int armourClass;
+    public int assetValue;
+  }
 
-	public class Attributes
-	{
-		public int strength;
-		public int intelligence;
-		public int piety;
-		public int vitality;
-		public int agility;
-		public int luck;
-		public int[] array;
+  public class Attributes
+  {
+    public int strength;
+    public int intelligence;
+    public int piety;
+    public int vitality;
+    public int agility;
+    public int luck;
+    public int[] array;
 
-		public Attributes ()
-		{
-			array = new int[6];
-		}
-	}
+    public Attributes ()
+    {
+      array = new int[6];
+    }
+  }
 }

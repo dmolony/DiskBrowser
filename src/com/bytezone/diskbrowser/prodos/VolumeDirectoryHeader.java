@@ -56,9 +56,14 @@ class VolumeDirectoryHeader extends DirectoryHeader
     }
 
     block = 0;
-    //    int max = (totalBlocks - 1) / 8 + 1;   // bytes required for sector map
+
+    // nb dual-dos disk needs to use totalBlocks obtained from disk
+    // int max1 = (totalBlocks - 1) / 8 + 1;   // bytes required for sector map
+
     // nb disk may be truncated, so use actual number of blocks
-    int max = (disk.getTotalBlocks () - 1) / 8 + 1;   // bytes required for sector map
+    // int max2 = (disk.getTotalBlocks () - 1) / 8 + 1;  // bytes required for sector map
+
+    int max = (Math.min (totalBlocks, disk.getTotalBlocks ()) - 1) / 8 + 1;
 
     for (int i = 0; i < max; i++)
     {

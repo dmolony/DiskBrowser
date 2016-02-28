@@ -343,12 +343,14 @@ public class AppleDisk implements Disk
     assert (size == 256 || size == 512) : "Invalid sector size : " + size;
     if (sectorSize == size)
       return;
+
     sectorSize = size;
     sectors = trackSize / sectorSize;
     blocks = tracks * sectors;
-    System.out.printf ("New blocks: %d%n", blocks);
+
     hasData = new boolean[blocks];
     checkSectorsForData ();
+
     if (actionListenerList != null)
       notifyListeners ("Sector size changed");
   }

@@ -84,10 +84,6 @@ class DiskLayoutImage extends JPanel implements Scrollable
   {
     super.paintComponent (g);
 
-    // why doesn't linux do this?
-    //    g.setColor (Color.WHITE);
-    //    g.fillRect (0, 0, getWidth (), getHeight ());
-
     if (disk == null)
       return;
 
@@ -102,8 +98,9 @@ class DiskLayoutImage extends JPanel implements Scrollable
     List<DiskAddress> selectedBlocks = selectionHandler.getHighlights ();
 
     // this stops an index error when using alt-5 to switch to 512-byte blocks
-    if (maxBlock > d.getTotalBlocks ())
-      maxBlock = d.getTotalBlocks ();
+    //    if (maxBlock > d.getTotalBlocks ())
+    //      maxBlock = d.getTotalBlocks ();
+    // the index error is caused by not recalculating the grid layout
 
     for (int y = p1.y; y <= p2.y; y += bh)
       for (int x = p1.x; x <= p2.x; x += bw)

@@ -99,6 +99,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
     for (DiskAddress da : disk)
       sectorTypes[da.getBlock ()] = disk.isSectorEmpty (da) ? emptySector : usedSector;
+
+    setGridLayout ();
   }
 
   private void setGridLayout ()
@@ -109,15 +111,19 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
       case 280:
         gridLayout = new Dimension (8, 35);
         break;
+
       case 455:
         gridLayout = new Dimension (13, 35);
         break;
+
       case 560:
         gridLayout = new Dimension (16, 35);
         break;
+
       case 1600:
         gridLayout = new Dimension (16, 100);
         break;
+
       default:
         int[] sizes = { 32, 20, 16, 8 };
         for (int size : sizes)
@@ -129,6 +135,12 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
         if (gridLayout == null)
           System.out.println ("Unusable total blocks : " + totalBlocks);
     }
+  }
+
+  @Override
+  public Dimension getGridLayout ()
+  {
+    return gridLayout;
   }
 
   @Override
@@ -377,12 +389,6 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
           System.out.printf ("%04X *** error ***%n", i);
       }
     }
-  }
-
-  @Override
-  public Dimension getGridLayout ()
-  {
-    return gridLayout;
   }
 
   // VTOC flags sector as free, but it is in use by a file

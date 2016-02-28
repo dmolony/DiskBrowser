@@ -3,7 +3,11 @@ package com.bytezone.diskbrowser.gui;
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -22,8 +26,8 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
-class DiskLayoutPanel extends JPanel implements DiskSelectionListener, FileSelectionListener,
-      RedoListener, FontChangeListener
+class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
+    FileSelectionListener, RedoListener, FontChangeListener
 {
   private static final int SIZE = 15; // basic unit of a display block
 
@@ -169,7 +173,7 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener, FileSelec
       int y = da.getBlock () / grid.width;
       int x = da.getBlock () % grid.width;
       Rectangle r =
-            new Rectangle (x * block.width, y * block.height, block.width, block.height);
+          new Rectangle (x * block.width, y * block.height, block.width, block.height);
       return r;
     }
 
@@ -227,7 +231,7 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener, FileSelec
   {
     if (newDisk instanceof DualDosDisk)
       newDisk = ((DualDosDisk) newDisk).getCurrentDisk (); // never set to a Dual-dos disk
-    if (newDisk != image.disk)
+    if (newDisk != image.getDisk ())
     {
       LayoutDetails layout = new LayoutDetails (newDisk);
       image.setDisk (newDisk, layout);

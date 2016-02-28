@@ -16,11 +16,12 @@ public class CPMDisk extends AbstractFormattedDisk
   public final SectorType catalogSector = new SectorType ("Catalog", green);
   public final SectorType prnSector = new SectorType ("PRN", Color.lightGray);
   public final SectorType comSector = new SectorType ("COM", Color.red);
-  public final SectorType dataSector = new SectorType ("Data", Color.blue);
+  public final SectorType otherSector = new SectorType ("Other", Color.blue);
   public final SectorType docSector = new SectorType ("DOC", Color.cyan);
   public final SectorType basSector = new SectorType ("BAS", Color.gray);
   public final SectorType asmSector = new SectorType ("ASM", Color.orange);
   public final SectorType ovrSector = new SectorType ("OVR", Color.magenta);
+  public final SectorType macSector = new SectorType ("Green", Color.green);
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
 
@@ -31,11 +32,12 @@ public class CPMDisk extends AbstractFormattedDisk
     sectorTypesList.add (catalogSector);
     sectorTypesList.add (prnSector);
     sectorTypesList.add (comSector);
-    sectorTypesList.add (dataSector);
     sectorTypesList.add (basSector);
     sectorTypesList.add (docSector);
     sectorTypesList.add (asmSector);
     sectorTypesList.add (ovrSector);
+    sectorTypesList.add (macSector);
+    sectorTypesList.add (otherSector);
 
     getDisk ().setEmptyByte ((byte) 0xE5);
     setSectorTypes ();
@@ -99,8 +101,10 @@ public class CPMDisk extends AbstractFormattedDisk
       return asmSector;
     if ("OVR".equals (type))
       return ovrSector;
+    if ("MAC".equals (type))
+      return macSector;
 
-    return dataSector;
+    return otherSector;
   }
 
   @Override

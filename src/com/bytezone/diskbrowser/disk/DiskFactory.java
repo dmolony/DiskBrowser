@@ -44,7 +44,7 @@ public class DiskFactory
     Boolean compressed = false;
     Path p = Paths.get (path);
 
-    if (suffix.equalsIgnoreCase ("sdk"))
+    if (suffix.equals ("sdk"))
     {
       try
       {
@@ -68,7 +68,7 @@ public class DiskFactory
         return null;
       }
     }
-    else if (suffix.equalsIgnoreCase ("gz"))    // will be .dsk.gz
+    else if (suffix.equals ("gz"))    // will be .dsk.gz
     {
       try
       {
@@ -266,6 +266,7 @@ public class DiskFactory
   {
     if (debug)
       System.out.println ("Checking Prodos disk");
+
     try
     {
       AppleDisk disk = new AppleDisk (file, 35, 8);

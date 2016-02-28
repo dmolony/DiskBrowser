@@ -1,12 +1,6 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -26,7 +20,8 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 class DiskLayoutImage extends JPanel implements Scrollable
 {
   static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
-  FormattedDisk disk;
+
+  private FormattedDisk disk;
   LayoutDetails layoutDetails;
   private boolean showFreeSectors;
   DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
@@ -51,9 +46,6 @@ class DiskLayoutImage extends JPanel implements Scrollable
     this.disk = disk;
     layoutDetails = details;
 
-    //    System.out.println (details);
-    //    new Exception ().printStackTrace ();
-
     bw = layoutDetails.block.width;
     bh = layoutDetails.block.height;
     gw = layoutDetails.grid.width;
@@ -63,6 +55,11 @@ class DiskLayoutImage extends JPanel implements Scrollable
     selectionHandler.setSelection (null);
 
     repaint ();
+  }
+
+  public FormattedDisk getDisk ()
+  {
+    return disk;
   }
 
   public void setShowFreeSectors (boolean showFree)
@@ -97,15 +94,10 @@ class DiskLayoutImage extends JPanel implements Scrollable
     Rectangle clipRect = g.getClipBounds ();
 
     Point p1 = new Point (clipRect.x / bw * bw, clipRect.y / bh * bh);
-    Point p2 =
-        new Point ((clipRect.x + clipRect.width - 1) / bw * bw, (clipRect.y
-            + clipRect.height - 1)
-            / bh * bh);
+    Point p2 = new Point ((clipRect.x + clipRect.width - 1) / bw * bw,
+        (clipRect.y + clipRect.height - 1) / bh * bh);
 
-    //    System.out.printf ("gw=%d, gh=%d, bw=%d, bh=%d%n", gw, gh, bw, bh);
-    // int totalBlocks = 0;
     int maxBlock = gw * gh;
-    //    System.out.printf ("Max blocks: %d%n", maxBlock);
     Disk d = disk.getDisk ();
     List<DiskAddress> selectedBlocks = selectionHandler.getHighlights ();
 
@@ -123,7 +115,6 @@ class DiskLayoutImage extends JPanel implements Scrollable
           boolean flag = showFreeSectors && disk.isSectorFree (da);
           boolean selected = selectedBlocks.contains (da);
           drawBlock ((Graphics2D) g, blockNo, x, y, flag, selected);
-          // totalBlocks++;
         }
       }
   }
@@ -135,7 +126,6 @@ class DiskLayoutImage extends JPanel implements Scrollable
     int offset = (bw - 4) / 2 + 1;
 
     Rectangle rect = new Rectangle (x, y, bw, bh);
-    //    System.out.printf ("Rect: %4d %4d %4d %4d%n", x, y, bw, bh);
 
     // draw frame
     if (true) // this needs to draw the outside rectangle, and show less white space
@@ -176,7 +166,7 @@ class DiskLayoutImage extends JPanel implements Scrollable
   {
     if (type.colour == Color.WHITE || type.colour == Color.YELLOW
         || type.colour == Color.PINK || type.colour == Color.CYAN
-        || type.colour == Color.ORANGE)
+        || type.colour == Color.ORANGE || type.colour == Color.GREEN)
       return Color.BLACK;
     return Color.WHITE;
   }

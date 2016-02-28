@@ -108,12 +108,14 @@ public class ProdosDisk extends AbstractFormattedDisk
               sectorTypes[vdh.bitMapBlock + i] = volumeMapSector;
             parentNode.setUserObject (vdh); // populate the empty volume node
             break;
+
           case ProdosConstants.TYPE_SUBDIRECTORY_HEADER:
             localHeader = new SubDirectoryHeader (this, entry, parent);
             headerEntries.add (localHeader);
             currentSectorType = subcatalogSector;
             sectorTypes[block] = currentSectorType;
             break;
+
           case ProdosConstants.TYPE_SUBDIRECTORY:
             FileEntry ce = new FileEntry (this, entry, localHeader, block);
             fileEntries.add (ce);
@@ -122,6 +124,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             parentNode.add (directoryNode);
             processDirectoryBlock (ce.keyPtr, ce, directoryNode); // Recursion !!
             break;
+
           case ProdosConstants.TYPE_SEEDLING:
           case ProdosConstants.TYPE_SAPLING:
           case ProdosConstants.TYPE_TREE:
@@ -133,6 +136,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             node.setAllowsChildren (false);
             parentNode.add (node);
             break;
+
           default:
             System.out.println ("Unknown storage type : " + storageType);
             System.out.println (HexFormatter.format (entry, 0, entry.length));
@@ -168,6 +172,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     int bitMapBlock = HexFormatter.intValue (buffer[0x27], buffer[0x28]);
     if (bitMapBlock != 6)
       return false;
+
     return true;
   }
 

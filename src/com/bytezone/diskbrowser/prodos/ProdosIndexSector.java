@@ -6,7 +6,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class ProdosIndexSector extends AbstractSector
 {
-  String name;
+  private final String name;
 
   ProdosIndexSector (String name, Disk disk, byte[] buffer)
   {
@@ -21,10 +21,12 @@ class ProdosIndexSector extends AbstractSector
 
     for (int i = 0; i < 256; i++)
     {
-      text.append (String.format ("%02X        %02X %02X", i, buffer[i], buffer[i + 256]));
+      text.append (String.format ("%02X        %02X %02X", i, buffer[i],
+                                  buffer[i + 256]));
       if (buffer[i] != 0 || buffer[i + 256] != 0)
-        text.append (String.format ("         %s%n",
-              "block " + HexFormatter.intValue (buffer[i], buffer[i + 256])));
+        text.append (String
+            .format ("         %s%n",
+                     "block " + HexFormatter.intValue (buffer[i], buffer[i + 256])));
       else
         text.append ("\n");
     }

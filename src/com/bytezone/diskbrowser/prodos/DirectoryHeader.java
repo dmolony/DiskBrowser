@@ -4,16 +4,16 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 abstract class DirectoryHeader extends CatalogEntry
 {
-	int entryLength;
-	int entriesPerBlock;
-	int fileCount;
+  final int entryLength;
+  final int entriesPerBlock;
+  final int fileCount;
 
-	public DirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer)
-	{
-		super (parentDisk, entryBuffer);
+  public DirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer)
+  {
+    super (parentDisk, entryBuffer);
 
-		entryLength = HexFormatter.intValue (entryBuffer[31]);
-		entriesPerBlock = HexFormatter.intValue (entryBuffer[32]);
-		fileCount = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
-	}
+    entryLength = HexFormatter.intValue (entryBuffer[31]);
+    entriesPerBlock = HexFormatter.intValue (entryBuffer[32]);
+    fileCount = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
+  }
 }

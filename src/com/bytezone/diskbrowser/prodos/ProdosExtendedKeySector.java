@@ -5,7 +5,6 @@ import com.bytezone.diskbrowser.disk.Disk;
 
 class ProdosExtendedKeySector extends AbstractSector
 {
-
   public ProdosExtendedKeySector (Disk disk, byte[] buffer)
   {
     super (disk, buffer);

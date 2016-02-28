@@ -8,8 +8,8 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 
 class ProdosBitMapSector extends AbstractSector
 {
-  DiskAddress da;
-  ProdosDisk parent;
+  private final DiskAddress da;
+  private final ProdosDisk parent;
 
   ProdosBitMapSector (ProdosDisk parent, Disk disk, byte[] buffer, DiskAddress da)
   {
@@ -26,8 +26,6 @@ class ProdosBitMapSector extends AbstractSector
     // check range of bits for current block - so far I don't have a disk that needs
     // more than a single block
     int relativeBlock = da.getBlock () - parent.vdh.bitMapBlock;
-//    System.out.println ("rel " + relativeBlock);
-//    System.out.println ("width : " + grid.width);
     int startBit = relativeBlock * 4096;
     int endBit = startBit + 4096;
     if (startBit >= grid.width * grid.height)
@@ -55,7 +53,7 @@ class ProdosBitMapSector extends AbstractSector
       int endRow = startRow + (512 / width);
       int block = startBit;
       int byteNo = 0;
-//      System.out.printf ("Start %d, end %d%n", startRow, endRow);
+      //      System.out.printf ("Start %d, end %d%n", startRow, endRow);
       for (int row = startRow; row < endRow; row++)
       {
         StringBuilder details = new StringBuilder ();

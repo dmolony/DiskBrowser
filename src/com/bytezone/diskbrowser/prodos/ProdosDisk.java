@@ -16,8 +16,12 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class ProdosDisk extends AbstractFormattedDisk
 {
+  protected static final DateFormat df = DateFormat.getInstance ();
+  protected static final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
+  protected static final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
+
   final SectorType dosSector = new SectorType ("Bootstrap Loader", Color.lightGray);
-  final SectorType catalogSector = new SectorType ("Catalog", new Color (0, 200, 0)); // green
+  final SectorType catalogSector = new SectorType ("Catalog", new Color (0, 200, 0));
   final SectorType volumeMapSector = new SectorType ("Volume Map", Color.blue);
   final SectorType subcatalogSector = new SectorType ("Subcatalog", Color.magenta);
   final SectorType masterIndexSector = new SectorType ("Master Index", Color.orange);
@@ -26,12 +30,9 @@ public class ProdosDisk extends AbstractFormattedDisk
   final SectorType extendedKeySector = new SectorType ("Extended key", Color.gray);
 
   private final List<DirectoryHeader> headerEntries = new ArrayList<DirectoryHeader> ();
-  VolumeDirectoryHeader vdh = null;
-  private static final boolean debug = false;
+  protected VolumeDirectoryHeader vdh;
 
-  static final DateFormat df = DateFormat.getInstance ();
-  static final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
-  static final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
+  private static final boolean debug = false;
 
   public ProdosDisk (Disk disk)
   {
@@ -106,7 +107,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             sectorTypes[block] = currentSectorType;
             for (int i = 0; i < vdh.totalBitMapBlocks; i++)
               sectorTypes[vdh.bitMapBlock + i] = volumeMapSector;
-            parentNode.setUserObject (vdh); // populate the empty volume node
+            parentNode.setUserObject (vdh);         // populate the empty volume node
             break;
 
           case ProdosConstants.TYPE_SUBDIRECTORY_HEADER:
@@ -122,7 +123,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             DefaultMutableTreeNode directoryNode = new DefaultMutableTreeNode (ce);
             directoryNode.setAllowsChildren (true);
             parentNode.add (directoryNode);
-            processDirectoryBlock (ce.keyPtr, ce, directoryNode); // Recursion !!
+            processDirectoryBlock (ce.keyPtr, ce, directoryNode);       // Recursion !!
             break;
 
           case ProdosConstants.TYPE_SEEDLING:
@@ -238,15 +239,6 @@ public class ProdosDisk extends AbstractFormattedDisk
       return new DefaultSector (name, disk, buffer);
     return super.getFormattedSector (da);
   }
-
-  //  @Override
-  //  public String getSectorFilename (DiskAddress da)
-  //  {
-  //    for (AppleFileSource fe : fileEntries)
-  //      if (((FileEntry) fe).contains (da))
-  //        return ((FileEntry) fe).getUniqueName ();
-  //    return null;
-  //  }
 
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)

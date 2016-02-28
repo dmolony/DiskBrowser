@@ -12,16 +12,16 @@ class ProdosDirectory extends AbstractFile
   private static final String newLine = String.format ("%n");
   private static final String newLine2 = newLine + newLine;
 
-  //  private final Disk parent;
   private final FormattedDisk parentFD;
   private final int totalBlocks;
   private final int freeBlocks;
   private final int usedBlocks;
 
-  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer, int totalBlocks,
-        int freeBlocks, int usedBlocks)
+  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer,
+      int totalBlocks, int freeBlocks, int usedBlocks)
   {
     super (name, buffer);
+
     this.parentFD = parent;
     this.totalBlocks = totalBlocks;
     this.freeBlocks = freeBlocks;
@@ -37,7 +37,8 @@ class ProdosDirectory extends AbstractFile
     {
       int storageType = (buffer[i] & 0xF0) >> 4;
       if (storageType == 0)
-        continue; // break??
+        continue;                               // break??
+
       int nameLength = buffer[i] & 0x0F;
       String filename = HexFormatter.getString (buffer, i + 1, nameLength);
       String subType = "";
@@ -49,8 +50,9 @@ class ProdosDirectory extends AbstractFile
         case ProdosConstants.TYPE_SUBDIRECTORY_HEADER:
           text.append ("/" + filename + newLine2);
           text.append (" NAME           TYPE  BLOCKS  "
-                + "MODIFIED         CREATED          ENDFILE SUBTYPE" + newLine2);
+              + "MODIFIED         CREATED          ENDFILE SUBTYPE" + newLine2);
           break;
+
         case ProdosConstants.TYPE_FREE:
         case ProdosConstants.TYPE_SEEDLING:
         case ProdosConstants.TYPE_SAPLING:
@@ -62,16 +64,17 @@ class ProdosDirectory extends AbstractFile
           int blocks = HexFormatter.intValue (buffer[i + 19], buffer[i + 20]);
 
           GregorianCalendar created = HexFormatter.getAppleDate (buffer, i + 24);
-          String dateC =
-                created == null ? NO_DATE : ProdosDisk.sdf.format (created.getTime ())
-                      .toUpperCase ();
-          String timeC = created == null ? "" : ProdosDisk.stf.format (created.getTime ());
+          String dateC = created == null ? NO_DATE
+              : ProdosDisk.sdf.format (created.getTime ()).toUpperCase ();
+          String timeC =
+              created == null ? "" : ProdosDisk.stf.format (created.getTime ());
           GregorianCalendar modified = HexFormatter.getAppleDate (buffer, i + 33);
-          String dateM =
-                modified == null ? NO_DATE : ProdosDisk.sdf.format (modified.getTime ())
-                      .toUpperCase ();
-          String timeM = modified == null ? "" : ProdosDisk.stf.format (modified.getTime ());
-          int eof = HexFormatter.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
+          String dateM = modified == null ? NO_DATE
+              : ProdosDisk.sdf.format (modified.getTime ()).toUpperCase ();
+          String timeM =
+              modified == null ? "" : ProdosDisk.stf.format (modified.getTime ());
+          int eof =
+              HexFormatter.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
           int fileType = HexFormatter.intValue (buffer[i + 16]);
           locked = (buffer[i + 30] & 0xE0) == 0xE0 ? " " : "*";
 
@@ -94,17 +97,18 @@ class ProdosDirectory extends AbstractFile
               subType = "";
           }
 
-          text.append (String.format ("%s%-15s %3s   %5d  %9s %5s  %9s %5s %8d %7s%n", locked,
-                                      filename, ProdosConstants.fileTypes[type], blocks,
-                                      dateM, timeM, dateC, timeC, eof, subType));
+          text.append (String.format ("%s%-15s %3s   %5d  %9s %5s  %9s %5s %8d %7s%n",
+                                      locked, filename, ProdosConstants.fileTypes[type],
+                                      blocks, dateM, timeM, dateC, timeC, eof, subType));
           break;
+
         default:
           text.append (" <Unknown strage type : " + storageType + newLine);
       }
     }
-    text.append (String
-          .format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n", freeBlocks,
-                   usedBlocks, totalBlocks));
+    text.append (String.format (
+                                "%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
+                                freeBlocks, usedBlocks, totalBlocks));
     return text.toString ();
   }
 

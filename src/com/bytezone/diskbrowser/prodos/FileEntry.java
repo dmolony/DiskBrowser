@@ -77,8 +77,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       case TYPE_GSOS_EXTENDED_FILE:
         parentDisk.setSectorType (keyPtr, fDisk.extendedKeySector);
         indexBlocks.add (disk.getDiskAddress (keyPtr));
-        byte[] buffer2 = disk.readSector (keyPtr);
-        // data fork and resource fork
+        byte[] buffer2 = disk.readSector (keyPtr);        // data fork and resource fork
+
         for (int i = 0; i < 512; i += 256)
         {
           int storageType = buffer2[i] & 0x0F;
@@ -536,6 +536,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return sectors;
   }
 
+  @Override
   public boolean contains (DiskAddress da)
   {
     if (da.equals (masterIndexBlock))

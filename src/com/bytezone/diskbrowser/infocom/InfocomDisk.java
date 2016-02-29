@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.infocom;
 
-import static java.lang.System.out;
-
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,8 +20,8 @@ public class InfocomDisk extends AbstractFormattedDisk
   private static final boolean TYPE_NODE = true;
   private static final boolean TYPE_LEAF = false;
   private byte[] data;
-  int version;
-  Header header;
+  private int version;
+  private final Header header;
 
   Color green = new Color (0, 200, 0);
 
@@ -41,7 +39,7 @@ public class InfocomDisk extends AbstractFormattedDisk
   {
     super (disk);
 
-    setSectorTypes ();
+    setInfocomSectorTypes ();
 
     data = disk.readSector (3, 0); // read first sector to get file size
     data = getBuffer (getWord (26) * 2); // read entire file into data buffer
@@ -85,8 +83,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     setSectors (header.stringPointer, header.fileLength, stringsSector);
   }
 
-  @Override
-  protected void setSectorTypes ()
+  protected void setInfocomSectorTypes ()
   {
     sectorTypesList.add (bootSector);
     sectorTypesList.add (headerSector);
@@ -125,7 +122,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     {
       if (da.getBlock () > startBlock && disk.isSectorEmpty (da))
       {
-        out.println ("Empty : " + da);
+        System.out.println ("Empty : " + da);
         buffer = disk.readSector (da.getBlock () - 1);
         fileSize = (da.getBlock () - 48) * disk.getBlockSize ();
         break;
@@ -141,7 +138,7 @@ public class InfocomDisk extends AbstractFormattedDisk
   {
     if (fileSize == 0)
       fileSize = getFileSize ();
-    System.out.println ("File size : " + fileSize);
+    //    System.out.println ("File size : " + fileSize);
     data = new byte[fileSize];
 
     for (int track = 3, ptr = 0; track < 35; track++)

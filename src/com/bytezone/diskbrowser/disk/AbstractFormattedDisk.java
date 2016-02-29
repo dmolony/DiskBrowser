@@ -93,7 +93,13 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     });
   }
 
-  protected void setSectorTypes ()
+  protected void setEmptyByte (byte value)
+  {
+    getDisk ().setEmptyByte ((byte) 0xE5);
+    setSectorTypes ();
+  }
+
+  private void setSectorTypes ()
   {
     sectorTypes = new SectorType[disk.getTotalBlocks ()];
 

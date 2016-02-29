@@ -39,8 +39,7 @@ public class CPMDisk extends AbstractFormattedDisk
     sectorTypesList.add (macSector);
     sectorTypesList.add (otherSector);
 
-    getDisk ().setEmptyByte ((byte) 0xE5);
-    setSectorTypes ();
+    setEmptyByte ((byte) 0xE5);
 
     byte[] buffer = disk.readSector (0, 8);
     String text = new String (buffer, 16, 24);

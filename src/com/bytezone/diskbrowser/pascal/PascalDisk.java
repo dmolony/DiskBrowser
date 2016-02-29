@@ -76,6 +76,7 @@ public class PascalDisk extends AbstractFormattedDisk
       sectors.add (da);
       freeBlocks.set (i, false);
     }
+
     buffer = disk.readSectors (sectors);
     diskCatalogSector = new PascalCatalogSector (disk, buffer); // uses all 4 sectors
 
@@ -94,18 +95,18 @@ public class PascalDisk extends AbstractFormattedDisk
     {
       int ptr = i * CATALOG_ENTRY_SIZE;
       data = new byte[CATALOG_ENTRY_SIZE];
+
       System.arraycopy (buffer, ptr, data, 0, CATALOG_ENTRY_SIZE);
       FileEntry fe = new FileEntry (this, data);
       fileEntries.add (fe);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fe);
 
-      if (fe.fileType == 2) // PascalCode
+      if (fe.fileType == 2)                   // PascalCode
       {
         node.setAllowsChildren (true);
         PascalCode pc = (PascalCode) fe.getDataSource ();
         for (PascalSegment ps : pc)
         {
-          //					List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
           DefaultMutableTreeNode segmentNode =
               new DefaultMutableTreeNode (new PascalCodeObject (this, ps, fe.firstBlock));
           node.add (segmentNode);
@@ -114,6 +115,7 @@ public class PascalDisk extends AbstractFormattedDisk
       }
       else
         node.setAllowsChildren (false);
+
       volumeNode.add (node);
       for (int j = fe.firstBlock; j < fe.lastBlock; j++)
         freeBlocks.set (j, false);
@@ -138,6 +140,8 @@ public class PascalDisk extends AbstractFormattedDisk
   public static boolean checkFormat (AppleDisk disk, boolean debug)
   {
     byte[] buffer = disk.readSector (2);
+    if (debug)
+      System.out.println (HexFormatter.format (buffer));
     int nameLength = HexFormatter.intValue (buffer[6]);
     if (nameLength < 1 || nameLength > 7)
     {
@@ -145,6 +149,7 @@ public class PascalDisk extends AbstractFormattedDisk
         System.out.println ("bad name length : " + nameLength);
       return false;
     }
+
     if (debug)
     {
       String name = HexFormatter.getPascalString (buffer, 6);
@@ -154,19 +159,24 @@ public class PascalDisk extends AbstractFormattedDisk
     int from = HexFormatter.intValue (buffer[0], buffer[1]);
     int to = HexFormatter.intValue (buffer[2], buffer[3]);
     if (from != 0 || to != 6)
-      return false; // will only work for floppies!
+    {
+      if (debug)
+        System.out.printf ("from: %d, to: %d%n", from, to);
+      return false;                         // will only work for floppies!
+    }
 
     List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
     for (int i = 2; i < to; i++)
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readSectors (addresses);
 
-    int blocks = HexFormatter.intValue (buffer[14], buffer[15]);
-    if (blocks > 280)
-      return false;
     int files = HexFormatter.intValue (buffer[16], buffer[17]);
     if (files < 0 || files > 77)
+    {
+      if (debug)
+        System.out.printf ("Files: %d%n", files);
       return false;
+    }
 
     if (debug)
       System.out.println ("Files found : " + files);
@@ -184,6 +194,17 @@ public class PascalDisk extends AbstractFormattedDisk
       nameLength = HexFormatter.intValue (buffer[ptr + 6]);
       if (nameLength < 1 || nameLength > 15)
         return false;
+      if (debug)
+        System.out.printf ("%4d  %4d  %d  %s%n", a, b, c,
+                           new String (buffer, ptr + 7, nameLength));
+    }
+
+    int blocks = HexFormatter.intValue (buffer[14], buffer[15]);
+    if (blocks > 280)
+    {
+      if (debug)
+        System.out.printf ("Blocks: %d%n", blocks);
+      return false;
     }
 
     return true;

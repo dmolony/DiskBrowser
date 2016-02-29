@@ -6,8 +6,8 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class VolumeEntry extends CatalogEntry
 {
-  int totalFiles;
-  int totalBlocks;
+  final int totalFiles;
+  final int totalBlocks;
 
   public VolumeEntry (PascalDisk parent, byte[] buffer)
   {
@@ -17,9 +17,6 @@ class VolumeEntry extends CatalogEntry
     totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
     firstBlock = HexFormatter.intValue (buffer[18], buffer[19]);
     date = HexFormatter.getPascalDate (buffer, 20);
-
-    //      for (int i = firstBlock; i < lastBlock; i++)
-    //        sectorType[i] = catalogSector;
   }
 
   @Override

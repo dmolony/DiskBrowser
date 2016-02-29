@@ -20,21 +20,27 @@ class FileEntry extends CatalogEntry
         case 2:
           parent.sectorTypes[i] = parent.codeSector;
           break;
+
         case 3:
           parent.sectorTypes[i] = parent.textSector;
           break;
+
         case 4:
           parent.sectorTypes[i] = parent.infoSector;
           break;
+
         case 5:
           parent.sectorTypes[i] = parent.dataSector;
           break;
+
         case 6:
           parent.sectorTypes[i] = parent.grafSector;
           break;
+
         case 7:
           parent.sectorTypes[i] = parent.fotoSector;
           break;
+
         default:
           System.out.println ("Unknown pascal file type : " + fileType);
           parent.sectorTypes[i] = parent.dataSector;

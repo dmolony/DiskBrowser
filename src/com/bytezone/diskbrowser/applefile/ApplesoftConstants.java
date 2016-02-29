@@ -2,40 +2,38 @@ package com.bytezone.diskbrowser.applefile;
 
 public interface ApplesoftConstants
 {
-  String[] tokens = { //
-                     "END", "FOR ", "NEXT ", "DATA ",           // 0x80 - 0x83
-                     "INPUT ", "DEL", "DIM ", "READ ",          // 0x84 - 0x87
-                     "GR", "TEXT", "PR#", "IN#",                // 0x88 - 0x8B
-                     "CALL ", "PLOT", "HLIN ", "VLIN ",         // 0x8C - 0x8F
-                     "HGR2", "HGR", "HCOLOR=", "HPLOT ",        // 0x90
-                     "DRAW ", "XDRAW ", "HTAB ", "HOME",        // 0x94
-                     "ROT=", "SCALE=", "SHLOAD", "TRACE",       // 0x98
-                     "NOTRACE", "NORMAL", "INVERSE", "FLASH",   // 0x9C
-                     "COLOR=", "POP", "VTAB ", "HIMEM:",        // 0x9F
-                     "LOMEM:", "ONERR ", "RESUME", "RECALL",    // 0xA0
-                     "STORE", "SPEED=", "LET ", "GOTO ",        // 0xA4
-                     "RUN", "IF ", "RESTORE", "& ",             // 0xA8
-                     "GOSUB ", "RETURN", "REM ", "STOP",        // 0xAC
-                     "ON ", "WAIT", "LOAD", "SAVE",             // 0xB0
-                     "DEF", "POKE ", "PRINT ", "CONT",          // 0xB4
-                     "LIST", "CLEAR", "GET ", "NEW",            // 0xB8
-                     "TAB(", "TO ", "FN", "SPC(",               // 0xBC
-                     "THEN ", "AT ", "NOT ", "STEP ",           // 0xC0
-                     "+ ", "- ", "* ", "/ ",                    // 0xC4
-                     "^ ", "AND ", "OR ", "> ",                 // 0xC8
-                     "= ", "< ", "SGN", "INT",                  // 0xCC
-                     "ABS", "USR", "FRE", "SCRN(",              // 0xD0 
-                     "PDL", "POS ", "SQR", "RND",               // 0xD4
-                     "LOG", "EXP", "COS", "SIN",                // 0xD8
-                     "TAN", "ATN", "PEEK", "LEN",               // 0xDC
-                     "STR$", "VAL", "ASC", "CHR$",              // 0xE0 - 0xE3
-                     "LEFT$", "RIGHT$", "MID$", "",             // 0xE4 - 0xE7
-                     "", "", "", "",                            // 0xE8 - 0xEB
-                     "", "", "", "",                            // 0xEC - 0xEF
-                     "ELSE", "MOD", "INC", "DEC",               // 0xF0 - 0xF3
-                     "DEEK", "DOKE", "REPEAT", "UNTIL",         // 0xF4 - 0xF7
-                     "", "", "", "",                            // 0xF8 - 0xFB
-                     "", "", "", "",                            // 0xFC - 0xFF
+  String[] tokens = { "END", "FOR ", "NEXT ", "DATA ",           // 0x80 - 0x83
+                      "INPUT ", "DEL", "DIM ", "READ ",          // 0x84 - 0x87
+                      "GR", "TEXT", "PR#", "IN#",                // 0x88 - 0x8B
+                      "CALL ", "PLOT", "HLIN ", "VLIN ",         // 0x8C - 0x8F
+                      "HGR2", "HGR", "HCOLOR=", "HPLOT ",        // 0x90
+                      "DRAW ", "XDRAW ", "HTAB ", "HOME",        // 0x94
+                      "ROT=", "SCALE=", "SHLOAD", "TRACE",       // 0x98
+                      "NOTRACE", "NORMAL", "INVERSE", "FLASH",   // 0x9C
+                      "COLOR=", "POP", "VTAB ", "HIMEM:",        // 0xA0
+                      "LOMEM:", "ONERR ", "RESUME", "RECALL",    // 0xA4 - 0xA7
+                      "STORE", "SPEED=", "LET ", "GOTO ",        // 0xA8
+                      "RUN", "IF ", "RESTORE", "& ",             // 0xAC
+                      "GOSUB ", "RETURN", "REM ", "STOP",        // 0xB0
+                      "ON ", "WAIT", "LOAD", "SAVE",             // 0xB4
+                      "DEF", "POKE ", "PRINT ", "CONT",          // 0xB8
+                      "LIST", "CLEAR", "GET ", "NEW",            // 0xBC
+                      "TAB(", "TO ", "FN", "SPC(",               // 0xC0
+                      "THEN ", "AT ", "NOT ", "STEP ",           // 0xC4
+                      "+ ", "- ", "* ", "/ ",                    // 0xC8
+                      "^ ", "AND ", "OR ", "> ",                 // 0xCC
+                      "= ", "< ", "SGN", "INT",                  // 0xD0
+                      "ABS", "USR", "FRE", "SCRN(",              // 0xD4 
+                      "PDL", "POS ", "SQR", "RND",               // 0xD8
+                      "LOG", "EXP", "COS", "SIN",                // 0xDC
+                      "TAN", "ATN", "PEEK", "LEN",               // 0xE0 - 0xE3
+                      "STR$", "VAL", "ASC", "CHR$",              // 0xE4 - 0xE7
+                      "LEFT$", "RIGHT$", "MID$", "",             // 0xE8 - 0xEB
+                      "", "", "", "",                            // 0xEC - 0xEF
+                      "ELSE", "MOD", "INC", "DEC",               // 0xF0 - 0xF3
+                      "DEEK", "DOKE", "REPEAT", "UNTIL",         // 0xF4 - 0xF7
+                      "", "", "", "",                            // 0xF8 - 0xFB
+                      "", "", "", "",                            // 0xFC - 0xFF
   };
 
   int[] tokenAddresses =

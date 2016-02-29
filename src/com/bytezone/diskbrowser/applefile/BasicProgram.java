@@ -1,6 +1,10 @@
 package com.bytezone.diskbrowser.applefile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -26,11 +30,11 @@ public class BasicProgram extends AbstractFile
   private final Set<Integer> gotoLines = new HashSet<Integer> ();
   private final Set<Integer> gosubLines = new HashSet<Integer> ();
 
-  boolean splitRem = false; // should be a user preference
-  boolean alignAssign = true; // should be a user preference
-  boolean showTargets = true; // should be a user preference
-  boolean showHeader = true; // should be a user preference
-  boolean onlyShowTargetLineNumbers = false; // should be a user preference
+  boolean splitRem = false;                       // should be a user preference
+  boolean alignAssign = true;                     // should be a user preference
+  boolean showTargets = true;                     // should be a user preference
+  boolean showHeader = true;                      // should be a user preference
+  boolean onlyShowTargetLineNumbers = false;      // should be a user preference
   int wrapPrintAt = 40;
   int wrapRemAt = 60;
 
@@ -71,8 +75,8 @@ public class BasicProgram extends AbstractFile
     {
       text = new StringBuilder (getBase (line) + "  ");
 
-      int indent = loopVariables.size (); // each full line starts at the loop indent
-      int ifIndent = 0; // IF statement(s) limit back indentation by NEXT
+      int indent = loopVariables.size ();   // each full line starts at the loop indent
+      int ifIndent = 0;                 // IF statement(s) limit back indentation by NEXT
 
       for (SubLine subline : line.sublines)
       {
@@ -83,9 +87,9 @@ public class BasicProgram extends AbstractFile
         // A REM statement might conceal an assembler routine - see P.CREATE on Diags2E.DSK
         if (subline.is (TOKEN_REM) && subline.containsToken ())
         {
-          int address = subline.getAddress () + 1; // skip the REM token
-          fullText.append (text
-                + String.format ("REM - Inline assembler @ $%02X (%d)%n", address, address));
+          int address = subline.getAddress () + 1;              // skip the REM token
+          fullText.append (text + String.format ("REM - Inline assembler @ $%02X (%d)%n",
+                                                 address, address));
           String padding = "                         ".substring (0, text.length () + 2);
           for (String asm : subline.getAssembler ())
             fullText.append (padding + asm + "\n");
@@ -103,7 +107,7 @@ public class BasicProgram extends AbstractFile
         if (!splitRem && subline.isJoinableRem ())
         {
           // Join this REM statement to the previous line, so no indenting
-          fullText.deleteCharAt (fullText.length () - 1); // remove newline
+          fullText.deleteCharAt (fullText.length () - 1);         // remove newline
           fullText.append (" ");
         }
         // ... otherwise do all the indenting and showing of targets etc.
@@ -144,8 +148,9 @@ public class BasicProgram extends AbstractFile
         text.append (lineText);
 
         // Check for a wrapable PRINT statement (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
-        if (subline.is (TOKEN_PRINT) && wrapPrintAt > 0 && countChars (text, ASCII_QUOTE) == 2
-              && countChars (text, ASCII_SEMI_COLON) == 0)
+        if (subline.is (TOKEN_PRINT) && wrapPrintAt > 0
+            && countChars (text, ASCII_QUOTE) == 2
+            && countChars (text, ASCII_SEMI_COLON) == 0)
         {
           int first = text.indexOf ("\"");
           int last = text.indexOf ("\"", first + 1);
@@ -155,7 +160,7 @@ public class BasicProgram extends AbstractFile
             do
             {
               fullText.append (text.substring (0, ptr)
-                    + "\n                                 ".substring (0, first + 1));
+                  + "\n                                 ".substring (0, first + 1));
               text.delete (0, ptr);
               ptr = wrapPrintAt;
             } while (text.length () > wrapPrintAt);
@@ -241,7 +246,7 @@ public class BasicProgram extends AbstractFile
   // and the column hasn't been calculated, read ahead to find the highest position.
   private int alignEqualsPosition (SubLine subline, int currentAlignPosition)
   {
-    if (subline.assignEqualPos > 0) // does the line have an equals sign?
+    if (subline.assignEqualPos > 0)                   // does the line have an equals sign?
     {
       if (currentAlignPosition == 0)
         currentAlignPosition = findHighest (subline); // examine following sublines for alignment
@@ -266,8 +271,8 @@ public class BasicProgram extends AbstractFile
           // Stop when we come to a line without an equals sign (except for non-split REMs).
           // Lines that start with a REM always break.
           if (subline.assignEqualPos == 0
-          // && (splitRem || !subline.is (TOKEN_REM) || subline.isFirst ()))
-                && (splitRem || !subline.isJoinableRem ()))
+              // && (splitRem || !subline.is (TOKEN_REM) || subline.isFirst ()))
+              && (splitRem || !subline.isJoinableRem ()))
             break fast; // of champions
 
           if (subline.assignEqualPos > highestAssign)
@@ -298,7 +303,7 @@ public class BasicProgram extends AbstractFile
     int offset = HexFormatter.intValue (buffer[0], buffer[1]);
     int programLoadAddress = offset - getLineLength (0);
 
-    while (ptr <= endPtr) // stop at the same place as the source listing
+    while (ptr <= endPtr)             // stop at the same place as the source listing
     {
       int length = getLineLength (ptr);
       if (length == 0)
@@ -310,7 +315,7 @@ public class BasicProgram extends AbstractFile
 
       if (ptr + length < buffer.length)
         pgm.append (HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress)
-              + "\n\n");
+            + "\n\n");
       ptr += length;
     }
 
@@ -380,7 +385,7 @@ public class BasicProgram extends AbstractFile
     if (v1.equals (v2))
       return true;
     if (v1.length () >= 2 && v2.length () >= 2 && v1.charAt (0) == v2.charAt (0)
-          && v1.charAt (1) == v2.charAt (1))
+        && v1.charAt (1) == v2.charAt (1))
       return true;
     return false;
   }
@@ -398,21 +403,21 @@ public class BasicProgram extends AbstractFile
       lineNumber = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
 
       int startPtr = ptr += 4;
-      boolean inString = false; // can toggle
-      boolean inRemark = false; // can only go false -> true
+      boolean inString = false;           // can toggle
+      boolean inRemark = false;           // can only go false -> true
       byte b;
 
       while ((b = buffer[ptr++]) != 0)
       {
         switch (b)
         {
-        // break IF statements into two sublines (allows for easier line indenting)
+          // break IF statements into two sublines (allows for easier line indenting)
           case TOKEN_IF:
             if (!inString && !inRemark)
             {
               // skip to THEN or GOTO - if not found then it's an error
               while (buffer[ptr] != TOKEN_THEN && buffer[ptr] != TOKEN_GOTO
-                    && buffer[ptr] != 0)
+                  && buffer[ptr] != 0)
                 ptr++;
 
               // keep THEN with the IF
@@ -504,7 +509,7 @@ public class BasicProgram extends AbstractFile
             catch (NumberFormatException e)
             {
               System.out.println ("Error parsing : GOTO " + target + " in "
-                    + parent.lineNumber);
+                  + parent.lineNumber);
             }
             break;
 
@@ -517,7 +522,7 @@ public class BasicProgram extends AbstractFile
             catch (NumberFormatException e)
             {
               System.out.println ("Error parsing : GOSUB " + target2 + " in "
-                    + parent.lineNumber);
+                  + parent.lineNumber);
             }
             break;
         }
@@ -613,7 +618,7 @@ public class BasicProgram extends AbstractFile
       byte[] buffer2 = new byte[length - 1];
       System.arraycopy (buffer, startPtr + 1, buffer2, 0, buffer2.length);
       AssemblerProgram program =
-            new AssemblerProgram ("REM assembler", buffer2, getAddress () + 1);
+          new AssemblerProgram ("REM assembler", buffer2, getAddress () + 1);
       return program.getAssembler ().split ("\n");
     }
 
@@ -635,7 +640,7 @@ public class BasicProgram extends AbstractFile
       for (int p = startPtr; p <= max; p++)
       {
         byte b = buffer[p];
-        if ((b & 0x80) > 0) // token
+        if ((b & 0x80) > 0)               // token
         {
           if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
             line.append (' ');

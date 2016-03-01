@@ -47,8 +47,8 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
     horizontalRuler = new ScrollRuler (image, ScrollRuler.HORIZONTAL);
     legendPanel = new DiskLegendPanel ();
 
-    this.setBackground (Color.WHITE);
-    this.setOpaque (true);
+    setBackground (Color.WHITE);
+    setOpaque (true);
 
     sp = new JScrollPane (image, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
     sp.setBackground (Color.WHITE);

@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -22,16 +24,16 @@ class DiskLayoutImage extends JPanel implements Scrollable
   static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
 
   private FormattedDisk disk;
-  LayoutDetails layoutDetails;
+  private LayoutDetails layoutDetails;
   private boolean showFreeSectors;
-  DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
-  boolean redo;
+  private final DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
+  private boolean redo;
 
   // set defaults (used until a real disk is set)
-  int bw = 30;
-  int bh = 15;
-  int gw = 8;
-  int gh = 35;
+  private int bw = 30;
+  private int bh = 15;
+  private int gw = 8;
+  private int gh = 35;
 
   public DiskLayoutImage ()
   {
@@ -39,6 +41,9 @@ class DiskLayoutImage extends JPanel implements Scrollable
     addMouseListener (new MyMouseListener ());
     setBackground (Color.WHITE);
     setOpaque (true);
+
+    addKeyListener (new MyKeyListener ());
+    setFocusable (true);
   }
 
   public void setDisk (FormattedDisk disk, LayoutDetails details)
@@ -235,6 +240,24 @@ class DiskLayoutImage extends JPanel implements Scrollable
     listenerList.remove (SectorSelectionListener.class, listener);
   }
 
+  class MyKeyListener extends KeyAdapter
+  {
+    @Override
+    public void keyPressed (KeyEvent e)
+    {
+      switch (e.getKeyCode ())
+      {
+        case KeyEvent.VK_LEFT:
+        case KeyEvent.VK_RIGHT:
+        case KeyEvent.VK_UP:
+        case KeyEvent.VK_DOWN:
+          selectionHandler.keyPress (e);
+          fireSectorSelectionEvent ();
+          repaint ();
+      }
+    }
+  }
+
   class MyMouseListener extends MouseAdapter
   {
     private Cursor currentCursor;
@@ -253,6 +276,7 @@ class DiskLayoutImage extends JPanel implements Scrollable
       selectionHandler.doClick (disk.getDisk (), da, extend, append);
       fireSectorSelectionEvent ();
       repaint ();
+      requestFocusInWindow ();
     }
 
     @Override

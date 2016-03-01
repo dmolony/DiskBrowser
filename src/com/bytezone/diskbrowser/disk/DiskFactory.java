@@ -315,15 +315,16 @@ public class DiskFactory
     }
 
     // assumes a track is 4096 bytes
-    if ((file.length () % 4096) != 0)
-    {
-      if (debug)
-        System.out.printf ("file length not divisible by 4096 : %d%n%n", file.length ());
-      return null;
-    }
+    //    if ((file.length () % 4096) != 0)
+    //    {
+    //      if (debug)
+    //   System.out.printf ("file length not divisible by 4096 : %d%n%n", file.length ());
+    //      return null;
+    //    }
 
     try
     {
+      // truncate the file if necessary
       AppleDisk disk = new AppleDisk (file, (int) file.length () / 4096, 8);
       if (ProdosDisk.isCorrectFormat (disk))
       {

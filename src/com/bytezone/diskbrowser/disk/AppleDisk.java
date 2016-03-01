@@ -97,10 +97,10 @@ public class AppleDisk implements Disk
         if (debug)
           System.out.printf ("Blocks    : %,d%n", blocks);
 
-        int format = buffer[12] & 0xFF;
+        //        int format = buffer[12] & 0xFF;
         //        if (blocks == 0 && format == 1)
         {
-          this.blocks = diskData / 4096 * 8; // reduces blocks to a legal multiple
+          this.blocks = diskData / 4096 * 8;    // reduces blocks to a legal multiple
           if (debug)
             System.out.printf ("Blocks    : %,d%n", blocks);
         }
@@ -355,7 +355,8 @@ public class AppleDisk implements Disk
     if (!isValidAddress (block))
     {
       System.out.println ("Invalid block : " + block);
-      return null;
+      //      return null;
+      return new AppleDiskAddress (0, this);
     }
     return new AppleDiskAddress (block, this);
   }

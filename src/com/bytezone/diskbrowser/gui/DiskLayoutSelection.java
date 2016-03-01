@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.gui;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 class DiskLayoutSelection implements Iterable<DiskAddress>
 {
   private final List<DiskAddress> highlights;
+  private Disk currentDisk;
 
   public DiskLayoutSelection ()
   {
@@ -19,6 +21,8 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
 
   public void doClick (Disk disk, DiskAddress da, boolean extend, boolean append)
   {
+    currentDisk = disk;
+
     /*
      * Single click without modifiers - just replace previous highlights with the new
      * sector. If there are no current highlights then even modifiers have the same
@@ -63,6 +67,54 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     Collections.sort (highlights);
   }
 
+  public void keyPress (KeyEvent e)
+  {
+    if (highlights.size () == 0)
+    {
+      System.out.println ("Nothing to move");
+      return;
+    }
+
+    DiskAddress first = highlights.get (0);
+    DiskAddress last = highlights.get (highlights.size () - 1);
+    highlights.clear ();
+
+    int totalBlocks = currentDisk.getTotalBlocks ();
+    int rowSize = currentDisk.getTrackSize () / currentDisk.getBlockSize ();
+
+    switch (e.getKeyCode ())
+    {
+      case KeyEvent.VK_LEFT:
+        int block = first.getBlock () - 1;
+        if (block < 0)
+          block = totalBlocks - 1;
+        highlights.add (currentDisk.getDiskAddress (block));
+        break;
+
+      case KeyEvent.VK_RIGHT:
+        block = last.getBlock () + 1;
+        if (block >= totalBlocks)
+          block = 0;
+        highlights.add (currentDisk.getDiskAddress (block));
+        break;
+
+      case KeyEvent.VK_UP:
+        block = first.getBlock () - rowSize;
+        if (block < 0)
+          block += totalBlocks;
+        highlights.add (currentDisk.getDiskAddress (block));
+        break;
+
+      case KeyEvent.VK_DOWN:
+        block = last.getBlock () + rowSize;
+        if (block >= totalBlocks)
+          block -= totalBlocks;
+        highlights.add (currentDisk.getDiskAddress (block));
+        break;
+    }
+  }
+
+  @Override
   public Iterator<DiskAddress> iterator ()
   {
     return highlights.iterator ();
@@ -83,8 +135,8 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
 
   private boolean checkContiguous ()
   {
-    int range =
-          highlights.get (highlights.size () - 1).getBlock () - highlights.get (0).getBlock () + 1;
+    int range = highlights.get (highlights.size () - 1).getBlock ()
+        - highlights.get (0).getBlock () + 1;
     return (range == highlights.size ());
   }
 
@@ -113,7 +165,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
   {
     // If we are outside the discontiguous range, just extend as usual
     if (da.getBlock () < highlights.get (0).getBlock ()
-          || da.getBlock () > highlights.get (highlights.size () - 1).getBlock ())
+        || da.getBlock () > highlights.get (highlights.size () - 1).getBlock ())
     {
       extendHighlights (disk, da);
       return;

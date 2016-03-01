@@ -21,7 +21,7 @@ public class CPMDisk extends AbstractFormattedDisk
   public final SectorType basSector = new SectorType ("BAS", Color.gray);
   public final SectorType asmSector = new SectorType ("ASM", Color.orange);
   public final SectorType ovrSector = new SectorType ("OVR", Color.magenta);
-  public final SectorType macSector = new SectorType ("Green", Color.green);
+  public final SectorType macSector = new SectorType ("MAC", Color.green);
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
 

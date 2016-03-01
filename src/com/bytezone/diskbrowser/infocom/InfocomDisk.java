@@ -41,8 +41,8 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     setInfocomSectorTypes ();
 
-    data = disk.readSector (3, 0); // read first sector to get file size
-    data = getBuffer (getWord (26) * 2); // read entire file into data buffer
+    data = disk.readSector (3, 0);          // read first sector to get file size
+    data = getBuffer (getWord (26) * 2);    // read entire file into data buffer
 
     if (false)
       createStoryFile ("Zork1.sf");
@@ -138,7 +138,6 @@ public class InfocomDisk extends AbstractFormattedDisk
   {
     if (fileSize == 0)
       fileSize = getFileSize ();
-    //    System.out.println ("File size : " + fileSize);
     data = new byte[fileSize];
 
     for (int track = 3, ptr = 0; track < 35; track++)

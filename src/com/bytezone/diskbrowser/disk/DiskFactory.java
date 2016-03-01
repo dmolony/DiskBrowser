@@ -124,6 +124,9 @@ public class DiskFactory
 
     if (((suffix.equals ("po") || suffix.equals ("dsk")) && file.length () > 143360))
     {
+      if (debug)
+        System.out.println ("Checking po or dsk hard drive: " + file.length ());
+
       disk = checkHardDisk (file);
       if (disk != null)
       {
@@ -131,10 +134,21 @@ public class DiskFactory
           disk.setOriginalPath (p);
         return disk;
       }
-      else
+
+      if (debug)
+        System.out.println ("Creating a data disk from bad length");
+      try
       {
         AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
+        if (debug)
+          System.out.println ("created");
         return new DataDisk (appleDisk);
+      }
+      catch (FileFormatException e)
+      {
+        if (debug)
+          System.out.println ("Creating AppleDisk failed");
+        return null;
       }
     }
 
@@ -296,20 +310,17 @@ public class DiskFactory
     if ((file.length () % 512) != 0)
     {
       if (debug)
-        System.out.printf ("file length not divisible by 512 : %,d%n", file.length ());
-      //      return null;
+        System.out.printf ("file length not divisible by 512 : %,d%n%n", file.length ());
+      return null;
     }
 
     // assumes a track is 4096 bytes
-    //    if ((file.length () % 4096) != 0)
-    //    {
-    //      if (debug)
-    //      {
-    //        System.out.printf ("file length not divisible by 4096 : %d%n%n", file.length ());
-    //        int usableLength = (int) (file.length () / 4096);
-    //      }
-    //      return null;
-    //    }
+    if ((file.length () % 4096) != 0)
+    {
+      if (debug)
+        System.out.printf ("file length not divisible by 4096 : %d%n%n", file.length ());
+      return null;
+    }
 
     try
     {

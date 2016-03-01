@@ -94,8 +94,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
            /F$  DOLLAR AND CENTS
            /FL  LEFT JUSTIFIED
            /FR  RIGHT JUSTIFIED
-           /F* GRAPH
-           /FD DEFAULT
+           /F*  GRAPH
+           /FD  DEFAULT
   
   /G   GLOBAL COMMANDS. THESE APPLY TO THE ENTIRE SHEET OR WINDOW.
   
@@ -111,9 +111,9 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   /R   REPLICATE COMMAND
   /S   STORAGE COMMANDS ARE AS FOLLOWS:
   
-      /SS SAVE
-      /SL LOAD
-      /SD DELETES SPECIFIED FILE ON DISK
+      /SS  SAVE
+      /SL  LOAD
+      /SD  DELETES SPECIFIED FILE ON DISK
       /SI  INITIALIZE A DISK ON SPECIFIED DRIVE
       /SQ  QUITS VISICALC
   
@@ -137,8 +137,6 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     int ptr = 0;
     int last = buffer.length - 1;
 
-    //    System.out.println (HexFormatter.format (buffer));
-
     while (buffer[last] == 0)
       last--;
 
@@ -146,7 +144,6 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     {
       int endPtr = findEndPtr (buffer, ptr);
       String s = HexFormatter.getString (buffer, ptr, endPtr - ptr);
-      //      System.out.println (s);
       add (s);
       ptr = endPtr + 1;
     }
@@ -161,8 +158,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
   private void add (String command)
   {
-    // [>K11:@SUM(J11...F11]
-    //    System.out.printf ("Adding command [%s]%n", command);
+    // NB no closing bracket: [>K11:@SUM(J11...F11]
+
     lines.add (command);
     String data;
 
@@ -175,7 +172,6 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         Address address = new Address (m.group (1), m.group (2));
         VisicalcCell cell = sheet.get (address.sortValue);
         command = command.substring (pos + 1);
-        //        System.out.printf ("%s %s%n", address, command);
 
         if (cell == null)
         {
@@ -192,17 +188,16 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
     if (command.startsWith ("/"))                               // command
     {
-      //      System.out.printf ("Cmd: %s%n", command);
       data = command.substring (1);
       char subCommand = command.charAt (1);
       switch (subCommand)
       {
         case 'W':
-          System.out.println ("  Window command: " + data);
+          //          System.out.println ("  Window command: " + data);
           break;
 
         case 'G':
-          System.out.println ("  Global command: " + data);
+          //          System.out.println ("  Global command: " + data);
           try
           {
             if (data.charAt (1) == 'C')
@@ -226,7 +221,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
           break;
 
         case 'T':
-          System.out.println ("  Title command: " + data);
+          //          System.out.println ("  Title command: " + data);
           break;
 
         default:
@@ -288,6 +283,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         String[] cells = m.group (1).split (",");
         range = new Range (cells);
       }
+
       if (range == null)
       {
         System.out.println ("null range : " + function);
@@ -492,10 +488,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       else if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
         this.value = Float.parseFloat (command);
       else
-      {
         formula = command;
-        //        System.out.printf ("Formula=[%s]%n", formula);
-      }
     }
 
     public boolean hasValue ()
@@ -511,13 +504,9 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       double result = 0.0;
       double interim = 0.0;
 
-      //      System.out.printf ("In getValue with [%s]%n", formula);
       Matcher m = cellContents.matcher (formula);
       while (m.find ())
       {
-        //        for (int i = 0; i <= m.groupCount (); i++)
-        //          System.out.printf ("%d  %s%n", i, m.group (i));
-
         valid = true;
         char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
 
@@ -604,21 +593,17 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       range.add (from);
 
       if (from.row == to.row)
-      {
         while (from.compareTo (to) < 0)
         {
           from = from.nextColumn ();
           range.add (from);
         }
-      }
       else if (from.column == to.column)
-      {
         while (from.compareTo (to) < 0)
         {
           from = from.nextRow ();
           range.add (from);
         }
-      }
       else
         throw new InvalidParameterException ();
     }
@@ -626,10 +611,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     public Range (String[] cells)
     {
       for (String s : cells)
-      {
-        Address address = new Address (s);
-        range.add (address);
-      }
+        range.add (new Address (s));
     }
 
     @Override

@@ -2,12 +2,7 @@ package com.bytezone.diskbrowser.applefile;
 
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +16,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   private static final Pattern cellContents =
       Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
   private static final Pattern functionPattern = Pattern
-      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)");
+      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
+  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private final Map<Integer, VisicalcCell> sheet = new TreeMap<Integer, VisicalcCell> ();
   private final Map<String, Double> functions = new HashMap<String, Double> ();
@@ -141,13 +137,17 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     int ptr = 0;
     int last = buffer.length - 1;
 
+    //    System.out.println (HexFormatter.format (buffer));
+
     while (buffer[last] == 0)
       last--;
 
     while (ptr <= last)
     {
       int endPtr = findEndPtr (buffer, ptr);
-      add (HexFormatter.getString (buffer, ptr, endPtr - ptr));
+      String s = HexFormatter.getString (buffer, ptr, endPtr - ptr);
+      //      System.out.println (s);
+      add (s);
       ptr = endPtr + 1;
     }
 
@@ -159,20 +159,23 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       System.out.printf ("Width of column %3d: %d%n", entry.getKey (), entry.getValue ());
   }
 
-  public void add (String command)
+  private void add (String command)
   {
+    // [>K11:@SUM(J11...F11]
+    //    System.out.printf ("Adding command [%s]%n", command);
     lines.add (command);
     String data;
 
-    if (command.startsWith (">"))             // GOTO cell
+    if (command.startsWith (">"))                               // GOTO cell
     {
-      int pos = command.indexOf (':');        // end of cell address
+      int pos = command.indexOf (':');                          // end of cell address
       Matcher m = addressPattern.matcher (command);
       if (m.find ())
       {
         Address address = new Address (m.group (1), m.group (2));
         VisicalcCell cell = sheet.get (address.sortValue);
         command = command.substring (pos + 1);
+        //        System.out.printf ("%s %s%n", address, command);
 
         if (cell == null)
         {
@@ -187,7 +190,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         System.out.printf ("Invalid cell address: %s%n", command);
     }
 
-    if (command.startsWith ("/"))        // command
+    if (command.startsWith ("/"))                               // command
     {
       //      System.out.printf ("Cmd: %s%n", command);
       data = command.substring (1);
@@ -276,6 +279,21 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     }
 
     double result = 0;
+
+    if (range == null)
+    {
+      m = addressList.matcher (function);
+      while (m.find ())
+      {
+        String[] cells = m.group (1).split (",");
+        range = new Range (cells);
+      }
+      if (range == null)
+      {
+        System.out.println ("null range : " + function);
+        return result;
+      }
+    }
 
     if (function.startsWith ("@SUM"))
     {
@@ -454,13 +472,13 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     {
       if (command.startsWith ("/"))
       {
-        if (command.charAt (1) == 'F')              // format cell
+        if (command.charAt (1) == 'F')                // format cell
         {
           format = command.charAt (2);
           if (command.length () > 3 && command.charAt (3) == '"')
             label = command.substring (4);
         }
-        else if (command.charAt (1) == '-')         // repeating label
+        else if (command.charAt (1) == '-')           // repeating label
         {
           repeatingChar = command.charAt (2);
           for (int i = 0; i < 20; i++)
@@ -474,7 +492,10 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       else if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
         this.value = Float.parseFloat (command);
       else
+      {
         formula = command;
+        //        System.out.printf ("Formula=[%s]%n", formula);
+      }
     }
 
     public boolean hasValue ()
@@ -490,15 +511,19 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       double result = 0.0;
       double interim = 0.0;
 
+      //      System.out.printf ("In getValue with [%s]%n", formula);
       Matcher m = cellContents.matcher (formula);
       while (m.find ())
       {
+        //        for (int i = 0; i <= m.groupCount (); i++)
+        //          System.out.printf ("%d  %s%n", i, m.group (i));
+
         valid = true;
         char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
 
-        if (m.group (3) != null)                            // address
+        if (m.group (3) != null)                                    // address
           interim = parent.getValue (m.group (3));
-        else if (m.group (4) != null)                       // constant
+        else if (m.group (4) != null)                               // constant
           try
           {
             interim = Double.parseDouble (m.group (4));
@@ -598,9 +623,27 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         throw new InvalidParameterException ();
     }
 
+    public Range (String[] cells)
+    {
+      for (String s : cells)
+      {
+        Address address = new Address (s);
+        range.add (address);
+      }
+    }
+
     @Override
     public String toString ()
     {
+      if (from == null || to == null)
+      {
+        StringBuilder text = new StringBuilder ();
+        for (Address address : range)
+          text.append (address.text + ",");
+        if (text.length () > 0)
+          text.deleteCharAt (text.length () - 1);
+        return text.toString ();
+      }
       return String.format ("      %s -> %s", from.text, to.text);
     }
 

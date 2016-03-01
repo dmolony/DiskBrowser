@@ -74,7 +74,9 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
 
     DiskAddress first = highlights.get (0);
     DiskAddress last = highlights.get (highlights.size () - 1);
-    highlights.clear ();
+
+    if (!e.isShiftDown ())
+      highlights.clear ();
 
     int totalBlocks = disk.getTotalBlocks ();
     int rowSize = disk.getTrackSize () / disk.getBlockSize ();
@@ -109,6 +111,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
         highlights.add (disk.getDiskAddress (block));
         break;
     }
+    Collections.sort (highlights);
   }
 
   @Override

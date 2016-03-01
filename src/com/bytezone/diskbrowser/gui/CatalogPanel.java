@@ -35,8 +35,8 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
-class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionListener,
-      QuitListener, FontChangeListener
+class CatalogPanel extends JTabbedPane
+    implements RedoListener, SectorSelectionListener, QuitListener, FontChangeListener
 //      PreferenceChangeListener
 {
   private static final String prefsLastDiskUsed = "Last disk used";
@@ -50,11 +50,11 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
   private final List<AppleDiskTab> diskTabs = new ArrayList<AppleDiskTab> ();
   private final DocumentCreatorFactory lister;
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
-  private final RedoHandler navMan;
+  private final RedoHandler redoHandler;
   private DuplicateAction duplicateAction; // this sux
   private CloseTabAction closeTabAction;
 
-  public CatalogPanel (MenuHandler mh, RedoHandler navMan, Preferences prefs)
+  public CatalogPanel (MenuHandler mh, RedoHandler redoHandler, Preferences prefs)
   {
     //    String catalogFontName =
     //      prefs.get (PreferencesDialog.prefsCatalogFont, PreferencesDialog.defaultFontName);
@@ -63,7 +63,7 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     //                        PreferencesDialog.defaultFontSize);
     //    this.font = new Font (catalogFontName, Font.PLAIN, catalogFontSize);
     this.lister = new DocumentCreatorFactory (mh);
-    this.navMan = navMan;
+    this.redoHandler = redoHandler;
 
     selector.addDiskSelectionListener (lister.diskLister);
 
@@ -113,8 +113,9 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     else
       System.out.println ("no disk selected");
 
-    fileTab = new FileSystemTab (rootDirectoryFile, selector, navMan, font, diskEvent);
-    fileTab.addTreeMouseListener (new MouseListener ()); // listen for disk selection
+    fileTab =
+        new FileSystemTab (rootDirectoryFile, selector, redoHandler, font, diskEvent);
+    fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
     lister.catalogLister.setNode (fileTab.getRootNode ());
     insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
 
@@ -129,19 +130,19 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
         if (afs != null)
         {
           FileSelectedEvent fileEvent = FileSelectedEvent.create (this, afs);
-          tab = new AppleDiskTab (fd, selector, navMan, font, fileEvent);
+          tab = new AppleDiskTab (fd, selector, redoHandler, font, fileEvent);
         }
         else
-          tab = new AppleDiskTab (fd, selector, navMan, font, lastFileUsed);
+          tab = new AppleDiskTab (fd, selector, redoHandler, font, lastFileUsed);
       }
       else if (!lastSectorsUsed.isEmpty ())
       {
         SectorSelectedEvent sectorEvent =
-              SectorSelectedEvent.create (this, fd, lastSectorsUsed);
-        tab = new AppleDiskTab (fd, selector, navMan, font, sectorEvent);
+            SectorSelectedEvent.create (this, fd, lastSectorsUsed);
+        tab = new AppleDiskTab (fd, selector, redoHandler, font, sectorEvent);
       }
       else
-        tab = new AppleDiskTab (fd, selector, navMan, font);
+        tab = new AppleDiskTab (fd, selector, redoHandler, font);
 
       if (tab != null)
       {
@@ -185,7 +186,7 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     //    try
     //    {
     // This might throw a NoDisksFoundException
-    FileSystemTab newFileTab = new FileSystemTab (root, selector, navMan, font);
+    FileSystemTab newFileTab = new FileSystemTab (root, selector, redoHandler, font);
 
     // is the user replacing an existing root folder?
     if (fileTab != null)
@@ -220,7 +221,7 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
       tabNo++;
     }
 
-    AppleDiskTab tab = new AppleDiskTab (disk, selector, navMan, font);
+    AppleDiskTab tab = new AppleDiskTab (disk, selector, redoHandler, font);
     diskTabs.add (tab);
     add (tab, "D" + diskTabs.size ());
     if (activate)
@@ -324,6 +325,11 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     }
   }
 
+  @Override
+  public void restore (Preferences preferences)
+  {
+  }
+
   // Pass through to DiskSelector
   public void addDiskSelectionListener (DiskSelectionListener listener)
   {
@@ -368,7 +374,7 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
 
       TreePath tp = tree.getPathForLocation (e.getX (), e.getY ());
       DefaultMutableTreeNode selectedNode =
-            (DefaultMutableTreeNode) tp.getLastPathComponent ();
+          (DefaultMutableTreeNode) tp.getLastPathComponent ();
       FileNode node = (FileNode) selectedNode.getUserObject ();
       if (node.file.isDirectory ())
         lister.catalogLister.setNode (selectedNode);
@@ -430,11 +436,6 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
   //    for (AppleDiskTab tab : diskTabs)
   //      tab.setTreeFont (font);
   //  }
-
-  @Override
-  public void restore (Preferences preferences)
-  {
-  }
 
   @Override
   public void changeFont (FontChangeEvent fontChangeEvent)

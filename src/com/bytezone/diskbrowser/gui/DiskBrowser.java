@@ -126,6 +126,9 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     //    prefs.addPreferenceChangeListener (catalogPanel);
     //    prefs.addPreferenceChangeListener (dataPanel);
 
+    // restore the menuHandler items before they are referenced
+    quitAction.restore ();
+
     // Remove the two optional panels if they were previously hidden
     if (!menuHandler.showLayoutItem.isSelected ())
       hideLayoutAction.set (false);
@@ -134,8 +137,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // activate the highest panel now that the listeners are ready
     catalogPanel.activate ();
-
-    quitAction.restore ();
   }
 
   private JPanel addPanel (JComponent pane, String title, String location)

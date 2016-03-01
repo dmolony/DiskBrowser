@@ -12,7 +12,6 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 class DiskLayoutSelection implements Iterable<DiskAddress>
 {
   private final List<DiskAddress> highlights;
-  private Disk currentDisk;
 
   public DiskLayoutSelection ()
   {
@@ -21,8 +20,6 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
 
   public void doClick (Disk disk, DiskAddress da, boolean extend, boolean append)
   {
-    currentDisk = disk;
-
     /*
      * Single click without modifiers - just replace previous highlights with the new
      * sector. If there are no current highlights then even modifiers have the same
@@ -67,7 +64,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     Collections.sort (highlights);
   }
 
-  public void keyPress (KeyEvent e)
+  public void cursorMove (Disk disk, KeyEvent e)
   {
     if (highlights.size () == 0)
     {
@@ -79,8 +76,8 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     DiskAddress last = highlights.get (highlights.size () - 1);
     highlights.clear ();
 
-    int totalBlocks = currentDisk.getTotalBlocks ();
-    int rowSize = currentDisk.getTrackSize () / currentDisk.getBlockSize ();
+    int totalBlocks = disk.getTotalBlocks ();
+    int rowSize = disk.getTrackSize () / disk.getBlockSize ();
 
     switch (e.getKeyCode ())
     {
@@ -88,28 +85,28 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
         int block = first.getBlock () - 1;
         if (block < 0)
           block = totalBlocks - 1;
-        highlights.add (currentDisk.getDiskAddress (block));
+        highlights.add (disk.getDiskAddress (block));
         break;
 
       case KeyEvent.VK_RIGHT:
         block = last.getBlock () + 1;
         if (block >= totalBlocks)
           block = 0;
-        highlights.add (currentDisk.getDiskAddress (block));
+        highlights.add (disk.getDiskAddress (block));
         break;
 
       case KeyEvent.VK_UP:
         block = first.getBlock () - rowSize;
         if (block < 0)
           block += totalBlocks;
-        highlights.add (currentDisk.getDiskAddress (block));
+        highlights.add (disk.getDiskAddress (block));
         break;
 
       case KeyEvent.VK_DOWN:
         block = last.getBlock () + rowSize;
         if (block >= totalBlocks)
           block -= totalBlocks;
-        highlights.add (currentDisk.getDiskAddress (block));
+        highlights.add (disk.getDiskAddress (block));
         break;
     }
   }

@@ -9,19 +9,11 @@ import java.util.EventListener;
 import java.util.EventObject;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JRootPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
-class RedoHandler implements FileSelectionListener, DiskSelectionListener, SectorSelectionListener,
-      FileNodeSelectionListener
+class RedoHandler implements FileSelectionListener, DiskSelectionListener,
+    SectorSelectionListener, FileNodeSelectionListener
 {
   private static final String base = "/com/bytezone/diskbrowser/icons/";
   EventListenerList listenerList = new EventListenerList ();
@@ -87,7 +79,7 @@ class RedoHandler implements FileSelectionListener, DiskSelectionListener, Secto
   @Override
   public void fileNodeSelected (FileNodeSelectedEvent event)
   {
-    if (!event.redo) // it's an event we just caused
+    if (!event.redo)                            // it's an event we just caused
       addEvent (new RedoEvent ("FileNodeEvent", event));
   }
 
@@ -101,7 +93,7 @@ class RedoHandler implements FileSelectionListener, DiskSelectionListener, Secto
   @Override
   public void sectorSelected (SectorSelectedEvent event)
   {
-    if (!event.redo) // it's an event we just caused
+    if (!event.redo)                            // it's an event we just caused
       addEvent (new RedoEvent ("SectorEvent", event));
   }
 

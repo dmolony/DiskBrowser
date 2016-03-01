@@ -1,10 +1,10 @@
 package com.bytezone.diskbrowser.gui;
 
-/***********************************************************************************************
+/*****************************************************************************************
  * JPanel used to display a scrolling JTree containing details of a single disk. The JTree
  * consists entirely of AppleFileSource objects. Any number of these objects are contained
  * in Catalog Panel, along with a single FileSystemTab.
- ***********************************************************************************************/
+ ****************************************************************************************/
 
 import java.awt.Font;
 import java.util.Enumeration;
@@ -23,29 +23,27 @@ class AppleDiskTab extends AbstractTab
 {
   FormattedDisk disk;
 
-  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector, RedoHandler navMan,
-        Font font, FileSelectedEvent event)
+  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
+      RedoHandler redoHandler, Font font, FileSelectedEvent event)
   {
-    super (navMan, selector, font);
+    super (redoHandler, selector, font);
     create (disk);
-    navMan.fileSelected (event);
-    //    System.out.println ("restoring a previous disk with a file selected");
+    redoHandler.fileSelected (event);
   }
 
-  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector, RedoHandler navMan,
-        Font font, SectorSelectedEvent event)
+  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
+      RedoHandler redoHandler, Font font, SectorSelectedEvent event)
   {
-    super (navMan, selector, font);
+    super (redoHandler, selector, font);
     create (disk);
-    navMan.sectorSelected (event);
-    //    System.out.println ("restoring a previous disk with a sector selected");
+    redoHandler.sectorSelected (event);
   }
 
   // This constructor is only called when lastFileUsed is not null, but the disk
   // couldn't find the file entry. Either the file has been deleted, or it is a disk
   // with redefined files (Wizardry, Infocom etc).
-  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector, RedoHandler navMan,
-        Font font, String lastFileUsed)
+  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
+      RedoHandler navMan, Font font, String lastFileUsed)
   {
     super (navMan, selector, font);
     create (disk);
@@ -60,8 +58,8 @@ class AppleDiskTab extends AbstractTab
   }
 
   // User is selecting a new disk from the catalog
-  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector, RedoHandler navMan,
-        Font font)
+  public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
+      RedoHandler navMan, Font font)
   {
     super (navMan, selector, font);
     create (disk);

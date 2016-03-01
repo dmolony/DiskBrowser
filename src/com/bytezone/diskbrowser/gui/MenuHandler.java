@@ -74,7 +74,9 @@ public class MenuHandler
     fileMenu.add (rootItem);
     fileMenu.addSeparator ();
     fileMenu.add (refreshTreeItem);
+
     addLauncherMenu ();
+
     fileMenu.add (printItem);
     fileMenu.addSeparator ();
     fileMenu.add (closeTabItem);
@@ -99,15 +101,21 @@ public class MenuHandler
     formatMenu.add (showCatalogItem);
     formatMenu.add (showLayoutItem);
     formatMenu.add (showFreeSectorsItem);
+
     formatMenu.addSeparator ();
+
     formatMenu.add (interleave0Item);
     formatMenu.add (interleave1Item);
     formatMenu.add (interleave2Item);
     formatMenu.add (interleave3Item);
+
     formatMenu.addSeparator ();
+
     formatMenu.add (sector256Item);
     formatMenu.add (sector512Item);
+
     formatMenu.addSeparator ();
+
     formatMenu.add (colourQuirksItem);
     formatMenu.add (monochromeItem);
 
@@ -129,14 +137,6 @@ public class MenuHandler
     interleaveGroup.add (interleave3Item);
 
     dbItem.setEnabled (false);
-
-    // preferences
-    lineWrapItem.setSelected (prefs.getBoolean (PREFS_LINE_WRAP, true));
-    showLayoutItem.setSelected (prefs.getBoolean (PREFS_SHOW_LAYOUT, true));
-    showCatalogItem.setSelected (prefs.getBoolean (PREFS_SHOW_CATALOG, true));
-    showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
-    colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
-    monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
 
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
     HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
@@ -195,6 +195,17 @@ public class MenuHandler
     prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
     prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
     prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
+  }
+
+  @Override
+  public void restore (Preferences prefs)
+  {
+    lineWrapItem.setSelected (prefs.getBoolean (PREFS_LINE_WRAP, true));
+    showLayoutItem.setSelected (prefs.getBoolean (PREFS_SHOW_LAYOUT, true));
+    showCatalogItem.setSelected (prefs.getBoolean (PREFS_SHOW_CATALOG, true));
+    showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
+    colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
+    monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
   }
 
   @Override
@@ -257,15 +268,5 @@ public class MenuHandler
       ((InterleaveAction) interleave2Item.getAction ()).setDisk (currentDisk);
       ((InterleaveAction) interleave3Item.getAction ()).setDisk (currentDisk);
     }
-  }
-
-  @Override
-  public void restore (Preferences prefs)
-  {
-    //    lineWrapItem.setSelected (prefs.getBoolean (PREFS_LINE_WRAP, true));
-    //    showLayoutItem.setSelected (prefs.getBoolean (PREFS_SHOW_LAYOUT, true));
-    //    showCatalogItem.setSelected (prefs.getBoolean (PREFS_SHOW_CATALOG, true));
-    //    showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
-    //    colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
   }
 }

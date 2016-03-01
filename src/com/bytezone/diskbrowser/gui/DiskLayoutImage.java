@@ -212,6 +212,8 @@ class DiskLayoutImage extends JPanel implements Scrollable
     setSelection (event.getSectors ());
     fireSectorSelectionEvent (event);
     redo = false;
+
+    requestFocusInWindow ();
   }
 
   private void fireSectorSelectionEvent ()
@@ -251,7 +253,7 @@ class DiskLayoutImage extends JPanel implements Scrollable
         case KeyEvent.VK_RIGHT:
         case KeyEvent.VK_UP:
         case KeyEvent.VK_DOWN:
-          selectionHandler.keyPress (e);
+          selectionHandler.cursorMove (disk.getDisk (), e);
           fireSectorSelectionEvent ();
           repaint ();
       }

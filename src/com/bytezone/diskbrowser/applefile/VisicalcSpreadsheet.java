@@ -152,8 +152,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       for (VisicalcCell cell : sheet.values ())
         System.out.println (cell);
 
-    for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
-      System.out.printf ("Width of column %3d: %d%n", entry.getKey (), entry.getValue ());
+    //    for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
+    //      System.out.printf ("Width of column %3d: %d%n", entry.getKey (), entry.getValue ());
   }
 
   private void add (String command)

@@ -362,27 +362,6 @@ class CatalogPanel extends JTabbedPane
     }
   }
 
-  private class MouseListener extends MouseAdapter
-  {
-    @Override
-    public void mousePressed (MouseEvent e)
-    {
-      JTree tree = (JTree) e.getSource ();
-      int selRow = tree.getRowForLocation (e.getX (), e.getY ());
-      if (selRow < 0)
-        return;
-
-      TreePath tp = tree.getPathForLocation (e.getX (), e.getY ());
-      DefaultMutableTreeNode selectedNode =
-          (DefaultMutableTreeNode) tp.getLastPathComponent ();
-      FileNode node = (FileNode) selectedNode.getUserObject ();
-      if (node.file.isDirectory ())
-        lister.catalogLister.setNode (selectedNode);
-      else if (e.getClickCount () == 2)
-        addDiskPanel (node.getFormattedDisk (), null, true);
-    }
-  }
-
   @Override
   public void redo (RedoEvent event)
   {
@@ -445,5 +424,26 @@ class CatalogPanel extends JTabbedPane
       fileTab.setTreeFont (font);
     for (AppleDiskTab tab : diskTabs)
       tab.setTreeFont (font);
+  }
+
+  private class MouseListener extends MouseAdapter
+  {
+    @Override
+    public void mousePressed (MouseEvent e)
+    {
+      JTree tree = (JTree) e.getSource ();
+      int selRow = tree.getRowForLocation (e.getX (), e.getY ());
+      if (selRow < 0)
+        return;
+
+      TreePath tp = tree.getPathForLocation (e.getX (), e.getY ());
+      DefaultMutableTreeNode selectedNode =
+          (DefaultMutableTreeNode) tp.getLastPathComponent ();
+      FileNode node = (FileNode) selectedNode.getUserObject ();
+      if (node.file.isDirectory ())
+        lister.catalogLister.setNode (selectedNode);
+      else if (e.getClickCount () == 2)
+        addDiskPanel (node.getFormattedDisk (), null, true);
+    }
   }
 }

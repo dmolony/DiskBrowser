@@ -179,8 +179,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
           sheet.put (cell.address.sortValue, cell);
           currentCell = cell;
         }
-        else
-          System.out.println ("Found " + cell);
+        //        else
+        //          System.out.println ("Found " + cell);
       }
       else
         System.out.printf ("Invalid cell address: %s%n", command);
@@ -264,32 +264,17 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     if (functions.containsKey (function))
       return functions.get (function);
 
-    Range range = null;
-    Matcher m = functionPattern.matcher (function);
-    while (m.find ())
-    {
-      Address fromAddress = new Address (m.group (1), m.group (2));
-      Address toAddress = new Address (m.group (3), m.group (4));
-      range = new Range (fromAddress, toAddress);
-    }
-
+    //    System.out.println (function);
     double result = 0;
 
-    if (range == null)
+    if (function.startsWith ("@IF("))
     {
-      m = addressList.matcher (function);
-      while (m.find ())
-      {
-        String[] cells = m.group (1).split (",");
-        range = new Range (cells);
-      }
-
-      if (range == null)
-      {
-        System.out.println ("null range : " + function);
-        return result;
-      }
+      return result;
     }
+
+    Range range = getRange (function);
+    if (range == null)
+      return result;
 
     if (function.startsWith ("@SUM"))
     {
@@ -352,6 +337,33 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
     functions.put (function, result);
     return result;
+  }
+
+  private Range getRange (String text)
+  {
+    Range range = null;
+    Matcher m = functionPattern.matcher (text);
+    while (m.find ())
+    {
+      Address fromAddress = new Address (m.group (1), m.group (2));
+      Address toAddress = new Address (m.group (3), m.group (4));
+      range = new Range (fromAddress, toAddress);
+    }
+
+    if (range == null)
+    {
+      m = addressList.matcher (text);
+      while (m.find ())
+      {
+        String[] cells = m.group (1).split (",");
+        range = new Range (cells);
+      }
+
+      if (range == null)
+        System.out.println ("null range : " + text);
+    }
+
+    return range;
   }
 
   public double getValue (Address address)
@@ -611,7 +623,10 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     public Range (String[] cells)
     {
       for (String s : cells)
+      {
+        //        System.out.println (s);
         range.add (new Address (s));
+      }
     }
 
     @Override
@@ -672,6 +687,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
     private void set (String sCol, String sRow)
     {
+      //      System.out.printf ("Set: %s, %s%n", sCol, sRow);
       if (sCol.length () == 1)
         column = sCol.charAt (0) - 'A';
       else if (sCol.length () == 2)
@@ -679,9 +695,16 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       else
         System.out.println ("Bollocks");
 
-      row = Integer.parseInt (sRow) - 1;
-      sortValue = row * 64 + column;
-      text = sCol + sRow;
+      try
+      {
+        row = Integer.parseInt (sRow) - 1;
+        sortValue = row * 64 + column;
+        text = sCol + sRow;
+      }
+      catch (NumberFormatException e)
+      {
+        System.out.printf ("NFE: %s%n", sRow);
+      }
     }
 
     public Address nextRow ()

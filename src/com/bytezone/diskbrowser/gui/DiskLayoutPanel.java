@@ -224,7 +224,7 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
     // This can happen if sectors are selected from a dual-dos disk
     checkCorrectDisk (((SectorSelectedEvent) event.value).getFormattedDisk ());
 
-    image.redoEvent (event);
+    image.redo (event);
   }
 
   private void checkCorrectDisk (FormattedDisk newDisk)

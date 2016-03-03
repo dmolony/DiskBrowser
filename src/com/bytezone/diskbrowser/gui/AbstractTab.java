@@ -137,6 +137,7 @@ abstract class AbstractTab extends JPanel implements Tab
     tree.setSelectionPath (tp);
     if (!tree.isVisible (tp))
       tree.scrollPathToVisible (tp);
+    tree.requestFocusInWindow ();
   }
 
   protected TreePath getPathToNode (DefaultMutableTreeNode selectNode)

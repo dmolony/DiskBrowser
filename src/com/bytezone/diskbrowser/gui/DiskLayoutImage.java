@@ -18,8 +18,9 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
+import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
-class DiskLayoutImage extends JPanel implements Scrollable
+class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 {
   static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
 
@@ -43,7 +44,7 @@ class DiskLayoutImage extends JPanel implements Scrollable
     setOpaque (true);
 
     addKeyListener (new MyKeyListener ());
-    setFocusable (true);
+    //    setFocusable (true);
   }
 
   public void setDisk (FormattedDisk disk, LayoutDetails details)
@@ -205,7 +206,8 @@ class DiskLayoutImage extends JPanel implements Scrollable
     return false;
   }
 
-  void redoEvent (RedoEvent redoEvent)
+  @Override
+  public void redo (RedoEvent redoEvent)
   {
     redo = true;
     SectorSelectedEvent event = (SectorSelectedEvent) redoEvent.value;

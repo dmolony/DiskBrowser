@@ -21,7 +21,11 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoData;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
@@ -33,19 +37,21 @@ abstract class AbstractTab extends JPanel implements Tab
   private Font font;
   private final JScrollPane scrollpane;
   final DiskAndFileSelector eventHandler;
-  final RedoHandler navMan;
+  final RedoHandler redoHandler;
   final RedoData redoData;
   protected JTree tree;
 
-  public AbstractTab (RedoHandler navMan, DiskAndFileSelector selector, Font font)
+  public AbstractTab (RedoHandler redoHandler, DiskAndFileSelector selector, Font font)
   {
     super (new BorderLayout ());
+
     this.eventHandler = selector;
     this.font = font;
-    this.navMan = navMan;
-    this.redoData = navMan.createData ();
+    this.redoHandler = redoHandler;
+    this.redoData = redoHandler.createData ();
 
-    scrollpane = new JScrollPane (null, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
+    scrollpane =
+        new JScrollPane (null, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
     scrollpane.setBorder (null);
     add (scrollpane, BorderLayout.CENTER);
   }
@@ -85,7 +91,7 @@ abstract class AbstractTab extends JPanel implements Tab
   protected Object getSelectedObject ()
   {
     DefaultMutableTreeNode node =
-          (DefaultMutableTreeNode) tree.getLastSelectedPathComponent ();
+        (DefaultMutableTreeNode) tree.getLastSelectedPathComponent ();
     return node == null ? null : node.getUserObject ();
   }
 

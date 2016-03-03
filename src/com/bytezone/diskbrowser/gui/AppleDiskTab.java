@@ -85,7 +85,7 @@ class AppleDiskTab extends AbstractTab
     eventHandler.fireDiskSelectionEvent (disk);
     eventHandler.redo = false;
     tree.setSelectionPath (null); // turn off any current selection to force an event
-    navMan.setCurrentData (redoData);
+    redoHandler.setCurrentData (redoData);
   }
 
   @Override

@@ -92,7 +92,7 @@ class FileSystemTab extends AbstractTab
   public void activate ()
   {
     tree.setSelectionPath (null); // turn off any current selection to force an event
-    navMan.setCurrentData (redoData);
+    redoHandler.setCurrentData (redoData);
   }
 
   // connected to RefreshTreeAction

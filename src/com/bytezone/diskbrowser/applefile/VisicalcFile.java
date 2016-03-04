@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.visicalc.VisicalcSpreadsheet;
 
 public class VisicalcFile extends AbstractFile
 {
@@ -22,16 +23,6 @@ public class VisicalcFile extends AbstractFile
     text.append ("Visicalc : " + name + "\n");
     text.append ("Cells    : " + sheet.size () + "\n\n");
     text.append (sheet.getCells ());
-
-    if (false)
-    {
-      text.append ("\n");
-      for (String line : sheet.lines)
-      {
-        text.append ("\n");
-        text.append (line);
-      }
-    }
 
     return text.toString ();
   }

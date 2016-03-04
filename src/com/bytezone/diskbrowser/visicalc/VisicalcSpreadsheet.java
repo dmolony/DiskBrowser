@@ -1,12 +1,10 @@
-package com.bytezone.diskbrowser.applefile;
+package com.bytezone.diskbrowser.visicalc;
 
-import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.bytezone.diskbrowser.applefile.VisicalcSpreadsheet.VisicalcCell;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
@@ -259,7 +257,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     return ptr;
   }
 
-  private double evaluateFunction (String function)
+  double evaluateFunction (String function)
   {
     if (functions.containsKey (function))
       return functions.get (function);
@@ -287,7 +285,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       for (Address address : range)
       {
         VisicalcCell cell = getCell (address);
-        if (cell != null && cell.hasValue () && cell.value != 0.0)
+        if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
           ++count;
       }
       result = count;
@@ -369,7 +367,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   public double getValue (Address address)
   {
     VisicalcCell cell = sheet.get (address.sortValue);
-    return cell == null ? 0.0 : cell.value;
+    return cell == null ? 0.0 : cell.getValue ();
   }
 
   public double getValue (String cellName)
@@ -453,282 +451,5 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       }
     }
     return text.toString ();
-  }
-
-  class VisicalcCell implements Comparable<VisicalcCell>
-  {
-    private final Address address;
-    private final VisicalcSpreadsheet parent;
-
-    private String label;
-    private double value;
-    private String formula;
-    private char format;
-    private int width;
-    private int columnWidth;
-    private char repeatingChar;
-    private String repeat = "";
-    private boolean valid;
-
-    public VisicalcCell (VisicalcSpreadsheet parent, Address address)
-    {
-      this.parent = parent;
-      this.address = address;
-    }
-
-    public void doCommand (String command)
-    {
-      if (command.startsWith ("/"))
-      {
-        if (command.charAt (1) == 'F')                // format cell
-        {
-          format = command.charAt (2);
-          if (command.length () > 3 && command.charAt (3) == '"')
-            label = command.substring (4);
-        }
-        else if (command.charAt (1) == '-')           // repeating label
-        {
-          repeatingChar = command.charAt (2);
-          for (int i = 0; i < 20; i++)
-            repeat += repeatingChar;
-        }
-        else
-          System.out.println ("Unknown command: " + command);
-      }
-      else if (command.startsWith ("\""))             // starts with a quote
-        label = command.substring (1);
-      else if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
-        this.value = Float.parseFloat (command);
-      else
-        formula = command;
-    }
-
-    public boolean hasValue ()
-    {
-      return label == null && repeatingChar == 0;
-    }
-
-    public double getValue ()
-    {
-      if (valid || formula == null)
-        return value;
-
-      double result = 0.0;
-      double interim = 0.0;
-
-      Matcher m = cellContents.matcher (formula);
-      while (m.find ())
-      {
-        valid = true;
-        char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
-
-        if (m.group (3) != null)                                    // address
-          interim = parent.getValue (m.group (3));
-        else if (m.group (4) != null)                               // constant
-          try
-          {
-            interim = Double.parseDouble (m.group (4));
-          }
-          catch (NumberFormatException e)
-          {
-            System.out.printf ("NFE: %s%n", m.group (4));
-          }
-        else
-          interim = parent.evaluateFunction (m.group (5));         // function
-
-        if (operator == '+')
-          result += interim;
-        else if (operator == '-')
-          result -= interim;
-        else if (operator == '*')
-          result *= interim;
-        else if (operator == '/')
-          result = interim == 0.0 ? 0 : result / interim;
-      }
-
-      if (valid)
-      {
-        value = result;
-        return result;
-      }
-
-      System.out.println ("?? " + formula);
-
-      return value;
-    }
-
-    public String value ()
-    {
-      if (label != null)
-        return label;
-      if (repeatingChar > 0)
-        return repeat;
-      if (formula != null)
-        if (formula.length () >= 12)
-          return formula.substring (0, 12);
-        else
-          return formula;
-      return value + "";
-    }
-
-    @Override
-    public String toString ()
-    {
-      String value = repeatingChar == 0 ? label == null
-          ? formula == null ? ", Value: " + this.value : ", Frmla: " + formula
-          : ", Label: " + label : ", Rpeat: " + repeatingChar;
-      String format = this.format == 0 ? "" : ", Format: " + this.format;
-      String width = this.width == 0 ? "" : ", Width: " + this.width;
-      String columnWidth =
-          this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
-      return String.format ("[Cell:%5s%s%s%s%s]", address, format, width, columnWidth,
-                            value);
-    }
-
-    @Override
-    public int compareTo (VisicalcCell o)
-    {
-      return address.compareTo (o.address);
-    }
-  }
-
-  class Range implements Iterable<Address>
-  {
-    Address from, to;
-    List<Address> range = new ArrayList<Address> ();
-
-    public Range (Address from, Address to)
-    {
-      this.from = from;
-      this.to = to;
-
-      range.add (from);
-
-      if (from.row == to.row)
-        while (from.compareTo (to) < 0)
-        {
-          from = from.nextColumn ();
-          range.add (from);
-        }
-      else if (from.column == to.column)
-        while (from.compareTo (to) < 0)
-        {
-          from = from.nextRow ();
-          range.add (from);
-        }
-      else
-        throw new InvalidParameterException ();
-    }
-
-    public Range (String[] cells)
-    {
-      for (String s : cells)
-      {
-        //        System.out.println (s);
-        range.add (new Address (s));
-      }
-    }
-
-    @Override
-    public String toString ()
-    {
-      if (from == null || to == null)
-      {
-        StringBuilder text = new StringBuilder ();
-        for (Address address : range)
-          text.append (address.text + ",");
-        if (text.length () > 0)
-          text.deleteCharAt (text.length () - 1);
-        return text.toString ();
-      }
-      return String.format ("      %s -> %s", from.text, to.text);
-    }
-
-    @Override
-    public Iterator<Address> iterator ()
-    {
-      return range.iterator ();
-    }
-  }
-
-  class Address implements Comparable<Address>
-  {
-    int row, column;
-    int sortValue;
-    String text;
-
-    public Address (String column, String row)
-    {
-      set (column, row);
-    }
-
-    public Address (int column, int row)
-    {
-      assert column <= 64;
-      assert row <= 255;
-      this.row = row;
-      this.column = column;
-      sortValue = row * 64 + column;
-
-      int col1 = column / 26;
-      int col2 = column % 26;
-      String col =
-          col1 > 0 ? (char) ('@' + col1) + ('A' + col2) + "" : (char) ('A' + col2) + "";
-      text = col + (row + 1);
-    }
-
-    public Address (String address)
-    {
-      if (address.charAt (1) < 'A')
-        set (address.substring (0, 1), address.substring (1));
-      else
-        set (address.substring (0, 2), address.substring (2));
-    }
-
-    private void set (String sCol, String sRow)
-    {
-      //      System.out.printf ("Set: %s, %s%n", sCol, sRow);
-      if (sCol.length () == 1)
-        column = sCol.charAt (0) - 'A';
-      else if (sCol.length () == 2)
-        column = (sCol.charAt (0) - '@') * 26 + sCol.charAt (1) - 'A';
-      else
-        System.out.println ("Bollocks");
-
-      try
-      {
-        row = Integer.parseInt (sRow) - 1;
-        sortValue = row * 64 + column;
-        text = sCol + sRow;
-      }
-      catch (NumberFormatException e)
-      {
-        System.out.printf ("NFE: %s%n", sRow);
-      }
-    }
-
-    public Address nextRow ()
-    {
-      Address next = new Address (column, row + 1);
-      return next;
-    }
-
-    public Address nextColumn ()
-    {
-      Address next = new Address (column + 1, row);
-      return next;
-    }
-
-    @Override
-    public String toString ()
-    {
-      return String.format ("%s %d %d %d", text, row, column, sortValue);
-    }
-
-    @Override
-    public int compareTo (Address o)
-    {
-      return sortValue - o.sortValue;
-    }
   }
 }

@@ -1,0 +1,82 @@
+package com.bytezone.diskbrowser.visicalc;
+
+class Address implements Comparable<Address>
+{
+  int row, column;
+  int sortValue;
+  String text;
+
+  public Address (String column, String row)
+  {
+    set (column, row);
+  }
+
+  public Address (int column, int row)
+  {
+    assert column <= 64;
+    assert row <= 255;
+    this.row = row;
+    this.column = column;
+    sortValue = row * 64 + column;
+
+    int col1 = column / 26;
+    int col2 = column % 26;
+    String col =
+        col1 > 0 ? (char) ('@' + col1) + ('A' + col2) + "" : (char) ('A' + col2) + "";
+    text = col + (row + 1);
+  }
+
+  public Address (String address)
+  {
+    if (address.charAt (1) < 'A')
+      set (address.substring (0, 1), address.substring (1));
+    else
+      set (address.substring (0, 2), address.substring (2));
+  }
+
+  private void set (String sCol, String sRow)
+  {
+    //      System.out.printf ("Set: %s, %s%n", sCol, sRow);
+    if (sCol.length () == 1)
+      column = sCol.charAt (0) - 'A';
+    else if (sCol.length () == 2)
+      column = (sCol.charAt (0) - '@') * 26 + sCol.charAt (1) - 'A';
+    else
+      System.out.println ("Bollocks");
+
+    try
+    {
+      row = Integer.parseInt (sRow) - 1;
+      sortValue = row * 64 + column;
+      text = sCol + sRow;
+    }
+    catch (NumberFormatException e)
+    {
+      System.out.printf ("NFE: %s%n", sRow);
+    }
+  }
+
+  public Address nextRow ()
+  {
+    Address next = new Address (column, row + 1);
+    return next;
+  }
+
+  public Address nextColumn ()
+  {
+    Address next = new Address (column + 1, row);
+    return next;
+  }
+
+  @Override
+  public String toString ()
+  {
+    return String.format ("%s %d %d %d", text, row, column, sortValue);
+  }
+
+  @Override
+  public int compareTo (Address o)
+  {
+    return sortValue - o.sortValue;
+  }
+}

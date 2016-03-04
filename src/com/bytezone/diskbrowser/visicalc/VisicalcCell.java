@@ -16,7 +16,7 @@ class VisicalcCell implements Comparable<VisicalcCell>
   private String formula;
   private char format;
   private int width;
-  private int columnWidth;
+  //  private int columnWidth;
   private char repeatingChar;
   private String repeat = "";
   private boolean valid;
@@ -27,39 +27,45 @@ class VisicalcCell implements Comparable<VisicalcCell>
     this.address = address;
   }
 
-  public void doCommand (String command)
+  void doCommand (String command)
   {
-    if (command.startsWith ("/"))
+    switch (command.charAt (0))
     {
-      if (command.charAt (1) == 'F')                // format cell
-      {
-        format = command.charAt (2);
-        if (command.length () > 3 && command.charAt (3) == '"')
-          label = command.substring (4);
-      }
-      else if (command.charAt (1) == '-')           // repeating label
-      {
-        repeatingChar = command.charAt (2);
-        for (int i = 0; i < 20; i++)
-          repeat += repeatingChar;
-      }
-      else
-        System.out.println ("Unknown command: " + command);
+      case '/':
+        if (command.charAt (1) == 'F')                // format cell
+        {
+          format = command.charAt (2);
+          if (command.length () > 3 && command.charAt (3) == '"')
+            label = command.substring (4);
+        }
+        else if (command.charAt (1) == '-')           // repeating label
+        {
+          repeatingChar = command.charAt (2);
+          for (int i = 0; i < 20; i++)
+            repeat += repeatingChar;
+        }
+        else
+          System.out.println ("Unknown command: " + command);
+        break;
+
+      case '"':
+        label = command.substring (1);
+        break;
+
+      default:
+        if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
+          this.value = Float.parseFloat (command);
+        else
+          formula = command;
     }
-    else if (command.startsWith ("\""))             // starts with a quote
-      label = command.substring (1);
-    else if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
-      this.value = Float.parseFloat (command);
-    else
-      formula = command;
   }
 
-  public boolean hasValue ()
+  boolean hasValue ()
   {
     return label == null && repeatingChar == 0;
   }
 
-  public double getValue ()
+  double getValue ()
   {
     if (valid || formula == null)
       return value;
@@ -108,7 +114,7 @@ class VisicalcCell implements Comparable<VisicalcCell>
     return value;
   }
 
-  public String value ()
+  String value ()
   {
     if (label != null)
       return label;
@@ -130,9 +136,8 @@ class VisicalcCell implements Comparable<VisicalcCell>
         : ", Label: " + label : ", Rpeat: " + repeatingChar;
     String format = this.format == 0 ? "" : ", Format: " + this.format;
     String width = this.width == 0 ? "" : ", Width: " + this.width;
-    String columnWidth = this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
-    return String.format ("[Cell:%5s%s%s%s%s]", address, format, width, columnWidth,
-                          value);
+    //    String columnWidth = this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
+    return String.format ("[Cell:%5s%s%s%s]", address, format, width, value);
   }
 
   @Override

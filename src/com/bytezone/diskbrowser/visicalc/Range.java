@@ -36,10 +36,7 @@ class Range implements Iterable<Address>
   public Range (String[] cells)
   {
     for (String s : cells)
-    {
-      //        System.out.println (s);
       range.add (new Address (s));
-    }
   }
 
   @Override

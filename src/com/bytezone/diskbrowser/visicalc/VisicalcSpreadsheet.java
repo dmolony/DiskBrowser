@@ -11,8 +11,6 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 {
   private static final Pattern addressPattern =
       Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3}):");
-  private static final Pattern cellContents =
-      Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
   private static final Pattern functionPattern = Pattern
       .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
@@ -21,10 +19,11 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   private final Map<String, Double> functions = new HashMap<String, Double> ();
 
   final List<String> lines = new ArrayList<String> ();
-  private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   VisicalcCell currentCell = null;
-  int columnWidth = 12;
   char defaultFormat;
+
+  private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
+  int columnWidth = 12;
 
   // Maximum cell = BK254
 
@@ -132,26 +131,34 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
   public VisicalcSpreadsheet (byte[] buffer)
   {
+    int last = buffer.length;
+    while (buffer[--last] == 0)
+      ;
+
     int ptr = 0;
-    int last = buffer.length - 1;
-
-    while (buffer[last] == 0)
-      last--;
-
     while (ptr <= last)
     {
       int endPtr = findEndPtr (buffer, ptr);
-      String s = HexFormatter.getString (buffer, ptr, endPtr - ptr);
-      add (s);
+      add (HexFormatter.getString (buffer, ptr, endPtr - ptr));
       ptr = endPtr + 1;
     }
 
     if (false)
+    {
       for (VisicalcCell cell : sheet.values ())
         System.out.println (cell);
 
-    //    for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
-    //      System.out.printf ("Width of column %3d: %d%n", entry.getKey (), entry.getValue ());
+      for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
+        System.out.printf ("Width of column %3d: %d%n", entry.getKey (),
+                           entry.getValue ());
+    }
+  }
+
+  private int findEndPtr (byte[] buffer, int ptr)
+  {
+    while (buffer[ptr] != (byte) 0x8D)
+      ptr++;
+    return ptr;
   }
 
   private void add (String command)
@@ -159,16 +166,15 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     // NB no closing bracket: [>K11:@SUM(J11...F11]
 
     lines.add (command);
-    String data;
 
     if (command.startsWith (">"))                               // GOTO cell
     {
-      int pos = command.indexOf (':');                          // end of cell address
       Matcher m = addressPattern.matcher (command);
       if (m.find ())
       {
         Address address = new Address (m.group (1), m.group (2));
         VisicalcCell cell = sheet.get (address.sortValue);
+        int pos = command.indexOf (':');                        // end of cell address
         command = command.substring (pos + 1);
 
         if (cell == null)
@@ -186,7 +192,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
     if (command.startsWith ("/"))                               // command
     {
-      data = command.substring (1);
+      String data = command.substring (1);
       char subCommand = command.charAt (1);
       switch (subCommand)
       {
@@ -248,13 +254,6 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     }
     else
       currentCell.doCommand (command);              // formula
-  }
-
-  private int findEndPtr (byte[] buffer, int ptr)
-  {
-    while (buffer[ptr] != (byte) 0x8D)
-      ptr++;
-    return ptr;
   }
 
   double evaluateFunction (String function)

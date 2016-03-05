@@ -14,7 +14,7 @@ class VisicalcCell implements Comparable<VisicalcCell>
   private String label;
   private double value;
   private String formula;
-  private char format;
+  private char format = ' ';
   private int width;
   //  private int columnWidth;
   private char repeatingChar;
@@ -70,6 +70,11 @@ class VisicalcCell implements Comparable<VisicalcCell>
   boolean hasValue ()
   {
     return label == null && repeatingChar == 0;
+  }
+
+  char getFormat ()
+  {
+    return format;
   }
 
   double getValue ()
@@ -142,9 +147,9 @@ class VisicalcCell implements Comparable<VisicalcCell>
   public String toString ()
   {
     String value = repeatingChar == 0 ? label == null
-        ? formula == null ? ", Value: " + this.value : ", Frmla: " + formula
+        ? formula == null ? ", Value: " + this.value : ", Formula: " + formula
         : ", Label: " + label : ", Rpeat: " + repeatingChar;
-    String format = this.format == 0 ? "" : ", Format: " + this.format;
+    String format = this.format == ' ' ? "" : ", Format: " + this.format;
     String width = this.width == 0 ? "" : ", Width: " + this.width;
     //    String columnWidth = this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
     return String.format ("[Cell:%5s%s%s%s]", address, format, width, value);

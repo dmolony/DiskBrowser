@@ -143,14 +143,19 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       ptr = endPtr + 1;
     }
 
-    if (false)
+    if (true)
     {
+      for (String line : lines)
+        System.out.println (line);
+
+      System.out.println ();
       for (VisicalcCell cell : sheet.values ())
         System.out.println (cell);
 
+      System.out.println ();
+      System.out.printf ("Default width : %3d%n", columnWidth);
       for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
-        System.out.printf ("Width of column %3d: %d%n", entry.getKey (),
-                           entry.getValue ());
+        System.out.printf ("    column %3d: %3d%n", entry.getKey (), entry.getValue ());
     }
   }
 
@@ -180,7 +185,8 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
         if (cell == null)
         {
           cell = new VisicalcCell (this, address);
-          sheet.put (cell.address.sortValue, cell);
+          if (!command.startsWith ("/GCC"))
+            sheet.put (cell.address.sortValue, cell);
           currentCell = cell;
         }
         //        else
@@ -404,13 +410,15 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   public String getCells ()
   {
     StringBuilder text = new StringBuilder ();
-    String longLine = "                                                     "
-        + "                                                                 ";
+    //    String longLine = "%+++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    //        + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    String longLine = "                                                          "
+        + "                                                                      ";
 
     DecimalFormat nf = new DecimalFormat ("$#####0.00");
     //    NumberFormat nf = NumberFormat.getCurrencyInstance ();
     int lastRow = 0;
-    int lastColumn = -1;
+    int lastColumn = 0;
 
     for (VisicalcCell cell : sheet.values ())
     {
@@ -418,45 +426,62 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       {
         text.append ("\n");
         ++lastRow;
-        lastColumn = -1;
+        lastColumn = 0;
       }
 
-      while (lastColumn < cell.address.column - 1)
+      while (lastColumn < cell.address.column)
       {
         int width = columnWidth;
-        if (columnWidths.containsKey (cell.address.column))
-          width = columnWidths.get (cell.address.column);
+        if (columnWidths.containsKey (lastColumn))
+          width = columnWidths.get (lastColumn);
         text.append (longLine.substring (0, width));
         ++lastColumn;
       }
-      lastColumn = cell.address.column;
 
       int colWidth = columnWidth;
       if (columnWidths.containsKey (cell.address.column))
         colWidth = columnWidths.get (cell.address.column);
+      ++lastColumn;
+
+      char format = cell.getFormat ();
+      if (format == ' ')
+        format = defaultFormat;
 
       if (cell.hasValue ())
       {
-        if (defaultFormat == 'I')
+        if (format == 'I')
         {
-          String integerFormat = String.format ("%%%d.0f", colWidth);
+          String integerFormat = String.format ("%%%dd", colWidth);
+          //          System.out.printf ("Integer format:%s%n", integerFormat);
           text.append (String.format (integerFormat, cell.getValue ()));
         }
-        else if (defaultFormat == '$')
+        else if (format == '$')
         {
           String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+          //          System.out.printf ("Currency format:%s%n", currencyFormat);
           text.append (String.format (currencyFormat, nf.format (cell.getValue ())));
         }
         else
         {
-          String numberFormat = String.format ("%%%d.3f", colWidth);
+          String numberFormat = String.format ("%%%d.0f", colWidth);
+          //          System.out.printf ("Number format:%s%n", numberFormat);
           text.append (String.format (numberFormat, cell.getValue ()));
         }
       }
       else
       {
-        String format = String.format ("%%-%d.%ds", colWidth, colWidth);
-        text.append (String.format (format, cell.value ()));
+        if (format == 'R')
+        {
+          String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+          //          System.out.printf ("Label format:%s%n", labelFormat);
+          text.append (String.format (labelFormat, cell.value ()));
+        }
+        else
+        {
+          String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+          //          System.out.printf ("Label format:%s%n", labelFormat);
+          text.append (String.format (labelFormat, cell.value ()));
+        }
       }
     }
     return text.toString ();

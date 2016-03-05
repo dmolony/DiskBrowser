@@ -196,11 +196,11 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       char subCommand = command.charAt (1);
       switch (subCommand)
       {
-        case 'W':
+        case 'W':           // Window control
           //          System.out.println ("  Window command: " + data);
           break;
 
-        case 'G':
+        case 'G':           // Global command
           //          System.out.println ("  Global command: " + data);
           try
           {
@@ -224,7 +224,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
           }
           break;
 
-        case 'T':
+        case 'T':             // Set title area
           //          System.out.println ("  Title command: " + data);
           break;
 
@@ -268,6 +268,10 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     {
       return result;
     }
+    if (function.startsWith ("@LOOKUP("))
+    {
+      return result;
+    }
 
     Range range = getRange (function);
     if (range == null)
@@ -305,6 +309,11 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
           max = getValue (address);
       result = max;
     }
+    else if (function.startsWith ("@LOOKUP"))
+    {
+      System.out.println ("Unfinished: " + function);
+      result = 0;
+    }
     else
       System.out.println ("Unimplemented function: " + function);
     // http://www.bricklin.com/history/refcard1.htm
@@ -339,6 +348,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   private Range getRange (String text)
   {
     Range range = null;
+    System.out.printf ("Range: [%s]%n", text);
     Matcher m = functionPattern.matcher (text);
     while (m.find ())
     {

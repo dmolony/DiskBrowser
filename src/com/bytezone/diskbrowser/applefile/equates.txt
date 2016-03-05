@@ -116,27 +116,40 @@ F48A  RIGHT EQU
 F4D5  UP EQU
 F504  DOWN EQU
 F6B9  HFNS
+
+F800  PLOT
+F819  HLINE
+F828  VLINE
+F864  SETCOL
+F871  SCRN
+
 F940  PRINTYX
 F941  PRINTAX - print a hex number
+
 FAA6  reboot DOS
 FAFF  0 = Autostart ROM, 1 = Old Monitor
+
 FB1E  PREAD - read game paddle
 FB2F  initialise text screen
 FB39  text mode - SETTXT
+FB40  SETGR
 FB5B  TABV - monitor tab routine
-FC66  CURSDWN - move cursor down
-FBF4  CURSRIT - move cursor right
-FC10  CURSLFT - move cursor left
-FC1A  CURSUP - move cursor up
 FB6F  set powerup checksum
 FBC1  BASCALC - calculate video address
 FBDD  BEEP
+FBF4  CURSRIT - move cursor right
+
+FC10  CURSLFT - move cursor left
+FC1A  CURSUP - move cursor up
 FC22  VTAB
 FC42  CLREOP - clear to end of page
 FC58  HOME - clear screen
 FC62  CR
+FC66  CURSDWN - move cursor down
 FC9C  CLREOL
 FCA8  WAIT 1/2(26+27A+5A^2) microseconds
+FCFA  RD2BIT
+
 FD0C  RDKEY - Blink cursor
 FD1B  KEYIN - Increment RNDL,H while polling keyboard
 FD35  RDCHAR - Call RDKEY
@@ -147,9 +160,16 @@ FDDA  PRBYTE - print A in hex
 FDED  COUT - output a character
 FDF0  COUT1 - output a character to screen
 FD8E  CROUT - generate a return
+
 FE2C  move a block of memory
 FE89  disconnect DOS from I/O links
+FE8B  INPORT
 FE93  disconnect DOS from I/O links
+FE95  OUTPORT
+FECD  WRITE
+FEFD  READ
+
+FF02  READ2
 FF3A  BELL
 FF3F  SAVE
 FF4A  RESTORE

@@ -34,6 +34,13 @@ class VisicalcCell implements Comparable<VisicalcCell>
       case '/':
         if (command.charAt (1) == 'F')                // format cell
         {
+          //  /FG - general
+          //  /FD - default
+          //  /FI - integer
+          //  /F$ - dollars and cents
+          //  /FL - left justified
+          //  /FR - right justified
+          //  /F* - graph
           format = command.charAt (2);
           if (command.length () > 3 && command.charAt (3) == '"')
             label = command.substring (4);
@@ -73,6 +80,9 @@ class VisicalcCell implements Comparable<VisicalcCell>
     double result = 0.0;
     double interim = 0.0;
 
+    if (formula.startsWith ("@LOOKUP("))
+      return result;
+
     Matcher m = cellContents.matcher (formula);
     while (m.find ())
     {
@@ -88,7 +98,7 @@ class VisicalcCell implements Comparable<VisicalcCell>
         }
         catch (NumberFormatException e)
         {
-          System.out.printf ("NFE: %s%n", m.group (4));
+          System.out.printf ("NFE: %s [%s]%n", m.group (4), formula);
         }
       else
         interim = parent.evaluateFunction (m.group (5));         // function

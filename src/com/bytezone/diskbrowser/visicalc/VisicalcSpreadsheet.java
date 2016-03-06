@@ -50,7 +50,9 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   //  /GF$            Global Format Currency
   //  /GC             Global Column <width>
   //  /GR             Global 
+  //  /GRA
   //  /GO             Global 
+  //  /GOC
 
   //  /T              Titles (HVBN)
   //  /TH             fix Horizontal Titles
@@ -145,14 +147,18 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
     if (true)
     {
+      System.out.println ();
+      System.out.println ("Lines:");
       for (String line : lines)
         System.out.println (line);
 
       System.out.println ();
+      System.out.println ("Cells:");
       for (VisicalcCell cell : sheet.values ())
         System.out.println (cell);
 
       System.out.println ();
+      System.out.println ("Column widths:");
       System.out.printf ("Default width : %3d%n", columnWidth);
       for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
         System.out.printf ("    column %3d: %3d%n", entry.getKey (), entry.getValue ());
@@ -170,6 +176,12 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   {
     // NB no closing bracket: [>K11:@SUM(J11...F11]
 
+    if (command.isEmpty ())
+    {
+      System.out.println ("empty command");
+      return;
+    }
+
     lines.add (command);
 
     if (command.startsWith (">"))                               // GOTO cell
@@ -178,19 +190,16 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       if (m.find ())
       {
         Address address = new Address (m.group (1), m.group (2));
-        VisicalcCell cell = sheet.get (address.sortValue);
+        currentCell = sheet.get (address.sortValue);
         int pos = command.indexOf (':');                        // end of cell address
         command = command.substring (pos + 1);
 
-        if (cell == null)
+        if (currentCell == null)
         {
-          cell = new VisicalcCell (this, address);
+          currentCell = new VisicalcCell (this, address);
           if (!command.startsWith ("/GCC"))
-            sheet.put (cell.address.sortValue, cell);
-          currentCell = cell;
+            sheet.put (currentCell.address.sortValue, currentCell);
         }
-        //        else
-        //          System.out.println ("Found " + cell);
       }
       else
         System.out.printf ("Invalid cell address: %s%n", command);
@@ -232,6 +241,9 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
         case 'T':             // Set title area
           //          System.out.println ("  Title command: " + data);
+          break;
+
+        case 'X':             // Position cursor?
           break;
 
         default:
@@ -346,15 +358,16 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     // Unimplemented functions found so far:
     //  @IF
     //  @ISERROR
+    //  @OR
+    //  @AND
 
     functions.put (function, result);
     return result;
   }
 
-  private Range getRange (String text)
+  Range getRange (String text)
   {
     Range range = null;
-    System.out.printf ("Range: [%s]%n", text);
     Matcher m = functionPattern.matcher (text);
     while (m.find ())
     {
@@ -363,18 +376,32 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       range = new Range (fromAddress, toAddress);
     }
 
-    if (range == null)
-    {
-      m = addressList.matcher (text);
-      while (m.find ())
-      {
-        String[] cells = m.group (1).split (",");
-        range = new Range (cells);
-      }
+    if (range != null)
+      return range;
 
-      if (range == null)
-        System.out.println ("null range : " + text);
+    m = addressList.matcher (text);
+    while (m.find ())
+    {
+      String[] cells = m.group (1).split (",");
+      range = new Range (cells);
     }
+
+    if (range != null)
+      return range;
+
+    int pos = text.indexOf ("...");
+    if (pos > 0)
+    {
+      String from = text.substring (0, pos);
+      String to = text.substring (pos + 3);
+      Address fromAddress = new Address (from);
+      Address toAddress = new Address (to);
+      range = new Range (fromAddress, toAddress);
+    }
+
+    if (range != null)
+      return range;
+    System.out.println ("null range : " + text);
 
     return range;
   }
@@ -410,10 +437,13 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   public String getCells ()
   {
     StringBuilder text = new StringBuilder ();
-    //    String longLine = "%+++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    //        + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
-    String longLine = "                                                          "
-        + "                                                                      ";
+    String longLine;
+    if (false)
+      longLine = "%+++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+          + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    else
+      longLine = "                                                          "
+          + "                                                                      ";
 
     DecimalFormat nf = new DecimalFormat ("$#####0.00");
     //    NumberFormat nf = NumberFormat.getCurrencyInstance ();
@@ -451,7 +481,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       {
         if (format == 'I')
         {
-          String integerFormat = String.format ("%%%dd", colWidth);
+          String integerFormat = String.format ("%%%d.0f", colWidth);
           //          System.out.printf ("Integer format:%s%n", integerFormat);
           text.append (String.format (integerFormat, cell.getValue ()));
         }
@@ -461,11 +491,24 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
           //          System.out.printf ("Currency format:%s%n", currencyFormat);
           text.append (String.format (currencyFormat, nf.format (cell.getValue ())));
         }
+        else if (format == '*')
+        {
+          String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+          text.append (String.format (graphFormat, "********************"));
+        }
         else
         {
-          String numberFormat = String.format ("%%%d.0f", colWidth);
+          // this could be improved
+          String numberFormat = String.format ("%%%d.3f", colWidth + 4);
           //          System.out.printf ("Number format:%s%n", numberFormat);
-          text.append (String.format (numberFormat, cell.getValue ()));
+          String val = String.format (numberFormat, cell.getValue ());
+          while (val.endsWith ("0"))
+            val = ' ' + val.substring (0, val.length () - 1);
+          if (val.endsWith ("."))
+            val = ' ' + val.substring (0, val.length () - 1);
+          if (val.length () > colWidth)
+            val = val.substring (val.length () - colWidth);
+          text.append (val);
         }
       }
       else

@@ -29,6 +29,7 @@ class VisicalcCell implements Comparable<VisicalcCell>
 
   void doCommand (String command)
   {
+    //    System.out.printf ("Cell command:%s%n", command);
     switch (command.charAt (0))
     {
       case '/':
@@ -86,7 +87,30 @@ class VisicalcCell implements Comparable<VisicalcCell>
     double interim = 0.0;
 
     if (formula.startsWith ("@LOOKUP("))
+    {
+      int pos = formula.indexOf (',');
+      String sourceText = formula.substring (8, pos);
+      String rangeText = formula.substring (pos + 1, formula.length () - 1);
+      VisicalcCell source = parent.getCell (new Address (sourceText));
+      Range range = parent.getRange (rangeText);
+      //      System.out.printf ("lookup[%s][%s]%n", source, range);
+
+      Address target = null;
+      for (Address address : range)
+      {
+        //        System.out.printf ("%s %s%n", source, parent.getCell (address));
+        if (parent.getCell (address).value > source.value)
+          break;
+        target = address;
+      }
+      if (target != null)
+      {
+        value = parent.getCell (target.nextColumn ()).value;
+        valid = true;
+        return value;
+      }
       return result;
+    }
 
     Matcher m = cellContents.matcher (formula);
     while (m.find ())
@@ -151,7 +175,6 @@ class VisicalcCell implements Comparable<VisicalcCell>
         : ", Label: " + label : ", Rpeat: " + repeatingChar;
     String format = this.format == ' ' ? "" : ", Format: " + this.format;
     String width = this.width == 0 ? "" : ", Width: " + this.width;
-    //    String columnWidth = this.columnWidth == 0 ? "" : ", Col Width: " + this.columnWidth;
     return String.format ("[Cell:%5s%s%s%s]", address, format, width, value);
   }
 

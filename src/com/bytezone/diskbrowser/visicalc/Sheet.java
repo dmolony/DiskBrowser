@@ -18,7 +18,6 @@ public class Sheet implements Iterable<Cell>
   private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
   private final Map<String, Double> functions = new HashMap<String, Double> ();
 
-  final List<String> lines = new ArrayList<String> ();
   Cell currentCell = null;
   char defaultFormat;
 
@@ -138,11 +137,14 @@ public class Sheet implements Iterable<Cell>
       ;
 
     int ptr = 0;
-    while (ptr <= last)
+    final List<String> lines = new ArrayList<String> ();
+    while (ptr < last)
     {
-      int endPtr = findEndPtr (buffer, ptr);
-      add (HexFormatter.getString (buffer, ptr, endPtr - ptr));
-      ptr = endPtr + 1;
+      int length = getLineLength (buffer, ptr);
+      String line = HexFormatter.getString (buffer, ptr, length);
+      lines.add (line);
+      processLine (line);
+      ptr += length + 1;            // +1 for end-of-line token
     }
 
     if (true)
@@ -165,14 +167,15 @@ public class Sheet implements Iterable<Cell>
     }
   }
 
-  private int findEndPtr (byte[] buffer, int ptr)
+  private int getLineLength (byte[] buffer, int offset)
   {
-    while (buffer[ptr] != (byte) 0x8D)
+    int ptr = offset;
+    while (buffer[ptr] != (byte) 0x8D)        // end-of-line token
       ptr++;
-    return ptr;
+    return ptr - offset;
   }
 
-  private void add (String command)
+  private void processLine (String command)
   {
     // NB no closing bracket: [>K11:@SUM(J11...F11]
 
@@ -181,8 +184,6 @@ public class Sheet implements Iterable<Cell>
       System.out.println ("empty command");
       return;
     }
-
-    lines.add (command);
 
     if (command.startsWith (">"))                               // GOTO cell
     {

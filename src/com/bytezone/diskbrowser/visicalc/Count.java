@@ -18,7 +18,7 @@ public class Count
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell.hasValue () && cell.getValue () != 0.0)
+      if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
         result += 1;
     }
 

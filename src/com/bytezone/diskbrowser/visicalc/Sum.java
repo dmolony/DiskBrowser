@@ -16,7 +16,11 @@ public class Sum
     double result = 0;
 
     for (Address address : range)
-      result += parent.getCell (address).getValue ();
+    {
+      Cell cell = parent.getCell (address);
+      if (cell != null && cell.hasValue ())
+        result += cell.getValue ();
+    }
 
     return result;
   }

@@ -1,11 +1,11 @@
 package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
-import com.bytezone.diskbrowser.visicalc.VisicalcSpreadsheet;
+import com.bytezone.diskbrowser.visicalc.Sheet;
 
 public class VisicalcFile extends AbstractFile
 {
-  private VisicalcSpreadsheet sheet;
+  private Sheet sheet;
 
   public VisicalcFile (String name, byte[] buffer)
   {
@@ -16,7 +16,7 @@ public class VisicalcFile extends AbstractFile
   public String getText ()
   {
     if (sheet == null)
-      sheet = new VisicalcSpreadsheet (buffer);
+      sheet = new Sheet (buffer);
 
     StringBuilder text = new StringBuilder ();
 

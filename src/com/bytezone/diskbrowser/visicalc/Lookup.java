@@ -3,11 +3,11 @@ package com.bytezone.diskbrowser.visicalc;
 public class Lookup
 {
   Range range;
-  VisicalcCell source;
-  VisicalcSpreadsheet parent;
+  Cell source;
+  Sheet parent;
   boolean hasValue;
 
-  public Lookup (VisicalcSpreadsheet parent, String text)
+  public Lookup (Sheet parent, String text)
   {
     this.parent = parent;
 

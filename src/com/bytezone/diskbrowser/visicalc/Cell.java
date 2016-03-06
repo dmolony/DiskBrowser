@@ -3,25 +3,24 @@ package com.bytezone.diskbrowser.visicalc;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class VisicalcCell implements Comparable<VisicalcCell>
+class Cell implements Comparable<Cell>
 {
   private static final Pattern cellContents =
       Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
 
   final Address address;
-  private final VisicalcSpreadsheet parent;
+  private final Sheet parent;
 
   private String label;
   private double value;
   private String formula;
   private char format = ' ';
   private int width;
-  //  private int columnWidth;
   private char repeatingChar;
   private String repeat = "";
   private boolean valid;
 
-  public VisicalcCell (VisicalcSpreadsheet parent, Address address)
+  public Cell (Sheet parent, Address address)
   {
     this.parent = parent;
     this.address = address;
@@ -159,7 +158,7 @@ class VisicalcCell implements Comparable<VisicalcCell>
   }
 
   @Override
-  public int compareTo (VisicalcCell o)
+  public int compareTo (Cell o)
   {
     return address.compareTo (o.address);
   }

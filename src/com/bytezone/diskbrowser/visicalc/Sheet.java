@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
+public class Sheet implements Iterable<Cell>
 {
   private static final Pattern addressPattern =
       Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3}):");
@@ -15,11 +15,11 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
       .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
-  private final Map<Integer, VisicalcCell> sheet = new TreeMap<Integer, VisicalcCell> ();
+  private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
   private final Map<String, Double> functions = new HashMap<String, Double> ();
 
   final List<String> lines = new ArrayList<String> ();
-  VisicalcCell currentCell = null;
+  Cell currentCell = null;
   char defaultFormat;
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
@@ -131,7 +131,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   /-  REPEATING LABEL
   */
 
-  public VisicalcSpreadsheet (byte[] buffer)
+  public Sheet (byte[] buffer)
   {
     int last = buffer.length;
     while (buffer[--last] == 0)
@@ -154,7 +154,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
       System.out.println ();
       System.out.println ("Cells:");
-      for (VisicalcCell cell : sheet.values ())
+      for (Cell cell : sheet.values ())
         System.out.println (cell);
 
       System.out.println ();
@@ -196,7 +196,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
         if (currentCell == null)
         {
-          currentCell = new VisicalcCell (this, address);
+          currentCell = new Cell (this, address);
           if (!command.startsWith ("/GCC"))
             sheet.put (currentCell.address.sortValue, currentCell);
         }
@@ -286,51 +286,58 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     {
       return result;
     }
+
     if (function.startsWith ("@LOOKUP("))
     {
       return result;
     }
 
-    Range range = getRange (function);
-    if (range == null)
-      return result;
+    //    Range range = getRange (function);
+    //    if (range == null)
+    //      return result;
 
-    if (function.startsWith ("@SUM"))
+    if (function.startsWith ("@SUM("))
     {
-      for (Address address : range)
-        result += getValue (address);
+      //      for (Address address : range)
+      //        result += getValue (address);
+      String text = function.substring (4, function.length () - 1);
+      Sum sum = new Sum (this, text);
+      result = sum.getValue ();
     }
-    else if (function.startsWith ("@COUNT"))
+    else if (function.startsWith ("@COUNT("))
     {
-      int count = 0;
-      for (Address address : range)
-      {
-        VisicalcCell cell = getCell (address);
-        if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
-          ++count;
-      }
-      result = count;
+      //      int count = 0;
+      //      for (Address address : range)
+      //      {
+      //        VisicalcCell cell = getCell (address);
+      //        if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
+      //          ++count;
+      //      }
+      //      result = count;
+      String text = function.substring (7, function.length () - 1);
+      Count count = new Count (this, text);
+      result = count.getValue ();
     }
-    else if (function.startsWith ("@MIN"))
+    else if (function.startsWith ("@MIN("))
     {
-      double min = Double.MAX_VALUE;
-      for (Address address : range)
-        if (min > getValue (address))
-          min = getValue (address);
-      result = min;
+      //      double min = Double.MAX_VALUE;
+      //      for (Address address : range)
+      //        if (min > getValue (address))
+      //          min = getValue (address);
+      String text = function.substring (5, function.length () - 1);
+      Min min = new Min (this, text);
+      result = min.getValue ();
     }
-    else if (function.startsWith ("@MAX"))
+    else if (function.startsWith ("@MAX("))
     {
-      double max = Double.MIN_VALUE;
-      for (Address address : range)
-        if (max < getValue (address))
-          max = getValue (address);
-      result = max;
-    }
-    else if (function.startsWith ("@LOOKUP"))
-    {
-      System.out.println ("Unfinished: " + function);
-      result = 0;
+      //      double max = Double.MIN_VALUE;
+      //      for (Address address : range)
+      //        if (max < getValue (address))
+      //          max = getValue (address);
+      //      result = max;
+      String text = function.substring (5, function.length () - 1);
+      Max max = new Max (this, text);
+      result = max.getValue ();
     }
     else
       System.out.println ("Unimplemented function: " + function);
@@ -408,7 +415,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
 
   public double getValue (Address address)
   {
-    VisicalcCell cell = sheet.get (address.sortValue);
+    Cell cell = sheet.get (address.sortValue);
     return cell == null ? 0.0 : cell.getValue ();
   }
 
@@ -418,7 +425,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     return getValue (address);
   }
 
-  public VisicalcCell getCell (Address address)
+  public Cell getCell (Address address)
   {
     return sheet.get (address.sortValue);
   }
@@ -429,7 +436,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
   }
 
   @Override
-  public Iterator<VisicalcCell> iterator ()
+  public Iterator<Cell> iterator ()
   {
     return sheet.values ().iterator ();
   }
@@ -450,7 +457,7 @@ public class VisicalcSpreadsheet implements Iterable<VisicalcCell>
     int lastRow = 0;
     int lastColumn = 0;
 
-    for (VisicalcCell cell : sheet.values ())
+    for (Cell cell : sheet.values ())
     {
       while (lastRow < cell.address.row)
       {

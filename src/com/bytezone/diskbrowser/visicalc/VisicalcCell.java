@@ -88,28 +88,8 @@ class VisicalcCell implements Comparable<VisicalcCell>
 
     if (formula.startsWith ("@LOOKUP("))
     {
-      int pos = formula.indexOf (',');
-      String sourceText = formula.substring (8, pos);
-      String rangeText = formula.substring (pos + 1, formula.length () - 1);
-      VisicalcCell source = parent.getCell (new Address (sourceText));
-      Range range = parent.getRange (rangeText);
-      //      System.out.printf ("lookup[%s][%s]%n", source, range);
-
-      Address target = null;
-      for (Address address : range)
-      {
-        //        System.out.printf ("%s %s%n", source, parent.getCell (address));
-        if (parent.getCell (address).value > source.value)
-          break;
-        target = address;
-      }
-      if (target != null)
-      {
-        value = parent.getCell (target.nextColumn ()).value;
-        valid = true;
-        return value;
-      }
-      return result;
+      Lookup lookup = new Lookup (parent, formula);
+      return lookup.getValue ();
     }
 
     Matcher m = cellContents.matcher (formula);

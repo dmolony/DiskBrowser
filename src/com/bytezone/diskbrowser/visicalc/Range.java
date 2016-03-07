@@ -39,6 +39,20 @@ class Range implements Iterable<Address>
       range.add (new Address (s));
   }
 
+  boolean isHorizontal ()
+  {
+    Address first = range.get (0);
+    Address last = range.get (range.size () - 1);
+    return first.row == last.row;
+  }
+
+  boolean isVertical ()
+  {
+    Address first = range.get (0);
+    Address last = range.get (range.size () - 1);
+    return first.column == last.column;
+  }
+
   @Override
   public String toString ()
   {

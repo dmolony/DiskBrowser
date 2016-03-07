@@ -98,7 +98,12 @@ class Cell implements Comparable<Cell>
       char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
 
       if (m.group (3) != null)                                    // address
-        interim = parent.getValue (m.group (3));
+      {
+        Address address = new Address (m.group (3));
+        Cell cell = parent.getCell (address);
+        if (cell != null)
+          interim = cell.getValue ();
+      }
       else if (m.group (4) != null)                               // constant
         try
         {

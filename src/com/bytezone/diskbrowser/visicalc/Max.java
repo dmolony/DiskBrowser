@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Max
+public class Max extends Function
 {
   Range range;
   Sheet parent;
@@ -11,6 +11,7 @@ public class Max
     range = parent.getRange (text);
   }
 
+  @Override
   public double getValue ()
   {
     double max = Double.MIN_VALUE;

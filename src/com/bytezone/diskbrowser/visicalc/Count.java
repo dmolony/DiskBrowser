@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Count
+public class Count extends Function
 {
   Range range;
   Sheet parent;
@@ -11,6 +11,7 @@ public class Count
     range = parent.getRange (text);
   }
 
+  @Override
   public double getValue ()
   {
     double result = 0;

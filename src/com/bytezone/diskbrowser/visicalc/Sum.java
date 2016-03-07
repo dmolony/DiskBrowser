@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Sum
+public class Sum extends Function
 {
   Range range;
   Sheet parent;
@@ -11,6 +11,7 @@ public class Sum
     range = parent.getRange (text);
   }
 
+  @Override
   public double getValue ()
   {
     double result = 0;

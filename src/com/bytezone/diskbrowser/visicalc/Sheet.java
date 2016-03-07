@@ -251,7 +251,7 @@ public class Sheet implements Iterable<Cell>
           currentCell.doCommand (command);
       }
     }
-    else if (command.startsWith ("@"))
+    else if (command.startsWith ("@"))              // function
     {
       currentCell.doCommand (command);
     }
@@ -414,19 +414,19 @@ public class Sheet implements Iterable<Cell>
     return range;
   }
 
-  public double getValue (Address address)
+  private double getValue (Address address)
   {
     Cell cell = sheet.get (address.sortValue);
     return cell == null ? 0.0 : cell.getValue ();
   }
 
-  public double getValue (String cellName)
+  private double getValue (String cellName)
   {
     Address address = new Address (cellName);
     return getValue (address);
   }
 
-  public Cell getCell (Address address)
+  Cell getCell (Address address)
   {
     return sheet.get (address.sortValue);
   }

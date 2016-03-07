@@ -8,7 +8,7 @@ public class Sum extends Function
   public Sum (Sheet parent, String text)
   {
     this.parent = parent;
-    range = parent.getRange (text);
+    range = getRange (text);
   }
 
   @Override

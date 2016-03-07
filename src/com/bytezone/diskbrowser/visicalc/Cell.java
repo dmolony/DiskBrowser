@@ -14,6 +14,7 @@ class Cell implements Comparable<Cell>
   private String label;
   private double value;
   private String formula;
+
   private char format = ' ';
   private int width;
   private char repeatingChar;
@@ -114,7 +115,12 @@ class Cell implements Comparable<Cell>
           System.out.printf ("NFE: %s [%s]%n", m.group (4), formula);
         }
       else
-        interim = parent.evaluateFunction (m.group (5));         // function
+      {
+        //        interim = parent.evaluateFunction (m.group (5));         // function
+        Function function = Function.getInstance (parent, m.group (5));
+        if (function != null)
+          interim = function.getValue ();
+      }
 
       if (operator == '+')
         result += interim;
@@ -158,8 +164,9 @@ class Cell implements Comparable<Cell>
         ? formula == null ? ", Value: " + this.value : ", Formula: " + formula
         : ", Label: " + label : ", Rpeat: " + repeatingChar;
     String format = this.format == ' ' ? "" : ", Format: " + this.format;
-    String width = this.width == 0 ? "" : ", Width: " + this.width;
-    return String.format ("[Cell:%5s%s%s%s]", address, format, width, value);
+    //    String width = this.width == 0 ? "" : ", Width: " + this.width;
+    //    return String.format ("[Cell:%5s%s%s%s]", address, format, width, value);
+    return String.format ("[Cell:%5s%s%s]", address, format, value);
   }
 
   @Override

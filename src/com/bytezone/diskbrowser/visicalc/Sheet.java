@@ -11,9 +11,9 @@ public class Sheet implements Iterable<Cell>
 {
   private static final Pattern addressPattern =
       Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3}):");
-  private static final Pattern functionPattern = Pattern
-      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
-  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
+  //  private static final Pattern functionPattern = Pattern
+  //      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
+  //  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
   private final Map<String, Double> functions = new HashMap<String, Double> ();
@@ -275,156 +275,130 @@ public class Sheet implements Iterable<Cell>
       currentCell.doCommand (command);              // formula
   }
 
-  double evaluateFunction (String function)
-  {
-    if (functions.containsKey (function))
-      return functions.get (function);
+  //  private double evaluateFunction (String function)
+  //  {
+  //    if (functions.containsKey (function))
+  //      return functions.get (function);
+  //
+  //    //    System.out.println (function);
+  //    double result = 0;
+  //
+  //    if (function.startsWith ("@IF("))
+  //    {
+  //      return result;
+  //    }
+  //
+  //    if (function.startsWith ("@LOOKUP("))
+  //    {
+  //      return result;
+  //    }
+  //
+  //    //    Range range = getRange (function);
+  //    //    if (range == null)
+  //    //      return result;
+  //
+  //    if (function.startsWith ("@SUM("))
+  //    {
+  //      //      for (Address address : range)
+  //      //        result += getValue (address);
+  //      String text = function.substring (4, function.length () - 1);
+  //      Sum sum = new Sum (this, text);
+  //      result = sum.getValue ();
+  //    }
+  //    else if (function.startsWith ("@COUNT("))
+  //    {
+  //      //      int count = 0;
+  //      //      for (Address address : range)
+  //      //      {
+  //      //        VisicalcCell cell = getCell (address);
+  //      //        if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
+  //      //          ++count;
+  //      //      }
+  //      //      result = count;
+  //      String text = function.substring (7, function.length () - 1);
+  //      Count count = new Count (this, text);
+  //      result = count.getValue ();
+  //    }
+  //    else if (function.startsWith ("@MIN("))
+  //    {
+  //      //      double min = Double.MAX_VALUE;
+  //      //      for (Address address : range)
+  //      //        if (min > getValue (address))
+  //      //          min = getValue (address);
+  //      String text = function.substring (5, function.length () - 1);
+  //      Min min = new Min (this, text);
+  //      result = min.getValue ();
+  //    }
+  //    else if (function.startsWith ("@MAX("))
+  //    {
+  //      //      double max = Double.MIN_VALUE;
+  //      //      for (Address address : range)
+  //      //        if (max < getValue (address))
+  //      //          max = getValue (address);
+  //      //      result = max;
+  //      String text = function.substring (5, function.length () - 1);
+  //      Max max = new Max (this, text);
+  //      result = max.getValue ();
+  //    }
+  //    else
+  //      System.out.println ("Unimplemented function: " + function);
+  //
+  //    functions.put (function, result);
+  //    return result;
+  //  }
 
-    //    System.out.println (function);
-    double result = 0;
+  //  Range getRange (String text)
+  //  {
+  //    Range range = null;
+  //    Matcher m = functionPattern.matcher (text);
+  //    while (m.find ())
+  //    {
+  //      Address fromAddress = new Address (m.group (1), m.group (2));
+  //      Address toAddress = new Address (m.group (3), m.group (4));
+  //      range = new Range (fromAddress, toAddress);
+  //    }
+  //
+  //    if (range != null)
+  //      return range;
+  //
+  //    m = addressList.matcher (text);
+  //    while (m.find ())
+  //    {
+  //      String[] cells = m.group (1).split (",");
+  //      range = new Range (cells);
+  //    }
+  //
+  //    if (range != null)
+  //      return range;
+  //
+  //    int pos = text.indexOf ("...");
+  //    if (pos > 0)
+  //    {
+  //      String from = text.substring (0, pos);
+  //      String to = text.substring (pos + 3);
+  //      Address fromAddress = new Address (from);
+  //      Address toAddress = new Address (to);
+  //      range = new Range (fromAddress, toAddress);
+  //    }
+  //
+  //    if (range != null)
+  //      return range;
+  //    System.out.println ("null range : " + text);
+  //
+  //    return range;
+  //  }
 
-    if (function.startsWith ("@IF("))
-    {
-      return result;
-    }
+  //  private double getValue (Address address)
+  //  {
+  //    Cell cell = sheet.get (address.sortValue);
+  //    return cell == null ? 0.0 : cell.getValue ();
+  //  }
 
-    if (function.startsWith ("@LOOKUP("))
-    {
-      return result;
-    }
-
-    //    Range range = getRange (function);
-    //    if (range == null)
-    //      return result;
-
-    if (function.startsWith ("@SUM("))
-    {
-      //      for (Address address : range)
-      //        result += getValue (address);
-      String text = function.substring (4, function.length () - 1);
-      Sum sum = new Sum (this, text);
-      result = sum.getValue ();
-    }
-    else if (function.startsWith ("@COUNT("))
-    {
-      //      int count = 0;
-      //      for (Address address : range)
-      //      {
-      //        VisicalcCell cell = getCell (address);
-      //        if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
-      //          ++count;
-      //      }
-      //      result = count;
-      String text = function.substring (7, function.length () - 1);
-      Count count = new Count (this, text);
-      result = count.getValue ();
-    }
-    else if (function.startsWith ("@MIN("))
-    {
-      //      double min = Double.MAX_VALUE;
-      //      for (Address address : range)
-      //        if (min > getValue (address))
-      //          min = getValue (address);
-      String text = function.substring (5, function.length () - 1);
-      Min min = new Min (this, text);
-      result = min.getValue ();
-    }
-    else if (function.startsWith ("@MAX("))
-    {
-      //      double max = Double.MIN_VALUE;
-      //      for (Address address : range)
-      //        if (max < getValue (address))
-      //          max = getValue (address);
-      //      result = max;
-      String text = function.substring (5, function.length () - 1);
-      Max max = new Max (this, text);
-      result = max.getValue ();
-    }
-    else
-      System.out.println ("Unimplemented function: " + function);
-    // http://www.bricklin.com/history/refcard1.htm
-    // Functions:
-    //   @AVERAGE
-    //   @NPV
-    //   @LOOKUP(v,range)
-    //   @NA
-    //   @ERROR
-    //   @PI
-    //   @ABS
-    //   @INT
-    //   @EXP
-    //   @SQRT
-    //   @LN
-    //   @LOG10
-    //   @SIN
-    //   @ASIN
-    //   @COS
-    //   @ACOS
-    //   @TAN
-    //   @ATAN
-
-    // Unimplemented functions found so far:
-    //  @IF
-    //  @ISERROR
-    //  @OR
-    //  @AND
-
-    functions.put (function, result);
-    return result;
-  }
-
-  Range getRange (String text)
-  {
-    Range range = null;
-    Matcher m = functionPattern.matcher (text);
-    while (m.find ())
-    {
-      Address fromAddress = new Address (m.group (1), m.group (2));
-      Address toAddress = new Address (m.group (3), m.group (4));
-      range = new Range (fromAddress, toAddress);
-    }
-
-    if (range != null)
-      return range;
-
-    m = addressList.matcher (text);
-    while (m.find ())
-    {
-      String[] cells = m.group (1).split (",");
-      range = new Range (cells);
-    }
-
-    if (range != null)
-      return range;
-
-    int pos = text.indexOf ("...");
-    if (pos > 0)
-    {
-      String from = text.substring (0, pos);
-      String to = text.substring (pos + 3);
-      Address fromAddress = new Address (from);
-      Address toAddress = new Address (to);
-      range = new Range (fromAddress, toAddress);
-    }
-
-    if (range != null)
-      return range;
-    System.out.println ("null range : " + text);
-
-    return range;
-  }
-
-  private double getValue (Address address)
-  {
-    Cell cell = sheet.get (address.sortValue);
-    return cell == null ? 0.0 : cell.getValue ();
-  }
-
-  private double getValue (String cellName)
-  {
-    Address address = new Address (cellName);
-    return getValue (address);
-  }
+  //  private double getValue (String cellName)
+  //  {
+  //    Address address = new Address (cellName);
+  //    return getValue (address);
+  //  }
 
   Cell getCell (Address address)
   {

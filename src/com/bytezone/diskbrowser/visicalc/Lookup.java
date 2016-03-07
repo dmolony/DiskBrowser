@@ -29,7 +29,7 @@ public class Lookup extends Function
   {
     // source could be a formula - @LOOKUP(.2*K8+K7,H3...H16)
     source = parent.getCell (new Address (sourceText));
-    range = parent.getRange (rangeText);
+    range = getRange (rangeText);
 
     Address target = null;
     for (Address address : range)

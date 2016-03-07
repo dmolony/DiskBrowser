@@ -8,7 +8,7 @@ public class Max extends Function
   public Max (Sheet parent, String text)
   {
     this.parent = parent;
-    range = parent.getRange (text);
+    range = getRange (text);
   }
 
   @Override

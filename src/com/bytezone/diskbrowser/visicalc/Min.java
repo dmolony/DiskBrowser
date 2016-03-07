@@ -8,7 +8,7 @@ public class Min extends Function
   public Min (Sheet parent, String text)
   {
     this.parent = parent;
-    range = parent.getRange (text);
+    range = getRange (text);
   }
 
   @Override

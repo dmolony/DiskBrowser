@@ -33,11 +33,29 @@ public class Expression
     this.parent = parent;
     String text = input.trim ();
 
+    System.out.printf ("New expression:[%s]%n", input);
     char firstChar = text.charAt (0);
     if (firstChar == '-')
     {
-      operator = '-';
-      expression1 = new Expression (parent, text.substring (1));
+      char secondChar = text.charAt (1);
+      if ((secondChar >= '0' && secondChar <= '9') || secondChar == '.')
+      {
+        String text2 = text.substring (1);
+        String numberText = getNumberText (text2);
+        char op = getOperator (numberText, text2);
+        if (op == ' ')
+        {
+          value = Double.parseDouble (numberText) * -1;
+          hasValue = true;
+        }
+        else
+          expression1 = new Expression (parent, "-" + numberText);
+      }
+      else
+      {
+        operator = '-';
+        expression1 = new Expression (parent, text.substring (1));
+      }
     }
     else if (firstChar == '=' || firstChar == '+')
     {
@@ -49,8 +67,6 @@ public class Expression
       char op = getOperator (functionText, text);
       if (op == ' ')
         function = Function.getInstance (parent, functionText);
-      else if (op != '!')
-        setExpressions (functionText, op, text);
     }
     else if (firstChar == '(')
     {
@@ -59,8 +75,6 @@ public class Expression
       if (op == ' ')
         expression1 =
             new Expression (parent, bracketText.substring (1, bracketText.length () - 2));
-      else if (op != '!')
-        setExpressions (bracketText, op, text);
     }
     else if ((firstChar >= '0' && firstChar <= '9') || firstChar == '.')
     {
@@ -71,8 +85,6 @@ public class Expression
         value = Double.parseDouble (numberText);
         hasValue = true;
       }
-      else if (op != '!')
-        setExpressions (numberText, op, text);
     }
     else if (firstChar >= 'A' && firstChar <= 'Z')
     {
@@ -80,18 +92,28 @@ public class Expression
       char op = getOperator (addressText, text);
       if (op == ' ')
         address = new Address (addressText);
-      else if (op != '!')
-        setExpressions (addressText, op, text);
     }
     else
       System.out.printf ("Error processing [%s]%n", text);
   }
 
-  private void setExpressions (String text1, char op, String text2)
+  private char getOperator (String text1, String text2)
   {
-    expression1 = new Expression (parent, text1);
-    operator = op;
-    expression2 = new Expression (parent, text2.substring (text1.length () + 2));
+    if (text1.length () == text2.length ())
+      return ' ';
+
+    char op = text2.charAt (text1.length ());
+    if (op == '+' || op == '-' || op == '*' || op == '/' || op == '^')
+    {
+      expression1 = new Expression (parent, text1);
+      operator = op;
+      expression2 = new Expression (parent, text2.substring (text1.length () + 1));
+      return op;
+    }
+
+    System.out.println ("error");
+    // error
+    return '!';
   }
 
   double getValue ()
@@ -103,7 +125,13 @@ public class Expression
       return function.getValue ();
 
     if (address != null)
-      return parent.getCell (address).getValue ();
+    {
+      Cell cell = parent.getCell (address);
+      if (cell != null)
+        return parent.getCell (address).getValue ();
+      System.out.println ("Error with address");
+      return 0;
+    }
 
     if (expression2 == null)
     {
@@ -174,19 +202,25 @@ public class Expression
     return text.substring (0, ptr);
   }
 
-  private char getOperator (String text1, String text2)
+  @Override
+  public String toString ()
   {
-    if (text1.length () == text2.length ())
-      return ' ';
+    StringBuilder text = new StringBuilder ();
 
-    char c = text2.charAt (text1.length ());
-    if (c == '+' || c == '-' || c == '*' || c == '/' || c == '^')
-    {
-      setExpressions (text1, c, text2);
-      return c;
-    }
+    text.append (String.format ("Has value ......... %s%n", hasValue));
+    text.append (String.format ("Value ............. %f%n", value));
+    text.append (String.format ("Function .......... %s%n", function));
+    text.append (String.format ("Address ........... %s%n", address));
+    text.append (String.format ("Operator .......... %s%n", operator));
+    text.append (String.format ("Expression1 ....... %s%n", expression1));
+    text.append (String.format ("Expression2 ....... %s%n", expression2));
 
-    // error
-    return '!';
+    return text.toString ();
+  }
+
+  public static void main (String[] args)
+  {
+    Expression ex = new Expression (null, "-5+12-6");
+    System.out.println (ex.getValue ());
   }
 }

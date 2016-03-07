@@ -8,7 +8,7 @@ public class Count extends Function
   public Count (Sheet parent, String text)
   {
     this.parent = parent;
-    range = parent.getRange (text);
+    range = getRange (text);
   }
 
   @Override

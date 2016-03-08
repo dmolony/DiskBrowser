@@ -1,7 +1,11 @@
 package com.bytezone.diskbrowser.visicalc;
 
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,20 +13,23 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class Sheet implements Iterable<Cell>
 {
+  private static char[] tokens = { '"', '@', '+' };    // label, function, formula/value
   private static final Pattern addressPattern =
-      Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3}):");
+      Pattern.compile ("([AB]?[A-Z])([0-9]{1,3}):");
   //  private static final Pattern functionPattern = Pattern
   //      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
   //  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
-  private final Map<String, Double> functions = new HashMap<String, Double> ();
+  //  private final Map<String, Double> functions = new HashMap<String, Double> ();
 
   Cell currentCell = null;
   char defaultFormat;
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
-  int columnWidth = 12;
+  private int columnWidth = 12;
+  private char recalculation = ' ';
+  private char recalculationOrder = ' ';
 
   // Maximum cell = BK254
 
@@ -49,9 +56,9 @@ public class Sheet implements Iterable<Cell>
   //  /GF$            Global Format Currency
   //  /GC             Global Column <width>
   //  /GR             Global 
-  //  /GRA
+  //  /GRA            Recalculation Auto
   //  /GO             Global 
-  //  /GOC
+  //  /GOC            Calculation Order - Columns first
 
   //  /T              Titles (HVBN)
   //  /TH             fix Horizontal Titles
@@ -175,230 +182,127 @@ public class Sheet implements Iterable<Cell>
     return ptr - offset;
   }
 
-  private void processLine (String command)
+  private void processLine (String line)
   {
     // NB no closing bracket: [>K11:@SUM(J11...F11]
 
-    if (command.isEmpty ())
+    // >B10:/F$+B4+B7+B8+B9
+    // >F2:/FR"INCOME
+
+    if (line.isEmpty ())
     {
       System.out.println ("empty command");
       return;
     }
 
-    if (command.startsWith (">"))                               // GOTO cell
+    if (line.startsWith ("/"))
     {
-      Matcher m = addressPattern.matcher (command);
-      if (m.find ())
+      switch (line.charAt (1))
       {
-        Address address = new Address (m.group (1), m.group (2));
-        currentCell = sheet.get (address.sortValue);
-        int pos = command.indexOf (':');                        // end of cell address
-        command = command.substring (pos + 1);
-
-        if (currentCell == null)
-        {
-          currentCell = new Cell (this, address);
-          if (!command.startsWith ("/GCC"))
-            sheet.put (currentCell.address.sortValue, currentCell);
-        }
-      }
-      else
-        System.out.printf ("Invalid cell address: %s%n", command);
-    }
-
-    if (command.startsWith ("/"))                               // command
-    {
-      String data = command.substring (1);
-      char subCommand = command.charAt (1);
-      switch (subCommand)
-      {
-        case 'W':           // Window control
-          //          System.out.println ("  Window command: " + data);
+        case 'W':
+          System.out.printf ("Skipping [%s]%n", line);
           break;
-
-        case 'G':           // Global command
-          //          System.out.println ("  Global command: " + data);
-          try
+        case 'G':
+          switch (line.charAt (2))
           {
-            if (data.charAt (1) == 'C')
-            {
-              if (data.charAt (2) == 'C')
-              {
-                int width = Integer.parseInt (data.substring (3));
-                int column = currentCell.address.column;
-                columnWidths.put (column, width);
-              }
-              else
-                columnWidth = Integer.parseInt (data.substring (2));
-            }
-            else if (data.charAt (1) == 'F')
-              defaultFormat = data.charAt (2);
-          }
-          catch (NumberFormatException e)
-          {
-            System.out.printf ("NFE: %s%n", data.substring (2));
+            case 'R':
+              recalculation = line.charAt (3);
+              break;
+            case 'O':
+              recalculationOrder = line.charAt (3);
+              break;
+            case 'P':
+              System.out.printf ("Skipping [%s]%n", line);
+              break;
+            case 'C':
+              columnWidth = Integer.parseInt (line.substring (3));
+              break;
           }
           break;
-
-        case 'T':             // Set title area
-          //          System.out.println ("  Title command: " + data);
+        case 'X':
+          System.out.printf ("Skipping [%s]%n", line);
           break;
-
-        case 'X':             // Position cursor?
-          break;
-
         default:
-          currentCell.doCommand (command);
+          System.out.printf ("Skipping [%s]%n", line);
       }
+      return;
     }
-    else if (command.startsWith ("@"))              // function
+
+    if (!line.startsWith (">"))                               // GOTO cell
     {
-      currentCell.doCommand (command);
+      System.out.printf ("Error [%s]%n", line);
+      return;
     }
-    else if (command.startsWith ("\""))
+
+    currentCell = null;
+
+    Matcher m = addressPattern.matcher (line);
+    if (m.find ())
     {
-      currentCell.doCommand (command);
-    }
-    else if (command.startsWith ("+"))
-    {
-      currentCell.doCommand (command);
-    }
-    else if (command.matches ("^[0-9.]+$"))         // value
-    {
-      currentCell.doCommand (command);
-    }
-    else if (command.matches ("^[-A-Z]+$"))         // label
-    {
-      currentCell.doCommand (command);
+      Address address = new Address (m.group (1), m.group (2));
+      currentCell = sheet.get (address.sortValue);
+
+      int pos = line.indexOf (':');                     // end of cell address
+      line = line.substring (pos + 1);                  // remove address from line
+
+      if (currentCell == null)
+      {
+        currentCell = new Cell (this, address);
+        if (!line.startsWith ("/G"))
+          sheet.put (currentCell.address.sortValue, currentCell);
+      }
     }
     else
-      currentCell.doCommand (command);              // formula
+    {
+      System.out.printf ("Invalid cell address: %s%n", line);
+      return;
+    }
+
+    assert currentCell != null;
+
+    if (line.startsWith ("/G"))               // global column widths
+    {
+      if (line.charAt (2) == 'C' && line.charAt (3) == 'C')
+      {
+        int width = Integer.parseInt (line.substring (4));
+        columnWidths.put (currentCell.address.column, width);
+      }
+      else
+        System.out.printf ("Unknown Global:[%s]%n", line);
+
+      return;
+    }
+
+    // check for formatting commands before a token
+    String command = "";
+    if (line.startsWith ("/"))
+    {
+      for (char token : tokens)
+      {
+        int pos = line.indexOf (token);
+        if (pos > 0)
+        {
+          command = line.substring (0, pos);
+          line = line.substring (pos);
+          break;
+        }
+      }
+
+      if (line.startsWith ("/"))        // no token found
+      {
+        command = line;
+        line = "";
+      }
+    }
+
+    if (true)
+      System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, command, line);
+
+    if (!command.isEmpty ())
+      currentCell.format (command);        // formatting command
+    if (!line.isEmpty ())
+      currentCell.doCommand (line);           // expression
   }
-
-  //  private double evaluateFunction (String function)
-  //  {
-  //    if (functions.containsKey (function))
-  //      return functions.get (function);
-  //
-  //    //    System.out.println (function);
-  //    double result = 0;
-  //
-  //    if (function.startsWith ("@IF("))
-  //    {
-  //      return result;
-  //    }
-  //
-  //    if (function.startsWith ("@LOOKUP("))
-  //    {
-  //      return result;
-  //    }
-  //
-  //    //    Range range = getRange (function);
-  //    //    if (range == null)
-  //    //      return result;
-  //
-  //    if (function.startsWith ("@SUM("))
-  //    {
-  //      //      for (Address address : range)
-  //      //        result += getValue (address);
-  //      String text = function.substring (4, function.length () - 1);
-  //      Sum sum = new Sum (this, text);
-  //      result = sum.getValue ();
-  //    }
-  //    else if (function.startsWith ("@COUNT("))
-  //    {
-  //      //      int count = 0;
-  //      //      for (Address address : range)
-  //      //      {
-  //      //        VisicalcCell cell = getCell (address);
-  //      //        if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
-  //      //          ++count;
-  //      //      }
-  //      //      result = count;
-  //      String text = function.substring (7, function.length () - 1);
-  //      Count count = new Count (this, text);
-  //      result = count.getValue ();
-  //    }
-  //    else if (function.startsWith ("@MIN("))
-  //    {
-  //      //      double min = Double.MAX_VALUE;
-  //      //      for (Address address : range)
-  //      //        if (min > getValue (address))
-  //      //          min = getValue (address);
-  //      String text = function.substring (5, function.length () - 1);
-  //      Min min = new Min (this, text);
-  //      result = min.getValue ();
-  //    }
-  //    else if (function.startsWith ("@MAX("))
-  //    {
-  //      //      double max = Double.MIN_VALUE;
-  //      //      for (Address address : range)
-  //      //        if (max < getValue (address))
-  //      //          max = getValue (address);
-  //      //      result = max;
-  //      String text = function.substring (5, function.length () - 1);
-  //      Max max = new Max (this, text);
-  //      result = max.getValue ();
-  //    }
-  //    else
-  //      System.out.println ("Unimplemented function: " + function);
-  //
-  //    functions.put (function, result);
-  //    return result;
-  //  }
-
-  //  Range getRange (String text)
-  //  {
-  //    Range range = null;
-  //    Matcher m = functionPattern.matcher (text);
-  //    while (m.find ())
-  //    {
-  //      Address fromAddress = new Address (m.group (1), m.group (2));
-  //      Address toAddress = new Address (m.group (3), m.group (4));
-  //      range = new Range (fromAddress, toAddress);
-  //    }
-  //
-  //    if (range != null)
-  //      return range;
-  //
-  //    m = addressList.matcher (text);
-  //    while (m.find ())
-  //    {
-  //      String[] cells = m.group (1).split (",");
-  //      range = new Range (cells);
-  //    }
-  //
-  //    if (range != null)
-  //      return range;
-  //
-  //    int pos = text.indexOf ("...");
-  //    if (pos > 0)
-  //    {
-  //      String from = text.substring (0, pos);
-  //      String to = text.substring (pos + 3);
-  //      Address fromAddress = new Address (from);
-  //      Address toAddress = new Address (to);
-  //      range = new Range (fromAddress, toAddress);
-  //    }
-  //
-  //    if (range != null)
-  //      return range;
-  //    System.out.println ("null range : " + text);
-  //
-  //    return range;
-  //  }
-
-  //  private double getValue (Address address)
-  //  {
-  //    Cell cell = sheet.get (address.sortValue);
-  //    return cell == null ? 0.0 : cell.getValue ();
-  //  }
-
-  //  private double getValue (String cellName)
-  //  {
-  //    Address address = new Address (cellName);
-  //    return getValue (address);
-  //  }
 
   Cell getCell (Address address)
   {

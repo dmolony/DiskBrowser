@@ -13,10 +13,9 @@ class Cell implements Comparable<Cell>
 
   private String label;
   private double value;
-  private String formula;
+  private String formulaText;
 
   private char format = ' ';
-  private int width;
   private char repeatingChar;
   private String repeat = "";
   private boolean valid;
@@ -27,35 +26,31 @@ class Cell implements Comparable<Cell>
     this.address = address;
   }
 
+  void format (String format)
+  {
+    //  /FG - general
+    //  /FD - default
+    //  /FI - integer
+    //  /F$ - dollars and cents
+    //  /FL - left justified
+    //  /FR - right justified
+    //  /F* - graph
+    if (format.startsWith ("/F"))
+      this.format = format.charAt (2);
+    else if (format.startsWith ("/-"))
+    {
+      repeatingChar = format.charAt (2);
+      for (int i = 0; i < 20; i++)
+        repeat += repeatingChar;
+    }
+    else
+      System.out.printf ("Unexpected format [%s]%n", format);
+  }
+
   void doCommand (String command)
   {
-    //    System.out.printf ("Cell command:%s%n", command);
     switch (command.charAt (0))
     {
-      case '/':
-        if (command.charAt (1) == 'F')                // format cell
-        {
-          //  /FG - general
-          //  /FD - default
-          //  /FI - integer
-          //  /F$ - dollars and cents
-          //  /FL - left justified
-          //  /FR - right justified
-          //  /F* - graph
-          format = command.charAt (2);
-          if (command.length () > 3 && command.charAt (3) == '"')
-            label = command.substring (4);
-        }
-        else if (command.charAt (1) == '-')           // repeating label
-        {
-          repeatingChar = command.charAt (2);
-          for (int i = 0; i < 20; i++)
-            repeat += repeatingChar;
-        }
-        else
-          System.out.println ("Unknown command: " + command);
-        break;
-
       case '"':
         label = command.substring (1);
         break;
@@ -64,7 +59,7 @@ class Cell implements Comparable<Cell>
         if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
           this.value = Float.parseFloat (command);
         else
-          formula = command;
+          formulaText = command;
     }
   }
 
@@ -80,19 +75,30 @@ class Cell implements Comparable<Cell>
 
   double getValue ()
   {
-    if (valid || formula == null)
+    if (valid || formulaText == null)
       return value;
 
     double result = 0.0;
     double interim = 0.0;
 
-    if (formula.startsWith ("@LOOKUP("))
+    if (formulaText.startsWith ("@LOOKUP("))
     {
-      Lookup lookup = new Lookup (parent, formula);
+      Lookup lookup = new Lookup (parent, formulaText);
       return lookup.getValue ();
     }
 
-    Matcher m = cellContents.matcher (formula);
+    System.out.printf ("Matching:[%s]%n", formulaText);
+    // [@IF(@ISERROR(BK24),0,BK24)]
+    // [@IF(D4=0,0,1)]
+    // [@IF(D4=0,0,B32+1)]
+    // [@IF(D4=0,0,1+(D3/100/D4)^D4-1*100)]
+    // [@SUM(C4...F4)]
+    // [+C4-@SUM(C5...C12)]
+    // [+D5/100/12]
+    // [.3*(B4+B7+B8+B9)]
+    // [+N12+(P12*(.2*K12+K9-O12))]
+
+    Matcher m = cellContents.matcher (formulaText);
     while (m.find ())
     {
       valid = true;
@@ -112,7 +118,7 @@ class Cell implements Comparable<Cell>
         }
         catch (NumberFormatException e)
         {
-          System.out.printf ("NFE: %s [%s]%n", m.group (4), formula);
+          System.out.printf ("NFE: %s [%s]%n", m.group (4), formulaText);
         }
       else
       {
@@ -138,7 +144,7 @@ class Cell implements Comparable<Cell>
       return result;
     }
 
-    System.out.println ("?? " + formula);
+    System.out.println ("?? " + formulaText);
 
     return value;
   }
@@ -149,24 +155,22 @@ class Cell implements Comparable<Cell>
       return label;
     if (repeatingChar > 0)
       return repeat;
-    if (formula != null)
-      if (formula.length () >= 12)
-        return formula.substring (0, 12);
+    if (formulaText != null)
+      if (formulaText.length () >= 12)
+        return formulaText.substring (0, 12);
       else
-        return formula;
+        return formulaText;
     return value + "";
   }
 
   @Override
   public String toString ()
   {
-    String value = repeatingChar == 0 ? label == null
-        ? formula == null ? ", Value: " + this.value : ", Formula: " + formula
-        : ", Label: " + label : ", Rpeat: " + repeatingChar;
-    String format = this.format == ' ' ? "" : ", Format: " + this.format;
-    //    String width = this.width == 0 ? "" : ", Width: " + this.width;
-    //    return String.format ("[Cell:%5s%s%s%s]", address, format, width, value);
-    return String.format ("[Cell:%5s%s%s]", address, format, value);
+    String value = repeatingChar == 0
+        ? label == null ? formulaText == null ? ", Value  : " + this.value
+            : ", Formula: " + formulaText : ", Label  : " + label
+        : ", Repeat : " + repeatingChar;
+    return String.format ("[Cell:%5s %-2s%s]", address, format, value);
   }
 
   @Override

@@ -29,14 +29,21 @@ public class Lookup extends Function
   {
     // source could be a formula - @LOOKUP(.2*K8+K7,H3...H16)
     source = parent.getCell (new Address (sourceText));
+    if (source == null)
+    {
+      System.out.println ("Null source:" + sourceText);
+      return 0;
+    }
+
+    double sourceValue = source.getValue ();
     range = getRange (rangeText);
 
     Address target = null;
     for (Address address : range)
     {
-      System.out.printf ("%s : %s%n", source, address);
+      //      System.out.printf ("%s : %s%n", source, address);
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.getValue () > source.getValue ())
+      if (cell != null && cell.getValue () > sourceValue)
         break;
       target = address;
     }

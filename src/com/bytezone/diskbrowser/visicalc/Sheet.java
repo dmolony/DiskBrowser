@@ -30,6 +30,8 @@ public class Sheet implements Iterable<Cell>
   private int columnWidth = 12;
   private char recalculation = ' ';
   private char recalculationOrder = ' ';
+  private int columns;
+  private int rows;
 
   // Maximum cell = BK254
 
@@ -249,7 +251,13 @@ public class Sheet implements Iterable<Cell>
       {
         currentCell = new Cell (this, address);
         if (!line.startsWith ("/G"))
+        {
           sheet.put (currentCell.address.sortValue, currentCell);
+          if (address.row > rows)
+            rows = address.row;
+          if (address.column > columns)
+            columns = address.column;
+        }
       }
     }
     else
@@ -306,7 +314,13 @@ public class Sheet implements Iterable<Cell>
 
   Cell getCell (Address address)
   {
-    return sheet.get (address.sortValue);
+    Cell cell = sheet.get (address.sortValue);
+    if (cell == null)
+    {
+      cell = new Cell (this, address);
+      sheet.put (address.sortValue, cell);
+    }
+    return cell;
   }
 
   public int size ()
@@ -333,16 +347,38 @@ public class Sheet implements Iterable<Cell>
 
     DecimalFormat nf = new DecimalFormat ("$#####0.00");
     //    NumberFormat nf = NumberFormat.getCurrencyInstance ();
-    int lastRow = 0;
+    int lastRow = -1;
     int lastColumn = 0;
+
+    StringBuilder heading = new StringBuilder ("    ");
+    for (int cellNo = 0; cellNo <= columns; cellNo++)
+    {
+      int width = columnWidth;
+      if (columnWidths.containsKey (cellNo))
+        width = columnWidths.get (cellNo);
+
+      if (width == 1)
+      {
+        heading.append ("=");
+      }
+      else
+      {
+        char letter1 = cellNo < 26 ? ' ' : cellNo < 676 ? 'A' : 'B';
+        char letter2 = (char) ((cellNo % 26) + 'A');
+        String fmt =
+            String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
+        heading.append (String.format (fmt, "--------------------------------------"));
+      }
+    }
+    text.append (heading);
 
     for (Cell cell : sheet.values ())
     {
       while (lastRow < cell.address.row)
       {
-        text.append ("\n");
         ++lastRow;
         lastColumn = 0;
+        text.append (String.format ("%n%03d:", lastRow + 1));
       }
 
       while (lastColumn < cell.address.column)
@@ -363,6 +399,7 @@ public class Sheet implements Iterable<Cell>
       if (format == ' ')
         format = defaultFormat;
 
+      //      System.out.println (cell.address);
       if (cell.hasValue ())
       {
         if (format == 'I')
@@ -403,13 +440,13 @@ public class Sheet implements Iterable<Cell>
         {
           String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
           //          System.out.printf ("Label format:%s%n", labelFormat);
-          text.append (String.format (labelFormat, cell.value ()));
+          text.append (String.format (labelFormat, cell.getText ()));
         }
         else
         {
           String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
           //          System.out.printf ("Label format:%s%n", labelFormat);
-          text.append (String.format (labelFormat, cell.value ()));
+          text.append (String.format (labelFormat, cell.getText ()));
         }
       }
     }

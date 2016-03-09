@@ -3,19 +3,21 @@ package com.bytezone.diskbrowser.visicalc;
 public class Lookup extends Function
 {
   Range range;
-  Cell source;
-  Sheet parent;
   boolean hasValue;
   String sourceText;
   String rangeText;
+  Expression source;
 
   public Lookup (Sheet parent, String text)
   {
-    this.parent = parent;
+    super (parent, text);
 
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);
     rangeText = text.substring (pos + 1, text.length () - 1);
+
+    source = new Expression (parent, sourceText);
+    range = getRange (rangeText);
   }
 
   // need a mechanism to return NA and ERROR
@@ -27,16 +29,7 @@ public class Lookup extends Function
   @Override
   public double getValue ()
   {
-    // source could be a formula - @LOOKUP(.2*K8+K7,H3...H16)
-    source = parent.getCell (new Address (sourceText));
-    if (source == null)
-    {
-      System.out.println ("Null source:" + sourceText);
-      return 0;
-    }
-
     double sourceValue = source.getValue ();
-    range = getRange (rangeText);
 
     Address target = null;
     for (Address address : range)

@@ -73,7 +73,7 @@ class Address implements Comparable<Address>
   @Override
   public String toString ()
   {
-    return String.format ("%-4s %3d %3d", text, row, column);
+    return String.format ("%-4s %3d %3d %4d", text, row, column, sortValue);
   }
 
   @Override

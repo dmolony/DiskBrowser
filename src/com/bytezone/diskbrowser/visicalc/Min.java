@@ -3,11 +3,11 @@ package com.bytezone.diskbrowser.visicalc;
 public class Min extends Function
 {
   Range range;
-  Sheet parent;
 
   public Min (Sheet parent, String text)
   {
-    this.parent = parent;
+    super (parent, text);
+
     range = getRange (text);
   }
 

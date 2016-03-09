@@ -3,11 +3,10 @@ package com.bytezone.diskbrowser.visicalc;
 public class Sum extends Function
 {
   Range range;
-  Sheet parent;
 
   public Sum (Sheet parent, String text)
   {
-    this.parent = parent;
+    super (parent, text);
     range = getRange (text);
   }
 

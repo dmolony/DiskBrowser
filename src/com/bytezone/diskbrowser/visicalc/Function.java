@@ -30,11 +30,14 @@ import java.util.regex.Pattern;
 // @OR
 // @AND
 
-public abstract class Function
+public abstract class Function implements Value
 {
   private static final Pattern functionPattern = Pattern
       .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
+
+  Sheet parent;
+  String text;
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -53,11 +56,18 @@ public abstract class Function
     if (text.startsWith ("@SUM("))
       return new Sum (parent, text);
 
+    if (text.startsWith ("@IF("))
+      return new If (parent, text);
+
     System.out.printf ("Unknown function: %s%n", text);
-    return null;
+    return new Error (parent, "@ERROR()");
   }
 
-  abstract double getValue ();
+  public Function (Sheet parent, String text)
+  {
+    this.parent = parent;
+    this.text = text;
+  }
 
   Range getRange (String text)
   {
@@ -98,5 +108,11 @@ public abstract class Function
     System.out.println ("null range : " + text);
 
     return range;
+  }
+
+  @Override
+  public String toString ()
+  {
+    return String.format ("Function: %s", text);
   }
 }

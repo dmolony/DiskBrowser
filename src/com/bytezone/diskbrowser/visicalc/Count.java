@@ -3,11 +3,10 @@ package com.bytezone.diskbrowser.visicalc;
 public class Count extends Function
 {
   Range range;
-  Sheet parent;
 
   public Count (Sheet parent, String text)
   {
-    this.parent = parent;
+    super (parent, text);
     range = getRange (text);
   }
 

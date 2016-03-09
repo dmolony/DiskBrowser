@@ -1,24 +1,24 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-class Cell implements Comparable<Cell>
+class Cell implements Comparable<Cell>, Value
 {
-  private static final Pattern cellContents =
-      Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
+  //  private static final Pattern cellContents =
+  //      Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
 
   final Address address;
   private final Sheet parent;
 
   private String label;
-  private double value;
-  private String formulaText;
+  //  private double value;
+  //  private String formulaText;
 
   private char format = ' ';
   private char repeatingChar;
   private String repeat = "";
-  private boolean valid;
+  //  private boolean valid;
+
+  private String expressionText;
+  private Expression expression;
 
   public Cell (Sheet parent, Address address)
   {
@@ -56,16 +56,23 @@ class Cell implements Comparable<Cell>
         break;
 
       default:
-        if (command.matches ("^[0-9.]+$"))         // contains only numbers or .
-          this.value = Float.parseFloat (command);
-        else
-          formulaText = command;
+        expressionText = command;
     }
+
+    // FUTURE.VC
+    if (address.sortValue == 67)
+      expressionText = "50";
+    if (address.sortValue == 131)
+      expressionText = ".04";
+    if (address.sortValue == 195)
+      expressionText = "12";
+    if (address.sortValue == 259)
+      expressionText = "5";
   }
 
   boolean hasValue ()
   {
-    return label == null && repeatingChar == 0;
+    return expressionText != null;
   }
 
   char getFormat ()
@@ -73,21 +80,34 @@ class Cell implements Comparable<Cell>
     return format;
   }
 
-  double getValue ()
+  String getText ()
   {
-    if (valid || formulaText == null)
-      return value;
+    if (label != null)
+      return label;
+    if (repeatingChar > 0)
+      return repeat;
+    return "bollocks";
+  }
 
-    double result = 0.0;
-    double interim = 0.0;
-
-    if (formulaText.startsWith ("@LOOKUP("))
-    {
-      Lookup lookup = new Lookup (parent, formulaText);
-      return lookup.getValue ();
-    }
-
-    System.out.printf ("Matching:[%s]%n", formulaText);
+  @Override
+  public double getValue ()
+  {
+    if (expression == null)
+      expression = new Expression (parent, expressionText);
+    return expression.getValue ();
+    //    if (valid || formulaText == null)
+    //      return value;
+    //
+    //    double result = 0.0;
+    //    double interim = 0.0;
+    //
+    //    if (formulaText.startsWith ("@LOOKUP("))
+    //    {
+    //      Lookup lookup = new Lookup (parent, formulaText);
+    //      return lookup.getValue ();
+    //    }
+    //
+    //    System.out.printf ("Matching:[%s]%n", formulaText);
     // [@IF(@ISERROR(BK24),0,BK24)]
     // [@IF(D4=0,0,1)]
     // [@IF(D4=0,0,B32+1)]
@@ -98,79 +118,72 @@ class Cell implements Comparable<Cell>
     // [.3*(B4+B7+B8+B9)]
     // [+N12+(P12*(.2*K12+K9-O12))]
 
-    Matcher m = cellContents.matcher (formulaText);
-    while (m.find ())
-    {
-      valid = true;
-      char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
-
-      if (m.group (3) != null)                                    // address
-      {
-        Address address = new Address (m.group (3));
-        Cell cell = parent.getCell (address);
-        if (cell != null)
-          interim = cell.getValue ();
-      }
-      else if (m.group (4) != null)                               // constant
-        try
-        {
-          interim = Double.parseDouble (m.group (4));
-        }
-        catch (NumberFormatException e)
-        {
-          System.out.printf ("NFE: %s [%s]%n", m.group (4), formulaText);
-        }
-      else
-      {
-        //        interim = parent.evaluateFunction (m.group (5));         // function
-        Function function = Function.getInstance (parent, m.group (5));
-        if (function != null)
-          interim = function.getValue ();
-      }
-
-      if (operator == '+')
-        result += interim;
-      else if (operator == '-')
-        result -= interim;
-      else if (operator == '*')
-        result *= interim;
-      else if (operator == '/')
-        result = interim == 0.0 ? 0 : result / interim;
-    }
-
-    if (valid)
-    {
-      value = result;
-      return result;
-    }
-
-    System.out.println ("?? " + formulaText);
-
-    return value;
-  }
-
-  String value ()
-  {
-    if (label != null)
-      return label;
-    if (repeatingChar > 0)
-      return repeat;
-    if (formulaText != null)
-      if (formulaText.length () >= 12)
-        return formulaText.substring (0, 12);
-      else
-        return formulaText;
-    return value + "";
+    //    Matcher m = cellContents.matcher (formulaText);
+    //    while (m.find ())
+    //    {
+    //      valid = true;
+    //      char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
+    //
+    //      if (m.group (3) != null)                                    // address
+    //      {
+    //        Address address = new Address (m.group (3));
+    //        Cell cell = parent.getCell (address);
+    //        if (cell != null)
+    //          interim = cell.getValue ();
+    //      }
+    //      else if (m.group (4) != null)                               // constant
+    //        try
+    //        {
+    //          interim = Double.parseDouble (m.group (4));
+    //        }
+    //        catch (NumberFormatException e)
+    //        {
+    //          System.out.printf ("NFE: %s [%s]%n", m.group (4), formulaText);
+    //        }
+    //      else
+    //      {
+    //        //        interim = parent.evaluateFunction (m.group (5));         // function
+    //        Function function = Function.getInstance (parent, m.group (5));
+    //        if (function != null)
+    //          interim = function.getValue ();
+    //      }
+    //
+    //      if (operator == '+')
+    //        result += interim;
+    //      else if (operator == '-')
+    //        result -= interim;
+    //      else if (operator == '*')
+    //        result *= interim;
+    //      else if (operator == '/')
+    //        result = interim == 0.0 ? 0 : result / interim;
+    //    }
+    //
+    //    if (valid)
+    //    {
+    //      value = result;
+    //      return result;
+    //    }
+    //
+    //    System.out.println ("?? " + formulaText);
+    //
+    //    return value;
   }
 
   @Override
   public String toString ()
   {
-    String value = repeatingChar == 0
-        ? label == null ? formulaText == null ? ", Value  : " + this.value
-            : ", Formula: " + formulaText : ", Label  : " + label
-        : ", Repeat : " + repeatingChar;
-    return String.format ("[Cell:%5s %-2s%s]", address, format, value);
+    //    String value = repeatingChar == 0
+    //        ? label == null ? formulaText == null ? ", Value  : " + this.value
+    //            : ", Formula: " + formulaText : ", Label  : " + label
+    //        : ", Repeat : " + repeatingChar;
+    String contents = "";
+    if (label != null)
+      contents = "Labl: " + label;
+    else if (repeatingChar != 0)
+      contents = "Rept: " + repeatingChar;
+    else if (expressionText != null)
+      contents = "Exp : " + expressionText;
+    return String.format ("[Cell:%5s %s]", address, contents);
   }
 
   @Override

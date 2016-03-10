@@ -25,8 +25,6 @@ import java.util.regex.Pattern;
 // @ATAN
 
 // Unimplemented functions found so far:
-// @IF
-// @ISERROR
 // @OR
 // @AND
 
@@ -58,6 +56,12 @@ public abstract class Function implements Value
 
     if (text.startsWith ("@IF("))
       return new If (parent, text);
+
+    if (text.startsWith ("@OR("))
+      return new Or (parent, text);
+
+    if (text.startsWith ("@AND("))
+      return new And (parent, text);
 
     if (text.startsWith ("@ISERROR("))
       return new IsError (parent, text);
@@ -107,9 +111,8 @@ public abstract class Function implements Value
       range = new Range (fromAddress, toAddress);
     }
 
-    if (range != null)
-      return range;
-    System.out.println ("null range : " + text);
+    if (range == null)
+      System.out.println ("null range : " + text);
 
     return range;
   }

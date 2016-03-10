@@ -2,27 +2,24 @@ package com.bytezone.diskbrowser.visicalc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class Expression implements Value
 {
   // Expressions:
-  //  - number
-  //  - cell address
-  //  - function
-  //  - expression [+-*/^] expression
-  //  - [+-=] expression
-  //  - ( expression )
+  //   number
+  //   cell address
+  //   function
+  //   expression [+-*/^] expression
+  //   [+-=] expression
+  //   ( expression )
+  //   -expression
 
   // From the reference card:
   // Expressions are evaluated strictly from left to right except as modified by
   // parentheses. You must start an expression with a +, a digit (0-9), or one of
   // the symbols @-(. or #.
 
-  private static final Pattern pattern = Pattern.compile ("");
-
-  private boolean isUnavailable;
-  private boolean isError;
+  // @IF(D5=0,0,D9*(G5/(1-((1+G5)^-D4))
 
   private final List<Value> values = new ArrayList<Value> ();
   private final List<String> operators = new ArrayList<String> ();
@@ -31,7 +28,26 @@ public class Expression implements Value
   {
     String line = input.trim ();
 
-    //    System.out.printf ("New expression [%s]%n", input);
+    System.out.printf ("New expression [%s]%n", input);
+
+    if (true)
+    {
+      int leftBracket = 0;
+      int rightBracket = 0;
+      for (char c : input.toCharArray ())
+      {
+        if (c == '(')
+          leftBracket++;
+        if (c == ')')
+          rightBracket++;
+      }
+      if (leftBracket != rightBracket)
+      {
+        System.out.printf ("Unbalanced brackets: left:%d, right:%d%n", leftBracket,
+                           rightBracket);
+        line = "@ERROR()";
+      }
+    }
 
     if (line.startsWith ("-"))
       line = "0" + line;
@@ -54,10 +70,7 @@ public class Expression implements Value
         case '(':                                           // parentheses block
           String bracketText = getFunctionText (line.substring (ptr));
           ptr += bracketText.length ();
-
-          while (bracketText.startsWith ("(") && bracketText.endsWith (")"))
-            bracketText = bracketText.substring (1, bracketText.length () - 1);
-
+          bracketText = bracketText.substring (1, bracketText.length () - 1);
           values.add (new Expression (parent, bracketText));
           break;
 
@@ -95,13 +108,17 @@ public class Expression implements Value
     }
 
     assert values.size () > 0;
-    //    ptr = 0;
-    //    for (Value val : values)
-    //    {
-    //      System.out.println (val.getValue ());
-    //      if (ptr < operators.size ())
-    //        System.out.println (operators.get (ptr++));
-    //    }
+
+    if (false)
+    {
+      ptr = 0;
+      for (Value val : values)
+      {
+        System.out.println (val.getValue ());
+        if (ptr < operators.size ())
+          System.out.println (operators.get (ptr++));
+      }
+    }
   }
 
   @Override

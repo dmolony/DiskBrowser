@@ -61,14 +61,28 @@ class Cell implements Comparable<Cell>, Value
     }
 
     // FUTURE.VC
-    if (address.sortValue == 67)
-      expressionText = "1000";
-    if (address.sortValue == 131)
-      expressionText = "10.5";
-    if (address.sortValue == 195)
-      expressionText = "12";
-    if (address.sortValue == 259)
-      expressionText = "8";
+    if (false)
+      if (address.sortValue == 67)
+        expressionText = "1000";
+      else if (address.sortValue == 131)
+        expressionText = "10.5";
+      else if (address.sortValue == 195)
+        expressionText = "12";
+      else if (address.sortValue == 259)
+        expressionText = "8";
+
+    // IRA.VC
+    if (false)
+      if (address.sortValue == 66)
+        expressionText = "10";
+      else if (address.sortValue == 130)
+        expressionText = "30";
+      else if (address.sortValue == 194)
+        expressionText = "65";
+      else if (address.sortValue == 258)
+        expressionText = "1000";
+      else if (address.sortValue == 386)
+        expressionText = "15";
   }
 
   boolean hasValue ()

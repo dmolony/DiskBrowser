@@ -364,7 +364,7 @@ public class Sheet implements Iterable<Cell>
         heading.append ("==");
       else
       {
-        char letter1 = cellNo < 26 ? ' ' : cellNo < 676 ? 'A' : 'B';
+        char letter1 = cellNo < 26 ? ' ' : cellNo < 52 ? 'A' : 'B';
         char letter2 = (char) ((cellNo % 26) + 'A');
         String fmt =
             String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));

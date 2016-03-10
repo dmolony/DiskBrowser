@@ -317,8 +317,9 @@ public class Sheet implements Iterable<Cell>
     Cell cell = sheet.get (address.sortValue);
     if (cell == null)
     {
-      cell = new Cell (this, address);
-      sheet.put (address.sortValue, cell);
+      //      cell = new Cell (this, address);
+      //      sheet.put (address.sortValue, cell);
+      System.out.printf ("Nonexistent cell requested [%s]%n", address);
     }
     return cell;
   }
@@ -358,9 +359,9 @@ public class Sheet implements Iterable<Cell>
         width = columnWidths.get (cellNo);
 
       if (width == 1)
-      {
         heading.append ("=");
-      }
+      else if (width == 2)
+        heading.append ("==");
       else
       {
         char letter1 = cellNo < 26 ? ' ' : cellNo < 676 ? 'A' : 'B';

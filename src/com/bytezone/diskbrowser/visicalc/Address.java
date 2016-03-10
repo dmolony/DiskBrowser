@@ -37,6 +37,14 @@ class Address implements Comparable<Address>
       set (address.substring (0, 2), address.substring (2));
   }
 
+  // copied from Appleworks Cell
+  static String getCellName (int row, int column)
+  {
+    char c1 = (char) ('A' + column / 26 - 1);
+    char c2 = (char) ('A' + column % 26);
+    return "" + (c1 == '@' ? "" : c1) + c2 + row;
+  }
+
   private void set (String sCol, String sRow)
   {
     if (sCol.length () == 1)
@@ -55,6 +63,8 @@ class Address implements Comparable<Address>
     catch (NumberFormatException e)
     {
       System.out.printf ("NFE: %s%n", sRow);
+      //      for (StackTraceElement ste : Thread.currentThread ().getStackTrace ())
+      //        System.out.println (ste);
     }
   }
 

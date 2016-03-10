@@ -34,7 +34,8 @@ class Cell implements Comparable<Cell>, Value
     //  /F$ - dollars and cents
     //  /FL - left justified
     //  /FR - right justified
-    //  /F* - graph
+    //  /F* - graph (histogram)
+
     if (format.startsWith ("/F"))
       this.format = format.charAt (2);
     else if (format.startsWith ("/-"))
@@ -61,13 +62,13 @@ class Cell implements Comparable<Cell>, Value
 
     // FUTURE.VC
     if (address.sortValue == 67)
-      expressionText = "50";
+      expressionText = "1000";
     if (address.sortValue == 131)
-      expressionText = ".04";
+      expressionText = "10.5";
     if (address.sortValue == 195)
       expressionText = "12";
     if (address.sortValue == 259)
-      expressionText = "5";
+      expressionText = "8";
   }
 
   boolean hasValue ()
@@ -93,21 +94,12 @@ class Cell implements Comparable<Cell>, Value
   public double getValue ()
   {
     if (expression == null)
+    {
+      System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
       expression = new Expression (parent, expressionText);
+    }
     return expression.getValue ();
-    //    if (valid || formulaText == null)
-    //      return value;
-    //
-    //    double result = 0.0;
-    //    double interim = 0.0;
-    //
-    //    if (formulaText.startsWith ("@LOOKUP("))
-    //    {
-    //      Lookup lookup = new Lookup (parent, formulaText);
-    //      return lookup.getValue ();
-    //    }
-    //
-    //    System.out.printf ("Matching:[%s]%n", formulaText);
+
     // [@IF(@ISERROR(BK24),0,BK24)]
     // [@IF(D4=0,0,1)]
     // [@IF(D4=0,0,B32+1)]
@@ -117,65 +109,11 @@ class Cell implements Comparable<Cell>, Value
     // [+D5/100/12]
     // [.3*(B4+B7+B8+B9)]
     // [+N12+(P12*(.2*K12+K9-O12))]
-
-    //    Matcher m = cellContents.matcher (formulaText);
-    //    while (m.find ())
-    //    {
-    //      valid = true;
-    //      char operator = m.group (1).isEmpty () ? '+' : m.group (1).charAt (0);
-    //
-    //      if (m.group (3) != null)                                    // address
-    //      {
-    //        Address address = new Address (m.group (3));
-    //        Cell cell = parent.getCell (address);
-    //        if (cell != null)
-    //          interim = cell.getValue ();
-    //      }
-    //      else if (m.group (4) != null)                               // constant
-    //        try
-    //        {
-    //          interim = Double.parseDouble (m.group (4));
-    //        }
-    //        catch (NumberFormatException e)
-    //        {
-    //          System.out.printf ("NFE: %s [%s]%n", m.group (4), formulaText);
-    //        }
-    //      else
-    //      {
-    //        //        interim = parent.evaluateFunction (m.group (5));         // function
-    //        Function function = Function.getInstance (parent, m.group (5));
-    //        if (function != null)
-    //          interim = function.getValue ();
-    //      }
-    //
-    //      if (operator == '+')
-    //        result += interim;
-    //      else if (operator == '-')
-    //        result -= interim;
-    //      else if (operator == '*')
-    //        result *= interim;
-    //      else if (operator == '/')
-    //        result = interim == 0.0 ? 0 : result / interim;
-    //    }
-    //
-    //    if (valid)
-    //    {
-    //      value = result;
-    //      return result;
-    //    }
-    //
-    //    System.out.println ("?? " + formulaText);
-    //
-    //    return value;
   }
 
   @Override
   public String toString ()
   {
-    //    String value = repeatingChar == 0
-    //        ? label == null ? formulaText == null ? ", Value  : " + this.value
-    //            : ", Formula: " + formulaText : ", Label  : " + label
-    //        : ", Repeat : " + repeatingChar;
     String contents = "";
     if (label != null)
       contents = "Labl: " + label;

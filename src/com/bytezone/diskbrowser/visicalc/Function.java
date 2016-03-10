@@ -37,7 +37,7 @@ public abstract class Function implements Value
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   Sheet parent;
-  String text;
+  String functionText;
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -59,6 +59,9 @@ public abstract class Function implements Value
     if (text.startsWith ("@IF("))
       return new If (parent, text);
 
+    if (text.startsWith ("@ISERROR("))
+      return new IsError (parent, text);
+
     System.out.printf ("Unknown function: %s%n", text);
     return new Error (parent, "@ERROR()");
   }
@@ -66,7 +69,8 @@ public abstract class Function implements Value
   public Function (Sheet parent, String text)
   {
     this.parent = parent;
-    this.text = text;
+    int pos = text.indexOf ('(');
+    this.functionText = text.substring (pos + 1, text.length () - 1);
   }
 
   Range getRange (String text)
@@ -113,6 +117,6 @@ public abstract class Function implements Value
   @Override
   public String toString ()
   {
-    return String.format ("Function: %s", text);
+    return String.format ("Function: %s", functionText);
   }
 }

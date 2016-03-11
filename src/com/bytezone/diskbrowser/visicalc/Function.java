@@ -24,13 +24,9 @@ import java.util.regex.Pattern;
 // @TAN
 // @ATAN
 
-// Unimplemented functions found so far:
-// @OR
-// @AND
-
-public abstract class Function implements Value
+abstract class Function implements Value
 {
-  private static final Pattern functionPattern = Pattern
+  private static final Pattern rangePattern = Pattern
       .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
@@ -66,22 +62,27 @@ public abstract class Function implements Value
     if (text.startsWith ("@ISERROR("))
       return new IsError (parent, text);
 
+    if (text.startsWith ("@ERROR("))
+      return new Error (parent, text);
+
     System.out.printf ("Unknown function: %s%n", text);
     return new Error (parent, "@ERROR()");
   }
 
-  public Function (Sheet parent, String text)
+  Function (Sheet parent, String text)
   {
     this.parent = parent;
+
+    // get function's parameter string
     int pos = text.indexOf ('(');
     this.functionText = text.substring (pos + 1, text.length () - 1);
   }
 
-  Range getRange (String text)
+  protected Range getRange (String text)
   {
     Range range = null;
-    Matcher m = functionPattern.matcher (text);
-    while (m.find ())
+    Matcher m = rangePattern.matcher (text);
+    if (m.find ())
     {
       Address fromAddress = new Address (m.group (1), m.group (2));
       Address toAddress = new Address (m.group (3), m.group (4));
@@ -92,7 +93,7 @@ public abstract class Function implements Value
       return range;
 
     m = addressList.matcher (text);
-    while (m.find ())
+    if (m.find ())
     {
       String[] cells = m.group (1).split (",");
       range = new Range (cells);
@@ -112,7 +113,7 @@ public abstract class Function implements Value
     }
 
     if (range == null)
-      System.out.println ("null range : " + text);
+      System.out.printf ("null range [%s]%n", text);
 
     return range;
   }

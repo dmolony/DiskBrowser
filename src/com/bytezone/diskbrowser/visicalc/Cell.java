@@ -83,6 +83,20 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "1000";
       else if (address.sortValue == 386)
         expressionText = "15";
+
+    // CARLOAN.VC
+    if (false)
+      if (address.sortValue == 67)
+        expressionText = "9375";
+      else if (address.sortValue == 131)
+        expressionText = "4500";
+      else if (address.sortValue == 195)
+        expressionText = "24";
+      else if (address.sortValue == 259)
+        expressionText = "11.9";
+      else if (address.sortValue == 579)
+        expressionText = "D9*G5/(1-((1+G5)^-D4))";
+
   }
 
   boolean hasValue ()
@@ -101,7 +115,7 @@ class Cell implements Comparable<Cell>, Value
       return label;
     if (repeatingChar > 0)
       return repeat;
-    return "bollocks";
+    return "?";
   }
 
   @Override
@@ -109,6 +123,11 @@ class Cell implements Comparable<Cell>, Value
   {
     if (expression == null)
     {
+      if (expressionText == null)
+      {
+        System.out.println ("null expression text");
+        return 0;
+      }
       System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
       expression = new Expression (parent, expressionText);
     }

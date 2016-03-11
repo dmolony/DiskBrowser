@@ -19,10 +19,9 @@ public class Expression implements Value
   // parentheses. You must start an expression with a +, a digit (0-9), or one of
   // the symbols @-(. or #.
 
-  // @IF(D5=0,0,D9*(G5/(1-((1+G5)^-D4))
-
   private final List<Value> values = new ArrayList<Value> ();
   private final List<String> operators = new ArrayList<String> ();
+  private final List<String> signs = new ArrayList<String> ();
 
   public Expression (Sheet parent, String input)
   {
@@ -30,34 +29,39 @@ public class Expression implements Value
 
     System.out.printf ("New expression [%s]%n", input);
 
-    if (true)
+    int leftBracket = 0;
+    int rightBracket = 0;
+
+    for (char c : input.toCharArray ())
+      if (c == '(')
+        leftBracket++;
+      else if (c == ')')
+        rightBracket++;
+
+    if (leftBracket != rightBracket)
     {
-      int leftBracket = 0;
-      int rightBracket = 0;
-      for (char c : input.toCharArray ())
-      {
-        if (c == '(')
-          leftBracket++;
-        if (c == ')')
-          rightBracket++;
-      }
-      if (leftBracket != rightBracket)
-      {
-        System.out.printf ("Unbalanced brackets: left:%d, right:%d%n", leftBracket,
-                           rightBracket);
-        line = "@ERROR()";
-      }
+      System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
+                         leftBracket, rightBracket);
+      line = "@ERROR()";
     }
 
-    if (line.startsWith ("-"))
-      line = "0" + line;
-    else if (line.startsWith ("+"))
-      line = line.substring (1);
-
+    //    System.out.printf ("Exp [%s]%n", line);
     int ptr = 0;
     while (ptr < line.length ())
     {
       char ch = line.charAt (ptr);
+
+      if (ch == '-')
+      {
+        signs.add ("(-)");
+        ch = line.charAt (++ptr);
+      }
+      else
+      {
+        signs.add ("(+)");
+        if (ch == '+')
+          ch = line.charAt (++ptr);
+      }
 
       switch (ch)
       {
@@ -72,6 +76,10 @@ public class Expression implements Value
           ptr += bracketText.length ();
           bracketText = bracketText.substring (1, bracketText.length () - 1);
           values.add (new Expression (parent, bracketText));
+          break;
+
+        case '#':
+          System.out.printf ("Hash character [%s] in [%s]%n", ch, line);
           break;
 
         default:
@@ -114,7 +122,11 @@ public class Expression implements Value
       ptr = 0;
       for (Value val : values)
       {
-        System.out.println (val.getValue ());
+        System.out.println (signs.get (ptr));
+        if (val == null)
+          System.out.println ("null");
+        else
+          System.out.println (val.getValue ());
         if (ptr < operators.size ())
           System.out.println (operators.get (ptr++));
       }
@@ -124,10 +136,22 @@ public class Expression implements Value
   @Override
   public double getValue ()
   {
-    double value = values.get (0).getValue ();
+    Value thisValue = values.get (0);
+    double value = thisValue == null ? 0 : values.get (0).getValue ();
+
+    String sign = signs.get (0);
+    if (sign.equals ("(-)"))
+      value *= -1;
+
     for (int i = 1; i < values.size (); i++)
     {
-      double nextValue = values.get (i).getValue ();
+      thisValue = values.get (i);
+      double nextValue = thisValue == null ? 0 : thisValue.getValue ();
+
+      sign = signs.get (i);
+      if (sign.equals ("(-)"))
+        nextValue *= -1;
+
       String operator = operators.get (i - 1);
       if (operator.equals ("+"))
         value += nextValue;
@@ -146,6 +170,8 @@ public class Expression implements Value
   private String getFunctionText (String text)
   {
     int ptr = text.indexOf ('(');         // find first left parenthesis
+    if (ptr < 0)
+      return "";
     int depth = 1;
     while (++ptr < text.length ())        // find matching right parenthesis
     {
@@ -190,16 +216,10 @@ public class Expression implements Value
   {
     StringBuilder text = new StringBuilder ();
 
-    //    text.append (String.format ("Has value ......... %s%n", hasValue));
-    //    text.append (String.format ("Value ............. %f%n", value));
-    //    text.append (String.format ("Function .......... %s%n", function));
-    //    text.append (String.format ("Address ........... %s%n", address));
-    //    text.append (String.format ("Operator .......... %s%n", operator));
-    //    text.append (String.format ("Expression1 ....... %s%n", expression1));
-    //    text.append (String.format ("Expression2 ....... %s%n", expression2));
     int ptr = 0;
     for (Value value : values)
     {
+      text.append (signs.get (ptr));
       text.append (value.getValue ());
       if (ptr < operators.size ())
         text.append (operators.get (ptr++));
@@ -210,7 +230,8 @@ public class Expression implements Value
 
   public static void main (String[] args)
   {
-    Expression ex = new Expression (null, "5+((4-(10-2)+6/3))*2");
+    Expression ex = new Expression (null, "-5+((-4-(20-(2^3))+6/3))*-2");
     System.out.println (ex.getValue ());
+    System.out.println (ex);
   }
 }

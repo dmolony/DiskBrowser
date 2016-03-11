@@ -345,6 +345,8 @@ public class Sheet implements Iterable<Cell>
     else
       longLine = "                                                          "
           + "                                                                      ";
+    String underline = "---------------------------------------------------------"
+        + "-----------------------------------------------------------------";
 
     DecimalFormat nf = new DecimalFormat ("$#####0.00");
     //    NumberFormat nf = NumberFormat.getCurrencyInstance ();
@@ -368,7 +370,7 @@ public class Sheet implements Iterable<Cell>
         char letter2 = (char) ((cellNo % 26) + 'A');
         String fmt =
             String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
-        heading.append (String.format (fmt, "--------------------------------------"));
+        heading.append (String.format (fmt, underline));
       }
     }
     text.append (heading);

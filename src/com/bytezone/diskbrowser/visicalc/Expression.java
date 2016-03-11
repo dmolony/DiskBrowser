@@ -10,9 +10,8 @@ public class Expression implements Value
   //   cell address
   //   function
   //   expression [+-*/^] expression
-  //   [+-=] expression
+  //   [+-] expression
   //   ( expression )
-  //   -expression
 
   // From the reference card:
   // Expressions are evaluated strictly from left to right except as modified by
@@ -33,34 +32,18 @@ public class Expression implements Value
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
+  private boolean hasValue;
+
   public Expression (Sheet parent, String input)
   {
-    String line = input.trim ();
-
-    //    System.out.printf ("New expression [%s]%n", input);
-
-    int leftBracket = 0;
-    int rightBracket = 0;
-
-    for (char c : input.toCharArray ())
-      if (c == '(')
-        leftBracket++;
-      else if (c == ')')
-        rightBracket++;
-
-    if (leftBracket != rightBracket)
-    {
-      System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
-                         leftBracket, rightBracket);
-      line = "@ERROR()";
-    }
-
     //    System.out.printf ("Exp [%s]%n", line);
+    String line = checkBrackets (input);
+
     int ptr = 0;
     while (ptr < line.length ())
     {
+      // check for optional leading + or -
       char ch = line.charAt (ptr);
-
       if (ch == '-')
       {
         signs.add ("(-)");
@@ -73,6 +56,7 @@ public class Expression implements Value
           ch = line.charAt (++ptr);
       }
 
+      // check for mandatory function/sub-expression/number/cell reference
       switch (ch)
       {
         case '@':                                           // function
@@ -84,12 +68,13 @@ public class Expression implements Value
         case '(':                                           // parentheses block
           String bracketText = getFunctionText (line.substring (ptr));
           ptr += bracketText.length ();
-          bracketText = bracketText.substring (1, bracketText.length () - 1);
-          values.add (new Expression (parent, bracketText));
+          values.add (new Expression (parent,
+              bracketText.substring (1, bracketText.length () - 1)));
           break;
 
         case '#':
           System.out.printf ("Hash character [%s] in [%s]%n", ch, line);
+          ptr++;                                            // no idea
           break;
 
         default:
@@ -97,21 +82,22 @@ public class Expression implements Value
           {
             String numberText = getNumberText (line.substring (ptr));
             ptr += numberText.length ();
-            values.add (new Number (Double.parseDouble (numberText)));
+            values.add (new Number (numberText));
           }
           else if (ch >= 'A' && ch <= 'Z')                  // cell address
           {
             String addressText = getAddressText (line.substring (ptr));
             ptr += addressText.length ();
-            values.add (parent.getCell (new Address (addressText)));
+            values.add (parent.getCell (addressText));
           }
           else
           {
-            System.out.printf ("Unknown character [%s] in [%s]%n", ch, line);
+            System.out.printf ("Unexpected character [%s] in [%s]%n", ch, line);
             return;
           }
       }
 
+      // check for optional continuation operator
       if (ptr < line.length ())
       {
         ch = line.charAt (ptr);
@@ -126,6 +112,7 @@ public class Expression implements Value
     }
 
     assert values.size () > 0;
+    hasValue = true;
 
     if (false)
     {
@@ -177,12 +164,47 @@ public class Expression implements Value
     return value;
   }
 
+  @Override
+  public boolean hasValue ()
+  {
+    return hasValue;
+  }
+
+  @Override
+  public String getError ()
+  {
+    return hasValue ? "" : "Error";
+  }
+
+  private String checkBrackets (String input)
+  {
+    String line = input.trim ();
+
+    int leftBracket = 0;
+    int rightBracket = 0;
+
+    for (char c : line.toCharArray ())
+      if (c == '(')
+        leftBracket++;
+      else if (c == ')')
+        rightBracket++;
+
+    if (leftBracket != rightBracket)
+    {
+      System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
+                         leftBracket, rightBracket);
+      return "@ERROR()";
+    }
+    return line;
+  }
+
   private String getFunctionText (String text)
   {
     int ptr = text.indexOf ('(');         // find first left parenthesis
     if (ptr < 0)
       return "";
     int depth = 1;
+
     while (++ptr < text.length ())        // find matching right parenthesis
     {
       if (text.charAt (ptr) == ')')

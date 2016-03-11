@@ -2,19 +2,17 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Cell implements Comparable<Cell>, Value
 {
-  //  private static final Pattern cellContents =
-  //      Pattern.compile ("([-+/*]?)(([A-Z]{1,2}[0-9]{1,3})|([0-9.]+)|(@[^-+/*]+))");
-
   final Address address;
   private final Sheet parent;
 
-  private String label;
   private char format = ' ';
   private char repeatingChar;
   private String repeat = "";
 
+  private String label;
   private String expressionText;
-  private Expression expression;
+  private Value value;
+  //  private boolean hasValue;
 
   public Cell (Sheet parent, Address address)
   {
@@ -44,7 +42,7 @@ class Cell implements Comparable<Cell>, Value
       System.out.printf ("Unexpected format [%s]%n", format);
   }
 
-  void doCommand (String command)
+  void setValue (String command)
   {
     switch (command.charAt (0))
     {
@@ -92,12 +90,6 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "11.9";
       else if (address.sortValue == 579)
         expressionText = "D9*G5/(1-((1+G5)^-D4))";
-
-  }
-
-  boolean hasValue ()
-  {
-    return expressionText != null;
   }
 
   char getFormat ()
@@ -105,6 +97,7 @@ class Cell implements Comparable<Cell>, Value
     return format;
   }
 
+  // this should be called by Sheet when drawing, so do all formatting here
   String getText ()
   {
     if (label != null)
@@ -115,19 +108,43 @@ class Cell implements Comparable<Cell>, Value
   }
 
   @Override
+  public boolean hasValue ()
+  {
+    if (label != null || repeatingChar > 0)
+      return false;
+
+    if (value == null)
+      createValue ();
+    return value.hasValue ();
+  }
+
+  // this should be called when doing calculations
+  @Override
   public double getValue ()
   {
-    if (expression == null)
+    if (value == null)
+      createValue ();
+    return value.getValue ();
+  }
+
+  @Override
+  public String getError ()
+  {
+    if (value == null)
+      createValue ();
+    return hasValue () ? "" : "@NA";
+  }
+
+  private void createValue ()
+  {
+    if (expressionText == null)
     {
-      if (expressionText == null)
-      {
-        System.out.printf ("%s null expression text %n", address);
-        return 0;
-      }
-      //      System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
-      expression = new Expression (parent, expressionText);
+      System.out.printf ("%s null expression text %n", address);
+      value = Function.getInstance (parent, "@ERROR()");
     }
-    return expression.getValue ();
+    else
+      //      System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
+      value = new Expression (parent, expressionText);
   }
 
   @Override

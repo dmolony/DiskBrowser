@@ -309,18 +309,21 @@ public class Sheet implements Iterable<Cell>
     if (!command.isEmpty ())
       currentCell.format (command);        // formatting command
     if (!line.isEmpty ())
-      currentCell.doCommand (line);           // expression
+      currentCell.setValue (line);           // expression
+  }
+
+  Cell getCell (String addressText)
+  {
+    Address address = new Address (addressText);
+    return getCell (address);
   }
 
   Cell getCell (Address address)
   {
     Cell cell = sheet.get (address.sortValue);
     if (cell == null)
-    {
-      //      cell = new Cell (this, address);
-      //      sheet.put (address.sortValue, cell);
       System.out.printf ("Nonexistent cell requested [%s]%n", address);
-    }
+
     return cell;
   }
 

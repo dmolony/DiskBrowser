@@ -32,6 +32,7 @@ abstract class Function implements Value
 
   Sheet parent;
   String functionText;
+  boolean hasValue;
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -76,6 +77,18 @@ abstract class Function implements Value
     // get function's parameter string
     int pos = text.indexOf ('(');
     this.functionText = text.substring (pos + 1, text.length () - 1);
+  }
+
+  @Override
+  public boolean hasValue ()
+  {
+    return hasValue;
+  }
+
+  @Override
+  public String getError ()
+  {
+    return hasValue ? "" : "Error";
   }
 
   protected Range getRange (String text)

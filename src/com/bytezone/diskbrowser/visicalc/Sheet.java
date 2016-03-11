@@ -21,6 +21,7 @@ public class Sheet implements Iterable<Cell>
   //  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
+  private final List<String> lines = new ArrayList<String> ();
   //  private final Map<String, Double> functions = new HashMap<String, Double> ();
 
   Cell currentCell = null;
@@ -146,7 +147,6 @@ public class Sheet implements Iterable<Cell>
       ;
 
     int ptr = 0;
-    final List<String> lines = new ArrayList<String> ();
     while (ptr < last)
     {
       int length = getLineLength (buffer, ptr);
@@ -333,6 +333,22 @@ public class Sheet implements Iterable<Cell>
   public Iterator<Cell> iterator ()
   {
     return sheet.values ().iterator ();
+  }
+
+  public String getLines ()
+  {
+    StringBuilder text = new StringBuilder ();
+
+    for (String line : lines)
+    {
+      text.append (line);
+      text.append ("\n");
+    }
+
+    if (text.length () > 0)
+      text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
   }
 
   public String getCells ()

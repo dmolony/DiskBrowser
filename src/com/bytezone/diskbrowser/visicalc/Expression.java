@@ -19,6 +19,16 @@ public class Expression implements Value
   // parentheses. You must start an expression with a +, a digit (0-9), or one of
   // the symbols @-(. or #.
 
+  // [@IF(@ISERROR(BK24),0,BK24)]
+  // [@IF(D4=0,0,1)]
+  // [@IF(D4=0,0,B32+1)]
+  // [@IF(D4=0,0,1+(D3/100/D4)^D4-1*100)]
+  // [@SUM(C4...F4)]
+  // [+C4-@SUM(C5...C12)]
+  // [+D5/100/12]
+  // [.3*(B4+B7+B8+B9)]
+  // [+N12+(P12*(.2*K12+K9-O12))]
+
   private final List<Value> values = new ArrayList<Value> ();
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
@@ -27,7 +37,7 @@ public class Expression implements Value
   {
     String line = input.trim ();
 
-    System.out.printf ("New expression [%s]%n", input);
+    //    System.out.printf ("New expression [%s]%n", input);
 
     int leftBracket = 0;
     int rightBracket = 0;

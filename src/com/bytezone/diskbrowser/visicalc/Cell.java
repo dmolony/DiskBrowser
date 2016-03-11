@@ -9,13 +9,9 @@ class Cell implements Comparable<Cell>, Value
   private final Sheet parent;
 
   private String label;
-  //  private double value;
-  //  private String formulaText;
-
   private char format = ' ';
   private char repeatingChar;
   private String repeat = "";
-  //  private boolean valid;
 
   private String expressionText;
   private Expression expression;
@@ -125,23 +121,13 @@ class Cell implements Comparable<Cell>, Value
     {
       if (expressionText == null)
       {
-        System.out.println ("null expression text");
+        System.out.printf ("%s null expression text %n", address);
         return 0;
       }
-      System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
+      //      System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
       expression = new Expression (parent, expressionText);
     }
     return expression.getValue ();
-
-    // [@IF(@ISERROR(BK24),0,BK24)]
-    // [@IF(D4=0,0,1)]
-    // [@IF(D4=0,0,B32+1)]
-    // [@IF(D4=0,0,1+(D3/100/D4)^D4-1*100)]
-    // [@SUM(C4...F4)]
-    // [+C4-@SUM(C5...C12)]
-    // [+D5/100/12]
-    // [.3*(B4+B7+B8+B9)]
-    // [+N12+(P12*(.2*K12+K9-O12))]
   }
 
   @Override

@@ -412,65 +412,13 @@ public class Sheet implements Iterable<Cell>
         ++lastColumn;
       }
 
+      ++lastColumn;
+
       int colWidth = columnWidth;
       if (columnWidths.containsKey (cell.address.column))
         colWidth = columnWidths.get (cell.address.column);
-      ++lastColumn;
 
-      char format = cell.getFormat ();
-      if (format == ' ')
-        format = defaultFormat;
-
-      //      System.out.println (cell.address);
-      if (cell.hasValue ())
-      {
-        if (format == 'I')
-        {
-          String integerFormat = String.format ("%%%d.0f", colWidth);
-          //          System.out.printf ("Integer format:%s%n", integerFormat);
-          text.append (String.format (integerFormat, cell.getValue ()));
-        }
-        else if (format == '$')
-        {
-          String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-          //          System.out.printf ("Currency format:%s%n", currencyFormat);
-          text.append (String.format (currencyFormat, nf.format (cell.getValue ())));
-        }
-        else if (format == '*')
-        {
-          String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-          text.append (String.format (graphFormat, "********************"));
-        }
-        else
-        {
-          // this could be improved
-          String numberFormat = String.format ("%%%d.3f", colWidth + 4);
-          //          System.out.printf ("Number format:%s%n", numberFormat);
-          String val = String.format (numberFormat, cell.getValue ());
-          while (val.endsWith ("0"))
-            val = ' ' + val.substring (0, val.length () - 1);
-          if (val.endsWith ("."))
-            val = ' ' + val.substring (0, val.length () - 1);
-          if (val.length () > colWidth)
-            val = val.substring (val.length () - colWidth);
-          text.append (val);
-        }
-      }
-      else
-      {
-        if (format == 'R')
-        {
-          String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-          //          System.out.printf ("Label format:%s%n", labelFormat);
-          text.append (String.format (labelFormat, cell.getText ()));
-        }
-        else
-        {
-          String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-          //          System.out.printf ("Label format:%s%n", labelFormat);
-          text.append (String.format (labelFormat, cell.getText ()));
-        }
-      }
+      text.append (cell.getText (colWidth, defaultFormat));
     }
     return text.toString ();
   }

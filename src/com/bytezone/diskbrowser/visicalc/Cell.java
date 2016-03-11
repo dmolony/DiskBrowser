@@ -1,7 +1,11 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import java.text.DecimalFormat;
+
 class Cell implements Comparable<Cell>, Value
 {
+  private static final DecimalFormat nf = new DecimalFormat ("$#####0.00");
+
   final Address address;
   private final Sheet parent;
 
@@ -97,14 +101,56 @@ class Cell implements Comparable<Cell>, Value
     return format;
   }
 
-  // this should be called by Sheet when drawing, so do all formatting here
-  String getText ()
+  String getText (int colWidth, char defaultFormat)
   {
+    if (hasValue ())
+      if (format == 'I')
+      {
+        String integerFormat = String.format ("%%%d.0f", colWidth);
+        return String.format (integerFormat, getValue ());
+      }
+      else if (format == '$')
+      {
+        String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+        return String.format (currencyFormat, nf.format (getValue ()));
+      }
+      else if (format == '*')
+      {
+        String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+        return String.format (graphFormat, "********************");
+      }
+      else
+      {
+        // this could be improved
+        String numberFormat = String.format ("%%%d.3f", colWidth + 4);
+        String val = String.format (numberFormat, getValue ());
+        while (val.endsWith ("0"))
+          val = ' ' + val.substring (0, val.length () - 1);
+        if (val.endsWith ("."))
+          val = ' ' + val.substring (0, val.length () - 1);
+        if (val.length () > colWidth)
+          val = val.substring (val.length () - colWidth);
+        return val;
+      }
+
+    String text;
     if (label != null)
-      return label;
-    if (repeatingChar > 0)
-      return repeat;
-    return "?";
+      text = label;
+    else if (repeatingChar > 0)
+      text = repeat;
+    else
+      text = "?";
+
+    if (format == 'R')
+    {
+      String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+      return (String.format (labelFormat, text));
+    }
+    else
+    {
+      String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+      return (String.format (labelFormat, text));
+    }
   }
 
   @Override
@@ -132,7 +178,7 @@ class Cell implements Comparable<Cell>, Value
   {
     if (value == null)
       createValue ();
-    return hasValue () ? "" : "@NA";
+    return value.getError ();
   }
 
   private void createValue ()
@@ -143,7 +189,7 @@ class Cell implements Comparable<Cell>, Value
       value = Function.getInstance (parent, "@ERROR()");
     }
     else
-      //      System.out.printf ("%s Instantiating [%s]%n", address, expressionText);
+      // could use Number or Cell for simple Values
       value = new Expression (parent, expressionText);
   }
 

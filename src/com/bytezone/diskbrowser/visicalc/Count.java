@@ -2,7 +2,9 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Count extends Function
 {
-  Range range;
+  private final Range range;
+  private boolean hasChecked;
+  private double count = 0;
 
   public Count (Sheet parent, String text)
   {
@@ -11,17 +13,35 @@ public class Count extends Function
   }
 
   @Override
+  public boolean hasValue ()
+  {
+    if (!hasChecked)
+      calculate ();
+    return hasValue;
+  }
+
+  @Override
   public double getValue ()
   {
-    double result = 0;
+    if (!hasChecked)
+      calculate ();
+    return hasValue ? count : 0;
+  }
+
+  private void calculate ()
+  {
+    hasChecked = true;
+    hasValue = false;
 
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.hasValue () && cell.getValue () != 0.0)
-        result += 1;
+      if (cell != null && cell.hasValue ())
+      {
+        hasValue = true;
+        if (cell.getValue () != 0.0)
+          count++;
+      }
     }
-
-    return result;
   }
 }

@@ -36,7 +36,6 @@ public class Expression implements Value
 
   public Expression (Sheet parent, String input)
   {
-    //    System.out.printf ("Exp [%s]%n", line);
     String line = checkBrackets (input);
 
     int ptr = 0;
@@ -113,21 +112,6 @@ public class Expression implements Value
 
     assert values.size () > 0;
     hasValue = true;
-
-    if (false)
-    {
-      ptr = 0;
-      for (Value val : values)
-      {
-        System.out.println (signs.get (ptr));
-        if (val == null)
-          System.out.println ("null");
-        else
-          System.out.println (val.getValue ());
-        if (ptr < operators.size ())
-          System.out.println (operators.get (ptr++));
-      }
-    }
   }
 
   @Override

@@ -21,6 +21,7 @@ public class Lookup extends Function
   }
 
   // need a mechanism to return NA and ERROR
+  @Override
   public boolean hasValue ()
   {
     return hasValue;
@@ -34,7 +35,6 @@ public class Lookup extends Function
     Address target = null;
     for (Address address : range)
     {
-      //      System.out.printf ("%s : %s%n", source, address);
       Cell cell = parent.getCell (address);
       if (cell != null && cell.getValue () > sourceValue)
         break;

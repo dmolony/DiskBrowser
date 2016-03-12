@@ -31,6 +31,8 @@ public class Min extends Function
   private void calculate ()
   {
     hasChecked = true;
+    hasValue = false;
+
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);

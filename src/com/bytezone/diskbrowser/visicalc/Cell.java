@@ -83,7 +83,7 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "15";
 
     // CARLOAN.VC
-    if (true)
+    if (false)
       if (address.sortValue == 67)
         expressionText = "9375";
       else if (address.sortValue == 131)

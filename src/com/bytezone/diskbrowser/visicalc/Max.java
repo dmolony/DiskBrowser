@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Max extends Function
+class Max extends Function
 {
   private final Range range;
   private boolean hasChecked;

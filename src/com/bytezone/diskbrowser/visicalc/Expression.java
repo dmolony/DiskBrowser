@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.visicalc;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Expression implements Value
+class Expression implements Value
 {
   // Expressions:
   //   number

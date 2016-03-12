@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class IsError extends Function
+class IsError extends Function
 {
   boolean firstTime = true;
   Cell cell;

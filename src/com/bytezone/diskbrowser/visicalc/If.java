@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class If extends Function
+class If extends Function
 {
   private final Condition condition;
   private final String textTrue;

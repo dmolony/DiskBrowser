@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Or extends Function
+class Or extends Function
 {
 
   public Or (Sheet parent, String text)

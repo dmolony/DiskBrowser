@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Error extends Function
+class Error extends Function
 {
   public Error (Sheet parent, String text)
   {

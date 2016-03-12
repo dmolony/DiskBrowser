@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public interface Value
+interface Value
 {
   public boolean hasValue ();
 

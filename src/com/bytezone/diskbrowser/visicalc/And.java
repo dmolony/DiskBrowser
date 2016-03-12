@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class And extends Function
+class And extends Function
 {
 
   public And (Sheet parent, String text)

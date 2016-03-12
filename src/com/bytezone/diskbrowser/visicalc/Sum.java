@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Sum extends Function
+class Sum extends Function
 {
   private final Range range;
   private boolean hasChecked;

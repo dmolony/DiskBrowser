@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Min extends Function
+class Min extends Function
 {
   private final Range range;
   private boolean hasChecked;

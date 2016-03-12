@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Lookup extends Function
+class Lookup extends Function
 {
   Range range;
   boolean hasValue;

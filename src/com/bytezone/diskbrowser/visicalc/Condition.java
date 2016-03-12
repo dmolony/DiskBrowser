@@ -1,8 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Condition
+class Condition
 {
-  private static String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
+  private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
 
   private final Sheet parent;
 

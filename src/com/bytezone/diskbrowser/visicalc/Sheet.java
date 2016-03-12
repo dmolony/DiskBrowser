@@ -299,8 +299,8 @@ public class Sheet implements Iterable<Cell>
   Cell getCell (Address address)
   {
     Cell cell = sheet.get (address.sortValue);
-    if (cell == null)
-      System.out.printf ("Nonexistent cell requested [%s]%n", address);
+    //    if (cell == null)
+    //      System.out.printf ("Nonexistent cell requested [%s]%n", address);
 
     return cell;
   }

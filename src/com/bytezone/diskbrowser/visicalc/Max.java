@@ -2,26 +2,45 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Max extends Function
 {
-  Range range;
+  private final Range range;
+  private boolean hasChecked;
+  private double max = Double.MIN_VALUE;
 
   public Max (Sheet parent, String text)
   {
     super (parent, text);
-
     range = getRange (text);
+  }
+
+  @Override
+  public boolean hasValue ()
+  {
+    if (!hasChecked)
+      calculate ();
+    return hasValue;
   }
 
   @Override
   public double getValue ()
   {
-    double max = Double.MIN_VALUE;
-    for (Address address : range)
-    {
-      double value = parent.getCell (address).getValue ();
-      if (value > max)
-        max = value;
-    }
-    return max;
+    if (!hasChecked)
+      calculate ();
+    return hasValue ? max : 0;
   }
 
+  private void calculate ()
+  {
+    hasChecked = true;
+    for (Address address : range)
+    {
+      Cell cell = parent.getCell (address);
+      if (cell != null && cell.hasValue ())
+      {
+        hasValue = true;
+        double value = cell.getValue ();
+        if (value > max)
+          max = value;
+      }
+    }
+  }
 }

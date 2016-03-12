@@ -23,9 +23,7 @@ public class Min extends Function
   @Override
   public double getValue ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue ? min : 0;
+    return hasValue () ? min : 0;
   }
 
   private void calculate ()

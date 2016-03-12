@@ -23,9 +23,7 @@ public class Sum extends Function
   @Override
   public double getValue ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue ? sum : 0;
+    return hasValue () ? sum : 0;
   }
 
   public void calculate ()

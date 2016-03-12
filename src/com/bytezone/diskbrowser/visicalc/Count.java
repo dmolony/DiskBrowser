@@ -23,9 +23,7 @@ public class Count extends Function
   @Override
   public double getValue ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue ? count : 0;
+    return hasValue () ? count : 0;
   }
 
   private void calculate ()

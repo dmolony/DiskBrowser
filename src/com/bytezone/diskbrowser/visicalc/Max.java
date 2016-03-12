@@ -23,9 +23,7 @@ public class Max extends Function
   @Override
   public double getValue ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue ? max : 0;
+    return hasValue () ? max : 0;
   }
 
   private void calculate ()

@@ -13,16 +13,11 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class Sheet implements Iterable<Cell>
 {
-  private static char[] tokens = { '"', '@', '+' };    // label, function, formula/value
   private static final Pattern addressPattern =
       Pattern.compile ("([AB]?[A-Z])([0-9]{1,3}):");
-  //  private static final Pattern functionPattern = Pattern
-  //      .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
-  //  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
   private final List<String> lines = new ArrayList<String> ();
-  //  private final Map<String, Double> functions = new HashMap<String, Double> ();
 
   Cell currentCell = null;
   char defaultFormat;
@@ -188,9 +183,6 @@ public class Sheet implements Iterable<Cell>
   {
     // NB no closing bracket: [>K11:@SUM(J11...F11]
 
-    // >B10:/F$+B4+B7+B8+B9
-    // >F2:/FR"INCOME
-
     if (line.isEmpty ())
     {
       System.out.println ("empty command");
@@ -281,35 +273,21 @@ public class Sheet implements Iterable<Cell>
       return;
     }
 
-    // check for formatting commands before a token
-    String command = "";
-    if (line.startsWith ("/"))
+    // check for formatting commands
+    String format = "";
+    while (line.startsWith ("/"))
     {
-      for (char token : tokens)
-      {
-        int pos = line.indexOf (token);
-        if (pos > 0)
-        {
-          command = line.substring (0, pos);
-          line = line.substring (pos);
-          break;
-        }
-      }
-
-      if (line.startsWith ("/"))        // no token found
-      {
-        command = line;
-        line = "";
-      }
+      String fmt = line.substring (0, 3);
+      currentCell.format (fmt);               // formatting command
+      line = line.substring (3);
+      format += fmt;
     }
 
-    if (true)
-      System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, command, line);
-
-    if (!command.isEmpty ())
-      currentCell.format (command);        // formatting command
     if (!line.isEmpty ())
-      currentCell.setValue (line);           // expression
+      currentCell.setValue (line);            // expression
+
+    if (true)
+      System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, format, line);
   }
 
   Cell getCell (String addressText)

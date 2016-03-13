@@ -8,15 +8,21 @@ class Cell implements Comparable<Cell>, Value
 
   final Address address;
   private final Sheet parent;
-
+  private CellType type;
   private char format = ' ';
+
   private char repeatingChar;
   private String repeat = "";
 
   private String label;
+
   private String expressionText;
   private Value value;
-  //  private boolean hasValue;
+
+  enum CellType
+  {
+    LABEL, REPEATING_CHARACTER, VALUE
+  }
 
   public Cell (Sheet parent, Address address)
   {
@@ -41,6 +47,7 @@ class Cell implements Comparable<Cell>, Value
       repeatingChar = format.charAt (2);
       for (int i = 0; i < 20; i++)
         repeat += repeatingChar;
+      type = CellType.REPEATING_CHARACTER;
     }
     else
       System.out.printf ("Unexpected format [%s]%n", format);
@@ -48,14 +55,15 @@ class Cell implements Comparable<Cell>, Value
 
   void setValue (String command)
   {
-    switch (command.charAt (0))
+    if (command.charAt (0) == '"')
     {
-      case '"':
-        label = command.substring (1);
-        break;
-
-      default:
-        expressionText = command;
+      label = command.substring (1);
+      type = CellType.LABEL;
+    }
+    else
+    {
+      expressionText = command;
+      type = CellType.VALUE;
     }
 
     // FUTURE.VC
@@ -96,61 +104,68 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "D9*G5/(1-((1+G5)^-D4))";
   }
 
-  char getFormat ()
-  {
-    return format;
-  }
-
   String getText (int colWidth, char defaultFormat)
   {
-    if (hasValue ())
-      if (format == 'I')
-      {
-        String integerFormat = String.format ("%%%d.0f", colWidth);
-        return String.format (integerFormat, getValue ());
-      }
-      else if (format == '$')
-      {
-        String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-        return String.format (currencyFormat, nf.format (getValue ()));
-      }
-      else if (format == '*')
-      {
-        String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-        return String.format (graphFormat, "********************");
-      }
-      else
-      {
-        // this could be improved
-        String numberFormat = String.format ("%%%d.3f", colWidth + 4);
-        String val = String.format (numberFormat, getValue ());
-        while (val.endsWith ("0"))
-          val = ' ' + val.substring (0, val.length () - 1);
-        if (val.endsWith ("."))
-          val = ' ' + val.substring (0, val.length () - 1);
-        if (val.length () > colWidth)
-          val = val.substring (val.length () - colWidth);
-        return val;
-      }
+    // cell may have been formatted but no value set
+    if (type == null)
+    {
+      System.out.println (this);
+      return justify ("", colWidth);
+    }
 
-    String text;
-    if (label != null)
-      text = label;
-    else if (repeatingChar > 0)
-      text = repeat;
-    else
-      text = "?";
+    switch (type)
+    {
+      case LABEL:
+        return justify (label, colWidth);
 
+      case REPEATING_CHARACTER:
+        return justify (repeat, colWidth);
+
+      case VALUE:
+        if (hasValue ())
+          if (format == 'I')
+          {
+            String integerFormat = String.format ("%%%d.0f", colWidth);
+            return String.format (integerFormat, getValue ());
+          }
+          else if (format == '$')
+          {
+            String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+            return String.format (currencyFormat, nf.format (getValue ()));
+          }
+          else if (format == '*')
+          {
+            String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+            // this is not finished
+            return String.format (graphFormat, "********************");
+          }
+          else
+          {
+            // this could be improved
+            String numberFormat = String.format ("%%%d.3f", colWidth + 4);
+            String val = String.format (numberFormat, getValue ());
+            while (val.endsWith ("0"))
+              val = ' ' + val.substring (0, val.length () - 1);
+            if (val.endsWith ("."))
+              val = ' ' + val.substring (0, val.length () - 1);
+            if (val.length () > colWidth)
+              val = val.substring (val.length () - colWidth);
+            return val;
+          }
+    }
+    return getError ();
+  }
+
+  private String justify (String text, int colWidth)
+  {
     if (format == 'R')
     {
       String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
       return (String.format (labelFormat, text));
     }
-    else
-    {
-      String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-      return (String.format (labelFormat, text));
-    }
+
+    String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+    return (String.format (labelFormat, text));
   }
 
   @Override
@@ -197,12 +212,20 @@ class Cell implements Comparable<Cell>, Value
   public String toString ()
   {
     String contents = "";
-    if (label != null)
-      contents = "Labl: " + label;
-    else if (repeatingChar != 0)
-      contents = "Rept: " + repeatingChar;
-    else if (expressionText != null)
-      contents = "Exp : " + expressionText;
+    if (type != null)
+      switch (type)
+      {
+        case LABEL:
+          contents = "Labl: " + label;
+          break;
+        case REPEATING_CHARACTER:
+          contents = "Rept: " + repeatingChar;
+          break;
+        case VALUE:
+          contents = "Exp : " + expressionText;
+          break;
+      }
+
     return String.format ("[Cell:%5s %s]", address, contents);
   }
 

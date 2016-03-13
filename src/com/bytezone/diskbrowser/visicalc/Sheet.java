@@ -151,7 +151,7 @@ public class Sheet implements Iterable<Cell>
       ptr += length + 1;            // +1 for end-of-line token
     }
 
-    if (true)
+    if (false)
     {
       System.out.println ();
       System.out.println ("Lines:");
@@ -286,7 +286,7 @@ public class Sheet implements Iterable<Cell>
     if (!line.isEmpty ())
       currentCell.setValue (line);            // expression
 
-    if (true)
+    if (false)
       System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, format, line);
   }
 
@@ -332,7 +332,7 @@ public class Sheet implements Iterable<Cell>
     return text.toString ();
   }
 
-  public String getCells ()
+  public String getTextDisplay ()
   {
     StringBuilder text = new StringBuilder ();
     String longLine;

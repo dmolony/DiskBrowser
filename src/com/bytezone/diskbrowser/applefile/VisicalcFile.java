@@ -22,7 +22,7 @@ public class VisicalcFile extends AbstractFile
 
     text.append ("Visicalc : " + name + "\n");
     text.append ("Cells    : " + sheet.size () + "\n\n");
-    text.append (sheet.getCells ());
+    text.append (sheet.getTextDisplay ());
     text.append ("\n\n");
     text.append (sheet.getLines ());
 

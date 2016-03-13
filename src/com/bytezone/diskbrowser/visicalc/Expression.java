@@ -177,6 +177,7 @@ class Expression implements Value
     {
       System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
                          leftBracket, rightBracket);
+      System.out.println (input);
       return "@ERROR()";
     }
     return line;

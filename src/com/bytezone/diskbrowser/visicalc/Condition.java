@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
+// Predicate
 class Condition
 {
   private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
@@ -7,11 +8,11 @@ class Condition
   private final Sheet parent;
 
   private String comparator;
-  private String cond;
-  private String value;
+  private String conditionText;
+  private String valueText;
 
-  private Expression expCond;
-  private Expression expValue;
+  private Expression conditionExpression;
+  private Expression valueExpression;
 
   public Condition (Sheet parent, String text)
   {
@@ -22,8 +23,8 @@ class Condition
       int pos = text.indexOf (comp);
       if (pos > 0)
       {
-        cond = text.substring (0, pos);
-        value = text.substring (pos + comp.length ());
+        conditionText = text.substring (0, pos);
+        valueText = text.substring (pos + comp.length ());
         comparator = comp;
         break;
       }
@@ -33,8 +34,8 @@ class Condition
     {
       if (text.startsWith ("@"))
       {
-        cond = text;
-        value = "1";
+        conditionText = text;
+        valueText = "1";
         comparator = "=";
       }
       else
@@ -44,27 +45,27 @@ class Condition
 
   public boolean getResult ()
   {
-    if (expCond == null)
+    if (conditionExpression == null)
     {
-      expCond = new Expression (parent, cond);
-      expValue = new Expression (parent, value);
+      conditionExpression = new Expression (parent, conditionText);
+      valueExpression = new Expression (parent, valueText);
     }
 
-    double condValue = expCond.getValue ();
-    double valueValue = expValue.getValue ();
+    double conditionResult = conditionExpression.getValue ();
+    double valueResult = valueExpression.getValue ();
 
     if (comparator.equals ("="))
-      return condValue == valueValue;
+      return conditionResult == valueResult;
     else if (comparator.equals ("<>"))
-      return condValue != valueValue;
+      return conditionResult != valueResult;
     else if (comparator.equals ("<"))
-      return condValue < valueValue;
+      return conditionResult < valueResult;
     else if (comparator.equals (">"))
-      return condValue > valueValue;
+      return conditionResult > valueResult;
     else if (comparator.equals ("<="))
-      return condValue <= valueValue;
+      return conditionResult <= valueResult;
     else if (comparator.equals (">="))
-      return condValue >= valueValue;
+      return conditionResult >= valueResult;
     else
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
 
@@ -74,6 +75,7 @@ class Condition
   @Override
   public String toString ()
   {
-    return String.format ("[cond=%s, op=%s, value=%s]", cond, comparator, value);
+    return String.format ("[cond=%s, op=%s, value=%s]", conditionText, comparator,
+                          valueText);
   }
 }

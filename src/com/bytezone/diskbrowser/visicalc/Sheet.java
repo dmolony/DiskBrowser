@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,8 +23,8 @@ public class Sheet implements Iterable<Cell>
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   private int columnWidth = 12;
-  private char recalculation = ' ';
-  private char recalculationOrder = ' ';
+  private char recalculation = ' ';               // auto/manual
+  private char recalculationOrder = ' ';          // row/column 
   private int columns;
   private int rows;
 
@@ -82,26 +81,23 @@ public class Sheet implements Iterable<Cell>
   
   /C   CLEARS THE SHEET, SETTING ALL ENTRIES TO BLANK
   
-  /D   DELETES THE ROW(/DR) OR COLUMN(/DC) ON WHICH THE CURSOR
-       LIES.
+  /D   DELETE
+      /DR THE ROW
+      /DC COLUMN ON WHICH THE CURSOR LIES
   
   /E   ALLOWS EDITING OF THE ENTRY CONTENTS OF ANY ENTRY POSITION
        BY REDISPLAYING IT ON THE EDIT LINE. USE <- -> KEYS & ESC.
   
-  /F   SETS THE DISPLAY FORMAT OF AN ENTRY TO ONE OF THE FOLLOWING
-       FORMATS:
-  
+  /F   FORMATS:
        /FG  GENERAL
-  
-           /FI  INTEGER
-           /F$  DOLLAR AND CENTS
-           /FL  LEFT JUSTIFIED
-           /FR  RIGHT JUSTIFIED
-           /F*  GRAPH
-           /FD  DEFAULT
+       /FI  INTEGER
+       /F$  DOLLAR AND CENTS
+       /FL  LEFT JUSTIFIED
+       /FR  RIGHT JUSTIFIED
+       /F*  GRAPH
+       /FD  DEFAULT
   
   /G   GLOBAL COMMANDS. THESE APPLY TO THE ENTIRE SHEET OR WINDOW.
-  
            /GC  SETS COLUMN WIDTH
            /GF  SETS THE GLOBAL DEFAULT FORMAT
            /GO  SETS THE ORDER OF RECALCULATION TO BE DOWN THE
@@ -112,20 +108,22 @@ public class Sheet implements Iterable<Cell>
   /M   MOVES AN ENTIRE ROW OR COLUMN TO A NEW POSITION.
   /P   PRINT COMMAND
   /R   REPLICATE COMMAND
-  /S   STORAGE COMMANDS ARE AS FOLLOWS:
-  
+   
+  /S   STORAGE COMMANDS
       /SS  SAVE
       /SL  LOAD
       /SD  DELETES SPECIFIED FILE ON DISK
       /SI  INITIALIZE A DISK ON SPECIFIED DRIVE
       /SQ  QUITS VISICALC
   
-  /T   SETS A HORIZONTAL TITLE AREA(/TH), A VERTICAL TITLE AREA
-       (/TV), SET BOTH A HORIZONTAL & VERTICAL TITLE AREA(/TB)
-       OR RESETS THE WINDOWS TO HAVE NO TITLE AREAS(/TN)
+  /T   
+      /TH SETS A HORIZONTAL TITLE AREA
+      /TV SETS A VERTICAL TITLE AREA
+      /TB SET BOTH A HORIZONTAL & VERTICAL TITLE AREA
+      /TN RESETS THE WINDOWS TO HAVE NO TITLE AREAS
+      
   /V   DISPLAYS VISICALC'S VERSION NUMBER ON THE PROMPT LINE
   /W   WINDOW CONTROL
-  
       /WH  HORIZONTAL WINDOW
       /WV  VERTICAL WINDOW
       /W1  RETURNS SCREEN TO ONE WINDOW
@@ -138,7 +136,7 @@ public class Sheet implements Iterable<Cell>
   public Sheet (byte[] buffer)
   {
     int last = buffer.length;
-    while (buffer[--last] == 0)
+    while (buffer[--last] == 0)     // ignore trailing zeroes
       ;
 
     int ptr = 0;
@@ -151,24 +149,15 @@ public class Sheet implements Iterable<Cell>
       ptr += length + 1;            // +1 for end-of-line token
     }
 
+    calculate (recalculationOrder);
+
     if (false)
-    {
-      System.out.println ();
-      System.out.println ("Lines:");
-      for (String line : lines)
-        System.out.println (line);
+      printDebug ();
+  }
 
-      System.out.println ();
-      System.out.println ("Cells:");
-      for (Cell cell : sheet.values ())
-        System.out.println (cell);
+  private void calculate (char order)
+  {
 
-      System.out.println ();
-      System.out.println ("Column widths:");
-      System.out.printf ("Default width : %3d%n", columnWidth);
-      for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
-        System.out.printf ("    column %3d: %3d%n", entry.getKey (), entry.getValue ());
-    }
   }
 
   private int getLineLength (byte[] buffer, int offset)
@@ -292,17 +281,12 @@ public class Sheet implements Iterable<Cell>
 
   Cell getCell (String addressText)
   {
-    Address address = new Address (addressText);
-    return getCell (address);
+    return getCell (new Address (addressText));
   }
 
   Cell getCell (Address address)
   {
-    Cell cell = sheet.get (address.sortValue);
-    //    if (cell == null)
-    //      System.out.printf ("Nonexistent cell requested [%s]%n", address);
-
-    return cell;
+    return sheet.get (address.sortValue);
   }
 
   public int size ()
@@ -345,8 +329,6 @@ public class Sheet implements Iterable<Cell>
     String underline = "---------------------------------------------------------"
         + "-----------------------------------------------------------------";
 
-    DecimalFormat nf = new DecimalFormat ("$#####0.00");
-    //    NumberFormat nf = NumberFormat.getCurrencyInstance ();
     int lastRow = -1;
     int lastColumn = 0;
 
@@ -357,18 +339,16 @@ public class Sheet implements Iterable<Cell>
       if (columnWidths.containsKey (cellNo))
         width = columnWidths.get (cellNo);
 
+      char letter1 = cellNo < 26 ? ' ' : cellNo < 52 ? 'A' : 'B';
+      char letter2 = (char) ((cellNo % 26) + 'A');
+      String fmt =
+          String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
       if (width == 1)
-        heading.append ("=");
+        heading.append (letter2);
       else if (width == 2)
-        heading.append ("==");
+        heading.append (String.format ("%s%s", letter1, letter2));
       else
-      {
-        char letter1 = cellNo < 26 ? ' ' : cellNo < 52 ? 'A' : 'B';
-        char letter2 = (char) ((cellNo % 26) + 'A');
-        String fmt =
-            String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
         heading.append (String.format (fmt, underline));
-      }
     }
     text.append (heading);
 
@@ -399,5 +379,24 @@ public class Sheet implements Iterable<Cell>
       text.append (cell.getText (colWidth, defaultFormat));
     }
     return text.toString ();
+  }
+
+  private void printDebug ()
+  {
+    System.out.println ();
+    System.out.println ("Lines:");
+    for (String line : lines)
+      System.out.println (line);
+
+    System.out.println ();
+    System.out.println ("Cells:");
+    for (Cell cell : sheet.values ())
+      System.out.println (cell);
+
+    System.out.println ();
+    System.out.println ("Column widths:");
+    System.out.printf ("Default width : %3d%n", columnWidth);
+    for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
+      System.out.printf ("    column %3d: %3d%n", entry.getKey (), entry.getValue ());
   }
 }

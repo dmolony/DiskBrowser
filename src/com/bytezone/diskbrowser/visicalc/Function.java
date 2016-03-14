@@ -30,9 +30,9 @@ abstract class Function implements Value
       .compile ("\\(([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})\\)?");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
-  Sheet parent;
-  String functionText;
-  boolean hasValue;
+  protected final Sheet parent;
+  protected String functionText;
+  protected boolean hasValue;
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -66,7 +66,10 @@ abstract class Function implements Value
     if (text.startsWith ("@ERROR("))
       return new Error (parent, text);
 
-    System.out.printf ("Unknown function: %s%n", text);
+    if (text.equals ("@NA"))
+      return new Error (parent, text);
+
+    System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, "@ERROR()");
   }
 
@@ -76,7 +79,8 @@ abstract class Function implements Value
 
     // get function's parameter string
     int pos = text.indexOf ('(');
-    this.functionText = text.substring (pos + 1, text.length () - 1);
+    if (pos >= 0)
+      this.functionText = text.substring (pos + 1, text.length () - 1);
   }
 
   @Override

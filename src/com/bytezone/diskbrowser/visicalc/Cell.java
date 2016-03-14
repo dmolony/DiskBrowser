@@ -106,12 +106,9 @@ class Cell implements Comparable<Cell>, Value
 
   String getText (int colWidth, char defaultFormat)
   {
-    // cell may have been formatted but no value set
+    // cell may have been created when formatted but no type set
     if (type == null)
-    {
-      System.out.println (this);
       return justify ("", colWidth);
-    }
 
     switch (type)
     {
@@ -171,12 +168,13 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public boolean hasValue ()
   {
-    if (label != null || repeatingChar > 0)
-      return false;
-
-    if (value == null)
-      createValue ();
-    return value.hasValue ();
+    if (type == CellType.VALUE)
+    {
+      if (value == null)
+        createValue ();
+      return value.hasValue ();
+    }
+    return false;
   }
 
   // this should be called when doing calculations
@@ -211,7 +209,7 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String toString ()
   {
-    String contents = "";
+    String contents = "<empty>";
     if (type != null)
       switch (type)
       {

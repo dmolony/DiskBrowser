@@ -36,4 +36,10 @@ class If extends Function
       return expFalse.getValue ();
     }
   }
+
+  @Override
+  public String toString ()
+  {
+    return String.format ("[IF:%s, True:%s, False:%s]", condition, textTrue, textFalse);
+  }
 }

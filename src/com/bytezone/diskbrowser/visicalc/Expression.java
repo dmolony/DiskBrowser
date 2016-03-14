@@ -34,9 +34,10 @@ class Expression implements Value
 
   private boolean hasValue;
 
-  public Expression (Sheet parent, String input)
+  public Expression (Sheet parent, String text)
   {
-    String line = checkBrackets (input);
+    String line = checkBrackets (text);
+    //    System.out.printf ("Exp[%s]%n", line);
 
     int ptr = 0;
     while (ptr < line.length ())
@@ -187,7 +188,7 @@ class Expression implements Value
   {
     int ptr = text.indexOf ('(');         // find first left parenthesis
     if (ptr < 0)
-      return "";
+      return text;
     int depth = 1;
 
     while (++ptr < text.length ())        // find matching right parenthesis

@@ -9,7 +9,7 @@ class Cell implements Comparable<Cell>, Value
   final Address address;
   private final Sheet parent;
   private CellType type;
-  private char format = ' ';
+  private char cellFormat = ' ';
 
   private char repeatingChar;
   private String repeat = "";
@@ -41,7 +41,7 @@ class Cell implements Comparable<Cell>, Value
     //  /F* - graph (histogram)
 
     if (format.startsWith ("/F"))
-      this.format = format.charAt (2);
+      this.cellFormat = format.charAt (2);
     else if (format.startsWith ("/-"))
     {
       repeatingChar = format.charAt (2);
@@ -118,6 +118,8 @@ class Cell implements Comparable<Cell>, Value
 
       case VALUE:
         if (hasValue ())
+        {
+          char format = cellFormat != ' ' ? cellFormat : defaultFormat;
           if (format == 'I')
           {
             String integerFormat = String.format ("%%%d.0f", colWidth);
@@ -147,13 +149,14 @@ class Cell implements Comparable<Cell>, Value
               val = val.substring (val.length () - colWidth);
             return val;
           }
+        }
     }
     return getError ();
   }
 
   private String justify (String text, int colWidth)
   {
-    if (format == 'R')
+    if (cellFormat == 'R')
     {
       String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
       return (String.format (labelFormat, text));

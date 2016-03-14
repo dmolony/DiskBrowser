@@ -200,6 +200,12 @@ public class Sheet implements Iterable<Cell>
             case 'C':
               columnWidth = Integer.parseInt (line.substring (3));
               break;
+            case 'F':
+              defaultFormat = line.charAt (3);
+              break;
+            default:
+              System.out.printf ("Unknown global format [%s]%n", line);
+              break;
           }
           break;
         case 'X':
@@ -249,7 +255,7 @@ public class Sheet implements Iterable<Cell>
 
     assert currentCell != null;
 
-    if (line.startsWith ("/G"))               // global column widths
+    if (line.startsWith ("/G"))                         // global column widths
     {
       if (line.charAt (2) == 'C' && line.charAt (3) == 'C')
       {
@@ -267,13 +273,20 @@ public class Sheet implements Iterable<Cell>
     while (line.startsWith ("/"))
     {
       String fmt = line.substring (0, 3);
-      currentCell.format (fmt);               // formatting command
+
+      if (fmt.equals ("/TH") || fmt.equals ("/TV"))     // lock titles ??
+      {
+        // ignore
+      }
+      else
+        currentCell.format (fmt);                       // formatting command
+
       line = line.substring (3);
       format += fmt;
     }
 
     if (!line.isEmpty ())
-      currentCell.setValue (line);            // expression
+      currentCell.setValue (line);                      // expression
 
     if (false)
       System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, format, line);

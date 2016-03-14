@@ -183,7 +183,7 @@ public class Sheet implements Iterable<Cell>
       switch (line.charAt (1))
       {
         case 'W':
-          System.out.printf ("Skipping [%s]%n", line);
+          //          System.out.printf ("Skipping [%s]%n", line);
           break;
         case 'G':
           switch (line.charAt (2))
@@ -195,7 +195,7 @@ public class Sheet implements Iterable<Cell>
               recalculationOrder = line.charAt (3);
               break;
             case 'P':
-              System.out.printf ("Skipping [%s]%n", line);
+              //              System.out.printf ("Skipping [%s]%n", line);
               break;
             case 'C':
               columnWidth = Integer.parseInt (line.substring (3));
@@ -209,7 +209,7 @@ public class Sheet implements Iterable<Cell>
           }
           break;
         case 'X':
-          System.out.printf ("Skipping [%s]%n", line);
+          //          System.out.printf ("Skipping [%s]%n", line);
           break;
         default:
           System.out.printf ("Skipping [%s]%n", line);
@@ -342,7 +342,7 @@ public class Sheet implements Iterable<Cell>
     String underline = "---------------------------------------------------------"
         + "-----------------------------------------------------------------";
 
-    int lastRow = -1;
+    int lastRow = 0;
     int lastColumn = 0;
 
     StringBuilder heading = new StringBuilder ("    ");
@@ -365,7 +365,10 @@ public class Sheet implements Iterable<Cell>
     }
 
     if (debug)
+    {
       text.append (heading);
+      text.append ("\n001:");
+    }
 
     for (Cell cell : sheet.values ())
     {

@@ -119,18 +119,19 @@ class Cell implements Comparable<Cell>, Value
       case VALUE:
         if (hasValue ())
         {
+          Double value = getValue ();
+          if (Double.isNaN (value))
+            return justify ("", colWidth);
+
           char format = cellFormat != ' ' ? cellFormat : defaultFormat;
           if (format == 'I')
           {
             String integerFormat = String.format ("%%%d.0f", colWidth);
-            return String.format (integerFormat, getValue ());
+            return String.format (integerFormat, value);
           }
           else if (format == '$')
           {
             String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-            Double value = getValue ();
-            if (Double.isNaN (value))
-              return justify ("", colWidth);
             return String.format (currencyFormat, nf.format (value));
           }
           else if (format == '*')
@@ -143,7 +144,7 @@ class Cell implements Comparable<Cell>, Value
           {
             // this could be improved
             String numberFormat = String.format ("%%%d.3f", colWidth + 4);
-            String val = String.format (numberFormat, getValue ());
+            String val = String.format (numberFormat, value);
             while (val.endsWith ("0"))
               val = ' ' + val.substring (0, val.length () - 1);
             if (val.endsWith ("."))

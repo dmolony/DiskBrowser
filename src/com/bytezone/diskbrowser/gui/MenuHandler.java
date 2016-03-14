@@ -13,6 +13,7 @@ import com.bytezone.common.OSXAdapter;
 import com.bytezone.common.Platform;
 import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
@@ -25,6 +26,7 @@ public class MenuHandler
   private static final String PREFS_SHOW_FREE_SECTORS = "show free sectors";
   private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
   private static final String PREFS_MONOCHROME = "monochrome";
+  private static final String PREFS_DEBUGGING = "debugging";
 
   FormattedDisk currentDisk;
 
@@ -61,6 +63,7 @@ public class MenuHandler
 
   JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
   JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
+  JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
 
   public MenuHandler (Preferences prefs)
   {
@@ -118,6 +121,7 @@ public class MenuHandler
 
     formatMenu.add (colourQuirksItem);
     formatMenu.add (monochromeItem);
+    formatMenu.add (debuggingItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -137,9 +141,6 @@ public class MenuHandler
     interleaveGroup.add (interleave3Item);
 
     dbItem.setEnabled (false);
-
-    HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
-    HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -195,6 +196,7 @@ public class MenuHandler
     prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
     prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
     prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
+    prefs.putBoolean (PREFS_DEBUGGING, debuggingItem.isSelected ());
   }
 
   @Override
@@ -206,6 +208,11 @@ public class MenuHandler
     showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
     monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
+    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
+
+    HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
+    HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
+    VisicalcFile.setDefaultDebug (debuggingItem.isSelected ());
   }
 
   @Override

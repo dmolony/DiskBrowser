@@ -329,7 +329,7 @@ public class Sheet implements Iterable<Cell>
     return text.toString ();
   }
 
-  public String getTextDisplay ()
+  public String getTextDisplay (boolean debug)
   {
     StringBuilder text = new StringBuilder ();
     String longLine;
@@ -363,7 +363,9 @@ public class Sheet implements Iterable<Cell>
       else
         heading.append (String.format (fmt, underline));
     }
-    text.append (heading);
+
+    if (debug)
+      text.append (heading);
 
     for (Cell cell : sheet.values ())
     {
@@ -371,7 +373,10 @@ public class Sheet implements Iterable<Cell>
       {
         ++lastRow;
         lastColumn = 0;
-        text.append (String.format ("%n%03d:", lastRow + 1));
+        if (debug)
+          text.append (String.format ("%n%03d:", lastRow + 1));
+        else
+          text.append ("\n");
       }
 
       while (lastColumn < cell.address.column)

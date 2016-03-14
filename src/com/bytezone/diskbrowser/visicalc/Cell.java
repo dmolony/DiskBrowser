@@ -128,7 +128,10 @@ class Cell implements Comparable<Cell>, Value
           else if (format == '$')
           {
             String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-            return String.format (currencyFormat, nf.format (getValue ()));
+            Double value = getValue ();
+            if (Double.isNaN (value))
+              return justify ("", colWidth);
+            return String.format (currencyFormat, nf.format (value));
           }
           else if (format == '*')
           {
@@ -150,6 +153,8 @@ class Cell implements Comparable<Cell>, Value
             return val;
           }
         }
+        //        else
+        //          return justify ("", colWidth);
     }
     return getError ();
   }

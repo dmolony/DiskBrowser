@@ -13,6 +13,7 @@ import javax.swing.event.ChangeListener;
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 
@@ -75,7 +76,7 @@ class DataPanel extends JTabbedPane
     imagePane =
         new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            // imagePane.getVerticalScrollBar ().setUnitIncrement (font.getSize ());
+    // imagePane.getVerticalScrollBar ().setUnitIncrement (font.getSize ());
 
     //    setTabsFont (font);
     //    this.setMinimumSize (new Dimension (800, 200));
@@ -126,6 +127,7 @@ class DataPanel extends JTabbedPane
     mh.lineWrapItem.setAction (new LineWrapAction (formattedText));
     mh.colourQuirksItem.setAction (new ColourQuirksAction (this));
     mh.monochromeItem.setAction (new MonochromeAction (this));
+    mh.debuggingItem.setAction (new DebuggingAction (this));
   }
 
   public void setColourQuirks (boolean value)
@@ -145,6 +147,16 @@ class DataPanel extends JTabbedPane
       HiResImage image = (HiResImage) currentDataSource;
       image.setMonochrome (value);
       imagePanel.setImage (image.getImage ());
+    }
+  }
+
+  public void setDebug (boolean value)
+  {
+    if (currentDataSource instanceof VisicalcFile)
+    {
+      VisicalcFile visicalcFile = (VisicalcFile) currentDataSource;
+      visicalcFile.setDebug (value);
+      setText (formattedText, visicalcFile.getText ());
     }
   }
 

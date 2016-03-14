@@ -1,10 +1,10 @@
 package com.bytezone.diskbrowser.applefile;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.visicalc.Sheet;
 
 public class VisicalcFile extends AbstractFile
 {
+  private static boolean debug;
   private Sheet sheet;
 
   public VisicalcFile (String name, byte[] buffer)
@@ -22,17 +22,29 @@ public class VisicalcFile extends AbstractFile
 
     text.append ("Visicalc : " + name + "\n");
     text.append ("Cells    : " + sheet.size () + "\n\n");
-    text.append (sheet.getTextDisplay ());
-    text.append ("\n\n");
-    text.append (sheet.getLines ());
+    text.append (sheet.getTextDisplay (debug));
+
+    if (debug)
+    {
+      text.append ("\n\n");
+      text.append (sheet.getLines ());
+    }
 
     return text.toString ();
   }
 
+  public static void setDefaultDebug (boolean value)
+  {
+    debug = value;
+  }
+
+  public void setDebug (boolean value)
+  {
+    debug = value;
+  }
+
   public static boolean isVisicalcFile (byte[] buffer)
   {
-    if (false)
-      System.out.println (HexFormatter.format (buffer));
     int firstByte = buffer[0] & 0xFF;
     if (firstByte != 0xBE && firstByte != 0xAF)
       return false;

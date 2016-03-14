@@ -176,10 +176,20 @@ class Expression implements Value
 
     if (leftBracket != rightBracket)
     {
-      System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
-                         leftBracket, rightBracket);
-      System.out.println (input);
-      return "@ERROR()";
+      if (rightBracket > leftBracket)
+      {
+        System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
+                           leftBracket, rightBracket);
+        System.out.println (input);
+        return "@ERROR()";
+      }
+      //      System.out.printf ("Old expression:[%s]%n", line);
+      while (rightBracket < leftBracket)
+      {
+        line = line + ")";
+        rightBracket++;
+      }
+      //      System.out.printf ("New expression:[%s]%n", line);
     }
     return line;
   }

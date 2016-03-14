@@ -100,8 +100,6 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "24";
       else if (address.sortValue == 259)
         expressionText = "11.9";
-      else if (address.sortValue == 579)
-        expressionText = "D9*G5/(1-((1+G5)^-D4))";
   }
 
   String getText (int colWidth, char defaultFormat)
@@ -181,8 +179,12 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public double getValue ()
   {
+    if (type != CellType.VALUE)
+      return 0;
+
     if (value == null)
       createValue ();
+
     return value.getValue ();
   }
 

@@ -13,6 +13,7 @@ public class Sheet
 {
   private static final Pattern addressPattern =
       Pattern.compile ("([AB]?[A-Z])([0-9]{1,3}):");
+  private static final byte END_OF_LINE_TOKEN = (byte) 0x8D;
 
   private final Map<Integer, Cell> rowOrderCells = new TreeMap<Integer, Cell> ();
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
@@ -23,10 +24,12 @@ public class Sheet
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   private int columnWidth = 12;
-  private char recalculation = ' ';               // auto/manual
+
+  private char recalculation = 'A';               // auto/manual
   private char recalculationOrder = 'C';          // row/column 
-  private int maxColumns;
-  private int maxRows;
+
+  private int highestColumn;
+  private int highestRow;
 
   // Maximum cell = BK254
 
@@ -166,7 +169,7 @@ public class Sheet
   private int getLineLength (byte[] buffer, int offset)
   {
     int ptr = offset;
-    while (buffer[ptr] != (byte) 0x8D)        // end-of-line token
+    while (buffer[ptr] != END_OF_LINE_TOKEN)        // end-of-line token
       ptr++;
     return ptr - offset;
   }
@@ -235,15 +238,7 @@ public class Sheet
       {
         currentCell = new Cell (this, address);
         if (!line.startsWith ("/G"))
-        {
-          rowOrderCells.put (currentCell.address.rowKey, currentCell);
-          columnOrderCells.put (currentCell.address.columnKey, currentCell);
-
-          if (address.row > maxRows)
-            maxRows = address.row;
-          if (address.column > maxColumns)
-            maxColumns = address.column;
-        }
+          addCell (currentCell);
       }
     }
     else
@@ -289,6 +284,17 @@ public class Sheet
 
     if (false)
       System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, format, line);
+  }
+
+  private void addCell (Cell cell)
+  {
+    rowOrderCells.put (cell.address.rowKey, cell);
+    columnOrderCells.put (cell.address.columnKey, cell);
+
+    if (cell.address.row > highestRow)
+      highestRow = cell.address.row;
+    if (cell.address.column > highestColumn)
+      highestColumn = cell.address.column;
   }
 
   Cell getCell (String addressText)
@@ -339,14 +345,15 @@ public class Sheet
     int lastColumn = 0;
 
     StringBuilder heading = new StringBuilder ("    ");
-    for (int cellNo = 0; cellNo <= maxColumns; cellNo++)
+    for (int column = 0; column <= highestColumn; column++)
     {
       int width = columnWidth;
-      if (columnWidths.containsKey (cellNo))
-        width = columnWidths.get (cellNo);
+      if (columnWidths.containsKey (column))
+        width = columnWidths.get (column);
 
-      char letter1 = cellNo < 26 ? ' ' : cellNo < 52 ? 'A' : 'B';
-      char letter2 = (char) ((cellNo % 26) + 'A');
+      char letter1 = column < 26 ? ' ' : column < 52 ? 'A' : 'B';
+      char letter2 = (char) ((column % 26) + 'A');
+
       String fmt =
           String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
       if (width == 1)
@@ -365,7 +372,8 @@ public class Sheet
 
     for (Cell cell : rowOrderCells.values ())
     {
-      while (lastRow < cell.address.row)
+      Address cellAddress = cell.address;
+      while (lastRow < cellAddress.row)
       {
         ++lastRow;
         lastColumn = 0;
@@ -375,7 +383,7 @@ public class Sheet
           text.append ("\n");
       }
 
-      while (lastColumn < cell.address.column)
+      while (lastColumn < cellAddress.column)
       {
         int width = columnWidth;
         if (columnWidths.containsKey (lastColumn))
@@ -387,8 +395,8 @@ public class Sheet
       ++lastColumn;
 
       int colWidth = columnWidth;
-      if (columnWidths.containsKey (cell.address.column))
-        colWidth = columnWidths.get (cell.address.column);
+      if (columnWidths.containsKey (cellAddress.column))
+        colWidth = columnWidths.get (cellAddress.column);
 
       text.append (cell.getText (colWidth, defaultFormat));
     }

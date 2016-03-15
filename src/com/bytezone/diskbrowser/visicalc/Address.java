@@ -6,7 +6,8 @@ class Address implements Comparable<Address>
   private static final int MAX_COLUMNS = 64;
 
   int row, column;
-  int sortValue;
+  int rowKey;
+  int columnKey;
   String text;
 
   public Address (String column, String row)
@@ -20,7 +21,8 @@ class Address implements Comparable<Address>
     assert row <= MAX_ROWS;
     this.row = row;
     this.column = column;
-    sortValue = row * MAX_COLUMNS + column;
+    rowKey = row * MAX_COLUMNS + column;
+    columnKey = column * MAX_ROWS + row;
 
     int col1 = column / 26;
     int col2 = column % 26;
@@ -37,14 +39,6 @@ class Address implements Comparable<Address>
       set (address.substring (0, 2), address.substring (2));
   }
 
-  // copied from Appleworks Cell
-  static String getCellName (int row, int column)
-  {
-    char c1 = (char) ('A' + column / 26 - 1);
-    char c2 = (char) ('A' + column % 26);
-    return "" + (c1 == '@' ? "" : c1) + c2 + row;
-  }
-
   private void set (String sCol, String sRow)
   {
     if (sCol.length () == 1)
@@ -57,7 +51,8 @@ class Address implements Comparable<Address>
     try
     {
       row = Integer.parseInt (sRow) - 1;
-      sortValue = row * MAX_COLUMNS + column;
+      rowKey = row * MAX_COLUMNS + column;
+      columnKey = column * MAX_ROWS + row;
       text = sCol + sRow;
     }
     catch (NumberFormatException e)
@@ -80,15 +75,23 @@ class Address implements Comparable<Address>
     return next;
   }
 
+  // copied from Appleworks Cell
+  static String getCellName (int row, int column)
+  {
+    char c1 = (char) ('A' + column / 26 - 1);
+    char c2 = (char) ('A' + column % 26);
+    return "" + (c1 == '@' ? "" : c1) + c2 + row;
+  }
+
   @Override
   public String toString ()
   {
-    return String.format ("%-4s %3d %3d %4d", text, row, column, sortValue);
+    return String.format ("%-4s %3d %3d %4d", text, row, column, rowKey);
   }
 
   @Override
   public int compareTo (Address o)
   {
-    return sortValue - o.sortValue;
+    return rowKey - o.rowKey;
   }
 }

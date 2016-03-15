@@ -30,6 +30,11 @@ class Cell implements Comparable<Cell>, Value
     this.address = address;
   }
 
+  public boolean isValue ()
+  {
+    return type == CellType.VALUE;
+  }
+
   void format (String format)
   {
     //  /FG - general
@@ -68,37 +73,37 @@ class Cell implements Comparable<Cell>, Value
 
     // FUTURE.VC
     if (false)
-      if (address.sortValue == 67)
+      if (address.rowKey == 67)
         expressionText = "1000";
-      else if (address.sortValue == 131)
+      else if (address.rowKey == 131)
         expressionText = "10.5";
-      else if (address.sortValue == 195)
+      else if (address.rowKey == 195)
         expressionText = "12";
-      else if (address.sortValue == 259)
+      else if (address.rowKey == 259)
         expressionText = "8";
 
     // IRA.VC
     if (false)
-      if (address.sortValue == 66)
+      if (address.rowKey == 66)
         expressionText = "10";
-      else if (address.sortValue == 130)
+      else if (address.rowKey == 130)
         expressionText = "30";
-      else if (address.sortValue == 194)
+      else if (address.rowKey == 194)
         expressionText = "65";
-      else if (address.sortValue == 258)
+      else if (address.rowKey == 258)
         expressionText = "1000";
-      else if (address.sortValue == 386)
+      else if (address.rowKey == 386)
         expressionText = "15";
 
     // CARLOAN.VC
     if (false)
-      if (address.sortValue == 67)
+      if (address.rowKey == 67)
         expressionText = "9375";
-      else if (address.sortValue == 131)
+      else if (address.rowKey == 131)
         expressionText = "4500";
-      else if (address.sortValue == 195)
+      else if (address.rowKey == 195)
         expressionText = "24";
-      else if (address.sortValue == 259)
+      else if (address.rowKey == 259)
         expressionText = "11.9";
   }
 
@@ -176,11 +181,7 @@ class Cell implements Comparable<Cell>, Value
   public boolean hasValue ()
   {
     if (type == CellType.VALUE)
-    {
-      if (value == null)
-        createValue ();
       return value.hasValue ();
-    }
     return false;
   }
 
@@ -191,21 +192,16 @@ class Cell implements Comparable<Cell>, Value
     if (type != CellType.VALUE)
       return 0;
 
-    if (value == null)
-      createValue ();
-
     return value.getValue ();
   }
 
   @Override
   public String getError ()
   {
-    if (value == null)
-      createValue ();
     return value.getError ();
   }
 
-  private void createValue ()
+  void calculate ()
   {
     if (expressionText == null)
     {

@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,23 +9,24 @@ import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class Sheet implements Iterable<Cell>
+public class Sheet
 {
   private static final Pattern addressPattern =
       Pattern.compile ("([AB]?[A-Z])([0-9]{1,3}):");
 
-  private final Map<Integer, Cell> sheet = new TreeMap<Integer, Cell> ();
+  private final Map<Integer, Cell> rowOrderCells = new TreeMap<Integer, Cell> ();
+  private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
   private final List<String> lines = new ArrayList<String> ();
 
-  Cell currentCell = null;
-  char defaultFormat;
+  private Cell currentCell = null;
+  private char defaultFormat;
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   private int columnWidth = 12;
   private char recalculation = ' ';               // auto/manual
-  private char recalculationOrder = ' ';          // row/column 
-  private int columns;
-  private int rows;
+  private char recalculationOrder = 'C';          // row/column 
+  private int maxColumns;
+  private int maxRows;
 
   // Maximum cell = BK254
 
@@ -157,7 +157,10 @@ public class Sheet implements Iterable<Cell>
 
   private void calculate (char order)
   {
-
+    Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
+    for (Cell cell : cells.values ())
+      if (cell.isValue ())
+        cell.calculate ();
   }
 
   private int getLineLength (byte[] buffer, int offset)
@@ -170,13 +173,7 @@ public class Sheet implements Iterable<Cell>
 
   private void processLine (String line)
   {
-    // NB no closing bracket: [>K11:@SUM(J11...F11]
-
-    if (line.isEmpty ())
-    {
-      System.out.println ("empty command");
-      return;
-    }
+    assert !line.isEmpty ();
 
     if (line.startsWith ("/"))
     {
@@ -229,7 +226,7 @@ public class Sheet implements Iterable<Cell>
     if (m.find ())
     {
       Address address = new Address (m.group (1), m.group (2));
-      currentCell = sheet.get (address.sortValue);
+      currentCell = rowOrderCells.get (address.rowKey);
 
       int pos = line.indexOf (':');                     // end of cell address
       line = line.substring (pos + 1);                  // remove address from line
@@ -239,11 +236,13 @@ public class Sheet implements Iterable<Cell>
         currentCell = new Cell (this, address);
         if (!line.startsWith ("/G"))
         {
-          sheet.put (currentCell.address.sortValue, currentCell);
-          if (address.row > rows)
-            rows = address.row;
-          if (address.column > columns)
-            columns = address.column;
+          rowOrderCells.put (currentCell.address.rowKey, currentCell);
+          columnOrderCells.put (currentCell.address.columnKey, currentCell);
+
+          if (address.row > maxRows)
+            maxRows = address.row;
+          if (address.column > maxColumns)
+            maxColumns = address.column;
         }
       }
     }
@@ -299,18 +298,12 @@ public class Sheet implements Iterable<Cell>
 
   Cell getCell (Address address)
   {
-    return sheet.get (address.sortValue);
+    return rowOrderCells.get (address.rowKey);
   }
 
   public int size ()
   {
-    return sheet.size ();
-  }
-
-  @Override
-  public Iterator<Cell> iterator ()
-  {
-    return sheet.values ().iterator ();
+    return rowOrderCells.size ();
   }
 
   public String getLines ()
@@ -346,7 +339,7 @@ public class Sheet implements Iterable<Cell>
     int lastColumn = 0;
 
     StringBuilder heading = new StringBuilder ("    ");
-    for (int cellNo = 0; cellNo <= columns; cellNo++)
+    for (int cellNo = 0; cellNo <= maxColumns; cellNo++)
     {
       int width = columnWidth;
       if (columnWidths.containsKey (cellNo))
@@ -370,7 +363,7 @@ public class Sheet implements Iterable<Cell>
       text.append ("\n001:");
     }
 
-    for (Cell cell : sheet.values ())
+    for (Cell cell : rowOrderCells.values ())
     {
       while (lastRow < cell.address.row)
       {
@@ -411,7 +404,7 @@ public class Sheet implements Iterable<Cell>
 
     System.out.println ();
     System.out.println ("Cells:");
-    for (Cell cell : sheet.values ())
+    for (Cell cell : rowOrderCells.values ())
       System.out.println (cell);
 
     System.out.println ();

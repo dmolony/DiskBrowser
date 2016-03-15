@@ -68,7 +68,7 @@ class CatalogPanel extends JTabbedPane
     selector.addDiskSelectionListener (lister.diskLister);
 
     setTabPlacement (SwingConstants.BOTTOM);
-    setPreferredSize (new Dimension (360, 802)); // width, height
+    setPreferredSize (new Dimension (360, 802));          // width, height
     //    setPreferredSize (new Dimension (360, 523)); // width, height
 
     createTabs (prefs);

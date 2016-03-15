@@ -1,8 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Error extends Function
+public class Na extends Function
 {
-  public Error (Sheet parent, String text)
+  public Na (Sheet parent, String text)
   {
     super (parent, text);
   }
@@ -16,7 +16,7 @@ class Error extends Function
   @Override
   public String getError ()
   {
-    return "@Error";
+    return "@NA";
   }
 
   @Override

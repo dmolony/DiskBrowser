@@ -60,17 +60,32 @@ abstract class Function implements Value
     if (text.startsWith ("@AND("))
       return new And (parent, text);
 
+    if (text.startsWith ("@NPV("))
+      return new Npv (parent, text);
+
+    if (text.startsWith ("@ABS("))
+      return new Abs (parent, text);
+
+    if (text.startsWith ("@INT("))
+      return new Int (parent, text);
+
     if (text.startsWith ("@ISERROR("))
       return new IsError (parent, text);
 
-    if (text.startsWith ("@ERROR("))
+    if (text.startsWith ("@ISNA("))
+      return new IsNa (parent, text);
+
+    if (text.startsWith ("@PI"))
+      return new Pi (parent, text);
+
+    if (text.startsWith ("@ERROR"))
       return new Error (parent, text);
 
     if (text.equals ("@NA"))
-      return new Error (parent, text);
+      return new Na (parent, text);
 
     System.out.printf ("Unknown function: [%s]%n", text);
-    return new Error (parent, "@ERROR()");
+    return new Error (parent, "@ERROR");
   }
 
   Function (Sheet parent, String text)

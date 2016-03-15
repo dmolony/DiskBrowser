@@ -16,7 +16,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 {
   private static final String windowTitle = "Apple ][ Disk Browser";
   private static final String PREFS_FULL_SCREEN = "full screen";
-  Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
+  private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
+  private WindowSaver windowSaver;
 
   public DiskBrowser ()
   {
@@ -157,6 +158,19 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         : e.getFormattedDisk ().getName ());
   }
 
+  @Override
+  public void quit (Preferences preferences)
+  {
+    windowSaver.saveWindow ();
+  }
+
+  @Override
+  public void restore (Preferences preferences)
+  {
+    windowSaver = new WindowSaver (prefs, this, "DiskBrowser");
+    windowSaver.restoreWindow ();
+  }
+
   public static void main (String[] args)
   {
     EventQueue.invokeLater (new Runnable ()
@@ -168,33 +182,5 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         new DiskBrowser ().setVisible (true);
       }
     });
-  }
-
-  @Override
-  public void quit (Preferences preferences)
-  {
-    prefs.putBoolean (PREFS_FULL_SCREEN, getExtendedState () == MAXIMIZED_BOTH);
-  }
-
-  @Override
-  public void restore (Preferences preferences)
-  {
-    if (true)
-    {
-      setLocationRelativeTo (null); // centre
-
-      // if we are on a smallish screen, just go fullscreen width
-      if (Platform.toolkit.getScreenSize ().width <= 1280)
-        setExtendedState (MAXIMIZED_HORIZ);
-
-      // restore window if it was previously at full screen
-      if (prefs.getBoolean (PREFS_FULL_SCREEN, false))
-        setExtendedState (MAXIMIZED_BOTH);
-    }
-    else
-    {
-      setLocation (10, 10);
-      setSize (1200, 812);
-    }
   }
 }

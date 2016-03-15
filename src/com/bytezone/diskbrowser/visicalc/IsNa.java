@@ -1,8 +1,9 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Pi extends Function
+public class IsNa extends Function
 {
-  Pi (Sheet parent, String text)
+
+  IsNa (Sheet parent, String text)
   {
     super (parent, text);
   }
@@ -10,6 +11,6 @@ class Pi extends Function
   @Override
   public double getValue ()
   {
-    return 3.1415926536;
+    return 0;
   }
 }

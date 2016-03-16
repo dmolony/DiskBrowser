@@ -3,8 +3,6 @@ package com.bytezone.diskbrowser.visicalc;
 class Min extends Function
 {
   private final Range range;
-  private boolean hasChecked;
-  private double min = Double.MAX_VALUE;
 
   public Min (Sheet parent, String text)
   {
@@ -13,34 +11,31 @@ class Min extends Function
   }
 
   @Override
-  public boolean hasValue ()
+  public void calculate ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue;
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return hasValue () ? min : 0;
-  }
-
-  private void calculate ()
-  {
-    hasChecked = true;
-    hasValue = false;
+    value = Double.MAX_VALUE;
+    isError = false;
+    int totalChecked = 0;
 
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.hasValue ())
+      if (cell == null)
+        continue;
+
+      if (cell.isError () || cell.isNaN ())
       {
-        hasValue = true;
-        double value = cell.getValue ();
-        if (value < min)
-          min = value;
+        isError = true;
+        break;
       }
+
+      double temp = cell.getValue ();
+      if (temp < value)
+        value = temp;
+      totalChecked++;
     }
+
+    if (totalChecked == 0)
+      isError = true;
   }
 }

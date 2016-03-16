@@ -28,6 +28,7 @@ class Cell implements Comparable<Cell>, Value
   {
     this.parent = parent;
     this.address = address;
+    type = CellType.VALUE;            // default to VALUE, formatting may change it
   }
 
   public boolean isValue ()
@@ -110,8 +111,8 @@ class Cell implements Comparable<Cell>, Value
   String getText (int colWidth, char defaultFormat)
   {
     // cell may have been created when formatted but no type set
-    if (type == null)
-      return justify ("", colWidth);
+    //    if (type == null)
+    //      return justify ("", colWidth);
 
     switch (type)
     {
@@ -122,47 +123,43 @@ class Cell implements Comparable<Cell>, Value
         return justify (repeat, colWidth);
 
       case VALUE:
-        if (hasValue ())
-        {
-          Double value = getValue ();
-          if (Double.isNaN (value))
-            return justify ("", colWidth);
+        if (value.isError () || value.isNaN ())
+          return justify (value.getText (), colWidth);
 
-          char format = cellFormat != ' ' ? cellFormat : defaultFormat;
-          if (format == 'I')
-          {
-            String integerFormat = String.format ("%%%d.0f", colWidth);
-            return String.format (integerFormat, value);
-          }
-          else if (format == '$')
-          {
-            String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-            return String.format (currencyFormat, nf.format (value));
-          }
-          else if (format == '*')
-          {
-            String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-            // this is not finished
-            return String.format (graphFormat, "********************");
-          }
-          else
-          {
-            // this could be improved
-            String numberFormat = String.format ("%%%d.3f", colWidth + 4);
-            String val = String.format (numberFormat, value);
-            while (val.endsWith ("0"))
-              val = ' ' + val.substring (0, val.length () - 1);
-            if (val.endsWith ("."))
-              val = ' ' + val.substring (0, val.length () - 1);
-            if (val.length () > colWidth)
-              val = val.substring (val.length () - colWidth);
-            return val;
-          }
+        Double thisValue = value.getValue ();
+
+        char format = cellFormat != ' ' ? cellFormat : defaultFormat;
+        if (format == 'I')
+        {
+          String integerFormat = String.format ("%%%d.0f", colWidth);
+          return String.format (integerFormat, thisValue);
         }
-        //        else
-        //          return justify ("", colWidth);
+        else if (format == '$')
+        {
+          String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+          return String.format (currencyFormat, nf.format (thisValue));
+        }
+        else if (format == '*')
+        {
+          String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+          // this is not finished
+          return String.format (graphFormat, "********************");
+        }
+        else
+        {
+          // this could be improved
+          String numberFormat = String.format ("%%%d.3f", colWidth + 4);
+          String val = String.format (numberFormat, thisValue);
+          while (val.endsWith ("0"))
+            val = ' ' + val.substring (0, val.length () - 1);
+          if (val.endsWith ("."))
+            val = ' ' + val.substring (0, val.length () - 1);
+          if (val.length () > colWidth)
+            val = val.substring (val.length () - colWidth);
+          return val;
+        }
     }
-    return getError ();
+    return getText ();
   }
 
   private String justify (String text, int colWidth)
@@ -178,39 +175,47 @@ class Cell implements Comparable<Cell>, Value
   }
 
   @Override
-  public boolean hasValue ()
-  {
-    if (type == CellType.VALUE)
-      return value.hasValue ();
-    return false;
-  }
-
-  // this should be called when doing calculations
-  @Override
   public double getValue ()
   {
-    if (type != CellType.VALUE)
-      return 0;
-
+    assert type == CellType.VALUE;
     return value.getValue ();
   }
 
   @Override
-  public String getError ()
+  public String getText ()
   {
-    return value.getError ();
+    assert type == CellType.VALUE;
+    return value.getText ();
   }
 
-  void calculate ()
+  @Override
+  public boolean isError ()
   {
+    assert type == CellType.VALUE;
+    return value.isError ();
+  }
+
+  @Override
+  public boolean isNaN ()
+  {
+    assert type == CellType.VALUE;
+    return value.isNaN ();
+  }
+
+  @Override
+  public void calculate ()
+  {
+    assert type == CellType.VALUE;
     if (expressionText == null)
     {
       System.out.printf ("%s null expression text %n", address);
-      value = Function.getInstance (parent, "@ERROR()");
+      value = Function.getInstance (parent, "@ERROR");
     }
     else
-      // could use Number or Cell for simple Values
+      // should use Number or Cell for simple Values
       value = new Expression (parent, expressionText);
+
+    value.calculate ();
   }
 
   @Override

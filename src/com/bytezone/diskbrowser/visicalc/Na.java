@@ -8,20 +8,25 @@ public class Na extends Function
   }
 
   @Override
-  public boolean hasValue ()
+  public boolean isError ()
   {
-    return false;
+    return true;
   }
 
   @Override
-  public String getError ()
+  public boolean isNaN ()
   {
-    return "@NA";
+    return true;
   }
 
   @Override
   public double getValue ()
   {
     return 0;
+  }
+
+  @Override
+  public void calculate ()
+  {
   }
 }

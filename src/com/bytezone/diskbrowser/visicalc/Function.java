@@ -32,7 +32,9 @@ abstract class Function implements Value
 
   protected final Sheet parent;
   protected String functionText;
-  protected boolean hasValue;
+
+  protected boolean isError;
+  protected double value;
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -95,19 +97,37 @@ abstract class Function implements Value
     // get function's parameter string
     int pos = text.indexOf ('(');
     if (pos >= 0)
-      this.functionText = text.substring (pos + 1, text.length () - 1);
+      functionText = text.substring (pos + 1, text.length () - 1);
+    else
+      functionText = "";
   }
 
   @Override
-  public boolean hasValue ()
+  public boolean isError ()
   {
-    return hasValue;
+    return isError;
   }
 
   @Override
-  public String getError ()
+  public boolean isNaN ()
   {
-    return hasValue ? "" : "Error";
+    return Double.isNaN (value);
+  }
+
+  @Override
+  public double getValue ()
+  {
+    return value;
+  }
+
+  @Override
+  public String getText ()
+  {
+    if (isNaN ())
+      return "NaN";
+    if (isError ())
+      return "Error";
+    return "";
   }
 
   protected Range getRange (String text)

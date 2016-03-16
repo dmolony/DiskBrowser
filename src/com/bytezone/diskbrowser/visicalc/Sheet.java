@@ -14,6 +14,7 @@ public class Sheet
   private static final Pattern addressPattern =
       Pattern.compile ("([AB]?[A-Z])([0-9]{1,3}):");
   private static final byte END_OF_LINE_TOKEN = (byte) 0x8D;
+  private static final int FORMAT_LENGTH = 3;
 
   private final Map<Integer, Cell> rowOrderCells = new TreeMap<Integer, Cell> ();
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
@@ -266,7 +267,8 @@ public class Sheet
     String format = "";
     while (line.startsWith ("/"))
     {
-      String fmt = line.substring (0, 3);
+      String fmt = line.substring (0, FORMAT_LENGTH);
+      line = line.substring (FORMAT_LENGTH);
 
       if (fmt.equals ("/TH") || fmt.equals ("/TV"))     // lock titles ??
       {
@@ -275,7 +277,6 @@ public class Sheet
       else
         currentCell.format (fmt);                       // formatting command
 
-      line = line.substring (3);
       format += fmt;
     }
 

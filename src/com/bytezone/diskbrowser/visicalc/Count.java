@@ -3,8 +3,6 @@ package com.bytezone.diskbrowser.visicalc;
 class Count extends Function
 {
   private final Range range;
-  private boolean hasChecked;
-  private double count = 0;
 
   public Count (Sheet parent, String text)
   {
@@ -13,33 +11,20 @@ class Count extends Function
   }
 
   @Override
-  public boolean hasValue ()
+  public void calculate ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue;
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return hasValue () ? count : 0;
-  }
-
-  private void calculate ()
-  {
-    hasChecked = true;
-    hasValue = false;
-
+    value = 0;
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.hasValue ())
+      if (cell == null || cell.isError () || cell.isNaN ())
       {
-        hasValue = true;
-        if (cell.getValue () != 0.0)
-          count++;
+        isError = true;
+        break;
       }
+
+      if (cell.getValue () != 0.0)
+        value++;
     }
   }
 }

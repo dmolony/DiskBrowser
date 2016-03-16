@@ -8,9 +8,6 @@ public class Npv extends Function
   private final Expression valueExp;
   private final Range range;
 
-  private boolean hasChecked;
-  private final double value = 0;
-
   Npv (Sheet parent, String text)
   {
     super (parent, text);
@@ -24,32 +21,23 @@ public class Npv extends Function
   }
 
   @Override
-  public boolean hasValue ()
+  public void calculate ()
   {
-    if (!hasChecked)
-      calculate ();
-    return hasValue;
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return hasValue () ? value : 0;
-  }
-
-  private void calculate ()
-  {
-    hasChecked = true;
-    hasValue = false;
+    value = 0;
 
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.hasValue ())
+      if (cell == null)
+        continue;
+
+      if (cell.isError () || cell.isNaN ())
       {
-        hasValue = true;
-        // calculate something
+        isError = true;
+        break;
       }
+
+      double temp = cell.getValue ();
     }
   }
 }

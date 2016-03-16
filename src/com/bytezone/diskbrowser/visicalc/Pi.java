@@ -8,8 +8,8 @@ class Pi extends Function
   }
 
   @Override
-  public double getValue ()
+  public void calculate ()
   {
-    return 3.1415926536;
+    value = 3.1415926536;
   }
 }

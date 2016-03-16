@@ -2,22 +2,18 @@ package com.bytezone.diskbrowser.visicalc;
 
 class IsError extends Function
 {
-  boolean firstTime = true;
-  Cell cell;
+  Expression expression;
 
   public IsError (Sheet parent, String text)
   {
     super (parent, text);
+    expression = new Expression (parent, functionText);
   }
 
   @Override
-  public double getValue ()
+  public void calculate ()
   {
-    if (firstTime)
-    {
-      firstTime = false;
-      cell = parent.getCell (new Address (functionText));
-    }
-    return cell == null ? 1 : 0;
+    value = expression.getValue ();
+    isError = expression.isError ();
   }
 }

@@ -32,7 +32,8 @@ class Expression implements Value
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  private boolean hasValue;
+  protected boolean isError;
+  private double value;
 
   public Expression (Sheet parent, String text)
   {
@@ -112,14 +113,13 @@ class Expression implements Value
     }
 
     assert values.size () > 0;
-    hasValue = true;
   }
 
   @Override
-  public double getValue ()
+  public void calculate ()
   {
     Value thisValue = values.get (0);
-    double value = thisValue == null ? 0 : values.get (0).getValue ();
+    value = thisValue == null ? 0 : values.get (0).getValue ();
 
     String sign = signs.get (0);
     if (sign.equals ("(-)"))
@@ -146,19 +146,34 @@ class Expression implements Value
       else if (operator.equals ("^"))
         value = Math.pow (value, nextValue);
     }
+  }
+
+  @Override
+  public boolean isNaN ()
+  {
+    return Double.isNaN (value);
+  }
+
+  @Override
+  public String getText ()
+  {
+    if (isNaN ())
+      return "NaN";
+    if (isError ())
+      return "Error";
+    return "";
+  }
+
+  @Override
+  public boolean isError ()
+  {
+    return isError;
+  }
+
+  @Override
+  public double getValue ()
+  {
     return value;
-  }
-
-  @Override
-  public boolean hasValue ()
-  {
-    return hasValue;
-  }
-
-  @Override
-  public String getError ()
-  {
-    return hasValue ? "" : "Error";
   }
 
   private String checkBrackets (String input)

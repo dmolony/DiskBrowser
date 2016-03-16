@@ -3,8 +3,6 @@ package com.bytezone.diskbrowser.visicalc;
 class Sum extends Function
 {
   private final Range range;
-  private boolean hasChecked;
-  private double sum = 0;
 
   public Sum (Sheet parent, String text)
   {
@@ -13,32 +11,21 @@ class Sum extends Function
   }
 
   @Override
-  public boolean hasValue ()
-  {
-    if (!hasChecked)
-      calculate ();
-    return hasValue;
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return hasValue () ? sum : 0;
-  }
-
   public void calculate ()
   {
-    hasChecked = true;
-    hasValue = false;
-
+    value = 0;
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.hasValue ())
+      if (cell == null)
+        continue;
+
+      if (cell.isError () || cell.isNaN ())
       {
-        hasValue = true;
-        sum += cell.getValue ();
+        isError = true;
+        break;
       }
+      value += cell.getValue ();
     }
   }
 }

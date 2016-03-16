@@ -2,26 +2,37 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Number implements Value
 {
-  private double value;
-  private boolean hasValue;
+  double value;
+  boolean isError;
 
   public Number (String text)
   {
     try
     {
-      this.value = Double.parseDouble (text);
-      hasValue = true;
+      value = Double.parseDouble (text);
     }
     catch (NumberFormatException e)
     {
-      hasValue = false;
+      isError = true;
     }
   }
 
   @Override
-  public boolean hasValue ()
+  public boolean isError ()
   {
-    return hasValue;
+    return isError;
+  }
+
+  @Override
+  public boolean isNaN ()
+  {
+    return Double.isNaN (value);
+  }
+
+  @Override
+  public String toString ()
+  {
+    return String.format ("Number: %f", value);
   }
 
   @Override
@@ -31,14 +42,13 @@ class Number implements Value
   }
 
   @Override
-  public String getError ()
+  public String getText ()
   {
-    return hasValue ? "" : "@NA";
+    return null;
   }
 
   @Override
-  public String toString ()
+  public void calculate ()
   {
-    return String.format ("Number: %f", value);
   }
 }

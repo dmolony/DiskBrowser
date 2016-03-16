@@ -49,7 +49,13 @@ class Condition
     {
       conditionExpression = new Expression (parent, conditionText);
       valueExpression = new Expression (parent, valueText);
+
+      conditionExpression.calculate ();
+      valueExpression.calculate ();
     }
+
+    if (conditionExpression.isError () || valueExpression.isError ())
+      return false;
 
     double conditionResult = conditionExpression.getValue ();
     double valueResult = valueExpression.getValue ();

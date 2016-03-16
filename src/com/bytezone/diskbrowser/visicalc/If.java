@@ -25,17 +25,31 @@ class If extends Function
   @Override
   public void calculate ()
   {
+    valueType = ValueType.VALUE;
+
     if (condition.getResult ())
     {
       if (expTrue == null)
+      {
         expTrue = new Expression (parent, textTrue);
-      value = expTrue.getValue ();
+        expTrue.calculate ();
+      }
+      if (expTrue.isError () || expTrue.isNaN ())
+        valueType = expTrue.getValueType ();
+      else
+        value = expTrue.getValue ();
     }
     else
     {
       if (expFalse == null)
+      {
         expFalse = new Expression (parent, textFalse);
-      value = expFalse.getValue ();
+        expFalse.calculate ();
+      }
+      if (expFalse.isError () || expFalse.isNaN ())
+        valueType = expFalse.getValueType ();
+      else
+        value = expFalse.getValue ();
     }
   }
 

@@ -2,7 +2,12 @@ package com.bytezone.diskbrowser.visicalc;
 
 interface Value
 {
-  //  public boolean hasValue ();
+  enum ValueType
+  {
+    VALUE, ERROR, NA
+  }
+
+  public ValueType getValueType ();
 
   public double getValue ();
 

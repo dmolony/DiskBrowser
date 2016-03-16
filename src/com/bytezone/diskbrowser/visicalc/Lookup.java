@@ -3,7 +3,6 @@ package com.bytezone.diskbrowser.visicalc;
 class Lookup extends Function
 {
   Range range;
-  //  boolean hasValue;
   String sourceText;
   String rangeText;
   Expression source;
@@ -20,15 +19,15 @@ class Lookup extends Function
     range = getRange (rangeText);
   }
 
-  // need a mechanism to return NA and ERROR
-  //  @Override
-  //  public boolean hasValue ()
-  //  {
-  //    return hasValue;
-  //  }
-
+  @Override
   public void calculate ()
   {
+    source.calculate ();
+    if (source.isError () || source.isNaN ())
+    {
+      valueType = source.getValueType ();
+      return;
+    }
     double sourceValue = source.getValue ();
 
     Address target = null;
@@ -45,7 +44,5 @@ class Lookup extends Function
         value = parent.getCell (target.nextColumn ()).getValue ();
       else
         value = parent.getCell (target.nextRow ()).getValue ();
-
-    //    return 0;
   }
 }

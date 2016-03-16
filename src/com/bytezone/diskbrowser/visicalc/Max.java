@@ -14,7 +14,6 @@ class Max extends Function
   public void calculate ()
   {
     value = Double.MIN_VALUE;
-    isError = false;
     int totalChecked = 0;
 
     for (Address address : range)
@@ -25,8 +24,8 @@ class Max extends Function
 
       if (cell.isError () || cell.isNaN ())
       {
-        isError = true;
-        break;
+        valueType = ValueType.ERROR;
+        return;
       }
 
       double temp = cell.getValue ();
@@ -36,6 +35,8 @@ class Max extends Function
     }
 
     if (totalChecked == 0)
-      isError = true;
+      valueType = ValueType.ERROR;
+    else
+      valueType = ValueType.VALUE;
   }
 }

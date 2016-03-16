@@ -32,7 +32,8 @@ class Expression implements Value
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  protected boolean isError;
+  //  protected boolean isError;
+  private ValueType valueType;
   private double value;
 
   public Expression (Sheet parent, String text)
@@ -118,34 +119,60 @@ class Expression implements Value
   @Override
   public void calculate ()
   {
-    Value thisValue = values.get (0);
-    value = thisValue == null ? 0 : values.get (0).getValue ();
-
-    String sign = signs.get (0);
-    if (sign.equals ("(-)"))
-      value *= -1;
-
-    for (int i = 1; i < values.size (); i++)
+    try
     {
-      thisValue = values.get (i);
-      double nextValue = thisValue == null ? 0 : thisValue.getValue ();
+      Value thisValue = values.get (0);
+      thisValue.calculate ();
+      if (thisValue.isError ())
+      {
+        valueType = ValueType.ERROR;
+        return;
+      }
+      value = thisValue.getValue ();
 
-      sign = signs.get (i);
+      String sign = signs.get (0);
       if (sign.equals ("(-)"))
-        nextValue *= -1;
+        value *= -1;
 
-      String operator = operators.get (i - 1);
-      if (operator.equals ("+"))
-        value += nextValue;
-      else if (operator.equals ("-"))
-        value -= nextValue;
-      else if (operator.equals ("*"))
-        value *= nextValue;
-      else if (operator.equals ("/"))
-        value /= nextValue;
-      else if (operator.equals ("^"))
-        value = Math.pow (value, nextValue);
+      for (int i = 1; i < values.size (); i++)
+      {
+        thisValue = values.get (i);
+        thisValue.calculate ();
+        if (thisValue.isError ())
+        {
+          valueType = ValueType.ERROR;
+          return;
+        }
+        double nextValue = thisValue.getValue ();
+
+        sign = signs.get (i);
+        if (sign.equals ("(-)"))
+          nextValue *= -1;
+
+        String operator = operators.get (i - 1);
+        if (operator.equals ("+"))
+          value += nextValue;
+        else if (operator.equals ("-"))
+          value -= nextValue;
+        else if (operator.equals ("*"))
+          value *= nextValue;
+        else if (operator.equals ("/"))
+          value /= nextValue;
+        else if (operator.equals ("^"))
+          value = Math.pow (value, nextValue);
+      }
+      valueType = ValueType.VALUE;
     }
+    catch (Exception e)
+    {
+      valueType = ValueType.ERROR;
+    }
+  }
+
+  @Override
+  public ValueType getValueType ()
+  {
+    return valueType;
   }
 
   @Override
@@ -157,22 +184,19 @@ class Expression implements Value
   @Override
   public String getText ()
   {
-    if (isNaN ())
-      return "NaN";
-    if (isError ())
-      return "Error";
-    return "";
+    return isNaN () ? "NaN" : isError () ? "Error" : "";
   }
 
   @Override
   public boolean isError ()
   {
-    return isError;
+    return valueType == ValueType.ERROR;
   }
 
   @Override
   public double getValue ()
   {
+    assert valueType == ValueType.VALUE : "Expression ValueType = " + valueType;
     return value;
   }
 

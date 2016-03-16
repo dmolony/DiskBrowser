@@ -14,6 +14,6 @@ public class IsNa extends Function
   public void calculate ()
   {
     value = expression.getValue ();
-    isError = expression.isError ();
+    valueType = expression.getValueType ();
   }
 }

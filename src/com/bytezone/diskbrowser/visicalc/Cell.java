@@ -18,6 +18,7 @@ class Cell implements Comparable<Cell>, Value
 
   private String expressionText;
   private Value value;
+  private ValueType valueType;
 
   enum CellType
   {
@@ -182,6 +183,12 @@ class Cell implements Comparable<Cell>, Value
   }
 
   @Override
+  public ValueType getValueType ()
+  {
+    return valueType;
+  }
+
+  @Override
   public String getText ()
   {
     assert type == CellType.VALUE;
@@ -210,12 +217,15 @@ class Cell implements Comparable<Cell>, Value
     {
       System.out.printf ("%s null expression text %n", address);
       value = Function.getInstance (parent, "@ERROR");
+      valueType = ValueType.ERROR;
     }
     else
+    {
       // should use Number or Cell for simple Values
       value = new Expression (parent, expressionText);
-
-    value.calculate ();
+      value.calculate ();
+      valueType = value.getValueType ();
+    }
   }
 
   @Override

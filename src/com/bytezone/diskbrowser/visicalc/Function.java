@@ -33,7 +33,7 @@ abstract class Function implements Value
   protected final Sheet parent;
   protected String functionText;
 
-  protected boolean isError;
+  protected ValueType valueType;
   protected double value;
 
   static Function getInstance (Sheet parent, String text)
@@ -103,9 +103,15 @@ abstract class Function implements Value
   }
 
   @Override
+  public ValueType getValueType ()
+  {
+    return valueType;
+  }
+
+  @Override
   public boolean isError ()
   {
-    return isError;
+    return valueType == ValueType.ERROR;
   }
 
   @Override
@@ -117,17 +123,14 @@ abstract class Function implements Value
   @Override
   public double getValue ()
   {
+    assert valueType == ValueType.VALUE : "Function ValueType = " + valueType;
     return value;
   }
 
   @Override
   public String getText ()
   {
-    if (isNaN ())
-      return "NaN";
-    if (isError ())
-      return "Error";
-    return "";
+    return isNaN () ? "NaN" : isError () ? "Error" : "";
   }
 
   protected Range getRange (String text)

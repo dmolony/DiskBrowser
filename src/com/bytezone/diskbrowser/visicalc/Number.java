@@ -2,8 +2,8 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Number implements Value
 {
-  double value;
-  boolean isError;
+  private double value;
+  private ValueType valueType;
 
   public Number (String text)
   {
@@ -13,14 +13,14 @@ class Number implements Value
     }
     catch (NumberFormatException e)
     {
-      isError = true;
+      valueType = ValueType.ERROR;
     }
   }
 
   @Override
   public boolean isError ()
   {
-    return isError;
+    return valueType == ValueType.ERROR;
   }
 
   @Override
@@ -50,5 +50,11 @@ class Number implements Value
   @Override
   public void calculate ()
   {
+  }
+
+  @Override
+  public ValueType getValueType ()
+  {
+    return null;
   }
 }

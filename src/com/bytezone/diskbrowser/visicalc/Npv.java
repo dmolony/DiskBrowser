@@ -24,6 +24,7 @@ public class Npv extends Function
   public void calculate ()
   {
     value = 0;
+    valueType = ValueType.VALUE;
 
     for (Address address : range)
     {
@@ -33,8 +34,8 @@ public class Npv extends Function
 
       if (cell.isError () || cell.isNaN ())
       {
-        isError = true;
-        break;
+        valueType = ValueType.VALUE;
+        return;
       }
 
       double temp = cell.getValue ();

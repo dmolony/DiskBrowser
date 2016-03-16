@@ -19,7 +19,7 @@ class Count extends Function
       Cell cell = parent.getCell (address);
       if (cell == null || cell.isError () || cell.isNaN ())
       {
-        isError = true;
+        valueType = ValueType.ERROR;
         break;
       }
 

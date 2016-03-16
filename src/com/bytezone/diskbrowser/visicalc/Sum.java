@@ -14,6 +14,8 @@ class Sum extends Function
   public void calculate ()
   {
     value = 0;
+    valueType = ValueType.VALUE;
+
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
@@ -22,8 +24,8 @@ class Sum extends Function
 
       if (cell.isError () || cell.isNaN ())
       {
-        isError = true;
-        break;
+        valueType = ValueType.ERROR;
+        return;
       }
       value += cell.getValue ();
     }

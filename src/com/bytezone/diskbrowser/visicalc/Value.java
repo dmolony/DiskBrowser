@@ -13,9 +13,11 @@ interface Value
 
   public String getText ();
 
+  public boolean isValue ();
+
   public boolean isError ();
 
-  public boolean isNaN ();
+  public boolean isNotAvailable ();
 
-  public void calculate ();
+  public Value calculate ();
 }

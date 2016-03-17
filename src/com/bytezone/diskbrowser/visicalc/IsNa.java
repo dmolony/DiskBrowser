@@ -11,9 +11,10 @@ public class IsNa extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     value = expression.getValue ();
     valueType = expression.getValueType ();
+    return this;
   }
 }

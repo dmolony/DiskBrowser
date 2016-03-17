@@ -23,7 +23,7 @@ class If extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     valueType = ValueType.VALUE;
 
@@ -34,7 +34,7 @@ class If extends Function
         expTrue = new Expression (parent, textTrue);
         expTrue.calculate ();
       }
-      if (expTrue.isError () || expTrue.isNaN ())
+      if (expTrue.isError () || expTrue.isNotAvailable ())
         valueType = expTrue.getValueType ();
       else
         value = expTrue.getValue ();
@@ -46,11 +46,12 @@ class If extends Function
         expFalse = new Expression (parent, textFalse);
         expFalse.calculate ();
       }
-      if (expFalse.isError () || expFalse.isNaN ())
+      if (expFalse.isError () || expFalse.isNotAvailable ())
         valueType = expFalse.getValueType ();
       else
         value = expFalse.getValue ();
     }
+    return this;
   }
 
   @Override

@@ -14,9 +14,9 @@ class Error extends Function
   }
 
   @Override
-  public boolean isNaN ()
+  public boolean isNotAvailable ()
   {
-    return true;
+    return false;
   }
 
   @Override
@@ -26,7 +26,8 @@ class Error extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
+    return this;
   }
 }

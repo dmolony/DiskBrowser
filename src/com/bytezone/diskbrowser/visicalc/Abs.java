@@ -8,9 +8,10 @@ public class Abs extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     Expression exp = new Expression (parent, functionText);
     value = Math.abs (exp.getValue ());
+    return this;
   }
 }

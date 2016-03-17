@@ -20,13 +20,13 @@ class Lookup extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     source.calculate ();
-    if (source.isError () || source.isNaN ())
+    if (source.isError () || source.isNotAvailable ())
     {
       valueType = source.getValueType ();
-      return;
+      return this;
     }
     double sourceValue = source.getValue ();
 
@@ -44,5 +44,7 @@ class Lookup extends Function
         value = parent.getCell (target.nextColumn ()).getValue ();
       else
         value = parent.getCell (target.nextRow ()).getValue ();
+
+    return this;
   }
 }

@@ -11,7 +11,7 @@ class Sum extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     value = 0;
     valueType = ValueType.VALUE;
@@ -19,15 +19,18 @@ class Sum extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell == null)
+      if (cell == null || cell.isNotAvailable ())
         continue;
 
-      if (cell.isError () || cell.isNaN ())
+      if (cell.isError ())
       {
         valueType = ValueType.ERROR;
-        return;
+        break;
       }
+
       value += cell.getValue ();
     }
+
+    return this;
   }
 }

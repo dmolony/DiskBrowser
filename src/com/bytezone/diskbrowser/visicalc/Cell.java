@@ -32,6 +32,7 @@ class Cell implements Comparable<Cell>, Value
     type = CellType.VALUE;            // default to VALUE, formatting may change it
   }
 
+  @Override
   public boolean isValue ()
   {
     return type == CellType.VALUE;
@@ -124,7 +125,7 @@ class Cell implements Comparable<Cell>, Value
         return justify (repeat, colWidth);
 
       case VALUE:
-        if (value.isError () || value.isNaN ())
+        if (value.isError () || value.isNotAvailable ())
           return justify (value.getText (), colWidth);
 
         Double thisValue = value.getValue ();
@@ -203,14 +204,14 @@ class Cell implements Comparable<Cell>, Value
   }
 
   @Override
-  public boolean isNaN ()
+  public boolean isNotAvailable ()
   {
     assert type == CellType.VALUE;
-    return value.isNaN ();
+    return value.isNotAvailable ();
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     assert type == CellType.VALUE;
     if (expressionText == null)
@@ -221,11 +222,12 @@ class Cell implements Comparable<Cell>, Value
     }
     else
     {
-      // should use Number or Cell for simple Values
+      // should use Number or Cell or Function for simple Values
       value = new Expression (parent, expressionText);
       value.calculate ();
       valueType = value.getValueType ();
     }
+    return this;
   }
 
   @Override

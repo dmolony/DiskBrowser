@@ -21,7 +21,7 @@ public class Npv extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     value = 0;
     valueType = ValueType.VALUE;
@@ -29,16 +29,18 @@ public class Npv extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell == null)
+      if (cell == null || cell.isNotAvailable ())
         continue;
 
-      if (cell.isError () || cell.isNaN ())
+      if (cell.isError ())
       {
-        valueType = ValueType.VALUE;
-        return;
+        valueType = ValueType.ERROR;
+        break;
       }
 
       double temp = cell.getValue ();
     }
+
+    return this;
   }
 }

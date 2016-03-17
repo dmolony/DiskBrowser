@@ -90,7 +90,9 @@ class Expression implements Value
           {
             String addressText = getAddressText (line.substring (ptr));
             ptr += addressText.length ();
-            values.add (parent.getCell (addressText));
+            Cell cell = parent.getCell (addressText);
+            if (cell != null)
+              values.add (parent.getCell (addressText));
           }
           else
           {
@@ -117,18 +119,19 @@ class Expression implements Value
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
+    //    System.out.println (this);
     try
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
       if (thisValue.isError ())
       {
-        valueType = ValueType.ERROR;
-        return;
+        valueType = thisValue.getValueType ();
+        return this;
       }
-      value = thisValue.getValue ();
+      value = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -140,10 +143,11 @@ class Expression implements Value
         thisValue.calculate ();
         if (thisValue.isError ())
         {
-          valueType = ValueType.ERROR;
-          return;
+          valueType = thisValue.getValueType ();
+          return this;
         }
-        double nextValue = thisValue.getValue ();
+
+        double nextValue = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -167,6 +171,7 @@ class Expression implements Value
     {
       valueType = ValueType.ERROR;
     }
+    return this;
   }
 
   @Override
@@ -176,15 +181,15 @@ class Expression implements Value
   }
 
   @Override
-  public boolean isNaN ()
+  public boolean isValue ()
   {
-    return Double.isNaN (value);
+    return valueType == ValueType.VALUE;
   }
 
   @Override
-  public String getText ()
+  public boolean isNotAvailable ()
   {
-    return isNaN () ? "NaN" : isError () ? "Error" : "";
+    return valueType == ValueType.NA;
   }
 
   @Override
@@ -198,6 +203,12 @@ class Expression implements Value
   {
     assert valueType == ValueType.VALUE : "Expression ValueType = " + valueType;
     return value;
+  }
+
+  @Override
+  public String getText ()
+  {
+    return isNotAvailable () ? "NA" : isError () ? "Error" : "";
   }
 
   private String checkBrackets (String input)
@@ -220,7 +231,7 @@ class Expression implements Value
         System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
                            leftBracket, rightBracket);
         System.out.println (input);
-        return "@ERROR()";
+        return "@ERROR";
       }
       //      System.out.printf ("Old expression:[%s]%n", line);
       while (rightBracket < leftBracket)
@@ -286,11 +297,18 @@ class Expression implements Value
     int ptr = 0;
     for (Value value : values)
     {
+      assert value != null;
       text.append (signs.get (ptr));
-      text.append (value.getValue ());
+      //      value.calculate ();
+      //      if (value.isValue ())
+      //        text.append (value.getValue ());
       if (ptr < operators.size ())
+      {
+        //        System.out.println (operators.get (ptr));
         text.append (operators.get (ptr++));
+      }
     }
+    //    System.out.println ("finished building");
 
     return text.toString ();
   }

@@ -9,8 +9,9 @@ class Or extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     value = 0;
+    return this;
   }
 }

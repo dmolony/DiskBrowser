@@ -10,11 +10,18 @@ class Number implements Value
     try
     {
       value = Double.parseDouble (text);
+      valueType = ValueType.VALUE;
     }
     catch (NumberFormatException e)
     {
       valueType = ValueType.ERROR;
     }
+  }
+
+  @Override
+  public boolean isValue ()
+  {
+    return valueType == ValueType.VALUE;
   }
 
   @Override
@@ -24,9 +31,9 @@ class Number implements Value
   }
 
   @Override
-  public boolean isNaN ()
+  public boolean isNotAvailable ()
   {
-    return Double.isNaN (value);
+    return valueType == ValueType.NA;
   }
 
   @Override
@@ -44,17 +51,18 @@ class Number implements Value
   @Override
   public String getText ()
   {
-    return null;
+    return valueType == ValueType.ERROR ? "Error" : "";
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
+    return this;
   }
 
   @Override
   public ValueType getValueType ()
   {
-    return null;
+    return valueType;
   }
 }

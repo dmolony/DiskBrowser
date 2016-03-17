@@ -14,7 +14,7 @@ public class Na extends Function
   }
 
   @Override
-  public boolean isNaN ()
+  public boolean isNotAvailable ()
   {
     return true;
   }
@@ -26,7 +26,8 @@ public class Na extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
+    return this;
   }
 }

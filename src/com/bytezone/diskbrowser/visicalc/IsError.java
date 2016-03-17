@@ -11,11 +11,12 @@ class IsError extends Function
   }
 
   @Override
-  public void calculate ()
+  public Value calculate ()
   {
     expression.calculate ();
     //    value = expression.getValue ();
     valueType = expression.getValueType ();
     value = isError () ? 1 : 0;
+    return this;
   }
 }

@@ -31,6 +31,7 @@ abstract class Function implements Value
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   protected final Sheet parent;
+  protected String functionName;
   protected String functionText;
 
   protected ValueType valueType;
@@ -97,9 +98,15 @@ abstract class Function implements Value
     // get function's parameter string
     int pos = text.indexOf ('(');
     if (pos >= 0)
+    {
+      functionName = text.substring (0, pos);
       functionText = text.substring (pos + 1, text.length () - 1);
+    }
     else
+    {
+      functionName = "";
       functionText = "";
+    }
   }
 
   @Override
@@ -109,15 +116,21 @@ abstract class Function implements Value
   }
 
   @Override
+  public boolean isValue ()
+  {
+    return valueType == ValueType.VALUE;
+  }
+
+  @Override
   public boolean isError ()
   {
     return valueType == ValueType.ERROR;
   }
 
   @Override
-  public boolean isNaN ()
+  public boolean isNotAvailable ()
   {
-    return Double.isNaN (value);
+    return valueType == ValueType.NA;
   }
 
   @Override
@@ -130,7 +143,7 @@ abstract class Function implements Value
   @Override
   public String getText ()
   {
-    return isNaN () ? "NaN" : isError () ? "Error" : "";
+    return isNotAvailable () ? "" : isError () ? "Error" : "";
   }
 
   protected Range getRange (String text)
@@ -176,6 +189,6 @@ abstract class Function implements Value
   @Override
   public String toString ()
   {
-    return String.format ("Function: %s", functionText);
+    return String.format ("Function: %s %s", functionName, functionText);
   }
 }

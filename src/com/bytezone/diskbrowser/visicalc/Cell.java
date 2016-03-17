@@ -192,21 +192,23 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String getText ()
   {
-    assert type == CellType.VALUE;
+    assert type == CellType.VALUE : "Cell type: " + type;
     return value.getText ();
   }
 
   @Override
   public boolean isError ()
   {
-    assert type == CellType.VALUE;
+    assert type == CellType.VALUE : "Cell type: " + type;
     return value.isError ();
   }
 
   @Override
   public boolean isNotAvailable ()
   {
-    assert type == CellType.VALUE;
+    //    assert type == CellType.VALUE : "Cell type: " + type;
+    if (!isValue ())
+      return true;
     return value.isNotAvailable ();
   }
 

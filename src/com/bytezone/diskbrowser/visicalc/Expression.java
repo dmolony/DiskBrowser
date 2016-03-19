@@ -94,6 +94,8 @@ class Expression implements Value
             Cell cell = parent.getCell (addressText);
             if (cell != null)
               values.add (parent.getCell (addressText));
+            else
+              values.add (Function.getInstance (parent, "@NA"));
           }
           else
           {

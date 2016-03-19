@@ -48,7 +48,7 @@ class Condition
     //    System.out.println (conditionText);
     if (conditionExpression == null)
     {
-      //      System.out.printf ("creating %s%n", conditionText);
+      System.out.printf ("creating %s %s %s%n", conditionText, comparator, valueText);
       conditionExpression = new Expression (parent, conditionText);
       //      System.out.printf ("creating %s%n", valueText);
       valueExpression = new Expression (parent, valueText);

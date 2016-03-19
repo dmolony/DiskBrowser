@@ -10,7 +10,7 @@ public class Na extends Function
   @Override
   public boolean isError ()
   {
-    return true;
+    return false;
   }
 
   @Override

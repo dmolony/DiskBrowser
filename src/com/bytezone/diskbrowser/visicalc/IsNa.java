@@ -7,12 +7,15 @@ public class IsNa extends Function
   IsNa (Sheet parent, String text)
   {
     super (parent, text);
-    expression = new Expression (parent, functionText);
   }
 
   @Override
   public Value calculate ()
   {
+    if (expression == null)
+      expression = new Expression (parent, functionText);
+
+    expression.calculate ();
     value = expression.getValue ();
     valueType = expression.getValueType ();
     return this;

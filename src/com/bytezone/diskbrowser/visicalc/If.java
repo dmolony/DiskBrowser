@@ -29,11 +29,12 @@ class If extends Function
 
     if (condition.getResult ())
     {
+      //      System.out.println ("true");
       if (expTrue == null)
-      {
         expTrue = new Expression (parent, textTrue);
-        expTrue.calculate ();
-      }
+
+      expTrue.calculate ();
+
       if (expTrue.isError () || expTrue.isNotAvailable ())
         valueType = expTrue.getValueType ();
       else
@@ -41,16 +42,18 @@ class If extends Function
     }
     else
     {
+      //      System.out.println ("false");
       if (expFalse == null)
-      {
         expFalse = new Expression (parent, textFalse);
-        expFalse.calculate ();
-      }
+
+      expFalse.calculate ();
+
       if (expFalse.isError () || expFalse.isNotAvailable ())
         valueType = expFalse.getValueType ();
       else
         value = expFalse.getValue ();
     }
+
     return this;
   }
 

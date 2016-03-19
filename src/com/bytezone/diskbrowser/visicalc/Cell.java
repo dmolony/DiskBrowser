@@ -112,10 +112,6 @@ class Cell implements Comparable<Cell>, Value
 
   String getText (int colWidth, char defaultFormat)
   {
-    // cell may have been created when formatted but no type set
-    //    if (type == null)
-    //      return justify ("", colWidth);
-
     switch (type)
     {
       case LABEL:
@@ -192,14 +188,14 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String getText ()
   {
-    assert type == CellType.VALUE : "Cell type: " + type;
+    assert isValue () : "Cell type: " + type;
     return value.getText ();
   }
 
   @Override
   public boolean isError ()
   {
-    assert type == CellType.VALUE : "Cell type: " + type;
+    assert isValue () : "Cell type: " + type;
     return value.isError ();
   }
 
@@ -235,20 +231,20 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String toString ()
   {
-    String contents = "<empty>";
-    if (type != null)
-      switch (type)
-      {
-        case LABEL:
-          contents = "Labl: " + label;
-          break;
-        case REPEATING_CHARACTER:
-          contents = "Rept: " + repeatingChar;
-          break;
-        case VALUE:
-          contents = "Exp : " + expressionText;
-          break;
-      }
+    String contents = "";
+
+    switch (type)
+    {
+      case LABEL:
+        contents = "Labl: " + label;
+        break;
+      case REPEATING_CHARACTER:
+        contents = "Rept: " + repeatingChar;
+        break;
+      case VALUE:
+        contents = "Exp : " + expressionText;
+        break;
+    }
 
     return String.format ("[Cell:%5s %s]", address, contents);
   }

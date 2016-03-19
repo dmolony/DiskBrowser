@@ -85,7 +85,9 @@ abstract class Function implements Value
       return new Error (parent, text);
 
     if (text.equals ("@NA"))
+    {
       return new Na (parent, text);
+    }
 
     System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, "@ERROR");
@@ -136,6 +138,7 @@ abstract class Function implements Value
   @Override
   public double getValue ()
   {
+    //    System.out.printf ("Getting value of : %s %s%n", functionName, functionText);
     assert valueType == ValueType.VALUE : "Function ValueType = " + valueType;
     return value;
   }

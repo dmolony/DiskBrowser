@@ -14,20 +14,25 @@ class Lookup extends Function
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);
     rangeText = text.substring (pos + 1, text.length () - 1);
-
-    source = new Expression (parent, sourceText);
-    range = getRange (rangeText);
   }
 
   @Override
   public Value calculate ()
   {
+    if (source == null)
+    {
+      source = new Expression (parent, sourceText);
+      range = getRange (rangeText);
+    }
+
     source.calculate ();
+    //    System.out.println ("calculated source");
     if (source.isError () || source.isNotAvailable ())
     {
       valueType = source.getValueType ();
       return this;
     }
+
     double sourceValue = source.getValue ();
 
     Address target = null;
@@ -40,10 +45,17 @@ class Lookup extends Function
     }
 
     if (target != null)
+    {
       if (range.isVertical ())
         value = parent.getCell (target.nextColumn ()).getValue ();
       else
         value = parent.getCell (target.nextRow ()).getValue ();
+      valueType = ValueType.VALUE;
+    }
+    else
+    {
+      System.out.println ("Target is null!");
+    }
 
     return this;
   }

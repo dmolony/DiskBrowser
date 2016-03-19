@@ -32,12 +32,13 @@ class Expression implements Value
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  //  protected boolean isError;
   private ValueType valueType;
   private double value;
+  private String text;
 
   public Expression (Sheet parent, String text)
   {
+    this.text = text;
     String line = checkBrackets (text);
     //    System.out.printf ("Exp[%s]%n", line);
 
@@ -121,7 +122,10 @@ class Expression implements Value
   @Override
   public Value calculate ()
   {
-    //    System.out.println (this);
+    //    System.out.printf ("Calculating: %s%n", text);
+    //    if (text.equals ("@NA"))
+    //      Utility.printStackTrace ();
+
     try
     {
       Value thisValue = values.get (0);
@@ -129,6 +133,7 @@ class Expression implements Value
       if (thisValue.isError ())
       {
         valueType = thisValue.getValueType ();
+        System.out.println ("error");
         return this;
       }
       value = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
@@ -144,6 +149,7 @@ class Expression implements Value
         if (thisValue.isError ())
         {
           valueType = thisValue.getValueType ();
+          System.out.println ("error");
           return this;
         }
 
@@ -171,6 +177,8 @@ class Expression implements Value
     {
       valueType = ValueType.ERROR;
     }
+
+    //    System.out.printf ("Result: %f%n", value);
     return this;
   }
 
@@ -292,25 +300,26 @@ class Expression implements Value
   @Override
   public String toString ()
   {
-    StringBuilder text = new StringBuilder ();
-
-    int ptr = 0;
-    for (Value value : values)
-    {
-      assert value != null;
-      text.append (signs.get (ptr));
-      //      value.calculate ();
-      //      if (value.isValue ())
-      //        text.append (value.getValue ());
-      if (ptr < operators.size ())
-      {
-        //        System.out.println (operators.get (ptr));
-        text.append (operators.get (ptr++));
-      }
-    }
-    //    System.out.println ("finished building");
-
-    return text.toString ();
+    //    StringBuilder text = new StringBuilder ();
+    //
+    //    int ptr = 0;
+    //    for (Value value : values)
+    //    {
+    //      assert value != null;
+    //      text.append (signs.get (ptr));
+    //      //      value.calculate ();
+    //      //      if (value.isValue ())
+    //      //        text.append (value.getValue ());
+    //      if (ptr < operators.size ())
+    //      {
+    //        //        System.out.println (operators.get (ptr));
+    //        text.append (operators.get (ptr++));
+    //      }
+    //    }
+    //    //    System.out.println ("finished building");
+    //
+    //    return text.toString ();
+    return "Expression: " + text;
   }
 
   public static void main (String[] args)

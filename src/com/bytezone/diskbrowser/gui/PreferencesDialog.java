@@ -23,11 +23,12 @@ class PreferencesDialog extends JDialog
   static final int defaultFontSize = 12;
   static final String[] monoFonts = new FontTester ().getMonospacedFontList ();
 
-  private final JComboBox catalogFontList = new JComboBox (monoFonts);
-  private final JComboBox dataFontList = new JComboBox (monoFonts);
-  private final String[] sizes = { "8", "9", "10", "11", "12", "13", "14", "15", "16" };
-  private final JComboBox catalogFontSizes = new JComboBox (sizes);
-  private final JComboBox dataFontSizes = new JComboBox (sizes);
+  private final JComboBox<String> catalogFontList = new JComboBox<String> (monoFonts);
+  private final JComboBox<String> dataFontList = new JComboBox<String> (monoFonts);
+  private final String[] sizes =
+      { "8", "9", "10", "11", "12", "13", "14", "15", "16", "18" };
+  private final JComboBox<String> catalogFontSizes = new JComboBox<String> (sizes);
+  private final JComboBox<String> dataFontSizes = new JComboBox<String> (sizes);
   private final Preferences prefs;
 
   private final JButton apply = new JButton ("Apply");
@@ -174,7 +175,7 @@ class PreferencesDialog extends JDialog
     int noModifiers = 0;
     KeyStroke escapeKey = KeyStroke.getKeyStroke (KeyEvent.VK_ESCAPE, noModifiers, false);
     InputMap inputMap =
-          getRootPane ().getInputMap (JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        getRootPane ().getInputMap (JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     inputMap.put (escapeKey, CANCEL_ACTION_KEY);
     AbstractAction cancelAction = new AbstractAction ()
     {

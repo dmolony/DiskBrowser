@@ -92,10 +92,10 @@ class Expression implements Value
             String addressText = getAddressText (line.substring (ptr));
             ptr += addressText.length ();
             Cell cell = parent.getCell (addressText);
-            if (cell != null)
-              values.add (parent.getCell (addressText));
-            else
+            if (cell == null)
               values.add (Function.getInstance (parent, "@NA"));
+            else
+              values.add (parent.getCell (addressText));
           }
           else
           {

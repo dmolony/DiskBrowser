@@ -27,7 +27,7 @@ class If extends Function
   {
     valueType = ValueType.VALUE;
 
-    System.out.println (functionText);
+    //    System.out.println (functionText);
     if (condition.getResult ())
     {
       //      System.out.println ("true");

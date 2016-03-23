@@ -128,9 +128,13 @@ public class InfocomDisk extends AbstractFormattedDisk
         break;
       }
     }
-    int ptr = 255;
-    while (buffer[ptr--] == 0)
-      fileSize--;
+
+    if (buffer != null)
+    {
+      int ptr = 255;
+      while (buffer[ptr--] == 0)
+        fileSize--;
+    }
     return fileSize;
   }
 

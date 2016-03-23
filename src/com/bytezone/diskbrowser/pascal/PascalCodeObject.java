@@ -60,12 +60,12 @@ class PascalCodeObject implements AppleFileSource
   @Override
   public String getUniqueName ()
   {
-    return segment.name; // this should be fileName/segmentName
+    return segment.getName (); // this should be fileName/segmentName
   }
 
   @Override
   public String toString ()
   {
-    return segment.name;
+    return segment.getName ();
   }
 }

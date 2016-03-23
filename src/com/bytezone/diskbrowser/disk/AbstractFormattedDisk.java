@@ -192,7 +192,11 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public String getName ()
   {
     if (originalPath != null)
-      return originalPath.getFileName ().toString ();
+    {
+      Path path = originalPath.getFileName ();
+      if (path != null)
+        return path.toString ();
+    }
     return disk.getFile ().getName ();
   }
 

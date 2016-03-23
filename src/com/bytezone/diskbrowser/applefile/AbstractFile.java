@@ -10,9 +10,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public abstract class AbstractFile implements DataSource
 {
-  public String name;
+  protected String name;
   public byte[] buffer;
-  AssemblerProgram assembler;
+  protected AssemblerProgram assembler;
   protected BufferedImage image;
 
   public AbstractFile (String name, byte[] buffer)
@@ -25,6 +25,11 @@ public abstract class AbstractFile implements DataSource
   public String getText ()      // Override this to get a tailored text representation
   {
     return "Name : " + name + "\n\nNo text description";
+  }
+
+  public String getName ()
+  {
+    return name;
   }
 
   @Override

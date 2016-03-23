@@ -58,7 +58,7 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
       FormattedDisk disk)
   {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode (
-        new DefaultAppleFileSource (object.name, object, disk));
+        new DefaultAppleFileSource (object.getName (), object, disk));
     parentNode.add (child);
     if (object.sibling > 0)
       buildObjectTree (header.objectManager.list.get (object.sibling - 1), parentNode,

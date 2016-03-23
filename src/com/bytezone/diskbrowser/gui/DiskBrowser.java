@@ -23,10 +23,11 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   {
     super (windowTitle);
 
-    State state = new State (prefs);
-
     if (false)
+    {
+      State state = new State (prefs);
       state.clear ();
+    }
 
     JToolBar toolBar = new JToolBar ("Toolbar", JToolBar.HORIZONTAL);
     MenuHandler menuHandler = new MenuHandler (prefs);

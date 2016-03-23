@@ -170,58 +170,58 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
         case Binary:                        // binary file
         case Relocatable:                   // relocatable binary file
-          if (buffer.length == 0)
-            appleFile = new AssemblerProgram (name, buffer, 0);
+          //          if (buffer.length == 0)
+          //            appleFile = new AssemblerProgram (name, buffer, 0);
+          //          else
+          //          {
+          int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
+          reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
+          if (reportedLength == 0)
+          {
+            System.out.println (name.trim () + " reported length : 0 - reverting to "
+                + (buffer.length - 4));
+            reportedLength = buffer.length - 4;
+          }
+
+          // buffer is a multiple of the block size, so it usually needs to be reduced
+          if ((reportedLength + 4) <= buffer.length)
+          {
+            exactBuffer = new byte[reportedLength];
+            //              extraBuffer = new byte[buffer.length - reportedLength - 4];
+            //              System.arraycopy (buffer, reportedLength + 4, extraBuffer, 0,
+            //                                extraBuffer.length);
+          }
+          else
+            exactBuffer = new byte[buffer.length - 4];  // reported length is too long
+
+          System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
+
+          if (ShapeTable.isShapeTable (exactBuffer))
+            appleFile = new ShapeTable (name, exactBuffer);
+          else if (HiResImage.isGif (exactBuffer))
+            appleFile = new HiResImage (name, exactBuffer);
+          else if (loadAddress == 0x2000 || loadAddress == 0x4000)
+          {
+            if ((reportedLength > 0x1F00 && reportedLength <= 0x4000)
+                || ((name.equals ("FLY LOGO") && reportedLength == 0x14FA)))
+              appleFile = new HiResImage (name, exactBuffer);
+            //            else if 
+            //              appleFile = new HiResImage (name, unscrunch (exactBuffer));
+            else
+              appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
+          }
+          else if (name.endsWith (".S"))
+            appleFile = new MerlinSource (name, exactBuffer);
           else
           {
-            int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
-            reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
-            if (reportedLength == 0)
-            {
-              System.out.println (name.trim () + " reported length : 0 - reverting to "
-                  + (buffer.length - 4));
-              reportedLength = buffer.length - 4;
-            }
-
-            // buffer is a multiple of the block size, so it usually needs to be reduced
-            if ((reportedLength + 4) <= buffer.length)
-            {
-              exactBuffer = new byte[reportedLength];
-              //              extraBuffer = new byte[buffer.length - reportedLength - 4];
-              //              System.arraycopy (buffer, reportedLength + 4, extraBuffer, 0,
-              //                                extraBuffer.length);
-            }
-            else
-              exactBuffer = new byte[buffer.length - 4];  // reported length is too long
-
-            System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
-
-            if (ShapeTable.isShapeTable (exactBuffer))
-              appleFile = new ShapeTable (name, exactBuffer);
-            else if (HiResImage.isGif (exactBuffer))
-              appleFile = new HiResImage (name, exactBuffer);
-            else if (loadAddress == 0x2000 || loadAddress == 0x4000)
-            {
-              if ((reportedLength > 0x1F00 && reportedLength <= 0x4000)
-                  || ((name.equals ("FLY LOGO") && reportedLength == 0x14FA)))
-                appleFile = new HiResImage (name, exactBuffer);
-              //            else if 
-              //              appleFile = new HiResImage (name, unscrunch (exactBuffer));
-              else
-                appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
-            }
-            else if (name.endsWith (".S"))
-              appleFile = new MerlinSource (name, exactBuffer);
-            else
-            {
-              appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
-              //    System.out.printf ("%d %d%n", exactBuffer.length, reportedLength);
-              if ((exactBuffer.length + 4) < buffer.length)
-                ((AssemblerProgram) appleFile)
-                    .setExtraBuffer (buffer, exactBuffer.length + 4,
-                                     buffer.length - (exactBuffer.length + 4));
-            }
+            appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
+            //    System.out.printf ("%d %d%n", exactBuffer.length, reportedLength);
+            if ((exactBuffer.length + 4) < buffer.length)
+              ((AssemblerProgram) appleFile)
+                  .setExtraBuffer (buffer, exactBuffer.length + 4,
+                                   buffer.length - (exactBuffer.length + 4));
           }
+          //          }
           break;
 
         case SS:                                          // what is this?
@@ -235,7 +235,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           break;
 
         case BB:                                          // what is this?
-          int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
+          loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
           reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
           exactBuffer = new byte[reportedLength];
           System.arraycopy (buffer, 4, exactBuffer, 0, reportedLength);

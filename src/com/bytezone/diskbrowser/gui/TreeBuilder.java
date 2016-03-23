@@ -4,14 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -49,8 +42,8 @@ public class TreeBuilder
 
   public TreeBuilder (File folder)
   {
-    assert(folder.exists ());
-    assert(folder.isDirectory ());
+    assert (folder.exists ());
+    assert (folder.isDirectory ());
 
     long start = System.currentTimeMillis ();
 
@@ -299,20 +292,24 @@ public class TreeBuilder
           + "      Date               Size  Type\n");
       text.append ("-  ----------------------------------------"
           + "  -----------  --------------  ---------\n");
-      for (File f : file.listFiles ())
-      {
-        String name = f.getName ();
-        if (name.startsWith ("."))
-          continue;
 
-        Date d = new Date (f.lastModified ());
-        int pos = name.lastIndexOf ('.');
-        String type = pos > 0 && !f.isDirectory () ? name.substring (pos) : "";
-        String size = f.isDirectory () ? "" : String.format ("%,14d", f.length ());
-        text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n",
-                                    f.isDirectory () ? "D" : " ", name, sdf.format (d),
-                                    size, type));
-      }
+      File[] files = file.listFiles ();
+      if (files != null)
+        for (File f : file.listFiles ())
+        {
+          String name = f.getName ();
+          if (name.startsWith ("."))
+            continue;
+
+          Date d = new Date (f.lastModified ());
+          int pos = name.lastIndexOf ('.');
+          String type = pos > 0 && !f.isDirectory () ? name.substring (pos) : "";
+          String size = f.isDirectory () ? "" : String.format ("%,14d", f.length ());
+          text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n",
+                                      f.isDirectory () ? "D" : " ", name, sdf.format (d),
+                                      size, type));
+        }
+
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);
       return text.toString ();

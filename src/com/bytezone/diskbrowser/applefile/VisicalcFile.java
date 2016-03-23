@@ -38,7 +38,7 @@ public class VisicalcFile extends AbstractFile
     debug = value;
   }
 
-  public void setDebug (boolean value)
+  public static void setDebug (boolean value)
   {
     debug = value;
   }

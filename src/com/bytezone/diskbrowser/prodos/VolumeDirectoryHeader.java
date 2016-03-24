@@ -121,7 +121,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     if (false)
     {
       String locked = (access == 0x01) ? "*" : " ";
-      String timeC = created == null ? "" : ProdosDisk.df.format (created.getTime ());
+      String timeC = created == null ? "" : parentDisk.df.format (created.getTime ());
       return String.format ("   %s%-42s %15s", locked, "/" + name, timeC);
     }
     return name;

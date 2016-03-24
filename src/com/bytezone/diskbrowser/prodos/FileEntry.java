@@ -164,7 +164,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private void traverseIndex (int keyBlock)
   {
-    parentDisk.setSectorType (keyBlock, ((ProdosDisk) parentDisk).indexSector);
+    parentDisk.setSectorType (keyBlock, parentDisk.indexSector);
     indexBlocks.add (disk.getDiskAddress (keyBlock));
     byte[] buffer = disk.readSector (keyBlock);
     for (int i = 0; i < 256; i++)
@@ -183,7 +183,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       // break;
       if (block != 0)
       {
-        parentDisk.setSectorType (block, ((ProdosDisk) parentDisk).dataSector);
+        parentDisk.setSectorType (block, parentDisk.dataSector);
         dataBlocks.add (disk.getDiskAddress (block));
       }
     }
@@ -206,7 +206,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private void traverseGEOSIndex (int keyPtr)
   {
-    parentDisk.setSectorType (keyPtr, ((ProdosDisk) parentDisk).indexSector);
+    parentDisk.setSectorType (keyPtr, parentDisk.indexSector);
     indexBlocks.add (disk.getDiskAddress (keyPtr));
     byte[] buffer = disk.readSector (keyPtr);
     // int length = HexFormatter.intValue (buffer[0xFF], buffer[0x1FF]);
@@ -217,7 +217,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
       if (block == 0xFFFF)
         continue;
-      parentDisk.setSectorType (block, ((ProdosDisk) parentDisk).dataSector);
+      parentDisk.setSectorType (block, parentDisk.dataSector);
       dataBlocks.add (disk.getDiskAddress (block));
     }
   }
@@ -294,7 +294,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new IntegerBasicProgram (name, exactBuffer);
           break;
         case FILE_TYPE_DIRECTORY:
-          VolumeDirectoryHeader vdh = ((ProdosDisk) parentDisk).vdh;
+          VolumeDirectoryHeader vdh = parentDisk.vdh;
           file = new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks,
               vdh.freeBlocks, vdh.usedBlocks);
           break;
@@ -561,8 +561,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType],
                             blocksUsed, locked)
           + name;
-    String timeC = created == null ? "" : ProdosDisk.df.format (created.getTime ());
-    String timeF = modified == null ? "" : ProdosDisk.df.format (modified.getTime ());
+    String timeC = created == null ? "" : parentDisk.df.format (created.getTime ());
+    String timeF = modified == null ? "" : parentDisk.df.format (modified.getTime ());
     return String.format ("%s %s%-30s %3d %,10d %15s %15s",
                           ProdosConstants.fileTypes[fileType], locked,
                           parentDirectory.name + "/" + name, blocksUsed, endOfFile, timeC,

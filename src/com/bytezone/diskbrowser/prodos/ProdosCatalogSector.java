@@ -81,7 +81,8 @@ class ProdosCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, offset + 19, 2, "Blocks used");
     addTextAndDecimal (text, buffer, offset + 21, 3, "EOF");
     GregorianCalendar created = HexFormatter.getAppleDate (buffer, offset + 24);
-    String dateC = created == null ? "" : ProdosDisk.df.format (created.getTime ());
+    String dateC =
+        created == null ? "" : ((ProdosDisk) disk).df.format (created.getTime ());
     addText (text, buffer, offset + 24, 4, "Creation date : " + dateC);
     addTextAndDecimal (text, buffer, offset + 28, 1, "Version");
     addText (text, buffer, offset + 29, 1, "Minimum version");
@@ -89,7 +90,8 @@ class ProdosCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, offset + 31, 2,
                        "Auxilliary type - " + getAuxilliaryText (fileType));
     GregorianCalendar modified = HexFormatter.getAppleDate (buffer, offset + 33);
-    String dateM = modified == null ? "" : ProdosDisk.df.format (modified.getTime ());
+    String dateM =
+        modified == null ? "" : ((ProdosDisk) disk).df.format (modified.getTime ());
     addText (text, buffer, offset + 33, 4, "Modification date : " + dateM);
     addTextAndDecimal (text, buffer, offset + 37, 2, "Header pointer");
     return text.toString ();
@@ -122,7 +124,8 @@ class ProdosCatalogSector extends AbstractSector
     StringBuilder text = new StringBuilder ();
     addText (text, buffer, offset + 20, 4, "Not used");
     GregorianCalendar created = HexFormatter.getAppleDate (buffer, offset + 24);
-    String dateC = created == null ? "" : ProdosDisk.df.format (created.getTime ());
+    String dateC =
+        created == null ? "" : ((ProdosDisk) disk).df.format (created.getTime ());
     addText (text, buffer, offset + 24, 4, "Creation date : " + dateC);
     addText (text, buffer, offset + 28, 1, "Prodos version");
     addText (text, buffer, offset + 29, 1, "Minimum version");

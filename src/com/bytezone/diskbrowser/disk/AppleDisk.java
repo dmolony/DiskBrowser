@@ -166,7 +166,9 @@ public class AppleDisk implements Disk
     {
       BufferedInputStream file = new BufferedInputStream (new FileInputStream (path));
       if (skip > 0)
-        file.skip (skip);
+      {
+        long result = file.skip (skip);
+      }
       file.read (diskBuffer);
       file.close ();
     }

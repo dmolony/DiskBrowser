@@ -12,7 +12,7 @@ class ProdosDirectory extends AbstractFile
   private static final String newLine = String.format ("%n");
   private static final String newLine2 = newLine + newLine;
 
-  private final FormattedDisk parentFD;
+  private final ProdosDisk parentFD;
   private final int totalBlocks;
   private final int freeBlocks;
   private final int usedBlocks;
@@ -22,7 +22,7 @@ class ProdosDirectory extends AbstractFile
   {
     super (name, buffer);
 
-    this.parentFD = parent;
+    this.parentFD = (ProdosDisk) parent;
     this.totalBlocks = totalBlocks;
     this.freeBlocks = freeBlocks;
     this.usedBlocks = usedBlocks;
@@ -65,14 +65,13 @@ class ProdosDirectory extends AbstractFile
 
           GregorianCalendar created = HexFormatter.getAppleDate (buffer, i + 24);
           String dateC = created == null ? NO_DATE
-              : ProdosDisk.sdf.format (created.getTime ()).toUpperCase ();
-          String timeC =
-              created == null ? "" : ProdosDisk.stf.format (created.getTime ());
+              : parentFD.sdf.format (created.getTime ()).toUpperCase ();
+          String timeC = created == null ? "" : parentFD.stf.format (created.getTime ());
           GregorianCalendar modified = HexFormatter.getAppleDate (buffer, i + 33);
           String dateM = modified == null ? NO_DATE
-              : ProdosDisk.sdf.format (modified.getTime ()).toUpperCase ();
+              : parentFD.sdf.format (modified.getTime ()).toUpperCase ();
           String timeM =
-              modified == null ? "" : ProdosDisk.stf.format (modified.getTime ());
+              modified == null ? "" : parentFD.stf.format (modified.getTime ());
           int eof =
               HexFormatter.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
           int fileType = HexFormatter.intValue (buffer[i + 16]);

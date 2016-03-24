@@ -16,9 +16,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class ProdosDisk extends AbstractFormattedDisk
 {
-  protected static final DateFormat df = DateFormat.getInstance ();
-  protected static final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
-  protected static final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
+  protected final DateFormat df = DateFormat.getInstance ();
+  protected final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
+  protected final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
 
   final SectorType dosSector = new SectorType ("Bootstrap Loader", Color.lightGray);
   final SectorType catalogSector = new SectorType ("Catalog", new Color (0, 200, 0));

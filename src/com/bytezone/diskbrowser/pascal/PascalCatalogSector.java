@@ -9,9 +9,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class PascalCatalogSector extends AbstractSector
 {
-  private static DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
-  private static String[] fileTypes = { "Volume", "Bad", "Code", "Text", "Info", "Data", "Graf",
-                                       "Foto", "SecureDir" };
+  private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
+  private static String[] fileTypes =
+      { "Volume", "Bad", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
   public PascalCatalogSector (Disk disk, byte[] buffer)
   {

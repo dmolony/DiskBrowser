@@ -295,7 +295,7 @@ public class TreeBuilder
 
       File[] files = file.listFiles ();
       if (files != null)
-        for (File f : file.listFiles ())
+        for (File f : files)
         {
           String name = f.getName ();
           if (name.startsWith ("."))

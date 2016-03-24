@@ -278,16 +278,20 @@ class DataPanel extends JTabbedPane
     private void setImage (BufferedImage image)
     {
       this.image = image;
+      int width, height;
 
       if (image != null)
       {
         Graphics2D g2 = image.createGraphics ();
         g2.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
                              RenderingHints.VALUE_ANTIALIAS_ON);
+        width = image.getWidth ();
+        height = image.getHeight ();
       }
-
-      int width = image.getWidth ();
-      int height = image.getHeight ();
+      else
+      {
+        width = height = 0;
+      }
 
       if (width < 400)
         scale = (400 - 1) / width + 1;

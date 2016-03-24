@@ -27,7 +27,7 @@ class SubDirectoryHeader extends DirectoryHeader
   {
     String locked = (access == 0x01) ? "*" : " ";
     return String.format ("   %s%-40s %15s", locked, "/" + name,
-                          ProdosDisk.df.format (created.getTime ()));
+                          parentDisk.df.format (created.getTime ()));
   }
 
   @Override

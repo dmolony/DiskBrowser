@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 abstract class CatalogEntry implements AppleFileSource
 {
-  FormattedDisk parentDisk;
+  ProdosDisk parentDisk;
   DirectoryHeader parentDirectory;
   String name;
   int storageType;

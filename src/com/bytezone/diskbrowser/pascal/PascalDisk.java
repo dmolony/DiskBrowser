@@ -18,7 +18,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class PascalDisk extends AbstractFormattedDisk
 {
   static final int CATALOG_ENTRY_SIZE = 26;
-  private static DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
+  private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
   private final VolumeEntry volume;
   private final PascalCatalogSector diskCatalogSector;
 

@@ -30,36 +30,33 @@ public class AppleDiskAddress implements DiskAddress
     return String.format ("[Block=%3d, Track=%2d, Sector=%2d]", block, track, sector);
   }
 
+  @Override
   public int compareTo (DiskAddress that)
   {
     return this.block - that.getBlock ();
   }
 
+  @Override
   public int getBlock ()
   {
     return block;
   }
 
+  @Override
   public int getSector ()
   {
     return sector;
   }
 
+  @Override
   public int getTrack ()
   {
     return track;
   }
 
+  @Override
   public Disk getDisk ()
   {
     return owner;
-  }
-
-  @Override
-  public boolean equals (Object other)
-  {
-    if (other == null || getClass () != other.getClass ())
-      return false;
-    return this.block == ((AppleDiskAddress) other).block;
   }
 }

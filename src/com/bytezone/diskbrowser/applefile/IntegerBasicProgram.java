@@ -4,237 +4,242 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class IntegerBasicProgram extends AbstractFile
 {
-	private static String[] tokens =
-							{ "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?", "?",
-									"HIMEM: ", "LOMEM: ", " + ", " - ", " * ", " / ", " = ", " # ", " >= ", " > ",
-									" <= ", " <> ", " < ", " AND ", " OR ", " MOD ", "^", "+", "(", ",", " THEN ",
-									" THEN ", ",", ",", "\"", "\"", "(", "!", "!", "(", "PEEK ", "RND ", "SGN",
-									"ABS", "PDL", "RNDX", "(", "+", "-", "NOT ", "(", "=", "#", "LEN(", "ASC(",
-									"SCRN(", ",", "(", "$", "$", "(", ", ", ",", ";", ";", ";", ",", ",", ",",
-									"TEXT", "GR ", "CALL ", "DIM ", "DIM ", "TAB ", "END", "INPUT ", "INPUT ",
-									"INPUT ", "FOR ", " = ", " TO ", " STEP ", "NEXT ", ",", "RETURN", "GOSUB ",
-									"REM ", "LET ", "GOTO ", "IF ", "PRINT ", "PRINT ", "PRINT", "POKE ", ",",
-									"COLOR=", "PLOT", ",", "HLIN", ",", " AT ", "VLIN ", ",", " AT ", "VTAB ", " = ",
-									" = ", ")", ")", "LIST ", ",", "LIST ", "POP ", "NODSP ", "NODSP ", "NOTRACE ",
-									"DSP ", "DSP ", "TRACE ", "PR#", "IN#", };
+  private static String[] tokens =
+      { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?",
+        "?", "HIMEM: ", "LOMEM: ", " + ", " - ", " * ", " / ", " = ", " # ", " >= ",
+        " > ", " <= ", " <> ", " < ", " AND ", " OR ", " MOD ", "^", "+", "(", ",",
+        " THEN ", " THEN ", ",", ",", "\"", "\"", "(", "!", "!", "(", "PEEK ", "RND ",
+        "SGN", "ABS", "PDL", "RNDX", "(", "+", "-", "NOT ", "(", "=", "#", "LEN(", "ASC(",
+        "SCRN(", ",", "(", "$", "$", "(", ", ", ",", ";", ";", ";", ",", ",", ",", "TEXT",
+        "GR ", "CALL ", "DIM ", "DIM ", "TAB ", "END", "INPUT ", "INPUT ", "INPUT ",
+        "FOR ", " = ", " TO ", " STEP ", "NEXT ", ",", "RETURN", "GOSUB ", "REM ", "LET ",
+        "GOTO ", "IF ", "PRINT ", "PRINT ", "PRINT", "POKE ", ",", "COLOR=", "PLOT", ",",
+        "HLIN", ",", " AT ", "VLIN ", ",", " AT ", "VTAB ", " = ", " = ", ")", ")",
+        "LIST ", ",", "LIST ", "POP ", "NODSP ", "NODSP ", "NOTRACE ", "DSP ", "DSP ",
+        "TRACE ", "PR#", "IN#", };
 
-	public IntegerBasicProgram (String name, byte[] buffer)
-	{
-		super (name, buffer);
-	}
+  public IntegerBasicProgram (String name, byte[] buffer)
+  {
+    super (name, buffer);
+  }
 
-	public String getText ()
-	{
-		StringBuilder pgm = new StringBuilder ();
-		pgm.append ("Name    : " + name + "\n");
-		pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
-								+ ")\n\n");
-		int ptr = 0;
-		boolean looksLikeAssembler = checkForAssembler (); // this can probably go
-		boolean looksLikeSCAssembler = checkForSCAssembler ();
+  @Override
+  public String getText ()
+  {
+    StringBuilder pgm = new StringBuilder ();
+    pgm.append ("Name    : " + name + "\n");
+    pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length) + " ("
+        + buffer.length + ")\n\n");
+    int ptr = 0;
 
-		while (ptr < buffer.length)
-		{
-			int lineLength = HexFormatter.intValue (buffer[ptr]);
-			/*
-			 * It appears that lines ending in 00 are S-C Assembler programs, and
-			 * lines ending in 01 are Integer Basic programs.
-			 */
-			int p2 = ptr + lineLength - 1;
-			if (p2 < 0 || (buffer[p2] != 1 && buffer[p2] != 0))
-			{
-				pgm.append ("\nPossible assembler code follows\n");
-				break;
-			}
-			if (lineLength <= 0)
-				break;
+    boolean looksLikeAssembler = checkForAssembler ();      // this can probably go
+    boolean looksLikeSCAssembler = checkForSCAssembler ();
 
-			if (looksLikeSCAssembler)
-				appendSCAssembler (pgm, ptr, lineLength);
-			else if (looksLikeAssembler)
-				appendAssembler (pgm, ptr, lineLength);
-			else
-				appendInteger (pgm, ptr, lineLength);
+    while (ptr < buffer.length)
+    {
+      int lineLength = HexFormatter.intValue (buffer[ptr]);
+      /*
+       * It appears that lines ending in 00 are S-C Assembler programs, and
+       * lines ending in 01 are Integer Basic programs.
+       */
+      int p2 = ptr + lineLength - 1;
+      if (p2 < 0 || p2 >= buffer.length || (buffer[p2] != 1 && buffer[p2] != 0))
+      {
+        pgm.append ("\nPossible assembler code follows\n");
+        break;
+      }
+      if (lineLength <= 0)
+        break;
 
-			pgm.append ("\n");
-			ptr += lineLength;
-		}
+      if (looksLikeSCAssembler)
+        appendSCAssembler (pgm, ptr, lineLength);
+      else if (looksLikeAssembler)
+        appendAssembler (pgm, ptr, lineLength);
+      else
+        appendInteger (pgm, ptr, lineLength);
 
-		if (ptr < buffer.length)
-		{
-			int address = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
-			int remainingBytes = buffer.length - ptr - 5;
-			byte[] newBuffer = new byte[remainingBytes];
-			System.arraycopy (buffer, ptr + 4, newBuffer, 0, remainingBytes);
-			AssemblerProgram ap = new AssemblerProgram ("embedded", newBuffer, address);
-			pgm.append ("\n" + ap.getText () + "\n");
-		}
+      pgm.append ("\n");
+      ptr += lineLength;
+    }
 
-		pgm.deleteCharAt (pgm.length () - 1);
-		return pgm.toString ();
-	}
+    if (ptr < buffer.length)
+    {
+      int address = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      int remainingBytes = buffer.length - ptr - 5;
+      byte[] newBuffer = new byte[remainingBytes];
+      System.arraycopy (buffer, ptr + 4, newBuffer, 0, remainingBytes);
+      AssemblerProgram ap = new AssemblerProgram ("embedded", newBuffer, address);
+      pgm.append ("\n" + ap.getText () + "\n");
+    }
 
-	private void appendAssembler (StringBuilder pgm, int ptr, int lineLength)
-	{
-		for (int i = ptr + 3; i < ptr + lineLength - 1; i++)
-		{
-			if ((buffer[i] & 0x80) == 0x80)
-			{
-				int spaces = buffer[i] & 0x0F;
-				for (int j = 0; j < spaces; j++)
-					pgm.append (' ');
-				continue;
-			}
-			int b = HexFormatter.intValue (buffer[i]);
-			pgm.append ((char) b);
-		}
-	}
+    pgm.deleteCharAt (pgm.length () - 1);
+    return pgm.toString ();
+  }
 
-	private boolean checkForAssembler ()
-	{
-		int ptr = 0;
+  private void appendAssembler (StringBuilder pgm, int ptr, int lineLength)
+  {
+    for (int i = ptr + 3; i < ptr + lineLength - 1; i++)
+    {
+      if ((buffer[i] & 0x80) == 0x80)
+      {
+        int spaces = buffer[i] & 0x0F;
+        for (int j = 0; j < spaces; j++)
+          pgm.append (' ');
+        continue;
+      }
+      int b = HexFormatter.intValue (buffer[i]);
+      pgm.append ((char) b);
+    }
+  }
 
-		while (ptr < buffer.length)
-		{
-			int lineLength = HexFormatter.intValue (buffer[ptr]);
-			int p2 = ptr + lineLength - 1;
-			if (p2 < 0 || (buffer[p2] != 1 && buffer[p2] != 0))
-				break;
-			if (lineLength <= 0) // in case of looping bug
-				break;
-			// check for comments
-			if (buffer[ptr + 3] == 0x3B || buffer[ptr + 3] == 0x2A)
-				return true;
-			ptr += lineLength;
-		}
-		return false;
-	}
+  private boolean checkForAssembler ()
+  {
+    int ptr = 0;
 
-	private boolean checkForSCAssembler ()
-	{
-		int lineLength = HexFormatter.intValue (buffer[0]);
-		if (lineLength <= 0)
-			return false;
-		return buffer[lineLength - 1] == 0;
-	}
+    while (ptr < buffer.length)
+    {
+      int lineLength = HexFormatter.intValue (buffer[ptr]);
+      if (lineLength == 255)
+        System.out.printf ("Line length %d%n", lineLength);
+      int p2 = ptr + lineLength - 1;
 
-	private void appendSCAssembler (StringBuilder pgm, int ptr, int lineLength)
-	{
-		int lineNumber =
-								HexFormatter.intValue (buffer[ptr + 2]) * 256
-														+ HexFormatter.intValue (buffer[ptr + 1]);
-		pgm.append (String.format ("%4d: ", lineNumber));
-		int p2 = ptr + 3;
-		while (buffer[p2] != 0)
-		{
-			if (buffer[p2] == (byte) 0xC0)
-			{
-				int repeat = buffer[p2 + 1];
-				for (int i = 0; i < repeat; i++)
-					pgm.append ((char) buffer[p2 + 2]);
-				p2 += 2;
-			}
-			else if ((buffer[p2] & 0x80) != 0)
-			{
-				int spaces = buffer[p2] & 0x7F;
-				for (int i = 0; i < spaces; i++)
-					pgm.append (' ');
-			}
-			else
-				pgm.append ((char) buffer[p2]);
-			p2++;
-		}
-	}
+      if (p2 < 0 || p2 >= buffer.length || (buffer[p2] != 1 && buffer[p2] != 0))
+        break;
+      if (lineLength <= 0)                   // in case of looping bug
+        break;
+      // check for comments
+      if (buffer[ptr + 3] == 0x3B || buffer[ptr + 3] == 0x2A)
+        return true;
+      ptr += lineLength;
+    }
 
-	private void appendInteger (StringBuilder pgm, int ptr, int lineLength)
-	{
-		int lineNumber = HexFormatter.intValue (buffer[ptr + 1], buffer[ptr + 2]);
+    return false;
+  }
 
-		boolean inString = false;
-		boolean inRemark = false;
+  private boolean checkForSCAssembler ()
+  {
+    int lineLength = HexFormatter.intValue (buffer[0]);
+    if (lineLength <= 0)
+      return false;
+    return buffer[lineLength - 1] == 0;
+  }
 
-		String lineText = String.format ("%5d ", lineNumber);
-		int lineTab = lineText.length ();
-		pgm.append (lineText);
+  private void appendSCAssembler (StringBuilder pgm, int ptr, int lineLength)
+  {
+    int lineNumber = HexFormatter.intValue (buffer[ptr + 2]) * 256
+        + HexFormatter.intValue (buffer[ptr + 1]);
+    pgm.append (String.format ("%4d: ", lineNumber));
+    int p2 = ptr + 3;
+    while (buffer[p2] != 0)
+    {
+      if (buffer[p2] == (byte) 0xC0)
+      {
+        int repeat = buffer[p2 + 1];
+        for (int i = 0; i < repeat; i++)
+          pgm.append ((char) buffer[p2 + 2]);
+        p2 += 2;
+      }
+      else if ((buffer[p2] & 0x80) != 0)
+      {
+        int spaces = buffer[p2] & 0x7F;
+        for (int i = 0; i < spaces; i++)
+          pgm.append (' ');
+      }
+      else
+        pgm.append ((char) buffer[p2]);
+      p2++;
+    }
+  }
 
-		for (int p = ptr + 3; p < ptr + lineLength - 1; p++)
-		{
-			int b = HexFormatter.intValue (buffer[p]);
+  private void appendInteger (StringBuilder pgm, int ptr, int lineLength)
+  {
+    int lineNumber = HexFormatter.intValue (buffer[ptr + 1], buffer[ptr + 2]);
 
-			if (b == 0x03 // token for colon (:)
-									&& !inString && !inRemark && buffer[p + 1] != 1) // not end of
-			// line
-			{
-				pgm.append (":\n" + "         ".substring (0, lineTab));
-				continue;
-			}
+    boolean inString = false;
+    boolean inRemark = false;
 
-			if (b >= 0xB0 && b <= 0xB9 // numeric literal
-									&& (buffer[p - 1] & 0x80) == 0 // not a variable name
-									&& !inString && !inRemark)
-			{
-				pgm.append (HexFormatter.intValue (buffer[p + 1], buffer[p + 2]));
-				p += 2;
-				continue;
-			}
+    String lineText = String.format ("%5d ", lineNumber);
+    int lineTab = lineText.length ();
+    pgm.append (lineText);
 
-			if (b >= 128)
-			{
-				b -= 128;
-				if (b >= 32)
-					pgm.append ((char) b);
-				else
-					pgm.append ("<ctrl-" + (char) (b + 64) + ">");
-			}
-			else if (!tokens[b].equals ("?"))
-			{
-				pgm.append (tokens[b]);
-				if ((b == 40 || b == 41) && !inRemark) // double quotes
-					inString = !inString;
-				if (b == 0x5D)
-					inRemark = true;
-			}
-			else
-				pgm.append (" ." + HexFormatter.format2 (b) + ". ");
-		}
-	}
+    for (int p = ptr + 3; p < ptr + lineLength - 1; p++)
+    {
+      int b = HexFormatter.intValue (buffer[p]);
 
-	public String getHexDump ()
-	{
-		if (false)
-			return super.getHexDump ();
+      if (b == 0x03 // token for colon (:)
+          && !inString && !inRemark && buffer[p + 1] != 1)        // not end of line
+      {
+        pgm.append (":\n" + "         ".substring (0, lineTab));
+        continue;
+      }
 
-		StringBuffer pgm = new StringBuffer ();
+      if (b >= 0xB0 && b <= 0xB9                        // numeric literal
+          && (buffer[p - 1] & 0x80) == 0                // not a variable name
+          && !inString && !inRemark)
+      {
+        pgm.append (HexFormatter.intValue (buffer[p + 1], buffer[p + 2]));
+        p += 2;
+        continue;
+      }
 
-		pgm.append ("Name : " + name + "\n");
-		pgm.append ("Length : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
-								+ ")\n\n");
+      if (b >= 128)
+      {
+        b -= 128;
+        if (b >= 32)
+          pgm.append ((char) b);
+        else
+          pgm.append ("<ctrl-" + (char) (b + 64) + ">");
+      }
+      else if (!tokens[b].equals ("?"))
+      {
+        pgm.append (tokens[b]);
+        if ((b == 40 || b == 41) && !inRemark) // double quotes
+          inString = !inString;
+        if (b == 0x5D)
+          inRemark = true;
+      }
+      else
+        pgm.append (" ." + HexFormatter.format2 (b) + ". ");
+    }
+  }
 
-		int ptr = 0;
+  @Override
+  public String getHexDump ()
+  {
+    if (false)
+      return super.getHexDump ();
 
-		while (ptr < buffer.length)
-		{
-			int lineLength = HexFormatter.intValue (buffer[ptr]);
-			int p2 = ptr + lineLength - 1;
-			if (p2 < 0 || buffer[p2] > 1)
-			{
-				System.out.println ("invalid line");
-				break;
-			}
-			pgm.append (HexFormatter.formatNoHeader (buffer, ptr, lineLength));
-			pgm.append ("\n");
-			if (lineLength <= 0)
-			{
-				System.out.println ("looping");
-				break;
-			}
-			ptr += lineLength;
-			pgm.append ("\n");
-		}
+    StringBuffer pgm = new StringBuffer ();
 
-		if (pgm.length () > 0)
-			pgm.deleteCharAt (pgm.length () - 1);
+    pgm.append ("Name : " + name + "\n");
+    pgm.append ("Length : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
+        + ")\n\n");
 
-		return pgm.toString ();
-	}
+    int ptr = 0;
+
+    while (ptr < buffer.length)
+    {
+      int lineLength = HexFormatter.intValue (buffer[ptr]);
+      int p2 = ptr + lineLength - 1;
+      if (p2 < 0 || p2 >= buffer.length || buffer[p2] > 1)
+      {
+        System.out.println ("invalid line");
+        break;
+      }
+      pgm.append (HexFormatter.formatNoHeader (buffer, ptr, lineLength));
+      pgm.append ("\n");
+      if (lineLength <= 0)
+      {
+        System.out.println ("looping");
+        break;
+      }
+      ptr += lineLength;
+      pgm.append ("\n");
+    }
+
+    if (pgm.length () > 0)
+      pgm.deleteCharAt (pgm.length () - 1);
+
+    return pgm.toString ();
+  }
 }

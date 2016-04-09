@@ -45,7 +45,7 @@ public class TreeBuilder
     assert (folder.exists ());
     assert (folder.isDirectory ());
 
-    long start = System.currentTimeMillis ();
+    //    long start = System.currentTimeMillis ();
 
     FileNode fn = new FileNode (folder);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (fn);
@@ -54,11 +54,12 @@ public class TreeBuilder
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     tree = new JTree (treeModel);
 
-    long duration = System.currentTimeMillis () - start;
-    System.out.printf (
-                       "Tree building took %,d milliseconds for %,d disk%s and %,d folder%s%n",
-                       duration, totalDisks, (totalDisks == 1 ? "" : "s"), totalFolders,
-                       (totalFolders == 1 ? "" : "s"));
+    //    long duration = System.currentTimeMillis () - start;
+    //    System.out.printf (
+    //                   "Tree building took %,d milliseconds for "
+    //                       + "%,d disk%s and %,d folder%s%n",
+    //             duration, totalDisks, (totalDisks == 1 ? "" : "s"), totalFolders,
+    //                       (totalFolders == 1 ? "" : "s"));
 
     treeModel.setAsksAllowsChildren (true);// allows empty nodes to appear as folders
     setDiskIcon ("/com/bytezone/diskbrowser/icons/disk.png");

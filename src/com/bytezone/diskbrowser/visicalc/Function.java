@@ -39,6 +39,12 @@ abstract class Function implements Value
 
   static Function getInstance (Sheet parent, String text)
   {
+    if (text.charAt (0) != '@')
+    {
+      System.out.printf ("Unknown function: [%s]%n", text);
+      return new Error (parent, "@ERROR");
+    }
+
     if (text.startsWith ("@LOOKUP("))
       return new Lookup (parent, text);
 
@@ -85,9 +91,7 @@ abstract class Function implements Value
       return new Error (parent, text);
 
     if (text.equals ("@NA"))
-    {
       return new Na (parent, text);
-    }
 
     System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, "@ERROR");

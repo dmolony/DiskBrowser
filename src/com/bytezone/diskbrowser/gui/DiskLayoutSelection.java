@@ -126,6 +126,14 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     return new ArrayList<DiskAddress> (highlights);
   }
 
+  public boolean isSelected (DiskAddress da)
+  {
+    for (DiskAddress selection : highlights)
+      if (selection.compareTo (da) == 0)
+        return true;
+    return false;
+  }
+
   public void setSelection (List<DiskAddress> list)
   {
     highlights.clear ();

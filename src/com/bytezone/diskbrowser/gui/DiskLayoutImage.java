@@ -101,7 +101,6 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 
     int maxBlock = gw * gh;
     Disk d = disk.getDisk ();
-    List<DiskAddress> selectedBlocks = selectionHandler.getHighlights ();
 
     // this stops an index error when using alt-5 to switch to 512-byte blocks
     //    if (maxBlock > d.getTotalBlocks ())
@@ -116,8 +115,8 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
         {
           DiskAddress da = d.getDiskAddress (blockNo);
           boolean flag = showFreeSectors && disk.isSectorFree (da);
-          boolean selected = selectedBlocks.contains (da);
-          drawBlock ((Graphics2D) g, blockNo, x, y, flag, selected);
+          drawBlock ((Graphics2D) g, blockNo, x, y, flag,
+                     selectionHandler.isSelected (da));
         }
       }
   }

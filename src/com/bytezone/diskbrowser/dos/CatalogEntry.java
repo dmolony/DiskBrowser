@@ -25,8 +25,9 @@ class CatalogEntry extends AbstractCatalogEntry
           dosDisk.sectorTypes[da.getBlock ()] = dosDisk.tsListSector;
         else
         {
-          System.out.print ("Attempt to assign TS sector to occupied sector : " + da);
-          System.out.println (" from " + name);
+          System.out.printf ("Attempt to assign TS sector to occupied sector "
+              + ": %s from %s%n", da, name);
+          break;
         }
         tsSectors.add (da);
         byte[] sectorBuffer = disk.readSector (da);

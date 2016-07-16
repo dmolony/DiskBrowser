@@ -27,7 +27,7 @@ class CatalogEntry extends AbstractCatalogEntry
         {
           System.out.printf ("Attempt to assign TS sector to occupied sector "
               + ": %s from %s%n", da, name);
-          break;
+          //          break;
         }
         tsSectors.add (da);
         byte[] sectorBuffer = disk.readSector (da);
@@ -42,6 +42,7 @@ class CatalogEntry extends AbstractCatalogEntry
               break;
             }
 
+        DiskAddress thisDA = da;
         for (int i = startPtr, max = disk.getBlockSize (); i < max; i += 2)
         {
           da = getValidAddress (sectorBuffer, i);
@@ -76,9 +77,15 @@ class CatalogEntry extends AbstractCatalogEntry
         da = getValidAddress (sectorBuffer, 1);
         if (da == null)
         {
-          System.out.print ("Next T/S list in sector " + da);
+          System.out.print ("Next T/S list in sector " + thisDA);
           System.out.printf (" is invalid : %02X, %02X%n", sectorBuffer[1],
                              sectorBuffer[2]);
+          break;
+        }
+
+        if (thisDA.compareTo (da) == 0)
+        {
+          System.out.printf ("Next T/S list in sector %s points to itself%n", thisDA);
           break;
         }
       }

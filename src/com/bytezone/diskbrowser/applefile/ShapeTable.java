@@ -34,7 +34,7 @@ public class ShapeTable extends AbstractFile
         int v1 = value >> 6;
         int v2 = (value & 0x38) >> 3;
         int v3 = value & 0x07;
-//        System.out.printf ("%02X  %02X  %02X  %02X%n", value, v1, v2, v3);
+        //        System.out.printf ("%02X  %02X  %02X  %02X%n", value, v1, v2, v3);
 
         if (v3 >= 4)
         {
@@ -129,7 +129,7 @@ public class ShapeTable extends AbstractFile
     if (totalShapes == 0)
       return false;
 
-    int lastOffset = 0;
+    //    int lastOffset = 0;
     for (int i = 0; i < totalShapes; i++)
     {
       // check index table entry is inside the file
@@ -139,10 +139,11 @@ public class ShapeTable extends AbstractFile
 
       // check index points inside the file
       int offset = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      if (offset == 0 || offset < lastOffset || offset >= buffer.length)
+      //      if (offset == 0 || offset < lastOffset || offset >= buffer.length)
+      if (offset == 0 || offset >= buffer.length)
         return false;
 
-      lastOffset = offset;
+      //      lastOffset = offset;
     }
 
     return true;

@@ -62,10 +62,7 @@ class DosVTOCSector extends AbstractSector
         extra = "(VTOC and Catalog)";
       else
         extra = "";
-      addText (text,
-               buffer,
-               i,
-               4,
+      addText (text, buffer, i, 4,
                String.format ("Track %02X  %s  %s", (i - 56) / 4,
                               getBitmap (buffer[i], buffer[i + 1]), extra));
     }

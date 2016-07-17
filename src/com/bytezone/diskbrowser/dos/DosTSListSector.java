@@ -29,13 +29,13 @@ class DosTSListSector extends AbstractSector
       if (da == null)
       {
         System.out.println ("Invalid sector address : null");
-        break; // throw exception
+        break;            // throw exception?
       }
 
       if (da.getBlock () > 0 && dosDisk.stillAvailable (da))
       {
         System.out.println ("Invalid sector address : " + da);
-        break; // throw exception
+        break;            // throw exception?
       }
     }
     return true;
@@ -52,6 +52,7 @@ class DosTSListSector extends AbstractSector
   @Override
   public String createText ()
   {
+    // should check whether the next sector address is this sector
     StringBuilder text = getHeader ("TS List Sector : " + name);
     addText (text, buffer, 0, 1, "Not used");
     addText (text, buffer, 1, 2, "Next TS list track/sector");

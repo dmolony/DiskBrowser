@@ -7,7 +7,7 @@ public class AppleDiskAddress implements DiskAddress
   private final int sector;
   public final Disk owner;
 
-  public AppleDiskAddress (int block, Disk owner)
+  public AppleDiskAddress (Disk owner, int block)
   {
     this.owner = owner;
     this.block = block;
@@ -16,7 +16,7 @@ public class AppleDiskAddress implements DiskAddress
     this.sector = block % sectorsPerTrack;
   }
 
-  public AppleDiskAddress (int track, int sector, Disk owner)
+  public AppleDiskAddress (Disk owner, int track, int sector)
   {
     this.owner = owner;
     this.track = track;

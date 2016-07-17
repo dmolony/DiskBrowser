@@ -72,7 +72,7 @@ public class DirectoryEntry implements AppleFileSource
         blockNumber = (b & 0x7F) * 4;
 
       for (int i = 0; i < 4; i++)
-        blocks.add (new AppleDiskAddress (blockNumber + i, disk));
+        blocks.add (new AppleDiskAddress (disk, blockNumber + i));
     }
   }
 
@@ -99,7 +99,7 @@ public class DirectoryEntry implements AppleFileSource
 
       int blockNumber = b * 4 + 48;
       for (int i = 0; i < 4; i++)
-        blocks.add (new AppleDiskAddress (blockNumber + i, disk));
+        blocks.add (new AppleDiskAddress (disk, blockNumber + i));
     }
   }
 

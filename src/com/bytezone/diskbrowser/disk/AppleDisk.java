@@ -372,9 +372,9 @@ public class AppleDisk implements Disk
     {
       System.out.println ("Invalid block : " + block);
       //      return null;
-      return new AppleDiskAddress (0, this);
+      return new AppleDiskAddress (this, 0);
     }
-    return new AppleDiskAddress (block, this);
+    return new AppleDiskAddress (this, block);
   }
 
   @Override
@@ -385,7 +385,7 @@ public class AppleDisk implements Disk
     for (int block : blocks)
     {
       assert (isValidAddress (block)) : "Invalid block : " + block;
-      addressList.add (new AppleDiskAddress (block, this));
+      addressList.add (new AppleDiskAddress (this, block));
     }
     return addressList;
   }
@@ -396,7 +396,7 @@ public class AppleDisk implements Disk
     // should this return null for invalid addresses?
     assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", "
         + sector;
-    return new AppleDiskAddress (track, sector, this);
+    return new AppleDiskAddress (this, track, sector);
   }
 
   @Override
@@ -505,7 +505,7 @@ public class AppleDisk implements Disk
     {
       blockList = new ArrayList<DiskAddress> (blocks);
       for (int block = 0; block < blocks; block++)
-        blockList.add (new AppleDiskAddress (block, this));
+        blockList.add (new AppleDiskAddress (this, block));
     }
 
     return blockList.iterator ();

@@ -53,7 +53,7 @@ class DosTSListSector extends AbstractSector
   public String createText ()
   {
     DiskAddress da = disk.getDiskAddress (buffer[1], buffer[2]);
-    String msg = da.compareTo (diskAddress) == 0 ? " (circular reference)" : "";
+    String msg = da.matches (diskAddress) ? " (circular reference)" : "";
 
     StringBuilder text = getHeader ("TS List Sector : " + name);
     addText (text, buffer, 0, 1, "Not used");

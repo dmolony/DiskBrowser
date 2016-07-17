@@ -9,4 +9,6 @@ public interface DiskAddress extends Comparable<DiskAddress>
   public int getSector ();
 
   public Disk getDisk ();
+
+  public boolean matches (DiskAddress other);
 }

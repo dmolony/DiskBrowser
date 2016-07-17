@@ -2,9 +2,11 @@ package com.bytezone.diskbrowser.pascal;
 
 import java.text.DateFormat;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class PascalCatalogSector extends AbstractSector
@@ -13,9 +15,9 @@ class PascalCatalogSector extends AbstractSector
   private static String[] fileTypes =
       { "Volume", "Bad", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
-  public PascalCatalogSector (Disk disk, byte[] buffer)
+  public PascalCatalogSector (Disk disk, byte[] buffer, List<DiskAddress> diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
   }
 
   @Override

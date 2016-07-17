@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.disk;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -16,14 +17,23 @@ public abstract class AbstractSector implements DataSource
 
   public byte[] buffer;
   protected Disk disk;
+  protected DiskAddress diskAddress;
+  protected List<DiskAddress> diskAddressList;
   AssemblerProgram assembler;
   String description;
 
-  // maybe this should just use a DiskAddress
-  public AbstractSector (Disk disk, byte[] buffer)
+  public AbstractSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
     this.buffer = buffer;
     this.disk = disk;
+    this.diskAddress = diskAddress;
+  }
+
+  public AbstractSector (Disk disk, byte[] buffer, List<DiskAddress> diskAddressList)
+  {
+    this.buffer = buffer;
+    this.disk = disk;
+    this.diskAddressList = diskAddressList;
   }
 
   @Override

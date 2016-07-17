@@ -306,14 +306,14 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     String address = String.format ("%02X %02X", da.getTrack (), da.getSector ());
 
     if (sectorType == emptySector)
-      return new DefaultSector ("Empty sector at " + address, disk, buffer);
+      return new DefaultSector ("Empty sector at " + address, disk, buffer, da);
     if (sectorType == usedSector)
-      return new DefaultSector ("Orphan sector at " + address, disk, buffer);
+      return new DefaultSector ("Orphan sector at " + address, disk, buffer, da);
 
     String name = getSectorFilename (da);
     if (!name.isEmpty ())
       name = " : " + name;
-    return new DefaultSector ("Data sector at " + address + name, disk, buffer);
+    return new DefaultSector ("Data sector at " + address + name, disk, buffer, da);
   }
 
   /*

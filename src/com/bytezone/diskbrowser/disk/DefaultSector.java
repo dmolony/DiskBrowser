@@ -6,9 +6,9 @@ public class DefaultSector extends AbstractSector
 {
   String name;
 
-  public DefaultSector (String name, Disk disk, byte[] buffer)
+  public DefaultSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
     this.name = name;
   }
 

@@ -1,16 +1,26 @@
 package com.bytezone.diskbrowser.applefile;
 
+import java.util.List;
+
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 
 public class BootSector extends AbstractSector
 {
   AssemblerProgram assembler;
-  String name;      // DOS or Prodos
+  String name;                                        // DOS or Prodos
 
-  public BootSector (Disk disk, byte[] buffer, String name)
+  public BootSector (Disk disk, byte[] buffer, String name, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
+    this.name = name;
+  }
+
+  public BootSector (Disk disk, byte[] buffer, String name,
+      List<DiskAddress> diskAddressList)
+  {
+    super (disk, buffer, diskAddressList);
     this.name = name;
   }
 
@@ -22,9 +32,9 @@ public class BootSector extends AbstractSector
     if (assembler == null)
     {
       int flag = buffer[0] & 0xFF;
-      if (flag == 1)      // apple II
+      if (flag == 1)                                // apple II
         assembler = new AssemblerProgram (name + " Boot Loader", buffer, 0x00, 1);
-      else                // apple III (SOS)
+      else                                          // apple III (SOS)
       {
         byte[] newBuffer = new byte[buffer.length * 2];
         System.arraycopy (buffer, 0, newBuffer, 0, buffer.length);

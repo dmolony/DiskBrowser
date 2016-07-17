@@ -2,15 +2,16 @@ package com.bytezone.diskbrowser.prodos;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class ProdosIndexSector extends AbstractSector
 {
   private final String name;
 
-  ProdosIndexSector (String name, Disk disk, byte[] buffer)
+  ProdosIndexSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
     this.name = name;
   }
 

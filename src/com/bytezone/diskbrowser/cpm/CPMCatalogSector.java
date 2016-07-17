@@ -2,14 +2,15 @@ package com.bytezone.diskbrowser.cpm;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 
 public class CPMCatalogSector extends AbstractSector
 {
   private static int CATALOG_ENTRY_SIZE = 32;
 
-  public CPMCatalogSector (Disk disk, byte[] buffer)
+  public CPMCatalogSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
   }
 
   @Override

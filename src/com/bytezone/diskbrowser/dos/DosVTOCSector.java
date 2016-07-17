@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.dos;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class DosVTOCSector extends AbstractSector
@@ -18,9 +19,10 @@ class DosVTOCSector extends AbstractSector
   int maxSectors;
   int maxTracks;
 
-  public DosVTOCSector (DosDisk parentDisk, Disk disk, byte[] buffer)
+  public DosVTOCSector (DosDisk parentDisk, Disk disk, byte[] buffer,
+      DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
 
     this.parentDisk = parentDisk;
     DOSVersion = buffer[3];

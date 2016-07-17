@@ -47,11 +47,13 @@ public class DosDisk extends AbstractFormattedDisk
     sectorTypesList.add (tsListSector);
     sectorTypesList.add (dataSector);
 
-    byte[] sectorBuffer = disk.readSector (0, 0);               // Boot sector
-    bootSector = new BootSector (disk, sectorBuffer, "DOS");
+    DiskAddress da = disk.getDiskAddress (0, 0);
+    byte[] sectorBuffer = disk.readSector (da);               // Boot sector
+    bootSector = new BootSector (disk, sectorBuffer, "DOS", da);
 
-    sectorBuffer = disk.readSector (CATALOG_TRACK, 0);          // VTOC
-    dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer);
+    da = disk.getDiskAddress (CATALOG_TRACK, 0);
+    sectorBuffer = disk.readSector (da);          // VTOC
+    dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer, da);
 
     DiskAddress catalogStart = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
@@ -77,7 +79,7 @@ public class DosDisk extends AbstractFormattedDisk
     rootNode.add (volumeNode);
 
     // flag the catalog sectors before any file mistakenly grabs them
-    DiskAddress da = disk.getDiskAddress (catalogStart.getBlock ());
+    da = disk.getDiskAddress (catalogStart.getBlock ());
     do
     {
       if (!disk.isValidAddress (da))
@@ -324,14 +326,14 @@ public class DosDisk extends AbstractFormattedDisk
     String address = String.format ("%02X %02X", da.getTrack (), da.getSector ());
 
     if (type == tsListSector)
-      return new DosTSListSector (getSectorFilename (da), disk, buffer);
+      return new DosTSListSector (getSectorFilename (da), disk, buffer, da);
     if (type == catalogSector)
-      return new DosCatalogSector (disk, buffer);
+      return new DosCatalogSector (disk, buffer, da);
     if (type == dataSector)
       return new DefaultSector (
-          "Data Sector at " + address + " : " + getSectorFilename (da), disk, buffer);
+          "Data Sector at " + address + " : " + getSectorFilename (da), disk, buffer, da);
     if (type == dosSector)
-      return new DefaultSector ("DOS sector at " + address, disk, buffer);
+      return new DefaultSector ("DOS sector at " + address, disk, buffer, da);
     return super.getFormattedSector (da);
   }
 

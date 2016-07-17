@@ -51,8 +51,9 @@ public class ProdosDisk extends AbstractFormattedDisk
       if (!disk.isSectorEmpty (disk.getDiskAddress (block)))
         sectorTypes[block] = dosSector;
 
-    byte[] buffer = disk.readSector (0);
-    bootSector = new BootSector (disk, buffer, "Prodos");
+    DiskAddress da = disk.getDiskAddress (0);
+    byte[] buffer = disk.readSector (da);
+    bootSector = new BootSector (disk, buffer, "Prodos", da);
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
     DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode ("empty volume node");
@@ -224,19 +225,19 @@ public class ProdosDisk extends AbstractFormattedDisk
     SectorType type = sectorTypes[da.getBlock ()];
 
     if (type == catalogSector || type == subcatalogSector)
-      return new ProdosCatalogSector (disk, buffer);
+      return new ProdosCatalogSector (disk, buffer, da);
     if (type == volumeMapSector)
       return new ProdosBitMapSector (this, disk, buffer, da);
     if (type == masterIndexSector || type == indexSector)
-      return new ProdosIndexSector (getSectorFilename (da), disk, buffer);
+      return new ProdosIndexSector (getSectorFilename (da), disk, buffer, da);
     if (type == extendedKeySector)
-      return new ProdosExtendedKeySector (disk, buffer);
+      return new ProdosExtendedKeySector (disk, buffer, da);
     if (type == dosSector)
-      return new DefaultSector ("Boot sector", disk, buffer);
+      return new DefaultSector ("Boot sector", disk, buffer, da);
 
     String name = getSectorFilename (da);
     if (name != null)
-      return new DefaultSector (name, disk, buffer);
+      return new DefaultSector (name, disk, buffer, da);
     return super.getFormattedSector (da);
   }
 

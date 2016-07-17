@@ -6,13 +6,14 @@ import java.util.GregorianCalendar;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class ProdosCatalogSector extends AbstractSector
 {
-  ProdosCatalogSector (Disk disk, byte[] buffer)
+  ProdosCatalogSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
   }
 
   @Override

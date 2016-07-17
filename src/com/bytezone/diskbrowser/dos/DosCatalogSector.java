@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.dos;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class DosCatalogSector extends AbstractSector
@@ -11,9 +12,9 @@ class DosCatalogSector extends AbstractSector
         "SS file", "Relocatable file", "AA file", "BB file" };
   private static int CATALOG_ENTRY_SIZE = 35;
 
-  public DosCatalogSector (Disk disk, byte[] buffer)
+  public DosCatalogSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
   }
 
   @Override

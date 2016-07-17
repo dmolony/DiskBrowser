@@ -2,12 +2,13 @@ package com.bytezone.diskbrowser.prodos;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 
 class ProdosExtendedKeySector extends AbstractSector
 {
-  public ProdosExtendedKeySector (Disk disk, byte[] buffer)
+  public ProdosExtendedKeySector (Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
   }
 
   @Override

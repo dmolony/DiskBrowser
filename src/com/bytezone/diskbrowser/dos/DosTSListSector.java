@@ -9,9 +9,9 @@ class DosTSListSector extends AbstractSector
 {
   String name;
 
-  public DosTSListSector (String name, Disk disk, byte[] buffer)
+  public DosTSListSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
-    super (disk, buffer);
+    super (disk, buffer, diskAddress);
     this.name = name;
   }
 
@@ -52,10 +52,12 @@ class DosTSListSector extends AbstractSector
   @Override
   public String createText ()
   {
-    // should check whether the next sector address is this sector
+    DiskAddress da = disk.getDiskAddress (buffer[1], buffer[2]);
+    String msg = da.compareTo (diskAddress) == 0 ? " (circular reference)" : "";
+
     StringBuilder text = getHeader ("TS List Sector : " + name);
     addText (text, buffer, 0, 1, "Not used");
-    addText (text, buffer, 1, 2, "Next TS list track/sector");
+    addText (text, buffer, 1, 2, "Next TS list track/sector" + msg);
     addText (text, buffer, 3, 2, "Not used");
     addTextAndDecimal (text, buffer, 5, 2, "Sector base number");
     addText (text, buffer, 7, 4, "Not used");

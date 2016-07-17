@@ -130,7 +130,7 @@ public class CPMDisk extends AbstractFormattedDisk
     byte[] buffer = disk.readSector (da);
 
     if (type == catalogSector)
-      return new CPMCatalogSector (disk, buffer);
+      return new CPMCatalogSector (disk, buffer, da);
 
     return super.getFormattedSector (da);
   }

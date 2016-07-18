@@ -61,16 +61,15 @@ class DosTSListSector extends AbstractSector
     addText (text, buffer, 7, 4, "Not used");
     addText (text, buffer, 11, 1, "Not used");
 
-    String message;
     int sectorBase = HexFormatter.intValue (buffer[5], buffer[6]);
 
     for (int i = 12; i <= 255; i += 2)
     {
       if (buffer[i] == 0 && buffer[i + 1] == 0)
-        message = "";
+        msg = "";
       else
-        message = "Track/sector of file sector " + ((i - 10) / 2 + sectorBase);
-      addText (text, buffer, i, 2, message);
+        msg = "Track/sector of file sector " + ((i - 10) / 2 + sectorBase);
+      addText (text, buffer, i, 2, msg);
     }
 
     text.deleteCharAt (text.length () - 1);

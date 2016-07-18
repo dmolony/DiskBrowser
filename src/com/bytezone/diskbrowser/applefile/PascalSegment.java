@@ -10,9 +10,10 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 {
   private final int segmentNoHeader;
   private int segmentNoBody;
+
   public final int blockNo;
   public final int size;
-  private List<PascalProcedure> procedures;
+
   private final int segKind;
   private final int textAddress;
   private final int machineType;
@@ -21,14 +22,17 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private final int intrinsSegs2;
   private final int slot;
   private int totalProcedures;
+  private List<PascalProcedure> procedures;
 
   public PascalSegment (String name, byte[] fullBuffer, int seq)
   {
-    super (name, fullBuffer); // sets this.buffer to the full buffer temporarily
+    super (name, fullBuffer);     // sets this.buffer to the full buffer temporarily
+
     this.slot = seq;
     this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
     this.size = HexFormatter.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
     this.segmentNoHeader = fullBuffer[0x100 + seq * 2];
+
     segKind = HexFormatter.intValue (fullBuffer[0xC0 + seq * 2],
                                      fullBuffer[0xC0 + seq * 2 + 1]);
     textAddress = HexFormatter.intValue (fullBuffer[0xE0 + seq * 2],
@@ -48,7 +52,10 @@ public class PascalSegment extends AbstractFile implements PascalConstants
       System.arraycopy (fullBuffer, blockNo * 512, buffer, 0, size);
       totalProcedures = buffer[size - 1] & 0xFF;
       segmentNoBody = buffer[size - 2] & 0xFF;
-      if (segmentNoBody != segmentNoHeader)
+
+      if (segmentNoHeader == 0)
+        System.out.printf ("Zero segment header in %s seq %d%n", name, seq);
+      else if (segmentNoBody != segmentNoHeader)
         System.out.println ("Segment number mismatch : " + segmentNoBody + " / "
             + segmentNoHeader);
     }
@@ -107,12 +114,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
       if (procedure.valid)
       {
         int address = size - procedure.slot * 2 - 2;
-        text.append (String
-            .format (" %2d    %04X  %3d    %04X   %04X   %04X   %04X   (%04X - %04X = %04X)%n",
-                     procedure.procedureNo, procedure.offset, procedure.procLevel,
-                     procedure.codeStart, procedure.codeEnd, procedure.parmSize,
-                     procedure.dataSize, address, procedure.offset,
-                     procedure.procOffset));
+        text.append (String.format (
+                                    " %2d    %04X  %3d    %04X   %04X   %04X   "
+                                        + "%04X   (%04X - %04X = %04X)%n",
+                                    procedure.procedureNo, procedure.offset,
+                                    procedure.procLevel, procedure.codeStart,
+                                    procedure.codeEnd, procedure.parmSize,
+                                    procedure.dataSize, address, procedure.offset,
+                                    procedure.procOffset));
       }
       else
         text.append (String.format (" %2d    %04X%n", procedure.slot, procedure.offset));

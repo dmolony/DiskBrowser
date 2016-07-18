@@ -129,7 +129,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
   public boolean isSelected (DiskAddress da)
   {
     for (DiskAddress selection : highlights)
-      if (selection.compareTo (da) == 0)
+      if (selection.matches (da))                 // NPE 18/7/2016
         return true;
     return false;
   }

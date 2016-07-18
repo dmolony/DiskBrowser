@@ -22,7 +22,9 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
 class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 {
-  static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
+  private static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
+  private static final Color[] lightColors =
+      { Color.WHITE, Color.YELLOW, Color.PINK, Color.CYAN, Color.ORANGE, Color.GREEN };
 
   private FormattedDisk disk;
   private LayoutDetails layoutDetails;
@@ -166,10 +168,9 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 
   private Color getContrastColor (SectorType type)
   {
-    if (type.colour == Color.WHITE || type.colour == Color.YELLOW
-        || type.colour == Color.PINK || type.colour == Color.CYAN
-        || type.colour == Color.ORANGE || type.colour == Color.GREEN)
-      return Color.BLACK;
+    for (Color color : lightColors)
+      if (type.colour == color)
+        return Color.BLACK;
     return Color.WHITE;
   }
 

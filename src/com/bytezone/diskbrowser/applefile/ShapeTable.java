@@ -1,5 +1,8 @@
 package com.bytezone.diskbrowser.applefile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class ShapeTable extends AbstractFile
@@ -34,7 +37,6 @@ public class ShapeTable extends AbstractFile
         int v1 = value >> 6;
         int v2 = (value & 0x38) >> 3;
         int v3 = value & 0x07;
-        //        System.out.printf ("%02X  %02X  %02X  %02X%n", value, v1, v2, v3);
 
         if (v3 >= 4)
         {
@@ -123,13 +125,15 @@ public class ShapeTable extends AbstractFile
 
   public static boolean isShapeTable (byte[] buffer)
   {
+    List<Integer> offsets = new ArrayList<Integer> ();
+
     if (buffer.length == 0 || buffer[buffer.length - 1] != 0)
       return false;
+
     int totalShapes = buffer[0] & 0xFF;
     if (totalShapes == 0)
       return false;
 
-    //    int lastOffset = 0;
     for (int i = 0; i < totalShapes; i++)
     {
       // check index table entry is inside the file
@@ -139,11 +143,13 @@ public class ShapeTable extends AbstractFile
 
       // check index points inside the file
       int offset = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      //      if (offset == 0 || offset < lastOffset || offset >= buffer.length)
       if (offset == 0 || offset >= buffer.length)
         return false;
 
-      //      lastOffset = offset;
+      // check offset is unique
+      if (offsets.contains (offset))
+        return false;
+      offsets.add (offset);
     }
 
     return true;

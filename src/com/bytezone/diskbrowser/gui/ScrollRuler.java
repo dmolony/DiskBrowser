@@ -1,6 +1,10 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 
@@ -17,13 +21,13 @@ class ScrollRuler extends JComponent
 
   public static final int HORIZONTAL = 0;
   public static final int VERTICAL = 1;
-  Font font = Platform.getFont (FontType.SANS_SERIF, FontSize.BASE);
 
-  int orientation;
-  boolean isHex = true;
-  boolean isTrackMode = true;
-  LayoutDetails layoutDetails;
-  JComponent image;
+  private Font font = Platform.getFont (FontType.SANS_SERIF, FontSize.BASE);
+  private final int orientation;
+  private boolean isHex = true;
+  private boolean isTrackMode = true;
+  private LayoutDetails layoutDetails;
+  private final JComponent image;
 
   public ScrollRuler (JComponent image, int orientation)
   {
@@ -43,11 +47,19 @@ class ScrollRuler extends JComponent
 
     // Must match the preferred size of DiskLayoutImage
     if (orientation == HORIZONTAL)
-      setPreferredSize (new Dimension (layout.block.width * layout.grid.width + 1, HEIGHT)); // width/height
+      setPreferredSize (new Dimension (layout.block.width * layout.grid.width + 1,
+          HEIGHT)); // width/height
     else
-      setPreferredSize (new Dimension (WIDTH, layout.block.height * layout.grid.height + 1));
+      setPreferredSize (new Dimension (WIDTH,
+          layout.block.height * layout.grid.height + 1));
 
-    setTrackMode (layout.grid.width == 16 || layout.grid.width == 13); // will call repaint ()
+    setTrackMode (layout.grid.width == 16 || layout.grid.width == 13);
+  }
+
+  public void setTrackMode (boolean trackMode)
+  {
+    isTrackMode = trackMode;
+    repaint ();
   }
 
   public void changeFont (Font font)
@@ -62,12 +74,6 @@ class ScrollRuler extends JComponent
     repaint ();
   }
 
-  public void setTrackMode (boolean trackMode)
-  {
-    isTrackMode = trackMode;
-    repaint ();
-  }
-
   @Override
   protected void paintComponent (Graphics g)
   {
@@ -79,7 +85,7 @@ class ScrollRuler extends JComponent
     if (layoutDetails == null)
       return;
 
-    g.setFont (font); // how do I do this in the constructor?
+    g.setFont (font);                 // how do I do this in the constructor?
     g.setColor (Color.black);
 
     if (orientation == HORIZONTAL)

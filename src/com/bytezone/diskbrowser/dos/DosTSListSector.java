@@ -7,7 +7,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class DosTSListSector extends AbstractSector
 {
-  String name;
+  private final String name;
 
   public DosTSListSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
   {
@@ -17,8 +17,6 @@ class DosTSListSector extends AbstractSector
 
   public boolean isValid (DosDisk dosDisk)
   {
-    System.out.println ("Validating TS List sector");
-
     // what is the count of blocks? does it match? this sector can't tell, there
     // might be more than one TS list
 

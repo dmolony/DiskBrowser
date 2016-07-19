@@ -542,10 +542,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     if (da.equals (masterIndexBlock))
       return true;
     for (DiskAddress block : indexBlocks)
-      if (block.compareTo (da) == 0)
+      if (block.matches (da))
         return true;
     for (DiskAddress block : dataBlocks)
-      if (block.compareTo (da) == 0)
+      if (block.matches (da))
         return true;
     return false;
   }

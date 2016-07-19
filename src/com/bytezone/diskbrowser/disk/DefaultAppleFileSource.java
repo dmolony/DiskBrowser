@@ -94,7 +94,7 @@ public class DefaultAppleFileSource implements AppleFileSource
   public boolean contains (DiskAddress diskAddress)
   {
     for (DiskAddress da : blocks)
-      if (da.compareTo (diskAddress) == 0)
+      if (da.matches (diskAddress))
         return true;
     return false;
   }

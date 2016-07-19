@@ -18,7 +18,7 @@ public interface FormattedDisk
   public List<DiskAddress> getFileSectors (int fileNo);
 
   // Methods implemented by AbstractFormattedDisk
-  public JTree getCatalogTree (); // each node is an AppleFileSource
+  public JTree getCatalogTree ();           // each node is an AppleFileSource
 
   public List<AppleFileSource> getCatalogList ();
 

@@ -36,7 +36,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
      * If the click was on an existing highlight, just remove it (regardless of modifiers)
      */
     for (DiskAddress setDA : highlights)
-      if (da.compareTo (setDA) == 0)
+      if (da.matches (setDA))
       {
         highlights.remove (setDA);
         return;

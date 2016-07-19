@@ -20,7 +20,7 @@ public class InfocomDisk extends AbstractFormattedDisk
   private static final boolean TYPE_NODE = true;
   private static final boolean TYPE_LEAF = false;
   private byte[] data;
-  private int version;
+  //  private int version;
   private final Header header;
 
   Color green = new Color (0, 200, 0);

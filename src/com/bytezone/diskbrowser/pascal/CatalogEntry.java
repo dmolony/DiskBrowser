@@ -41,7 +41,7 @@ abstract class CatalogEntry implements AppleFileSource
   public boolean contains (DiskAddress da)
   {
     for (DiskAddress sector : blocks)
-      if (sector.compareTo (da) == 0)
+      if (sector.matches (da))
         return true;
     return false;
   }

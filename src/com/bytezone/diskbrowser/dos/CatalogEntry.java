@@ -83,7 +83,7 @@ class CatalogEntry extends AbstractCatalogEntry
           break;
         }
 
-        if (thisDA.compareTo (da) == 0)
+        if (thisDA.matches (da))
         {
           System.out.printf ("Next T/S list in sector %s points to itself%n", thisDA);
           break;

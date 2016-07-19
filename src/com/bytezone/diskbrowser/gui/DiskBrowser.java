@@ -15,7 +15,7 @@ import com.bytezone.common.State;
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
 {
   private static final String windowTitle = "Apple ][ Disk Browser";
-  private static final String PREFS_FULL_SCREEN = "full screen";
+  //  private static final String PREFS_FULL_SCREEN = "full screen";
   private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
   private WindowSaver windowSaver;
 
@@ -36,7 +36,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     setLayout (new BorderLayout ());
     add (toolBar, BorderLayout.NORTH);
 
-    RedoHandler redoHandler = new RedoHandler (getRootPane (), toolBar); // add nav buttons
+    // add navigation buttons
+    RedoHandler redoHandler = new RedoHandler (getRootPane (), toolBar);
     toolBar.addSeparator ();
 
     // create and add the left-hand catalog panel

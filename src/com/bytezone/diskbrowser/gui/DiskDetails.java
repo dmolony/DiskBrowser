@@ -36,6 +36,7 @@ class DiskDetails
   @Override
   public String toString ()
   {
-    return String.format ("%s (%s)", file.getAbsolutePath (), duplicate ? "duplicate" : "OK");
+    return String.format ("%s (%s)", file.getAbsolutePath (),
+                          duplicate ? "duplicate" : "OK");
   }
 }

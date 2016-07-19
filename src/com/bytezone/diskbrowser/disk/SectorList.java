@@ -40,7 +40,8 @@ public class SectorList extends AbstractFile
       String owner = formattedDisk.getSectorFilename (da);
       if (owner == null)
         owner = "";
-      text.append (String.format (" %04X  %-18s  %s%n", da.getBlock (), sectorType.name, owner));
+      text.append (String.format (" %04X  %-18s  %s%n", da.getBlock (), sectorType.name,
+                                  owner));
     }
 
     return text.toString ();

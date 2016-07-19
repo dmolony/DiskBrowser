@@ -260,11 +260,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   public boolean contains (DiskAddress da)
   {
     for (DiskAddress sector : tsSectors)
-      if (sector.compareTo (da) == 0)
+      if (sector.matches (da))
         return true;
     for (DiskAddress sector : dataSectors)
       // random access files may have gaps, and thus null sectors
-      if (sector != null && sector.compareTo (da) == 0)
+      if (sector != null && sector.matches (da))
         return true;
     return false;
   }

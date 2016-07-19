@@ -7,16 +7,16 @@ import java.util.List;
 class Routine extends InfocomAbstractFile
     implements Iterable<Instruction>, Comparable<Routine>
 {
+  private static final String padding = "                             ";
+
   int startPtr, length, strings, locals;
-  Header header;
+  private final Header header;
 
   List<Parameter> parameters = new ArrayList<Parameter> ();
   List<Instruction> instructions = new ArrayList<Instruction> ();
   List<Integer> calls = new ArrayList<Integer> ();
   List<Integer> calledBy = new ArrayList<Integer> ();
-  List<Integer> actions = new ArrayList<Integer> (); // not used yet
-
-  private static final String padding = "                             ";
+  List<Integer> actions = new ArrayList<Integer> ();          // not used yet
 
   public Routine (int ptr, Header header, int caller)
   {
@@ -27,12 +27,12 @@ class Routine extends InfocomAbstractFile
     if (locals > 15)
       return;
 
-    startPtr = ptr++; // also used to flag a valid routine
+    startPtr = ptr++;                             // also used to flag a valid routine
     calledBy.add (caller);
 
     for (int i = 1; i <= locals; i++)
     {
-      parameters.add (new Parameter (i, header.getWord (ptr))); // default values
+      parameters.add (new Parameter (i, header.getWord (ptr)));     // default values
       ptr += 2;
     }
 
@@ -43,6 +43,7 @@ class Routine extends InfocomAbstractFile
         System.out.println ("Bad instruction found : " + ptr);
         return;
       }
+
       Instruction instruction = new Instruction (buffer, ptr, header);
       instructions.add (instruction);
 

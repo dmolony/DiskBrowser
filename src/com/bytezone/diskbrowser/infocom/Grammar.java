@@ -28,17 +28,17 @@ class Grammar extends InfocomAbstractFile
     super (name, buffer);
     this.header = header;
 
-    indexPtr = header.staticMemory; // start of the index
-    tablePtr = header.getWord (indexPtr); // start of the data (end of the index)
+    indexPtr = header.staticMemory;               // start of the index
+    tablePtr = header.getWord (indexPtr);         // start of the data (end of the index)
     indexSize = tablePtr - indexPtr;
     indexEntries = indexSize / 2;
 
     padding = getPadding ();
 
-    int lastEntry = header.getWord (tablePtr - 2); // address of the last data entry
+    int lastEntry = header.getWord (tablePtr - 2);    // address of the last data entry
     tableSize = lastEntry + getRecordLength (lastEntry) - tablePtr; // uses padding
-    actionPtr = tablePtr + tableSize; // start of the action routines
-    actionSize = getTotalActions () * 2; // uses padding
+    actionPtr = tablePtr + tableSize;                 // start of the action routines
+    actionSize = getTotalActions () * 2;              // uses padding
 
     preActionSize = actionSize;
     preActionPtr = actionPtr + actionSize;
@@ -80,14 +80,14 @@ class Grammar extends InfocomAbstractFile
       sentenceGroups.add (sg);
       for (Sentence sentence : sg)
       {
-        // add to hashmap
-        if (!actionList.containsKey (sentence.actionId))
+        if (!actionList.containsKey (sentence.actionId))    // add to hashmap
           actionList.put (sentence.actionId, new ArrayList<Sentence> ());
         actionList.get (sentence.actionId).add (sentence);
-        // add to pre-action routine list
-        if (sentence.preActionRoutine > 0
+
+        if (sentence.preActionRoutine > 0         // add to pre-action routine list
             && !preActionRoutines.contains (sentence.preActionRoutine))
           preActionRoutines.add (sentence.preActionRoutine);
+
         // add to action routine list
         if (sentence.actionRoutine > 0
             && !actionRoutines.contains (sentence.actionRoutine))
@@ -127,9 +127,9 @@ class Grammar extends InfocomAbstractFile
           highest = val;
         ptr += SENTENCE_LENGTH;
       }
-      ptr += padding; // could be zero or one
+      ptr += padding;             // could be zero or one
     }
-    return highest + 1; // zero-based, so increment it
+    return highest + 1;           // zero-based, so increment it
   }
 
   public List<Integer> getActionRoutines ()
@@ -268,8 +268,8 @@ class Grammar extends InfocomAbstractFile
     int startPtr;
     SentenceGroup parent;
     int actionId;
-    int actionRoutine; // mandatory
-    int preActionRoutine; // optional
+    int actionRoutine;        // mandatory
+    int preActionRoutine;     // optional
     String sentenceText;
 
     public Sentence (int ptr, SentenceGroup parent)

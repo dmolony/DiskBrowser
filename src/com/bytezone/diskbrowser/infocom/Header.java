@@ -6,7 +6,7 @@ class Header extends InfocomAbstractFile
 {
   final String[] propertyNames = new String[32];
 
-  File file;
+  private final File file;
   int version;
   int highMemory;
   int programCounter;
@@ -49,7 +49,7 @@ class Header extends InfocomAbstractFile
     // do the basic managers
     abbreviations = new Abbreviations (this);
     dictionary = new Dictionary (this);
-    globals = new Globals (this); // may display ZStrings
+    globals = new Globals (this);                     // may display ZStrings
 
     // set up an empty object to store Routines in
     codeManager = new CodeManager (this);
@@ -63,9 +63,9 @@ class Header extends InfocomAbstractFile
     stringManager = new StringManager ("Strings", buffer, this);
 
     codeManager.addRoutine (programCounter - 1, 0);
-    codeManager.addActionRoutines (); // obtained from Grammar
-    codeManager.addCodeRoutines (); // obtained from Object properties
-    codeManager.addMissingRoutines (); // requires stringPtr to be set
+    codeManager.addActionRoutines ();                 // obtained from Grammar
+    codeManager.addCodeRoutines ();                   // obtained from Object properties
+    codeManager.addMissingRoutines ();                // requires stringPtr to be set
 
     // add entries for AbstractFile.getHexDump ()
     hexBlocks.add (new HexBlock (0, 64, "Header data:"));

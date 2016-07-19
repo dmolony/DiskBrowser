@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -48,23 +49,37 @@ public class InfocomDisk extends AbstractFormattedDisk
       createStoryFile ("Zork1.sf");
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
+    DefaultMutableTreeNode headerNode = null;
+    DefaultMutableTreeNode abbreviationsNode = null;
     DefaultMutableTreeNode codeNode = null;
     DefaultMutableTreeNode objectNode = null;
+    DefaultMutableTreeNode globalsNode = null;
+    DefaultMutableTreeNode grammarNode = null;
+    DefaultMutableTreeNode dictionaryNode = null;
+    DefaultMutableTreeNode stringsNode = null;
 
     header = new Header ("Header", data, disk.getFile ());
 
-    addToTree (root, "Header", header, TYPE_LEAF);
-    addToTree (root, "Abbreviations", header.abbreviations, TYPE_LEAF);
+    headerNode = addToTree (root, "Header", header, TYPE_LEAF);
+    DefaultAppleFileSource dafs = (DefaultAppleFileSource) headerNode.getUserObject ();
+    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    blocks.add (disk.getDiskAddress (3, 0));
+    dafs.setSectors (blocks);
+
+    abbreviationsNode =
+        addToTree (root, "Abbreviations", header.abbreviations, TYPE_LEAF);
 
     objectNode = addToTree (root, "Objects", header.objectManager, TYPE_NODE);
     header.objectManager.addNodes (objectNode, this);
-    addToTree (root, "Globals", header.globals, TYPE_LEAF);
-    addToTree (root, "Grammar", header.grammar, TYPE_LEAF);
-    addToTree (root, "Dictionary", header.dictionary, TYPE_LEAF);
+
+    globalsNode = addToTree (root, "Globals", header.globals, TYPE_LEAF);
+    grammarNode = addToTree (root, "Grammar", header.grammar, TYPE_LEAF);
+    dictionaryNode = addToTree (root, "Dictionary", header.dictionary, TYPE_LEAF);
+
     codeNode = addToTree (root, "Code", header.codeManager, TYPE_NODE);
     header.codeManager.addNodes (codeNode, this);
 
-    addToTree (root, "Strings", header.stringManager, TYPE_LEAF);
+    stringsNode = addToTree (root, "Strings", header.stringManager, TYPE_LEAF);
 
     PropertyManager pm = new PropertyManager ("Properties", data, header);
     pm.addNodes (addToTree (objectNode, "Properties", pm, TYPE_NODE), this);
@@ -74,13 +89,17 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     sectorTypes[48] = headerSector;
 
-    setSectors (header.abbreviationsTable, header.objectTable, abbreviationsSector);
-    setSectors (header.objectTable, header.globalsOffset, objectsSector);
-    setSectors (header.globalsOffset, header.staticMemory, globalsSector);
-    setSectors (header.staticMemory, header.dictionaryOffset, grammarSector);
-    setSectors (header.dictionaryOffset, header.highMemory, dictionarySector);
-    setSectors (header.highMemory, header.stringPointer, codeSector);
-    setSectors (header.stringPointer, header.fileLength, stringsSector);
+    setSectorTypes (header.abbreviationsTable, header.objectTable, abbreviationsSector,
+                    abbreviationsNode);
+    setSectorTypes (header.objectTable, header.globalsOffset, objectsSector, objectNode);
+    setSectorTypes (header.globalsOffset, header.staticMemory, globalsSector,
+                    globalsNode);
+    setSectorTypes (header.staticMemory, header.dictionaryOffset, grammarSector,
+                    grammarNode);
+    setSectorTypes (header.dictionaryOffset, header.highMemory, dictionarySector,
+                    dictionaryNode);
+    setSectorTypes (header.highMemory, header.stringPointer, codeSector, codeNode);
+    setSectorTypes (header.stringPointer, header.fileLength, stringsSector, stringsNode);
   }
 
   protected void setInfocomSectorTypes ()
@@ -101,16 +120,22 @@ public class InfocomDisk extends AbstractFormattedDisk
           sectorTypes[track * 16 + sector] = bootSector;
   }
 
-  private void setSectors (int sectorFrom, int sectorTo, SectorType type)
+  private void setSectorTypes (int sectorFrom, int sectorTo, SectorType type,
+      DefaultMutableTreeNode node)
   {
+    DefaultAppleFileSource dafs = (DefaultAppleFileSource) node.getUserObject ();
+    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+
     int blockNo = sectorFrom / disk.getBlockSize () + 48;
     int blockTo = sectorTo / disk.getBlockSize () + 48;
     while (blockNo <= blockTo)
     {
+      blocks.add (disk.getDiskAddress (blockNo));
       if (!disk.isSectorEmpty (blockNo))
         sectorTypes[blockNo] = type;
       blockNo++;
     }
+    dafs.setSectors (blocks);
   }
 
   private int getFileSize ()
@@ -162,8 +187,10 @@ public class InfocomDisk extends AbstractFormattedDisk
   private DefaultMutableTreeNode addToTree (DefaultMutableTreeNode root, String title,
       DataSource af, boolean allowsChildren)
   {
-    DefaultMutableTreeNode node =
-        new DefaultMutableTreeNode (new DefaultAppleFileSource (title, af, this));
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource (title, af, this);
+
+    //    dafs.setSectors (blocks);
+    DefaultMutableTreeNode node = new DefaultMutableTreeNode (dafs);
     node.setAllowsChildren (allowsChildren);
     root.add (node);
     return node;

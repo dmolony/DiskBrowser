@@ -2,11 +2,14 @@ package com.bytezone.diskbrowser.infocom;
 
 import java.io.File;
 
+import com.bytezone.diskbrowser.disk.Disk;
+
 class Header extends InfocomAbstractFile
 {
   final String[] propertyNames = new String[32];
 
   private final File file;
+  private final Disk disk;
   int version;
   int highMemory;
   int programCounter;
@@ -27,10 +30,11 @@ class Header extends InfocomAbstractFile
   Globals globals;
   Grammar grammar;
 
-  public Header (String name, byte[] buffer, File file)
+  public Header (String name, byte[] buffer, Disk disk)
   {
     super (name, buffer);
-    this.file = file;
+    this.disk = disk;
+    this.file = disk.getFile ();
 
     version = getByte (0);
     highMemory = getWord (4);

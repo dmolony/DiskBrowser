@@ -58,7 +58,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     DefaultMutableTreeNode dictionaryNode = null;
     DefaultMutableTreeNode stringsNode = null;
 
-    header = new Header ("Header", data, disk.getFile ());
+    header = new Header ("Header", data, disk);
 
     headerNode = addToTree (root, "Header", header, TYPE_LEAF);
     DefaultAppleFileSource dafs = (DefaultAppleFileSource) headerNode.getUserObject ();

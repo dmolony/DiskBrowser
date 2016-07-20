@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.infocom;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -8,7 +9,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
-import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class CodeManager extends AbstractFile
@@ -23,23 +25,39 @@ class CodeManager extends AbstractFile
     this.header = header;
   }
 
-  public void addNodes (DefaultMutableTreeNode root, FormattedDisk disk)
+  void addNodes (DefaultMutableTreeNode root, InfocomDisk disk)
   {
     root.setAllowsChildren (true);
 
-    codeSize = header.stringPointer - header.highMemory; // should be set by now - do this better!
+    // should be set by now - do this better!
+    codeSize = header.stringPointer - header.highMemory;
 
     int count = 0;
     for (Routine routine : routines.values ())
     {
-      DefaultMutableTreeNode node =
-          new DefaultMutableTreeNode (new DefaultAppleFileSource (
-              String.format ("%3d %s (%04X)", ++count, routine.getName (),
-                             routine.startPtr / 2),
-              routine, disk));
+      String name = String.format ("%3d %s (%04X)", ++count, routine.getName (),
+                                   routine.startPtr / 2);
+      DefaultAppleFileSource dafs = new DefaultAppleFileSource (name, routine, disk);
+      dafs.setSectors (getSectors (routine, disk.getDisk ()));
+
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode (dafs);
       node.setAllowsChildren (false);
       root.add (node);
     }
+  }
+
+  private List<DiskAddress> getSectors (Routine routine, Disk disk)
+  {
+    int blockNo = routine.startPtr / 256 + 48;
+    int size = routine.length;
+    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+
+    while (size > 0)
+    {
+      blocks.add (disk.getDiskAddress (blockNo++));
+      size -= 256;
+    }
+    return blocks;
   }
 
   public void addMissingRoutines ()

@@ -195,7 +195,7 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public boolean isError ()
   {
-    assert isValue () : "Cell type: " + type;
+    //    assert isValue () : "Cell type: " + type;
     return value.isError ();
   }
 
@@ -211,7 +211,12 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public Value calculate ()
   {
-    assert type == CellType.VALUE;
+    if (!isValue ())
+    {
+      System.out.println ("Not a value");
+      return this;
+    }
+    assert isValue () : "Cell type: " + type + " @ " + address;
     if (expressionText == null)
     {
       System.out.printf ("%s null expression text %n", address);

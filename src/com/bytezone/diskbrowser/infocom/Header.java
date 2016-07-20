@@ -22,13 +22,13 @@ class Header extends InfocomAbstractFile
   int checksum;
   int stringPointer;
 
-  Abbreviations abbreviations;
-  Dictionary dictionary;
-  ObjectManager objectManager;
-  StringManager stringManager;
-  CodeManager codeManager;
-  Globals globals;
-  Grammar grammar;
+  final Abbreviations abbreviations;
+  final Dictionary dictionary;
+  final ObjectManager objectManager;
+  final StringManager stringManager;
+  final CodeManager codeManager;
+  final Globals globals;
+  final Grammar grammar;
 
   public Header (String name, byte[] buffer, Disk disk)
   {

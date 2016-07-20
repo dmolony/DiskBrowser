@@ -15,9 +15,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class CodeManager extends AbstractFile
 {
-  Header header;
-  int codeSize;
-  Map<Integer, Routine> routines = new TreeMap<Integer, Routine> ();
+  private final Header header;
+  private int codeSize;
+  private final Map<Integer, Routine> routines = new TreeMap<Integer, Routine> ();
 
   public CodeManager (Header header)
   {
@@ -60,7 +60,7 @@ class CodeManager extends AbstractFile
     return blocks;
   }
 
-  public void addMissingRoutines ()
+  void addMissingRoutines ()
   {
     System.out.printf ("%nWalking the code block%n%n");
     int total = 0;
@@ -125,12 +125,12 @@ class CodeManager extends AbstractFile
     return text.toString ();
   }
 
-  public boolean containsRoutineAt (int address)
+  boolean containsRoutineAt (int address)
   {
     return (routines.containsKey (address));
   }
 
-  public void addCodeRoutines ()
+  void addCodeRoutines ()
   {
     List<Integer> routines = header.objectManager.getCodeRoutines ();
     System.out.println ("Adding " + routines.size () + " code routines");
@@ -138,7 +138,7 @@ class CodeManager extends AbstractFile
       addRoutine (address, 0);
   }
 
-  public void addActionRoutines ()
+  void addActionRoutines ()
   {
     List<Integer> routines = header.grammar.getActionRoutines ();
     System.out.println ("Adding " + routines.size () + " action routines");
@@ -146,7 +146,7 @@ class CodeManager extends AbstractFile
       addRoutine (address, 0);
   }
 
-  public Routine addRoutine (int address, int caller)
+  Routine addRoutine (int address, int caller)
   {
     if (address == 0) // stack-based call
       return null;
@@ -174,7 +174,7 @@ class CodeManager extends AbstractFile
     return r;
   }
 
-  public Routine getRoutine (int address)
+  Routine getRoutine (int address)
   {
     return routines.get (address);
   }

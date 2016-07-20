@@ -124,7 +124,7 @@ class Expression implements Value
   @Override
   public Value calculate ()
   {
-    //    System.out.printf ("Calculating: %s%n", text);
+    System.out.printf ("Calculating: %s%n", text);
     //    if (text.equals ("@NA"))
     //      Utility.printStackTrace ();
 

@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.gui;
 
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.disk.FormattedDisk;
 
 class DiskLayoutSelection implements Iterable<DiskAddress>
 {
@@ -64,13 +66,15 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     Collections.sort (highlights);
   }
 
-  public void cursorMove (Disk disk, KeyEvent e)
+  void cursorMove (FormattedDisk formattedDisk, KeyEvent e)
   {
     if (highlights.size () == 0)
     {
       System.out.println ("Nothing to move");
       return;
     }
+
+    Disk disk = formattedDisk.getDisk ();
 
     DiskAddress first = highlights.get (0);
     DiskAddress last = highlights.get (highlights.size () - 1);
@@ -79,7 +83,9 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
       highlights.clear ();
 
     int totalBlocks = disk.getTotalBlocks ();
-    int rowSize = disk.getTrackSize () / disk.getBlockSize ();
+    //    int rowSize = disk.getTrackSize () / disk.getBlockSize ();
+    Dimension gridLayout = formattedDisk.getGridLayout ();
+    int rowSize = gridLayout.width;
 
     switch (e.getKeyCode ())
     {

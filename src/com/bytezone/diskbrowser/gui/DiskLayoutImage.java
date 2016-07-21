@@ -255,7 +255,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
         case KeyEvent.VK_RIGHT:
         case KeyEvent.VK_UP:
         case KeyEvent.VK_DOWN:
-          selectionHandler.cursorMove (disk.getDisk (), e);
+          selectionHandler.cursorMove (disk, e);
           fireSectorSelectionEvent ();
           repaint ();
       }

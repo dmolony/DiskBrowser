@@ -272,6 +272,7 @@ class Expression implements Value
       else if (text.charAt (ptr) == '(')
         ++depth;
     }
+
     return text.substring (0, ptr + 1);   // include closing parenthesis
   }
 

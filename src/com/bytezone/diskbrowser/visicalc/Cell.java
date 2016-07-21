@@ -125,6 +125,8 @@ class Cell implements Comparable<Cell>, Value
           return justify (value.getText (), colWidth);
 
         Double thisValue = value.getValue ();
+        if (thisValue.isNaN ())
+          return justify ("NaN", colWidth);
 
         char format = cellFormat != ' ' ? cellFormat : defaultFormat;
         if (format == 'I')
@@ -213,7 +215,7 @@ class Cell implements Comparable<Cell>, Value
   {
     if (!isValue ())
     {
-      //      System.out.println ("Not a value");
+      //      System.out.println (value);
       return this;
     }
     assert isValue () : "Cell type: " + type + " @ " + address;

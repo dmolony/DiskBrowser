@@ -31,6 +31,7 @@ class Count extends Function
       if (cell.getValue () != 0.0)
         value++;
     }
+
     return this;
   }
 }

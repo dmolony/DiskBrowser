@@ -140,6 +140,12 @@ abstract class Function implements Value
   }
 
   @Override
+  public boolean isNotANumber ()
+  {
+    return valueType == ValueType.NAN;
+  }
+
+  @Override
   public double getValue ()
   {
     //    System.out.printf ("Getting value of : %s %s%n", functionName, functionText);
@@ -150,7 +156,7 @@ abstract class Function implements Value
   @Override
   public String getText ()
   {
-    return isNotAvailable () ? "" : isError () ? "Error" : "";
+    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
   }
 
   protected Range getRange (String text)

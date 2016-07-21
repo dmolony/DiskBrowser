@@ -173,7 +173,11 @@ class Expression implements Value
         else if (operator.equals ("^"))
           value = Math.pow (value, nextValue);
       }
-      valueType = ValueType.VALUE;
+
+      if (Double.isNaN (value))
+        valueType = ValueType.NAN;
+      else
+        valueType = ValueType.VALUE;
     }
     catch (Exception e)
     {
@@ -203,6 +207,12 @@ class Expression implements Value
   }
 
   @Override
+  public boolean isNotANumber ()
+  {
+    return valueType == ValueType.NAN;
+  }
+
+  @Override
   public boolean isError ()
   {
     return valueType == ValueType.ERROR;
@@ -211,14 +221,15 @@ class Expression implements Value
   @Override
   public double getValue ()
   {
-    assert valueType == ValueType.VALUE : "Expression ValueType = " + valueType;
+    //    assert valueType == ValueType.VALUE : "Expression ValueType = " + valueType;
     return value;
   }
 
   @Override
   public String getText ()
   {
-    return isNotAvailable () ? "NA" : isError () ? "Error" : "";
+    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
+    //    return isNotAvailable () ? "NA" : isError () ? "Error" : "";
   }
 
   private String checkBrackets (String input)

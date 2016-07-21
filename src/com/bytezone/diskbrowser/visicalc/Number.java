@@ -37,6 +37,12 @@ class Number implements Value
   }
 
   @Override
+  public boolean isNotANumber ()
+  {
+    return valueType == ValueType.NAN;
+  }
+
+  @Override
   public String toString ()
   {
     return String.format ("Number: %f", value);
@@ -51,7 +57,8 @@ class Number implements Value
   @Override
   public String getText ()
   {
-    return valueType == ValueType.ERROR ? "Error" : "";
+    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
+    //    return valueType == ValueType.ERROR ? "Error" : "";
   }
 
   @Override

@@ -4,7 +4,7 @@ interface Value
 {
   enum ValueType
   {
-    VALUE, ERROR, NA
+    VALUE, ERROR, NA, NAN
   }
 
   public ValueType getValueType ();
@@ -18,6 +18,8 @@ interface Value
   public boolean isError ();
 
   public boolean isNotAvailable ();
+
+  public boolean isNotANumber ();
 
   public Value calculate ();
 }

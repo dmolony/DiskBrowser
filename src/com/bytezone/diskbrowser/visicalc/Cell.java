@@ -121,12 +121,10 @@ class Cell implements Comparable<Cell>, Value
         return justify (repeat, colWidth);
 
       case VALUE:
-        if (value.isError () || value.isNotAvailable ())
+        if (value.isError () || value.isNotAvailable () || value.isNotANumber ())
           return justify (value.getText (), colWidth);
 
         Double thisValue = value.getValue ();
-        if (thisValue.isNaN ())
-          return justify ("NaN", colWidth);
 
         char format = cellFormat != ' ' ? cellFormat : defaultFormat;
         if (format == 'I')
@@ -208,6 +206,15 @@ class Cell implements Comparable<Cell>, Value
     if (!isValue ())
       return true;
     return value.isNotAvailable ();
+  }
+
+  @Override
+  public boolean isNotANumber ()
+  {
+    //    assert type == CellType.VALUE : "Cell type: " + type;
+    //    if (!isValue ())
+    //      return true;
+    return value.isNotANumber ();
   }
 
   @Override

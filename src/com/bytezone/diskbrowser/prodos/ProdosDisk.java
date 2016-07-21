@@ -225,7 +225,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     SectorType type = sectorTypes[da.getBlock ()];
 
     if (type == catalogSector || type == subcatalogSector)
-      return new ProdosCatalogSector (disk, buffer, da);
+      return new ProdosCatalogSector (this, disk, buffer, da);
     if (type == volumeMapSector)
       return new ProdosBitMapSector (this, disk, buffer, da);
     if (type == masterIndexSector || type == indexSector)

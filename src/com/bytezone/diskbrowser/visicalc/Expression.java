@@ -124,7 +124,7 @@ class Expression implements Value
   @Override
   public Value calculate ()
   {
-    System.out.printf ("Calculating: %s%n", text);
+    //    System.out.printf ("Calculating: %s%n", text);
     //    if (text.equals ("@NA"))
     //      Utility.printStackTrace ();
 
@@ -135,7 +135,7 @@ class Expression implements Value
       if (thisValue.isError ())
       {
         valueType = thisValue.getValueType ();
-        System.out.println ("error");
+        //        System.out.println ("error");
         return this;
       }
       value = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
@@ -151,7 +151,7 @@ class Expression implements Value
         if (thisValue.isError ())
         {
           valueType = thisValue.getValueType ();
-          System.out.println ("error");
+          //          System.out.println ("error");
           return this;
         }
 

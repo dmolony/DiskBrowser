@@ -213,7 +213,7 @@ class Cell implements Comparable<Cell>, Value
   {
     if (!isValue ())
     {
-      System.out.println ("Not a value");
+      //      System.out.println ("Not a value");
       return this;
     }
     assert isValue () : "Cell type: " + type + " @ " + address;

@@ -18,6 +18,8 @@ public class HiResImage extends AbstractFile
   private static final int BLUE = 0x0000FF;
   private static final int VIOLET = 0xBB66FF;
   private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
+  private static final byte[] pngHeader =
+      { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
   private static boolean colourQuirks;
   private static boolean matchColourBits = false;
@@ -42,8 +44,8 @@ public class HiResImage extends AbstractFile
 
   private void draw ()
   {
-    if (isGif (buffer))
-      makeGif ();
+    if (isGif (buffer) || isPng (buffer))
+      makeImage ();
     else if (monochrome)
       drawMonochrome (buffer);
     else
@@ -268,7 +270,7 @@ public class HiResImage extends AbstractFile
     return dst;
   }
 
-  private void makeGif ()
+  private void makeImage ()
   {
     try
     {
@@ -386,5 +388,17 @@ public class HiResImage extends AbstractFile
 
     String text = new String (buffer, 0, 6);
     return text.equals ("GIF89a") || text.equals ("GIF87a");
+  }
+
+  public static boolean isPng (byte[] buffer)
+  {
+    if (buffer.length < pngHeader.length)
+      return false;
+
+    for (int i = 0; i < pngHeader.length; i++)
+      if (pngHeader[i] != buffer[i])
+        return false;
+
+    return true;
   }
 }

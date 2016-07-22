@@ -112,21 +112,22 @@ class Cell implements Comparable<Cell>, Value
 
   String getText (int colWidth, char defaultFormat)
   {
+    char format = cellFormat != ' ' ? cellFormat : defaultFormat;
+
     switch (type)
     {
       case LABEL:
-        return justify (label, colWidth);
+        return justify (label, colWidth, format);
 
       case REPEATING_CHARACTER:
-        return justify (repeat, colWidth);
+        return justify (repeat, colWidth, format);
 
       case VALUE:
         if (value.isError () || value.isNotAvailable () || value.isNotANumber ())
-          return justify (value.getText (), colWidth);
+          return justify (value.getText (), colWidth, format);
 
         Double thisValue = value.getValue ();
 
-        char format = cellFormat != ' ' ? cellFormat : defaultFormat;
         if (format == 'I')
         {
           String integerFormat = String.format ("%%%d.0f", colWidth);
@@ -160,14 +161,16 @@ class Cell implements Comparable<Cell>, Value
     return getText ();
   }
 
-  private String justify (String text, int colWidth)
+  private String justify (String text, int colWidth, char format)
   {
-    if (cellFormat == 'R')
+    // right justify
+    if (format == 'R' || format == '$' || format == 'I')
     {
       String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
       return (String.format (labelFormat, text));
     }
 
+    // left justify
     String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
     return (String.format (labelFormat, text));
   }

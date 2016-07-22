@@ -16,7 +16,7 @@ class Expression implements Value
   // From the reference card:
   // Expressions are evaluated strictly from left to right except as modified by
   // parentheses. You must start an expression with a +, a digit (0-9), or one of
-  // the symbols @-(. or #.
+  // the symbols @-(. or #
 
   // [@IF(@ISERROR(BK24),0,BK24)]
   // [@IF(D4=0,0,1)]
@@ -40,7 +40,6 @@ class Expression implements Value
   {
     this.text = text;
     String line = checkBrackets (text);
-    //    System.out.printf ("Exp[%s]%n", line);
 
     int ptr = 0;
     while (ptr < line.length ())
@@ -124,10 +123,6 @@ class Expression implements Value
   @Override
   public Value calculate ()
   {
-    //    System.out.printf ("Calculating: %s%n", text);
-    //    if (text.equals ("@NA"))
-    //      Utility.printStackTrace ();
-
     try
     {
       Value thisValue = values.get (0);
@@ -135,7 +130,6 @@ class Expression implements Value
       if (thisValue.isError ())
       {
         valueType = thisValue.getValueType ();
-        //        System.out.println ("error");
         return this;
       }
       value = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
@@ -151,7 +145,6 @@ class Expression implements Value
         if (thisValue.isError ())
         {
           valueType = thisValue.getValueType ();
-          //          System.out.println ("error");
           return this;
         }
 
@@ -184,7 +177,6 @@ class Expression implements Value
       valueType = ValueType.ERROR;
     }
 
-    //    System.out.printf ("Result: %f%n", value);
     return this;
   }
 
@@ -254,13 +246,12 @@ class Expression implements Value
         System.out.println (input);
         return "@ERROR";
       }
-      //      System.out.printf ("Old expression:[%s]%n", line);
+
       while (rightBracket < leftBracket)
       {
         line = line + ")";
         rightBracket++;
       }
-      //      System.out.printf ("New expression:[%s]%n", line);
     }
     return line;
   }

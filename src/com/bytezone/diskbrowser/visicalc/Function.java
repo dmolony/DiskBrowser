@@ -148,7 +148,6 @@ abstract class Function implements Value
   @Override
   public double getValue ()
   {
-    //    System.out.printf ("Getting value of : %s %s%n", functionName, functionText);
     assert valueType == ValueType.VALUE : "Function ValueType = " + valueType;
     return value;
   }

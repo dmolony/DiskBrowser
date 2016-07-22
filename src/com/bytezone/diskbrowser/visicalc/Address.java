@@ -58,8 +58,6 @@ class Address implements Comparable<Address>
     catch (NumberFormatException e)
     {
       System.out.printf ("NFE: %s%n", sRow);
-      //      for (StackTraceElement ste : Thread.currentThread ().getStackTrace ())
-      //        System.out.println (ste);
     }
   }
 

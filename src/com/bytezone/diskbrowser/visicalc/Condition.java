@@ -45,20 +45,14 @@ class Condition
 
   public boolean getResult ()
   {
-    //    System.out.println (conditionText);
     if (conditionExpression == null)
     {
-      //      System.out.printf ("creating %s %s %s%n", conditionText, comparator, valueText);
       conditionExpression = new Expression (parent, conditionText);
-      //      System.out.printf ("creating %s%n", valueText);
       valueExpression = new Expression (parent, valueText);
 
-      //      System.out.printf ("calculating %s%n", conditionExpression);
       conditionExpression.calculate ();
-      //      System.out.printf ("calculating %s%n", valueExpression);
       valueExpression.calculate ();
     }
-    //    System.out.println ("after calculation");
 
     if (conditionExpression.isError () || valueExpression.isError ())
       return false;

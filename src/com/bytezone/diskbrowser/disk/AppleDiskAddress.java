@@ -39,7 +39,7 @@ public class AppleDiskAddress implements DiskAddress
   @Override
   public boolean matches (DiskAddress that)
   {
-    return this.block == that.getBlock ();
+    return that != null && this.block == that.getBlock ();
   }
 
   @Override

@@ -30,7 +30,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     if ((!extend && !append) || highlights.size () == 0)
     {
       highlights.clear ();
-      highlights.add (da);
+      addHighlight (da);
       return;
     }
 
@@ -49,7 +49,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
      */
     if (append)
     {
-      highlights.add (da);
+      addHighlight (da);
       Collections.sort (highlights);
       return;
     }
@@ -93,31 +93,37 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
         int block = first.getBlock () - 1;
         if (block < 0)
           block = totalBlocks - 1;
-        highlights.add (disk.getDiskAddress (block));
+        addHighlight (disk.getDiskAddress (block));
         break;
 
       case KeyEvent.VK_RIGHT:
         block = last.getBlock () + 1;
         if (block >= totalBlocks)
           block = 0;
-        highlights.add (disk.getDiskAddress (block));
+        addHighlight (disk.getDiskAddress (block));
         break;
 
       case KeyEvent.VK_UP:
         block = first.getBlock () - rowSize;
         if (block < 0)
           block += totalBlocks;
-        highlights.add (disk.getDiskAddress (block));
+        addHighlight (disk.getDiskAddress (block));
         break;
 
       case KeyEvent.VK_DOWN:
         block = last.getBlock () + rowSize;
         if (block >= totalBlocks)
           block -= totalBlocks;
-        highlights.add (disk.getDiskAddress (block));
+        addHighlight (disk.getDiskAddress (block));
         break;
     }
     Collections.sort (highlights);
+  }
+
+  private void addHighlight (DiskAddress da)
+  {
+    assert da != null;
+    highlights.add (da);
   }
 
   @Override
@@ -135,16 +141,19 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
   public boolean isSelected (DiskAddress da)
   {
     for (DiskAddress selection : highlights)
-      if (da.matches (selection))
+      if (selection != null && da.matches (selection))
         return true;
     return false;
   }
 
   public void setSelection (List<DiskAddress> list)
   {
+    // for some reason list sometimes contains nulls
     highlights.clear ();
     if (list != null)
-      highlights.addAll (list);
+      for (DiskAddress da : list)
+        if (da != null)
+          highlights.add (da);
   }
 
   private boolean checkContiguous ()
@@ -172,7 +181,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     }
 
     for (int i = lo; i <= hi; i++)
-      highlights.add (disk.getDiskAddress (i));
+      addHighlight (disk.getDiskAddress (i));
   }
 
   private void adjustHighlights (Disk disk, DiskAddress da)
@@ -186,6 +195,6 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     }
 
     // just treat it like a ctrl-click (hack!!)
-    highlights.add (da);
+    addHighlight (da);
   }
 }

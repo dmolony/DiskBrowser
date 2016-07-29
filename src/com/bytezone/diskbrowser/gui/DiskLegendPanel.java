@@ -16,17 +16,16 @@ import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 
 class DiskLegendPanel extends JPanel
 {
-  static final int LEFT = 10;
-  static final int TOP = 10;
+  private static final int LEFT = 10;
+  private static final int TOP = 10;
 
-  FormattedDisk disk;
-  LayoutDetails layoutDetails;
-  Font font;
+  private FormattedDisk disk;
+  private LayoutDetails layoutDetails;
+  private final Font font;
   private boolean retina;
 
   public DiskLegendPanel ()
   {
-    //    font = new Font ("SansSerif", Font.PLAIN, 12);
     font = Platform.getFont (FontType.SANS_SERIF, FontSize.BASE);
     setBackground (Color.WHITE);
   }

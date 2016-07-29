@@ -110,10 +110,9 @@ class DiskLayoutPanel extends JPanel
       public void actionPerformed (ActionEvent e)
       {
         LayoutDetails layout = new LayoutDetails (disk);
-        image.setDisk (disk, layout);
 
-        legendPanel.layoutDetails = layout;
-        legendPanel.repaint ();
+        image.setDisk (disk, layout);
+        legendPanel.setDisk (disk, layout);
 
         verticalRuler.setLayout (layout);
         horizontalRuler.setLayout (layout);

@@ -44,12 +44,6 @@ class DiskLegendPanel extends JPanel
     repaint ();
   }
 
-  //  void changeFont (Font font)
-  //  {
-  //    this.font = font;
-  //    repaint ();
-  //  }
-
   @Override
   public Dimension getPreferredSize ()
   {

@@ -13,9 +13,12 @@ public class BasicProgram extends AbstractFile
   private static final byte ASCII_QUOTE = 0x22;
   private static final byte ASCII_COLON = 0x3A;
   private static final byte ASCII_SEMI_COLON = 0x3B;
+  private static final byte ASCII_CARET = 0x5E;
+  private static final byte BELL = 0x07;
 
   private static final byte TOKEN_FOR = (byte) 0x81;
   private static final byte TOKEN_NEXT = (byte) 0x82;
+  private static final byte TOKEN_INPUT = (byte) 0x84;
   private static final byte TOKEN_LET = (byte) 0xAA;
   private static final byte TOKEN_GOTO = (byte) 0xAB;
   private static final byte TOKEN_IF = (byte) 0xAD;
@@ -30,13 +33,13 @@ public class BasicProgram extends AbstractFile
   private final Set<Integer> gotoLines = new HashSet<Integer> ();
   private final Set<Integer> gosubLines = new HashSet<Integer> ();
 
-  boolean splitRem = false;                       // should be a user preference
-  boolean alignAssign = true;                     // should be a user preference
-  boolean showTargets = true;                     // should be a user preference
-  boolean showHeader = true;                      // should be a user preference
-  boolean onlyShowTargetLineNumbers = false;      // should be a user preference
-  int wrapPrintAt = 40;
-  int wrapRemAt = 60;
+  private final boolean splitRem = false;                   // should be a user preference
+  private final boolean alignAssign = true;                 // should be a user preference
+  private final boolean showTargets = true;                 // should be a user preference
+  private final boolean showHeader = true;                  // should be a user preference
+  private final boolean onlyShowTargetLineNumbers = false;  // should be a user preference
+  private final int wrapPrintAt = 40;
+  private final int wrapRemAt = 60;
 
   public BasicProgram (String name, byte[] buffer)
   {
@@ -110,8 +113,7 @@ public class BasicProgram extends AbstractFile
           fullText.deleteCharAt (fullText.length () - 1);         // remove newline
           fullText.append (" ");
         }
-        // ... otherwise do all the indenting and showing of targets etc.
-        else
+        else    // ... otherwise do all the indenting and showing of targets etc.
         {
           // Prepare target indicators for subsequent sublines (ie no line number)
           if (showTargets && !subline.isFirst ())
@@ -133,41 +135,69 @@ public class BasicProgram extends AbstractFile
         int pos = subline.is (TOKEN_REM) ? 0 : alignPos;
         String lineText = subline.getAlignedText (pos);
 
-        // if (subline.is (TOKEN_REM) && lineText.length () > wrapRemAt + 4)
-        // {
-        // System.out.println (subline.getAlignedText (pos));
-        // String copy = lineText.substring (4);
-        // text.append ("REM ");
-        // int inset = text.length ();
-        // System.out.println (inset);
-        // List<String> remarks = splitRemark (copy, wrapRemAt);
-        // for (String remark : remarks)
-        // text.append ("                        ".substring (0, inset) + remark);
-        // }
-        // else
-        text.append (lineText);
-
-        // Check for a wrapable PRINT statement (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
-        if (subline.is (TOKEN_PRINT) && wrapPrintAt > 0
-            && countChars (text, ASCII_QUOTE) == 2
-            && countChars (text, ASCII_SEMI_COLON) == 0)
+        // Check for a wrappable REM statement
+        // (see SEA BATTLE on DISK283.DSK)
+        if (subline.is (TOKEN_REM) && lineText.length () > wrapRemAt + 4)
         {
-          int first = text.indexOf ("\"");
-          int last = text.indexOf ("\"", first + 1);
-          if ((last - first) > wrapPrintAt)
+          //          System.out.println (subline.getAlignedText (pos));
+          String copy = lineText.substring (4);
+          text.append ("REM ");
+          int inset = text.length ();
+          //          System.out.println (inset);
+          List<String> remarks = splitRemark (copy, wrapRemAt);
+          for (String remark : remarks)
+            text.append ("                        ".substring (0, inset) + remark);
+        }
+        else
+          text.append (lineText);
+
+        // Check for a wrappable PRINT statement 
+        // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
+        if (wrapPrintAt > 0 && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
+            && countChars (text, ASCII_QUOTE) == 2        // just start and end quotes
+            && countChars (text, ASCII_CARET) == 0)       // no control characters
+        //    && countChars (text, ASCII_SEMI_COLON) == 0)
+        {
+          if (true)       // new method
           {
-            int ptr = first + wrapPrintAt;
-            do
+            List<String> lines = splitPrint (lineText);
+            if (lines != null)
             {
-              fullText.append (text.substring (0, ptr)
-                  + "\n                                 ".substring (0, first + 1));
-              text.delete (0, ptr);
-              ptr = wrapPrintAt;
-            } while (text.length () > wrapPrintAt);
+              int offset = text.indexOf ("PRINT");
+              if (offset < 0)
+                offset = text.indexOf ("INPUT");
+              String fmt = "%-" + offset + "." + offset + "s%s%n";
+              String padding = text.substring (0, offset);
+              for (String s : lines)
+              {
+                fullText.append (String.format (fmt, padding, s));
+                padding = "";
+              }
+            }
+            else
+              fullText.append (text + "\n");
+          }
+          else            // old method
+          {
+            int first = text.indexOf ("\"") + 1;
+            int last = text.indexOf ("\"", first + 1) - 1;
+            if ((last - first) > wrapPrintAt)
+            {
+              int ptr = first + wrapPrintAt;
+              do
+              {
+                fullText.append (text.substring (0, ptr)
+                    + "\n                                 ".substring (0, first + 1));
+                text.delete (0, ptr);
+                ptr = wrapPrintAt;
+              } while (text.length () > wrapPrintAt);
+            }
+            fullText.append (text + "\n");
           }
         }
+        else
+          fullText.append (text + "\n");
 
-        fullText.append (text + "\n");
         text.setLength (0);
 
         // Calculate indent changes that take effect after the current subline
@@ -180,13 +210,56 @@ public class BasicProgram extends AbstractFile
         }
       }
 
-      // Reset the alignment value if we just left an IF - the indentation will be different now.
+      // Reset alignment value if we just left an IF - the indentation will be different now.
       if (ifIndent > 0)
         alignPos = 0;
     }
 
-    fullText.deleteCharAt (fullText.length () - 1); // remove last newline
+    fullText.deleteCharAt (fullText.length () - 1);               // remove last newline
     return fullText.toString ();
+  }
+
+  private List<String> splitPrint (String line)
+  {
+    int first = line.indexOf ("\"") + 1;
+    int last = line.indexOf ("\"", first + 1) - 1;
+
+    if (first != 7 || (last - first) <= wrapPrintAt)
+      return null;
+
+    int charsLeft = last - first + 1;
+
+    List<String> lines = new ArrayList<String> ();
+    String padding = line.substring (0, 7);
+    line = line.substring (7);
+    String sub;
+    while (true)
+    {
+      if (line.length () >= wrapPrintAt)
+      {
+        sub = line.substring (0, wrapPrintAt);
+        line = line.substring (wrapPrintAt);
+      }
+      else
+      {
+        sub = line;
+        line = "";
+      }
+
+      String subline = padding + sub;
+      charsLeft -= wrapPrintAt;
+
+      if (charsLeft > 0)
+        lines.add (subline);
+      else
+      {
+        lines.add (subline + line);
+        break;
+      }
+      padding = "       ";
+    }
+
+    return lines;
   }
 
   private List<String> splitRemark (String remark, int wrapLength)
@@ -197,14 +270,14 @@ public class BasicProgram extends AbstractFile
       int max = Math.min (wrapLength, remark.length () - 1);
       while (max > 0 && remark.charAt (max) != ' ')
         --max;
-      System.out.println (remark.substring (0, max));
+      //      System.out.println (remark.substring (0, max));
       remarks.add (remark.substring (0, max) + "\n");
       if (max == 0)
         break;
       remark = remark.substring (max + 1);
     }
     remarks.add (remark);
-    System.out.println (remark);
+    //    System.out.println (remark);
     return remarks;
   }
 
@@ -252,7 +325,7 @@ public class BasicProgram extends AbstractFile
         currentAlignPosition = findHighest (subline); // examine following sublines for alignment
       return currentAlignPosition;
     }
-    return 0; // reset it
+    return 0;                                         // reset it
   }
 
   // The IF processing is so that any assignment that is being aligned doesn't continue
@@ -409,44 +482,56 @@ public class BasicProgram extends AbstractFile
 
       while ((b = buffer[ptr++]) != 0)
       {
+        if (inRemark)                     // cannot terminate a REM
+          continue;
+
+        if (inString)
+        {
+          if (b == ASCII_QUOTE)           // terminate string
+            inString = false;
+          continue;
+        }
+
         switch (b)
         {
           // break IF statements into two sublines (allows for easier line indenting)
           case TOKEN_IF:
-            if (!inString && !inRemark)
-            {
-              // skip to THEN or GOTO - if not found then it's an error
-              while (buffer[ptr] != TOKEN_THEN && buffer[ptr] != TOKEN_GOTO
-                  && buffer[ptr] != 0)
-                ptr++;
+            // skip to THEN or GOTO - if not found then it's an error
+            while (buffer[ptr] != TOKEN_THEN && buffer[ptr] != TOKEN_GOTO
+                && buffer[ptr] != 0)
+              ptr++;
 
-              // keep THEN with the IF
-              if (buffer[ptr] == TOKEN_THEN)
-                ++ptr;
+            // keep THEN with the IF
+            if (buffer[ptr] == TOKEN_THEN)
+              ++ptr;
 
-              // create subline from the condition (and THEN if it exists)
-              sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-              startPtr = ptr;
-            }
+            // create subline from the condition (and THEN if it exists)
+            sublines.add (new SubLine (this, startPtr, ptr - startPtr));
+            startPtr = ptr;
+
             break;
 
           // end of subline, so add it, advance startPtr and continue
           case ASCII_COLON:
-            if (!inString && !inRemark)
-            {
-              sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-              startPtr = ptr;
-            }
+            sublines.add (new SubLine (this, startPtr, ptr - startPtr));
+            startPtr = ptr;
             break;
 
           case TOKEN_REM:
-            if (!inString && !inRemark)
+            if (ptr != startPtr + 1)      // REM appears mid-line (should follow a colon)
+            {
+              System.out.println ("mid-line REM token");
+              //     System.out.println (HexFormatter.format (buffer, startPtr, 10));
+              sublines.add (new SubLine (this, startPtr, (ptr - startPtr) - 1));
+              startPtr = ptr - 1;
+            }
+            else
               inRemark = true;
+
             break;
 
           case ASCII_QUOTE:
-            if (!inRemark)
-              inString = !inString;
+            inString = true;
             break;
         }
       }
@@ -476,7 +561,7 @@ public class BasicProgram extends AbstractFile
       this.length = length;
 
       byte b = buffer[startPtr];
-      if ((b & 0x80) > 0) // token
+      if ((b & 0x80) > 0)                   // token
       {
         switch (b)
         {
@@ -487,7 +572,7 @@ public class BasicProgram extends AbstractFile
             break;
 
           case TOKEN_NEXT:
-            if (length == 2) // no variables
+            if (length == 2)                // no variables
               nextVariables = new String[0];
             else
             {
@@ -521,6 +606,7 @@ public class BasicProgram extends AbstractFile
             }
             catch (NumberFormatException e)
             {
+              System.out.println (HexFormatter.format (buffer, startPtr + 1, length - 2));
               System.out.println ("Error parsing : GOSUB " + target2 + " in "
                   + parent.lineNumber);
             }
@@ -539,9 +625,12 @@ public class BasicProgram extends AbstractFile
           }
           catch (NumberFormatException e)
           {
+            System.out.printf ("b: %d, start: %d, length: %d%n", b, startPtr,
+                               (length - 1));
             System.out.println (target);
             System.out.println (HexFormatter.format (buffer, startPtr, length - 1));
-            System.out.println (e.toString ());
+            System.out.println (e);
+            assert false;
           }
         }
         else if (alignAssign)

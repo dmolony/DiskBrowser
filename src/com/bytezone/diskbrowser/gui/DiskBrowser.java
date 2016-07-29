@@ -49,7 +49,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     addPanel (dataPanel, "Output", BorderLayout.CENTER);
 
     // create and add the right-hand disk layout panel
-    DiskLayoutPanel diskLayoutPanel = new DiskLayoutPanel ();
+    DiskLayoutPanel diskLayoutPanel = new DiskLayoutPanel (menuHandler, prefs);
     JPanel layoutBorderPanel =
         addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
@@ -100,7 +100,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     menuHandler.fontAction.addFontChangeListener (dataPanel);
     menuHandler.fontAction.addFontChangeListener (catalogPanel);
-    menuHandler.fontAction.addFontChangeListener (diskLayoutPanel);
+    //    menuHandler.fontAction.addFontChangeListener (diskLayoutPanel);
 
     // set the MenuItem Actions
     menuHandler.printItem.setAction (print);
@@ -119,6 +119,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     quitAction.addQuitListener (menuHandler);
     quitAction.addQuitListener (menuHandler.fontAction);
     quitAction.addQuitListener (catalogPanel);
+    quitAction.addQuitListener (diskLayoutPanel);
     quitAction.addQuitListener (this);
 
     catalogPanel.setDuplicateAction (duplicateAction);

@@ -38,6 +38,8 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   private int gw = 8;
   private int gh = 35;
 
+  private boolean retina;
+
   public DiskLayoutImage ()
   {
     setPreferredSize (new Dimension (240 + 1, 525 + 1));
@@ -76,6 +78,12 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     repaint ();
   }
 
+  public void setRetina (boolean value)
+  {
+    retina = value;
+    repaint ();
+  }
+
   void setSelection (List<DiskAddress> sectors)
   {
     selectionHandler.setSelection (sectors);
@@ -109,6 +117,8 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     //      maxBlock = d.getTotalBlocks ();
     // the index error is caused by not recalculating the grid layout
 
+    Graphics2D g2d = (Graphics2D) g;
+
     for (int y = p1.y; y <= p2.y; y += bh)
       for (int x = p1.x; x <= p2.x; x += bw)
       {
@@ -116,9 +126,9 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
         if (blockNo < maxBlock)
         {
           DiskAddress da = d.getDiskAddress (blockNo);
-          boolean flag = showFreeSectors && disk.isSectorFree (da);
-          drawBlock ((Graphics2D) g, blockNo, x, y, flag,
-                     selectionHandler.isSelected (da));
+          boolean free = showFreeSectors && disk.isSectorFree (da);
+          boolean selected = selectionHandler.isSelected (da);
+          drawBlock (g2d, blockNo, x, y, free, selected);
         }
       }
   }
@@ -145,10 +155,10 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
       g.setColor (type.colour);
       // this is weird, the retina OSX screen needs the second fillRect
       // see also DiskLegendPanel.paint()
-      if (false)
-        g.fillRect (rect.x + 2, rect.y + 2, rect.width - 3, rect.height - 3);
-      else
+      if (retina)
         g.fillRect (rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+      else
+        g.fillRect (rect.x + 2, rect.y + 2, rect.width - 3, rect.height - 3);
     }
 
     // draw an indicator in free blocks

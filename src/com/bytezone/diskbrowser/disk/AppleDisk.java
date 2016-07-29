@@ -35,10 +35,10 @@ public class AppleDisk implements Disk
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
-      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // Dos
-        { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos
-        { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
-        { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
+        { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // Dos
+          { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos
+          { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
+          { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
 
   // Info from http://www.applelogic.org/TheAppleIIEGettingStarted.html
   // Block:    0 1 2 3 4 5 6 7 8 9 A B C D E F
@@ -82,7 +82,7 @@ public class AppleDisk implements Disk
     int skip = 0;
 
     if ((pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
-        || "2IMG".equals (prefix))
+          || "2IMG".equals (prefix))
     //      if ("2IMG".equals (prefix))
     {
       if (debug)
@@ -368,11 +368,12 @@ public class AppleDisk implements Disk
   @Override
   public DiskAddress getDiskAddress (int block)
   {
+    //    assert (isValidAddress (block)) : "Invalid address : " + block;
     if (!isValidAddress (block))
     {
       System.out.println ("Invalid block : " + block);
-      //      return null;
-      return new AppleDiskAddress (this, 0);
+      return null;
+      //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
     }
     return new AppleDiskAddress (this, block);
   }
@@ -394,8 +395,7 @@ public class AppleDisk implements Disk
   public DiskAddress getDiskAddress (int track, int sector)
   {
     // should this return null for invalid addresses?
-    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", "
-        + sector;
+    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", " + sector;
     return new AppleDiskAddress (this, track, sector);
   }
 
@@ -438,22 +438,22 @@ public class AppleDisk implements Disk
     assert da.getDisk () == this : "Disk address not applicable to this disk";
     assert sectorSize == 256 || sectorSize == 512 : "Invalid sector size : " + sectorSize;
     assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
-        + interleave;
+          + interleave;
 
     if (sectorSize == 256)
     {
       int diskOffset = da.getTrack () * trackSize
-          + interleaveSector[interleave][da.getSector ()] * sectorSize;
+            + interleaveSector[interleave][da.getSector ()] * sectorSize;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, sectorSize);
     }
     else if (sectorSize == 512)
     {
       int diskOffset = da.getTrack () * trackSize
-          + interleaveSector[interleave][da.getSector () * 2] * 256;
+            + interleaveSector[interleave][da.getSector () * 2] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, 256);
 
       diskOffset = da.getTrack () * trackSize
-          + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
+            + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + 256, 256);
     }
   }
@@ -474,7 +474,7 @@ public class AppleDisk implements Disk
   {
     if (actionListenerList != null)
       actionListenerList
-          .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
+            .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
   }
 
   public AppleFileSource getDetails ()

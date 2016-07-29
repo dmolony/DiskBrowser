@@ -23,7 +23,7 @@ public class PascalDisk extends AbstractFormattedDisk
   private final PascalCatalogSector diskCatalogSector;
 
   final String[] fileTypes =
-      { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
+        { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
   SectorType diskBootSector = new SectorType ("Boot", Color.lightGray);
   SectorType catalogSector = new SectorType ("Catalog", Color.magenta);
@@ -109,7 +109,7 @@ public class PascalDisk extends AbstractFormattedDisk
         for (PascalSegment ps : pc)
         {
           DefaultMutableTreeNode segmentNode =
-              new DefaultMutableTreeNode (new PascalCodeObject (this, ps, fe.firstBlock));
+                new DefaultMutableTreeNode (new PascalCodeObject (this, ps, fe.firstBlock));
           node.add (segmentNode);
           segmentNode.setAllowsChildren (false);
         }
@@ -204,7 +204,7 @@ public class PascalDisk extends AbstractFormattedDisk
     if (blocks > 280)
     {
       if (debug)
-        System.out.printf ("Blocks: %d%n", blocks);
+        System.out.printf ("Blocks > 280: %d%n", blocks);
       return false;
     }
 
@@ -254,15 +254,13 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String newLine2 = newLine + newLine;
-    String line =
-        "----   ---------------   ----   --------  -------   ----   ----" + newLine;
+    String line = "----   ---------------   ----   --------  -------   ----   ----" + newLine;
     String date = volume.date == null ? "--" : df.format (volume.date.getTime ());
     StringBuilder text = new StringBuilder ();
     text.append ("Disk : " + disk.getFile ().getAbsolutePath () + newLine2);
     text.append ("Volume : " + volume.name + newLine);
     text.append ("Date   : " + date + newLine2);
-    text.append ("Blks   Name              Type     Date     Length   Frst   Last"
-        + newLine);
+    text.append ("Blks   Name              Type     Date     Length   Frst   Last" + newLine);
     text.append (line);
 
     int usedBlocks = 6;
@@ -274,13 +272,13 @@ public class PascalDisk extends AbstractFormattedDisk
       date = ce.date == null ? "--" : df.format (ce.date.getTime ());
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
       text.append (String.format (" %3d   %-15s   %s   %8s %,8d   $%03X   $%03X%n", size,
-                                  ce.name, fileTypes[ce.fileType], date, bytes,
-                                  ce.firstBlock, ce.lastBlock));
+                                  ce.name, fileTypes[ce.fileType], date, bytes, ce.firstBlock,
+                                  ce.lastBlock));
     }
     text.append (line);
-    text.append (String
-        .format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
-                 (volume.totalBlocks - usedBlocks), usedBlocks, volume.totalBlocks));
+    text.append (String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
+                                (volume.totalBlocks - usedBlocks), usedBlocks,
+                                volume.totalBlocks));
     return new DefaultAppleFileSource (volume.name, text.toString (), this);
   }
 }

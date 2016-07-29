@@ -22,6 +22,7 @@ class DiskLegendPanel extends JPanel
   FormattedDisk disk;
   LayoutDetails layoutDetails;
   Font font;
+  private boolean retina;
 
   public DiskLegendPanel ()
   {
@@ -37,11 +38,17 @@ class DiskLegendPanel extends JPanel
     repaint ();
   }
 
-  void changeFont (Font font)
+  public void setRetina (boolean value)
   {
-    this.font = font;
+    retina = value;
     repaint ();
   }
+
+  //  void changeFont (Font font)
+  //  {
+  //    this.font = font;
+  //    repaint ();
+  //  }
 
   @Override
   public Dimension getPreferredSize ()
@@ -73,12 +80,12 @@ class DiskLegendPanel extends JPanel
 
       // draw the colour
       g.setColor (type.colour);
-      if (false)
-        g.fillRect (x + 2, y + 2, layoutDetails.block.width - 3,
-                    layoutDetails.block.height - 3);
-      else
+      if (retina)
         g.fillRect (x + 1, y + 1, layoutDetails.block.width - 2,
                     layoutDetails.block.height - 2);
+      else
+        g.fillRect (x + 2, y + 2, layoutDetails.block.width - 3,
+                    layoutDetails.block.height - 3);
 
       // draw the text
       g.setColor (Color.BLACK);

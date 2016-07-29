@@ -12,13 +12,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.prefs.Preferences;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.bytezone.common.FontAction.FontChangeEvent;
-import com.bytezone.common.FontAction.FontChangeListener;
+import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
@@ -26,10 +26,15 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
-class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
-    FileSelectionListener, RedoListener, FontChangeListener
+class DiskLayoutPanel extends JPanel
+    implements DiskSelectionListener, FileSelectionListener, RedoListener, QuitListener
+//, FontChangeListener
 {
-  private static final int SIZE = 15; // basic unit of a display block
+  private static final int SIZE = 15;             // basic unit of a display block
+  private static final String PREFS_RETINA = "retina";
+
+  private final Preferences prefs;
+  private final MenuHandler mh;
 
   private final DiskLayoutImage image;
   private final ScrollRuler verticalRuler;
@@ -38,9 +43,12 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
   private final JScrollPane sp;
   private LayoutDetails layout;
 
-  public DiskLayoutPanel ()
+  public DiskLayoutPanel (MenuHandler mh, Preferences prefs)
   {
     super (new BorderLayout ());
+
+    this.prefs = prefs;
+    this.mh = mh;
 
     image = new DiskLayoutImage ();
     verticalRuler = new ScrollRuler (image, ScrollRuler.VERTICAL);
@@ -64,13 +72,15 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
     // this is just so the pack is correct
     add (sp, BorderLayout.CENTER);
     add (legendPanel, BorderLayout.SOUTH);
+
+    mh.retinaItem.setAction (new RetinaAction (this));
   }
 
-  public DiskLayoutPanel (FormattedDisk disk)
-  {
-    this ();
-    setDisk (disk);
-  }
+  //  public DiskLayoutPanel (FormattedDisk disk)
+  //  {
+  //    this ();
+  //    setDisk (disk);
+  //  }
 
   public void setDisk (final FormattedDisk disk)
   {
@@ -111,6 +121,12 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
     });
 
     repaint ();
+  }
+
+  public void setRetina (boolean value)
+  {
+    image.setRetina (value);
+    legendPanel.setRetina (value);
   }
 
   public void setHex (boolean hex)
@@ -192,9 +208,9 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
     Color backgroundColor = Color.WHITE;
     boolean showHex = true;
 
-    public Corner (boolean click)
+    public Corner (boolean allowClick)
     {
-      if (click)
+      if (allowClick)
         addMouseListener (new MouseAdapter ()
         {
           @Override
@@ -240,10 +256,23 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
   }
 
   @Override
-  public void changeFont (FontChangeEvent e)
+  public void quit (Preferences arg0)
   {
-    verticalRuler.changeFont (e.font);
-    horizontalRuler.changeFont (e.font);
-    legendPanel.changeFont (e.font);
+    prefs.putBoolean (PREFS_RETINA, mh.retinaItem.isSelected ());
   }
+
+  @Override
+  public void restore (Preferences arg0)
+  {
+    mh.retinaItem.setSelected (prefs.getBoolean (PREFS_RETINA, false));
+    setRetina (mh.retinaItem.isSelected ());
+  }
+
+  //  @Override
+  //  public void changeFont (FontChangeEvent e)
+  //  {
+  //    //    verticalRuler.changeFont (e.font);
+  //    //    horizontalRuler.changeFont (e.font);
+  //    //    legendPanel.changeFont (e.font);
+  //  }
 }

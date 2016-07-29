@@ -5,18 +5,17 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class IntegerBasicProgram extends AbstractFile
 {
   private static String[] tokens =
-      { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?",
-        "?", "HIMEM: ", "LOMEM: ", " + ", " - ", " * ", " / ", " = ", " # ", " >= ",
-        " > ", " <= ", " <> ", " < ", " AND ", " OR ", " MOD ", "^", "+", "(", ",",
-        " THEN ", " THEN ", ",", ",", "\"", "\"", "(", "!", "!", "(", "PEEK ", "RND ",
-        "SGN", "ABS", "PDL", "RNDX", "(", "+", "-", "NOT ", "(", "=", "#", "LEN(", "ASC(",
-        "SCRN(", ",", "(", "$", "$", "(", ", ", ",", ";", ";", ";", ",", ",", ",", "TEXT",
-        "GR ", "CALL ", "DIM ", "DIM ", "TAB ", "END", "INPUT ", "INPUT ", "INPUT ",
-        "FOR ", " = ", " TO ", " STEP ", "NEXT ", ",", "RETURN", "GOSUB ", "REM ", "LET ",
-        "GOTO ", "IF ", "PRINT ", "PRINT ", "PRINT", "POKE ", ",", "COLOR=", "PLOT", ",",
-        "HLIN", ",", " AT ", "VLIN ", ",", " AT ", "VTAB ", " = ", " = ", ")", ")",
-        "LIST ", ",", "LIST ", "POP ", "NODSP ", "NODSP ", "NOTRACE ", "DSP ", "DSP ",
-        "TRACE ", "PR#", "IN#", };
+        { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?", "?",
+          "HIMEM: ", "LOMEM: ", " + ", " - ", " * ", " / ", " = ", " # ", " >= ", " > ",
+          " <= ", " <> ", " < ", " AND ", " OR ", " MOD ", "^", "+", "(", ",", " THEN ",
+          " THEN ", ",", ",", "\"", "\"", "(", "!", "!", "(", "PEEK ", "RND ", "SGN", "ABS",
+          "PDL", "RNDX", "(", "+", "-", "NOT ", "(", "=", "#", "LEN(", "ASC(", "SCRN(", ",",
+          "(", "$", "$", "(", ", ", ",", ";", ";", ";", ",", ",", ",", "TEXT", "GR ", "CALL ",
+          "DIM ", "DIM ", "TAB ", "END", "INPUT ", "INPUT ", "INPUT ", "FOR ", " = ", " TO ",
+          " STEP ", "NEXT ", ",", "RETURN", "GOSUB ", "REM ", "LET ", "GOTO ", "IF ", "PRINT ",
+          "PRINT ", "PRINT", "POKE ", ",", "COLOR=", "PLOT", ",", "HLIN", ",", " AT ", "VLIN ",
+          ",", " AT ", "VTAB ", " = ", " = ", ")", ")", "LIST ", ",", "LIST ", "POP ",
+          "NODSP ", "NODSP ", "NOTRACE ", "DSP ", "DSP ", "TRACE ", "PR#", "IN#", };
 
   public IntegerBasicProgram (String name, byte[] buffer)
   {
@@ -28,8 +27,8 @@ public class IntegerBasicProgram extends AbstractFile
   {
     StringBuilder pgm = new StringBuilder ();
     pgm.append ("Name    : " + name + "\n");
-    pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length) + " ("
-        + buffer.length + ")\n\n");
+    pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
+          + ")\n\n");
     int ptr = 0;
 
     boolean looksLikeAssembler = checkForAssembler ();      // this can probably go
@@ -118,6 +117,11 @@ public class IntegerBasicProgram extends AbstractFile
 
   private boolean checkForSCAssembler ()
   {
+    if (buffer.length == 0)
+    {
+      System.out.println ("Empty buffer array");
+      return false;
+    }
     int lineLength = HexFormatter.intValue (buffer[0]);
     if (lineLength <= 0)
       return false;
@@ -127,7 +131,7 @@ public class IntegerBasicProgram extends AbstractFile
   private void appendSCAssembler (StringBuilder pgm, int ptr, int lineLength)
   {
     int lineNumber = HexFormatter.intValue (buffer[ptr + 2]) * 256
-        + HexFormatter.intValue (buffer[ptr + 1]);
+          + HexFormatter.intValue (buffer[ptr + 1]);
     pgm.append (String.format ("%4d: ", lineNumber));
     int p2 = ptr + 3;
     while (buffer[p2] != 0)
@@ -167,15 +171,15 @@ public class IntegerBasicProgram extends AbstractFile
       int b = HexFormatter.intValue (buffer[p]);
 
       if (b == 0x03 // token for colon (:)
-          && !inString && !inRemark && buffer[p + 1] != 1)        // not end of line
+            && !inString && !inRemark && buffer[p + 1] != 1)        // not end of line
       {
         pgm.append (":\n" + "         ".substring (0, lineTab));
         continue;
       }
 
       if (b >= 0xB0 && b <= 0xB9                        // numeric literal
-          && (buffer[p - 1] & 0x80) == 0                // not a variable name
-          && !inString && !inRemark)
+            && (buffer[p - 1] & 0x80) == 0                // not a variable name
+            && !inString && !inRemark)
       {
         pgm.append (HexFormatter.intValue (buffer[p + 1], buffer[p + 2]));
         p += 2;
@@ -213,7 +217,7 @@ public class IntegerBasicProgram extends AbstractFile
 
     pgm.append ("Name : " + name + "\n");
     pgm.append ("Length : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
-        + ")\n\n");
+          + ")\n\n");
 
     int ptr = 0;
 

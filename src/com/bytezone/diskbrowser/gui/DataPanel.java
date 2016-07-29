@@ -155,7 +155,7 @@ class DataPanel extends JTabbedPane
     if (currentDataSource instanceof VisicalcFile)
     {
       VisicalcFile visicalcFile = (VisicalcFile) currentDataSource;
-      visicalcFile.setDebug (value);
+      VisicalcFile.setDebug (value);
       setText (formattedText, visicalcFile.getText ());
     }
   }

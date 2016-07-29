@@ -138,11 +138,9 @@ public class BasicProgram extends AbstractFile
         // (see SEA BATTLE on DISK283.DSK)
         if (subline.is (TOKEN_REM) && lineText.length () > wrapRemAt + 4)
         {
-          //          System.out.println (subline.getAlignedText (pos));
           String copy = lineText.substring (4);
           text.append ("REM ");
           int inset = text.length ();
-          //          System.out.println (inset);
           List<String> remarks = splitRemark (copy, wrapRemAt);
           for (String remark : remarks)
             text.append ("                        ".substring (0, inset) + remark);

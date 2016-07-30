@@ -15,7 +15,6 @@ import com.bytezone.common.Platform.FontType;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
-import com.bytezone.diskbrowser.utilities.Utility;
 
 class DiskLegendPanel extends JPanel
 {
@@ -25,7 +24,6 @@ class DiskLegendPanel extends JPanel
   private FormattedDisk disk;
   private LayoutDetails layoutDetails;
   private final Font font;
-  //  private boolean retina;
   private boolean retinaTest;
 
   public DiskLegendPanel ()
@@ -46,12 +44,6 @@ class DiskLegendPanel extends JPanel
     repaint ();
   }
 
-  //  public void setRetina (boolean value)
-  //  {
-  //    retina = value;
-  //    repaint ();
-  //  }
-
   @Override
   public Dimension getPreferredSize ()
   {
@@ -70,7 +62,9 @@ class DiskLegendPanel extends JPanel
 
     int count = 0;
     int lineHeight = 20;
-    System.out.println (Utility.test ((Graphics2D) g));
+    int width = layoutDetails.block.width - (retinaTest ? 2 : 3);
+    int height = layoutDetails.block.height - (retinaTest ? 2 : 3);
+    int offset = retinaTest ? 1 : 2;
 
     for (SectorType type : disk.getSectorTypeList ())
     {
@@ -83,12 +77,7 @@ class DiskLegendPanel extends JPanel
 
       // draw the colour
       g.setColor (type.colour);
-      if (retinaTest)
-        g.fillRect (x + 1, y + 1, layoutDetails.block.width - 2,
-                    layoutDetails.block.height - 2);
-      else
-        g.fillRect (x + 2, y + 2, layoutDetails.block.width - 3,
-                    layoutDetails.block.height - 3);
+      g.fillRect (x + offset, y + offset, width, height);
 
       // draw the text
       g.setColor (Color.BLACK);

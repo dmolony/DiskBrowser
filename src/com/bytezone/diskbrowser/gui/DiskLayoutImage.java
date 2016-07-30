@@ -40,8 +40,6 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   private int gw = 8;
   private int gh = 35;
 
-  //  private boolean retina;
-
   public DiskLayoutImage ()
   {
     setPreferredSize (new Dimension (240 + 1, 525 + 1));
@@ -50,7 +48,6 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     setOpaque (true);
 
     addKeyListener (new MyKeyListener ());
-    //    setFocusable (true);
   }
 
   public void setDisk (FormattedDisk disk, LayoutDetails details)
@@ -83,12 +80,6 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     showFreeSectors = showFree;
     repaint ();
   }
-
-  //  public void setRetina (boolean value)
-  //  {
-  //    retina = value;
-  //    repaint ();
-  //  }
 
   void setSelection (List<DiskAddress> sectors)
   {
@@ -147,24 +138,23 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 
     Rectangle rect = new Rectangle (x, y, bw, bh);
 
+    int width = rect.width - (retinaTest ? 2 : 3);
+    int height = rect.height - (retinaTest ? 2 : 3);
+    int offset2 = retinaTest ? 1 : 2;
+
     // draw frame
-    if (true) // this needs to draw the outside rectangle, and show less white space
-    // between blocks
+    if (true)
     {
       g.setColor (Color.GRAY);
-      g.drawRect (rect.x, rect.y, rect.width, rect.height);
+      //      g.drawRect (rect.x, rect.y, rect.width, rect.height);
+      g.draw (rect);
     }
 
     // draw coloured block
     if (type.colour != Color.WHITE)
     {
       g.setColor (type.colour);
-      // this is weird, the retina OSX screen needs the second fillRect
-      // see also DiskLegendPanel.paint()
-      if (retinaTest)
-        g.fillRect (rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
-      else
-        g.fillRect (rect.x + 2, rect.y + 2, rect.width - 3, rect.height - 3);
+      g.fillRect (rect.x + offset2, rect.y + offset2, width, height);
     }
 
     // draw an indicator in free blocks

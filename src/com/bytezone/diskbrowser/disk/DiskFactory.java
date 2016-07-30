@@ -1,6 +1,10 @@
 package com.bytezone.diskbrowser.disk;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
@@ -151,7 +155,8 @@ public class DiskFactory
     long length = file.length ();
     if (length != 143360 && length != 116480)
     {
-      System.out.printf ("%s: invalid file length : %,d%n", file.getName (), file.length ());
+      System.out.printf ("%s: invalid file length : %,d%n", file.getName (),
+                         file.length ());
       return null;
     }
 
@@ -162,9 +167,9 @@ public class DiskFactory
       long checksum = appleDisk.getBootChecksum ();
 
       if (checksum == 3176296590L || checksum == 108825457L || checksum == 1439356606L
-            || checksum == 1550012074L || checksum == 1614602459L || checksum == 940889336L
-            || checksum == 990032697 || checksum == 2936955085L || checksum == 1348415927L
-            || checksum == 3340889101L || checksum == 18315788L || checksum == 993895235L)
+          || checksum == 1550012074L || checksum == 1614602459L || checksum == 940889336L
+          || checksum == 990032697 || checksum == 2936955085L || checksum == 1348415927L
+          || checksum == 3340889101L || checksum == 18315788L || checksum == 993895235L)
       {
         disk = checkDos (file);
         disk2 = checkProdos (file);
@@ -180,8 +185,8 @@ public class DiskFactory
           disk = new DualDosDisk (disk, disk2);
       }
 
-      else if (checksum == 2803644711L || checksum == 3317783349L || checksum == 1728863694L
-            || checksum == 198094178L)
+      else if (checksum == 2803644711L || checksum == 3317783349L
+          || checksum == 1728863694L || checksum == 198094178L)
         disk = checkPascalDisk (file);
 
       else if (checksum == 3028642627L || checksum == 2070151659L)
@@ -244,7 +249,7 @@ public class DiskFactory
 
     if (debug)
       System.out.println ("Factory creating disk : "
-            + disk.getDisk ().getFile ().getAbsolutePath ());
+          + disk.getDisk ().getFile ().getAbsolutePath ());
 
     if (disk != null && compressed)
       disk.setOriginalPath (p);
@@ -333,7 +338,8 @@ public class DiskFactory
     }
     catch (Exception e)
     {
-      e.printStackTrace ();
+      //      e.printStackTrace ();
+      System.out.println (e);
     }
 
     if (debug)

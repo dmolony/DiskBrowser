@@ -45,8 +45,6 @@ public class TreeBuilder
     assert (folder.exists ());
     assert (folder.isDirectory ());
 
-    //    long start = System.currentTimeMillis ();
-
     FileNode fn = new FileNode (folder);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (fn);
     fn.setTreeNode (root);
@@ -54,14 +52,7 @@ public class TreeBuilder
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     tree = new JTree (treeModel);
 
-    //    long duration = System.currentTimeMillis () - start;
-    //    System.out.printf (
-    //                   "Tree building took %,d milliseconds for "
-    //                       + "%,d disk%s and %,d folder%s%n",
-    //             duration, totalDisks, (totalDisks == 1 ? "" : "s"), totalFolders,
-    //                       (totalFolders == 1 ? "" : "s"));
-
-    treeModel.setAsksAllowsChildren (true);// allows empty nodes to appear as folders
+    treeModel.setAsksAllowsChildren (true);   // allows empty nodes to appear as folders
     setDiskIcon ("/com/bytezone/diskbrowser/icons/disk.png");
     ((FileNode) root.getUserObject ()).disks = totalDisks;
 
@@ -104,7 +95,7 @@ public class TreeBuilder
         totalFolders++;
 
         if (FULL_TREE)
-          addFiles (newNode, file);// recursion!
+          addFiles (newNode, file);             // recursion!
         continue;
       }
 
@@ -144,6 +135,7 @@ public class TreeBuilder
 
         if (false)
           checkDuplicates (file);
+
         totalDisks++;
 
         if (false)
@@ -196,6 +188,15 @@ public class TreeBuilder
       return false;
 
     String suffix = filename.substring (dotPos + 1).toLowerCase ();
+
+    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
+    if (dotPos2 > 0)
+    {
+      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
+      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
+        return false;
+    }
+
     return suffixes.contains (suffix);
   }
 

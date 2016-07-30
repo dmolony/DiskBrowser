@@ -31,7 +31,7 @@ class DiskLayoutPanel extends JPanel
 //, FontChangeListener
 {
   private static final int SIZE = 15;             // basic unit of a display block
-  private static final String PREFS_RETINA = "retina";
+  //  private static final String PREFS_RETINA = "retina";
 
   private final Preferences prefs;
   private final MenuHandler mh;
@@ -73,7 +73,7 @@ class DiskLayoutPanel extends JPanel
     add (sp, BorderLayout.CENTER);
     add (legendPanel, BorderLayout.SOUTH);
 
-    mh.retinaItem.setAction (new RetinaAction (this));
+    //    mh.retinaItem.setAction (new RetinaAction (this));
   }
 
   //  public DiskLayoutPanel (FormattedDisk disk)
@@ -122,11 +122,11 @@ class DiskLayoutPanel extends JPanel
     repaint ();
   }
 
-  public void setRetina (boolean value)
-  {
-    image.setRetina (value);
-    legendPanel.setRetina (value);
-  }
+  //  public void setRetina (boolean value)
+  //  {
+  //    image.setRetina (value);
+  //    legendPanel.setRetina (value);
+  //  }
 
   public void setHex (boolean hex)
   {
@@ -257,14 +257,14 @@ class DiskLayoutPanel extends JPanel
   @Override
   public void quit (Preferences arg0)
   {
-    prefs.putBoolean (PREFS_RETINA, mh.retinaItem.isSelected ());
+    //    prefs.putBoolean (PREFS_RETINA, mh.retinaItem.isSelected ());
   }
 
   @Override
   public void restore (Preferences arg0)
   {
-    mh.retinaItem.setSelected (prefs.getBoolean (PREFS_RETINA, false));
-    setRetina (mh.retinaItem.isSelected ());
+    //    mh.retinaItem.setSelected (prefs.getBoolean (PREFS_RETINA, false));
+    //    setRetina (mh.retinaItem.isSelected ());
   }
 
   //  @Override

@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -31,6 +32,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   private boolean showFreeSectors;
   private final DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
   private boolean redo;
+  private boolean retinaTest;
 
   // set defaults (used until a real disk is set)
   private int bw = 30;
@@ -38,7 +40,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   private int gw = 8;
   private int gh = 35;
 
-  private boolean retina;
+  //  private boolean retina;
 
   public DiskLayoutImage ()
   {
@@ -64,6 +66,10 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     setPreferredSize (new Dimension (gw * bw + 1, gh * bh + 1));
     selectionHandler.setSelection (null);
 
+    Graphics2D g = (Graphics2D) this.getGraphics ();
+    retinaTest = g.getFontRenderContext ().getTransform ()
+        .equals (AffineTransform.getScaleInstance (2.0, 2.0));
+
     repaint ();
   }
 
@@ -78,11 +84,11 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     repaint ();
   }
 
-  public void setRetina (boolean value)
-  {
-    retina = value;
-    repaint ();
-  }
+  //  public void setRetina (boolean value)
+  //  {
+  //    retina = value;
+  //    repaint ();
+  //  }
 
   void setSelection (List<DiskAddress> sectors)
   {
@@ -155,7 +161,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
       g.setColor (type.colour);
       // this is weird, the retina OSX screen needs the second fillRect
       // see also DiskLegendPanel.paint()
-      if (retina)
+      if (retinaTest)
         g.fillRect (rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
       else
         g.fillRect (rect.x + 2, rect.y + 2, rect.width - 3, rect.height - 3);

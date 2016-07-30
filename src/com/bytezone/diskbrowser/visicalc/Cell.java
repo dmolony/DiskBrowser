@@ -117,7 +117,7 @@ class Cell implements Comparable<Cell>, Value
     switch (type)
     {
       case LABEL:
-        return justify (label, colWidth, format);
+        return justify (label, colWidth, cellFormat);
 
       case REPEATING_CHARACTER:
         return justify (repeat, colWidth, format);

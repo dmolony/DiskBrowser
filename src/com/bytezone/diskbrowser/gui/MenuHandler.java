@@ -64,7 +64,7 @@ public class MenuHandler
   JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
   JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
   JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
-  JMenuItem retinaItem = new JCheckBoxMenuItem ("Retina display");
+  //  JMenuItem retinaItem = new JCheckBoxMenuItem ("Retina display");
 
   public MenuHandler (Preferences prefs)
   {
@@ -123,7 +123,7 @@ public class MenuHandler
     formatMenu.add (colourQuirksItem);
     formatMenu.add (monochromeItem);
     formatMenu.add (debuggingItem);
-    formatMenu.add (retinaItem);
+    //    formatMenu.add (retinaItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 

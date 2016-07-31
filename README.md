@@ -14,6 +14,10 @@
 - Dual DOS disks
 - CPM disks
 
+### Documentation
+* [Commands](resources/commands.md)
+* [Project layout](resources/structure.md)
+
 ### Installation
 * Install the **latest** version of the [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JRE or JDK).
 * Download DiskBrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.

@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 
 class Cell implements Comparable<Cell>, Value
 {
-  private static final DecimalFormat nf = new DecimalFormat ("$#####0.00");
+  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
 
   final Address address;
   private final Sheet parent;

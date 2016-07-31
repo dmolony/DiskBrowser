@@ -1,22 +1,12 @@
 ```
-http://cloc.sourceforge.net v 1.64  T=0.65 s (273.8 files/s, 37671.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Java                           179           3343            983          20298
+Java                           216           3940           1178          22680
 -------------------------------------------------------------------------------
-SUM:                           179           3343            983          20298
+SUM:                           216           3940           1178          22680
 -------------------------------------------------------------------------------
-.
 └── diskbrowser
-    ├── DateTime.java
-    ├── FileFormatException.java
-    ├── HexFormatter.java
-    ├── LZW.java
-    ├── LZW1.java
-    ├── LZW2.java
-    ├── NuFX.java
-    ├── Thread.java
     ├── applefile
     │   ├── AbstractFile.java
     │   ├── AppleFileSource.java
@@ -26,6 +16,7 @@ SUM:                           179           3343            983          20298
     │   ├── AssemblerStatement.java
     │   ├── BasicProgram.java
     │   ├── BootSector.java
+    │   ├── CPMTextFile.java
     │   ├── Charset.java
     │   ├── Command.java
     │   ├── DefaultAppleFile.java
@@ -49,7 +40,6 @@ SUM:                           179           3343            983          20298
     │   ├── TextBuffer.java
     │   ├── TextFile.java
     │   ├── VisicalcFile.java
-    │   ├── VisicalcSpreadsheet.java
     │   ├── WizardryTitle.java
     │   └── equates.txt
     ├── appleworks
@@ -76,7 +66,9 @@ SUM:                           179           3343            983          20298
     │   ├── TextCatalogCreator.java
     │   └── TextDiskCreator.java
     ├── cpm
-    │   └── CPMDisk.java
+    │   ├── CPMCatalogSector.java
+    │   ├── CPMDisk.java
+    │   └── DirectoryEntry.java
     ├── disk
     │   ├── AbstractFormattedDisk.java
     │   ├── AbstractSector.java
@@ -108,9 +100,11 @@ SUM:                           179           3343            983          20298
     │   ├── AppleDiskTab.java
     │   ├── CatalogPanel.java
     │   ├── CloseTabAction.java
+    │   ├── ColourQuirksAction.java
     │   ├── CreateDatabaseAction.java
     │   ├── DataPanel.java
     │   ├── DataSource.java
+    │   ├── DebuggingAction.java
     │   ├── DiskAndFileSelector.java
     │   ├── DiskBrowser.java
     │   ├── DiskDetails.java
@@ -132,6 +126,7 @@ SUM:                           179           3343            983          20298
     │   ├── InterleaveAction.java
     │   ├── LineWrapAction.java
     │   ├── MenuHandler.java
+    │   ├── MonochromeAction.java
     │   ├── NoDisksFoundException.java
     │   ├── OpenFileAction.java
     │   ├── PreferencesAction.java
@@ -146,7 +141,8 @@ SUM:                           179           3343            983          20298
     │   ├── SectorSelectionListener.java
     │   ├── ShowFreeSectorsAction.java
     │   ├── Tab.java
-    │   └── TreeBuilder.java
+    │   ├── TreeBuilder.java
+    │   └── WindowSaver.java
     ├── icons
     │   ├── Symbol-Left-32.png
     │   ├── Symbol-Right-32.png
@@ -174,6 +170,7 @@ SUM:                           179           3343            983          20298
     │   ├── Globals.java
     │   ├── Grammar.java
     │   ├── Header.java
+    │   ├── InfocomAbstractFile.java
     │   ├── InfocomDisk.java
     │   ├── Instruction.java
     │   ├── ObjectAnalyser.java
@@ -185,8 +182,12 @@ SUM:                           179           3343            983          20298
     │   ├── ZObject.java
     │   └── ZString.java
     ├── pascal
+    │   ├── CatalogEntry.java
+    │   ├── FileEntry.java
     │   ├── PascalCatalogSector.java
-    │   └── PascalDisk.java
+    │   ├── PascalCodeObject.java
+    │   ├── PascalDisk.java
+    │   └── VolumeEntry.java
     ├── prodos
     │   ├── CatalogEntry.java
     │   ├── DirectoryHeader.java
@@ -200,6 +201,42 @@ SUM:                           179           3343            983          20298
     │   ├── ProdosIndexSector.java
     │   ├── SubDirectoryHeader.java
     │   └── VolumeDirectoryHeader.java
+    ├── utilities
+    │   ├── DateTime.java
+    │   ├── FileFormatException.java
+    │   ├── HexFormatter.java
+    │   ├── LZW.java
+    │   ├── LZW1.java
+    │   ├── LZW2.java
+    │   ├── NuFX.java
+    │   ├── Thread.java
+    │   └── Utility.java
+    ├── visicalc
+    │   ├── Abs.java
+    │   ├── Address.java
+    │   ├── And.java
+    │   ├── Cell.java
+    │   ├── Condition.java
+    │   ├── Count.java
+    │   ├── Error.java
+    │   ├── Expression.java
+    │   ├── Function.java
+    │   ├── If.java
+    │   ├── Int.java
+    │   ├── IsError.java
+    │   ├── IsNa.java
+    │   ├── Lookup.java
+    │   ├── Max.java
+    │   ├── Min.java
+    │   ├── Na.java
+    │   ├── Npv.java
+    │   ├── Number.java
+    │   ├── Or.java
+    │   ├── Pi.java
+    │   ├── Range.java
+    │   ├── Sheet.java
+    │   ├── Sum.java
+    │   └── Value.java
     └── wizardry
         ├── AbstractImage.java
         ├── Character.java
@@ -220,5 +257,5 @@ SUM:                           179           3343            983          20298
         ├── Spell.java
         └── WizardryScenarioDisk.java
 
-13 directories, 198 files
+15 directories, 235 files
 ```

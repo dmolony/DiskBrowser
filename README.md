@@ -15,7 +15,7 @@
 - CPM disks
 
 ### Documentation
-* [Commands](resources/commands.md)
+* [Usage](resources/usage.md)
 * [Project layout](resources/structure.md)
 
 ### Installation

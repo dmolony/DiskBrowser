@@ -1,6 +1,6 @@
 #Apple II Disk Browser
 
-####Features
+###Features
 - Applesoft and Integer Basic
 - Pascal disassembler
 - 6502 disassembler
@@ -14,18 +14,23 @@
 - Dual DOS disks
 - CPM disks
 
-####Images
-#####Disk listing
+### Installation
+* Install the **latest** version of the [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JRE or JDK).
+* Download diskbrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
+* Double-click the jar file, or enter 'java -jar diskbrowser.jar' in the terminal.
+
+###Images
+####Disk listing
 ![Disk listing](resources/disk1.png?raw=true "Disk listing")
-#####Disk contents
+####Disk contents
 ![Disk catalog](resources/disk2.png?raw=true "Disk catalog")
-#####Hard disk
+####Hard disk
 ![Hard disk](resources/disk3.png?raw=true "Hard disk")
-#####Pascal code
+####Pascal code
 ![Pascal](resources/pascal.png?raw=true "Pascal")
-#####Zork
+####Zork
 ![Zork](resources/zork.png?raw=true "Zork")
-#####Wizardry
+####Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
-#####Visicalc
+####Visicalc
 ![Visicalc](resources/visicalc.png?raw=true "Visicalc")

@@ -35,11 +35,12 @@ public class AppleDisk implements Disk
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
-        { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // Dos
-          { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos
-          { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
-          { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
+      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // Dos
+        { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos
+        { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
+        { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
 
+  // Physical disk interleave:
   // Info from http://www.applelogic.org/TheAppleIIEGettingStarted.html
   // Block:    0 1 2 3 4 5 6 7 8 9 A B C D E F
   // Position: 0 8 1 9 2 A 3 B 4 C 5 D 6 E 7 F    - Prodos (.PO disks)
@@ -58,6 +59,17 @@ public class AppleDisk implements Disk
   //  {0x00,0x07,0x0E,0x06,0x0D,0x05,0x0C,0x04, 0x0B,0x03,0x0A,0x02,0x09,0x01,0x08,0x0F},
   //  {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
   //}; 
+
+  // * TABLE OF PHYSICAL BSECTR NUMBERS
+  // * WHICH CORRESPOND TO THE LOGICAL
+  // * BSECTRS 0-F ON TRACK ZERO...
+  // BHERE2  EQU     >*
+  // TABLE   EQU     $800+BHERE2
+  //         DFB     $00,13,11       ;00->00,01->13,02->11
+  //         DFB     09,07,05        ;03->09,04->07;05->05
+  //         DFB     03,01,14        ;06->03,07->01,08->14
+  //         DFB     12,10,08        ;09->12,10->10,11->08
+  //         DFB     06,04,02,15     ;12->06,13->04,14->02,15->15
 
   private boolean[] hasData;
   private byte emptyByte = 0;
@@ -82,7 +94,7 @@ public class AppleDisk implements Disk
     int skip = 0;
 
     if ((pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
-          || "2IMG".equals (prefix))
+        || "2IMG".equals (prefix))
     //      if ("2IMG".equals (prefix))
     {
       if (debug)
@@ -395,7 +407,8 @@ public class AppleDisk implements Disk
   public DiskAddress getDiskAddress (int track, int sector)
   {
     // should this return null for invalid addresses?
-    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", " + sector;
+    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", "
+        + sector;
     return new AppleDiskAddress (this, track, sector);
   }
 
@@ -438,22 +451,22 @@ public class AppleDisk implements Disk
     assert da.getDisk () == this : "Disk address not applicable to this disk";
     assert sectorSize == 256 || sectorSize == 512 : "Invalid sector size : " + sectorSize;
     assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
-          + interleave;
+        + interleave;
 
     if (sectorSize == 256)
     {
       int diskOffset = da.getTrack () * trackSize
-            + interleaveSector[interleave][da.getSector ()] * sectorSize;
+          + interleaveSector[interleave][da.getSector ()] * sectorSize;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, sectorSize);
     }
     else if (sectorSize == 512)
     {
       int diskOffset = da.getTrack () * trackSize
-            + interleaveSector[interleave][da.getSector () * 2] * 256;
+          + interleaveSector[interleave][da.getSector () * 2] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, 256);
 
       diskOffset = da.getTrack () * trackSize
-            + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
+          + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + 256, 256);
     }
   }
@@ -474,7 +487,7 @@ public class AppleDisk implements Disk
   {
     if (actionListenerList != null)
       actionListenerList
-            .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
+          .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
   }
 
   public AppleFileSource getDetails ()

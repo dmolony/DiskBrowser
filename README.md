@@ -16,8 +16,8 @@
 
 ### Installation
 * Install the **latest** version of the [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JRE or JDK).
-* Download diskbrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
-* Double-click the jar file, or enter 'java -jar diskbrowser.jar' in the terminal.
+* Download DiskBrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
+* Double-click the jar file, or enter 'java -jar DiskBrowser.jar' in the terminal.
 
 ###Images
 ####Disk listing

@@ -1,8 +1,7 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Lookup extends Function
+class Lookup extends RangeFunction
 {
-  Range range;
   String sourceText;
   String rangeText;
   Expression source;
@@ -20,13 +19,9 @@ class Lookup extends Function
   public Value calculate ()
   {
     if (source == null)
-    {
       source = new Expression (parent, sourceText);
-      range = getRange (rangeText);
-    }
 
     source.calculate ();
-    //    System.out.println ("calculated source");
     if (source.isError () || source.isNotAvailable ())
     {
       valueType = source.getValueType ();
@@ -53,9 +48,7 @@ class Lookup extends Function
       valueType = ValueType.VALUE;
     }
     else
-    {
       System.out.println ("Target is null!");
-    }
 
     return this;
   }

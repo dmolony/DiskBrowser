@@ -1,13 +1,10 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Max extends Function
+class Max extends RangeFunction
 {
-  private final Range range;
-
   public Max (Sheet parent, String text)
   {
     super (parent, text);
-    range = getRange (text);
   }
 
   @Override

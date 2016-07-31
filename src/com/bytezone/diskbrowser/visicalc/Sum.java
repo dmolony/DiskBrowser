@@ -1,13 +1,10 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Sum extends Function
+class Sum extends RangeFunction
 {
-  private final Range range;
-
   public Sum (Sheet parent, String text)
   {
     super (parent, text);
-    range = getRange (text);
   }
 
   @Override

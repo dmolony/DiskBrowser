@@ -23,7 +23,7 @@
 * Download DiskBrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
 * Double-click the jar file, or enter 'java -jar DiskBrowser.jar' in the terminal.
 
-###Images
+###Example Screens
 ####Disk listing
 ![Disk listing](resources/disk1.png?raw=true "Disk listing")
 ####Disk contents

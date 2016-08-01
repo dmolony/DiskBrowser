@@ -13,12 +13,10 @@ class Cell implements Comparable<Cell>, Value
 
   private char repeatingChar;
   private String repeat = "";
-
   private String label;
 
   private String expressionText;
   private Value value;
-  private ValueType valueType;
 
   enum CellType
   {
@@ -30,8 +28,8 @@ class Cell implements Comparable<Cell>, Value
     this.parent = parent;
     this.address = address;
 
-    cellType = CellType.VALUE;            // default to VALUE, formatting may change it
-    valueType = ValueType.VALUE;
+    cellType = CellType.VALUE;          // default to VALUE, formatting may change it
+    value = new Number ("0.0");
   }
 
   void format (String format)
@@ -182,7 +180,7 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public ValueType getValueType ()
   {
-    return valueType;
+    return value.getValueType ();
   }
 
   @Override
@@ -192,36 +190,10 @@ class Cell implements Comparable<Cell>, Value
     return value.getText ();
   }
 
-  //  @Override
-  //  public boolean isValue ()
-  //  {
-  //    return type == CellType.VALUE;
-  //  }
-  //
-  //  @Override
-  //  public boolean isError ()
-  //  {
-  //    return value.isError ();
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotAvailable ()
-  //  {
-  //    if (!isValue ())
-  //      return true;
-  //    return value.isNotAvailable ();
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotANumber ()
-  //  {
-  //    return value.isNotANumber ();
-  //  }
-
   @Override
   public boolean is (ValueType type)
   {
-    return valueType == type;
+    return value.is (type);
   }
 
   public boolean is (CellType type)
@@ -233,23 +205,18 @@ class Cell implements Comparable<Cell>, Value
   public Value calculate ()
   {
     if (!is (CellType.VALUE))
-    {
-      //      System.out.println (value);
       return this;
-    }
-    assert is (CellType.VALUE) : "Cell type: " + cellType + " @ " + address;
+
     if (expressionText == null)
     {
       System.out.printf ("%s null expression text %n", address);
       value = Function.getInstance (parent, "@ERROR");
-      valueType = ValueType.ERROR;
     }
     else
     {
       // should use Number or Cell or Function for simple Values
       value = new Expression (parent, expressionText);
       value.calculate ();
-      valueType = value.getValueType ();
     }
     return this;
   }

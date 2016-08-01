@@ -8,7 +8,7 @@ class Cell implements Comparable<Cell>, Value
 
   final Address address;
   private final Sheet parent;
-  private CellType type;
+  private CellType cellType;
   private char cellFormat = ' ';
 
   private char repeatingChar;
@@ -29,13 +29,9 @@ class Cell implements Comparable<Cell>, Value
   {
     this.parent = parent;
     this.address = address;
-    type = CellType.VALUE;            // default to VALUE, formatting may change it
-  }
 
-  @Override
-  public boolean isValue ()
-  {
-    return type == CellType.VALUE;
+    cellType = CellType.VALUE;            // default to VALUE, formatting may change it
+    valueType = ValueType.VALUE;
   }
 
   void format (String format)
@@ -55,7 +51,7 @@ class Cell implements Comparable<Cell>, Value
       repeatingChar = format.charAt (2);
       for (int i = 0; i < 20; i++)
         repeat += repeatingChar;
-      type = CellType.REPEATING_CHARACTER;
+      cellType = CellType.REPEATING_CHARACTER;
     }
     else
       System.out.printf ("Unexpected format [%s]%n", format);
@@ -66,12 +62,12 @@ class Cell implements Comparable<Cell>, Value
     if (command.charAt (0) == '"')
     {
       label = command.substring (1);
-      type = CellType.LABEL;
+      cellType = CellType.LABEL;
     }
     else
     {
       expressionText = command;
-      type = CellType.VALUE;
+      cellType = CellType.VALUE;
     }
 
     // FUTURE.VC
@@ -114,7 +110,7 @@ class Cell implements Comparable<Cell>, Value
   {
     char format = cellFormat != ' ' ? cellFormat : defaultFormat;
 
-    switch (type)
+    switch (cellType)
     {
       case LABEL:
         return justify (label, colWidth, cellFormat);
@@ -123,7 +119,8 @@ class Cell implements Comparable<Cell>, Value
         return justify (repeat, colWidth, format);
 
       case VALUE:
-        if (value.isError () || value.isNotAvailable () || value.isNotANumber ())
+        if (value.is (ValueType.ERROR) || value.is (ValueType.NA)
+            || value.is (ValueType.NAN))
           return justify (value.getText (), colWidth, format);
 
         Double thisValue = value.getValue ();
@@ -178,7 +175,7 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public double getValue ()
   {
-    assert type == CellType.VALUE;
+    assert cellType == CellType.VALUE;
     return value.getValue ();
   }
 
@@ -191,44 +188,56 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String getText ()
   {
-    assert isValue () : "Cell type: " + type;
+    assert is (CellType.VALUE) : "Cell type: " + cellType;
     return value.getText ();
   }
 
-  @Override
-  public boolean isError ()
-  {
-    //    assert isValue () : "Cell type: " + type;
-    return value.isError ();
-  }
+  //  @Override
+  //  public boolean isValue ()
+  //  {
+  //    return type == CellType.VALUE;
+  //  }
+  //
+  //  @Override
+  //  public boolean isError ()
+  //  {
+  //    return value.isError ();
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotAvailable ()
+  //  {
+  //    if (!isValue ())
+  //      return true;
+  //    return value.isNotAvailable ();
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotANumber ()
+  //  {
+  //    return value.isNotANumber ();
+  //  }
 
   @Override
-  public boolean isNotAvailable ()
+  public boolean is (ValueType type)
   {
-    //    assert type == CellType.VALUE : "Cell type: " + type;
-    if (!isValue ())
-      return true;
-    return value.isNotAvailable ();
+    return valueType == type;
   }
 
-  @Override
-  public boolean isNotANumber ()
+  public boolean is (CellType type)
   {
-    //    assert type == CellType.VALUE : "Cell type: " + type;
-    //    if (!isValue ())
-    //      return true;
-    return value.isNotANumber ();
+    return cellType == type;
   }
 
   @Override
   public Value calculate ()
   {
-    if (!isValue ())
+    if (!is (CellType.VALUE))
     {
       //      System.out.println (value);
       return this;
     }
-    assert isValue () : "Cell type: " + type + " @ " + address;
+    assert is (CellType.VALUE) : "Cell type: " + cellType + " @ " + address;
     if (expressionText == null)
     {
       System.out.printf ("%s null expression text %n", address);
@@ -250,7 +259,7 @@ class Cell implements Comparable<Cell>, Value
   {
     String contents = "";
 
-    switch (type)
+    switch (cellType)
     {
       case LABEL:
         contents = "Labl: " + label;

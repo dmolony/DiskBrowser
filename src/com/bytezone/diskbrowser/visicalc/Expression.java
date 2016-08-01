@@ -127,12 +127,13 @@ class Expression implements Value
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
-      if (thisValue.isError ())
+      if (thisValue.is (ValueType.ERROR))
       {
         valueType = thisValue.getValueType ();
         return this;
       }
-      value = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
+
+      value = thisValue.is (ValueType.NA) ? 0 : thisValue.getValue ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -142,13 +143,13 @@ class Expression implements Value
       {
         thisValue = values.get (i);
         thisValue.calculate ();
-        if (thisValue.isError ())
+        if (thisValue.is (ValueType.ERROR))
         {
           valueType = thisValue.getValueType ();
           return this;
         }
 
-        double nextValue = thisValue.isNotAvailable () ? 0 : thisValue.getValue ();
+        double nextValue = thisValue.is (ValueType.NA) ? 0 : thisValue.getValue ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -186,28 +187,33 @@ class Expression implements Value
     return valueType;
   }
 
+  //  @Override
+  //  public boolean isValue ()
+  //  {
+  //    return valueType == ValueType.VALUE;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotAvailable ()
+  //  {
+  //    return valueType == ValueType.NA;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotANumber ()
+  //  {
+  //    return valueType == ValueType.NAN;
+  //  }
+  //
+  //  @Override
+  //  public boolean isError ()
+  //  {
+  //    return valueType == ValueType.ERROR;
+  //  }
   @Override
-  public boolean isValue ()
+  public boolean is (ValueType type)
   {
-    return valueType == ValueType.VALUE;
-  }
-
-  @Override
-  public boolean isNotAvailable ()
-  {
-    return valueType == ValueType.NA;
-  }
-
-  @Override
-  public boolean isNotANumber ()
-  {
-    return valueType == ValueType.NAN;
-  }
-
-  @Override
-  public boolean isError ()
-  {
-    return valueType == ValueType.ERROR;
+    return valueType == type;
   }
 
   @Override
@@ -217,11 +223,27 @@ class Expression implements Value
     return value;
   }
 
+  //  @Override
+  //  public String getText ()
+  //  {
+  //    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
+  //    //    return isNotAvailable () ? "NA" : isError () ? "Error" : "";
+  //  }
+
   @Override
   public String getText ()
   {
-    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
-    //    return isNotAvailable () ? "NA" : isError () ? "Error" : "";
+    switch (valueType)
+    {
+      case NA:
+        return "NA";
+      case ERROR:
+        return "Error";
+      case NAN:
+        return "NaN";
+      default:
+        return "";
+    }
   }
 
   private String checkBrackets (String input)

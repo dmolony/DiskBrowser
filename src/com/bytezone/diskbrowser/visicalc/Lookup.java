@@ -22,7 +22,7 @@ class Lookup extends RangeFunction
       source = new Expression (parent, sourceText);
 
     source.calculate ();
-    if (source.isError () || source.isNotAvailable ())
+    if (source.is (ValueType.ERROR) || source.is (ValueType.NA))
     {
       valueType = source.getValueType ();
       return this;

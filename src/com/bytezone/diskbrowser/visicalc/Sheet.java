@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.visicalc.Value.ValueType;
 
 public class Sheet
 {
@@ -163,7 +164,7 @@ public class Sheet
   {
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
-      if (cell.isValue ())
+      if (cell.is (ValueType.VALUE))
         cell.calculate ();
   }
 

@@ -13,13 +13,14 @@ interface Value
 
   public String getText ();
 
-  public boolean isValue ();
-
-  public boolean isError ();
-
-  public boolean isNotAvailable ();
-
-  public boolean isNotANumber ();
+  //  public boolean isValue ();
+  //
+  //  public boolean isError ();
+  //
+  //  public boolean isNotAvailable ();
+  //
+  //  public boolean isNotANumber ();
+  public boolean is (ValueType valueType);
 
   public Value calculate ();
 }

@@ -8,18 +8,6 @@ class Error extends Function
   }
 
   @Override
-  public boolean isError ()
-  {
-    return true;
-  }
-
-  @Override
-  public boolean isNotAvailable ()
-  {
-    return false;
-  }
-
-  @Override
   public double getValue ()
   {
     return 0;

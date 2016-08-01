@@ -18,28 +18,33 @@ class Number implements Value
     }
   }
 
+  //  @Override
+  //  public boolean isValue ()
+  //  {
+  //    return valueType == ValueType.VALUE;
+  //  }
+  //
+  //  @Override
+  //  public boolean isError ()
+  //  {
+  //    return valueType == ValueType.ERROR;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotAvailable ()
+  //  {
+  //    return valueType == ValueType.NA;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotANumber ()
+  //  {
+  //    return valueType == ValueType.NAN;
+  //  }
   @Override
-  public boolean isValue ()
+  public boolean is (ValueType type)
   {
-    return valueType == ValueType.VALUE;
-  }
-
-  @Override
-  public boolean isError ()
-  {
-    return valueType == ValueType.ERROR;
-  }
-
-  @Override
-  public boolean isNotAvailable ()
-  {
-    return valueType == ValueType.NA;
-  }
-
-  @Override
-  public boolean isNotANumber ()
-  {
-    return valueType == ValueType.NAN;
+    return valueType == type;
   }
 
   @Override
@@ -54,11 +59,27 @@ class Number implements Value
     return value;
   }
 
+  //  @Override
+  //  public String getText ()
+  //  {
+  //    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
+  //    //    return valueType == ValueType.ERROR ? "Error" : "";
+  //  }
+
   @Override
   public String getText ()
   {
-    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
-    //    return valueType == ValueType.ERROR ? "Error" : "";
+    switch (valueType)
+    {
+      case NA:
+        return "NA";
+      case ERROR:
+        return "Error";
+      case NAN:
+        return "NaN";
+      default:
+        return "";
+    }
   }
 
   @Override

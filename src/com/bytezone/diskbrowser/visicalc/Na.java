@@ -7,17 +7,17 @@ public class Na extends Function
     super (parent, text);
   }
 
-  @Override
-  public boolean isError ()
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isNotAvailable ()
-  {
-    return true;
-  }
+  //  @Override
+  //  public boolean isError ()
+  //  {
+  //    return false;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotAvailable ()
+  //  {
+  //    return true;
+  //  }
 
   @Override
   public double getValue ()

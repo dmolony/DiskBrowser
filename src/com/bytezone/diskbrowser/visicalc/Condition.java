@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import com.bytezone.diskbrowser.visicalc.Value.ValueType;
+
 // Predicate
 class Condition
 {
@@ -54,7 +56,7 @@ class Condition
       valueExpression.calculate ();
     }
 
-    if (conditionExpression.isError () || valueExpression.isError ())
+    if (conditionExpression.is (ValueType.ERROR) || valueExpression.is (ValueType.ERROR))
       return false;
 
     double conditionResult = conditionExpression.getValue ();

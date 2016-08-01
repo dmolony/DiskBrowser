@@ -114,28 +114,34 @@ abstract class Function implements Value
     return valueType;
   }
 
-  @Override
-  public boolean isValue ()
-  {
-    return valueType == ValueType.VALUE;
-  }
+  //  @Override
+  //  public boolean isValue ()
+  //  {
+  //    return valueType == ValueType.VALUE;
+  //  }
+  //
+  //  @Override
+  //  public boolean isError ()
+  //  {
+  //    return valueType == ValueType.ERROR;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotAvailable ()
+  //  {
+  //    return valueType == ValueType.NA;
+  //  }
+  //
+  //  @Override
+  //  public boolean isNotANumber ()
+  //  {
+  //    return valueType == ValueType.NAN;
+  //  }
 
   @Override
-  public boolean isError ()
+  public boolean is (ValueType type)
   {
-    return valueType == ValueType.ERROR;
-  }
-
-  @Override
-  public boolean isNotAvailable ()
-  {
-    return valueType == ValueType.NA;
-  }
-
-  @Override
-  public boolean isNotANumber ()
-  {
-    return valueType == ValueType.NAN;
+    return valueType == type;
   }
 
   @Override
@@ -148,7 +154,18 @@ abstract class Function implements Value
   @Override
   public String getText ()
   {
-    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
+    switch (valueType)
+    {
+      case NA:
+        return "NA";
+      case ERROR:
+        return "Error";
+      case NAN:
+        return "NaN";
+      default:
+        return "";
+    }
+    //    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
   }
 
   @Override

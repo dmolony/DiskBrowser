@@ -16,10 +16,10 @@ class Min extends RangeFunction
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell == null || cell.isNotAvailable ())
+      if (cell == null || cell.is (ValueType.NA))
         continue;
 
-      if (cell.isError ())
+      if (cell.is (ValueType.ERROR))
       {
         valueType = ValueType.ERROR;
         break;

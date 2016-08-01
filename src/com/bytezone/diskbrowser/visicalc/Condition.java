@@ -56,7 +56,7 @@ class Condition
       valueExpression.calculate ();
     }
 
-    if (conditionExpression.is (ValueType.ERROR) || valueExpression.is (ValueType.ERROR))
+    if (conditionExpression.isValueType (ValueType.ERROR) || valueExpression.isValueType (ValueType.ERROR))
       return false;
 
     double conditionResult = conditionExpression.getValue ();

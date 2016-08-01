@@ -117,8 +117,8 @@ class Cell implements Comparable<Cell>, Value
         return justify (repeat, colWidth, format);
 
       case VALUE:
-        if (value.is (ValueType.ERROR) || value.is (ValueType.NA)
-            || value.is (ValueType.NAN))
+        if (value.isValueType (ValueType.ERROR) || value.isValueType (ValueType.NA)
+            || value.isValueType (ValueType.NAN))
           return justify (value.getText (), colWidth, format);
 
         Double thisValue = value.getValue ();
@@ -173,7 +173,6 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public double getValue ()
   {
-    assert cellType == CellType.VALUE;
     return value.getValue ();
   }
 
@@ -186,17 +185,16 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String getText ()
   {
-    assert is (CellType.VALUE) : "Cell type: " + cellType;
     return value.getText ();
   }
 
   @Override
-  public boolean is (ValueType type)
+  public boolean isValueType (ValueType type)
   {
-    return value.is (type);
+    return value.isValueType (type);
   }
 
-  public boolean is (CellType type)
+  public boolean isCellType (CellType type)
   {
     return cellType == type;
   }
@@ -204,7 +202,7 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public Value calculate ()
   {
-    if (!is (CellType.VALUE))
+    if (!isCellType (CellType.VALUE))
       return this;
 
     if (expressionText == null)

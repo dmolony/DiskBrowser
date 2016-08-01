@@ -114,32 +114,8 @@ abstract class Function implements Value
     return valueType;
   }
 
-  //  @Override
-  //  public boolean isValue ()
-  //  {
-  //    return valueType == ValueType.VALUE;
-  //  }
-  //
-  //  @Override
-  //  public boolean isError ()
-  //  {
-  //    return valueType == ValueType.ERROR;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotAvailable ()
-  //  {
-  //    return valueType == ValueType.NA;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotANumber ()
-  //  {
-  //    return valueType == ValueType.NAN;
-  //  }
-
   @Override
-  public boolean is (ValueType type)
+  public boolean isValueType (ValueType type)
   {
     return valueType == type;
   }
@@ -165,7 +141,6 @@ abstract class Function implements Value
       default:
         return "";
     }
-    //    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
   }
 
   @Override

@@ -22,15 +22,15 @@ class Lookup extends RangeFunction
       source = new Expression (parent, sourceText);
 
     source.calculate ();
-    if (source.is (ValueType.ERROR) || source.is (ValueType.NA))
+    if (!source.isValueType (ValueType.VALUE))
     {
       valueType = source.getValueType ();
       return this;
     }
 
     double sourceValue = source.getValue ();
-
     Address target = null;
+
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);

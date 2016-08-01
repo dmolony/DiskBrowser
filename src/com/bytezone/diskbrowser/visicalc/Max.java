@@ -16,10 +16,10 @@ class Max extends RangeFunction
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell == null || cell.is (ValueType.NA))
+      if (cell == null || cell.isValueType (ValueType.NA))
         continue;
 
-      if (cell.is (ValueType.ERROR))
+      if (cell.isValueType (ValueType.ERROR))
       {
         valueType = ValueType.ERROR;
         break;

@@ -164,7 +164,7 @@ public class Sheet
   {
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
-      if (cell.is (ValueType.VALUE))
+      if (cell.isValueType (ValueType.VALUE))
         cell.calculate ();
   }
 

@@ -36,7 +36,7 @@ class If extends Function
 
       expTrue.calculate ();
 
-      if (expTrue.is (ValueType.ERROR) || expTrue.is (ValueType.NA))
+      if (expTrue.isValueType (ValueType.ERROR) || expTrue.isValueType (ValueType.NA))
         valueType = expTrue.getValueType ();
       else
         value = expTrue.getValue ();
@@ -49,7 +49,7 @@ class If extends Function
 
       expFalse.calculate ();
 
-      if (expFalse.is (ValueType.ERROR) || expFalse.is (ValueType.NA))
+      if (expFalse.isValueType (ValueType.ERROR) || expFalse.isValueType (ValueType.NA))
         valueType = expFalse.getValueType ();
       else
         value = expFalse.getValue ();

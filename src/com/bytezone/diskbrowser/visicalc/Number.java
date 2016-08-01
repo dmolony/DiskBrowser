@@ -42,7 +42,7 @@ class Number implements Value
   //    return valueType == ValueType.NAN;
   //  }
   @Override
-  public boolean is (ValueType type)
+  public boolean isValueType (ValueType type)
   {
     return valueType == type;
   }

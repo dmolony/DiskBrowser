@@ -127,13 +127,13 @@ class Expression implements Value
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
-      if (thisValue.is (ValueType.ERROR))
+      if (thisValue.isValueType (ValueType.ERROR))
       {
         valueType = thisValue.getValueType ();
         return this;
       }
 
-      value = thisValue.is (ValueType.NA) ? 0 : thisValue.getValue ();
+      value = thisValue.isValueType (ValueType.NA) ? 0 : thisValue.getValue ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -143,13 +143,13 @@ class Expression implements Value
       {
         thisValue = values.get (i);
         thisValue.calculate ();
-        if (thisValue.is (ValueType.ERROR))
+        if (thisValue.isValueType (ValueType.ERROR))
         {
           valueType = thisValue.getValueType ();
           return this;
         }
 
-        double nextValue = thisValue.is (ValueType.NA) ? 0 : thisValue.getValue ();
+        double nextValue = thisValue.isValueType (ValueType.NA) ? 0 : thisValue.getValue ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -211,7 +211,7 @@ class Expression implements Value
   //    return valueType == ValueType.ERROR;
   //  }
   @Override
-  public boolean is (ValueType type)
+  public boolean isValueType (ValueType type)
   {
     return valueType == type;
   }

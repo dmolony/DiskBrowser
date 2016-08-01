@@ -7,20 +7,13 @@ interface Value
     VALUE, ERROR, NA, NAN
   }
 
-  public ValueType getValueType ();
-
   public double getValue ();
 
   public String getText ();
 
-  //  public boolean isValue ();
-  //
-  //  public boolean isError ();
-  //
-  //  public boolean isNotAvailable ();
-  //
-  //  public boolean isNotANumber ();
-  public boolean is (ValueType valueType);
+  public boolean isValueType (ValueType valueType);
+
+  public ValueType getValueType ();
 
   public Value calculate ();
 }

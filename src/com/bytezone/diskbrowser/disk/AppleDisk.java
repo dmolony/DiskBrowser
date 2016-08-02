@@ -384,6 +384,7 @@ public class AppleDisk implements Disk
     if (!isValidAddress (block))
     {
       System.out.println ("Invalid block : " + block);
+      //      assert false;
       return null;
       //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
     }

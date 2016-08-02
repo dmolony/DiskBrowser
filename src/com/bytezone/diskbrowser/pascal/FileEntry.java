@@ -15,6 +15,10 @@ class FileEntry extends CatalogEntry
     date = HexFormatter.getPascalDate (buffer, 24);
 
     for (int i = firstBlock; i < lastBlock; i++)
+    {
+      if (i >= 280)
+        break;
+
       switch (fileType)
       {
         case 2:
@@ -46,6 +50,7 @@ class FileEntry extends CatalogEntry
           parent.sectorTypes[i] = parent.dataSector;
           break;
       }
+    }
   }
 
   @Override
@@ -58,28 +63,30 @@ class FileEntry extends CatalogEntry
 
     switch (fileType)
     {
-      case 3:
-        file = new PascalText (name, buffer);
-        break;
-
       case 2:
         file = new PascalCode (name, buffer);
+        break;
+
+      case 3:
+        file = new PascalText (name, buffer);
         break;
 
       case 4:
         file = new PascalInfo (name, buffer);
         break;
 
-      case 0:                                           // volume
-        break;
-
       case 5:                                           // data
         if (name.equals ("SYSTEM.CHARSET"))
           file = new Charset (name, buffer);
-        else if (name.equals ("WT"))                    // only testing
-          file = new WizardryTitle (name, buffer);
+        //        else if (name.equals ("WT"))               // only testing
+        //          file = new WizardryTitle (name, buffer);
+        else if (name.equals ("SYSTEM.RELOC"))
+          file = new Relocator (name, buffer);
         else
           file = new DefaultAppleFile (name, buffer);
+        break;
+
+      case 0:                                           // volume
         break;
 
       default:                                          // unknown

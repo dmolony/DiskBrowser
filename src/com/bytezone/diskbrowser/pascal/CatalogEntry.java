@@ -14,11 +14,12 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 abstract class CatalogEntry implements AppleFileSource
 {
   protected final PascalDisk parent;
-  String name;
+  protected final String name;
   int firstBlock;
   int lastBlock;                      // block AFTER last used block
   int fileType;
   GregorianCalendar date;
+  int bytesUsedInLastBlock;
   List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
   AbstractFile file;
 
@@ -28,13 +29,21 @@ abstract class CatalogEntry implements AppleFileSource
 
     firstBlock = HexFormatter.intValue (buffer[0], buffer[1]);
     lastBlock = HexFormatter.intValue (buffer[2], buffer[3]);
-    //      fileType = HexFormatter.intValue (buffer[4], buffer[5]);
-    fileType = buffer[4] & 0x0F;
+    fileType = HexFormatter.intValue (buffer[4], buffer[5]);
+    //    fileType = buffer[4] & 0x0F;
     name = HexFormatter.getPascalString (buffer, 6);
+    bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
 
     Disk disk = parent.getDisk ();
     for (int i = firstBlock; i < lastBlock; i++)
+    {
+      if (i >= 280)
+      {
+        System.out.printf ("CatalogEntry: block >= 280%n");
+        break;
+      }
       blocks.add (disk.getDiskAddress (i));
+    }
   }
 
   @Override

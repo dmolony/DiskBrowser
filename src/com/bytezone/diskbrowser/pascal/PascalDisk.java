@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.pascal;
 import java.awt.Color;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -19,11 +20,11 @@ public class PascalDisk extends AbstractFormattedDisk
 {
   static final int CATALOG_ENTRY_SIZE = 26;
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
-  private final VolumeEntry volume;
+  private final VolumeEntry volumeEntry;
   private final PascalCatalogSector diskCatalogSector;
 
   final String[] fileTypes =
-        { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
+      { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
   SectorType diskBootSector = new SectorType ("Boot", Color.lightGray);
   SectorType catalogSector = new SectorType ("Catalog", Color.magenta);
@@ -56,7 +57,7 @@ public class PascalDisk extends AbstractFormattedDisk
     byte[] data = new byte[CATALOG_ENTRY_SIZE];
     System.arraycopy (buffer, 0, data, 0, CATALOG_ENTRY_SIZE);
 
-    volume = new VolumeEntry (this, data);
+    volumeEntry = new VolumeEntry (this, data);
 
     for (int i = 0; i < 2; i++)
       if (!disk.isSectorEmpty (i))
@@ -69,7 +70,7 @@ public class PascalDisk extends AbstractFormattedDisk
       freeBlocks.set (i, true);
 
     List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
-    for (int i = 2; i < volume.lastBlock; i++)
+    for (int i = 2; i < volumeEntry.lastBlock; i++)
     {
       DiskAddress da = disk.getDiskAddress (i);
       if (!disk.isSectorEmpty (da))
@@ -82,34 +83,34 @@ public class PascalDisk extends AbstractFormattedDisk
     diskCatalogSector = new PascalCatalogSector (disk, buffer, sectors);
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
-    DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode (volume);
+    DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode (volumeEntry);
     root.add (volumeNode);
 
     // read the catalog
     List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
-    for (int i = 2; i < volume.lastBlock; i++)
+    for (int i = 2; i < volumeEntry.lastBlock; i++)
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readSectors (addresses);
 
     // loop through each catalog entry (what if there are deleted files?)
-    for (int i = 1; i <= volume.totalFiles; i++)
+    for (int i = 1; i <= volumeEntry.totalFiles; i++)
     {
       int ptr = i * CATALOG_ENTRY_SIZE;
       data = new byte[CATALOG_ENTRY_SIZE];
 
       System.arraycopy (buffer, ptr, data, 0, CATALOG_ENTRY_SIZE);
-      FileEntry fe = new FileEntry (this, data);
-      fileEntries.add (fe);
-      DefaultMutableTreeNode node = new DefaultMutableTreeNode (fe);
+      FileEntry fileEntry = new FileEntry (this, data);
+      fileEntries.add (fileEntry);
+      DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
 
-      if (fe.fileType == 2)                   // PascalCode
+      if (fileEntry.fileType == 2)                   // PascalCode
       {
         node.setAllowsChildren (true);
-        PascalCode pc = (PascalCode) fe.getDataSource ();
-        for (PascalSegment ps : pc)
+        PascalCode pascalCode = (PascalCode) fileEntry.getDataSource ();
+        for (PascalSegment pascalSegment : pascalCode)
         {
-          DefaultMutableTreeNode segmentNode =
-                new DefaultMutableTreeNode (new PascalCodeObject (this, ps, fe.firstBlock));
+          DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (
+              new PascalCodeObject (this, pascalSegment, fileEntry.firstBlock));
           node.add (segmentNode);
           segmentNode.setAllowsChildren (false);
         }
@@ -118,7 +119,7 @@ public class PascalDisk extends AbstractFormattedDisk
         node.setAllowsChildren (false);
 
       volumeNode.add (node);
-      for (int j = fe.firstBlock; j < fe.lastBlock; j++)
+      for (int j = fileEntry.firstBlock; j < fileEntry.lastBlock; j++)
         freeBlocks.set (j, false);
     }
 
@@ -128,9 +129,10 @@ public class PascalDisk extends AbstractFormattedDisk
 
   public static boolean isCorrectFormat (AppleDisk disk, boolean debug)
   {
-    disk.setInterleave (1);
+    disk.setInterleave (1);                 // should only ever be Prodos
     if (checkFormat (disk, debug))
       return true;
+
     disk.setInterleave (0);
     if (checkFormat (disk, debug))
       return true;
@@ -141,8 +143,8 @@ public class PascalDisk extends AbstractFormattedDisk
   public static boolean checkFormat (AppleDisk disk, boolean debug)
   {
     byte[] buffer = disk.readSector (2);
-    if (debug)
-      System.out.println (HexFormatter.format (buffer));
+    //    if (debug)
+    //      System.out.println (HexFormatter.format (buffer));
     int nameLength = HexFormatter.intValue (buffer[6]);
     if (nameLength < 1 || nameLength > 7)
     {
@@ -166,6 +168,14 @@ public class PascalDisk extends AbstractFormattedDisk
       return false;                         // will only work for floppies!
     }
 
+    int blocks = HexFormatter.intValue (buffer[14], buffer[15]);
+    if (blocks > 280)
+    {
+      if (debug)
+        System.out.printf ("Blocks > 280: %d%n", blocks);
+      //      return false;
+    }
+
     List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
     for (int i = 2; i < to; i++)
       addresses.add (disk.getDiskAddress (i));
@@ -185,27 +195,21 @@ public class PascalDisk extends AbstractFormattedDisk
     for (int i = 1; i <= files; i++)
     {
       int ptr = i * 26;
-      int a = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      int b = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
-      int c = HexFormatter.intValue (buffer[ptr + 4], buffer[ptr + 5]);
-      if (b < a)
+      int firstBlock = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
+      int lastBlock = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      int kind = HexFormatter.intValue (buffer[ptr + 4], buffer[ptr + 5]);
+      if (lastBlock < firstBlock)
         return false;
-      if (c == 0)
+      if (kind == 0)
         return false;
       nameLength = HexFormatter.intValue (buffer[ptr + 6]);
       if (nameLength < 1 || nameLength > 15)
         return false;
+      int lastByte = HexFormatter.intValue (buffer[ptr + 22], buffer[ptr + 23]);
+      GregorianCalendar date = HexFormatter.getPascalDate (buffer, 24);
       if (debug)
-        System.out.printf ("%4d  %4d  %d  %s%n", a, b, c,
-                           new String (buffer, ptr + 7, nameLength));
-    }
-
-    int blocks = HexFormatter.intValue (buffer[14], buffer[15]);
-    if (blocks > 280)
-    {
-      if (debug)
-        System.out.printf ("Blocks > 280: %d%n", blocks);
-      return false;
+        System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,
+                           new String (buffer, ptr + 7, nameLength), lastByte, date);
     }
 
     return true;
@@ -254,13 +258,16 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String newLine2 = newLine + newLine;
-    String line = "----   ---------------   ----   --------  -------   ----   ----" + newLine;
-    String date = volume.date == null ? "--" : df.format (volume.date.getTime ());
+    String line =
+        "----   ---------------   ----   --------  -------   ----   ----" + newLine;
+    String date =
+        volumeEntry.date == null ? "--" : df.format (volumeEntry.date.getTime ());
     StringBuilder text = new StringBuilder ();
     text.append ("Disk : " + disk.getFile ().getAbsolutePath () + newLine2);
-    text.append ("Volume : " + volume.name + newLine);
+    text.append ("Volume : " + volumeEntry.name + newLine);
     text.append ("Date   : " + date + newLine2);
-    text.append ("Blks   Name              Type     Date     Length   Frst   Last" + newLine);
+    text.append ("Blks   Name              Type     Date     Length   Frst   Last"
+        + newLine);
     text.append (line);
 
     int usedBlocks = 6;
@@ -271,14 +278,15 @@ public class PascalDisk extends AbstractFormattedDisk
       usedBlocks += size;
       date = ce.date == null ? "--" : df.format (ce.date.getTime ());
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
-      text.append (String.format (" %3d   %-15s   %s   %8s %,8d   $%03X   $%03X%n", size,
-                                  ce.name, fileTypes[ce.fileType], date, bytes, ce.firstBlock,
-                                  ce.lastBlock));
+      text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X%n", size,
+                                  ce.name, fileTypes[ce.fileType], date, bytes,
+                                  ce.firstBlock, ce.lastBlock));
     }
     text.append (line);
-    text.append (String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
-                                (volume.totalBlocks - usedBlocks), usedBlocks,
-                                volume.totalBlocks));
-    return new DefaultAppleFileSource (volume.name, text.toString (), this);
+    text.append (String.format (
+                                "Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
+                                (volumeEntry.totalBlocks - usedBlocks), usedBlocks,
+                                volumeEntry.totalBlocks));
+    return new DefaultAppleFileSource (volumeEntry.name, text.toString (), this);
   }
 }

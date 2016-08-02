@@ -15,7 +15,6 @@ import com.bytezone.common.State;
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
 {
   private static final String windowTitle = "Apple ][ Disk Browser";
-  //  private static final String PREFS_FULL_SCREEN = "full screen";
   private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
   private WindowSaver windowSaver;
 
@@ -127,9 +126,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     pack ();
 
-    //    prefs.addPreferenceChangeListener (catalogPanel);
-    //    prefs.addPreferenceChangeListener (dataPanel);
-
     // restore the menuHandler items before they are referenced
     quitAction.restore ();
 
@@ -164,6 +160,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   @Override
   public void quit (Preferences preferences)
   {
+    windowSaver = new WindowSaver (prefs, this, "DiskBrowser");
     windowSaver.saveWindow ();
   }
 

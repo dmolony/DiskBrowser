@@ -39,7 +39,7 @@ abstract class CatalogEntry implements AppleFileSource
     {
       if (i >= 280)
       {
-        System.out.printf ("CatalogEntry: block >= 280%n");
+        System.out.printf ("CatalogEntry: block %04X >= 280%n", i);
         break;
       }
       blocks.add (disk.getDiskAddress (i));

@@ -160,7 +160,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   @Override
   public void quit (Preferences preferences)
   {
-    windowSaver = new WindowSaver (prefs, this, "DiskBrowser");
+    //    windowSaver = new WindowSaver (prefs, this, "DiskBrowser");
     windowSaver.saveWindow ();
   }
 

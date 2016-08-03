@@ -335,3 +335,19 @@ public class PascalCodeStatement implements PascalConstants
     }
   }
 }
+
+/* from Wizardry info 1.txt
+
+LDC instruction
+---------------
+Earlier today I noticed the LDC pcode instruction seems to display
+differently at times.  Then I realized that it is operating with WORD
+values and needs to have them aligned on an even BYTE boundary.  For
+example:
+
+5004 B3 02 8C 3F CD CC
+                 LDC.   PUSH 02 WORDS
+
+5017 B3 02 (02)8C 3F CD CC
+                 LDC.   PUSH 02 WORDS
+*/

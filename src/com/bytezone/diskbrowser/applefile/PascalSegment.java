@@ -31,12 +31,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     this.slot = seq;
     this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
     this.size = HexFormatter.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
-    this.segmentNoHeader = fullBuffer[0x100 + seq * 2];
 
     segKind = HexFormatter.intValue (fullBuffer[0xC0 + seq * 2],
                                      fullBuffer[0xC0 + seq * 2 + 1]);
+
     textAddress = HexFormatter.intValue (fullBuffer[0xE0 + seq * 2],
                                          fullBuffer[0xE0 + seq * 2 + 1]);
+
+    this.segmentNoHeader = fullBuffer[0x100 + seq * 2] & 0xFF;
     int flags = fullBuffer[0x101 + seq * 2] & 0xFF;
     machineType = flags & 0x0F;
     version = (flags & 0xD0) >> 5;
@@ -64,8 +66,8 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     }
     else
     {
-      System.out.printf ("Error in blocksize %,d > %,d for pascal disk%n", offset,
-                         fullBuffer.length);
+      //      System.out.printf ("Error in blocksize %,d > %,d for pascal disk%n", offset,
+      //                         fullBuffer.length);
       throw new FileFormatException ("Error in PascalSegment");
     }
   }
@@ -81,7 +83,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   public String toText ()
   {
     return String
-        .format (" %2d    %02X    %04X %,6d  %-8s  %-15s  %3d   %3d    %d     %d    %d    %d",
+        .format (" %2d    %02X    %04X %,6d  %-8s  %-15s  %3d   %02X    %d     %d    %d    %d",
                  slot, blockNo, size, size, name, SegmentKind[segKind], textAddress,
                  segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2);
   }
@@ -96,13 +98,13 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     String title = "Segment - " + name;
     text.append (title + "\n"
         + "===============================".substring (0, title.length ()) + "\n\n");
-    String warning =
-        segmentNoBody == segmentNoHeader ? "" : " (" + segmentNoHeader + " in header)";
+    String warning = segmentNoBody == segmentNoHeader ? ""
+        : String.format (" (%02X in header)", segmentNoHeader);
     text.append (String.format ("Address........ %02X%n", blockNo));
     text.append (String.format ("Length......... %04X%n", buffer.length));
     text.append (String.format ("Machine type... %d%n", machineType));
     text.append (String.format ("Version........ %d%n", version));
-    text.append (String.format ("Segment........ %d%s%n", segmentNoBody, warning));
+    text.append (String.format ("Segment........ %02X%s%n", segmentNoBody, warning));
     text.append (String.format ("Total procs.... %d%n", procedures.size ()));
 
     text.append ("\nProcedure Dictionary\n====================\n\n");
@@ -118,17 +120,15 @@ public class PascalSegment extends AbstractFile implements PascalConstants
       if (procedure.valid)
       {
         int address = size - procedure.slot * 2 - 2;
-        text.append (String.format (
-                                    " %2d    %04X  %3d    %04X   %04X   %04X   "
-                                        + "%04X   (%04X - %04X = %04X)%n",
-                                    procedure.procedureNo, procedure.offset,
-                                    procedure.procLevel, procedure.codeStart,
-                                    procedure.codeEnd, procedure.parmSize,
-                                    procedure.dataSize, address, procedure.offset,
-                                    procedure.procOffset));
+        text.append (String
+            .format (" %3d   %04X   %3d   %04X   %04X   %04X   %04X   (%04X - %04X = %04X)%n",
+                     procedure.procedureNo, procedure.offset, procedure.procLevel,
+                     procedure.codeStart, procedure.codeEnd, procedure.parmSize,
+                     procedure.dataSize, address, procedure.offset,
+                     procedure.procOffset));
       }
       else
-        text.append (String.format (" %2d    %04X%n", procedure.slot, procedure.offset));
+        text.append (String.format (" %3d   %04X%n", procedure.slot, procedure.offset));
     }
 
     text.append ("\nStrings\n=======\n");

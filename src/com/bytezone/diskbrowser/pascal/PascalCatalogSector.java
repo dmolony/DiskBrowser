@@ -54,9 +54,9 @@ class PascalCatalogSector extends AbstractSector
       addTextAndDecimal (text, buffer, ptr + 2, 2, "File's last block");
       int type = buffer[ptr + 4] & 0x0F;
       if (type < fileTypes.length)
-        addText (text, buffer, ptr + 4, 2, "File type : " + fileTypes[type]);
+        addText (text, buffer, ptr + 4, 1, "File type : " + fileTypes[type]);
       int wildcard = buffer[ptr + 4] & 0xC0;
-      addText (text, buffer, ptr + 4, 2, "Wildcard : " + wildcard);
+      addText (text, buffer, ptr + 5, 1, "Wildcard : " + wildcard);
       name = HexFormatter.getPascalString (buffer, ptr + 6);
       addText (text, buffer, ptr + 6, 4, "");
       addText (text, buffer, ptr + 10, 4, "");

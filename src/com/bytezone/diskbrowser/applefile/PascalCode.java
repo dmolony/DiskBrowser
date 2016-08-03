@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class PascalCode extends AbstractFile
     implements PascalConstants, Iterable<PascalSegment>
@@ -25,25 +26,31 @@ public class PascalCode extends AbstractFile
   {
     super (name, buffer);
     int nonameCounter = 0;
+    if (false)
+    {
+      System.out.println (name);
+      byte[] key = new byte[] { 0x38, 0x00, 0x0C, 0x1C };
+      Utility.find (buffer, key);
+    }
 
-    // Build segment list (up to 16 segments)
+    // Create segment list (up to 16 segments)
     for (int i = 0; i < 16; i++)
     {
       codeName = HexFormatter.getString (buffer, 0x40 + i * 8, 8).trim ();
+      if (codeName.length () == 0)
+        codeName = "<NULL" + nonameCounter++ + ">";
       int size = HexFormatter.intValue (buffer[i * 4 + 2], buffer[i * 4 + 3]);
-      System.out.printf ("%s %s %d %n", HexFormatter.getHexString (buffer, i * 4, 4),
-                         codeName, size);
+      //      System.out.printf ("%s %s %d %n", HexFormatter.getHexString (buffer, i * 4, 4),
+      //                         codeName, size);
       if (size > 0)
       {
-        if (codeName.length () == 0)
-          codeName = "<NULL" + nonameCounter++ + ">";
         try
         {
           segments.add (new PascalSegment (codeName, buffer, i));
         }
         catch (FileFormatException e)
         {
-          System.out.println ("Bad segment");
+          System.out.printf ("Bad segment: %d%n", i);
         }
       }
     }

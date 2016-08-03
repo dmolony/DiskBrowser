@@ -38,7 +38,7 @@ public class PascalProcedure
     if (valid)
     {
       procedureNo = buffer[procOffset] & 0xFF;
-      procLevel = buffer[procOffset + 1];
+      procLevel = buffer[procOffset + 1] & 0xFF;
       codeStart = HexFormatter.intValue (buffer[procOffset - 2], buffer[procOffset - 1]);
       codeEnd = HexFormatter.intValue (buffer[procOffset - 4], buffer[procOffset - 3]);
       parmSize = HexFormatter.intValue (buffer[procOffset - 6], buffer[procOffset - 5]);

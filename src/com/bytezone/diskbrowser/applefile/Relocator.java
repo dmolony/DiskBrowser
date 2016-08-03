@@ -100,8 +100,8 @@ public class Relocator extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("    %04X      %04X      %04X", logicalBlock, physicalBlock,
-                            segmentLength);
+      return String.format ("    %04X      %04X      %04X      %04X", logicalBlock,
+                            physicalBlock, segmentLength, (physicalBlock - 0x46));
     }
   }
 }

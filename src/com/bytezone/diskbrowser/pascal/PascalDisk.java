@@ -132,12 +132,12 @@ public class PascalDisk extends AbstractFormattedDisk
     disk.setInterleave (1);                 // should only ever be Prodos
     if (checkFormat (disk, debug))
       return true;
-
-    disk.setInterleave (0);
-    if (checkFormat (disk, debug))
-      return true;
-    disk.setInterleave (3);
-    return checkFormat (disk, debug);
+    return false;
+    //    disk.setInterleave (0);
+    //    if (checkFormat (disk, debug))
+    //      return true;
+    //    disk.setInterleave (3);
+    //    return checkFormat (disk, debug);
   }
 
   public static boolean checkFormat (AppleDisk disk, boolean debug)

@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.pascal;
 
 import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class FileEntry extends CatalogEntry
@@ -63,11 +64,18 @@ class FileEntry extends CatalogEntry
 
     switch (fileType)
     {
-      case 2:
-        if (name.equals ("SYSTEM.INTERP"))
-          file = new AssemblerProgram (name, buffer, 0xD000);
-        else
+      case 2:                                         // code (6502 or Pascal)
+        try
+        {
           file = new PascalCode (name, buffer);
+        }
+        catch (FileFormatException e)
+        {
+          if (name.equals ("SYSTEM.INTERP"))
+            file = new AssemblerProgram (name, buffer, 0xD000);
+          else
+            file = new AssemblerProgram (name, buffer, 0);
+        }
         break;
 
       case 3:

@@ -28,14 +28,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
   static
   {
-    // somehow this should match the data in SYSTEM.RELOC
+    // somehow the offsets should match the data in SYSTEM.RELOC
     redirections.add (new Redirection ("WIZARDRY", 0x01, 0x1C66, 0x01));
-    redirections.add (new Redirection ("KANJIREA", 0x013F, 0x104E, 0x10));
+    redirections.add (new Redirection ("KANJIREA", 0x3F, 0x104E, 0x10));
     redirections.add (new Redirection ("UTILITIE", 0x48, 0x1598, 0x19));
-    redirections.add (new Redirection ("SHOPS", 0x53, 0x0BE2, 0x24));
-    redirections.add (new Redirection ("CAMP", 0x70, 0x24CA, 0x2A));
-    redirections.add (new Redirection ("DOCOPY", 0x83, 0x07A0, 0x3D));
-    redirections.add (new Redirection ("DOCACHE", 0x87, 0x072E, 0x41));
+    redirections.add (new Redirection ("SHOPS   ", 0x53, 0x0BE2, 0x24));
+    redirections.add (new Redirection ("CAMP    ", 0x70, 0x24CA, 0x2A));
+    redirections.add (new Redirection ("DOCOPY  ", 0x83, 0x07A0, 0x3D));
+    redirections.add (new Redirection ("DOCACHE ", 0x87, 0x072E, 0x41));
   }
 
   public PascalSegment (String name, byte[] fullBuffer, int seq)
@@ -60,11 +60,18 @@ public class PascalSegment extends AbstractFile implements PascalConstants
         fullBuffer[0xE0 + seq * 2 + 1]);
 
     // segment 1 is the main segment, 2-6 are used by the system, and 7
-    // onwards is for our program
+    // onwards is for the program
     this.segmentNoHeader = fullBuffer[0x100 + seq * 2] & 0xFF;
     int flags = fullBuffer[0x101 + seq * 2] & 0xFF;
+
+    // 0 unknown,
+    // 1 positive byte sex p-code
+    // 2 negative byte sex p-code (apple pascal)
+    // 3-9 6502 code (7 = apple 6502)
     machineType = flags & 0x0F;
+
     version = (flags & 0xD0) >> 5;
+
     intrinsSegs1 = HexFormatter.intValue (fullBuffer[0x120 + seq * 4],
         fullBuffer[0x120 + seq * 4 + 1]);
     intrinsSegs2 = HexFormatter.intValue (fullBuffer[0x120 + seq * 4 + 2],
@@ -172,6 +179,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     for (PascalProcedure procedure : procedures)
       if (procedure.valid)
         text.append (procedure);
+
     return text.toString ();
   }
 }
@@ -185,7 +193,7 @@ class Redirection
 
   public Redirection (String name, int oldOffset, int length, int newOffset)
   {
-    this.name = name;
+    this.name = name.trim ();
     this.oldOffset = oldOffset;
     this.newOffset = newOffset;
     this.length = length;

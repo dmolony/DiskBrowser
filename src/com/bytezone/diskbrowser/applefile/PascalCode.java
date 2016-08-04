@@ -29,7 +29,8 @@ public class PascalCode extends AbstractFile
     if (false)
     {
       System.out.println (name);
-      byte[] key = new byte[] { 0x38, 0x00, 0x0C, 0x1C };
+      //      byte[] key = new byte[] { 0x38, 0x00, 0x0C, 0x1C };
+      byte[] key = new byte[] { 0x0F };
       Utility.find (buffer, key);
     }
 
@@ -64,10 +65,10 @@ public class PascalCode extends AbstractFile
 
     text.append ("Segment Dictionary\n==================\n\n");
 
-    text.append ("Slot  Addr    Len    Len    Name    Kind"
-        + "            Text  Seg#  Mtyp  Vers  I/S\n");
-    text.append ("----  ----  -----  -----  --------  ---------------"
-        + " ----  ----  ----  ----  ---\n");
+    text.append ("Slot Addr Blks  Len    Len    Name     Kind"
+        + "            Txt  Seg  Mch Ver  I/S  I/S\n");
+    text.append ("---- ---- ----  ----  -----  --------  ---------------"
+        + " ---  ---  --- ---  ---  ---\n");
 
     for (PascalSegment segment : segments)
       text.append (segment.toText () + "\n");

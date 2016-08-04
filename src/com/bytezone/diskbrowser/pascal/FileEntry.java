@@ -64,7 +64,10 @@ class FileEntry extends CatalogEntry
     switch (fileType)
     {
       case 2:
-        file = new PascalCode (name, buffer);
+        if (name.equals ("SYSTEM.INTERP"))
+          file = new AssemblerProgram (name, buffer, 0xD000);
+        else
+          file = new PascalCode (name, buffer);
         break;
 
       case 3:

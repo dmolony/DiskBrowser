@@ -30,16 +30,15 @@ abstract class CatalogEntry implements AppleFileSource
     firstBlock = HexFormatter.intValue (buffer[0], buffer[1]);
     lastBlock = HexFormatter.intValue (buffer[2], buffer[3]);
     fileType = HexFormatter.intValue (buffer[4], buffer[5]);
-    //    fileType = buffer[4] & 0x0F;
     name = HexFormatter.getPascalString (buffer, 6);
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
 
     Disk disk = parent.getDisk ();
     for (int i = firstBlock; i < lastBlock; i++)
     {
-      if (i >= 280)
+      if (i >= 0x118)
       {
-        System.out.printf ("CatalogEntry: block %04X >= 280%n", i);
+        System.out.printf ("CatalogEntry: block 0x%04X >= 0x0118%n", i);
         break;
       }
       blocks.add (disk.getDiskAddress (i));

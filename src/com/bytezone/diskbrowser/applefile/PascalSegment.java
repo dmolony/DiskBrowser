@@ -11,7 +11,8 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private final int segmentNoHeader;
   private int segmentNoBody;
 
-  public final int blockNo;
+  public int blockNo;
+  public int newBlockNo;
   public final int size;
 
   private final int segKind;
@@ -23,6 +24,19 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private final int slot;
   private int totalProcedures;
   private List<PascalProcedure> procedures;
+  private static final List<Redirection> redirections = new ArrayList<Redirection> ();
+
+  static
+  {
+    // somehow this should match the data in SYSTEM.RELOC
+    redirections.add (new Redirection ("WIZARDRY", 0x01, 0x1C66, 0x01));
+    redirections.add (new Redirection ("KANJIREA", 0x013F, 0x104E, 0x10));
+    redirections.add (new Redirection ("UTILITIE", 0x48, 0x1598, 0x19));
+    redirections.add (new Redirection ("SHOPS", 0x53, 0x0BE2, 0x24));
+    redirections.add (new Redirection ("CAMP", 0x70, 0x24CA, 0x2A));
+    redirections.add (new Redirection ("DOCOPY", 0x83, 0x07A0, 0x3D));
+    redirections.add (new Redirection ("DOCACHE", 0x87, 0x072E, 0x41));
+  }
 
   public PascalSegment (String name, byte[] fullBuffer, int seq)
   {
@@ -32,37 +46,48 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
     this.size = HexFormatter.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
 
+    for (Redirection redirection : redirections)
+      if (redirection.matches (name, blockNo, size))
+      {
+        newBlockNo = redirection.newOffset;
+        break;
+      }
+
     segKind = HexFormatter.intValue (fullBuffer[0xC0 + seq * 2],
-                                     fullBuffer[0xC0 + seq * 2 + 1]);
+        fullBuffer[0xC0 + seq * 2 + 1]);
 
     textAddress = HexFormatter.intValue (fullBuffer[0xE0 + seq * 2],
-                                         fullBuffer[0xE0 + seq * 2 + 1]);
+        fullBuffer[0xE0 + seq * 2 + 1]);
 
+    // segment 1 is the main segment, 2-6 are used by the system, and 7
+    // onwards is for our program
     this.segmentNoHeader = fullBuffer[0x100 + seq * 2] & 0xFF;
     int flags = fullBuffer[0x101 + seq * 2] & 0xFF;
     machineType = flags & 0x0F;
     version = (flags & 0xD0) >> 5;
     intrinsSegs1 = HexFormatter.intValue (fullBuffer[0x120 + seq * 4],
-                                          fullBuffer[0x120 + seq * 4 + 1]);
+        fullBuffer[0x120 + seq * 4 + 1]);
     intrinsSegs2 = HexFormatter.intValue (fullBuffer[0x120 + seq * 4 + 2],
-                                          fullBuffer[0x120 + seq * 4 + 3]);
+        fullBuffer[0x120 + seq * 4 + 3]);
 
     int offset = blockNo * 512;
+    if (newBlockNo > 0)
+      offset = newBlockNo * 512;
     //    System.out.printf ("Seq:%d, block:%d, size:%d, seg:%d, kind:%d, address:%d %n", seq,
     //                       blockNo, size, segmentNoHeader, segKind, textAddress);
     //    System.out.println (HexFormatter.format (fullBuffer));
     if (offset < fullBuffer.length)
     {
       buffer = new byte[size];      // replaces this.buffer with the segment buffer only
-      System.arraycopy (fullBuffer, blockNo * 512, buffer, 0, size);
+      System.arraycopy (fullBuffer, offset, buffer, 0, size);
       totalProcedures = buffer[size - 1] & 0xFF;
       segmentNoBody = buffer[size - 2] & 0xFF;
 
       if (segmentNoHeader == 0)
         System.out.printf ("Zero segment header in %s seq %d%n", name, seq);
       else if (segmentNoBody != segmentNoHeader)
-        System.out.println ("Segment number mismatch : " + segmentNoBody + " / "
-            + segmentNoHeader);
+        System.out.println (
+            "Segment number mismatch : " + segmentNoBody + " / " + segmentNoHeader);
     }
     else
     {
@@ -82,10 +107,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
   public String toText ()
   {
-    return String
-        .format (" %2d    %02X    %04X %,6d  %-8s  %-15s  %3d   %02X    %d     %d    %d    %d",
-                 slot, blockNo, size, size, name, SegmentKind[segKind], textAddress,
-                 segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2);
+    int sizeInBlocks = (size - 1) / 512 + 1;
+    String newBlock = newBlockNo > 0 ? String.format ("%02X + %02X = %02X", newBlockNo,
+        sizeInBlocks, (newBlockNo + sizeInBlocks)) : "";
+    return String.format (
+        " %2d   %02X   %02X   %04X %,6d  %-8s  %-15s%3d    "
+            + "%02X   %d   %d    %d    %d    %s",
+        slot, blockNo, sizeInBlocks, size, size, name, SegmentKind[segKind], textAddress,
+        segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2, newBlock);
   }
 
   @Override
@@ -114,18 +143,18 @@ public class PascalSegment extends AbstractFile implements PascalConstants
       text.append (HexFormatter.format (buffer, buffer.length - len, len) + "\n\n");
 
     text.append ("Proc  Offset  Lvl  Entry   Exit   Parm   Data   Proc header\n");
-    text.append ("----  ------  ---  -----   ----   ----   ----   --------------------\n");
+    text.append (
+        "----  ------  ---  -----   ----   ----   ----   --------------------\n");
     for (PascalProcedure procedure : procedures)
     {
       if (procedure.valid)
       {
         int address = size - procedure.slot * 2 - 2;
-        text.append (String
-            .format (" %3d   %04X   %3d   %04X   %04X   %04X   %04X   (%04X - %04X = %04X)%n",
-                     procedure.procedureNo, procedure.offset, procedure.procLevel,
-                     procedure.codeStart, procedure.codeEnd, procedure.parmSize,
-                     procedure.dataSize, address, procedure.offset,
-                     procedure.procOffset));
+        text.append (String.format (
+            " %3d   %04X   %3d   %04X   %04X   %04X   %04X   (%04X - %04X = %04X)%n",
+            procedure.procedureNo, procedure.offset, procedure.procLevel,
+            procedure.codeStart, procedure.codeEnd, procedure.parmSize,
+            procedure.dataSize, address, procedure.offset, procedure.procOffset));
       }
       else
         text.append (String.format (" %3d   %04X%n", procedure.slot, procedure.offset));
@@ -136,13 +165,34 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     {
       List<PascalCodeStatement> strings = pp.extractStrings ();
       for (PascalCodeStatement cs : strings)
-        text.append (String.format (" %2d   %04X   %s%n", pp.procedureNo, cs.ptr,
-                                    cs.text));
+        text.append (
+            String.format (" %2d   %04X   %s%n", pp.procedureNo, cs.ptr, cs.text));
     }
 
     for (PascalProcedure procedure : procedures)
       if (procedure.valid)
         text.append (procedure);
     return text.toString ();
+  }
+}
+
+class Redirection
+{
+  int oldOffset;
+  int newOffset;
+  int length;
+  String name;
+
+  public Redirection (String name, int oldOffset, int length, int newOffset)
+  {
+    this.name = name;
+    this.oldOffset = oldOffset;
+    this.newOffset = newOffset;
+    this.length = length;
+  }
+
+  public boolean matches (String name, int offset, int length)
+  {
+    return this.name.equals (name) && this.oldOffset == offset && this.length == length;
   }
 }

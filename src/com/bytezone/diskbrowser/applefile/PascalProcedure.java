@@ -67,7 +67,7 @@ public class PascalProcedure
 
     while (ptr < max)
     {
-      System.out.printf ("ptr:%d, max:%d, buf:%d %n", ptr, max, buffer.length);
+      //      System.out.printf ("ptr:%d, max:%d, buf:%d %n", ptr, max, buffer.length);
       if (ptr >= buffer.length || ptr < 0)
       {
         System.out.println ("Ptr outside buffer");
@@ -138,19 +138,18 @@ public class PascalProcedure
     StringBuilder text = new StringBuilder ("\nProcedure Header\n================\n\n");
 
     if (false)
-      text.append (HexFormatter.format (buffer, procOffset + jumpTable, 2 - jumpTable)
-          + "\n\n");
+      text.append (
+          HexFormatter.format (buffer, procOffset + jumpTable, 2 - jumpTable) + "\n\n");
 
-    text.append (String.format ("Level.......%5d     %02X%n", procLevel,
-                                procLevel & 0xFF));
+    text.append (
+        String.format ("Level.......%5d     %02X%n", procLevel, procLevel & 0xFF));
     text.append (String.format ("Proc no.....%5d     %02X%n", procedureNo, procedureNo));
     text.append (String.format ("Code entry..%5d   %04X  (%04X - %04X = %04X)%n",
-                                codeStart, codeStart, (procOffset - 2), codeStart,
-                                (procOffset - codeStart - 2)));
+        codeStart, codeStart, (procOffset - 2), codeStart, (procOffset - codeStart - 2)));
     text.append (String.format ("Code exit...%5d   %04X", codeEnd, codeEnd));
     if (codeEnd > 0)
       text.append (String.format ("  (%04X - %04X = %04X)%n", (procOffset - 4), codeEnd,
-                                  (procOffset - codeEnd - 4)));
+          (procOffset - codeEnd - 4)));
     else
       text.append (String.format ("%n"));
     text.append (String.format ("Parm size...%5d   %04X%n", parmSize, parmSize));
@@ -181,7 +180,7 @@ public class PascalProcedure
         {
           ptr = i - ((buffer[i + 1] & 0xFF) * 256 + (buffer[i] & 0xFF));
           text.append (String.format ("%05X : %02X %02X  --> %04X%n", i, buffer[i],
-                                      buffer[i + 1], ptr));
+              buffer[i + 1], ptr));
         }
       }
     }

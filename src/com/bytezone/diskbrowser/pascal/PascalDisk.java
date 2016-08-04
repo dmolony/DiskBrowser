@@ -103,7 +103,7 @@ public class PascalDisk extends AbstractFormattedDisk
       fileEntries.add (fileEntry);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
 
-      if (fileEntry.fileType == 2)                   // PascalCode
+      if (fileEntry.fileType == 2 && fileEntry.getDataSource () instanceof PascalCode)                   // PascalCode
       {
         node.setAllowsChildren (true);
         PascalCode pascalCode = (PascalCode) fileEntry.getDataSource ();

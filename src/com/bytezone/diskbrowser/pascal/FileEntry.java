@@ -7,11 +7,13 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 class FileEntry extends CatalogEntry
 {
   int bytesUsedInLastBlock;
+  private final Relocator relocator;
 
-  public FileEntry (PascalDisk parent, byte[] buffer)
+  public FileEntry (PascalDisk parent, byte[] buffer, Relocator relocator)
   {
     super (parent, buffer);
 
+    this.relocator = relocator;
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
     date = HexFormatter.getPascalDate (buffer, 24);
 
@@ -67,7 +69,7 @@ class FileEntry extends CatalogEntry
       case 2:                                         // code (6502 or Pascal)
         try
         {
-          file = new PascalCode (name, buffer);
+          file = new PascalCode (name, buffer, firstBlock, relocator);
         }
         catch (FileFormatException e)
         {

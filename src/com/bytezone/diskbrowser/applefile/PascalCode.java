@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.Relocator.MultiDiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class PascalCode extends AbstractFile
     implements PascalConstants, Iterable<PascalSegment>
 {
-  List<PascalSegment> segments = new ArrayList<PascalSegment> (16);
-  String comment;
+  private final List<PascalSegment> segments = new ArrayList<PascalSegment> (16);
+  private final String comment;
+  private final int blockOffset;
+  private final Relocator relocator;
 
   public static void print ()
   {
@@ -20,9 +23,13 @@ public class PascalCode extends AbstractFile
           PascalConstants.mnemonics[i], PascalConstants.descriptions[i]);
   }
 
-  public PascalCode (String name, byte[] buffer)
+  public PascalCode (String name, byte[] buffer, int blockOffset, Relocator relocator)
   {
     super (name, buffer);
+
+    this.blockOffset = blockOffset;
+    this.relocator = relocator;
+
     int nonameCounter = 0;
     if (false)
     {
@@ -54,13 +61,51 @@ public class PascalCode extends AbstractFile
 
     text.append ("Segment Dictionary\n==================\n\n");
 
-    text.append ("Slot Addr Blks  Len    Len    Name     Kind"
+    text.append ("Slot Addr Addr Blks  Len   D:Blk    Name     Kind"
         + "            Txt  Seg  Mch Ver  I/S  I/S\n");
-    text.append ("---- ---- ----  ----  -----  --------  ---------------"
+    text.append ("---- ---- ---- ----  ----  -----  --------  ---------------"
         + " ---  ---  --- ---  ---  ---\n");
 
+    MultiDiskAddress lastMultiDiskAddress = null;
+    int minBlocks = 0;
+    int maxBlocks = 0;
+
     for (PascalSegment segment : segments)
-      text.append (segment.toText () + "\n");
+    {
+      int sizeInBlocks = (segment.size - 1) / 512 + 1;
+      String multiDiskAddressText = "";
+      if (segment.segmentNoHeader == 1)           // main segment
+      {
+        multiDiskAddressText = String.format ("1:%03X", (segment.blockNo + blockOffset));
+      }
+      else if (relocator != null)
+      {
+        if (segment.blockNo >= minBlocks && segment.blockNo < maxBlocks)
+        {
+          int offset = segment.blockNo - minBlocks;
+          multiDiskAddressText = String.format ("%d:%03X",
+              lastMultiDiskAddress.diskNumber, lastMultiDiskAddress.blockNumber + offset);
+        }
+        else
+        {
+          int targetBlock = segment.blockNo + blockOffset;
+          List<MultiDiskAddress> addresses = relocator.getMultiDiskAddress (targetBlock);
+          if (addresses.isEmpty ())
+            multiDiskAddressText = ".";
+          else
+          {
+            lastMultiDiskAddress = addresses.get (0);
+            multiDiskAddressText = addresses.get (0).toString ();
+            if (lastMultiDiskAddress.totalBlocks > sizeInBlocks)
+            {
+              minBlocks = segment.blockNo;
+              maxBlocks = minBlocks + lastMultiDiskAddress.totalBlocks;
+            }
+          }
+        }
+      }
+      text.append (segment.toText (blockOffset, multiDiskAddressText) + "\n");
+    }
     text.append ("\nComment : " + comment + "\n\n");
 
     return text.toString ();

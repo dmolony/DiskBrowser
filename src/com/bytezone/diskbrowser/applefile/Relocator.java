@@ -26,6 +26,20 @@ public class Relocator extends AbstractFile
     }
   }
 
+  public List<MultiDiskAddress> getMultiDiskAddress (int blockNumber)
+  {
+    System.out.printf ("searching for %04X%n", blockNumber);
+    List<MultiDiskAddress> addresses = new ArrayList<MultiDiskAddress> ();
+
+    for (DiskRecord diskRecord : diskRecords)
+      for (DiskSegment diskSegment : diskRecord.diskSegments)
+        if (diskSegment.logicalBlock == blockNumber)
+          addresses.add (new MultiDiskAddress (diskRecord.diskNumber,
+              diskSegment.physicalBlock, diskSegment.segmentLength));
+
+    return addresses;
+  }
+
   @Override
   public String getText ()
   {
@@ -46,25 +60,25 @@ public class Relocator extends AbstractFile
   private class DiskRecord
   {
     int diskNumber;
-    int diskSegments;
-    List<Segment> segments = new ArrayList<Segment> ();
+    int totDiskSegments;
+    List<DiskSegment> diskSegments = new ArrayList<DiskSegment> ();
 
     public DiskRecord (byte[] buffer, int ptr)
     {
       diskNumber = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      diskSegments = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 4]);
+      totDiskSegments = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 4]);
 
       ptr += 4;
-      for (int i = 0; i < diskSegments; i++)
+      for (int i = 0; i < totDiskSegments; i++)
       {
-        segments.add (new Segment (buffer, ptr));
+        diskSegments.add (new DiskSegment (buffer, ptr));
         ptr += 6;
       }
     }
 
     int size ()
     {
-      return 4 + segments.size () * 6;
+      return 4 + diskSegments.size () * 6;
     }
 
     @Override
@@ -72,25 +86,28 @@ public class Relocator extends AbstractFile
     {
       StringBuilder text = new StringBuilder ();
 
+      int offset = 0xe2;
+
       text.append (String.format ("Disk number.... %04X%n", diskNumber));
-      text.append (String.format ("Segments....... %04X%n%n", diskSegments));
-      text.append ("Segment Logical   Physical   Length\n");
+      text.append (String.format ("Segments....... %04X%n%n", totDiskSegments));
+      text.append (String.format (
+          "Segment Logical   Physical   Length    -%04X     -%04X%n", offset, offset));
 
       int count = 1;
-      for (Segment segment : segments)
-        text.append (String.format ("  %02X  %s %n", count++, segment));
+      for (DiskSegment segment : diskSegments)
+        text.append (String.format ("  %02X  %s %n", count++, segment.toString (offset)));
 
       return text.toString ();
     }
   }
 
-  private class Segment
+  private class DiskSegment
   {
     int logicalBlock;
     int physicalBlock;
     int segmentLength;
 
-    public Segment (byte[] buffer, int ptr)
+    public DiskSegment (byte[] buffer, int ptr)
     {
       logicalBlock = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
       physicalBlock = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
@@ -100,9 +117,39 @@ public class Relocator extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("    %04X      %04X      %04X      %04X      %04X",
-                            logicalBlock, physicalBlock, segmentLength,
-                            (logicalBlock - 0x46), (physicalBlock - 0x46));
+      return String.format ("    %04X      %04X      %04X", logicalBlock, physicalBlock,
+          segmentLength);
+    }
+
+    public String toString (int offset)
+    {
+      int logical = logicalBlock - offset;
+      int physical = physicalBlock - offset;
+      if (physical >= 0)
+        return String.format ("    %04X      %04X      %04X      %04X      %04X",
+            logicalBlock, physicalBlock, segmentLength, logical, physical);
+      return String.format ("    %04X      %04X      %04X", logicalBlock, physicalBlock,
+          segmentLength);
+    }
+  }
+
+  class MultiDiskAddress
+  {
+    int diskNumber;
+    int blockNumber;
+    int totalBlocks;
+
+    public MultiDiskAddress (int diskNumber, int blockNumber, int totalBlocks)
+    {
+      this.diskNumber = diskNumber;
+      this.blockNumber = blockNumber;
+      this.totalBlocks = totalBlocks;
+    }
+
+    @Override
+    public String toString ()
+    {
+      return String.format ("%d:%03X", diskNumber, blockNumber);
     }
   }
 }

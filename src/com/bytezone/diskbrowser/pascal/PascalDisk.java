@@ -12,6 +12,7 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.applefile.PascalCode;
 import com.bytezone.diskbrowser.applefile.PascalSegment;
+import com.bytezone.diskbrowser.applefile.Relocator;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -22,6 +23,7 @@ public class PascalDisk extends AbstractFormattedDisk
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
   private final VolumeEntry volumeEntry;
   private final PascalCatalogSector diskCatalogSector;
+  private Relocator relocator;
 
   final String[] fileTypes =
       { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
@@ -99,11 +101,14 @@ public class PascalDisk extends AbstractFormattedDisk
       data = new byte[CATALOG_ENTRY_SIZE];
 
       System.arraycopy (buffer, ptr, data, 0, CATALOG_ENTRY_SIZE);
-      FileEntry fileEntry = new FileEntry (this, data);
+      FileEntry fileEntry = new FileEntry (this, data, relocator);
       fileEntries.add (fileEntry);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
 
-      if (fileEntry.fileType == 2 && fileEntry.getDataSource () instanceof PascalCode)                   // PascalCode
+      if (fileEntry.fileType == 5 && fileEntry.getDataSource () instanceof Relocator)
+        this.relocator = (Relocator) fileEntry.getDataSource ();
+
+      if (fileEntry.fileType == 2 && fileEntry.getDataSource () instanceof PascalCode)
       {
         node.setAllowsChildren (true);
         PascalCode pascalCode = (PascalCode) fileEntry.getDataSource ();
@@ -209,7 +214,7 @@ public class PascalDisk extends AbstractFormattedDisk
       GregorianCalendar date = HexFormatter.getPascalDate (buffer, 24);
       if (debug)
         System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,
-                           new String (buffer, ptr + 7, nameLength), lastByte, date);
+            new String (buffer, ptr + 7, nameLength), lastByte, date);
     }
 
     return true;
@@ -258,16 +263,16 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String newLine2 = newLine + newLine;
-    String line =
-        "----   ---------------   ----   --------  -------   ----   ----" + newLine;
+    String line = "----   ---------------   ----   --------  -------   ----   ----   ----"
+        + newLine;
     String date =
         volumeEntry.date == null ? "--" : df.format (volumeEntry.date.getTime ());
     StringBuilder text = new StringBuilder ();
     text.append ("Disk : " + disk.getFile ().getAbsolutePath () + newLine2);
     text.append ("Volume : " + volumeEntry.name + newLine);
     text.append ("Date   : " + date + newLine2);
-    text.append ("Blks   Name              Type     Date     Length   Frst   Last"
-        + newLine);
+    text.append (
+        "Blks   Name              Type     Date     Length   Frst   Last   Blks\n");
     text.append (line);
 
     int usedBlocks = 6;
@@ -278,15 +283,14 @@ public class PascalDisk extends AbstractFormattedDisk
       usedBlocks += size;
       date = ce.date == null ? "--" : df.format (ce.date.getTime ());
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
-      text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X%n", size,
-                                  ce.name, fileTypes[ce.fileType], date, bytes,
-                                  ce.firstBlock, ce.lastBlock));
+      text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X   $%03X%n",
+          size, ce.name, fileTypes[ce.fileType], date, bytes, ce.firstBlock, ce.lastBlock,
+          size));
     }
     text.append (line);
-    text.append (String.format (
-                                "Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
-                                (volumeEntry.totalBlocks - usedBlocks), usedBlocks,
-                                volumeEntry.totalBlocks));
+    text.append (
+        String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
+            (volumeEntry.totalBlocks - usedBlocks), usedBlocks, volumeEntry.totalBlocks));
     return new DefaultAppleFileSource (volumeEntry.name, text.toString (), this);
   }
 }

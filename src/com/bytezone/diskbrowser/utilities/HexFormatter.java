@@ -55,6 +55,8 @@ public class HexFormatter
     {
       if (line.length () > 0 && i > 0)
         line.append ("\n");
+      if (i > 0 && (i % 0x200) == 0)
+        line.append ("\n");
 
       // print offset
       for (int temp = i + startingAddress, max = 65536; max > 0; max /= 16)
@@ -106,8 +108,8 @@ public class HexFormatter
         if (freq[i] > 0)
         {
           totalBits += (Integer.bitCount (i) * freq[i]);
-          line.append (String.format ("%02X  %3d   %d%n", i, freq[i],
-                                      Integer.bitCount (i)));
+          line.append (
+              String.format ("%02X  %3d   %d%n", i, freq[i], Integer.bitCount (i)));
         }
       line.append (String.format ("%nTotal bits : %d%n", totalBits));
     }

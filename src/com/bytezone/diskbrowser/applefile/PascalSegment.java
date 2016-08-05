@@ -115,15 +115,12 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   public String toText (int offset, String multiDiskAddress)
   {
     int sizeInBlocks = (size - 1) / 512 + 1;
-    String newBlock = newBlockNo > 0 ? String.format ("%02X + %02X = %02X", newBlockNo,
-        sizeInBlocks, (newBlockNo + sizeInBlocks)) : "";
 
     return String.format (
-        " %2d   %02X   %02X   %02X   %04X %6s  %-8s  %-15s%3d    "
-            + "%02X   %d   %d    %d    %d    %s",
-        slot, blockNo, (blockNo + offset), sizeInBlocks, size, multiDiskAddress, name,
-        SegmentKind[segKind], textAddress, segmentNoHeader, machineType, version,
-        intrinsSegs1, intrinsSegs2, newBlock);
+        " %2d   %02X   %02X  %04X  %-8s  %-15s%3d   " + "%02X  %d   %d   %d   %d  %s",
+        slot, blockNo, sizeInBlocks, size, name, SegmentKind[segKind], textAddress,
+        segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2,
+        multiDiskAddress);
   }
 
   @Override

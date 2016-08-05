@@ -61,18 +61,15 @@ public class PascalCode extends AbstractFile
 
     text.append ("Segment Dictionary\n==================\n\n");
 
-    text.append ("Slot Addr Addr Blks  Len   D:Blk    Name     Kind"
-        + "            Txt  Seg  Mch Ver  I/S  I/S\n");
-    text.append ("---- ---- ---- ----  ----  -----  --------  ---------------"
-        + " ---  ---  --- ---  ---  ---\n");
-
-    MultiDiskAddress lastMultiDiskAddress = null;
-    int minBlocks = 0;
-    int maxBlocks = 0;
+    text.append ("Slot Addr Blks Len    Name     Kind"
+        + "            Txt Seg Mch Ver I/S I/S D:Blk\n");
+    text.append ("---- ---- ---- ----  --------  ---------------"
+        + " --- --- --- --- --- --- ---------------------\n");
 
     for (PascalSegment segment : segments)
     {
       int sizeInBlocks = (segment.size - 1) / 512 + 1;
+      System.out.printf ("Seg: %-8s add: %03X%n", segment.name, segment.blockNo);
       String multiDiskAddressText = "";
       if (segment.segmentNoHeader == 1)           // main segment
       {
@@ -80,33 +77,28 @@ public class PascalCode extends AbstractFile
       }
       else if (relocator != null)
       {
-        if (segment.blockNo >= minBlocks && segment.blockNo < maxBlocks)
-        {
-          int offset = segment.blockNo - minBlocks;
-          multiDiskAddressText = String.format ("%d:%03X",
-              lastMultiDiskAddress.diskNumber, lastMultiDiskAddress.blockNumber + offset);
-        }
+        int targetBlock = segment.blockNo + blockOffset;
+        List<MultiDiskAddress> addresses =
+            relocator.getMultiDiskAddress (segment.name, targetBlock, sizeInBlocks);
+        if (addresses.isEmpty ())
+          multiDiskAddressText = ".";
         else
         {
-          int targetBlock = segment.blockNo + blockOffset;
-          List<MultiDiskAddress> addresses = relocator.getMultiDiskAddress (targetBlock);
-          if (addresses.isEmpty ())
-            multiDiskAddressText = ".";
-          else
+          StringBuilder locations = new StringBuilder ();
+          for (MultiDiskAddress multiDiskAddress : addresses)
+            locations.append (multiDiskAddress.toString () + ", ");
+          if (locations.length () > 2)
           {
-            lastMultiDiskAddress = addresses.get (0);
-            multiDiskAddressText = addresses.get (0).toString ();
-            if (lastMultiDiskAddress.totalBlocks > sizeInBlocks)
-            {
-              minBlocks = segment.blockNo;
-              maxBlocks = minBlocks + lastMultiDiskAddress.totalBlocks;
-            }
+            locations.deleteCharAt (locations.length () - 1);
+            locations.deleteCharAt (locations.length () - 1);
           }
+          multiDiskAddressText = locations.toString ();
         }
       }
       text.append (segment.toText (blockOffset, multiDiskAddressText) + "\n");
     }
     text.append ("\nComment : " + comment + "\n\n");
+    relocator.list ();
 
     return text.toString ();
   }

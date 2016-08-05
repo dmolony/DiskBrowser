@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -9,6 +10,7 @@ public class Relocator extends AbstractFile
 {
   private final int checkByte;
   private final List<DiskRecord> diskRecords = new ArrayList<DiskRecord> ();
+  private final List<MultiDiskAddress> addresses = new ArrayList<MultiDiskAddress> ();
 
   public Relocator (String name, byte[] buffer)
   {
@@ -24,20 +26,67 @@ public class Relocator extends AbstractFile
       diskRecords.add (diskRecord);
       ptr += diskRecord.size ();
     }
-  }
-
-  public List<MultiDiskAddress> getMultiDiskAddress (int blockNumber)
-  {
-    System.out.printf ("searching for %04X%n", blockNumber);
-    List<MultiDiskAddress> addresses = new ArrayList<MultiDiskAddress> ();
 
     for (DiskRecord diskRecord : diskRecords)
       for (DiskSegment diskSegment : diskRecord.diskSegments)
-        if (diskSegment.logicalBlock == blockNumber)
-          addresses.add (new MultiDiskAddress (diskRecord.diskNumber,
-              diskSegment.physicalBlock, diskSegment.segmentLength));
+        addresses
+            .add (new MultiDiskAddress (diskRecord.diskNumber, diskSegment.logicalBlock,
+                diskSegment.physicalBlock, diskSegment.segmentLength));
 
-    return addresses;
+    list ();
+  }
+
+  public void list ()
+  {
+
+    for (MultiDiskAddress multiDiskAddress : addresses)
+      System.out.printf ("%d  %03X  %03X  %03X  %s%n", multiDiskAddress.diskNumber,
+          multiDiskAddress.logicalBlockNumber, multiDiskAddress.physicalBlockNumber,
+          multiDiskAddress.totalBlocks, multiDiskAddress.name);
+  }
+
+  public List<MultiDiskAddress> getMultiDiskAddress (String name, int blockNumber,
+      int length)
+  {
+    List<MultiDiskAddress> foundAddresses = new ArrayList<MultiDiskAddress> ();
+    List<MultiDiskAddress> newAddresses = new ArrayList<MultiDiskAddress> ();
+    List<MultiDiskAddress> oldAddresses = new ArrayList<MultiDiskAddress> ();
+
+    for (MultiDiskAddress multiDiskAddress : addresses)
+    {
+      if (multiDiskAddress.logicalBlockNumber == blockNumber)
+      {
+        if (multiDiskAddress.totalBlocks == length)
+        {
+          foundAddresses.add (multiDiskAddress);
+          if (multiDiskAddress.name.isEmpty ())
+            multiDiskAddress.name = name;
+        }
+        else if (multiDiskAddress.totalBlocks > length)
+        {
+          MultiDiskAddress newAddress1 = new MultiDiskAddress (
+              multiDiskAddress.diskNumber, multiDiskAddress.logicalBlockNumber,
+              multiDiskAddress.physicalBlockNumber, length, name);
+          MultiDiskAddress newAddress2 = new MultiDiskAddress (
+              multiDiskAddress.diskNumber, multiDiskAddress.logicalBlockNumber + length,
+              multiDiskAddress.physicalBlockNumber + length,
+              multiDiskAddress.totalBlocks - length);
+          oldAddresses.add (multiDiskAddress);
+          newAddresses.add (newAddress1);
+          newAddresses.add (newAddress2);
+          foundAddresses.add (newAddress1);
+        }
+      }
+    }
+
+    if (newAddresses.size () > 0)
+    {
+      addresses.addAll (newAddresses);
+      addresses.removeAll (oldAddresses);
+      Collections.sort (addresses);
+    }
+
+    return foundAddresses;
   }
 
   @Override
@@ -133,23 +182,42 @@ public class Relocator extends AbstractFile
     }
   }
 
-  class MultiDiskAddress
+  class MultiDiskAddress implements Comparable<MultiDiskAddress>
   {
     int diskNumber;
-    int blockNumber;
+    int logicalBlockNumber;
+    int physicalBlockNumber;
     int totalBlocks;
+    String name = "";
 
-    public MultiDiskAddress (int diskNumber, int blockNumber, int totalBlocks)
+    public MultiDiskAddress (int diskNumber, int logicalBlockNumber,
+        int physicalBlockNumber, int totalBlocks)
     {
       this.diskNumber = diskNumber;
-      this.blockNumber = blockNumber;
+      this.logicalBlockNumber = logicalBlockNumber;
+      this.physicalBlockNumber = physicalBlockNumber;
       this.totalBlocks = totalBlocks;
+    }
+
+    public MultiDiskAddress (int diskNumber, int logicalBlockNumber,
+        int physicalBlockNumber, int totalBlocks, String name)
+    {
+      this (diskNumber, logicalBlockNumber, physicalBlockNumber, totalBlocks);
+      this.name = name;
     }
 
     @Override
     public String toString ()
     {
-      return String.format ("%d:%03X", diskNumber, blockNumber);
+      return String.format ("%d:%03X", diskNumber, physicalBlockNumber);
+    }
+
+    @Override
+    public int compareTo (MultiDiskAddress o)
+    {
+      if (this.diskNumber == o.diskNumber)
+        return this.logicalBlockNumber - o.logicalBlockNumber;
+      return this.diskNumber - o.diskNumber;
     }
   }
 }

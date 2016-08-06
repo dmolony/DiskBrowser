@@ -3,16 +3,20 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.Relocator.MultiDiskAddress;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class PascalSegment extends AbstractFile implements PascalConstants
 {
+  private final static int BLOCK_SIZE = 512;
   final int segmentNoHeader;
   private int segmentNoBody;
+  private final int blockOffset;
+  private final Relocator relocator;
 
   public int blockNo;
-  public int newBlockNo;
+  //  public int newBlockNo;
   public final int size;
 
   private final int segKind;
@@ -24,34 +28,19 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private final int slot;
   private int totalProcedures;
   private List<PascalProcedure> procedures;
-  private static final List<Redirection> redirections = new ArrayList<Redirection> ();
+  private List<MultiDiskAddress> addresses;
 
-  static
-  {
-    // somehow the offsets should match the data in SYSTEM.RELOC
-    redirections.add (new Redirection ("WIZARDRY", 0x01, 0x1C66, 0x01));
-    redirections.add (new Redirection ("KANJIREA", 0x3F, 0x104E, 0x10));
-    redirections.add (new Redirection ("UTILITIE", 0x48, 0x1598, 0x19));
-    redirections.add (new Redirection ("SHOPS   ", 0x53, 0x0BE2, 0x24));
-    redirections.add (new Redirection ("CAMP    ", 0x70, 0x24CA, 0x2A));
-    redirections.add (new Redirection ("DOCOPY  ", 0x83, 0x07A0, 0x3D));
-    redirections.add (new Redirection ("DOCACHE ", 0x87, 0x072E, 0x41));
-  }
-
-  public PascalSegment (String name, byte[] fullBuffer, int seq)
+  public PascalSegment (String name, byte[] fullBuffer, int seq, int blockOffset,
+      Relocator relocator)
   {
     super (name, fullBuffer);     // sets this.buffer to the full buffer temporarily
 
     this.slot = seq;
+    this.blockOffset = blockOffset;
+    this.relocator = relocator;
+
     this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
     this.size = HexFormatter.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
-
-    for (Redirection redirection : redirections)
-      if (redirection.matches (name, blockNo, size))
-      {
-        newBlockNo = redirection.newOffset;
-        break;
-      }
 
     segKind = HexFormatter.intValue (fullBuffer[0xC0 + seq * 2],
         fullBuffer[0xC0 + seq * 2 + 1]);
@@ -78,12 +67,30 @@ public class PascalSegment extends AbstractFile implements PascalConstants
         fullBuffer[0x120 + seq * 4 + 3]);
 
     int offset = blockNo * 512;
-    if (newBlockNo > 0)
-      offset = newBlockNo * 512;
-    //    System.out.printf ("Seq:%d, block:%d, size:%d, seg:%d, kind:%d, address:%d %n", seq,
-    //                       blockNo, size, segmentNoHeader, segKind, textAddress);
-    //    System.out.println (HexFormatter.format (fullBuffer));
-    if (offset < fullBuffer.length)
+
+    if (relocator != null)
+    {
+      if (segmentNoHeader > 1)
+      {
+        int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
+        int targetBlock = blockNo + blockOffset;
+        addresses = relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
+        if (addresses.size () > 0)
+        {
+          MultiDiskAddress multiDiskAddress = addresses.get (0);
+          if (multiDiskAddress.diskNumber == 1)
+            offset = (multiDiskAddress.physicalBlockNumber - blockOffset) * BLOCK_SIZE;
+          else
+            offset = -1;
+        }
+      }
+    }
+
+    if (offset < 0)
+    {
+      buffer = new byte[0];
+    }
+    else if (offset < fullBuffer.length)
     {
       buffer = new byte[size];      // replaces this.buffer with the segment buffer only
       System.arraycopy (fullBuffer, offset, buffer, 0, size);
@@ -98,10 +105,13 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     }
     else
     {
-      //      System.out.printf ("Error in blocksize %,d > %,d for pascal disk%n", offset,
-      //                         fullBuffer.length);
       throw new FileFormatException ("Error in PascalSegment");
     }
+  }
+
+  void setMultiDiskAddresses (List<MultiDiskAddress> addresses)
+  {
+    this.addresses = addresses;
   }
 
   private void buildProcedureList ()
@@ -112,15 +122,15 @@ public class PascalSegment extends AbstractFile implements PascalConstants
       procedures.add (new PascalProcedure (buffer, i));
   }
 
-  public String toText (int offset, String multiDiskAddress)
+  public String toText ()
   {
-    int sizeInBlocks = (size - 1) / 512 + 1;
+    int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
 
     return String.format (
         " %2d   %02X   %02X  %04X  %-8s  %-15s%3d   " + "%02X  %d   %d   %d   %d  %s",
         slot, blockNo, sizeInBlocks, size, name, SegmentKind[segKind], textAddress,
         segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2,
-        multiDiskAddress);
+        getMultiDiskAddresses ());
   }
 
   @Override
@@ -136,6 +146,8 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     String warning = segmentNoBody == segmentNoHeader ? ""
         : String.format (" (%02X in header)", segmentNoHeader);
     text.append (String.format ("Address........ %02X%n", blockNo));
+    if (addresses != null)
+      text.append (String.format ("Multi disk .... %s%n", getMultiDiskAddresses ()));
     text.append (String.format ("Length......... %04X%n", buffer.length));
     text.append (String.format ("Machine type... %d%n", machineType));
     text.append (String.format ("Version........ %d%n", version));
@@ -181,25 +193,36 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     return text.toString ();
   }
-}
 
-class Redirection
-{
-  int oldOffset;
-  int newOffset;
-  int length;
-  String name;
-
-  public Redirection (String name, int oldOffset, int length, int newOffset)
+  private String getMultiDiskAddresses ()
   {
-    this.name = name.trim ();
-    this.oldOffset = oldOffset;
-    this.newOffset = newOffset;
-    this.length = length;
-  }
+    String multiDiskAddressText = "";
+    int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
 
-  public boolean matches (String name, int offset, int length)
-  {
-    return this.name.equals (name) && this.oldOffset == offset && this.length == length;
+    if (segmentNoHeader == 1)           // main segment
+    {
+      multiDiskAddressText = String.format ("1:%03X", (blockNo + blockOffset));
+    }
+    else if (relocator != null)
+    {
+      int targetBlock = blockNo + blockOffset;
+      List<MultiDiskAddress> addresses =
+          relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
+      if (addresses.isEmpty ())
+        multiDiskAddressText = ".";
+      else
+      {
+        StringBuilder locations = new StringBuilder ();
+        for (MultiDiskAddress multiDiskAddress : addresses)
+          locations.append (multiDiskAddress.toString () + ", ");
+        if (locations.length () > 2)
+        {
+          locations.deleteCharAt (locations.length () - 1);
+          locations.deleteCharAt (locations.length () - 1);
+        }
+        multiDiskAddressText = locations.toString ();
+      }
+    }
+    return multiDiskAddressText;
   }
 }

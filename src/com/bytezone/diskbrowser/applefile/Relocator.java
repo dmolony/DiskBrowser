@@ -12,6 +12,9 @@ public class Relocator extends AbstractFile
   private final List<DiskRecord> diskRecords = new ArrayList<DiskRecord> ();
   private final List<MultiDiskAddress> addresses = new ArrayList<MultiDiskAddress> ();
 
+  private final List<MultiDiskAddress> newAddresses = new ArrayList<MultiDiskAddress> ();
+  private final List<MultiDiskAddress> oldAddresses = new ArrayList<MultiDiskAddress> ();
+
   public Relocator (String name, byte[] buffer)
   {
     super (name, buffer);
@@ -32,13 +35,10 @@ public class Relocator extends AbstractFile
         addresses
             .add (new MultiDiskAddress (diskRecord.diskNumber, diskSegment.logicalBlock,
                 diskSegment.physicalBlock, diskSegment.segmentLength));
-
-    list ();
   }
 
   public void list ()
   {
-
     for (MultiDiskAddress multiDiskAddress : addresses)
       System.out.printf ("%d  %03X  %03X  %03X  %s%n", multiDiskAddress.diskNumber,
           multiDiskAddress.logicalBlockNumber, multiDiskAddress.physicalBlockNumber,
@@ -49,8 +49,8 @@ public class Relocator extends AbstractFile
       int length)
   {
     List<MultiDiskAddress> foundAddresses = new ArrayList<MultiDiskAddress> ();
-    List<MultiDiskAddress> newAddresses = new ArrayList<MultiDiskAddress> ();
-    List<MultiDiskAddress> oldAddresses = new ArrayList<MultiDiskAddress> ();
+    newAddresses.clear ();
+    oldAddresses.clear ();
 
     for (MultiDiskAddress multiDiskAddress : addresses)
     {

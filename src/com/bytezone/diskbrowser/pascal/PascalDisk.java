@@ -52,10 +52,9 @@ public class PascalDisk extends AbstractFormattedDisk
 
     //    DiskAddress da = disk.getDiskAddress (0);
     List<DiskAddress> blocks = disk.getDiskAddressList (0, 1);
-    byte[] buffer = disk.readSectors (blocks);
-    this.bootSector = new BootSector (disk, buffer, "Pascal", blocks);
+    this.bootSector = new BootSector (disk, disk.readSectors (blocks), "Pascal");//, blocks);
 
-    buffer = disk.readSector (2);
+    byte[] buffer = disk.readSector (2);
     byte[] data = new byte[CATALOG_ENTRY_SIZE];
     System.arraycopy (buffer, 0, data, 0, CATALOG_ENTRY_SIZE);
 
@@ -81,8 +80,8 @@ public class PascalDisk extends AbstractFormattedDisk
       freeBlocks.set (i, false);
     }
 
-    buffer = disk.readSectors (sectors);
-    diskCatalogSector = new PascalCatalogSector (disk, buffer, sectors);
+    diskCatalogSector =
+        new PascalCatalogSector (disk, disk.readSectors (sectors), sectors);
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
     DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode (volumeEntry);

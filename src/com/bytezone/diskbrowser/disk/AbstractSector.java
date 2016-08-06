@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.disk;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -15,10 +14,10 @@ public abstract class AbstractSector implements DataSource
   private static String newLine = String.format ("%n");
   private static String newLine2 = newLine + newLine;
 
-  public byte[] buffer;
+  final public byte[] buffer;
   protected Disk disk;
   protected DiskAddress diskAddress;
-  protected List<DiskAddress> diskAddressList;
+  //  private List<DiskAddress> diskAddressList;
   AssemblerProgram assembler;
   String description;
 
@@ -29,11 +28,11 @@ public abstract class AbstractSector implements DataSource
     this.diskAddress = diskAddress;
   }
 
-  public AbstractSector (Disk disk, byte[] buffer, List<DiskAddress> diskAddressList)
+  public AbstractSector (Disk disk, byte[] buffer)//, List<DiskAddress> diskAddressList)
   {
     this.buffer = buffer;
     this.disk = disk;
-    this.diskAddressList = diskAddressList;
+    //    this.diskAddressList = diskAddressList;
   }
 
   @Override
@@ -95,22 +94,20 @@ public abstract class AbstractSector implements DataSource
     switch (size)
     {
       case 1:
-        text.append (String.format ("%03X       %02X            %s%n", offset, b[offset],
-                                    desc));
+        text.append (
+            String.format ("%03X       %02X            %s%n", offset, b[offset], desc));
         break;
       case 2:
         text.append (String.format ("%03X-%03X   %02X %02X         %s%n", offset,
-                                    offset + 1, b[offset], b[offset + 1], desc));
+            offset + 1, b[offset], b[offset + 1], desc));
         break;
       case 3:
         text.append (String.format ("%03X-%03X   %02X %02X %02X      %s%n", offset,
-                                    offset + 2, b[offset], b[offset + 1], b[offset + 2],
-                                    desc));
+            offset + 2, b[offset], b[offset + 1], b[offset + 2], desc));
         break;
       case 4:
         text.append (String.format ("%03X-%03X   %02X %02X %02X %02X   %s%n", offset,
-                                    offset + 3, b[offset], b[offset + 1], b[offset + 2],
-                                    b[offset + 3], desc));
+            offset + 3, b[offset], b[offset + 1], b[offset + 2], b[offset + 3], desc));
         break;
       default:
         System.out.println ("Invalid length : " + size);

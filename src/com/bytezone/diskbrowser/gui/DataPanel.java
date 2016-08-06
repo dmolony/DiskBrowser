@@ -284,7 +284,7 @@ class DataPanel extends JTabbedPane
       {
         Graphics2D g2 = image.createGraphics ();
         g2.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
-                             RenderingHints.VALUE_ANTIALIAS_ON);
+            RenderingHints.VALUE_ANTIALIAS_ON);
         width = image.getWidth ();
         height = image.getHeight ();
       }
@@ -314,7 +314,7 @@ class DataPanel extends JTabbedPane
         Graphics2D g2 = ((Graphics2D) g);
         g2.transform (AffineTransform.getScaleInstance (scale, scale));
         g2.drawImage (image, (getWidth () - image.getWidth () * scale) / 2 / scale, 4,
-                      this);
+            this);
       }
     }
   }

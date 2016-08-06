@@ -17,7 +17,7 @@ class PascalCatalogSector extends AbstractSector
 
   public PascalCatalogSector (Disk disk, byte[] buffer, List<DiskAddress> diskAddress)
   {
-    super (disk, buffer, diskAddress);
+    super (disk, buffer);//, diskAddress);
   }
 
   @Override

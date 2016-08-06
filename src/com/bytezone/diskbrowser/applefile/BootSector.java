@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.applefile;
 
-import java.util.List;
-
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
@@ -22,10 +20,10 @@ public class BootSector extends AbstractSector
     this.name = name;
   }
 
-  public BootSector (Disk disk, byte[] buffer, String name,
-      List<DiskAddress> diskAddressList)
+  public BootSector (Disk disk, byte[] buffer, String name)//,
+  //      List<DiskAddress> diskAddressList)
   {
-    super (disk, buffer, diskAddressList);
+    super (disk, buffer);//, diskAddressList);
     this.name = name;
   }
 
@@ -58,10 +56,11 @@ public class BootSector extends AbstractSector
         byte[] newBuffer = new byte[buffer.length * 2];
         System.arraycopy (buffer, 0, newBuffer, 0, buffer.length);
 
-        byte[] buf = disk.readSector (1);
-        System.arraycopy (buf, 0, newBuffer, buf.length, buf.length);
+        //        byte[] buf = disk.readSector (1);
+        //        System.arraycopy (buf, 0, newBuffer, buf.length, buf.length);
 
-        buffer = newBuffer;
+        // this was doubling the size of Pascal boot blocks - 06/08/2016
+        //        buffer = newBuffer;
         assembler1 = new AssemblerProgram (name + " Boot Loader", buffer, 0x00, 0);
       }
     }

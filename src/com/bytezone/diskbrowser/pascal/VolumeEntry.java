@@ -28,6 +28,17 @@ class VolumeEntry extends CatalogEntry
     firstBlock = HexFormatter.intValue (buffer[18], buffer[19]);          // 0
     date = HexFormatter.getPascalDate (buffer, 20);                       // 2 bytes
     // bytes 0x16 - 0x19 are unused
+
+    if (false)
+    {
+      System.out.printf ("Total files ..... %d%n", totalFiles);
+      System.out.printf ("Total blocks .... %d%n", totalBlocks);
+      System.out.printf ("Block1 .......... %d%n", block1);
+      System.out.printf ("Last block ...... %d%n", lastDirectoryBlock);
+      System.out.printf ("Record type ..... %d%n", recordType);
+      System.out.printf ("Name length ..... %d%n", nameLength);
+      System.out.printf ("Name ............ %s%n", name);
+    }
   }
 
   @Override

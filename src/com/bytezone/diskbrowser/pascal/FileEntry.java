@@ -17,6 +17,13 @@ class FileEntry extends CatalogEntry
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
     date = HexFormatter.getPascalDate (buffer, 24);
 
+    if (relocator != null)
+    {
+      int size = lastBlock - firstBlock;
+      //      System.out.printf ("%04X  %04X  %s%n", firstBlock, size, name);
+      relocator.getMultiDiskAddress (name, firstBlock, size);
+    }
+
     for (int i = firstBlock; i < lastBlock; i++)
     {
       if (i >= 280)
@@ -114,7 +121,7 @@ class FileEntry extends CatalogEntry
     byte[] buffer = parent.getDisk ().readSectors (blocks);
     byte[] exactBuffer;
 
-    if (bytesUsedInLastBlock < 512)
+    if (buffer.length > 0 && bytesUsedInLastBlock < 512)
     {
       int exactLength = buffer.length - 512 + bytesUsedInLastBlock;
       exactBuffer = new byte[exactLength];

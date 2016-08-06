@@ -105,13 +105,19 @@ public class PascalDisk extends AbstractFormattedDisk
       fileEntries.add (fileEntry);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
 
-      if (fileEntry.fileType == 5 && fileEntry.getDataSource () instanceof Relocator)
-        this.relocator = (Relocator) fileEntry.getDataSource ();
+      DataSource dataSource = fileEntry.getDataSource ();
 
-      if (fileEntry.fileType == 2 && fileEntry.getDataSource () instanceof PascalCode)
+      if (fileEntry.fileType == 5 && dataSource instanceof Relocator)
+      {
+        this.relocator = (Relocator) dataSource;
+        int size = fileEntry.lastBlock - fileEntry.firstBlock;
+        relocator.getMultiDiskAddress (fileEntry.name, fileEntry.firstBlock, size);
+      }
+
+      if (fileEntry.fileType == 2 && dataSource instanceof PascalCode)
       {
         node.setAllowsChildren (true);
-        PascalCode pascalCode = (PascalCode) fileEntry.getDataSource ();
+        PascalCode pascalCode = (PascalCode) dataSource;
         for (PascalSegment pascalSegment : pascalCode)
         {
           DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (

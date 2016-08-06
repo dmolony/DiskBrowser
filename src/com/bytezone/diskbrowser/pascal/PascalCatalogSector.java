@@ -69,7 +69,7 @@ class PascalCatalogSector extends AbstractSector
       addText (text, buffer, ptr + 24, 2, "Date : " + date);
 
       ptr += PascalDisk.CATALOG_ENTRY_SIZE;
-      --totalFiles; // what if there are deleted files?
+      --totalFiles;                           // what if there are deleted files?
     }
 
     return text.toString ();

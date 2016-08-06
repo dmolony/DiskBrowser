@@ -35,6 +35,9 @@ public class Relocator extends AbstractFile
         addresses
             .add (new MultiDiskAddress (diskRecord.diskNumber, diskSegment.logicalBlock,
                 diskSegment.physicalBlock, diskSegment.segmentLength));
+
+    getMultiDiskAddress ("BOOT", 0, 2);
+    getMultiDiskAddress ("CATALOG", 2, 4);
   }
 
   public void list ()
@@ -51,6 +54,7 @@ public class Relocator extends AbstractFile
     List<MultiDiskAddress> foundAddresses = new ArrayList<MultiDiskAddress> ();
     newAddresses.clear ();
     oldAddresses.clear ();
+    //    System.out.printf ("%04X  %04X  %s%n", blockNumber, length, name);
 
     for (MultiDiskAddress multiDiskAddress : addresses)
     {
@@ -103,6 +107,22 @@ public class Relocator extends AbstractFile
       text.append ("\n");
     }
 
+    int previousDiskNumber = 0;
+    for (MultiDiskAddress multiDiskAddress : addresses)
+    {
+      if (multiDiskAddress.diskNumber != previousDiskNumber)
+      {
+        previousDiskNumber = multiDiskAddress.diskNumber;
+        text.append ("\n");
+        text.append ("Disk  Logical  Physical   Size   Name\n");
+        text.append ("----  -------  --------   ----   -----------\n");
+      }
+      text.append (String.format ("  %d     %03X       %03X      %03X   %s%n",
+          multiDiskAddress.diskNumber, multiDiskAddress.logicalBlockNumber,
+          multiDiskAddress.physicalBlockNumber, multiDiskAddress.totalBlocks,
+          multiDiskAddress.name));
+    }
+
     return text.toString ();
   }
 
@@ -135,16 +155,13 @@ public class Relocator extends AbstractFile
     {
       StringBuilder text = new StringBuilder ();
 
-      int offset = 0xe2;
-
       text.append (String.format ("Disk number.... %04X%n", diskNumber));
       text.append (String.format ("Segments....... %04X%n%n", totDiskSegments));
-      text.append (String.format (
-          "Segment Logical   Physical   Length    -%04X     -%04X%n", offset, offset));
+      text.append (String.format ("Segment Logical   Physical   Length%n"));
 
       int count = 1;
       for (DiskSegment segment : diskSegments)
-        text.append (String.format ("  %02X  %s %n", count++, segment.toString (offset)));
+        text.append (String.format ("  %02X  %s %n", count++, segment.toString ()));
 
       return text.toString ();
     }

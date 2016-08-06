@@ -34,15 +34,9 @@ abstract class CatalogEntry implements AppleFileSource
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
 
     Disk disk = parent.getDisk ();
-    for (int i = firstBlock; i < lastBlock; i++)
-    {
-      if (i >= 0x118)
-      {
-        System.out.printf ("CatalogEntry: block 0x%04X >= 0x0118%n", i);
-        break;
-      }
+    int max = Math.min (lastBlock, 0x118);
+    for (int i = firstBlock; i < max; i++)
       blocks.add (disk.getDiskAddress (i));
-    }
   }
 
   @Override

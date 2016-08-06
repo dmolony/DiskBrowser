@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
-import com.bytezone.diskbrowser.utilities.Utility;
 
 public class PascalCode extends AbstractFile
     implements PascalConstants, Iterable<PascalSegment>
 {
   private final List<PascalSegment> segments = new ArrayList<PascalSegment> (16);
   private final String comment;
-  private final int blockOffset;
-  private final Relocator relocator;
+  //  private final int blockOffset;
+  //  private final Relocator relocator;
 
   public static void print ()
   {
@@ -26,17 +26,15 @@ public class PascalCode extends AbstractFile
   {
     super (name, buffer);
 
-    this.blockOffset = blockOffset;
-    this.relocator = relocator;
+    SegmentDictionary segmentDictionary = new SegmentDictionary (name, buffer);
+    if (!segmentDictionary.isValid ())
+      throw new FileFormatException ("Error in PascalSegment");
+    //    this.blockOffset = blockOffset;
+    //    this.relocator = relocator;
+    if (relocator != null)
+      relocator.getMultiDiskAddress ("SEG-DIC", blockOffset, 1);
 
     int nonameCounter = 0;
-    if (false)
-    {
-      //      System.out.println (name);
-      //      byte[] key = new byte[] { 0x38, 0x00, 0x0C, 0x1C };
-      byte[] key = new byte[] { 0x0F };
-      Utility.find (buffer, key);
-    }
 
     // Create segment list (up to 16 segments)
     for (int i = 0; i < 16; i++)
@@ -47,6 +45,7 @@ public class PascalCode extends AbstractFile
         codeName = "<NULL" + ++nonameCounter + ">";
       if (size > 0)
       {
+        // this could throw an exception
         PascalSegment pascalSegment =
             new PascalSegment (codeName, buffer, i, blockOffset, relocator);
         segments.add (pascalSegment);
@@ -63,8 +62,8 @@ public class PascalCode extends AbstractFile
 
     text.append ("Segment Dictionary\n==================\n\n");
 
-    text.append ("Slot Addr Blks Len    Name     Kind"
-        + "            Txt Seg Mch Ver I/S I/S D:Blk\n");
+    text.append ("Slot Addr Blks Byte   Name     Kind"
+        + "            Txt Seg Mch Ver I/S I/S Disk:Block\n");
     text.append ("---- ---- ---- ----  --------  ---------------"
         + " --- --- --- --- --- --- ---------------------\n");
 

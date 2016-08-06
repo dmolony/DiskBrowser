@@ -70,20 +70,20 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     if (relocator != null)
     {
-      if (segmentNoHeader > 1)
+      //      if (segmentNoHeader > 1)
+      //      {
+      int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
+      int targetBlock = blockNo + blockOffset;
+      addresses = relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
+      if (addresses.size () > 0)
       {
-        int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
-        int targetBlock = blockNo + blockOffset;
-        addresses = relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
-        if (addresses.size () > 0)
-        {
-          MultiDiskAddress multiDiskAddress = addresses.get (0);
-          if (multiDiskAddress.diskNumber == 1)
-            offset = (multiDiskAddress.physicalBlockNumber - blockOffset) * BLOCK_SIZE;
-          else
-            offset = -1;
-        }
+        MultiDiskAddress multiDiskAddress = addresses.get (0);
+        if (multiDiskAddress.diskNumber == 1)
+          offset = (multiDiskAddress.physicalBlockNumber - blockOffset) * BLOCK_SIZE;
+        else
+          offset = -1;
       }
+      //      }
     }
 
     if (offset < 0)
@@ -144,14 +144,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     text.append (title + "\n"
         + "===============================".substring (0, title.length ()) + "\n\n");
     String warning = segmentNoBody == segmentNoHeader ? ""
-        : String.format (" (%02X in header)", segmentNoHeader);
+        : String.format (" (%02X in routine)", segmentNoBody);
     text.append (String.format ("Address........ %02X%n", blockNo));
-    if (addresses != null)
-      text.append (String.format ("Multi disk .... %s%n", getMultiDiskAddresses ()));
+    //    if (addresses != null)
+    text.append (String.format ("Multi disk .... %s%n", getMultiDiskAddresses ()));
     text.append (String.format ("Length......... %04X%n", buffer.length));
     text.append (String.format ("Machine type... %d%n", machineType));
     text.append (String.format ("Version........ %d%n", version));
-    text.append (String.format ("Segment........ %02X%s%n", segmentNoBody, warning));
+    text.append (String.format ("Segment........ %02X%s%n", segmentNoHeader, warning));
     text.append (String.format ("Total procs.... %d%n", procedures.size ()));
 
     text.append ("\nProcedure Dictionary\n====================\n\n");
@@ -199,11 +199,12 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     String multiDiskAddressText = "";
     int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
 
-    if (segmentNoHeader == 1)           // main segment
-    {
-      multiDiskAddressText = String.format ("1:%03X", (blockNo + blockOffset));
-    }
-    else if (relocator != null)
+    //    if (segmentNoHeader == 1)           // main segment
+    //    {
+    //      multiDiskAddressText = String.format ("1:%03X", (blockNo + blockOffset));
+    //    }
+    //    else
+    if (relocator != null)
     {
       int targetBlock = blockNo + blockOffset;
       List<MultiDiskAddress> addresses =

@@ -95,7 +95,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
   protected void setEmptyByte (byte value)
   {
-    getDisk ().setEmptyByte ((byte) 0xE5);
+    getDisk ().setEmptyByte (value);
     setSectorTypes ();
   }
 
@@ -128,6 +128,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
       case 1600:
         gridLayout = new Dimension (16, 100);
+        break;
+
+      case 2048:
+        gridLayout = new Dimension (8, 256);
         break;
 
       default:
@@ -237,8 +241,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
   public void makeNodeVisible (DefaultMutableTreeNode node)
   {
-    catalogTree.makeVisible (new TreePath (
-        ((DefaultTreeModel) catalogTree.getModel ()).getPathToRoot (node)));
+    catalogTree.makeVisible (
+        new TreePath (((DefaultTreeModel) catalogTree.getModel ()).getPathToRoot (node)));
   }
 
   protected DefaultMutableTreeNode findNode (DefaultMutableTreeNode node, String name)

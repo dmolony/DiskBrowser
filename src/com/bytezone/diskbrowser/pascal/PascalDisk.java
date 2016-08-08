@@ -23,7 +23,7 @@ public class PascalDisk extends AbstractFormattedDisk
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
   private final VolumeEntry volumeEntry;
   private final PascalCatalogSector diskCatalogSector;
-  private Relocator relocator;
+  protected Relocator relocator;
 
   final String[] fileTypes =
       { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
@@ -41,6 +41,7 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     super (disk);
 
+    System.out.println (disk.getTotalBlocks ());
     sectorTypesList.add (diskBootSector);
     sectorTypesList.add (catalogSector);
     sectorTypesList.add (dataSector);
@@ -50,9 +51,8 @@ public class PascalDisk extends AbstractFormattedDisk
     sectorTypesList.add (grafSector);
     sectorTypesList.add (fotoSector);
 
-    //    DiskAddress da = disk.getDiskAddress (0);
-    List<DiskAddress> blocks = disk.getDiskAddressList (0, 1);
-    this.bootSector = new BootSector (disk, disk.readSectors (blocks), "Pascal");//, blocks);
+    List<DiskAddress> blocks = disk.getDiskAddressList (0, 1);    // B0, B1
+    this.bootSector = new BootSector (disk, disk.readSectors (blocks), "Pascal");
 
     byte[] buffer = disk.readSector (2);
     byte[] data = new byte[CATALOG_ENTRY_SIZE];
@@ -67,7 +67,7 @@ public class PascalDisk extends AbstractFormattedDisk
         freeBlocks.set (i, false);
       }
 
-    for (int i = 2; i < 280; i++)
+    for (int i = 2; i < disk.getTotalBlocks (); i++)
       freeBlocks.set (i, true);
 
     List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
@@ -143,18 +143,11 @@ public class PascalDisk extends AbstractFormattedDisk
     if (checkFormat (disk, debug))
       return true;
     return false;
-    //    disk.setInterleave (0);
-    //    if (checkFormat (disk, debug))
-    //      return true;
-    //    disk.setInterleave (3);
-    //    return checkFormat (disk, debug);
   }
 
   public static boolean checkFormat (AppleDisk disk, boolean debug)
   {
     byte[] buffer = disk.readSector (2);
-    //    if (debug)
-    //      System.out.println (HexFormatter.format (buffer));
     int nameLength = HexFormatter.intValue (buffer[6]);
     if (nameLength < 1 || nameLength > 7)
     {

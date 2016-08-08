@@ -26,7 +26,8 @@ class PascalCodeObject implements AppleFileSource
     int lo = firstBlock + segment.blockNo;
     int hi = lo + (segment.size - 1) / 512;
     Disk disk = parent.getDisk ();
-    for (int i = lo; i <= hi; i++)
+    int max = Math.min (hi, 279);
+    for (int i = lo; i <= max; i++)
       blocks.add (disk.getDiskAddress (i));
   }
 

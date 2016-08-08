@@ -4,7 +4,7 @@ import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-class FileEntry extends CatalogEntry
+public class FileEntry extends CatalogEntry
 {
   int bytesUsedInLastBlock;
   private final Relocator relocator;

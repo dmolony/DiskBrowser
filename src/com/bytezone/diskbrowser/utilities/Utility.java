@@ -42,19 +42,13 @@ public class Utility
     }
   }
 
-  private static boolean matches (byte[] buffer, int offset, byte[] key)
+  public static boolean matches (byte[] buffer, int offset, byte[] key)
   {
     int ptr = 0;
     while (offset < buffer.length && ptr < key.length)
-    {
       if (buffer[offset++] != key[ptr++])
-      {
-        //        System.out.printf ("%04X: %02X != %02X%n", offset, buffer[offset], key[ptr]);
         return false;
-      }
-      //      System.out.printf ("%04X: %02X == %02X%n", offset, buffer[offset - 1],
-      //                         key[ptr - 1]);
-    }
+
     return true;
   }
 }

@@ -20,8 +20,10 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AppleDisk implements Disk
 {
-  static final String newLine = String.format ("%n");
-  static final int MAX_INTERLEAVE = 3;
+  private static final String newLine = String.format ("%n");
+  private static final int MAX_INTERLEAVE = 3;
+  private static final int SECTOR_SIZE = 256;
+  private static final int BLOCK_SIZE = 512;
 
   public final File path;
   private final byte[] diskBuffer;        // contains the disk contents in memory
@@ -89,13 +91,13 @@ public class AppleDisk implements Disk
     String name = path.getName ();
     int pos = name.lastIndexOf ('.');
 
+    String suffix = pos > 0 ? name.substring (pos + 1) : "";
+
     byte[] buffer = getPrefix (path);         // HDV could be a 2mg
     String prefix = new String (buffer, 0, 4);
     int skip = 0;
 
-    if ((pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("2mg"))
-        || "2IMG".equals (prefix))
-    //      if ("2IMG".equals (prefix))
+    if (suffix.equalsIgnoreCase ("2mg") || "2IMG".equals (prefix))
     {
       if (debug)
         System.out.println (Utility.toHex (buffer));
@@ -125,11 +127,11 @@ public class AppleDisk implements Disk
 
         //        int format = buffer[12] & 0xFF;
         //        if (blocks == 0 && format == 1)
-        {
-          this.blocks = diskData / 4096 * 8;    // reduces blocks to a legal multiple
-          if (debug)
-            System.out.printf ("Blocks    : %,d%n", blocks);
-        }
+        //        {
+        this.blocks = diskData / 4096 * 8;    // reduces blocks to a legal multiple
+        if (debug)
+          System.out.printf ("Blocks    : %,d%n", blocks);
+        //        }
 
         this.sectorSize = 512;
         this.trackSize = 8 * sectorSize;
@@ -146,7 +148,7 @@ public class AppleDisk implements Disk
         this.trackSize = sectors * sectorSize;
       }
     }
-    else if (pos > 0 && name.substring (pos + 1).equalsIgnoreCase ("HDV"))
+    else if (suffix.equalsIgnoreCase ("HDV"))
     {
       this.blocks = (int) path.length () / 4096 * 8; // reduces blocks to a legal multiple
       this.sectorSize = 512;
@@ -154,9 +156,18 @@ public class AppleDisk implements Disk
     }
     else
     {
-      this.blocks = tracks * sectors;
-      this.sectorSize = (int) path.length () / blocks;
-      this.trackSize = sectors * sectorSize;
+      if (path.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4
+      {
+        this.blocks = tracks * sectors;
+        this.sectorSize = 512;
+        this.trackSize = sectors * sectorSize;
+      }
+      else
+      {
+        this.blocks = tracks * sectors;
+        this.sectorSize = (int) path.length () / blocks;
+        this.trackSize = sectors * sectorSize;
+      }
     }
 
     if (false)
@@ -227,12 +238,16 @@ public class AppleDisk implements Disk
 
   private void checkSectorsForData ()
   {
+    if (true)
+    {
+      checkSectorsFaster ();
+      return;
+    }
     // force blockList to be rebuilt with the correct number/size of blocks
     blockList = null;
 
-    for (DiskAddress da : this)
+    for (DiskAddress da : this)         // uses blockList.iterator
     {
-      //      System.out.println (da);
       byte[] buffer = readSector (da);
       hasData[da.getBlock ()] = false;
       for (int i = 0; i < sectorSize; i++)
@@ -242,6 +257,35 @@ public class AppleDisk implements Disk
           break;
         }
     }
+  }
+
+  private void checkSectorsFaster ()
+  {
+    // force blockList to be rebuilt with the correct number/size of blocks
+    blockList = null;
+
+    for (DiskAddress da : this)         // uses blockList.iterator
+    {
+      if (sectorSize == SECTOR_SIZE)
+      {
+        int diskOffset = getBufferOffset (da);
+        hasData[da.getBlock ()] = check (diskOffset);
+      }
+      else
+      {
+        int diskOffset1 = getBufferOffset (da, 0);
+        int diskOffset2 = getBufferOffset (da, 1);
+        hasData[da.getBlock ()] = check (diskOffset1) || check (diskOffset2);
+      }
+    }
+  }
+
+  private boolean check (int diskOffset)
+  {
+    for (int i = diskOffset, max = diskOffset + SECTOR_SIZE; i < max; i++)
+      if (diskBuffer[i] != emptyByte)
+        return true;
+    return false;
   }
 
   /*
@@ -362,7 +406,7 @@ public class AppleDisk implements Disk
   @Override
   public void setBlockSize (int size)
   {
-    assert (size == 256 || size == 512) : "Invalid sector size : " + size;
+    assert (size == SECTOR_SIZE || size == BLOCK_SIZE) : "Invalid sector size : " + size;
     if (sectorSize == size)
       return;
 
@@ -380,11 +424,9 @@ public class AppleDisk implements Disk
   @Override
   public DiskAddress getDiskAddress (int block)
   {
-    //    assert (isValidAddress (block)) : "Invalid address : " + block;
     if (!isValidAddress (block))
     {
       System.out.println ("Invalid block : " + block);
-      //      assert false;
       return null;
       //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
     }
@@ -450,26 +492,41 @@ public class AppleDisk implements Disk
     }
 
     assert da.getDisk () == this : "Disk address not applicable to this disk";
-    assert sectorSize == 256 || sectorSize == 512 : "Invalid sector size : " + sectorSize;
+    assert sectorSize == SECTOR_SIZE
+        || sectorSize == BLOCK_SIZE : "Invalid sector size : " + sectorSize;
     assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
         + interleave;
 
-    if (sectorSize == 256)
+    if (sectorSize == SECTOR_SIZE)
     {
-      int diskOffset = da.getTrack () * trackSize
-          + interleaveSector[interleave][da.getSector ()] * sectorSize;
-      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, sectorSize);
+      int diskOffset = getBufferOffset (da);
+      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, SECTOR_SIZE);
     }
-    else if (sectorSize == 512)
+    else
     {
-      int diskOffset = da.getTrack () * trackSize
-          + interleaveSector[interleave][da.getSector () * 2] * 256;
-      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, 256);
+      int diskOffset = getBufferOffset (da, 0);
+      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, SECTOR_SIZE);
 
-      diskOffset = da.getTrack () * trackSize
-          + interleaveSector[interleave][da.getSector () * 2 + 1] * 256;
-      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + 256, 256);
+      diskOffset = getBufferOffset (da, 1);
+      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + SECTOR_SIZE,
+          SECTOR_SIZE);
     }
+  }
+
+  private int getBufferOffset (DiskAddress da)
+  {
+    assert sectorSize == SECTOR_SIZE;
+    return da.getTrack () * trackSize
+        + interleaveSector[interleave][da.getSector ()] * SECTOR_SIZE;
+  }
+
+  private int getBufferOffset (DiskAddress da, int seq)
+  {
+    assert sectorSize == BLOCK_SIZE;
+    assert seq == 0 || seq == 1;
+
+    return da.getTrack () * trackSize
+        + interleaveSector[interleave][da.getSector () * 2 + seq] * SECTOR_SIZE;
   }
 
   @Override

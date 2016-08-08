@@ -11,12 +11,10 @@ import javax.swing.tree.DefaultTreeModel;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.gui.DataSource;
-import com.bytezone.diskbrowser.gui.FileSelectedEvent;
-import com.bytezone.diskbrowser.gui.FileSelectionListener;
 
 // Apple Assembly Lines disks are dual-dos
 
-public class DualDosDisk implements FormattedDisk, FileSelectionListener
+public class DualDosDisk implements FormattedDisk
 {
   private final FormattedDisk[] disks = new FormattedDisk[2];
   private int currentDisk;
@@ -25,16 +23,21 @@ public class DualDosDisk implements FormattedDisk, FileSelectionListener
   public DualDosDisk (FormattedDisk disk0, FormattedDisk disk1)
   {
     String diskName = disk0.getDisk ().getFile ().getName ();
-    String text = "This disk contains both DOS and Prodos files. Isn't that clever?\n\n"
-        + disk0.getDisk () + "\n" + disk1.getDisk ();
-    DefaultMutableTreeNode root =
-        new DefaultMutableTreeNode (new DefaultAppleFileSource (diskName, text, this));
+    String text = "This disk contains both DOS and Prodos files\n\n" + disk0.getDisk ()
+        + "\n" + disk1.getDisk ();
+
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource (diskName, text, this);
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode (dafs);
+
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     tree = new JTree (treeModel);
-    treeModel.setAsksAllowsChildren (true); // allows empty nodes to appear as folders
+
+    // allow empty nodes to appear as folders
+    treeModel.setAsksAllowsChildren (true);
 
     this.disks[0] = disk0;
     this.disks[1] = disk1;
+
     disk0.setParent (this);
     disk1.setParent (this);
 
@@ -110,15 +113,11 @@ public class DualDosDisk implements FormattedDisk, FileSelectionListener
       currentDisk = 0;
     else if (disks[1] == fd && currentDisk != 1)
       currentDisk = 1;
-
-    //    System.out.println ("AFS : " + afs);
-    //    System.out.println ("1. Setting current disk to : " + currentDisk);
   }
 
   public void setCurrentDiskNo (int n)
   {
     currentDisk = n;
-    //    System.out.println ("2. Setting current disk to : " + currentDisk);
   }
 
   public int getCurrentDiskNo ()
@@ -149,19 +148,7 @@ public class DualDosDisk implements FormattedDisk, FileSelectionListener
   @Override
   public AppleFileSource getFile (String uniqueName)
   {
-    if (true)
-      return disks[currentDisk].getFile (uniqueName);
-    //    System.out.println ("Searching for : " + uniqueName);
-    for (int i = 0; i < 2; i++)
-    {
-      AppleFileSource afs = disks[i].getFile (uniqueName);
-      if (afs != null)
-      {
-        setCurrentDiskNo (i);
-        return afs;
-      }
-    }
-    return null;
+    return disks[currentDisk].getFile (uniqueName);
   }
 
   @Override
@@ -252,12 +239,6 @@ public class DualDosDisk implements FormattedDisk, FileSelectionListener
   public void setParent (FormattedDisk disk)
   {
     disks[currentDisk].setParent (disk);
-  }
-
-  @Override
-  public void fileSelected (FileSelectedEvent event)
-  {
-    System.out.println ("In DDD - file selected : " + event.file);
   }
 
   @Override

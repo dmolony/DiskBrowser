@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.bytezone.diskbrowser.disk.AppleDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class Relocator extends AbstractFile
@@ -14,6 +15,12 @@ public class Relocator extends AbstractFile
 
   private final List<MultiDiskAddress> newAddresses = new ArrayList<MultiDiskAddress> ();
   private final List<MultiDiskAddress> oldAddresses = new ArrayList<MultiDiskAddress> ();
+
+  private final List<MultiDiskAddress> logicalAddresses =
+      new ArrayList<MultiDiskAddress> ();
+  private final byte[] diskBlocks = new byte[0x800];
+  private final int[] diskOffsets = new int[0x800];
+  private final AppleDisk[] disks = new AppleDisk[5];
 
   public Relocator (String name, byte[] buffer)
   {
@@ -30,11 +37,16 @@ public class Relocator extends AbstractFile
       ptr += diskRecord.size ();
     }
 
+    logicalAddresses.add (new MultiDiskAddress (0, 0, 0, 0x800));
+
     for (DiskRecord diskRecord : diskRecords)
       for (DiskSegment diskSegment : diskRecord.diskSegments)
+      {
         addresses
             .add (new MultiDiskAddress (diskRecord.diskNumber, diskSegment.logicalBlock,
                 diskSegment.physicalBlock, diskSegment.segmentLength));
+        addLogicalBlock ((byte) diskRecord.diskNumber, diskSegment);
+      }
 
     getMultiDiskAddress ("BOOT", 0, 2);
     getMultiDiskAddress ("CATALOG", 2, 4);
@@ -46,6 +58,18 @@ public class Relocator extends AbstractFile
       System.out.printf ("%d  %03X  %03X  %03X  %s%n", multiDiskAddress.diskNumber,
           multiDiskAddress.logicalBlockNumber, multiDiskAddress.physicalBlockNumber,
           multiDiskAddress.totalBlocks, multiDiskAddress.name);
+  }
+
+  private void addLogicalBlock (byte disk, DiskSegment diskSegment)
+  {
+    int lo = diskSegment.logicalBlock;
+    int hi = diskSegment.logicalBlock + diskSegment.segmentLength;
+    for (int i = lo; i < hi; i++)
+      if (diskBlocks[i] == 0)
+      {
+        diskBlocks[i] = disk;
+        diskOffsets[i] = diskSegment.physicalBlock;
+      }
   }
 
   public List<MultiDiskAddress> getMultiDiskAddress (String name, int blockNumber,
@@ -93,6 +117,22 @@ public class Relocator extends AbstractFile
     return foundAddresses;
   }
 
+  public void addDisk (AppleDisk disk)
+  {
+    byte[] buffer = disk.readSector (1);
+    int diskNo = buffer[510] & 0xFF;
+    if (diskNo > 0 && diskNo <= 5)
+      disks[diskNo - 1] = disk;
+  }
+
+  public boolean hasData ()
+  {
+    for (AppleDisk disk : disks)
+      if (disk == null)
+        return false;
+    return true;
+  }
+
   @Override
   public String getText ()
   {
@@ -115,12 +155,42 @@ public class Relocator extends AbstractFile
         previousDiskNumber = multiDiskAddress.diskNumber;
         text.append ("\n");
         text.append ("Disk  Logical  Physical   Size   Name\n");
-        text.append ("----  -------  --------   ----   -----------\n");
+        text.append ("----  -------  --------   ----   -------------\n");
       }
       text.append (String.format ("  %d     %03X       %03X      %03X   %s%n",
           multiDiskAddress.diskNumber, multiDiskAddress.logicalBlockNumber,
           multiDiskAddress.physicalBlockNumber, multiDiskAddress.totalBlocks,
           multiDiskAddress.name));
+    }
+
+    text.append ("\n\n Logical   Size  Disk  Physical");
+    text.append ("\n---------  ----  ----  ---------\n");
+
+    int first = 0;
+    int lastDisk = diskBlocks[0];
+    int lastOffset = diskOffsets[0];
+    for (int i = 0; i < diskBlocks.length; i++)
+    {
+      if (diskBlocks[i] != lastDisk || diskOffsets[i] != lastOffset)
+      {
+        int size = i - first;
+        if (lastDisk > 0)
+          text.append (String.format ("%03X - %03X   %03X    %d   %03X - %03X%n", first,
+              i - 1, size, lastDisk, lastOffset, lastOffset + size - 1));
+        else
+          text.append (String.format ("%03X - %03X   %03X%n", first, i - 1, size));
+        first = i;
+        lastDisk = diskBlocks[i];
+        lastOffset = diskOffsets[i];
+      }
+    }
+
+    if (lastDisk > 0)
+    {
+      int max = diskBlocks.length;
+      int size = max - first;
+      text.append (String.format ("%03X - %03X   %03X    %d   %03X - %03X%n", first,
+          max - 1, size, lastDisk, lastOffset, lastOffset + size - 1));
     }
 
     return text.toString ();
@@ -157,11 +227,24 @@ public class Relocator extends AbstractFile
 
       text.append (String.format ("Disk number.... %04X%n", diskNumber));
       text.append (String.format ("Segments....... %04X%n%n", totDiskSegments));
-      text.append (String.format ("Segment Logical   Physical   Length%n"));
+      text.append (String.format (" Seg   Skip   Size     Logical      Physical%n"));
+      text.append (String.format (" ---   ----   ----   -----------   -----------%n"));
 
       int count = 1;
+      int last = 0;
+      int size = 0;
+
       for (DiskSegment segment : diskSegments)
-        text.append (String.format ("  %02X  %s %n", count++, segment.toString ()));
+      {
+        if (segment.logicalBlock > last)
+        {
+          int end = segment.logicalBlock - 1;
+          size = end - last + 1;
+        }
+        last = segment.logicalBlock + segment.segmentLength;
+        text.append (
+            String.format ("  %02X   %04X  %s %n", count++, size, segment.toString ()));
+      }
 
       return text.toString ();
     }
@@ -183,20 +266,21 @@ public class Relocator extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("    %04X      %04X      %04X", logicalBlock, physicalBlock,
-          segmentLength);
+      return String.format (" %04X   %04X - %04X   %04X - %04X", segmentLength,
+          logicalBlock, (logicalBlock + segmentLength - 1), physicalBlock,
+          (physicalBlock + segmentLength - 1));
     }
 
-    public String toString (int offset)
-    {
-      int logical = logicalBlock - offset;
-      int physical = physicalBlock - offset;
-      if (physical >= 0)
-        return String.format ("    %04X      %04X      %04X      %04X      %04X",
-            logicalBlock, physicalBlock, segmentLength, logical, physical);
-      return String.format ("    %04X      %04X      %04X", logicalBlock, physicalBlock,
-          segmentLength);
-    }
+    //    public String toString (int offset)
+    //    {
+    //      int logical = logicalBlock - offset;
+    //      int physical = physicalBlock - offset;
+    //      if (physical >= 0)
+    //        return String.format ("    %04X      %04X      %04X      %04X      %04X",
+    //            logicalBlock, physicalBlock, segmentLength, logical, physical);
+    //      return String.format ("    %04X      %04X      %04X", logicalBlock, physicalBlock,
+    //          segmentLength);
+    //    }
   }
 
   class MultiDiskAddress implements Comparable<MultiDiskAddress>

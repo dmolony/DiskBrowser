@@ -16,6 +16,7 @@ import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.NuFX;
+import com.bytezone.diskbrowser.wizardry.Wizardry4BootDisk;
 import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
 public class DiskFactory
@@ -156,7 +157,7 @@ public class DiskFactory
     if (length != 143360 && length != 116480)
     {
       System.out.printf ("%s: invalid file length : %,d%n", file.getName (),
-                         file.length ());
+          file.length ());
       return null;
     }
 
@@ -248,8 +249,8 @@ public class DiskFactory
       disk = new DataDisk (new AppleDisk (file, 35, 16));
 
     if (debug)
-      System.out.println ("Factory creating disk : "
-          + disk.getDisk ().getFile ().getAbsolutePath ());
+      System.out.println (
+          "Factory creating disk : " + disk.getDisk ().getFile ().getAbsolutePath ());
 
     if (disk != null && compressed)
       disk.setOriginalPath (p);
@@ -372,16 +373,53 @@ public class DiskFactory
   {
     if (debug)
       System.out.println ("Checking Pascal disk");
+
     AppleDisk disk = new AppleDisk (file, 35, 8);
+
     if (!PascalDisk.isCorrectFormat (disk, debug))
       return null;
+
     if (debug)
       System.out.println ("Pascal disk OK - Checking Wizardry disk");
+
     if (WizardryScenarioDisk.isWizardryFormat (disk, debug))
       return new WizardryScenarioDisk (disk);
+
     if (debug)
-      System.out.println ("Not a Wizardry disk");
-    return new PascalDisk (disk);
+      System.out.println ("Not a Wizardry 1-3 disk");
+
+    if (Wizardry4BootDisk.isWizardryIV (disk, debug))
+    {
+      // collect 4 data disks
+      AppleDisk[] disks = new AppleDisk[5];
+      AppleDisk d = new AppleDisk (file, 256, 8);
+      d.setInterleave (1);
+      disks[0] = d;
+
+      for (int i = 2; i <= 5; i++)
+      {
+        String filename = file.getAbsolutePath ().replace ("1.dsk", i + ".dsk");
+        File f = new File (filename);
+        if (f.exists () && f.isFile ())
+        {
+          AppleDisk dataDisk = new AppleDisk (f, 35, 8);
+          dataDisk.setInterleave (1);
+          disks[i - 1] = dataDisk;
+        }
+        else
+        {
+          PascalDisk pascalDisk = new PascalDisk (disk);
+          return pascalDisk;
+        }
+      }
+      Wizardry4BootDisk wiz4 = new Wizardry4BootDisk (disks);
+      return wiz4;
+    }
+    if (debug)
+      System.out.println ("Not a Wizardry IV disk");
+
+    PascalDisk pascalDisk = new PascalDisk (disk);
+    return pascalDisk;
   }
 
   private static InfocomDisk checkInfocomDisk (File file)

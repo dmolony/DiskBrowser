@@ -34,8 +34,7 @@ abstract class CatalogEntry implements AppleFileSource
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
 
     Disk disk = parent.getDisk ();
-    int max = Math.min (lastBlock, 0x118);
-    for (int i = firstBlock; i < max; i++)
+    for (int i = firstBlock; i < lastBlock; i++)
       blocks.add (disk.getDiskAddress (i));
   }
 

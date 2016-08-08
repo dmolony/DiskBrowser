@@ -367,7 +367,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
       System.out.printf ("Block %d not in range : 0-%d%n", block, freeBlocks.size () - 1);
       return;
     }
-    //    assert block < freeBlocks.size () : String.format ("Set free block # %6d, size %6d",
+    //assert block < freeBlocks.size () : String.format ("Set free block # %6d, size %6d",
     //                                                       block, freeBlocks.size ());
     freeBlocks.set (block, free);
   }

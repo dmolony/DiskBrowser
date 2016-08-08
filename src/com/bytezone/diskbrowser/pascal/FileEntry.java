@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.pascal;
 
 import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -69,6 +70,8 @@ public class FileEntry extends CatalogEntry
     if (file != null)
       return file;
 
+    // this needs to use the Relocator to obtain the currect blocks
+    assembleBuffer ();
     byte[] buffer = getExactBuffer ();
 
     switch (fileType)
@@ -116,6 +119,23 @@ public class FileEntry extends CatalogEntry
     return file;
   }
 
+  private byte[] assembleBuffer ()
+  {
+    if (relocator != null)
+      for (DiskAddress da : blocks)
+      {
+        System.out.println (da);
+        if (da.getBlock () < 20)
+        {
+          byte[] buffer = relocator.getLogicalBuffer (da);
+          System.out.println (HexFormatter.format (buffer));
+        }
+      }
+
+    return null;
+  }
+
+  // use Relocator to obtain correct blocks
   private byte[] getExactBuffer ()
   {
     byte[] buffer = parent.getDisk ().readSectors (blocks);

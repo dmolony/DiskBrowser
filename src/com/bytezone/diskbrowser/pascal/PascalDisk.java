@@ -21,9 +21,11 @@ public class PascalDisk extends AbstractFormattedDisk
 {
   static final int CATALOG_ENTRY_SIZE = 26;
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
-  private final VolumeEntry volumeEntry;
-  private final PascalCatalogSector diskCatalogSector;
+  private VolumeEntry volumeEntry;
+  private PascalCatalogSector diskCatalogSector;
+
   protected Relocator relocator;
+  protected Disk[] dataDisks;
 
   final String[] fileTypes =
       { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
@@ -37,11 +39,26 @@ public class PascalDisk extends AbstractFormattedDisk
   SectorType grafSector = new SectorType ("Graf", Color.cyan);
   SectorType fotoSector = new SectorType ("Foto", Color.gray);
 
+  public PascalDisk (Disk[] disks)
+  {
+    super (disks[0]);
+    init ();
+
+    dataDisks = disks;      // these need to be in place before ...
+
+    // 1. create new disk buffer
+    // 2. copy sectors from 5 data disks to new buffer
+    // 3. replace old disk buffer with new disk buffer
+  }
+
   public PascalDisk (Disk disk)
   {
     super (disk);
+    init ();
+  }
 
-    System.out.println (disk.getTotalBlocks ());
+  private void init ()
+  {
     sectorTypesList.add (diskBootSector);
     sectorTypesList.add (catalogSector);
     sectorTypesList.add (dataSector);
@@ -104,11 +121,13 @@ public class PascalDisk extends AbstractFormattedDisk
       fileEntries.add (fileEntry);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
 
-      DataSource dataSource = fileEntry.getDataSource ();
+      // why is this being called? it creates every file on the disk
+      DataSource dataSource = fileEntry.getDataSource ();     // reads all buffers
 
       if (fileEntry.fileType == 5 && dataSource instanceof Relocator)
       {
-        this.relocator = (Relocator) dataSource;
+        relocator = (Relocator) dataSource;
+        relocator.setDisks (dataDisks);
         int size = fileEntry.lastBlock - fileEntry.firstBlock;
         relocator.getMultiDiskAddress (fileEntry.name, fileEntry.firstBlock, size);
       }

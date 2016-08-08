@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.bytezone.diskbrowser.disk.AppleDisk;
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class Relocator extends AbstractFile
@@ -18,9 +19,11 @@ public class Relocator extends AbstractFile
 
   private final List<MultiDiskAddress> logicalAddresses =
       new ArrayList<MultiDiskAddress> ();
+
   private final byte[] diskBlocks = new byte[0x800];
   private final int[] diskOffsets = new int[0x800];
-  private final AppleDisk[] disks = new AppleDisk[5];
+  private final int[] diskOffsets2 = new int[0x800];
+  private final Disk[] dataDisks = new Disk[5];
 
   public Relocator (String name, byte[] buffer)
   {
@@ -64,12 +67,24 @@ public class Relocator extends AbstractFile
   {
     int lo = diskSegment.logicalBlock;
     int hi = diskSegment.logicalBlock + diskSegment.segmentLength;
+    int count = 0;
     for (int i = lo; i < hi; i++)
       if (diskBlocks[i] == 0)
       {
         diskBlocks[i] = disk;
         diskOffsets[i] = diskSegment.physicalBlock;
+        diskOffsets2[i] = diskSegment.physicalBlock + count++;
       }
+  }
+
+  public byte[] getLogicalBuffer (DiskAddress da)
+  {
+    int block = da.getBlock ();
+    System.out.println (diskBlocks[block]);
+    Disk disk = dataDisks[diskBlocks[block] - 1];
+    System.out.println (diskOffsets2[block]);
+    System.out.println (disk);
+    return disk.readSector (diskOffsets2[block]);
   }
 
   public List<MultiDiskAddress> getMultiDiskAddress (String name, int blockNumber,
@@ -117,17 +132,20 @@ public class Relocator extends AbstractFile
     return foundAddresses;
   }
 
-  public void addDisk (AppleDisk disk)
+  public void setDisks (Disk[] disks)
   {
-    byte[] buffer = disk.readSector (1);
-    int diskNo = buffer[510] & 0xFF;
-    if (diskNo > 0 && diskNo <= 5)
-      disks[diskNo - 1] = disk;
+    for (Disk disk : disks)
+    {
+      byte[] buffer = disk.readSector (1);
+      int diskNo = buffer[510] & 0xFF;
+      if (diskNo > 0 && diskNo <= 5)
+        dataDisks[diskNo - 1] = disk;
+    }
   }
 
   public boolean hasData ()
   {
-    for (AppleDisk disk : disks)
+    for (Disk disk : dataDisks)
       if (disk == null)
         return false;
     return true;

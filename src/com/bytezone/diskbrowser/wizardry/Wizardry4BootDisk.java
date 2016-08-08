@@ -14,10 +14,7 @@ public class Wizardry4BootDisk extends PascalDisk
 
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
   {
-    super (dataDisks[0]);
-
-    for (AppleDisk dataDisk : dataDisks)
-      relocator.addDisk (dataDisk);
+    super (dataDisks);
   }
 
   public static boolean isWizardryIV (Disk disk, boolean debug)

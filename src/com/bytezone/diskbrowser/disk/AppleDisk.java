@@ -361,7 +361,7 @@ public class AppleDisk implements Disk
     int bufferOffset = 0;
     for (DiskAddress da : daList)
     {
-      if (da != null)                               // text files may have gaps
+      if (da != null)                               // sparse text files may have gaps
         readBuffer (da, buffer, bufferOffset);
       bufferOffset += sectorSize;
     }
@@ -485,12 +485,6 @@ public class AppleDisk implements Disk
    */
   private void readBuffer (DiskAddress da, byte[] buffer, int bufferOffset)
   {
-    if (da.getDisk () != this)
-    {
-      System.out.println (da.getDisk ());
-      System.out.println (this);
-    }
-
     assert da.getDisk () == this : "Disk address not applicable to this disk";
     assert sectorSize == SECTOR_SIZE
         || sectorSize == BLOCK_SIZE : "Invalid sector size : " + sectorSize;
@@ -509,6 +503,30 @@ public class AppleDisk implements Disk
 
       diskOffset = getBufferOffset (da, 1);
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + SECTOR_SIZE,
+          SECTOR_SIZE);
+    }
+  }
+
+  private void writeBuffer (DiskAddress da, byte[] buffer, int bufferOffset)
+  {
+    assert da.getDisk () == this : "Disk address not applicable to this disk";
+    assert sectorSize == SECTOR_SIZE
+        || sectorSize == BLOCK_SIZE : "Invalid sector size : " + sectorSize;
+    assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
+        + interleave;
+
+    if (sectorSize == SECTOR_SIZE)
+    {
+      int diskOffset = getBufferOffset (da);
+      System.arraycopy (buffer, bufferOffset, diskBuffer, diskOffset, SECTOR_SIZE);
+    }
+    else
+    {
+      int diskOffset = getBufferOffset (da, 0);
+      System.arraycopy (buffer, bufferOffset, diskBuffer, diskOffset, SECTOR_SIZE);
+
+      diskOffset = getBufferOffset (da, 1);
+      System.arraycopy (buffer, bufferOffset + SECTOR_SIZE, diskBuffer, diskOffset,
           SECTOR_SIZE);
     }
   }

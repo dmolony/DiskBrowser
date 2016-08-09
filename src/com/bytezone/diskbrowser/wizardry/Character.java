@@ -114,8 +114,8 @@ class Character extends AbstractFile
           if (index > 0 && index <= spellList.size ())
             spellBook.add (spellList.get (index - 1));
           else
-            System.out.println (name + " SpellID : " + index + " is outside range 1:"
-                + spellList.size ());
+            System.out.println ("LinkSpell: " + name + " SpellID : " + index
+                + " is outside range 1:" + spellList.size ());
         }
   }
 
@@ -284,7 +284,7 @@ class Character extends AbstractFile
     public String toString ()
     {
       return String.format ("%s%-15s (%d)", equipped ? "*" : " ", item.getName (),
-                            item.getCost ());
+          item.getCost ());
     }
   }
 

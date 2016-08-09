@@ -37,6 +37,12 @@ public class Wizardry4BootDisk extends PascalDisk
       relocator.createNewBuffer (dataDisks);
       fileEntry.setFile (relocator);
     }
+
+    // reset the code segment so that it rebuilds itself from the new data
+    DefaultMutableTreeNode pascalNode = findNode (currentRoot, "SYSTEM.PASCAL");
+    fileEntry = (FileEntry) pascalNode.getUserObject ();
+    fileEntry.setFile (null);
+    fileEntry.getDataSource ();
   }
 
   public static boolean isWizardryIV (Disk disk, boolean debug)

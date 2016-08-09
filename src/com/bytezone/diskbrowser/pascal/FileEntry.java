@@ -85,8 +85,8 @@ public class FileEntry extends CatalogEntry
           {
             DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (
                 new PascalCodeObject (parent, pascalSegment, firstBlock));
-            node.add (segmentNode);
             segmentNode.setAllowsChildren (false);
+            node.add (segmentNode);
           }
         }
         catch (FileFormatException e)
@@ -95,6 +95,7 @@ public class FileEntry extends CatalogEntry
             file = new AssemblerProgram (name, buffer, 0xD000);
           else
             file = new AssemblerProgram (name, buffer, 0);
+          node.setAllowsChildren (false);
         }
         break;
 

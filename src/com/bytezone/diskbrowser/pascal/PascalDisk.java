@@ -103,19 +103,10 @@ public class PascalDisk extends AbstractFormattedDisk
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
       fileEntry.setNode (node);
 
-      if (fileEntry.fileType == 2)// && dataSource instanceof PascalCode)
+      if (fileEntry.fileType == 2)
       {
         node.setAllowsChildren (true);
-        // this does not trigger correctly when opening the arrow
-
-        //        PascalCode pascalCode = (PascalCode) dataSource;
-        //        for (PascalSegment pascalSegment : pascalCode)
-        //        {
-        //          DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (
-        //              new PascalCodeObject (this, pascalSegment, fileEntry.firstBlock));
-        //          node.add (segmentNode);
-        //          segmentNode.setAllowsChildren (false);
-        //        }
+        fileEntry.getDataSource ();
       }
       else
         node.setAllowsChildren (false);

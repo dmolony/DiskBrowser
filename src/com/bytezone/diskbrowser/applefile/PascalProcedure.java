@@ -70,7 +70,7 @@ public class PascalProcedure
       //      System.out.printf ("ptr:%d, max:%d, buf:%d %n", ptr, max, buffer.length);
       if (ptr >= buffer.length || ptr < 0)
       {
-        System.out.println ("Ptr outside buffer");
+        System.out.printf ("Ptr outside buffer: %d %d%n", ptr, buffer.length);
         break;
       }
       PascalCodeStatement cs = new PascalCodeStatement (buffer, ptr, procOffset);

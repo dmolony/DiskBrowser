@@ -390,13 +390,15 @@ public class DiskFactory
 
     if (Wizardry4BootDisk.isWizardryIV (disk, debug))
     {
-      // collect 4 data disks
-      AppleDisk[] disks = new AppleDisk[5];
-      AppleDisk d = new AppleDisk (file, 256, 8);
-      d.setInterleave (1);
-      disks[0] = d;
+      // collect 4 extra data disks
+      AppleDisk[] disks = new AppleDisk[6];
 
-      for (int i = 2; i <= 5; i++)
+      disks[0] = new AppleDisk (file, 256, 8);           // will become a PascalDisk
+      disks[1] = new AppleDisk (file, 256, 8);           // will remain a DataDisk
+      disks[0].setInterleave (1);
+      disks[1].setInterleave (1);
+
+      for (int i = 2; i < disks.length; i++)
       {
         String filename = file.getAbsolutePath ().replace ("1.dsk", i + ".dsk");
         File f = new File (filename);
@@ -404,7 +406,7 @@ public class DiskFactory
         {
           AppleDisk dataDisk = new AppleDisk (f, 35, 8);
           dataDisk.setInterleave (1);
-          disks[i - 1] = dataDisk;
+          disks[i] = dataDisk;
         }
         else
         {

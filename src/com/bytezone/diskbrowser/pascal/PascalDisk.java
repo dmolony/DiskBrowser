@@ -10,8 +10,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
-import com.bytezone.diskbrowser.applefile.PascalCode;
-import com.bytezone.diskbrowser.applefile.PascalSegment;
 import com.bytezone.diskbrowser.applefile.Relocator;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
@@ -21,11 +19,10 @@ public class PascalDisk extends AbstractFormattedDisk
 {
   static final int CATALOG_ENTRY_SIZE = 26;
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
-  private VolumeEntry volumeEntry;
-  private PascalCatalogSector diskCatalogSector;
+  private final VolumeEntry volumeEntry;
+  private final PascalCatalogSector diskCatalogSector;
 
   protected Relocator relocator;
-  protected Disk[] dataDisks;
 
   final String[] fileTypes =
       { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
@@ -39,26 +36,10 @@ public class PascalDisk extends AbstractFormattedDisk
   SectorType grafSector = new SectorType ("Graf", Color.cyan);
   SectorType fotoSector = new SectorType ("Foto", Color.gray);
 
-  public PascalDisk (Disk[] disks)
-  {
-    super (disks[0]);
-    init ();
-
-    dataDisks = disks;      // these need to be in place before ...
-
-    // 1. create new disk buffer
-    // 2. copy sectors from 5 data disks to new buffer
-    // 3. replace old disk buffer with new disk buffer
-  }
-
   public PascalDisk (Disk disk)
   {
     super (disk);
-    init ();
-  }
 
-  private void init ()
-  {
     sectorTypesList.add (diskBootSector);
     sectorTypesList.add (catalogSector);
     sectorTypesList.add (dataSector);
@@ -117,32 +98,24 @@ public class PascalDisk extends AbstractFormattedDisk
       data = new byte[CATALOG_ENTRY_SIZE];
 
       System.arraycopy (buffer, ptr, data, 0, CATALOG_ENTRY_SIZE);
-      FileEntry fileEntry = new FileEntry (this, data, relocator);
+      FileEntry fileEntry = new FileEntry (this, data);
       fileEntries.add (fileEntry);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
+      fileEntry.setNode (node);
 
-      // why is this being called? it creates every file on the disk
-      DataSource dataSource = fileEntry.getDataSource ();     // reads all buffers
-
-      if (fileEntry.fileType == 5 && dataSource instanceof Relocator)
-      {
-        relocator = (Relocator) dataSource;
-        relocator.setDisks (dataDisks);
-        int size = fileEntry.lastBlock - fileEntry.firstBlock;
-        relocator.getMultiDiskAddress (fileEntry.name, fileEntry.firstBlock, size);
-      }
-
-      if (fileEntry.fileType == 2 && dataSource instanceof PascalCode)
+      if (fileEntry.fileType == 2)// && dataSource instanceof PascalCode)
       {
         node.setAllowsChildren (true);
-        PascalCode pascalCode = (PascalCode) dataSource;
-        for (PascalSegment pascalSegment : pascalCode)
-        {
-          DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (
-              new PascalCodeObject (this, pascalSegment, fileEntry.firstBlock));
-          node.add (segmentNode);
-          segmentNode.setAllowsChildren (false);
-        }
+        // this does not trigger correctly when opening the arrow
+
+        //        PascalCode pascalCode = (PascalCode) dataSource;
+        //        for (PascalSegment pascalSegment : pascalCode)
+        //        {
+        //          DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (
+        //              new PascalCodeObject (this, pascalSegment, fileEntry.firstBlock));
+        //          node.add (segmentNode);
+        //          segmentNode.setAllowsChildren (false);
+        //        }
       }
       else
         node.setAllowsChildren (false);

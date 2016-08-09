@@ -22,7 +22,7 @@ public class PascalCode extends AbstractFile
           PascalConstants.mnemonics[i], PascalConstants.descriptions[i]);
   }
 
-  public PascalCode (String name, byte[] buffer, int blockOffset, Relocator relocator)
+  public PascalCode (String name, byte[] buffer, int blockOffset)
   {
     super (name, buffer);
 
@@ -31,8 +31,8 @@ public class PascalCode extends AbstractFile
       throw new FileFormatException ("Error in PascalSegment");
     //    this.blockOffset = blockOffset;
     //    this.relocator = relocator;
-    if (relocator != null)
-      relocator.getMultiDiskAddress ("SEG-DIC", blockOffset, 1);
+    //    if (relocator != null)
+    //      relocator.getMultiDiskAddress ("SEG-DIC", blockOffset, 1);
 
     int nonameCounter = 0;
 
@@ -47,7 +47,7 @@ public class PascalCode extends AbstractFile
       {
         // this could throw an exception
         PascalSegment pascalSegment =
-            new PascalSegment (codeName, buffer, i, blockOffset, relocator);
+            new PascalSegment (codeName, buffer, i, blockOffset);
         segments.add (pascalSegment);
       }
     }

@@ -1,35 +1,26 @@
 package com.bytezone.diskbrowser.pascal;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import com.bytezone.diskbrowser.applefile.*;
-import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class FileEntry extends CatalogEntry
 {
   int bytesUsedInLastBlock;
-  private final Relocator relocator;
+  private DefaultMutableTreeNode node;
+  AbstractFile file;
 
-  public FileEntry (PascalDisk parent, byte[] buffer, Relocator relocator)
+  public FileEntry (PascalDisk parent, byte[] buffer)
   {
     super (parent, buffer);
 
-    this.relocator = relocator;
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
     date = HexFormatter.getPascalDate (buffer, 24);
 
-    if (relocator != null)
-    {
-      int size = lastBlock - firstBlock;
-      //      System.out.printf ("%04X  %04X  %s%n", firstBlock, size, name);
-      relocator.getMultiDiskAddress (name, firstBlock, size);
-    }
-
     for (int i = firstBlock; i < lastBlock; i++)
     {
-      if (i >= 280)
-        break;
-
       switch (fileType)
       {
         case 2:
@@ -64,14 +55,22 @@ public class FileEntry extends CatalogEntry
     }
   }
 
+  void setNode (DefaultMutableTreeNode node)
+  {
+    this.node = node;
+  }
+
+  public void setFile (AbstractFile file)
+  {
+    this.file = file;
+  }
+
   @Override
   public AbstractFile getDataSource ()
   {
     if (file != null)
       return file;
 
-    // this needs to use the Relocator to obtain the currect blocks
-    assembleBuffer ();
     byte[] buffer = getExactBuffer ();
 
     switch (fileType)
@@ -79,7 +78,16 @@ public class FileEntry extends CatalogEntry
       case 2:                                         // code (6502 or Pascal)
         try
         {
-          file = new PascalCode (name, buffer, firstBlock, relocator);
+          file = new PascalCode (name, buffer, firstBlock);
+          node.removeAllChildren ();
+
+          for (PascalSegment pascalSegment : (PascalCode) file)
+          {
+            DefaultMutableTreeNode segmentNode = new DefaultMutableTreeNode (
+                new PascalCodeObject (parent, pascalSegment, firstBlock));
+            node.add (segmentNode);
+            segmentNode.setAllowsChildren (false);
+          }
         }
         catch (FileFormatException e)
         {
@@ -103,8 +111,8 @@ public class FileEntry extends CatalogEntry
           file = new Charset (name, buffer);
         //        else if (name.equals ("WT"))               // only testing
         //          file = new WizardryTitle (name, buffer);
-        else if (name.equals ("SYSTEM.RELOC"))
-          file = new Relocator (name, buffer);
+        //        else if (name.equals ("SYSTEM.RELOC"))
+        //          file = new Relocator (name, buffer);
         else
           file = new DefaultAppleFile (name, buffer);
         break;
@@ -119,27 +127,11 @@ public class FileEntry extends CatalogEntry
     return file;
   }
 
-  private byte[] assembleBuffer ()
-  {
-    if (relocator != null)
-      for (DiskAddress da : blocks)
-      {
-        System.out.println (da);
-        if (da.getBlock () < 20)
-        {
-          byte[] buffer = relocator.getLogicalBuffer (da);
-          System.out.println (HexFormatter.format (buffer));
-        }
-      }
-
-    return null;
-  }
-
-  // use Relocator to obtain correct blocks
   private byte[] getExactBuffer ()
   {
     byte[] buffer = parent.getDisk ().readSectors (blocks);
     byte[] exactBuffer;
+    //    System.out.println (HexFormatter.format (buffer));
 
     if (buffer.length > 0 && bytesUsedInLastBlock < 512)
     {

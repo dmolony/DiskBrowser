@@ -40,7 +40,7 @@ public interface Disk extends Iterable<DiskAddress>
 
   public byte[] readSectors (List<DiskAddress> daList);
 
-  public int writeSector (DiskAddress da, byte[] buffer);
+  public void writeSector (DiskAddress da, byte[] buffer);
 
   public boolean isSectorEmpty (DiskAddress da);
 

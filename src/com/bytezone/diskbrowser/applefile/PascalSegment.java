@@ -13,7 +13,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   final int segmentNoHeader;
   private int segmentNoBody;
   private final int blockOffset;
-  private final Relocator relocator;
+  //  private final Relocator relocator;
 
   public int blockNo;
   //  public int newBlockNo;
@@ -30,14 +30,13 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private List<PascalProcedure> procedures;
   private List<MultiDiskAddress> addresses;
 
-  public PascalSegment (String name, byte[] fullBuffer, int seq, int blockOffset,
-      Relocator relocator)
+  public PascalSegment (String name, byte[] fullBuffer, int seq, int blockOffset)
   {
     super (name, fullBuffer);     // sets this.buffer to the full buffer temporarily
 
     this.slot = seq;
     this.blockOffset = blockOffset;
-    this.relocator = relocator;
+    //    this.relocator = relocator;
 
     this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
     this.size = HexFormatter.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
@@ -68,23 +67,23 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     int offset = blockNo * 512;
 
-    if (relocator != null)
-    {
-      //      if (segmentNoHeader > 1)
-      //      {
-      int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
-      int targetBlock = blockNo + blockOffset;
-      addresses = relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
-      if (addresses.size () > 0)
-      {
-        MultiDiskAddress multiDiskAddress = addresses.get (0);
-        if (multiDiskAddress.diskNumber == 1)
-          offset = (multiDiskAddress.physicalBlockNumber - blockOffset) * BLOCK_SIZE;
-        else
-          offset = -1;
-      }
-      //      }
-    }
+    //    if (relocator != null)
+    //    {
+    //      //      if (segmentNoHeader > 1)
+    //      //      {
+    //      int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
+    //      int targetBlock = blockNo + blockOffset;
+    //      addresses = relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
+    //      if (addresses.size () > 0)
+    //      {
+    //        MultiDiskAddress multiDiskAddress = addresses.get (0);
+    //        if (multiDiskAddress.diskNumber == 1)
+    //          offset = (multiDiskAddress.physicalBlockNumber - blockOffset) * BLOCK_SIZE;
+    //        else
+    //          offset = -1;
+    //      }
+    //      //      }
+    //    }
 
     if (offset < 0)
     {
@@ -204,26 +203,26 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     //      multiDiskAddressText = String.format ("1:%03X", (blockNo + blockOffset));
     //    }
     //    else
-    if (relocator != null)
-    {
-      int targetBlock = blockNo + blockOffset;
-      List<MultiDiskAddress> addresses =
-          relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
-      if (addresses.isEmpty ())
-        multiDiskAddressText = ".";
-      else
-      {
-        StringBuilder locations = new StringBuilder ();
-        for (MultiDiskAddress multiDiskAddress : addresses)
-          locations.append (multiDiskAddress.toString () + ", ");
-        if (locations.length () > 2)
-        {
-          locations.deleteCharAt (locations.length () - 1);
-          locations.deleteCharAt (locations.length () - 1);
-        }
-        multiDiskAddressText = locations.toString ();
-      }
-    }
+    //    if (relocator != null)
+    //    {
+    //      int targetBlock = blockNo + blockOffset;
+    //      List<MultiDiskAddress> addresses =
+    //          relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
+    //      if (addresses.isEmpty ())
+    //        multiDiskAddressText = ".";
+    //      else
+    //      {
+    //        StringBuilder locations = new StringBuilder ();
+    //        for (MultiDiskAddress multiDiskAddress : addresses)
+    //          locations.append (multiDiskAddress.toString () + ", ");
+    //        if (locations.length () > 2)
+    //        {
+    //          locations.deleteCharAt (locations.length () - 1);
+    //          locations.deleteCharAt (locations.length () - 1);
+    //        }
+    //        multiDiskAddressText = locations.toString ();
+    //      }
+    //    }
     return multiDiskAddressText;
   }
 }

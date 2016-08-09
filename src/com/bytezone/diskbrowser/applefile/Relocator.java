@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.bytezone.diskbrowser.disk.AppleDisk;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -151,6 +152,24 @@ public class Relocator extends AbstractFile
     return true;
   }
 
+  public void createNewBuffer (Disk[] dataDisks)
+  {
+    AppleDisk master = (AppleDisk) dataDisks[0];
+
+    for (int logicalBlock = 0; logicalBlock < diskBlocks.length; logicalBlock++)
+    {
+      int physicalBlock = diskOffsets2[logicalBlock];
+      int diskNo = diskBlocks[logicalBlock];
+      if (diskNo > 0)
+      {
+        Disk disk = dataDisks[diskNo];
+        byte[] temp = disk.readSector (physicalBlock);
+        DiskAddress da = master.getDiskAddress (logicalBlock);
+        master.writeSector (da, temp);
+      }
+    }
+  }
+
   @Override
   public String getText ()
   {
@@ -165,23 +184,26 @@ public class Relocator extends AbstractFile
       text.append ("\n");
     }
 
-    int previousDiskNumber = 0;
-    for (MultiDiskAddress multiDiskAddress : addresses)
+    if (false)
     {
-      if (multiDiskAddress.diskNumber != previousDiskNumber)
+      int previousDiskNumber = 0;
+      for (MultiDiskAddress multiDiskAddress : addresses)
       {
-        previousDiskNumber = multiDiskAddress.diskNumber;
-        text.append ("\n");
-        text.append ("Disk  Logical  Physical   Size   Name\n");
-        text.append ("----  -------  --------   ----   -------------\n");
+        if (multiDiskAddress.diskNumber != previousDiskNumber)
+        {
+          previousDiskNumber = multiDiskAddress.diskNumber;
+          text.append ("\n");
+          text.append ("Disk  Logical  Physical   Size   Name\n");
+          text.append ("----  -------  --------   ----   -------------\n");
+        }
+        text.append (String.format ("  %d     %03X       %03X      %03X   %s%n",
+            multiDiskAddress.diskNumber, multiDiskAddress.logicalBlockNumber,
+            multiDiskAddress.physicalBlockNumber, multiDiskAddress.totalBlocks,
+            multiDiskAddress.name));
       }
-      text.append (String.format ("  %d     %03X       %03X      %03X   %s%n",
-          multiDiskAddress.diskNumber, multiDiskAddress.logicalBlockNumber,
-          multiDiskAddress.physicalBlockNumber, multiDiskAddress.totalBlocks,
-          multiDiskAddress.name));
     }
 
-    text.append ("\n\n Logical   Size  Disk  Physical");
+    text.append ("\n Logical   Size  Disk  Physical");
     text.append ("\n---------  ----  ----  ---------\n");
 
     int first = 0;

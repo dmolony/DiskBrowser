@@ -381,10 +381,11 @@ public class AppleDisk implements Disk
   }
 
   @Override
-  public int writeSector (DiskAddress da, byte[] buffer)
+  public void writeSector (DiskAddress da, byte[] buffer)
   {
-    System.out.println ("Not yet implemented");
-    return -1;
+    //    System.out.println ("Not yet implemented");
+    //    return -1;
+    writeBuffer (da, buffer);
   }
 
   @Override
@@ -507,7 +508,7 @@ public class AppleDisk implements Disk
     }
   }
 
-  private void writeBuffer (DiskAddress da, byte[] buffer, int bufferOffset)
+  private void writeBuffer (DiskAddress da, byte[] buffer)
   {
     assert da.getDisk () == this : "Disk address not applicable to this disk";
     assert sectorSize == SECTOR_SIZE
@@ -518,16 +519,15 @@ public class AppleDisk implements Disk
     if (sectorSize == SECTOR_SIZE)
     {
       int diskOffset = getBufferOffset (da);
-      System.arraycopy (buffer, bufferOffset, diskBuffer, diskOffset, SECTOR_SIZE);
+      System.arraycopy (buffer, 0, diskBuffer, diskOffset, SECTOR_SIZE);
     }
     else
     {
       int diskOffset = getBufferOffset (da, 0);
-      System.arraycopy (buffer, bufferOffset, diskBuffer, diskOffset, SECTOR_SIZE);
+      System.arraycopy (buffer, 0, diskBuffer, diskOffset, SECTOR_SIZE);
 
       diskOffset = getBufferOffset (da, 1);
-      System.arraycopy (buffer, bufferOffset + SECTOR_SIZE, diskBuffer, diskOffset,
-          SECTOR_SIZE);
+      System.arraycopy (buffer, SECTOR_SIZE, diskBuffer, diskOffset, SECTOR_SIZE);
     }
   }
 

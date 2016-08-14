@@ -14,7 +14,6 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.pascal.FileEntry;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class Wizardry4BootDisk extends PascalDisk
@@ -50,8 +49,8 @@ public class Wizardry4BootDisk extends PascalDisk
 
     if (fileEntry != null)
     {
-      //      fileEntry.setFile (null);
-      //      fileEntry.getDataSource ();
+      fileEntry.setFile (null);
+      fileEntry.getDataSource ();
     }
 
     DefaultMutableTreeNode scenarioNode = findNode (currentRoot, "SCENARIO.DATA");
@@ -62,13 +61,12 @@ public class Wizardry4BootDisk extends PascalDisk
       fileEntry.setFile (null);
       scenarioNode.setAllowsChildren (true);
 
-      fileEntry.setFile (null);
       byte[] buffer = fileEntry.getDataSource ().buffer;
 
-      for (int i = 0; i < 11; i++)
+      for (int i = 0; i < 14; i++)
       {
         byte[] level = new byte[896];
-        System.out.println (HexFormatter.format (buffer, 0, 512));
+        //        System.out.println (HexFormatter.format (buffer, 0, 512));
         System.arraycopy (buffer, 0xC600 + i * 1024, level, 0, level.length);
         MazeLevel maze = new MazeLevel (level, i);
 

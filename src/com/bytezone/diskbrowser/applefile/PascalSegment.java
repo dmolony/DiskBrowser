@@ -3,7 +3,6 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.applefile.Relocator.MultiDiskAddress;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -12,8 +11,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private final static int BLOCK_SIZE = 512;
   final int segmentNoHeader;
   private int segmentNoBody;
-  private final int blockOffset;
+  //  private final int blockOffset;
   //  private final Relocator relocator;
+  boolean debug = false;
 
   public int blockNo;
   //  public int newBlockNo;
@@ -28,14 +28,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private final int slot;
   private int totalProcedures;
   private List<PascalProcedure> procedures;
-  private List<MultiDiskAddress> addresses;
+  //  private List<MultiDiskAddress> addresses;
 
   public PascalSegment (String name, byte[] fullBuffer, int seq, int blockOffset)
   {
     super (name, fullBuffer);     // sets this.buffer to the full buffer temporarily
 
     this.slot = seq;
-    this.blockOffset = blockOffset;
+    //    this.blockOffset = blockOffset;
     //    this.relocator = relocator;
 
     this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
@@ -89,18 +89,19 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     {
       buffer = new byte[0];
     }
-    else if (offset < fullBuffer.length)
+    else if ((offset + size) < fullBuffer.length)
     {
       buffer = new byte[size];      // replaces this.buffer with the segment buffer only
       System.arraycopy (fullBuffer, offset, buffer, 0, size);
       totalProcedures = buffer[size - 1] & 0xFF;
       segmentNoBody = buffer[size - 2] & 0xFF;
 
-      if (segmentNoHeader == 0)
-        System.out.printf ("Zero segment header in %s seq %d%n", name, seq);
-      else if (segmentNoBody != segmentNoHeader)
-        System.out.println (
-            "Segment number mismatch : " + segmentNoBody + " / " + segmentNoHeader);
+      if (debug)
+        if (segmentNoHeader == 0)
+          System.out.printf ("Zero segment header in %s seq %d%n", name, seq);
+        else if (segmentNoBody != segmentNoHeader)
+          System.out.println (
+              "Segment number mismatch : " + segmentNoBody + " / " + segmentNoHeader);
     }
     else
     {
@@ -108,10 +109,10 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     }
   }
 
-  void setMultiDiskAddresses (List<MultiDiskAddress> addresses)
-  {
-    this.addresses = addresses;
-  }
+  //  void setMultiDiskAddresses (List<MultiDiskAddress> addresses)
+  //  {
+  //    this.addresses = addresses;
+  //  }
 
   private void buildProcedureList ()
   {

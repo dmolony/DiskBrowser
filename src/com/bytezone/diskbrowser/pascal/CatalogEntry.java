@@ -13,15 +13,15 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 abstract class CatalogEntry implements AppleFileSource
 {
+  protected AbstractFile file;
   protected final PascalDisk parent;
-  protected final String name;
-  int firstBlock;
-  int lastBlock;                      // block AFTER last used block
-  int fileType;
-  GregorianCalendar date;
-  int bytesUsedInLastBlock;
-  List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
-  AbstractFile file;
+  protected String name;
+  protected int firstBlock;
+  protected int lastBlock;                      // block AFTER last used block
+  protected int fileType;
+  protected GregorianCalendar date;
+  protected int bytesUsedInLastBlock;
+  protected final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
 
   public CatalogEntry (PascalDisk parent, byte[] buffer)
   {
@@ -34,7 +34,8 @@ abstract class CatalogEntry implements AppleFileSource
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
 
     Disk disk = parent.getDisk ();
-    for (int i = firstBlock; i < lastBlock; i++)
+    int max = Math.min (lastBlock, disk.getTotalBlocks ());
+    for (int i = firstBlock; i < max; i++)
       blocks.add (disk.getDiskAddress (i));
   }
 
@@ -45,13 +46,6 @@ abstract class CatalogEntry implements AppleFileSource
       if (sector.matches (da))
         return true;
     return false;
-  }
-
-  @Override
-  public String toString ()
-  {
-    int size = lastBlock - firstBlock;
-    return String.format ("%03d  %s  %-15s", size, parent.fileTypes[fileType], name);
   }
 
   @Override
@@ -71,5 +65,12 @@ abstract class CatalogEntry implements AppleFileSource
   public String getUniqueName ()
   {
     return name;
+  }
+
+  @Override
+  public String toString ()
+  {
+    int size = lastBlock - firstBlock;
+    return String.format ("%03d  %s  %-15s", size, parent.fileTypes[fileType], name);
   }
 }

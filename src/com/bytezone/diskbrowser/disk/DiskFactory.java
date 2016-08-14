@@ -388,40 +388,64 @@ public class DiskFactory
     if (debug)
       System.out.println ("Not a Wizardry 1-3 disk");
 
-    if (Wizardry4BootDisk.isWizardryIV (disk, debug))
+    // check for compressed disk
+    if (file.getName ().endsWith (".tmp"))
+      return new PascalDisk (disk);       // complicated joining up compressed disks
+
+    if (Wizardry4BootDisk.isWizardryIVorV (disk, debug))
     {
-      // collect 4 extra data disks
-      AppleDisk[] disks = new AppleDisk[6];
+      String fileName = file.getAbsolutePath ().toLowerCase ();
+      int pos = file.getAbsolutePath ().indexOf ('.');
+      char c = fileName.charAt (pos - 1);
+      String suffix = fileName.substring (pos + 1);
+      int requiredDisks = c == '1' ? 6 : c == 'a' ? 10 : 0;
 
-      disks[0] = new AppleDisk (file, 256, 8);           // will become a PascalDisk
-      disks[1] = new AppleDisk (file, 256, 8);           // will remain a DataDisk
-      disks[0].setInterleave (1);
-      disks[1].setInterleave (1);
-
-      for (int i = 2; i < disks.length; i++)
+      if (requiredDisks > 0)
       {
-        String filename = file.getAbsolutePath ().replace ("1.dsk", i + ".dsk");
-        File f = new File (filename);
-        if (f.exists () && f.isFile ())
+        // collect extra data disks
+        AppleDisk[] disks = new AppleDisk[requiredDisks];
+
+        disks[0] = new AppleDisk (file, 256, 8);           // will become a PascalDisk
+        disks[0].setInterleave (1);
+
+        disks[1] = new AppleDisk (file, 256, 8);           // will remain a DataDisk
+        disks[1].setInterleave (1);
+
+        if (pos > 0 && requiredDisks > 0)
         {
-          AppleDisk dataDisk = new AppleDisk (f, 35, 8);
-          dataDisk.setInterleave (1);
-          disks[i] = dataDisk;
-        }
-        else
-        {
-          PascalDisk pascalDisk = new PascalDisk (disk);
-          return pascalDisk;
+          if (collectDataDisks (file.getAbsolutePath (), pos, disks))
+            return new Wizardry4BootDisk (disks);
         }
       }
-      Wizardry4BootDisk wiz4 = new Wizardry4BootDisk (disks);
-      return wiz4;
     }
     if (debug)
       System.out.println ("Not a Wizardry IV disk");
 
     PascalDisk pascalDisk = new PascalDisk (disk);
     return pascalDisk;
+  }
+
+  private static boolean collectDataDisks (String fileName, int dotPos, AppleDisk[] disks)
+  {
+    char c = fileName.charAt (dotPos - 1);
+    String suffix = fileName.substring (dotPos + 1);
+
+    for (int i = 2; i < disks.length; i++)
+    {
+      String old = new String (c + "." + suffix);
+      String rep = new String ((char) (c + i - 1) + "." + suffix);
+      //      System.out.printf ("[%s] [%s]%n", old, rep);
+      File f = new File (fileName.replace (old, rep));
+      //      System.out.println (f);
+      if (!f.exists () || !f.isFile ())
+        return false;
+
+      AppleDisk dataDisk = new AppleDisk (f, 35, 8);
+      dataDisk.setInterleave (1);
+      disks[i] = dataDisk;
+    }
+
+    return true;
   }
 
   private static InfocomDisk checkInfocomDisk (File file)

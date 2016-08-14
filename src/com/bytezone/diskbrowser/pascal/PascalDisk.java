@@ -10,10 +10,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
-import com.bytezone.diskbrowser.applefile.Relocator;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.wizardry.Relocator;
 
 public class PascalDisk extends AbstractFormattedDisk
 {
@@ -52,12 +52,6 @@ public class PascalDisk extends AbstractFormattedDisk
     List<DiskAddress> blocks = disk.getDiskAddressList (0, 1);    // B0, B1
     this.bootSector = new BootSector (disk, disk.readSectors (blocks), "Pascal");
 
-    byte[] buffer = disk.readSector (2);
-    byte[] data = new byte[CATALOG_ENTRY_SIZE];
-    System.arraycopy (buffer, 0, data, 0, CATALOG_ENTRY_SIZE);
-
-    volumeEntry = new VolumeEntry (this, data);
-
     for (int i = 0; i < 2; i++)
       if (!disk.isSectorEmpty (i))
       {
@@ -68,8 +62,18 @@ public class PascalDisk extends AbstractFormattedDisk
     for (int i = 2; i < disk.getTotalBlocks (); i++)
       freeBlocks.set (i, true);
 
+    byte[] buffer = disk.readSector (2);
+    byte[] data = new byte[CATALOG_ENTRY_SIZE];
+    System.arraycopy (buffer, 0, data, 0, CATALOG_ENTRY_SIZE);
+    volumeEntry = new VolumeEntry (this, data);
+
+    DefaultMutableTreeNode root = getCatalogTreeRoot ();
+    DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode (volumeEntry);
+    root.add (volumeNode);
+
     List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
-    for (int i = 2; i < volumeEntry.lastBlock; i++)
+    int max = Math.min (volumeEntry.lastBlock, disk.getTotalBlocks ());
+    for (int i = 2; i < max; i++)
     {
       DiskAddress da = disk.getDiskAddress (i);
       if (!disk.isSectorEmpty (da))
@@ -81,13 +85,9 @@ public class PascalDisk extends AbstractFormattedDisk
     diskCatalogSector =
         new PascalCatalogSector (disk, disk.readSectors (sectors), sectors);
 
-    DefaultMutableTreeNode root = getCatalogTreeRoot ();
-    DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode (volumeEntry);
-    root.add (volumeNode);
-
     // read the catalog
     List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
-    for (int i = 2; i < volumeEntry.lastBlock; i++)
+    for (int i = 2; i < max; i++)
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readSectors (addresses);
 
@@ -96,9 +96,9 @@ public class PascalDisk extends AbstractFormattedDisk
     {
       int ptr = i * CATALOG_ENTRY_SIZE;
       data = new byte[CATALOG_ENTRY_SIZE];
-
       System.arraycopy (buffer, ptr, data, 0, CATALOG_ENTRY_SIZE);
       FileEntry fileEntry = new FileEntry (this, data);
+
       fileEntries.add (fileEntry);
       DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
       fileEntry.setNode (node);
@@ -106,7 +106,7 @@ public class PascalDisk extends AbstractFormattedDisk
       if (fileEntry.fileType == 2)
       {
         node.setAllowsChildren (true);
-        fileEntry.getDataSource ();
+        fileEntry.getDataSource ();         // build segments
       }
       else
         node.setAllowsChildren (false);

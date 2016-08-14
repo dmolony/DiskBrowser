@@ -485,7 +485,8 @@ public class WizardryScenarioDisk extends PascalDisk
       nodeSectors.addAll (blocks);
       byte[] buffer = disk.readSectors (blocks);
       byte[] data2 = new byte[896];
-      System.arraycopy (buffer, 0, data2, 0, 896);
+      System.arraycopy (buffer, 0, data2, 0, data2.length);
+      //      System.out.println (HexFormatter.format (data2));
 
       MazeLevel model = new MazeLevel (data2, i + 1);
       model.setMessages (messages);

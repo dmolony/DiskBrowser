@@ -8,9 +8,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class FileEntry extends CatalogEntry
 {
-  int bytesUsedInLastBlock;
   private DefaultMutableTreeNode node;
-  AbstractFile file;
 
   public FileEntry (PascalDisk parent, byte[] buffer)
   {
@@ -19,7 +17,8 @@ public class FileEntry extends CatalogEntry
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
     date = HexFormatter.getPascalDate (buffer, 24);
 
-    for (int i = firstBlock; i < lastBlock; i++)
+    int max = Math.min (lastBlock, parent.getDisk ().getTotalBlocks ());
+    for (int i = firstBlock; i < max; i++)
     {
       switch (fileType)
       {

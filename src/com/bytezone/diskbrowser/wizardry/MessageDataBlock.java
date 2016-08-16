@@ -4,36 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.common.Utility;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.applefile.AbstractFile;
 
-public class MessageDataBlock
+public class MessageDataBlock extends AbstractFile
 {
-  private final byte[] buffer;
-  private final int offset;
+  //  private final byte[] buffer;
+  //  private final int offset;
   final int firstMessageNo;
+  //  private final int lastMessageNo;
 
   private final int groupCount;
   private final List<Message> messages = new ArrayList<Message> ();
 
-  public MessageDataBlock (byte[] buffer, int offset, int firstMessageNo)
+  private Huffman huffman;
+
+  public MessageDataBlock (String name, byte[] buffer, int firstMessageNo)
   {
-    this.buffer = buffer;
-    this.offset = offset;
+    super (name, buffer);
     this.firstMessageNo = firstMessageNo;
 
-    boolean debug = firstMessageNo == 0;
-
-    if (debug)
-    {
-      System.out.println (HexFormatter.format (buffer, offset, 512));
-      System.out.println ();
-    }
-
-    int ptr = offset + 0x1FF;          // last byte in block
+    int ptr = 0x1FF;          // last byte in block
     groupCount = buffer[ptr--] & 0xFF;
 
     int currentMessageNo = firstMessageNo;
-    int totalMessageBytes = 0;
+    int totalMessageBytes = firstMessageNo == 1 ? 4 : 0;
 
     for (int i = 0, max = groupCount - 1; i < groupCount; i++, max--)
     {
@@ -44,7 +38,7 @@ public class MessageDataBlock
         int messageLength = buffer[ptr - j - 1] & 0xFF;
         totalMessageBytes += messageLength;
         Message message = new Message (currentMessageNo + j,
-            offset + totalMessageBytes - messageLength, messageLength);
+            totalMessageBytes - messageLength, messageLength);
         messages.add (message);
       }
 
@@ -69,9 +63,6 @@ public class MessageDataBlock
         currentMessageNo += skip;
       }
     }
-
-    if (debug)
-      System.out.println (this);
   }
 
   byte[] getMessage (int messageNo)
@@ -84,6 +75,37 @@ public class MessageDataBlock
         return returnMessage;
       }
     return null;
+  }
+
+  void setHuffman (Huffman huffman)
+  {
+    this.huffman = huffman;
+  }
+
+  @Override
+  public String getText ()
+  {
+    if (huffman == null)
+      return toString ();
+
+    StringBuilder text = new StringBuilder ();
+    text.append ("\n");
+    int lastMessageNo = messages.get (0).msgNo - 1;
+    for (Message message : messages)
+    {
+      if (message.msgNo != lastMessageNo + 1)
+        text.append ("\n");
+      lastMessageNo = message.msgNo;
+      byte[] returnMessage = new byte[message.length];
+      System.arraycopy (buffer, message.offset, returnMessage, 0, message.length);
+      text.append (
+          String.format ("%5d  %s%n", message.msgNo, huffman.getMessage (returnMessage)));
+    }
+
+    if (text.length () > 0)
+      text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
   }
 
   @Override
@@ -122,7 +144,7 @@ public class MessageDataBlock
       StringBuilder text = new StringBuilder ();
 
       String data = Utility.getHex (buffer, offset, length);
-      text.append (String.format ("%5d: %02X  %02X : %s", msgNo, offset, length, data));
+      text.append (String.format ("%5d: %03X  %02X : %s", msgNo, offset, length, data));
 
       return text.toString ();
     }

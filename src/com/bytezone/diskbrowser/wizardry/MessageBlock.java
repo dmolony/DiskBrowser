@@ -1,23 +1,24 @@
 package com.bytezone.diskbrowser.wizardry;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bytezone.common.Utility;
 
-public class MessageBlock
+public class MessageBlock implements Iterable<MessageDataBlock>
 {
-  private final byte[] buffer;
+  //  private final byte[] buffer;
   private final int indexOffset;
   private final int indexLength;
 
   private final List<MessageDataBlock> messageDataBlocks =
       new ArrayList<MessageDataBlock> ();
 
+  private Huffman huffman;
+
   public MessageBlock (byte[] buffer)
   {
-    this.buffer = buffer;
-
     indexOffset = Utility.getWord (buffer, 0);
     indexLength = Utility.getWord (buffer, 2);
 
@@ -26,10 +27,19 @@ public class MessageBlock
     for (int i = 0, max = indexLength / 2; i < max; i++)
     {
       int firstMessageNo = Utility.getWord (buffer, ptr + i * 2);
+      byte[] data = new byte[512];
+      System.arraycopy (buffer, i * 512, data, 0, data.length);
       MessageDataBlock messageDataBlock =
-          new MessageDataBlock (buffer, i * 512, firstMessageNo);
+          new MessageDataBlock ("Block " + firstMessageNo, data, firstMessageNo);
       messageDataBlocks.add (messageDataBlock);
     }
+  }
+
+  public void setHuffman (Huffman huffman)
+  {
+    this.huffman = huffman;
+    for (MessageDataBlock messageDataBlock : messageDataBlocks)
+      messageDataBlock.setHuffman (huffman);
   }
 
   public byte[] getMessage (int messageNo)
@@ -43,16 +53,9 @@ public class MessageBlock
     return null;
   }
 
-  //  public int getBlock (int msgNo)
-  //  {
-  //    int ptr = indexOffset * 512;
-  //
-  //    for (int i = 0; i < indexLength; i += 2)
-  //    {
-  //      int msg = Utility.getWord (buffer, ptr + i);
-  //      if (msg > msgNo)
-  //        return i - 1;
-  //    }
-  //    return indexLength - 1;
-  //  }
+  @Override
+  public Iterator<MessageDataBlock> iterator ()
+  {
+    return messageDataBlocks.iterator ();
+  }
 }

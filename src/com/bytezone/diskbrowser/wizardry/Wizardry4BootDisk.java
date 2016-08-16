@@ -79,6 +79,12 @@ public class Wizardry4BootDisk extends PascalDisk
     if (fileEntry != null)
     {
       messageBlock = new MessageBlock (fileEntry.getDataSource ().buffer);
+      messagesNode.setAllowsChildren (true);
+      for (MessageDataBlock mdb : messageBlock)
+      {
+        List<DiskAddress> messageBlocks = new ArrayList<DiskAddress> ();
+        addToNode (mdb, messagesNode, messageBlocks);
+      }
     }
 
     DefaultMutableTreeNode huffNode = findNode (currentRoot, "ASCII.HUFF");
@@ -89,9 +95,10 @@ public class Wizardry4BootDisk extends PascalDisk
       byte[] buffer = fileEntry.getDataSource ().buffer;
 
       Huffman huffman = new Huffman (buffer);
+      messageBlock.setHuffman (huffman);
 
-      for (int msg = 2043; msg <= 2045; msg++)
-        System.out.println (huffman.getMessage (messageBlock.getMessage (msg)));
+      //      for (int msg = 2043; msg <= 2045; msg++)
+      //        System.out.println (huffman.getMessage (messageBlock.getMessage (msg)));
     }
   }
 

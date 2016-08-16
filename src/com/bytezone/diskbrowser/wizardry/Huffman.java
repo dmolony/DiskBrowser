@@ -56,13 +56,13 @@ public class Huffman
       {
         if ((tree[treePtr] & 0x02) != 0)         // if has right leaf
           return right[treePtr];
-        treePtr = right[treePtr];                // go to right node
+        treePtr = right[treePtr] & 0xFF;                // go to right node
       }
       else                                       // take left path
       {
         if ((tree[treePtr] & 0x01) != 0)         // if has left leaf
           return left[treePtr];
-        treePtr = left[treePtr];                 // go to left node
+        treePtr = left[treePtr] & 0xFF;                 // go to left node
       }
     }
   }

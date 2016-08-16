@@ -85,20 +85,13 @@ public class Wizardry4BootDisk extends PascalDisk
     fileEntry = (FileEntry) huffNode.getUserObject ();
     if (fileEntry != null)
     {
-      //      byte[] tree = new byte[256];
-      //      byte[] left = new byte[256];
-      //      byte[] right = new byte[256];
 
       byte[] buffer = fileEntry.getDataSource ().buffer;
 
-      //      System.arraycopy (buffer, 0, tree, 0, 256);
-      //      System.arraycopy (buffer, 256, left, 0, 256);
-      //      System.arraycopy (buffer, 512, right, 0, 256);
       Huffman huffman = new Huffman (buffer);
 
-      System.out.println (huffman.getMessage (messageBlock.getMessage (2043)));
-      System.out.println (huffman.getMessage (messageBlock.getMessage (2044)));
-      System.out.println (huffman.getMessage (messageBlock.getMessage (2045)));
+      for (int msg = 2043; msg <= 2045; msg++)
+        System.out.println (huffman.getMessage (messageBlock.getMessage (msg)));
     }
   }
 

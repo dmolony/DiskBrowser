@@ -488,12 +488,12 @@ public class WizardryScenarioDisk extends PascalDisk
       System.arraycopy (buffer, 0, data2, 0, data2.length);
       //      System.out.println (HexFormatter.format (data2));
 
-      MazeLevel model = new MazeLevel (data2, i + 1);
-      model.setMessages (messages);
-      model.setMonsters (monsters);
-      model.setItems (items);
-      levels.add (model);
-      addToNode (model, node, blocks, mazeSector);
+      MazeLevel mazeLevel = new MazeLevel (data2, i + 1);
+      mazeLevel.setMessages (messages);
+      mazeLevel.setMonsters (monsters);
+      mazeLevel.setItems (items);
+      levels.add (mazeLevel);
+      addToNode (mazeLevel, node, blocks, mazeSector);
     }
 
     StringBuilder text = new StringBuilder ();

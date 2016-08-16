@@ -55,7 +55,7 @@ public class HexFormatter
     {
       if (line.length () > 0 && i > 0)
         line.append ("\n");
-      if (i > 0 && (i % 0x200) == 0)
+      if (i > offset && (i % 0x200) == 0)
         line.append ("\n");
 
       // print offset

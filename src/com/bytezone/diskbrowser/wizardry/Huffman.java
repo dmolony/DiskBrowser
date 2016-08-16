@@ -1,14 +1,16 @@
 package com.bytezone.diskbrowser.wizardry;
 
+// Based on a pascal routine by Tom Ewers
+
 public class Huffman
 {
   private final byte[] tree;
   private final byte[] left;
   private final byte[] right;
 
-  private int bitNo = 0;
-  private int msgPtr = 0;
-  private int currentByte = 0;
+  private int bitNo;
+  private int msgPtr;
+  private int currentByte;
   private byte[] message;
 
   public Huffman (byte[] buffer)
@@ -33,24 +35,24 @@ public class Huffman
     StringBuilder text = new StringBuilder ();
     for (int i = 0; i < len; i++)
       text.append ((char) getChar ());
+
     return text.toString ();
   }
 
   private byte getChar ()
   {
-    int treePtr = 0;
+    int treePtr = 0;                            // start at the root
 
     while (true)
     {
-      if (bitNo == 0)
+      if (bitNo-- == 0)
       {
-        bitNo = 8;
+        bitNo = 7;
         currentByte = message[msgPtr++] & 0xFF;
       }
 
-      int currentBit = currentByte % 2;
+      int currentBit = currentByte % 2;         // get the next bit to process
       currentByte /= 2;
-      bitNo--;
 
       if (currentBit == 0)                       // take right path
       {

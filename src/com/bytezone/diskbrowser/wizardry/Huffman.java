@@ -6,9 +6,9 @@ public class Huffman
   private final byte[] left;
   private final byte[] right;
 
-  private int bit = 0;
+  private int bitNo = 0;
   private int msgPtr = 0;
-  private int b = 0;
+  private int currentByte = 0;
   private byte[] message;
 
   public Huffman (byte[] buffer)
@@ -25,9 +25,9 @@ public class Huffman
   public String getMessage (byte[] message)
   {
     this.message = message;
-    bit = 0;
+    bitNo = 0;
     msgPtr = 0;
-    b = 0;
+    currentByte = 0;
 
     int len = getChar ();
     StringBuilder text = new StringBuilder ();
@@ -42,27 +42,27 @@ public class Huffman
 
     while (true)
     {
-      if (bit == 0)
+      if (bitNo == 0)
       {
-        bit = 8;
-        b = message[msgPtr++] & 0xFF;
+        bitNo = 8;
+        currentByte = message[msgPtr++] & 0xFF;
       }
 
-      int thisBit = b % 2;
-      b /= 2;
-      bit--;
+      int currentBit = currentByte % 2;
+      currentByte /= 2;
+      bitNo--;
 
-      if (thisBit == 0)                          // take right path
+      if (currentBit == 0)                       // take right path
       {
-        if ((tree[treePtr] & 0x02) != 0)         // if has right leaf
-          return right[treePtr];
-        treePtr = right[treePtr] & 0xFF;                // go to right node
+        if ((tree[treePtr] & 0x02) != 0)         // if has right leaf...
+          return right[treePtr];                 // return that character
+        treePtr = right[treePtr] & 0xFF;         // else go to right node
       }
       else                                       // take left path
       {
-        if ((tree[treePtr] & 0x01) != 0)         // if has left leaf
-          return left[treePtr];
-        treePtr = left[treePtr] & 0xFF;                 // go to left node
+        if ((tree[treePtr] & 0x01) != 0)         // if has left leaf...
+          return left[treePtr];                  // return that character
+        treePtr = left[treePtr] & 0xFF;          // else go to left node
       }
     }
   }

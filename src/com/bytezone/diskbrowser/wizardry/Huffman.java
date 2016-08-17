@@ -15,9 +15,9 @@ public class Huffman extends AbstractFile
   private static final byte[] mask = { 2, 1 };
   private static final int[] offset = { RIGHT, LEFT };
 
-  private int bitNo;
+  private byte depth;
   private int msgPtr;
-  private int currentByte;
+  private byte currentByte;
   private byte[] message;
 
   private String bufferContents;
@@ -30,7 +30,7 @@ public class Huffman extends AbstractFile
   public String decodeMessage (byte[] message)
   {
     this.message = message;
-    bitNo = 0;
+    depth = 0;
     msgPtr = 0;
     currentByte = 0;
 
@@ -48,14 +48,11 @@ public class Huffman extends AbstractFile
 
     while (true)
     {
-      if (bitNo-- == 0)
-      {
-        bitNo += 8;
-        currentByte = message[msgPtr++] & 0xFF;
-      }
+      if ((depth++ & 0x07) == 0)                    // every 8th bit
+        currentByte = message[msgPtr++];            // get a new byte
 
-      int currentBit = currentByte % 2;             // get the next bit to process
-      currentByte /= 2;
+      int currentBit = currentByte & 0x01;          // get the next bit to process
+      currentByte >>= 1;                            // and discard it
 
       // use currentBit to determine whether to use the left or right node
       byte nodeValue = buffer[treePtr + offset[currentBit]];

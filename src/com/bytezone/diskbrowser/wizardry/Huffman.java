@@ -6,28 +6,19 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 
 public class Huffman extends AbstractFile
 {
-  private final byte[] tree;
-  private final byte[] left;
-  private final byte[] right;
+  private static final int LEFT = 256;
+  private static final int RIGHT = 512;
 
   private int bitNo;
   private int msgPtr;
   private int currentByte;
   private byte[] message;
 
-  private String treeContents;
+  private String bufferContents;
 
   public Huffman (String name, byte[] buffer)
   {
     super (name, buffer);
-
-    tree = new byte[256];
-    left = new byte[256];
-    right = new byte[256];
-
-    System.arraycopy (buffer, 0, tree, 0, 256);
-    System.arraycopy (buffer, 256, left, 0, 256);
-    System.arraycopy (buffer, 512, right, 0, 256);
   }
 
   public String getMessage (byte[] message)
@@ -47,7 +38,7 @@ public class Huffman extends AbstractFile
 
   private byte getChar ()
   {
-    int treePtr = 0;                            // start at the root
+    int treePtr = 0;                                // start at the root
 
     while (true)
     {
@@ -57,20 +48,20 @@ public class Huffman extends AbstractFile
         currentByte = message[msgPtr++] & 0xFF;
       }
 
-      int currentBit = currentByte % 2;         // get the next bit to process
+      int currentBit = currentByte % 2;             // get the next bit to process
       currentByte /= 2;
 
-      if (currentBit == 0)                       // take right path
+      if (currentBit == 0)                          // take right path
       {
-        if ((tree[treePtr] & 0x02) != 0)         // if has right leaf...
-          return right[treePtr];                 // return that character
-        treePtr = right[treePtr] & 0xFF;         // else go to right node
+        if ((buffer[treePtr] & 0x02) != 0)          // if has right leaf...
+          return buffer[treePtr + RIGHT];           // return that character
+        treePtr = buffer[treePtr + RIGHT] & 0xFF;   // else traverse right node
       }
-      else                                       // take left path
+      else                                          // take left path
       {
-        if ((tree[treePtr] & 0x01) != 0)         // if has left leaf...
-          return left[treePtr];                  // return that character
-        treePtr = left[treePtr] & 0xFF;          // else go to left node
+        if ((buffer[treePtr] & 0x01) != 0)          // if has left leaf...
+          return buffer[treePtr + LEFT];            // return that character
+        treePtr = buffer[treePtr + LEFT] & 0xFF;    // else traverse left node
       }
     }
   }
@@ -78,26 +69,26 @@ public class Huffman extends AbstractFile
   @Override
   public String getText ()
   {
-    if (treeContents == null)
+    if (bufferContents == null)
     {
       StringBuilder text = new StringBuilder ();
       walk (0, "", text);
-      treeContents = text.toString ();
+      bufferContents = text.toString ();
     }
-    return treeContents;
+    return bufferContents;
   }
 
   private void walk (int treePtr, String path, StringBuilder text)
   {
-    if ((tree[treePtr] & 0x01) == 0)
-      walk (left[treePtr] & 0xFF, path + "1", text);
+    if ((buffer[treePtr] & 0x01) == 0)
+      walk (buffer[treePtr + LEFT] & 0xFF, path + "1", text);
     else
-      print (path + "1", left[treePtr], text);
+      print (path + "1", buffer[treePtr + LEFT], text);
 
-    if ((tree[treePtr] & 0x02) == 0)
-      walk (right[treePtr] & 0xFF, path + "0", text);
+    if ((buffer[treePtr] & 0x02) == 0)
+      walk (buffer[treePtr + RIGHT] & 0xFF, path + "0", text);
     else
-      print (path + "0", right[treePtr], text);
+      print (path + "0", buffer[treePtr + RIGHT], text);
   }
 
   private void print (String path, byte value, StringBuilder text)

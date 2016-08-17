@@ -94,11 +94,9 @@ public class Wizardry4BootDisk extends PascalDisk
 
       byte[] buffer = fileEntry.getDataSource ().buffer;
 
-      Huffman huffman = new Huffman (buffer);
+      Huffman huffman = new Huffman ("Huffman tree", buffer);
       messageBlock.setHuffman (huffman);
-
-      //      for (int msg = 2043; msg <= 2045; msg++)
-      //        System.out.println (huffman.getMessage (messageBlock.getMessage (msg)));
+      fileEntry.setFile (huffman);
     }
   }
 

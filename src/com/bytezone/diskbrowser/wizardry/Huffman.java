@@ -1,8 +1,10 @@
 package com.bytezone.diskbrowser.wizardry;
 
+import com.bytezone.diskbrowser.applefile.AbstractFile;
+
 // Based on a pascal routine by Tom Ewers
 
-public class Huffman
+public class Huffman extends AbstractFile
 {
   private final byte[] tree;
   private final byte[] left;
@@ -13,8 +15,12 @@ public class Huffman
   private int currentByte;
   private byte[] message;
 
-  public Huffman (byte[] buffer)
+  private String treeContents;
+
+  public Huffman (String name, byte[] buffer)
   {
+    super (name, buffer);
+
     tree = new byte[256];
     left = new byte[256];
     right = new byte[256];
@@ -47,7 +53,7 @@ public class Huffman
     {
       if (bitNo-- == 0)
       {
-        bitNo = 7;
+        bitNo += 8;
         currentByte = message[msgPtr++] & 0xFF;
       }
 
@@ -67,5 +73,37 @@ public class Huffman
         treePtr = left[treePtr] & 0xFF;          // else go to left node
       }
     }
+  }
+
+  @Override
+  public String getText ()
+  {
+    if (treeContents == null)
+    {
+      StringBuilder text = new StringBuilder ();
+      walk (0, "", text);
+      treeContents = text.toString ();
+    }
+    return treeContents;
+  }
+
+  private void walk (int treePtr, String path, StringBuilder text)
+  {
+    if ((tree[treePtr] & 0x01) == 0)
+      walk (left[treePtr] & 0xFF, path + "1", text);
+    else
+      print (path + "1", left[treePtr], text);
+
+    if ((tree[treePtr] & 0x02) == 0)
+      walk (right[treePtr] & 0xFF, path + "0", text);
+    else
+      print (path + "0", right[treePtr], text);
+  }
+
+  private void print (String path, byte value, StringBuilder text)
+  {
+    int val = value & 0xFF;
+    char c = val < 32 || val >= 127 ? ' ' : (char) val;
+    text.append (String.format ("%3d  %1.1s  %s%n", val, c, path));
   }
 }

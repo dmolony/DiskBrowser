@@ -99,7 +99,7 @@ public class MessageDataBlock extends AbstractFile
       byte[] returnMessage = new byte[message.length];
       System.arraycopy (buffer, message.offset, returnMessage, 0, message.length);
       text.append (
-          String.format ("%5d  %s%n", message.msgNo, huffman.getMessage (returnMessage)));
+          String.format ("%5d  %s%n", message.msgNo, huffman.decodeMessage (returnMessage)));
     }
 
     if (text.length () > 0)

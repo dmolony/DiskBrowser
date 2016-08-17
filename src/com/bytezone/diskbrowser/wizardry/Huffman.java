@@ -4,10 +4,16 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 
 // Based on a pascal routine by Tom Ewers
 
+// link for possible display algorithm:
+// http://stackoverflow.com/questions/14184655/set-position-for-drawing-binary-tree
+
 public class Huffman extends AbstractFile
 {
   private static final int LEFT = 256;
   private static final int RIGHT = 512;
+
+  private static final byte[] mask = { 2, 1 };
+  private static final int[] offset = { RIGHT, LEFT };
 
   private int bitNo;
   private int msgPtr;
@@ -21,7 +27,7 @@ public class Huffman extends AbstractFile
     super (name, buffer);
   }
 
-  public String getMessage (byte[] message)
+  public String decodeMessage (byte[] message)
   {
     this.message = message;
     bitNo = 0;
@@ -51,18 +57,15 @@ public class Huffman extends AbstractFile
       int currentBit = currentByte % 2;             // get the next bit to process
       currentByte /= 2;
 
-      if (currentBit == 0)                          // take right path
-      {
-        if ((buffer[treePtr] & 0x02) != 0)          // if has right leaf...
-          return buffer[treePtr + RIGHT];           // return that character
-        treePtr = buffer[treePtr + RIGHT] & 0xFF;   // else traverse right node
-      }
-      else                                          // take left path
-      {
-        if ((buffer[treePtr] & 0x01) != 0)          // if has left leaf...
-          return buffer[treePtr + LEFT];            // return that character
-        treePtr = buffer[treePtr + LEFT] & 0xFF;    // else traverse left node
-      }
+      // use currentBit to determine whether to use the left or right node
+      byte nodeValue = buffer[treePtr + offset[currentBit]];
+
+      // if the node is a leaf, return its contents
+      if ((buffer[treePtr] & mask[currentBit]) != 0)
+        return nodeValue;
+
+      // else continue traversal
+      treePtr = nodeValue & 0xFF;
     }
   }
 
@@ -80,11 +83,13 @@ public class Huffman extends AbstractFile
 
   private void walk (int treePtr, String path, StringBuilder text)
   {
+    // check left node
     if ((buffer[treePtr] & 0x01) == 0)
       walk (buffer[treePtr + LEFT] & 0xFF, path + "1", text);
     else
       print (path + "1", buffer[treePtr + LEFT], text);
 
+    // check right node
     if ((buffer[treePtr] & 0x02) == 0)
       walk (buffer[treePtr + RIGHT] & 0xFF, path + "0", text);
     else

@@ -8,20 +8,19 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 
 public class MessageDataBlock extends AbstractFile
 {
-  //  private final byte[] buffer;
-  //  private final int offset;
   final int firstMessageNo;
-  //  private final int lastMessageNo;
 
   private final int groupCount;
   private final List<Message> messages = new ArrayList<Message> ();
 
-  private Huffman huffman;
+  private final Huffman huffman;
 
-  public MessageDataBlock (String name, byte[] buffer, int firstMessageNo)
+  public MessageDataBlock (String name, byte[] buffer, int firstMessageNo,
+      Huffman huffman)
   {
     super (name, buffer);
     this.firstMessageNo = firstMessageNo;
+    this.huffman = huffman;
 
     int ptr = 0x1FF;          // last byte in block
     groupCount = buffer[ptr--] & 0xFF;
@@ -77,11 +76,6 @@ public class MessageDataBlock extends AbstractFile
     return null;
   }
 
-  void setHuffman (Huffman huffman)
-  {
-    this.huffman = huffman;
-  }
-
   @Override
   public String getText ()
   {
@@ -98,8 +92,8 @@ public class MessageDataBlock extends AbstractFile
       lastMessageNo = message.msgNo;
       byte[] returnMessage = new byte[message.length];
       System.arraycopy (buffer, message.offset, returnMessage, 0, message.length);
-      text.append (
-          String.format ("%5d  %s%n", message.msgNo, huffman.decodeMessage (returnMessage)));
+      text.append (String.format ("%5d  %s%n", message.msgNo,
+          huffman.decodeMessage (returnMessage)));
     }
 
     if (text.length () > 0)

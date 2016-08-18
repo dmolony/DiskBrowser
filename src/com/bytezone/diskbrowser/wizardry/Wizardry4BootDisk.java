@@ -20,9 +20,9 @@ public class Wizardry4BootDisk extends PascalDisk
 {
   public Header scenarioHeader;
   List<AppleDisk> disks = new ArrayList<AppleDisk> ();
-  //  protected Disk[] dataDisks;
   private Relocator relocator;
   private MessageBlock messageBlock;
+  private Huffman huffman;
 
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
   {
@@ -74,19 +74,6 @@ public class Wizardry4BootDisk extends PascalDisk
       linkMonsterImages (monstersNode, fileEntry);
     }
 
-    DefaultMutableTreeNode messagesNode = findNode (currentRoot, "ASCII.KRN");
-    fileEntry = (FileEntry) messagesNode.getUserObject ();
-    if (fileEntry != null)
-    {
-      messageBlock = new MessageBlock (fileEntry.getDataSource ().buffer);
-      messagesNode.setAllowsChildren (true);
-      for (MessageDataBlock mdb : messageBlock)
-      {
-        List<DiskAddress> messageBlocks = new ArrayList<DiskAddress> ();
-        addToNode (mdb, messagesNode, messageBlocks);
-      }
-    }
-
     DefaultMutableTreeNode huffNode = findNode (currentRoot, "ASCII.HUFF");
     fileEntry = (FileEntry) huffNode.getUserObject ();
     if (fileEntry != null)
@@ -94,9 +81,21 @@ public class Wizardry4BootDisk extends PascalDisk
 
       byte[] buffer = fileEntry.getDataSource ().buffer;
 
-      Huffman huffman = new Huffman ("Huffman tree", buffer);
-      messageBlock.setHuffman (huffman);
+      huffman = new Huffman ("Huffman tree", buffer);
       fileEntry.setFile (huffman);
+    }
+
+    DefaultMutableTreeNode messagesNode = findNode (currentRoot, "ASCII.KRN");
+    fileEntry = (FileEntry) messagesNode.getUserObject ();
+    if (fileEntry != null)
+    {
+      messageBlock = new MessageBlock (fileEntry.getDataSource ().buffer, huffman);
+      messagesNode.setAllowsChildren (true);
+      for (MessageDataBlock mdb : messageBlock)
+      {
+        List<DiskAddress> messageBlocks = new ArrayList<DiskAddress> ();
+        addToNode (mdb, messagesNode, messageBlocks);
+      }
     }
   }
 

@@ -41,15 +41,15 @@ public class Huffman extends AbstractFile
 
   private byte getChar ()
   {
-    int treePtr = 0;                                // start at the root
+    int treePtr = 0;                            // start at the root
 
     while (true)
     {
-      if ((depth++ & 0x07) == 0)                    // every 8th bit
-        currentByte = message[msgPtr++];            // get a new byte
+      if ((depth++ & 0x07) == 0)                // every 8th bit...
+        currentByte = message[msgPtr++];        // ...get a new byte
 
-      int currentBit = currentByte & 0x01;          // extract the next bit to process
-      currentByte >>= 1;                            // and remove it from the byte
+      int currentBit = currentByte & 0x01;      // extract the next bit to process
+      currentByte >>= 1;                        // and remove it from the current byte
 
       // use currentBit to determine whether to use the left or right node
       byte nodeValue = buffer[treePtr + offset[currentBit]];

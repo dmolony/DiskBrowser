@@ -9,11 +9,8 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 
 public class Huffman extends AbstractFile
 {
-  private static final int LEFT = 256;
-  private static final int RIGHT = 512;
-
-  private static final byte[] mask = { 2, 1 };
-  private static final int[] offset = { RIGHT, LEFT };
+  private static final byte[] mask = { 2, 1 };          // bits: 10 or 01
+  private static final int[] offset = { 512, 256 };     // offset to left/right nodes
 
   private byte depth;
   private int msgPtr;
@@ -51,8 +48,8 @@ public class Huffman extends AbstractFile
       if ((depth++ & 0x07) == 0)                    // every 8th bit
         currentByte = message[msgPtr++];            // get a new byte
 
-      int currentBit = currentByte & 0x01;          // get the next bit to process
-      currentByte >>= 1;                            // and discard it
+      int currentBit = currentByte & 0x01;          // extract the next bit to process
+      currentByte >>= 1;                            // and remove it from the byte
 
       // use currentBit to determine whether to use the left or right node
       byte nodeValue = buffer[treePtr + offset[currentBit]];
@@ -80,23 +77,14 @@ public class Huffman extends AbstractFile
 
   private void walk (int treePtr, String path, StringBuilder text)
   {
-    // check left node
-    if ((buffer[treePtr] & 0x01) == 0)
-      walk (buffer[treePtr + LEFT] & 0xFF, path + "1", text);
-    else
-      print (path + "1", buffer[treePtr + LEFT], text);
-
-    // check right node
-    if ((buffer[treePtr] & 0x02) == 0)
-      walk (buffer[treePtr + RIGHT] & 0xFF, path + "0", text);
-    else
-      print (path + "0", buffer[treePtr + RIGHT], text);
-  }
-
-  private void print (String path, byte value, StringBuilder text)
-  {
-    int val = value & 0xFF;
-    char c = val < 32 || val >= 127 ? ' ' : (char) val;
-    text.append (String.format ("%3d  %1.1s  %s%n", val, c, path));
+    for (int currentBit = 1; currentBit >= 0; --currentBit)
+      if ((buffer[treePtr] & mask[currentBit]) == 0)
+        walk (buffer[treePtr + offset[currentBit]] & 0xFF, path + currentBit, text);
+      else
+      {
+        int val = buffer[treePtr + offset[currentBit]] & 0xFF;
+        char c = val < 32 || val >= 127 ? ' ' : (char) val;
+        text.append (String.format ("%3d  %1.1s  %s%n", val, c, path + currentBit));
+      }
   }
 }

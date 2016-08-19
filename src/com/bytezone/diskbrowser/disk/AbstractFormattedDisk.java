@@ -257,7 +257,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
           return childNode;
       }
     }
-    System.out.println ("Node not found : " + name);
+    //    System.out.println ("Node not found : " + name);
     return null;
   }
 

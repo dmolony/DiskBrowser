@@ -112,23 +112,29 @@ class MazeLevel extends AbstractFile
         cell.stairs = true;
         cell.addressTo = getAddress (b);
         break;
+
       case 2:
         cell.pit = true;
         break;
+
       case 3:
         cell.chute = true;
         cell.addressTo = getAddress (b);
         break;
+
       case 4:
         cell.spinner = true;
         break;
+
       case 5:
         cell.darkness = true;
         break;
+
       case 6:
         cell.teleport = true;
         cell.addressTo = getAddress (b);
         break;
+
       case 8:
         cell.elevator = true;
         cell.elevatorTo =
@@ -136,23 +142,28 @@ class MazeLevel extends AbstractFile
         cell.elevatorFrom =
             HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
         break;
+
       case 9:
         cell.rock = true;
         break;
+
       case 10:
         cell.spellsBlocked = true;
         break;
+
       case 11:
         int messageNum = HexFormatter.intValue (buffer[800 + b * 2], buffer[801 + b * 2]);
         if (messages != null)
+        {
           for (Message m : messages)
             if (m.match (messageNum))
             {
               cell.message = m;
               break;
             }
-        if (cell.message == null)
-          System.out.println ("message not found : " + messageNum);
+          if (cell.message == null)
+            System.out.println ("message not found : " + messageNum);
+        }
         cell.messageType =
             HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
 
@@ -190,10 +201,12 @@ class MazeLevel extends AbstractFile
           }
         }
         break;
+
       case 12:
         cell.monsterID = HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
         cell.monsters = monsters;
         break;
+
       default:
         cell.unknown = d;
         break;

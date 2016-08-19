@@ -50,10 +50,10 @@ public abstract class AbstractFile implements DataSource
     if (buffer == null || buffer.length == 0)
       return "No buffer";
 
-    if (buffer.length <= 99999)
+    if (buffer.length <= 999999)
       return HexFormatter.format (buffer, 0, buffer.length);
 
-    return HexFormatter.format (buffer, 0, 99999);
+    return HexFormatter.format (buffer, 0, 999999);
   }
 
   @Override

@@ -27,7 +27,7 @@ public class MessageBlock implements Iterable<MessageDataBlock>
       byte[] data = new byte[512];
       System.arraycopy (buffer, i * 512, data, 0, data.length);
       MessageDataBlock messageDataBlock = new MessageDataBlock (
-          "Block " + i + " Msg " + firstMessageNo, data, firstMessageNo, huffman);
+          " Message " + firstMessageNo, data, firstMessageNo, huffman);
       messageDataBlocks.add (messageDataBlock);
     }
   }

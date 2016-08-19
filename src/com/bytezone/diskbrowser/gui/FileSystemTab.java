@@ -33,7 +33,7 @@ class FileSystemTab extends AbstractTab
   Map<String, List<DiskDetails>> duplicateDisks;
 
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
-        Font font, DiskSelectedEvent diskEvent) // throws NoDisksFoundException
+      Font font, DiskSelectedEvent diskEvent) // throws NoDisksFoundException
   {
     super (navMan, selector, font);
     this.rootFolder = folder;
@@ -76,13 +76,13 @@ class FileSystemTab extends AbstractTab
         }
         for (File file : tb.dosMap.get (key))
           System.out.printf ("                      %s%n",
-                             file.getAbsolutePath ().substring (beginIndex));
+              file.getAbsolutePath ().substring (beginIndex));
       }
     }
   }
 
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
-        Font font)
+      Font font)
   // throws NoDisksFoundException
   {
     this (folder, selector, navMan, font, null); // default to first available disk
@@ -177,7 +177,7 @@ class FileSystemTab extends AbstractTab
         return childNode;
 
       if (fn2.file.isDirectory () && absolutePath.startsWith (path)
-            && absolutePath.charAt (path.length ()) == '/')
+          && absolutePath.charAt (path.length ()) == '/')
       {
         DefaultMutableTreeNode node2 = search (childNode, absolutePath);
         if (node2 != null)
@@ -231,7 +231,8 @@ class FileSystemTab extends AbstractTab
       public void treeWillExpand (TreeExpansionEvent e) throws ExpandVetoException
       {
         TreePath path = e.getPath ();
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent ();
+        DefaultMutableTreeNode node =
+            (DefaultMutableTreeNode) path.getLastPathComponent ();
         FileNode fn = (FileNode) node.getUserObject ();
         if (node.getChildCount () == 0)
           fn.readFiles ();

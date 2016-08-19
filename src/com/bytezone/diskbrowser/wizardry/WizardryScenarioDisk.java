@@ -84,8 +84,8 @@ public class WizardryScenarioDisk extends PascalDisk
 
     // Process SCENARIO.MESGS (requires scenario)
     AppleFileSource afs = (AppleFileSource) msgNode.getUserObject ();
-    DefaultMutableTreeNode node = linkNode ("Messages", "Messages string", msgNode);
-    extractMessages (node, afs.getSectors ());
+    //    DefaultMutableTreeNode node = linkNode ("Messages", "Messages string", msgNode);
+    extractMessages (msgNode, afs.getSectors ());
     //		makeNodeVisible (node);
 
     // Process SCENARIO.DATA (requires scenario and messages)
@@ -100,7 +100,7 @@ public class WizardryScenarioDisk extends PascalDisk
     extractExperienceLevels (linkNode ("Experience", "Experience string", dataNode),
         sectors);
     //		node = linkNode ("Spells", "Spells string", dataNode);
-    node = null;
+    DefaultMutableTreeNode node = null;
     extractSpells (node, sectors);
     extractLevels (linkNode ("Maze", "Levels string", dataNode), sectors);
     // Make the Spells node (and its siblings) visible
@@ -467,9 +467,6 @@ public class WizardryScenarioDisk extends PascalDisk
         totalLines = 0;
       }
     }
-
-    DefaultAppleFileSource afs = (DefaultAppleFileSource) node.getUserObject ();
-    afs.setSectors (sectors);
   }
 
   private void extractLevels (DefaultMutableTreeNode node, List<DiskAddress> sectors)

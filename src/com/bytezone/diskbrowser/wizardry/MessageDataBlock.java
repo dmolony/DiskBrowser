@@ -19,6 +19,7 @@ public class MessageDataBlock extends AbstractFile
       Huffman huffman)
   {
     super (name, buffer);
+
     this.firstMessageNo = firstMessageNo;
     this.huffman = huffman;
 
@@ -62,6 +63,9 @@ public class MessageDataBlock extends AbstractFile
         currentMessageNo += skip;
       }
     }
+
+    if (currentMessageNo > firstMessageNo)
+      this.name += " - " + (currentMessageNo - 1);
   }
 
   byte[] getMessage (int messageNo)
@@ -79,12 +83,15 @@ public class MessageDataBlock extends AbstractFile
   @Override
   public String getText ()
   {
+    if (messages.size () == 0)
+      return "No Messages";
+
     if (huffman == null)
       return toString ();
 
     StringBuilder text = new StringBuilder ();
-    text.append ("\n");
     int lastMessageNo = messages.get (0).msgNo - 1;
+
     for (Message message : messages)
     {
       if (message.msgNo != lastMessageNo + 1)

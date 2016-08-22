@@ -53,6 +53,10 @@ public class Relocator extends AbstractFile
   public void createNewBuffer (Disk[] dataDisks)
   {
     AppleDisk master = (AppleDisk) dataDisks[0];
+    //    byte[] key1 = { 0x55, 0x55, 0x15, 0x55 };
+    //    byte[] key2 = { 0x00, 0x00, 0x01, 0x41 };
+    //    byte[] key3 = { 0x01, 0x00, 0x01, 0x41 };
+    //    byte[] key4 = { 0x00, 0x00, 0x15, 0x55 };
 
     for (int logicalBlock = 0; logicalBlock < diskBlocks.length; logicalBlock++)
     {
@@ -63,6 +67,11 @@ public class Relocator extends AbstractFile
         byte[] temp = disk.readSector (diskOffsets[logicalBlock]);
         DiskAddress da = master.getDiskAddress (logicalBlock);
         master.writeSector (da, temp);
+        //        if (Utility.find (temp, key1))
+        //          if (Utility.find (temp, key2))
+        //            if (Utility.find (temp, key3))
+        //              if (Utility.find (temp, key4))
+        //                System.out.println (da);
       }
     }
   }

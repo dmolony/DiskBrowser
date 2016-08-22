@@ -26,20 +26,20 @@ public class Utility
         .equals (AffineTransform.getScaleInstance (2.0, 2.0));
   }
 
-  public static void find (byte[] buffer, byte[] key)
+  public static boolean find (byte[] buffer, byte[] key)
   {
-    System.out.println ("*********** searching ************");
-    //    System.out.println (HexFormatter.format (buffer));
     for (int i = 0; i < buffer.length; i++)
     {
-      //      System.out.printf ("%02X  %02X%n", buffer[i], key[0]);
       if (buffer[i] == key[0])
       {
-        //        System.out.println ("**** checking first ****");
         if (matches (buffer, i, key))
+        {
           System.out.printf ("Matches at %04X%n", i);
+          return true;
+        }
       }
     }
+    return false;
   }
 
   public static boolean matches (byte[] buffer, int offset, byte[] key)

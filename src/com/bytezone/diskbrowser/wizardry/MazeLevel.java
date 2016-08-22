@@ -70,28 +70,71 @@ class MazeLevel extends AbstractFile
           "Elevator", "Rock/Water", "Fizzle", "Message/Item", "Monster" };
 
     List<MazeAddress> messageList = new ArrayList<MazeAddress> ();
-    text.append ("\n\nAddresses/Messages/Items\n\n");
-    for (int i = 768, j = 0; i < 800; i += 2, j++)
+    List<MazeAddress> monsterList = new ArrayList<MazeAddress> ();
+
+    text.append ("\n\nTable   Index   Contains      \n");
+    for (int j = 0; j < 16; j++)
     {
+      String extraText = "";
       int val = buffer[760 + j / 2] & 0xFF;
       String extra = (j % 2) == 0 ? extras[val % 16] : extras[val / 16];
       MazeAddress address = getAddress (j);
-      int k = (j % 2) == 0 ? val % 16 : val / 16;
-      if (k == 11)
-        messageList.add (address);
-      text.append (String.format ("%04X-%04X-%04X: %04X  %04X  %04X : %X  %X  %s%n", i,
-          i + 32, i + 64, address.level, address.row, address.column, j, k, extra));
+      int cellFlag = (j % 2) == 0 ? val % 16 : val / 16;
+      if (cellFlag == 11)
+      {
+        extraText = "Msg:" + String.format ("%04X  ", address.row);
+        messageList.add (address);          // to print at the end
+
+        int messageType = address.column;
+        if (messageType == 2)
+        {
+          extraText += "Obtained: ";
+          if (items != null)
+            extraText += items.get (address.level).getName ();
+        }
+
+        if (messageType == 5)
+        {
+          extraText += "Requires: ";
+          if (items != null)
+            extraText += items.get (address.level).getName ();
+        }
+
+        if (messageType == 4)
+        {
+          extraText += "Unknown";
+        }
+      }
+
+      if (cellFlag == 12)
+      {
+        monsterList.add (address);
+        extraText = "Encounter: ";
+        if (monsters != null)
+          extraText += monsters.get (address.column).realName;
+      }
+
+      text.append (String.format ("  %X       %X     %-15s   %04X  %04X  %04X  %s%n", j,
+          cellFlag, extra, address.level, address.row, address.column, extraText));
     }
 
     text.append ("\nRest\n\n");
     text.append (HexFormatter.format (buffer, 864, buffer.length - 864));
 
-    text.append ("\n\n");
+    text.append ("\n");
     for (MazeAddress address : messageList)
     {
       Message message = getMessage (address.row);
-      text.append (address.row + "\n");
+      text.append (String.format ("%nMessage: %04X%n", address.row));
       text.append (message.getText ());
+      text.append ("\n");
+    }
+
+    for (MazeAddress address : monsterList)
+    {
+      Monster monster = getMonster (address.column);
+      text.append (String.format ("%nMonster: %04X%n", address.column));
+      text.append (monster.getText ());
       text.append ("\n");
     }
 
@@ -116,7 +159,6 @@ class MazeLevel extends AbstractFile
 
   private void addExtras (StringBuilder text, int ptr)
   {
-    //    StringBuilder text2 = new StringBuilder ();
     text.append ("\n\n");
     for (int i = 0; i < 20; i++)
     {
@@ -127,19 +169,9 @@ class MazeLevel extends AbstractFile
         int left = val / 16;          // 0:F
         int right = val % 16;         // 0:F
         text.append (String.format ("%X:%X  ", right, left));
-
-        int c2 = buffer[760 + right / 2] & 0xFF;                      // 760 + 0:7
-        int d2 = (right % 2 == 0) ? c2 % 16 : c2 / 16;
-        //        text2.append (String.format ("%02X  %02X   ", c2, d2));
-
-        int c1 = buffer[760 + left / 2] & 0xFF;
-        int d1 = (left % 2 == 0) ? c1 % 16 : c1 / 16;
-        //        text2.append (String.format ("%02X  %02X%n", c1, d1));
       }
       text.append ("\n");
-      //      text2.append ("\n");
     }
-    //    text.append (text2.toString ());
   }
 
   @Override
@@ -231,9 +263,9 @@ class MazeLevel extends AbstractFile
     int b = (row % 2 == 0) ? value % 16 : value / 16;     // 0:F
 
     int c = buffer[760 + b / 2] & 0xFF;                   // 760:767
-    int d = (b % 2 == 0) ? c % 16 : c / 16;
+    int cellFlag = (b % 2 == 0) ? c % 16 : c / 16;
 
-    switch (d)
+    switch (cellFlag)
     {
       case 0:         // normal
         break;
@@ -266,7 +298,7 @@ class MazeLevel extends AbstractFile
         break;
 
       case 7:       // ouchy
-        cell.unknown = d;
+        cell.unknown = cellFlag;
         break;
 
       case 8:
@@ -328,7 +360,7 @@ class MazeLevel extends AbstractFile
             System.out.println ("Value : " + val);
             // this gives Index error: 20410, Size 104 in Wizardry_III/legacy2.dsk
             if (items != null && val < items.size ())
-              cell.itemObtained = items.get (val); // check this
+              cell.itemObtained = items.get (val);          // check this
             if (cell.itemObtained == null)
               System.out.printf ("Item %d not found%n", val);
           }
@@ -343,8 +375,8 @@ class MazeLevel extends AbstractFile
         break;
 
       default:
-        System.out.println ("Unknown extra: " + d);
-        cell.unknown = d;
+        System.out.println ("Unknown extra: " + cellFlag);
+        cell.unknown = cellFlag;
         break;
     }
 
@@ -368,8 +400,18 @@ class MazeLevel extends AbstractFile
       if (m.match (messageNo))
         return m;
 
-    //    if (cell.message == null)
-    //      System.out.println ("message not found : " + messageNum);
+    return null;
+  }
+
+  private Monster getMonster (int monsterNo)
+  {
+    if (monsters == null)
+      return null;
+
+    for (Monster m : monsters)
+      if (m.match (monsterNo))
+        return m;
+
     return null;
   }
 

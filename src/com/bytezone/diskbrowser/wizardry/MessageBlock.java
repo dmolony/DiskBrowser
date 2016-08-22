@@ -5,17 +5,21 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.bytezone.common.Utility;
+import com.bytezone.diskbrowser.applefile.AbstractFile;
 
-public class MessageBlock implements Iterable<MessageDataBlock>
+public class MessageBlock extends AbstractFile implements Iterable<MessageDataBlock>
 {
   private final int indexOffset;
   private final int indexLength;
+  private String text;
 
   private final List<MessageDataBlock> messageDataBlocks =
       new ArrayList<MessageDataBlock> ();
 
   public MessageBlock (byte[] buffer, Huffman huffman)
   {
+    super ("bollocks", buffer);
+
     indexOffset = Utility.getWord (buffer, 0);
     indexLength = Utility.getWord (buffer, 2);
 
@@ -41,6 +45,25 @@ public class MessageBlock implements Iterable<MessageDataBlock>
         return messageDataBlocks.get (i - 1).getMessage (messageNo);
     }
     return null;
+  }
+
+  @Override
+  public String getText ()
+  {
+    if (text != null)
+      return text;
+
+    StringBuilder text = new StringBuilder ();
+
+    for (MessageDataBlock mdb : messageDataBlocks)
+    {
+      text.append (mdb);
+      text.append ("\n");
+    }
+
+    this.text = text.toString ();
+
+    return this.text;
   }
 
   @Override

@@ -9,7 +9,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class MazeCell
 {
-  static Dimension cellSize = new Dimension (22, 22); // size in pixels
+  static Dimension cellSize = new Dimension (22, 22);       // size in pixels
 
   boolean northWall;
   boolean southWall;
@@ -43,7 +43,8 @@ class MazeCell
   int unknown;
 
   MazeAddress address;
-  MazeAddress addressTo; // if teleport/stairs/chute
+  MazeAddress addressTo;                    // if teleport/stairs/chute
+
   public Message message;
   public List<Monster> monsters;
   public Item itemRequired;
@@ -131,7 +132,7 @@ class MazeCell
   private void drawEast (Graphics2D g, int x, int y)
   {
     g.drawLine (x + cellSize.width - 1, y + 1, x + cellSize.width - 1,
-                y + cellSize.height - 1);
+        y + cellSize.height - 1);
   }
 
   private void drawNorth (Graphics2D g, int x, int y)
@@ -142,7 +143,7 @@ class MazeCell
   private void drawSouth (Graphics2D g, int x, int y)
   {
     g.drawLine (x + 1, y + cellSize.height - 1, x + cellSize.width - 1,
-                y + cellSize.height - 1);
+        y + cellSize.height - 1);
   }
 
   public void drawStairsUp (Graphics2D g, int x, int y)

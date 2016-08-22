@@ -41,6 +41,7 @@ public class HexFormatter
   {
     StringBuffer line = new StringBuffer ();
     int[] freq = new int[256];
+    boolean startedOnBoundary = offset % 0x100 == 0;
 
     if (header)
     {
@@ -55,7 +56,7 @@ public class HexFormatter
     {
       if (line.length () > 0 && i > 0)
         line.append ("\n");
-      if (i > offset && (i % 0x200) == 0)
+      if (i > offset && startedOnBoundary && (i % 0x200) == 0)
         line.append ("\n");
 
       // print offset

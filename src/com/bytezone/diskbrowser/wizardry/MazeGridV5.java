@@ -8,20 +8,24 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class MazeGridV5 extends AbstractFile
 {
+  private final MessageBlock messageBlock;
   List<MazeGrid> grids = new ArrayList<MazeGrid> ();
   int minX = 9999;
   int minY = 9999;
   int maxX = 0;
   int maxY = 0;
 
-  public MazeGridV5 (String name, byte[] buffer)
+  public MazeGridV5 (String name, byte[] buffer, MessageBlock messageBlock)
   {
     super (name, buffer);
+
+    this.messageBlock = messageBlock;
 
     for (int i = 0; i < 16; i++)
     {
@@ -121,6 +125,28 @@ public class MazeGridV5 extends AbstractFile
     }
 
     return cell;
+  }
+
+  @Override
+  public String getHexDump ()
+  {
+    StringBuilder text = new StringBuilder (super.getHexDump ());
+
+    text.append ("\n\n");
+    text.append (HexFormatter.format (buffer, 0x550, 0x80));
+    text.append ("\n\n");
+
+    for (int i = 0; i < 128; i += 2)
+    {
+      int msg = Utility.getWord (buffer, 0x550 + i);
+      if (msg >= 15000)
+      {
+        String message = messageBlock.getMessageText (msg);
+        text.append (String.format ("%4d  %04X %s%n", i, msg, message));
+      }
+    }
+
+    return text.toString ();
   }
 
   private class MazeGrid

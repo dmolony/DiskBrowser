@@ -54,6 +54,35 @@ public class Wizardry4BootDisk extends PascalDisk
       fileEntry.getDataSource ();
     }
 
+    DefaultMutableTreeNode huffNode = findNode (currentRoot, "ASCII.HUFF");
+    fileEntry = (FileEntry) huffNode.getUserObject ();
+    if (fileEntry != null)
+    {
+
+      byte[] buffer = fileEntry.getDataSource ().buffer;
+
+      huffman = new Huffman ("Huffman tree", buffer);
+      fileEntry.setFile (huffman);
+    }
+
+    DefaultMutableTreeNode messagesNode = findNode (currentRoot, "ASCII.KRN");
+    fileEntry = (FileEntry) messagesNode.getUserObject ();
+    if (fileEntry != null)
+    {
+      messageBlock = new MessageBlock (fileEntry.getDataSource ().buffer, huffman);
+      fileEntry.setFile (messageBlock);
+      messagesNode.setAllowsChildren (true);
+      List<DiskAddress> blocks = fileEntry.getSectors ();
+
+      int count = 0;
+      for (MessageDataBlock mdb : messageBlock)
+      {
+        List<DiskAddress> messageBlocks = new ArrayList<DiskAddress> ();
+        messageBlocks.add (blocks.get (count++));
+        addToNode (mdb, messagesNode, messageBlocks);
+      }
+    }
+
     if (version == 4)
     {
       DefaultMutableTreeNode scenarioNode = findNode (currentRoot, "SCENARIO.DATA");
@@ -107,35 +136,6 @@ public class Wizardry4BootDisk extends PascalDisk
         }
       }
     }
-
-    DefaultMutableTreeNode huffNode = findNode (currentRoot, "ASCII.HUFF");
-    fileEntry = (FileEntry) huffNode.getUserObject ();
-    if (fileEntry != null)
-    {
-
-      byte[] buffer = fileEntry.getDataSource ().buffer;
-
-      huffman = new Huffman ("Huffman tree", buffer);
-      fileEntry.setFile (huffman);
-    }
-
-    DefaultMutableTreeNode messagesNode = findNode (currentRoot, "ASCII.KRN");
-    fileEntry = (FileEntry) messagesNode.getUserObject ();
-    if (fileEntry != null)
-    {
-      messageBlock = new MessageBlock (fileEntry.getDataSource ().buffer, huffman);
-      fileEntry.setFile (messageBlock);
-      messagesNode.setAllowsChildren (true);
-      List<DiskAddress> blocks = fileEntry.getSectors ();
-
-      int count = 0;
-      for (MessageDataBlock mdb : messageBlock)
-      {
-        List<DiskAddress> messageBlocks = new ArrayList<DiskAddress> ();
-        messageBlocks.add (blocks.get (count++));
-        addToNode (mdb, messagesNode, messageBlocks);
-      }
-    }
   }
 
   private void linkMazeLevels4 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
@@ -170,10 +170,11 @@ public class Wizardry4BootDisk extends PascalDisk
     int base = 0x1800;
     for (int i = 0; i < 8; i++)
     {
-      int offset = base + i * 1024;
-      byte[] data = new byte[1024];
-      System.arraycopy (buffer, offset, data, 0, data.length);
-      MazeGridV5 grid = new MazeGridV5 ("Maze level " + (i + 1), data);
+      int offset = base + i * 0x400;
+      byte[] data = new byte[2048];
+      System.arraycopy (buffer, offset, data, 0, 1024);
+      System.arraycopy (buffer, offset + 8192, data, 1024, 1024);
+      MazeGridV5 grid = new MazeGridV5 ("Maze level " + (i + 1), data, messageBlock);
 
       List<DiskAddress> mazeBlocks = new ArrayList<DiskAddress> ();
       addToNode (grid, mazeNode, mazeBlocks);

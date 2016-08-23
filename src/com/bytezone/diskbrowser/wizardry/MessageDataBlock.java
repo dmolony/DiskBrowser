@@ -80,6 +80,18 @@ public class MessageDataBlock extends AbstractFile
     return null;
   }
 
+  String getText (int messageNo)
+  {
+    for (Message message : messages)
+      if (message.msgNo == messageNo)
+      {
+        byte[] returnMessage = new byte[message.length];
+        System.arraycopy (buffer, message.offset, returnMessage, 0, message.length);
+        return huffman.decodeMessage (returnMessage);
+      }
+    return "*** not found ***";
+  }
+
   @Override
   public String getText ()
   {

@@ -26,7 +26,6 @@ class MazeLevel extends AbstractFile
   @Override
   public String getHexDump ()
   {
-    //    StringBuilder text = new StringBuilder (super.getHexDump ());
     StringBuilder text = new StringBuilder ();
 
     text.append ("West walls/doors\n\n");

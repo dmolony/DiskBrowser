@@ -173,7 +173,7 @@ public class Wizardry4BootDisk extends PascalDisk
       int offset = base + i * 1024;
       byte[] data = new byte[1024];
       System.arraycopy (buffer, offset, data, 0, data.length);
-      MazeGridV5 grid = new MazeGridV5 ("test level " + i, data);
+      MazeGridV5 grid = new MazeGridV5 ("Maze level " + (i + 1), data);
 
       List<DiskAddress> mazeBlocks = new ArrayList<DiskAddress> ();
       addToNode (grid, mazeNode, mazeBlocks);

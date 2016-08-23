@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.wizardry;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -13,6 +14,10 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class MazeGridV5 extends AbstractFile
 {
   List<MazeGrid> grids = new ArrayList<MazeGrid> ();
+  int minX = 9999;
+  int minY = 9999;
+  int maxX = 0;
+  int maxY = 0;
 
   public MazeGridV5 (String name, byte[] buffer)
   {
@@ -25,11 +30,14 @@ public class MazeGridV5 extends AbstractFile
         for (int col = 0; col < 8; col++)
           grid[row][col] = getLayout (i, row, col);
 
-      MazeGrid mazeGrid = new MazeGrid ();
-      mazeGrid.grid = grid;
+      MazeGrid mazeGrid =
+          new MazeGrid (grid, buffer[528 + i] & 0xFF, buffer[512 + i] & 0xFF);
       grids.add (mazeGrid);
-      mazeGrid.yOffset = buffer[512 + i] & 0xFF;
-      mazeGrid.xOffset = buffer[528 + i] & 0xFF;
+
+      minX = Math.min (minX, mazeGrid.xOffset);
+      minY = Math.min (minY, mazeGrid.yOffset);
+      maxX = Math.max (maxX, mazeGrid.xOffset);
+      maxY = Math.max (maxY, mazeGrid.yOffset);
     }
   }
 
@@ -37,13 +45,19 @@ public class MazeGridV5 extends AbstractFile
   public BufferedImage getImage ()
   {
     Dimension cellSize = new Dimension (22, 22);
-    int gridWidth = 8 * cellSize.width + 1;
-    int gridHeight = 8 * cellSize.height + 1;
-    image = new BufferedImage (6 * gridWidth, 6 * gridHeight,
+    int fudge = 30;
+
+    int gridWidth = (maxX - minX + 8) * cellSize.width;
+    int gridHeight = (maxY - minY + 7) * cellSize.height;
+
+    image = new BufferedImage (gridWidth + 1, gridHeight + fudge,
         BufferedImage.TYPE_USHORT_555_RGB);
     Graphics2D g = image.createGraphics ();
     g.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
+
+    g.setColor (Color.LIGHT_GRAY);
+    g.fillRect (0, 0, gridWidth + 1, gridHeight + fudge);
 
     for (int i = 0; i < 16; i++)
     {
@@ -53,9 +67,9 @@ public class MazeGridV5 extends AbstractFile
         {
           MazeCell cell = mazeGrid.grid[row][column];
           int x = column * cellSize.width;
-          int y = image.getHeight () - (row + 1) * cellSize.height - 1;
-          x += (mazeGrid.xOffset - 0x80) * cellSize.width + 10 * cellSize.width;
-          y -= (mazeGrid.yOffset - 0x80) * cellSize.height + 10 * cellSize.height;
+          int y = image.getHeight () - (row) * cellSize.height;
+          x += (mazeGrid.xOffset - minX) * cellSize.width;
+          y -= (mazeGrid.yOffset - minY) * cellSize.height + fudge;
           cell.draw (g, x, y);
         }
     }
@@ -111,8 +125,15 @@ public class MazeGridV5 extends AbstractFile
 
   private class MazeGrid
   {
-    MazeCell[][] grid = new MazeCell[8][8];
+    MazeCell[][] grid;
     int xOffset;
     int yOffset;
+
+    public MazeGrid (MazeCell[][] grid, int x, int y)
+    {
+      this.grid = grid;
+      this.xOffset = x;
+      this.yOffset = y;
+    }
   }
 }

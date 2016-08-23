@@ -75,7 +75,7 @@ class DataPanel extends JTabbedPane
     imagePanel = new ImagePanel ();
     imagePane =
         new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     imagePane.getVerticalScrollBar ().setUnitIncrement (50);
     imagePane.getHorizontalScrollBar ().setUnitIncrement (25);
 

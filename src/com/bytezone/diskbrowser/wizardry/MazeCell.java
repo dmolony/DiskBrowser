@@ -57,6 +57,9 @@ class MazeCell
 
   public void draw (Graphics2D g, int x, int y)
   {
+    g.setColor (Color.BLACK);
+    g.fillRect (x, y, 22, 22);
+
     g.setColor (Color.WHITE);
 
     if (westWall)

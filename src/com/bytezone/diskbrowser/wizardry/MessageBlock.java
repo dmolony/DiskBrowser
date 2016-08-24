@@ -41,10 +41,36 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
     for (int i = 0; i < messageDataBlocks.size (); i++)
     {
       MessageDataBlock messageDataBlock = messageDataBlocks.get (i);
-      if (messageDataBlock.firstMessageNo > messageNo)
-        return messageDataBlocks.get (i - 1).getText (messageNo);
+      if (messageDataBlock.lastMessageNo >= messageNo)
+        return messageDataBlock.getText (messageNo);
     }
     return null;
+  }
+
+  public List<String> getMessageLines (int messageNo)
+  {
+    List<String> lines = new ArrayList<String> ();
+
+    for (MessageDataBlock messageDataBlock : messageDataBlocks)
+    {
+      if (messageNo > messageDataBlock.lastMessageNo)
+        continue;
+      if (messageNo < messageDataBlock.firstMessageNo)
+        break;
+
+      while (true)
+      {
+        String message = messageDataBlock.getText (messageNo);
+        if (message != null)
+        {
+          lines.add (message);
+          ++messageNo;
+        }
+        else
+          break;
+      }
+    }
+    return lines;
   }
 
   public byte[] getMessage (int messageNo)

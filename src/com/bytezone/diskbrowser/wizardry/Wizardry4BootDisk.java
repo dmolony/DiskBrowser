@@ -167,13 +167,15 @@ public class Wizardry4BootDisk extends PascalDisk
 
     DefaultMutableTreeNode mazeNode = linkNode ("Maze", "Level 5 mazes", scenarioNode);
 
+    int blockSize = 0x39A;
     int base = 0x1800;
     for (int i = 0; i < 8; i++)
     {
       int offset = base + i * 0x400;
-      byte[] data = new byte[2048];
-      System.arraycopy (buffer, offset, data, 0, 1024);
-      System.arraycopy (buffer, offset + 8192, data, 1024, 1024);
+      //      byte[] data = new byte[2048];
+      byte[] data = new byte[0x800];
+      System.arraycopy (buffer, offset, data, 0, blockSize);
+      System.arraycopy (buffer, offset + 0x2000, data, 0x400, blockSize);
       MazeGridV5 grid = new MazeGridV5 ("Maze level " + (i + 1), data, messageBlock);
 
       List<DiskAddress> mazeBlocks = new ArrayList<DiskAddress> ();

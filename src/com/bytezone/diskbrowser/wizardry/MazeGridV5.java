@@ -88,41 +88,17 @@ public class MazeGridV5 extends AbstractFile
     int offset = gridNo * 16 + column * 2 + row / 4;
     int value;
 
-    if (false)
-    {
-      value = HexFormatter.intValue (buffer[offset]);
-      value >>>= (row % 4) * 2;
-      cell.westWall = ((value & 1) == 1);
-      value >>>= 1;
-      cell.westDoor = ((value & 1) == 1);
-    }
+    value = HexFormatter.intValue (buffer[offset + 0]);
+    value >>>= (row % 4) * 2;
+    cell.eastWall = ((value & 1) == 1);
+    value >>>= 1;
+    cell.eastDoor = ((value & 1) == 1);
 
-    if (false)
-    {
-      value = HexFormatter.intValue (buffer[offset + 256]);
-      value >>>= (row % 4) * 2;
-      cell.southWall = ((value & 1) == 1);
-      value >>>= 1;
-      cell.southDoor = ((value & 1) == 1);
-    }
-
-    if (true)
-    {
-      value = HexFormatter.intValue (buffer[offset + 0]);
-      value >>>= (row % 4) * 2;
-      cell.eastWall = ((value & 1) == 1);
-      value >>>= 1;
-      cell.eastDoor = ((value & 1) == 1);
-    }
-
-    if (true)
-    {
-      value = HexFormatter.intValue (buffer[offset + 256]);
-      value >>>= (row % 4) * 2;
-      cell.northWall = ((value & 1) == 1);
-      value >>>= 1;
-      cell.northDoor = ((value & 1) == 1);
-    }
+    value = HexFormatter.intValue (buffer[offset + 256]);
+    value >>>= (row % 4) * 2;
+    cell.northWall = ((value & 1) == 1);
+    value >>>= 1;
+    cell.northDoor = ((value & 1) == 1);
 
     return cell;
   }
@@ -134,15 +110,17 @@ public class MazeGridV5 extends AbstractFile
 
     text.append ("\n\n");
     text.append (HexFormatter.format (buffer, 0x550, 0x80));
-    text.append ("\n\n");
+    text.append ("\n");
 
     for (int i = 0; i < 128; i += 2)
     {
       int msg = Utility.getWord (buffer, 0x550 + i);
       if (msg >= 15000)
       {
-        String message = messageBlock.getMessageText (msg);
-        text.append (String.format ("%4d  %04X %s%n", i, msg, message));
+        List<String> messages = messageBlock.getMessageLines (msg);
+        text.append (String.format ("%n%4d  %04X  %s%n", i, msg, messages.get (0)));
+        for (int j = 1; j < messages.size (); j++)
+          text.append (String.format ("            %s%n", messages.get (j)));
       }
     }
 

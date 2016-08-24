@@ -9,6 +9,7 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 public class MessageDataBlock extends AbstractFile
 {
   final int firstMessageNo;
+  final int lastMessageNo;
 
   private final int groupCount;
   private final List<Message> messages = new ArrayList<Message> ();
@@ -65,7 +66,13 @@ public class MessageDataBlock extends AbstractFile
     }
 
     if (currentMessageNo > firstMessageNo)
-      this.name += " - " + (currentMessageNo - 1);
+    {
+      lastMessageNo = currentMessageNo - 1;
+      //      this.name += " - " + (currentMessageNo - 1);
+    }
+    else
+      lastMessageNo = firstMessageNo;
+    this.name += " - " + lastMessageNo;
   }
 
   byte[] getMessage (int messageNo)
@@ -89,7 +96,7 @@ public class MessageDataBlock extends AbstractFile
         System.arraycopy (buffer, message.offset, returnMessage, 0, message.length);
         return huffman.decodeMessage (returnMessage);
       }
-    return "*** not found ***";
+    return null;
   }
 
   @Override

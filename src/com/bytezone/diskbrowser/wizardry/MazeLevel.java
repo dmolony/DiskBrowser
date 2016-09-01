@@ -54,9 +54,12 @@ class MazeLevel extends AbstractFile
 
     text.append ("\nIndex\n\n");
     text.append (
-        String.format ("%04X: %s%n%n", 760, HexFormatter.getHexString (buffer, 760, 8)));
+        String.format ("%04X: %s%n", 760, HexFormatter.getHexString (buffer, 760, 8)));
 
-    text.append ("      0 1  2 3  4 5  6 7  8 9  A B  C D  E F\n");
+    text.append ("\nTable\n\n");
+    text.append (HexFormatter.format (buffer, 768, 96));
+
+    text.append ("\n\n      0 1  2 3  4 5  6 7  8 9  A B  C D  E F\n");
     text.append (String.format ("%04X: ", 760));
     for (int i = 0; i < 8; i++)
     {
@@ -71,7 +74,7 @@ class MazeLevel extends AbstractFile
     List<MazeAddress> messageList = new ArrayList<MazeAddress> ();
     List<MazeAddress> monsterList = new ArrayList<MazeAddress> ();
 
-    text.append ("\n\nTable   Index   Contains      \n");
+    text.append ("\n\nValue   Index   Contains          Table\n");
     for (int j = 0; j < 16; j++)
     {
       String extraText = "";
@@ -113,18 +116,18 @@ class MazeLevel extends AbstractFile
           extraText += monsters.get (address.column).realName;
       }
 
-      text.append (String.format ("  %X       %X     %-15s   %04X  %04X  %04X  %s%n", j,
+      text.append (String.format ("  %X  -->  %X     %-15s   %04X  %04X  %04X  %s%n", j,
           cellFlag, extra, address.level, address.row, address.column, extraText));
     }
 
-    text.append ("\nRest\n\n");
+    text.append ("\n\nRest\n\n");
     text.append (HexFormatter.format (buffer, 864, buffer.length - 864));
 
     text.append ("\n");
     for (MazeAddress address : messageList)
     {
       Message message = getMessage (address.row);
-      text.append (String.format ("%nMessage: %04X%n", address.row));
+      text.append (String.format ("%nMessage: %04X  (%d)%n", address.row, address.row));
       text.append (message.getText ());
       text.append ("\n");
     }
@@ -152,8 +155,28 @@ class MazeLevel extends AbstractFile
   {
     text.append ("\n\n");
     for (int i = 0; i < 20; i++)
-      text.append (String.format ("  Col %2d: %s%n", i,
+    {
+      text.append (String.format ("  Col %2d: %s  ", i,
           HexFormatter.getHexString (buffer, ptr + i * 4, 4)));
+      StringBuilder bitString = new StringBuilder ();
+      for (int j = 2; j >= 0; j--)
+      {
+        byte b = buffer[ptr + i * 4 + j];
+        String s = ("0000000" + Integer.toBinaryString (0xFF & b))
+            .replaceAll (".*(.{8})$", "$1");
+        bitString.append (s);
+        //        text.append (s);
+        //        text.append ("  ");
+      }
+
+      String bitsReversed = bitString.reverse ().toString ();
+      bitsReversed = bitsReversed.replace ("1", " 1");
+      bitsReversed = bitsReversed.replace ("0", "  ");
+      text.append (bitsReversed.substring (0, 40));
+      text.append ("  : ");
+      text.append (bitsReversed.substring (40));
+      text.append ("\n");
+    }
   }
 
   private void addExtras (StringBuilder text, int ptr)

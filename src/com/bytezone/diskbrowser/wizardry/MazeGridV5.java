@@ -109,18 +109,78 @@ public class MazeGridV5 extends AbstractFile
     StringBuilder text = new StringBuilder (super.getHexDump ());
 
     text.append ("\n\n");
-    text.append (HexFormatter.format (buffer, 0x550, 0x80));
+
+    int offset = 0x220;
+    for (int i = 0; i < 16; i++)
+    {
+      text.append (String.format ("%05X : ", offset + i * 4));
+      for (int j = 0; j < 4; j++)
+      {
+        text.append (HexFormatter.getHexString (buffer, offset + j * 64 + i * 4, 4));
+        text.append ("  ");
+      }
+      text.append ("\n");
+    }
+
     text.append ("\n");
 
-    for (int i = 0; i < 128; i += 2)
+    offset = 0x320;
+    for (int i = 0; i < 15; i++)
     {
-      int msg = Utility.getWord (buffer, 0x550 + i);
-      if (msg >= 15000)
+      text.append (Utility.toHex (buffer, offset + i * 10, 10));
+      text.append ("\n");
+    }
+    text.append ("\n");
+
+    offset = 0x400;
+    for (int i = 0; i < 5; i++)
+    {
+      text.append (Utility.toHex (buffer, offset + i * 64, 64));
+      text.append ("\n\n");
+    }
+
+    text.append ("\n");
+    for (int i = 0; i < 176; i += 2)
+    {
+      int msg = Utility.getWord (buffer, 0x540 + i);
+      text.append (String.format ("%05X  %04X  %04X", 0x540 + i, i / 2, msg));
+      if (msg >= 700)
       {
         List<String> messages = messageBlock.getMessageLines (msg);
-        text.append (String.format ("%n%4d  %04X  %s%n", i, msg, messages.get (0)));
-        for (int j = 1; j < messages.size (); j++)
-          text.append (String.format ("            %s%n", messages.get (j)));
+        if (messages.size () > 0)
+          text.append (String.format ("  %s%n", messages.get (0)));
+        else
+          text.append (String.format (" Message not found: %04X%n", msg));
+      }
+      else
+        text.append ("\n");
+    }
+
+    text.append ("\n");
+    offset = 0x5F0;
+    for (int i = 0; i < 7; i++)
+    {
+      text.append (Utility.toHex (buffer, offset + i * 64, 64));
+      text.append ("\n\n");
+    }
+
+    if (false)
+    {
+      for (int i = 0; i < 176; i += 2)
+      {
+        int msg = Utility.getWord (buffer, 0x540 + i);
+        if (msg >= 15000)
+        {
+          List<String> messages = messageBlock.getMessageLines (msg);
+          if (messages.size () > 0)
+            text.append (
+                String.format ("%n%4d  %02X  %04X  %s%n", i, i, msg, messages.get (0)));
+          else
+            text.append (String.format ("Message not found: %04X%n", msg));
+
+          for (int j = 1; j < messages.size (); j++)
+            text.append (String.format ("                %s%n", messages.get (j)));
+        }
       }
     }
 

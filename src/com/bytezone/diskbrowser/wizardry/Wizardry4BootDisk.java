@@ -13,6 +13,7 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.pascal.FileEntry;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 
@@ -104,6 +105,9 @@ public class Wizardry4BootDisk extends PascalDisk
         fileEntry.setFile (null);
         scenarioNode.setAllowsChildren (true);
         linkMazeLevels5 (scenarioNode, fileEntry);
+        linkBlock1 (scenarioNode, fileEntry);
+        linkOracle (scenarioNode, fileEntry);
+        linkBlock2 (scenarioNode, fileEntry);
       }
     }
 
@@ -166,21 +170,116 @@ public class Wizardry4BootDisk extends PascalDisk
     List<DiskAddress> blocks = fileEntry.getSectors ();
 
     DefaultMutableTreeNode mazeNode = linkNode ("Maze", "Level 5 mazes", scenarioNode);
+    List<DiskAddress> allMazeBlocks = new ArrayList<DiskAddress> ();
 
-    int blockSize = 0x39A;
+    int dataSize = 0x39A;
     int base = 0x1800;
     for (int i = 0; i < 8; i++)
     {
       int offset = base + i * 0x400;
-      //      byte[] data = new byte[2048];
       byte[] data = new byte[0x800];
-      System.arraycopy (buffer, offset, data, 0, blockSize);
-      System.arraycopy (buffer, offset + 0x2000, data, 0x400, blockSize);
+      System.arraycopy (buffer, offset, data, 0, dataSize);
+      System.arraycopy (buffer, offset + 0x2000, data, 0x400, dataSize);
       MazeGridV5 grid = new MazeGridV5 ("Maze level " + (i + 1), data, messageBlock);
 
       List<DiskAddress> mazeBlocks = new ArrayList<DiskAddress> ();
+      for (int j = 0; j < 4; j++)
+        mazeBlocks.add (blocks.get (12 + i * 4 + j));
+      allMazeBlocks.addAll (mazeBlocks);
+
       addToNode (grid, mazeNode, mazeBlocks);
     }
+
+    DefaultAppleFileSource afs = (DefaultAppleFileSource) mazeNode.getUserObject ();
+    afs.setSectors (allMazeBlocks);
+  }
+
+  private void linkBlock1 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  {
+    byte[] buffer = fileEntry.getDataSource ().buffer;
+    List<DiskAddress> blocks = fileEntry.getSectors ();
+
+    StringBuilder text = new StringBuilder ();
+    List<DiskAddress> allBlocks = new ArrayList<DiskAddress> ();
+    for (int i = 0; i < 23; i++)
+    {
+      allBlocks.add (blocks.get (44 + i));
+    }
+
+    int offset = 0x5800;
+    int length = 66;
+    for (int i = 0; i < 179; i++)
+    {
+      text.append (String.format ("%04X : %s%n", (offset + i * length),
+          HexFormatter.getHexString (buffer, offset + i * length, length)));
+    }
+
+    DefaultMutableTreeNode oracleNode =
+        linkNode ("Block1", text.toString (), scenarioNode);
+    oracleNode.setAllowsChildren (false);
+    DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
+    afs.setSectors (allBlocks);
+  }
+
+  private void linkBlock2 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  {
+    byte[] buffer = fileEntry.getDataSource ().buffer;
+    List<DiskAddress> blocks = fileEntry.getSectors ();
+
+    StringBuilder text = new StringBuilder ();
+    List<DiskAddress> allBlocks = new ArrayList<DiskAddress> ();
+    for (int i = 0; i < 19; i++)
+    {
+      allBlocks.add (blocks.get (87 + i));
+    }
+
+    int offset = 0xAE00;
+    int length = 60;
+    for (int i = 0; i < 150; i++)
+    {
+      text.append (String.format ("%04X : %s%n", (offset + i * length),
+          HexFormatter.getHexString (buffer, offset + i * length, length)));
+    }
+
+    DefaultMutableTreeNode oracleNode =
+        linkNode ("Block2", text.toString (), scenarioNode);
+    oracleNode.setAllowsChildren (false);
+    DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
+    afs.setSectors (allBlocks);
+  }
+
+  private void linkOracle (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  {
+    byte[] buffer = fileEntry.getDataSource ().buffer;
+    List<DiskAddress> blocks = fileEntry.getSectors ();
+
+    StringBuilder text = new StringBuilder ();
+
+    for (int i = 0; i < 320; i++)
+    {
+      //      System.out.println (HexFormatter.format (buffer, 0x08600 + i * 32, 32));
+      int offset = 0x08600 + i * 32 + 18;
+      int key = HexFormatter.getWord (buffer, offset);
+      if (key > 0)
+        text.append (String.format ("%04X  %04X  * %s%n", offset, key,
+            messageBlock.getMessageText (key)));
+      key = HexFormatter.getWord (buffer, offset + 8);
+      if (key > 0)
+        text.append (String.format ("%04X  %04X    %s%n", offset + 8, key,
+            messageBlock.getMessageText (key)));
+    }
+
+    List<DiskAddress> allOracleBlocks = new ArrayList<DiskAddress> ();
+    for (int i = 0; i < 20; i++)
+    {
+      allOracleBlocks.add (blocks.get (67 + i));
+    }
+
+    DefaultMutableTreeNode oracleNode =
+        linkNode ("Oracle", text.toString (), scenarioNode);
+    oracleNode.setAllowsChildren (false);
+    DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
+    afs.setSectors (allOracleBlocks);
   }
 
   private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode,

@@ -117,7 +117,6 @@ public class Wizardry4BootDisk extends PascalDisk
       fileEntry = (FileEntry) monstersNode.getUserObject ();
       if (fileEntry != null)
       {
-        fileEntry.setFile (null);
         monstersNode.setAllowsChildren (true);
         linkMonsterImages4 (monstersNode, fileEntry);
       }
@@ -128,17 +127,42 @@ public class Wizardry4BootDisk extends PascalDisk
       fileEntry = (FileEntry) monstersNode.getUserObject ();
       if (fileEntry != null)
       {
-        Wiz5Monsters w5monsters =
-            new Wiz5Monsters ("monsters", fileEntry.getDataSource ().buffer);
-        fileEntry.setFile (w5monsters);
         monstersNode.setAllowsChildren (true);
-        for (Wiz4Image image : w5monsters.images)
-        {
-          List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
-          //          monsterBlocks.add (pictureBlocks.get (block));
-          addToNode (image, monstersNode, monsterBlocks);
-        }
+        linkMonsterImages5 (monstersNode, fileEntry);
       }
+    }
+  }
+
+  private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode,
+      FileEntry fileEntry)
+  {
+    fileEntry.setFile (null);
+    List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
+
+    Wiz4Monsters w4monsters =
+        new Wiz4Monsters ("monsters", fileEntry.getDataSource ().buffer);
+    fileEntry.setFile (w4monsters);
+    int count = 0;
+    for (Wiz4Image image : w4monsters.images)
+    {
+      List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
+      monsterBlocks.add (pictureBlocks.get (w4monsters.blocks.get (count++)));
+      addToNode (image, monstersNode, monsterBlocks);
+    }
+  }
+
+  private void linkMonsterImages5 (DefaultMutableTreeNode monstersNode,
+      FileEntry fileEntry)
+  {
+    Wiz5Monsters w5monsters =
+        new Wiz5Monsters ("monsters", fileEntry.getDataSource ().buffer);
+    fileEntry.setFile (w5monsters);
+    for (Wiz5Monsters.Monster monster : w5monsters.monsters)
+    {
+      Wiz4Image image = monster.image;
+      List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
+      //          monsterBlocks.add (pictureBlocks.get (block));
+      addToNode (image, monstersNode, monsterBlocks);
     }
   }
 
@@ -280,28 +304,6 @@ public class Wizardry4BootDisk extends PascalDisk
     oracleNode.setAllowsChildren (false);
     DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
     afs.setSectors (allOracleBlocks);
-  }
-
-  private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode,
-      FileEntry fileEntry)
-  {
-    byte[] pictureBuffer = fileEntry.getDataSource ().buffer;
-    List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
-
-    int count = 0;
-    for (int block = 0; block < 24; block++)
-    {
-      int ptr = block * 512;
-      for (int pic = 0; pic < 2; pic++)
-      {
-        byte[] buffer = new byte[240];
-        System.arraycopy (pictureBuffer, ptr + pic * 256, buffer, 0, buffer.length);
-        Wiz4Image image = new Wiz4Image ("Image " + count++, buffer, 5, 6);
-        List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
-        monsterBlocks.add (pictureBlocks.get (block));
-        addToNode (image, monstersNode, monsterBlocks);
-      }
-    }
   }
 
   private void addToNode (AbstractFile af, DefaultMutableTreeNode node,

@@ -127,17 +127,23 @@ class MazeLevel extends AbstractFile
     for (MazeAddress address : messageList)
     {
       Message message = getMessage (address.row);
-      text.append (String.format ("%nMessage: %04X  (%d)%n", address.row, address.row));
-      text.append (message.getText ());
-      text.append ("\n");
+      if (message != null)
+      {
+        text.append (String.format ("%nMessage: %04X  (%d)%n", address.row, address.row));
+        text.append (message.getText ());
+        text.append ("\n");
+      }
     }
 
     for (MazeAddress address : monsterList)
     {
       Monster monster = getMonster (address.column);
-      text.append (String.format ("%nMonster: %04X%n", address.column));
-      text.append (monster.getText ());
-      text.append ("\n");
+      if (monster != null)
+      {
+        text.append (String.format ("%nMonster: %04X%n", address.column));
+        text.append (monster.getText ());
+        text.append ("\n");
+      }
     }
 
     return text.toString ();

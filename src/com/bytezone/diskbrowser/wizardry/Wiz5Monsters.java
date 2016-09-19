@@ -1,24 +1,27 @@
 package com.bytezone.diskbrowser.wizardry;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class Wiz5Monsters extends AbstractFile
+public class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.Monster>
 {
-  List<Monster> monsters = new ArrayList<Monster> ();
+  private static final int BLOCK_SIZE = 512;
+  private final List<Monster> monsters = new ArrayList<Monster> ();
 
   public Wiz5Monsters (String name, byte[] buffer)
   {
     super (name, buffer);
 
     int p = 0;
-    int nextBlock = buffer[0] & 0xFF;
+    int nextBlock = buffer[p] & 0xFF;
     int nextOffset = Utility.getWord (buffer, 256);
-    Monster monster = new Monster (1, nextBlock * 512 + nextOffset);
+
+    Monster monster = new Monster (p + 1);
     monsters.add (monster);
     boolean createMonster = false;
 
@@ -27,34 +30,36 @@ public class Wiz5Monsters extends AbstractFile
       int firstBlock = nextBlock;
       int firstOffset = nextOffset;
 
-      int ndx = nextBlock * 512 + nextOffset;
+      int ndx = nextBlock * BLOCK_SIZE + nextOffset;
 
-      if (buffer[ndx] == (byte) 0)
-      {
-        nextBlock = buffer[++p] & 0xFF;
-        nextOffset = Utility.getWord (buffer, p * 2 + 256);
-
-        createMonster = true;
-      }
-      else
+      if (buffer[ndx] != (byte) 0)
       {
         nextBlock = buffer[ndx] & 0xFF;
         nextOffset = Utility.getWord (buffer, ndx + 1);
       }
+      else
+      {
+        nextBlock = buffer[++p] & 0xFF;
+        nextOffset = Utility.getWord (buffer, p * 2 + 256);
+        createMonster = true;
+      }
 
-      int length = nextOffset > 0 ? nextOffset : 512 - firstOffset;
-
-      Buffer monsterBuffer = new Buffer (firstBlock, firstOffset, length);
-      monster.buffers.add (monsterBuffer);
-      //      System.out.println (monsterBuffer);
+      int length = nextOffset > 0 ? nextOffset : BLOCK_SIZE - firstOffset;
+      monster.dataBuffers.add (new DataBuffer (firstBlock, firstOffset, length));
 
       if (createMonster && nextBlock > 0)
       {
-        createMonster = false;
-        monster = new Monster (p + 1, nextBlock * 512 + nextOffset);
+        monster = new Monster (p + 1);
         monsters.add (monster);
+        createMonster = false;
       }
     }
+  }
+
+  @Override
+  public Iterator<Monster> iterator ()
+  {
+    return monsters.iterator ();
   }
 
   @Override
@@ -64,13 +69,13 @@ public class Wiz5Monsters extends AbstractFile
 
     for (Monster monster : monsters)
     {
-      text.append (
-          String.format ("%02X : %02X %04X : %s%n", monster.id, monster.offset / 512,
-              monster.offset % 512, monster.buffers.get (0).toHexString ()));
-      for (int i = 1; i < monster.buffers.size (); i++)
+      DataBuffer dataBuffer = monster.dataBuffers.get (0);
+      text.append (String.format ("%02X : %02X %04X : %s%n", monster.id, dataBuffer.block,
+          dataBuffer.offset, dataBuffer.toHexString ()));
+      for (int i = 1; i < monster.dataBuffers.size (); i++)
       {
-        Buffer monsterBuffer = monster.buffers.get (i);
-        text.append (String.format ("             : %s%n", monsterBuffer.toHexString ()));
+        dataBuffer = monster.dataBuffers.get (i);
+        text.append (String.format ("             : %s%n", dataBuffer.toHexString ()));
       }
     }
 
@@ -82,36 +87,33 @@ public class Wiz5Monsters extends AbstractFile
 
   class Monster
   {
-    int id;
-    int offset;
-    int length;
-    Wiz4Image image;
-    byte[] data;
+    private final int id;
+    private final List<DataBuffer> dataBuffers = new ArrayList<DataBuffer> ();
 
-    List<Buffer> buffers = new ArrayList<Buffer> ();
+    private Wiz4Image image;
+    private byte[] data;
 
-    public Monster (int id, int offset)
+    public Monster (int id)
     {
       this.id = id;
-      this.offset = offset;
     }
 
     public Wiz4Image getImage ()
     {
       if (image == null)
       {
-        length = 0;
-        for (Buffer monsterBuffer : buffers)
-          length += monsterBuffer.length - 3;
+        int length = 0;
+        for (DataBuffer dataBuffer : dataBuffers)
+          length += dataBuffer.length - 3;
 
         data = new byte[length];
 
         int ptr = 0;
-        for (Buffer monsterBuffer : buffers)
+        for (DataBuffer dataBuffer : dataBuffers)
         {
-          int offset = monsterBuffer.block * 512 + monsterBuffer.offset + 3;
-          System.arraycopy (buffer, offset, data, ptr, monsterBuffer.length - 3);
-          ptr += monsterBuffer.length - 3;
+          int offset = dataBuffer.block * BLOCK_SIZE + dataBuffer.offset + 3;
+          System.arraycopy (buffer, offset, data, ptr, dataBuffer.length - 3);
+          ptr += dataBuffer.length - 3;
         }
         image = new Wiz4Image ("Image " + id, data, 8, 8);
       }
@@ -123,9 +125,9 @@ public class Wiz5Monsters extends AbstractFile
     {
       StringBuilder text = new StringBuilder ();
 
-      for (Buffer monsterBuffer : buffers)
+      for (DataBuffer dataBuffer : dataBuffers)
       {
-        text.append (monsterBuffer);
+        text.append (dataBuffer);
         text.append ("\n");
       }
 
@@ -133,13 +135,13 @@ public class Wiz5Monsters extends AbstractFile
     }
   }
 
-  class Buffer
+  class DataBuffer
   {
-    int block;
-    int offset;
-    int length;
+    private final int block;
+    private final int offset;
+    private final int length;
 
-    public Buffer (int block, int offset, int length)
+    public DataBuffer (int block, int offset, int length)
     {
       this.block = block;
       this.offset = offset;
@@ -148,13 +150,13 @@ public class Wiz5Monsters extends AbstractFile
 
     public String toHexString ()
     {
-      return HexFormatter.getHexString (buffer, block * 512 + offset, length);
+      return HexFormatter.getHexString (buffer, block * BLOCK_SIZE + offset, length);
     }
 
     @Override
     public String toString ()
     {
-      return (HexFormatter.format (buffer, block * 512 + offset, length));
+      return (HexFormatter.format (buffer, block * BLOCK_SIZE + offset, length));
     }
   }
 }

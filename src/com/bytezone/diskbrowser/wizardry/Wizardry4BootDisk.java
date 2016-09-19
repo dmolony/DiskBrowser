@@ -157,7 +157,7 @@ public class Wizardry4BootDisk extends PascalDisk
     Wiz5Monsters w5monsters =
         new Wiz5Monsters ("monsters", fileEntry.getDataSource ().buffer);
     fileEntry.setFile (w5monsters);
-    for (Wiz5Monsters.Monster monster : w5monsters.monsters)
+    for (Wiz5Monsters.Monster monster : w5monsters)
     {
       List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
       //          monsterBlocks.add (pictureBlocks.get (block));

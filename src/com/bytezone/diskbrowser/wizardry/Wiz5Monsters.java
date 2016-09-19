@@ -15,34 +15,46 @@ public class Wiz5Monsters extends AbstractFile
   {
     super (name, buffer);
 
-    int ptr = 0;
-    Monster monster = null;
+    int p = 0;
+    int nextBlock = buffer[0] & 0xFF;
+    int nextOffset = Utility.getWord (buffer, 256);
+    Monster monster = new Monster (1, nextBlock * 512 + nextOffset);
+    monsters.add (monster);
+    boolean createMonster = false;
 
-    while (buffer[ptr] != 0)
+    while (nextBlock > 0)
     {
-      int val1 = buffer[ptr] & 0xFF;
-      int val2 = Utility.getWord (buffer, ptr * 2 + 256);
-      int offset = val1 * 512 + val2;
+      int firstBlock = nextBlock;
+      int firstOffset = nextOffset;
 
-      if (monster != null)
-        fillMonster (offset, monster, ptr);
+      int ndx = nextBlock * 512 + nextOffset;
 
-      monster = new Monster ();
-      monster.offset = offset;        // don't know the length yet
-      monsters.add (monster);
+      if (buffer[ndx] == (byte) 0)
+      {
+        nextBlock = buffer[++p] & 0xFF;
+        nextOffset = Utility.getWord (buffer, p * 2 + 256);
 
-      ptr++;
+        createMonster = true;
+      }
+      else
+      {
+        nextBlock = buffer[ndx] & 0xFF;
+        nextOffset = Utility.getWord (buffer, ndx + 1);
+      }
+
+      int length = nextOffset > 0 ? nextOffset : 512 - firstOffset;
+
+      Buffer monsterBuffer = new Buffer (firstBlock, firstOffset, length);
+      monster.buffers.add (monsterBuffer);
+      //      System.out.println (monsterBuffer);
+
+      if (createMonster && nextBlock > 0)
+      {
+        createMonster = false;
+        monster = new Monster (p + 1, nextBlock * 512 + nextOffset);
+        monsters.add (monster);
+      }
     }
-
-    fillMonster (buffer.length, monster, ptr);
-  }
-
-  private void fillMonster (int offset, Monster monster, int ptr)
-  {
-    int len = offset - monster.offset;
-    monster.buffer = new byte[len];
-    System.arraycopy (buffer, monster.offset, monster.buffer, 0, len);
-    monster.image = new Wiz4Image ("Image " + ptr, monster.buffer, 3, 10, 6);
   }
 
   @Override
@@ -50,11 +62,17 @@ public class Wiz5Monsters extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    int count = 0;
     for (Monster monster : monsters)
-      text.append (String.format ("%02X : %02X %04X : %s%n", ++count,
-          monster.offset / 512, monster.offset % 512,
-          HexFormatter.getHexString (buffer, monster.offset, monster.buffer.length)));
+    {
+      text.append (
+          String.format ("%02X : %02X %04X : %s%n", monster.id, monster.offset / 512,
+              monster.offset % 512, monster.buffers.get (0).toHexString ()));
+      for (int i = 1; i < monster.buffers.size (); i++)
+      {
+        Buffer monsterBuffer = monster.buffers.get (i);
+        text.append (String.format ("             : %s%n", monsterBuffer.toHexString ()));
+      }
+    }
 
     if (text.length () > 0)
       text.deleteCharAt (text.length () - 1);
@@ -64,8 +82,79 @@ public class Wiz5Monsters extends AbstractFile
 
   class Monster
   {
+    int id;
     int offset;
+    int length;
     Wiz4Image image;
-    byte[] buffer;
+    byte[] data;
+
+    List<Buffer> buffers = new ArrayList<Buffer> ();
+
+    public Monster (int id, int offset)
+    {
+      this.id = id;
+      this.offset = offset;
+    }
+
+    public Wiz4Image getImage ()
+    {
+      if (image == null)
+      {
+        length = 0;
+        for (Buffer monsterBuffer : buffers)
+          length += monsterBuffer.length - 3;
+
+        data = new byte[length];
+
+        int ptr = 0;
+        for (Buffer monsterBuffer : buffers)
+        {
+          int offset = monsterBuffer.block * 512 + monsterBuffer.offset + 3;
+          System.arraycopy (buffer, offset, data, ptr, monsterBuffer.length - 3);
+          ptr += monsterBuffer.length - 3;
+        }
+        image = new Wiz4Image ("Image " + id, data, 8, 8);
+      }
+      return image;
+    }
+
+    @Override
+    public String toString ()
+    {
+      StringBuilder text = new StringBuilder ();
+
+      for (Buffer monsterBuffer : buffers)
+      {
+        text.append (monsterBuffer);
+        text.append ("\n");
+      }
+
+      return text.toString ();
+    }
+  }
+
+  class Buffer
+  {
+    int block;
+    int offset;
+    int length;
+
+    public Buffer (int block, int offset, int length)
+    {
+      this.block = block;
+      this.offset = offset;
+      this.length = length;
+    }
+
+    public String toHexString ()
+    {
+      return HexFormatter.getHexString (buffer, block * 512 + offset, length);
+    }
+
+    @Override
+    public String toString ()
+    {
+      return (HexFormatter.format (buffer, block * 512 + offset, length));
+    }
   }
 }

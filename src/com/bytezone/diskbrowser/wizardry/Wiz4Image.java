@@ -5,7 +5,7 @@ import java.awt.image.DataBuffer;
 
 public class Wiz4Image extends AbstractImage
 {
-  public Wiz4Image (String name, byte[] buffer, int offset, int rows, int cols)   // 5, 6
+  public Wiz4Image (String name, byte[] buffer, int rows, int cols)   // 5, 6
   {
     super (name, buffer);
 
@@ -18,7 +18,7 @@ public class Wiz4Image extends AbstractImage
       for (int line = 0; line < 8; line++)
         for (int col = 0; col < cols; col++)
         {
-          byte b = buffer[offset + row * rowSize + col * 8 + line];
+          byte b = buffer[row * rowSize + col * 8 + line];
           for (int bit = 0; bit < 7; bit++)
           {
             if ((b & 0x01) == 0x01)

@@ -20,7 +20,7 @@ import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 public class Wizardry4BootDisk extends PascalDisk
 {
   public Header scenarioHeader;
-  private final List<AppleDisk> disks = new ArrayList<AppleDisk> ();
+  //  private final List<AppleDisk> disks = new ArrayList<AppleDisk> ();
   private Relocator relocator;
   private MessageBlock messageBlock;
   private Huffman huffman;
@@ -159,10 +159,9 @@ public class Wizardry4BootDisk extends PascalDisk
     fileEntry.setFile (w5monsters);
     for (Wiz5Monsters.Monster monster : w5monsters.monsters)
     {
-      Wiz4Image image = monster.image;
       List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
       //          monsterBlocks.add (pictureBlocks.get (block));
-      addToNode (image, monstersNode, monsterBlocks);
+      addToNode (monster.getImage (), monstersNode, monsterBlocks);
     }
   }
 

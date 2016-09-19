@@ -23,7 +23,7 @@ public class Wiz4Monsters extends AbstractFile
       {
         byte[] data = new byte[240];
         System.arraycopy (buffer, ptr + pic * 256, data, 0, data.length);
-        Wiz4Image image = new Wiz4Image ("Image " + count++, data, 0, 5, 6);
+        Wiz4Image image = new Wiz4Image ("Image " + count++, data, 5, 6);
         images.add (image);
         blocks.add (block);
       }

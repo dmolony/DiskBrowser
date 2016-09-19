@@ -136,12 +136,12 @@ public class Wizardry4BootDisk extends PascalDisk
   private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode,
       FileEntry fileEntry)
   {
-    fileEntry.setFile (null);
     List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
 
     Wiz4Monsters w4monsters =
         new Wiz4Monsters ("monsters", fileEntry.getDataSource ().buffer);
     fileEntry.setFile (w4monsters);
+
     int count = 0;
     for (Wiz4Image image : w4monsters.images)
     {
@@ -154,13 +154,17 @@ public class Wizardry4BootDisk extends PascalDisk
   private void linkMonsterImages5 (DefaultMutableTreeNode monstersNode,
       FileEntry fileEntry)
   {
+    List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
+
     Wiz5Monsters w5monsters =
         new Wiz5Monsters ("monsters", fileEntry.getDataSource ().buffer);
     fileEntry.setFile (w5monsters);
+
     for (Wiz5Monsters.Monster monster : w5monsters)
     {
       List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
-      //          monsterBlocks.add (pictureBlocks.get (block));
+      for (Integer blockId : monster.getBlocks ())
+        monsterBlocks.add (pictureBlocks.get (blockId));
       addToNode (monster.getImage (), monstersNode, monsterBlocks);
     }
   }

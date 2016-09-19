@@ -120,6 +120,14 @@ public class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.
       return image;
     }
 
+    List<Integer> getBlocks ()
+    {
+      List<Integer> blocks = new ArrayList<Integer> ();
+      for (DataBuffer dataBuffer : dataBuffers)
+        blocks.add (dataBuffer.block);
+      return blocks;
+    }
+
     @Override
     public String toString ()
     {

@@ -75,12 +75,17 @@ public class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.
       for (int i = 1; i < monster.dataBuffers.size (); i++)
       {
         dataBuffer = monster.dataBuffers.get (i);
-        text.append (String.format ("             : %s%n", dataBuffer.toHexString ()));
+        text.append (String.format ("     %02X %04X : %s%n", dataBuffer.block,
+            dataBuffer.offset, dataBuffer.toHexString ()));
       }
+      text.append ("\n");
     }
 
-    if (text.length () > 0)
+    if (text.length () > 1)
+    {
       text.deleteCharAt (text.length () - 1);
+      text.deleteCharAt (text.length () - 1);
+    }
 
     return text.toString ();
   }
@@ -115,7 +120,10 @@ public class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.
           System.arraycopy (buffer, offset, data, ptr, dataBuffer.length - 3);
           ptr += dataBuffer.length - 3;
         }
-        image = new Wiz4Image ("Image " + id, data, 8, 8);
+        image = new Wiz4Image ("Image " + id, data, 10, 6);
+        //        System.out.printf ("Monster# %d%n", id);
+        //        System.out.println (Utility.toHex (data));
+        //        System.out.println ();
       }
       return image;
     }
@@ -158,7 +166,22 @@ public class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.
 
     public String toHexString ()
     {
-      return HexFormatter.getHexString (buffer, block * BLOCK_SIZE + offset, length);
+      int p1 = block * BLOCK_SIZE + offset;
+      String s1 = HexFormatter.getHexString (buffer, p1, 3);
+      String s2 = HexFormatter.getHexString (buffer, p1 + 3, length - 3);
+      //      split (p1 + 3, length - 3);
+      return s1 + " : " + s2;
+    }
+
+    private void split (int offset, int length)
+    {
+      for (int p = offset; length > 0; p += 16, length -= 16)
+      {
+        int len = length > 15 ? 16 : length;
+        String s = HexFormatter.getHexString (buffer, p, len);
+        System.out.println (s);
+      }
+      System.out.println ();
     }
 
     @Override

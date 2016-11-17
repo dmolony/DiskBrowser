@@ -362,15 +362,14 @@ public class DosDisk extends AbstractFormattedDisk
 
     text.append (line);
     text.append (String.format (
-                                "           Free sectors: %3d    "
-                                    + "Used sectors: %3d    Total sectors: %3d",
-                                dosVTOCSector.freeSectors, dosVTOCSector.usedSectors,
-                                (dosVTOCSector.freeSectors + dosVTOCSector.usedSectors)));
+        "           Free sectors: %3d    " + "Used sectors: %3d    Total sectors: %3d",
+        dosVTOCSector.freeSectors, dosVTOCSector.usedSectors,
+        (dosVTOCSector.freeSectors + dosVTOCSector.usedSectors)));
     if (dosVTOCSector.freeSectors != freeSectors)
       text.append (String.format (
-                                  "%nActual:    Free sectors: %3d    "
-                                      + "Used sectors: %3d    Total sectors: %3d",
-                                  freeSectors, usedSectors, (usedSectors + freeSectors)));
+          "%nActual:    Free sectors: %3d    "
+              + "Used sectors: %3d    Total sectors: %3d",
+          freeSectors, usedSectors, (usedSectors + freeSectors)));
     return new DefaultAppleFileSource ("Volume " + dosVTOCSector.volume, text.toString (),
         this);
   }
@@ -385,4 +384,35 @@ public class DosDisk extends AbstractFormattedDisk
 
     return new DefaultAppleFileSource ("Deleted files", text.toString (), this);
   }
+
+  /* From http://apple2history.org/history/ah15/
+   * 
+    There were actually three versions of DOS 3.3 that Apple released without 
+    bumping the version number:
+  
+    The first version that was released had FPBASIC and INTBASIC files that were 50
+    sectors in size.
+    
+    The second version of DOS 3.3, often referred to as “DOS 3.3e”, appeared at the 
+    time the Apple IIe was released. In this version, the FPBASIC and INTBASIC files 
+    were 42 sectors in size. The changes introduced at that time included code to turn 
+    off the IIe 80-column card at boot time, and an attempt to fix a bug in the APPEND 
+    command. This fix reportedly introduced an even worse bug, but as the command was 
+    not heavily used it did not make much of an impact on most programmers. The APPEND 
+    fix was applied by utilizing some formerly unused space in the DOS 3.3 code.
+    
+    The third version of DOS 3.3 appeared just before the first release of ProDOS. 
+    The only mention of this in the press was in the DOSTalk column of Softalk magazine. 
+    This final version of DOS 3.3 included a different fix for the APPEND bug, using 
+    another bit of unused space in DOS 3.3.
+  
+    With regard to the FPBASIC and INTBASIC files: There were three differences between 
+    the 50 sector and the 42 sector versions of the INTBASIC file. Firstly, the 
+    $F800-$FFFF section was removed. This area was the code for the Monitor, and with 
+    the changes introduced in the Apple IIe, it could cause some things to “break” if 
+    the older Monitor code was executed. Secondly, a FOR/NEXT bug in Integer BASIC was 
+    fixed. Finally, there was a three-byte bug in the Programmer’s Aid ROM #1 chip. 
+    The code for this chip was included in the INTBASIC file, and could therefore be 
+    patched.
+   */
 }

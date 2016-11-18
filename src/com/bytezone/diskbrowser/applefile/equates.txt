@@ -127,14 +127,19 @@ F4D5  UP EQU
 F504  DOWN EQU
 F6B9  HFNS
 
-F800  PLOT
-F819  HLINE
-F828  VLINE
-F864  SETCOL
-F871  SCRN
+F800  PLOT - plot a block on lo-res screen
+F819  HLINE - draw horizontal line of blocks
+F828  VLINE - draw vertical line of blocks
+F832  CLRSCR - clear lo-res screen
+F836  CLRTOP - clear top of lo-res screen
+F85F  NEXTCOL - increment color by 3
+F864  SETCOL - set lo-res graphics color
+F871  SCRN - read lo-res screen
 
-F940  PRINTYX
-F941  PRINTAX - print a hex number
+F940  PRINTYX - print YX registers in hex
+F941  PRINTAX - print AX registers in hex
+F948  PRBLNK - print 3 spaces
+F94A  PRBL2 - print X blank spaces
 
 FAA6  reboot DOS
 FAFF  0 = Autostart ROM, 1 = Old Monitor
@@ -146,7 +151,7 @@ FB40  SETGR
 FB5B  TABV - monitor tab routine
 FB6F  set powerup checksum
 FBC1  BASCALC - calculate video address
-FBDD  BEEP
+FBDD  BELL1 - beep speaker
 FBF4  CURSRIT - move cursor right
 
 FC10  CURSLFT - move cursor left
@@ -156,22 +161,27 @@ FC42  CLREOP - clear to end of page
 FC58  HOME - clear screen
 FC62  CR
 FC66  CURSDWN - move cursor down
-FC9C  CLREOL
-FCA8  WAIT 1/2(26+27A+5A^2) microseconds
+FC9C  CLREOL - clear to end of line
+FCA8  WAIT - delay
 FCFA  RD2BIT
 
-FD0C  RDKEY - Blink cursor
-FD1B  KEYIN - Increment RNDL,H while polling keyboard
-FD35  RDCHAR - Call RDKEY
-FD6A  GETLN
+FD0C  RDKEY - get input character
+FD1B  KEYIN - read keyboard
+FD35  RDCHAR - get input char or escape code
+FD6A  GETLN - get input line (with prompt)
+FD67  GETLNZ - get input line after CR
+FD6F  GETLN1 - get input line (no prompt)
 FD75  NXTCHAR
-FD8B  CROUT1 - generate a return with clear
-FDDA  PRBYTE - print A in hex
-FDED  COUT - output a character
-FDF0  COUT1 - output a character to screen
-FD8E  CROUT - generate a return
+FD8B  CROUT1 - output a return with clear
+FD8E  CROUT - output a return
+FDDA  PRBYTE - print A register in hex
+FDE3  PRHEX - print a hex digit
+FDED  COUT - output a character (in Acc)
+FDF0  COUT1 - output character to screen
 
 FE2C  move a block of memory
+FE80  SETINV - set inverse mode
+FE84  SETNORM - set normal mode
 FE89  disconnect DOS from I/O links
 FE8B  INPORT
 FE93  disconnect DOS from I/O links
@@ -180,9 +190,10 @@ FECD  WRITE
 FEFD  READ
 
 FF02  READ2
+FF2D  PRERR - print 'ERR'
 FF3A  BELL
-FF3F  SAVE
-FF4A  RESTORE
+FF3F  IOREST - restore all registers
+FF4A  IOSAVE - save all registers
 FF58  RTS - jump to <address on stack> + 1
 FF59  Monitor cold entry point
 FFA7  GETNUM - move num to A2L.A2H

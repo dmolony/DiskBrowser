@@ -172,12 +172,12 @@ FD6A  GETLN - get input line (with prompt)
 FD67  GETLNZ - get input line after CR
 FD6F  GETLN1 - get input line (no prompt)
 FD75  NXTCHAR
-FD8B  CROUT1 - output a return with clear
-FD8E  CROUT - output a return
+FD8B  CROUT1 - print a CR with clear
+FD8E  CROUT - print a CR
 FDDA  PRBYTE - print A register in hex
 FDE3  PRHEX - print a hex digit
-FDED  COUT - output a character (in Acc)
-FDF0  COUT1 - output character to screen
+FDED  COUT - print a character (in Acc)
+FDF0  COUT1 - print character to screen
 
 FE2C  move a block of memory
 FE80  SETINV - set inverse mode

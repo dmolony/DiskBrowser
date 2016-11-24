@@ -64,7 +64,8 @@ class DataPanel extends JTabbedPane
     formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"
-        + "\nthe disk. You will then be able to select individual files to view completely.");
+        + "\nthe disk. You will then be able to select individual files to "
+        + "view completely.");
 
     hexText = new JTextArea (10, TEXT_WIDTH);
     setPanel (hexText, "Hex dump");

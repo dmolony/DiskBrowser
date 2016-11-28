@@ -1,12 +1,9 @@
 package com.bytezone.diskbrowser.disk;
 
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -25,29 +22,44 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
  * travel from one track to the next, so quarter-tracks could also be stored with this
  * format (I have never heard of disk actually using quarter tracks, though).
  */
-public class V2dDisk implements Disk
+
+// Physical disk interleave:
+// Info from http://www.applelogic.org/TheAppleIIEGettingStarted.html
+// Block ..: 0 1 2 3 4 5 6 7 8 9 A B C D E F
+// Position: 0 8 1 9 2 A 3 B 4 C 5 D 6 E 7 F - Prodos (.PO disks)
+// Position: 0 7 E 6 D 5 C 4 B 3 A 2 9 1 8 F - Dos (.DO disks)
+public class V2dDisk
 {
   private static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
   private static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
   private static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+  private static int[] interleave =
+      { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
 
   private final Nibblizer nibbler = new Nibblizer ();
 
+  final File file;
+  final int tracks;
+  int actualTracks;
+
+  final byte[] buffer = new byte[4096 * 35];
+
   public V2dDisk (File file)
   {
-    byte[] diskBuffer = new byte[10];
-
+    this.file = file;
+    int tracks = 0;
     try
     {
+      byte[] diskBuffer = new byte[10];
       BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
       in.read (diskBuffer);
 
       int diskLength = HexFormatter.getLongBigEndian (diskBuffer, 0);   // 4 bytes
-      System.out.printf ("Disk length: %,d%n", diskLength);
+      //      System.out.printf ("Disk length: %,d%n", diskLength);
       String id = HexFormatter.getString (diskBuffer, 4, 4);            // 4 bytes
-      System.out.printf ("ID: %s%n", id);
-      int tracks = HexFormatter.getShortBigEndian (diskBuffer, 8);      // 2 bytes
-      System.out.printf ("Tracks: %d%n", tracks);
+      //      System.out.printf ("ID: %s%n", id);
+      tracks = HexFormatter.getShortBigEndian (diskBuffer, 8);          // 2 bytes
+      //      System.out.printf ("Tracks: %d%n", tracks);
 
       for (int i = 0; i < tracks; i++)
       {
@@ -62,7 +74,8 @@ public class V2dDisk implements Disk
         byte[] trackData = new byte[trackLength];
         in.read (trackData);
 
-        processTrack (trackData);
+        if (processTrack (trackData, buffer))
+          actualTracks++;
       }
 
       in.close ();
@@ -72,9 +85,11 @@ public class V2dDisk implements Disk
       e.printStackTrace ();
       System.exit (1);
     }
+
+    this.tracks = tracks;
   }
 
-  private void processTrack (byte[] buffer)
+  private boolean processTrack (byte[] buffer, byte[] diskBuffer)
   {
     int ptr = 0;
     int track, sector, volume, checksum;
@@ -96,15 +111,15 @@ public class V2dDisk implements Disk
         track = nibbler.decode4and4 (buffer, ptr + 5);
         sector = nibbler.decode4and4 (buffer, ptr + 7);
         checksum = nibbler.decode4and4 (buffer, ptr + 9);
-        System.out.printf ("Volume: %03d, Track: %02d, Sector: %02d, Checksum: %03d%n",
-            volume, track, sector, checksum);
+        //        System.out.printf ("Volume: %03d, Track: %02d, Sector: %02d, Checksum: %03d%n",
+        //            volume, track, sector, checksum);
         ptr += 14;
       }
       else
       {
         System.out.println ("Invalid address prologue/epilogue");
         ptr += listBytes (buffer, ptr, 14);
-        break;
+        return false;
       }
 
       ptr += skipBytes (buffer, ptr, (byte) 0xFF);
@@ -113,20 +128,22 @@ public class V2dDisk implements Disk
       {
         System.out.println ("Invalid data prologue");
         ptr += listBytes (buffer, ptr, dataPrologue.length);
-        break;
+        return false;
       }
 
       if (!matchBytes (buffer, ptr + 346, epilogue))
       {
         System.out.println ("Invalid data epilogue");
         ptr += listBytes (buffer, ptr + 346, epilogue.length);
-        break;
+        return false;
       }
 
       ptr += dataPrologue.length;
 
       byte[] decodedBuffer = nibbler.decode6and2 (buffer, ptr);
-      System.out.println (HexFormatter.format (decodedBuffer));
+
+      int offset = track * 4096 + interleave[sector] * 256;
+      System.arraycopy (decodedBuffer, 0, diskBuffer, offset, 256);
 
       ptr += 342;
       ptr += 1;     // checksum
@@ -138,7 +155,8 @@ public class V2dDisk implements Disk
       ptr += skipBytes (buffer, ptr, (byte) 0xFF);
     }
 
-    System.out.println ("----------------------------------------------");
+    //    System.out.println ("----------------------------------------------");
+    return true;
   }
 
   private int skipBytes (byte[] buffer, int offset, byte skipValue)
@@ -146,7 +164,7 @@ public class V2dDisk implements Disk
     int count = 0;
     while (offset < buffer.length && buffer[offset++] == skipValue)
       ++count;
-    System.out.printf ("   (%2d x %02X)%n", count, skipValue);
+    //    System.out.printf ("   (%2d x %02X)%n", count, skipValue);
     return count;
   }
 
@@ -175,167 +193,4 @@ public class V2dDisk implements Disk
     }
     return true;
   }
-
-  @Override
-  public Iterator<DiskAddress> iterator ()
-  {
-    return null;
-  }
-
-  @Override
-  public long getBootChecksum ()
-  {
-    return 0;
-  }
-
-  @Override
-  public void setEmptyByte (byte value)
-  {
-  }
-
-  @Override
-  public int getTotalBlocks ()
-  {
-    return 0;
-  }
-
-  @Override
-  public int getTotalTracks ()
-  {
-    return 0;
-  }
-
-  @Override
-  public int getBlockSize ()
-  {
-    return 0;
-  }
-
-  @Override
-  public void setBlockSize (int blockSize)
-  {
-  }
-
-  @Override
-  public int getTrackSize ()
-  {
-    return 0;
-  }
-
-  @Override
-  public int getSectorsPerTrack ()
-  {
-    return 0;
-  }
-
-  @Override
-  public void setInterleave (int interleave)
-  {
-  }
-
-  @Override
-  public int getInterleave ()
-  {
-    return 0;
-  }
-
-  @Override
-  public DiskAddress getDiskAddress (int block)
-  {
-    return null;
-  }
-
-  @Override
-  public List<DiskAddress> getDiskAddressList (int... blocks)
-  {
-    return null;
-  }
-
-  @Override
-  public DiskAddress getDiskAddress (int track, int sector)
-  {
-    return null;
-  }
-
-  @Override
-  public byte[] readSector (int block)
-  {
-    return null;
-  }
-
-  @Override
-  public byte[] readSector (int track, int sector)
-  {
-    return null;
-  }
-
-  @Override
-  public byte[] readSector (DiskAddress da)
-  {
-    return null;
-  }
-
-  @Override
-  public byte[] readSectors (List<DiskAddress> daList)
-  {
-    return null;
-  }
-
-  @Override
-  public void writeSector (DiskAddress da, byte[] buffer)
-  {
-  }
-
-  @Override
-  public boolean isSectorEmpty (DiskAddress da)
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isSectorEmpty (int block)
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isSectorEmpty (int track, int sector)
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isValidAddress (int block)
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isValidAddress (int track, int sector)
-  {
-    return false;
-  }
-
-  @Override
-  public boolean isValidAddress (DiskAddress da)
-  {
-    return false;
-  }
-
-  @Override
-  public File getFile ()
-  {
-    return null;
-  }
-
-  @Override
-  public void addActionListener (ActionListener listener)
-  {
-  }
-
-  @Override
-  public void removeActionListener (ActionListener listener)
-  {
-  }
-
 }

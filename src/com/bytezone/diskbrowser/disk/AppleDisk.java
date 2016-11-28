@@ -219,6 +219,20 @@ public class AppleDisk implements Disk
     checkSectorsForData ();
   }
 
+  public AppleDisk (V2dDisk disk)
+  {
+    tracks = disk.actualTracks;
+    trackSize = 4096;
+    sectorSize = 256;
+    sectors = 16;
+    blocks = tracks * sectors;
+    file = disk.file;
+    diskBuffer = disk.buffer;
+    hasData = new boolean[blocks];
+
+    checkSectorsForData ();
+  }
+
   private byte[] getPrefix (File path)
   {
     byte[] buffer = new byte[64];

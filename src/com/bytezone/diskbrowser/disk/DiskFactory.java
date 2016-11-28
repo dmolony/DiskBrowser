@@ -44,6 +44,7 @@ public class DiskFactory
     String suffix = path.substring (path.lastIndexOf (".") + 1).toLowerCase ();
     Boolean compressed = false;
     Path p = Paths.get (path);
+    V2dDisk v2dDisk = null;
 
     if (suffix.equals ("sdk"))
     {
@@ -158,8 +159,12 @@ public class DiskFactory
     {
       //      Disk disk = checkV2DDisk (file);
       //      return disk2;
-      checkV2DDisk (file);
-      return null;
+      //      checkV2DDisk (file);
+      //      return null;
+      v2dDisk = new V2dDisk (file);
+      AppleDisk appleDisk16 = new AppleDisk (v2dDisk);
+      disk = checkDos (appleDisk16);
+      return disk;
     }
 
     long length = file.length ();
@@ -475,13 +480,13 @@ public class DiskFactory
     return true;
   }
 
-  private static V2dDisk checkV2DDisk (File file)
-  {
-    //    System.out.println ("possible V2D disk");
-    new V2dDisk (file);
-
-    return null;
-  }
+  //  private static V2dDisk checkV2DDisk (File file)
+  //  {
+  //    //    System.out.println ("possible V2D disk");
+  //    new V2dDisk (file);
+  //
+  //    return null;
+  //  }
 
   //  private static InfocomDisk checkInfocomDisk (File file)
   private static InfocomDisk checkInfocomDisk (AppleDisk disk)

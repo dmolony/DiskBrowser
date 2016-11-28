@@ -319,6 +319,28 @@ public class HexFormatter
     return val;
   }
 
+  public static int getLongBigEndian (byte[] buffer, int ptr)
+  {
+    int val = 0;
+    for (int i = 0; i < 4; i++)
+    {
+      val <<= 8;
+      val += buffer[ptr + i] & 0xFF;
+    }
+    return val;
+  }
+
+  public static int getShortBigEndian (byte[] buffer, int ptr)
+  {
+    int val = 0;
+    for (int i = 0; i < 2; i++)
+    {
+      val <<= 8;
+      val += buffer[ptr + i] & 0xFF;
+    }
+    return val;
+  }
+
   public static double getSANEDouble (byte[] buffer, int offset)
   {
     long bits = 0;

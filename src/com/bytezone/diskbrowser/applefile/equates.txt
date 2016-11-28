@@ -32,6 +32,19 @@
 03EA  VECT
 A56E  catalog routine
 
+C000  80STOREOFF      Allow page2 to switch video page1 page2
+C001  80STOREON       Allow page2 to switch main & aux video memory
+C002  RAMRDOFF        Read enable main memory from $0200-$BFFF
+C003  RAMDRON         Read enable aux memory from $0200-$BFFF
+C004  RAMWRTOFF       Write enable main memory from $0200-$BFFF
+C005  RAMWRTON        Write enable aux memory from $0200-$BFFF
+C006  INTCXROMOFF     Enable slot ROM from $C100-$CFFF
+C007  INTCXROMON      Enable main ROM from $C100-$CFFF
+C008  ALTZPOFF        Enable main memory from $0000-$01FF & avl BSR
+C009  ALTZPON         Enable aux memory from $0000-$01FF & avl BSR
+C00A  SLOTC3ROMOFF    Enable main ROM from $C300-$C3FF
+C00B  SLOTC3ROMON     Enable slot ROM from $C300-$C3FF
+
 C000  KYBD - last key pressed
 C010  STROBE - Clear KYBD
 C050  TXTCLR - Display Graphics

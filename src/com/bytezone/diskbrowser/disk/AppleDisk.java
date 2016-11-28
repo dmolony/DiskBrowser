@@ -25,7 +25,7 @@ public class AppleDisk implements Disk
   private static final int SECTOR_SIZE = 256;
   private static final int BLOCK_SIZE = 512;
 
-  public final File path;
+  public final File file;
   private final byte[] diskBuffer;        // contains the disk contents in memory
 
   private final int tracks;               // usually 35 for floppy disks
@@ -81,19 +81,19 @@ public class AppleDisk implements Disk
 
   private final boolean debug = false;
 
-  public AppleDisk (File path, int tracks, int sectors) throws FileFormatException
+  public AppleDisk (File file, int tracks, int sectors) throws FileFormatException
   {
-    assert (path.exists ()) : "No such path :" + path.getAbsolutePath ();
-    assert (!path.isDirectory ()) : "File is directory :" + path.getAbsolutePath ();
-    assert (path.length () <= Integer.MAX_VALUE) : "File too large";
-    assert (path.length () != 0) : "File empty";
+    assert (file.exists ()) : "No such path :" + file.getAbsolutePath ();
+    assert (!file.isDirectory ()) : "File is directory :" + file.getAbsolutePath ();
+    assert (file.length () <= Integer.MAX_VALUE) : "File too large";
+    assert (file.length () != 0) : "File empty";
 
-    String name = path.getName ();
+    String name = file.getName ();
     int pos = name.lastIndexOf ('.');
 
     String suffix = pos > 0 ? name.substring (pos + 1) : "";
 
-    byte[] buffer = getPrefix (path);         // HDV could be a 2mg
+    byte[] buffer = getPrefix (file);         // HDV could be a 2mg
     String prefix = new String (buffer, 0, 4);
     int skip = 0;
 
@@ -105,7 +105,6 @@ public class AppleDisk implements Disk
       // http://apple2.org.za/gswv/a2zine/Docs/DiskImage_2MG_Info.txt
       if ("2IMG".equals (prefix))
       {
-
         if (debug)
         {
           String creator = new String (buffer, 4, 4);
@@ -119,16 +118,18 @@ public class AppleDisk implements Disk
         }
 
         int diskData = Utility.getLong (buffer, 28);
-        if (debug)
-          System.out.printf ("Data size : %08X (%,d)%n", diskData, diskData);
         blocks = HexFormatter.intValue (buffer[20], buffer[21]);       // 1600
+
         if (debug)
+        {
+          System.out.printf ("Data size : %08X (%,d)%n", diskData, diskData);
           System.out.printf ("Blocks    : %,d%n", blocks);
+        }
 
         //        int format = buffer[12] & 0xFF;
         //        if (blocks == 0 && format == 1)
         //        {
-        this.blocks = diskData / 4096 * 8;    // reduces blocks to a legal multiple
+        this.blocks = diskData / 4096 * 8;    // reduce blocks to a multiple of 8
         if (debug)
           System.out.printf ("Blocks    : %,d%n", blocks);
         //        }
@@ -137,26 +138,26 @@ public class AppleDisk implements Disk
         this.trackSize = 8 * sectorSize;
         skip = Utility.getWord (buffer, 8);
 
-        tracks = blocks / 8;          // change parameter
-        sectors = 8;                  // change parameter
+        tracks = blocks / 8;          // change parameter!
+        sectors = 8;                  // change parameter!
       }
       else
       {
         System.out.println ("Not a 2mg file");
-        this.blocks = (int) path.length () / 4096 * 8; // reduces blocks to a legal multiple
+        this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
         this.sectorSize = 512;
         this.trackSize = sectors * sectorSize;
       }
     }
     else if (suffix.equalsIgnoreCase ("HDV"))
     {
-      this.blocks = (int) path.length () / 4096 * 8; // reduces blocks to a legal multiple
+      this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
       this.sectorSize = 512;
       this.trackSize = sectors * sectorSize;
     }
     else
     {
-      if (path.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4
+      if (file.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4
       {
         this.blocks = tracks * sectors;
         this.sectorSize = 512;
@@ -165,7 +166,7 @@ public class AppleDisk implements Disk
       else
       {
         this.blocks = tracks * sectors;
-        this.sectorSize = (int) path.length () / blocks;
+        this.sectorSize = (int) file.length () / blocks;
         this.trackSize = sectors * sectorSize;
       }
     }
@@ -173,8 +174,8 @@ public class AppleDisk implements Disk
     if (false)
     {
       System.out.println ();
-      System.out.printf ("File name   : %s%n", path.getName ());
-      System.out.printf ("File size   : %,d%n", path.length ());
+      System.out.printf ("File name   : %s%n", file.getName ());
+      System.out.printf ("File size   : %,d%n", file.length ());
       System.out.println ("Tracks      : " + tracks);
       System.out.println ("Sectors     : " + sectors);
       System.out.println ("Blocks      : " + blocks);
@@ -186,7 +187,7 @@ public class AppleDisk implements Disk
     if (sectorSize != 256 && sectorSize != 512)
       throw new FileFormatException ("Invalid sector size : " + sectorSize);
 
-    this.path = path;
+    this.file = file;
     this.tracks = tracks;
     this.sectors = sectors;
 
@@ -201,13 +202,13 @@ public class AppleDisk implements Disk
 
     try
     {
-      BufferedInputStream file = new BufferedInputStream (new FileInputStream (path));
+      BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
       if (skip > 0)
       {
-        long result = file.skip (skip);
+        long result = in.skip (skip);
       }
-      file.read (diskBuffer);
-      file.close ();
+      in.read (diskBuffer);
+      in.close ();
     }
     catch (IOException e)
     {
@@ -343,7 +344,7 @@ public class AppleDisk implements Disk
   @Override
   public File getFile ()
   {
-    return path;
+    return file;
   }
 
   @Override
@@ -383,8 +384,6 @@ public class AppleDisk implements Disk
   @Override
   public void writeSector (DiskAddress da, byte[] buffer)
   {
-    //    System.out.println ("Not yet implemented");
-    //    return -1;
     writeBuffer (da, buffer);
   }
 
@@ -568,7 +567,7 @@ public class AppleDisk implements Disk
 
   public AppleFileSource getDetails ()
   {
-    return new DefaultAppleFileSource (toString (), path.getName (), null);
+    return new DefaultAppleFileSource (toString (), file.getName (), null);
   }
 
   @Override
@@ -576,8 +575,8 @@ public class AppleDisk implements Disk
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Path............ " + path.getAbsolutePath () + newLine);
-    text.append (String.format ("File size....... %,d%n", path.length ()));
+    text.append ("Path............ " + file.getAbsolutePath () + newLine);
+    text.append (String.format ("File size....... %,d%n", file.length ()));
     text.append ("Tracks.......... " + tracks + newLine);
     text.append ("Sectors......... " + sectors + newLine);
     text.append (String.format ("Blocks.......... %,d%n", blocks));

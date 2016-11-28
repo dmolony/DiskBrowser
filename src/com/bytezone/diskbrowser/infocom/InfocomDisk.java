@@ -90,14 +90,14 @@ public class InfocomDisk extends AbstractFormattedDisk
     sectorTypes[48] = headerSector;
 
     setSectorTypes (header.abbreviationsTable, header.objectTable, abbreviationsSector,
-                    abbreviationsNode);
+        abbreviationsNode);
     setSectorTypes (header.objectTable, header.globalsOffset, objectsSector, objectNode);
     setSectorTypes (header.globalsOffset, header.staticMemory, globalsSector,
-                    globalsNode);
+        globalsNode);
     setSectorTypes (header.staticMemory, header.dictionaryOffset, grammarSector,
-                    grammarNode);
+        grammarNode);
     setSectorTypes (header.dictionaryOffset, header.highMemory, dictionarySector,
-                    dictionaryNode);
+        dictionaryNode);
     setSectorTypes (header.highMemory, header.stringPointer, codeSector, codeNode);
     setSectorTypes (header.stringPointer, header.fileLength, stringsSector, stringsNode);
   }
@@ -257,11 +257,10 @@ public class InfocomDisk extends AbstractFormattedDisk
     if (version < 2 || version > 3)
     {
       System.out.println ("Incorrect format : " + version);
-      JOptionPane
-          .showMessageDialog (null,
-                              "This appears to be an Infocom disk," + " but version "
-                                  + version + " is not supported",
-                              "Unknown disk format", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog (null,
+          "This appears to be an Infocom disk," + " but version " + version
+              + " is not supported",
+          "Unknown disk format", JOptionPane.INFORMATION_MESSAGE);
       return false;
     }
 

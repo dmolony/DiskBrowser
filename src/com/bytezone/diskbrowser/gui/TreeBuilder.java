@@ -26,7 +26,7 @@ public class TreeBuilder
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
   private static final boolean FULL_TREE = false;
   private static final List<String> suffixes =
-      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "d13", "sdk", "gz");
+      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk", "gz");
 
   FileComparator fc = new FileComparator ();
   JTree tree;
@@ -308,8 +308,7 @@ public class TreeBuilder
           String type = pos > 0 && !f.isDirectory () ? name.substring (pos) : "";
           String size = f.isDirectory () ? "" : String.format ("%,14d", f.length ());
           text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n",
-                                      f.isDirectory () ? "D" : " ", name, sdf.format (d),
-                                      size, type));
+              f.isDirectory () ? "D" : " ", name, sdf.format (d), size, type));
         }
 
       if (text.length () > 0)

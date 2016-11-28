@@ -35,8 +35,8 @@ public class DualDosDisk implements FormattedDisk
     // allow empty nodes to appear as folders
     treeModel.setAsksAllowsChildren (true);
 
-    this.disks[0] = disk0;
-    this.disks[1] = disk1;
+    disks[0] = disk0;
+    disks[1] = disk1;
 
     disk0.setParent (this);
     disk1.setParent (this);

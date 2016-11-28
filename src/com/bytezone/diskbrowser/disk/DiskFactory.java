@@ -138,6 +138,7 @@ public class DiskFactory
 
       if (debug)
         System.out.println ("Creating a data disk from bad length");
+
       try
       {
         AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
@@ -153,45 +154,65 @@ public class DiskFactory
       }
     }
 
+    if (suffix.equals ("v2d"))
+    {
+      //      Disk disk = checkV2DDisk (file);
+      //      return disk2;
+      checkV2DDisk (file);
+      return null;
+    }
+
     long length = file.length ();
-    if (length != 143360 && length != 116480)
+
+    if (length == 116480)           // 13 sector disk
+    {
+      if (!suffix.equals ("d13"))
+        System.out.printf ("%s should have a d13 suffix%n", file.getName ());
+
+      AppleDisk appleDisk = new AppleDisk (file, 35, 13);
+      disk = checkDos (appleDisk);
+      return disk == null ? new DataDisk (appleDisk) : disk;
+    }
+
+    if (length != 143360)
     {
       System.out.printf ("%s: invalid file length : %,d%n", file.getName (),
           file.length ());
       return null;
     }
 
-    int sectors = file.length () == 143360 ? 16 : 13;
+    AppleDisk appleDisk16 = new AppleDisk (file, 35, 16);
+    AppleDisk appleDisk8 = new AppleDisk (file, 35, 8);
+
     if (true)
     {
-      AppleDisk appleDisk = new AppleDisk (file, 35, sectors);
-      long checksum = appleDisk.getBootChecksum ();
+      long checksum = appleDisk16.getBootChecksum ();
 
       if (checksum == 3176296590L || checksum == 108825457L || checksum == 1439356606L
           || checksum == 1550012074L || checksum == 1614602459L || checksum == 940889336L
           || checksum == 990032697 || checksum == 2936955085L || checksum == 1348415927L
           || checksum == 3340889101L || checksum == 18315788L || checksum == 993895235L)
       {
-        disk = checkDos (file);
-        disk2 = checkProdos (file);
+        disk = checkDos (appleDisk16);
+        disk2 = checkProdos (appleDisk8);
         if (disk2 != null && disk != null)
           disk = new DualDosDisk (disk, disk2);
       }
-
       else if (checksum == 1737448647L || checksum == 170399908L)
       {
-        disk = checkProdos (file);
-        disk2 = checkDos (file);
+        disk = checkProdos (appleDisk8);
+        disk2 = checkDos (appleDisk16);
         if (disk2 != null && disk != null)
           disk = new DualDosDisk (disk, disk2);
       }
-
       else if (checksum == 2803644711L || checksum == 3317783349L
           || checksum == 1728863694L || checksum == 198094178L)
-        disk = checkPascalDisk (file);
-
+      {
+        //        disk = checkPascalDisk (file);
+        disk = checkPascalDisk (appleDisk8);
+      }
       else if (checksum == 3028642627L || checksum == 2070151659L)
-        disk = checkInfocomDisk (file);
+        disk = checkInfocomDisk (appleDisk16);
 
       //      else if (checksum == 1212926910L || checksum == 1365043894L
       //          || checksum == 2128073918L)
@@ -211,42 +232,43 @@ public class DiskFactory
         System.out.println ("Unknown checksum : " + checksum + " : " + path);
     }
 
-    if (suffix.equals ("dsk") || suffix.equals ("do") || suffix.equals ("d13"))
+    if (suffix.equals ("dsk") || suffix.equals ("do"))
     {
-      disk = checkDos (file);
+      disk = checkDos (appleDisk16);
       if (disk == null)
-        disk = checkProdos (file);
-      else if (sectors == 16)
+        disk = checkProdos (appleDisk8);
+      else
       {
         if (debug)
           System.out.println ("Checking DualDos disk");
-        disk2 = checkProdos (file);
+
+        disk2 = checkProdos (appleDisk8);
         if (disk2 != null)
           disk = new DualDosDisk (disk, disk2);
       }
     }
     else if (suffix.equals ("po"))
     {
-      disk = checkProdos (file);
+      disk = checkProdos (appleDisk8);
       if (disk == null)
-        disk = checkDos (file);
+        disk = checkDos (appleDisk16);
     }
 
     if (disk == null)
-      disk = checkPascalDisk (file);
+      disk = checkPascalDisk (appleDisk8);
 
     if (disk == null)
-      disk = checkCPMDisk (file);
+      disk = checkCPMDisk (appleDisk16);
 
     if (disk == null)
     {
-      disk2 = checkInfocomDisk (file);
+      disk2 = checkInfocomDisk (appleDisk16);
       if (disk2 != null)
         disk = disk2;
     }
 
     if (disk == null)
-      disk = new DataDisk (new AppleDisk (file, 35, 16));
+      disk = new DataDisk (appleDisk16);
 
     if (debug)
       System.out.println (
@@ -258,14 +280,16 @@ public class DiskFactory
     return disk;
   }
 
-  private static DosDisk checkDos (File file)
+  //  private static DosDisk checkDos (File file)
+  private static DosDisk checkDos (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking DOS disk");
+
     try
     {
-      int sectors = file.length () == 143360 ? 16 : 13;
-      AppleDisk disk = new AppleDisk (file, 35, sectors);
+      //      int sectors = file.length () == 143360 ? 16 : 13;
+      //      AppleDisk disk = new AppleDisk (file, 35, sectors);
       if (DosDisk.isCorrectFormat (disk))
         return new DosDisk (disk);
     }
@@ -277,14 +301,15 @@ public class DiskFactory
     return null;
   }
 
-  private static ProdosDisk checkProdos (File file)
+  //  private static ProdosDisk checkProdos (File file)
+  private static ProdosDisk checkProdos (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking Prodos disk");
 
     try
     {
-      AppleDisk disk = new AppleDisk (file, 35, 8);
+      //      AppleDisk disk = new AppleDisk (file, 35, 8);
       if (ProdosDisk.isCorrectFormat (disk))
         return new ProdosDisk (disk);
     }
@@ -369,12 +394,14 @@ public class DiskFactory
     return null;
   }
 
-  private static FormattedDisk checkPascalDisk (File file)
+  //  private static FormattedDisk checkPascalDisk (File file)
+  private static FormattedDisk checkPascalDisk (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking Pascal disk");
 
-    AppleDisk disk = new AppleDisk (file, 35, 8);
+    //    AppleDisk disk = new AppleDisk (file, 35, 8);
+    File file = disk.getFile ();
 
     if (!PascalDisk.isCorrectFormat (disk, debug))
       return null;
@@ -448,11 +475,20 @@ public class DiskFactory
     return true;
   }
 
-  private static InfocomDisk checkInfocomDisk (File file)
+  private static V2dDisk checkV2DDisk (File file)
+  {
+    //    System.out.println ("possible V2D disk");
+    new V2dDisk (file);
+
+    return null;
+  }
+
+  //  private static InfocomDisk checkInfocomDisk (File file)
+  private static InfocomDisk checkInfocomDisk (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking Infocom disk");
-    AppleDisk disk = new AppleDisk (file, 35, 16);
+    //    AppleDisk disk = new AppleDisk (file, 35, 16);
     if (InfocomDisk.isCorrectFormat (disk))
       return new InfocomDisk (disk);
     if (debug)
@@ -460,11 +496,12 @@ public class DiskFactory
     return null;
   }
 
-  private static CPMDisk checkCPMDisk (File file)
+  //  private static CPMDisk checkCPMDisk (File file)
+  private static CPMDisk checkCPMDisk (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking CPM disk");
-    AppleDisk disk = new AppleDisk (file, 35, 16);
+    //    AppleDisk disk = new AppleDisk (file, 35, 16);
     if (CPMDisk.isCorrectFormat (disk))
       return new CPMDisk (disk);
     if (debug)

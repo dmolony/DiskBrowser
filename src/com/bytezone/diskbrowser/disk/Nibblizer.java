@@ -2,6 +2,10 @@ package com.bytezone.diskbrowser.disk;
 
 public class Nibblizer
 {
+  private static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
+  private static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
+  private static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+
   private static byte[] writeTranslateTable =
       { (byte) 0x96, (byte) 0x97, (byte) 0x9A, (byte) 0x9B, (byte) 0x9D, (byte) 0x9E,
         (byte) 0x9F, (byte) 0xA6, (byte) 0xA7, (byte) 0xAB, (byte) 0xAC, (byte) 0xAD,
@@ -93,6 +97,16 @@ public class Nibblizer
 
       return;
     }
+  }
+
+  public AddressField getAddressField (byte[] buffer, int offset)
+  {
+    return new AddressField (buffer, offset);
+  }
+
+  public DataField getDataField (byte[] buffer, int offset)
+  {
+    return new DataField (buffer, offset);
   }
 
   int decode4and4 (byte[] buffer, int offset)
@@ -229,5 +243,105 @@ public class Nibblizer
   private static int reverse (int b)
   {
     return b == 1 ? 2 : b == 2 ? 1 : b;
+  }
+
+  private boolean matchBytes (byte[] buffer, int offset, byte[] valueBuffer)
+  {
+    for (int i = 0; i < valueBuffer.length; i++)
+    {
+      if (offset >= buffer.length)
+        return false;
+      if (buffer[offset++] != valueBuffer[i])
+        return false;
+    }
+    return true;
+  }
+
+  int skipBytes (byte[] buffer, int offset, byte skipValue)
+  {
+    int count = 0;
+    while (offset < buffer.length && buffer[offset++] == skipValue)
+      ++count;
+    return count;
+  }
+
+  int listBytes (byte[] buffer, int offset, int length)
+  {
+    int count = 0;
+    for (int i = 0; i < length; i++)
+    {
+      if (offset >= buffer.length)
+        break;
+      System.out.printf ("%02X ", buffer[offset++]);
+      ++count;
+    }
+    System.out.println ();
+    return count;
+  }
+
+  abstract class Field
+  {
+    boolean valid;
+    byte[] buffer;
+    int offset;
+
+    public Field (byte[] buffer, int offset)
+    {
+      this.buffer = buffer;
+      this.offset = offset;
+    }
+
+    public boolean isValid ()
+    {
+      return valid;
+    }
+
+    public abstract int size ();
+  }
+
+  class AddressField extends Field
+  {
+    int track, sector, volume, checksum;
+
+    public AddressField (byte[] buffer, int offset)
+    {
+      super (buffer, offset);
+
+      if (matchBytes (buffer, offset, addressPrologue)
+          && matchBytes (buffer, offset + 11, epilogue))
+      {
+        volume = decode4and4 (buffer, offset + 3);
+        track = decode4and4 (buffer, offset + 5);
+        sector = decode4and4 (buffer, offset + 7);
+        checksum = decode4and4 (buffer, offset + 9);
+        valid = true;
+      }
+    }
+
+    @Override
+    public int size ()
+    {
+      return 14;
+    }
+  }
+
+  class DataField extends Field
+  {
+    public DataField (byte[] buffer, int offset)
+    {
+      super (buffer, offset);
+
+      if (matchBytes (buffer, offset, dataPrologue)
+          && matchBytes (buffer, offset + 346, epilogue))
+      {
+        valid = true;
+      }
+    }
+
+    @Override
+    public int size ()
+    {
+      return 349;
+    }
   }
 }

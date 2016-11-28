@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.bytezone.diskbrowser.disk.Nibblizer.AddressField;
+import com.bytezone.diskbrowser.disk.Nibblizer.DataField;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 /*
@@ -33,8 +35,13 @@ public class V2dDisk
   private static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
   private static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
   private static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
-  private static int[] interleave =
-      { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
+
+  // this assumes dos order
+  private static int[][] interleave =
+      { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
+        { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
+  private static final int DOS = 0;
+  private static final int PRODOS = 1;
 
   private final Nibblizer nibbler = new Nibblizer ();
 
@@ -92,105 +99,37 @@ public class V2dDisk
   private boolean processTrack (byte[] buffer, byte[] diskBuffer)
   {
     int ptr = 0;
-    int track, sector, volume, checksum;
 
-    if (buffer[0] == (byte) 0xEB)
+    while (buffer[ptr] == (byte) 0xEB)
     {
-      System.out.println ("overrun");
+      System.out.println ("overrun: " + ptr);
       ++ptr;
     }
 
-    ptr += skipBytes (buffer, ptr, (byte) 0xFF);
+    ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);          // gap1
 
     while (ptr < buffer.length)
     {
-      if (matchBytes (buffer, ptr, addressPrologue)
-          && matchBytes (buffer, ptr + 11, epilogue))
-      {
-        volume = nibbler.decode4and4 (buffer, ptr + 3);
-        track = nibbler.decode4and4 (buffer, ptr + 5);
-        sector = nibbler.decode4and4 (buffer, ptr + 7);
-        checksum = nibbler.decode4and4 (buffer, ptr + 9);
-        //        System.out.printf ("Volume: %03d, Track: %02d, Sector: %02d, Checksum: %03d%n",
-        //            volume, track, sector, checksum);
-        ptr += 14;
-      }
-      else
-      {
-        System.out.println ("Invalid address prologue/epilogue");
-        ptr += listBytes (buffer, ptr, 14);
+      AddressField addressField = nibbler.getAddressField (buffer, ptr);
+      if (!addressField.isValid ())
         return false;
-      }
 
-      ptr += skipBytes (buffer, ptr, (byte) 0xFF);
+      ptr += addressField.size ();
+      ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);        // gap2
 
-      if (!matchBytes (buffer, ptr, dataPrologue))
-      {
-        System.out.println ("Invalid data prologue");
-        ptr += listBytes (buffer, ptr, dataPrologue.length);
+      DataField dataField = nibbler.getDataField (buffer, ptr);
+      if (!dataField.isValid ())
         return false;
-      }
 
-      if (!matchBytes (buffer, ptr + 346, epilogue))
-      {
-        System.out.println ("Invalid data epilogue");
-        ptr += listBytes (buffer, ptr + 346, epilogue.length);
-        return false;
-      }
+      byte[] decodedBuffer = nibbler.decode6and2 (buffer, ptr + 3);
 
-      ptr += dataPrologue.length;
-
-      byte[] decodedBuffer = nibbler.decode6and2 (buffer, ptr);
-
-      int offset = track * 4096 + interleave[sector] * 256;
+      int offset = addressField.track * 4096 + interleave[DOS][addressField.sector] * 256;
       System.arraycopy (decodedBuffer, 0, diskBuffer, offset, 256);
 
-      ptr += 342;
-      ptr += 1;     // checksum
-      ptr += epilogue.length;
-
-      //      System.out.print ("<--- 342 data bytes --> ");
-
-      //      ptr += listBytes (buffer, ptr, 4);
-      ptr += skipBytes (buffer, ptr, (byte) 0xFF);
+      ptr += dataField.size ();
+      ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);        // gap3
     }
 
-    //    System.out.println ("----------------------------------------------");
-    return true;
-  }
-
-  private int skipBytes (byte[] buffer, int offset, byte skipValue)
-  {
-    int count = 0;
-    while (offset < buffer.length && buffer[offset++] == skipValue)
-      ++count;
-    //    System.out.printf ("   (%2d x %02X)%n", count, skipValue);
-    return count;
-  }
-
-  private int listBytes (byte[] buffer, int offset, int length)
-  {
-    int count = 0;
-    for (int i = 0; i < length; i++)
-    {
-      if (offset >= buffer.length)
-        break;
-      System.out.printf ("%02X ", buffer[offset++]);
-      ++count;
-    }
-    System.out.println ();
-    return count;
-  }
-
-  private boolean matchBytes (byte[] buffer, int offset, byte[] valueBuffer)
-  {
-    for (int i = 0; i < valueBuffer.length; i++)
-    {
-      if (offset >= buffer.length)
-        return false;
-      if (buffer[offset++] != valueBuffer[i])
-        return false;
-    }
     return true;
   }
 }

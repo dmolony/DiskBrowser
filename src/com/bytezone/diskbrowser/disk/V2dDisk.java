@@ -10,6 +10,7 @@ import com.bytezone.diskbrowser.disk.Nibblizer.DataField;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 /*
+ * from Gerard Putter's email:
  * Offsets in bytes
  * From To Meaning
  * 0000 0003 Length of disk image, from offset 8 to the end (big endian)
@@ -30,13 +31,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 // Block ..: 0 1 2 3 4 5 6 7 8 9 A B C D E F
 // Position: 0 8 1 9 2 A 3 B 4 C 5 D 6 E 7 F - Prodos (.PO disks)
 // Position: 0 7 E 6 D 5 C 4 B 3 A 2 9 1 8 F - Dos (.DO disks)
+
 public class V2dDisk
 {
-  private static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
-  private static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
-  private static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
-
-  // this assumes dos order
   private static int[][] interleave =
       { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
         { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
@@ -62,11 +59,10 @@ public class V2dDisk
       in.read (diskBuffer);
 
       int diskLength = HexFormatter.getLongBigEndian (diskBuffer, 0);   // 4 bytes
-      //      System.out.printf ("Disk length: %,d%n", diskLength);
       String id = HexFormatter.getString (diskBuffer, 4, 4);            // 4 bytes
-      //      System.out.printf ("ID: %s%n", id);
       tracks = HexFormatter.getShortBigEndian (diskBuffer, 8);          // 2 bytes
-      //      System.out.printf ("Tracks: %d%n", tracks);
+
+      assert "D5NI".equals (id);
 
       for (int i = 0; i < tracks; i++)
       {
@@ -77,11 +73,13 @@ public class V2dDisk
 
         int fullTrackNo = trackNumber / 4;
         int halfTrackNo = trackNumber % 4;
+        //        System.out.printf ("%3d %3d%n", fullTrackNo, halfTrackNo);
 
         byte[] trackData = new byte[trackLength];
         in.read (trackData);
 
-        if (processTrack (trackData, buffer))
+        // only process full tracks
+        if (halfTrackNo == 0 && processTrack (fullTrackNo, trackData, buffer))
           actualTracks++;
       }
 
@@ -90,19 +88,18 @@ public class V2dDisk
     catch (IOException e)
     {
       e.printStackTrace ();
-      System.exit (1);
     }
 
     this.tracks = tracks;
   }
 
-  private boolean processTrack (byte[] buffer, byte[] diskBuffer)
+  private boolean processTrack (int trackNo, byte[] buffer, byte[] diskBuffer)
   {
     int ptr = 0;
 
     while (buffer[ptr] == (byte) 0xEB)
     {
-      System.out.println ("overrun: " + ptr);
+      System.out.println ("overrun: " + ptr + " in track " + trackNo);
       ++ptr;
     }
 

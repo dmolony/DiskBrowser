@@ -44,7 +44,7 @@ public class V2dDisk
 
   final File file;
   final int tracks;
-  int actualTracks;
+  //  int actualTracks;
 
   final byte[] buffer = new byte[4096 * 35];
 
@@ -62,6 +62,7 @@ public class V2dDisk
       String id = HexFormatter.getString (diskBuffer, 4, 4);            // 4 bytes
       tracks = HexFormatter.getShortBigEndian (diskBuffer, 8);          // 2 bytes
 
+      assert diskLength + 8 == file.length ();
       assert "D5NI".equals (id);
 
       for (int i = 0; i < tracks; i++)
@@ -69,18 +70,20 @@ public class V2dDisk
         byte[] trackHeader = new byte[4];
         in.read (trackHeader);
         int trackNumber = HexFormatter.getShortBigEndian (trackHeader, 0);
-        int trackLength = HexFormatter.getShortBigEndian (trackHeader, 2);
+        int trackLength = HexFormatter.getShortBigEndian (trackHeader, 2);    // 6304
 
         int fullTrackNo = trackNumber / 4;
         int halfTrackNo = trackNumber % 4;
-        //        System.out.printf ("%3d %3d%n", fullTrackNo, halfTrackNo);
 
         byte[] trackData = new byte[trackLength];
         in.read (trackData);
 
         // only process full tracks
-        if (halfTrackNo == 0 && processTrack (fullTrackNo, trackData, buffer))
-          actualTracks++;
+        if (halfTrackNo == 0)
+          processTrack (fullTrackNo, trackData, buffer);
+        else
+          System.out.printf ("%s skipping half track %02X / %02X%n", file.getName (),
+              fullTrackNo, halfTrackNo);
       }
 
       in.close ();
@@ -99,7 +102,8 @@ public class V2dDisk
 
     while (buffer[ptr] == (byte) 0xEB)
     {
-      System.out.println ("overrun: " + ptr + " in track " + trackNo);
+      System.out.printf ("%s overrun 0xEB offset %d in track %02X%n", file.getName (),
+          ptr, trackNo);
       ++ptr;
     }
 
@@ -116,8 +120,14 @@ public class V2dDisk
 
       DataField dataField = nibbler.getDataField (buffer, ptr);
       if (!dataField.isValid ())
+      {
+        System.out.printf ("skipping data %02X / %02X%n", addressField.track,
+            addressField.sector);
         return false;
+      }
 
+      //      System.out.printf ("decoding track %02X / %02X%n", addressField.track,
+      //          addressField.sector);
       byte[] decodedBuffer = nibbler.decode6and2 (buffer, ptr + 3);
 
       int offset = addressField.track * 4096 + interleave[DOS][addressField.sector] * 256;

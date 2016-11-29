@@ -59,7 +59,7 @@ public class AssemblerProgram extends AbstractFile
       return text;
 
     return text + "\n\n" + HexFormatter.format (extraBuffer, 0, extraBuffer.length,
-                                                loadAddress + buffer.length);
+        loadAddress + buffer.length);
   }
 
   @Override
@@ -180,8 +180,8 @@ public class AssemblerProgram extends AbstractFile
     {
       StringBuilder line = new StringBuilder ();
 
-      line.append (String.format ("%3.3s %04X: %02X ", getArrow (cmd), cmd.address,
-                                  cmd.value));
+      line.append (
+          String.format ("%3.3s %04X: %02X ", getArrow (cmd), cmd.address, cmd.value));
 
       if (cmd.size > 1)
         line.append (String.format ("%02X ", cmd.operand1));
@@ -306,7 +306,7 @@ public class AssemblerProgram extends AbstractFile
         {
           int address = Integer.parseInt (line.substring (0, 4), 16);
           if (equates.containsKey (address))
-            System.out.println ("Duplicate equate entry : " + address);
+            System.out.printf ("Duplicate equate entry : %04X%n" + address);
           else
             equates.put (address, line.substring (6));
         }

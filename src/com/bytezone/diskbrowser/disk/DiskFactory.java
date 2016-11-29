@@ -44,7 +44,6 @@ public class DiskFactory
     String suffix = path.substring (path.lastIndexOf (".") + 1).toLowerCase ();
     Boolean compressed = false;
     Path p = Paths.get (path);
-    V2dDisk v2dDisk = null;
 
     if (suffix.equals ("sdk"))
     {
@@ -157,14 +156,18 @@ public class DiskFactory
 
     if (suffix.equals ("v2d"))
     {
-      //      Disk disk = checkV2DDisk (file);
-      //      return disk2;
-      //      checkV2DDisk (file);
-      //      return null;
-      v2dDisk = new V2dDisk (file);
+      V2dDisk v2dDisk = new V2dDisk (file);
       AppleDisk appleDisk16 = new AppleDisk (v2dDisk);
       disk = checkDos (appleDisk16);
       return disk;
+    }
+
+    if (suffix.equals ("nib"))
+    {
+      NibDisk nibDisk = new NibDisk (file);
+      AppleDisk appleDisk16 = new AppleDisk (nibDisk);
+      disk = checkDos (appleDisk16);
+      return null;
     }
 
     long length = file.length ();

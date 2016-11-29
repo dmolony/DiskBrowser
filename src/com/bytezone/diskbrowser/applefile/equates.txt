@@ -32,7 +32,7 @@
 03EA  VECT
 A56E  catalog routine
 
-C000  80STOREOFF      Allow page2 to switch video page1 page2
+* C000  80STOREOFF      Allow page2 to switch video page1 page2
 C001  80STOREON       Allow page2 to switch main & aux video memory
 C002  RAMRDOFF        Read enable main memory from $0200-$BFFF
 C003  RAMDRON         Read enable aux memory from $0200-$BFFF

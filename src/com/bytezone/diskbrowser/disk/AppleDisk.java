@@ -221,16 +221,25 @@ public class AppleDisk implements Disk
 
   public AppleDisk (V2dDisk disk)
   {
-    tracks = disk.actualTracks;
+    tracks = 35;
     trackSize = 4096;
+    file = disk.file;
+    diskBuffer = disk.buffer;
+
     sectorSize = 256;
     sectors = 16;
     blocks = tracks * sectors;
-    file = disk.file;
-    diskBuffer = disk.buffer;
     hasData = new boolean[blocks];
 
     checkSectorsForData ();
+  }
+
+  public AppleDisk (NibDisk disk)       // not used yet
+  {
+    tracks = 35;
+    trackSize = 4096;
+    file = disk.file;
+    diskBuffer = disk.buffer;
   }
 
   private byte[] getPrefix (File path)
@@ -463,9 +472,12 @@ public class AppleDisk implements Disk
   @Override
   public DiskAddress getDiskAddress (int track, int sector)
   {
-    // should this return null for invalid addresses?
-    assert (isValidAddress (track, sector)) : "Invalid address : " + track + ", "
-        + sector;
+    if (!isValidAddress (track, sector))
+    {
+      System.out.println ("Invalid block : " + track + "/" + sector);
+      return null;
+      //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
+    }
     return new AppleDiskAddress (this, track, sector);
   }
 

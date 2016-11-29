@@ -275,7 +275,7 @@ public class Nibblizer
       System.out.printf ("%02X ", buffer[offset++]);
       ++count;
     }
-    System.out.println ();
+    //    System.out.println ();
     return count;
   }
 
@@ -316,6 +316,11 @@ public class Nibblizer
         checksum = decode4and4 (buffer, offset + 9);
         valid = true;
       }
+      else
+      {
+        listBytes (buffer, offset, 14);
+        System.out.println ();
+      }
     }
 
     @Override
@@ -331,10 +336,21 @@ public class Nibblizer
     {
       super (buffer, offset);
 
-      if (matchBytes (buffer, offset, dataPrologue)
-          && matchBytes (buffer, offset + 346, epilogue))
+      if (matchBytes (buffer, offset, dataPrologue))
       {
         valid = true;
+        if (!matchBytes (buffer, offset + 346, epilogue))
+        {
+          System.out.print ("   bad data epilogue: ");
+          listBytes (buffer, offset + 346, 3);
+          System.out.println ();
+        }
+      }
+      else
+      {
+        System.out.print ("   bad data prologue: ");
+        listBytes (buffer, offset, 3);
+        System.out.println ();
       }
     }
 

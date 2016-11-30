@@ -22,6 +22,7 @@ public class Nibblizer
 
   private static byte[] readTranslateTable = new byte[106];
 
+  // this array is just here for testing - it matches the example in Beneath Apple Prodos
   private static byte[] xor =
       { (byte) 0x00, (byte) 0x00, (byte) 0x03, (byte) 0x00, (byte) 0xFA, (byte) 0x55,
         (byte) 0x53, (byte) 0x45, (byte) 0x52, (byte) 0x53, (byte) 0x2E, (byte) 0x44,
@@ -84,15 +85,19 @@ public class Nibblizer
     }
   }
 
+  private final byte[] decode1 = new byte[343];
+  private final byte[] decode2 = new byte[342];
+  private final byte[] encode1 = new byte[342];
+  private final byte[] encode2 = new byte[343];
+
   public Nibblizer ()
   {
     if (false)
     {
-      byte[] buffer = encode6and2 (xor);
-      byte[] buffer2 = decode6and2 (buffer, 0);
+      byte[] testBuffer = decode6and2 (encode6and2 (xor), 0);
 
       for (int i = 0; i < 256; i++)
-        if (xor[i] != buffer2[i])
+        if (xor[i] != testBuffer[i])
           System.out.println ("bollocks");
 
       return;
@@ -118,43 +123,29 @@ public class Nibblizer
 
   byte[] decode6and2 (byte[] buffer, int offset)
   {
-    //    System.out.println ("\n\n343 byte disk buffer:\n");
-    //    System.out.println (HexFormatter.format (buffer, offset, 343));
-
-    byte[] temp = new byte[343];
-
-    for (int i = 0; i < temp.length; i++)
+    for (int i = 0; i < decode1.length; i++)
     {
       int val = (buffer[offset++] & 0xFF) - 150;
       byte trans = readTranslateTable[val];
       assert trans != 0;
-      temp[i] = (byte) ((trans - 1) << 2);
+      decode1[i] = (byte) ((trans - 1) << 2);
     }
-
-    //    System.out.println ("\nTranslated 343 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (temp));
-
-    byte[] temp2 = new byte[342];
 
     byte chk = 0;
     for (int i = 342; i > 0; i--)
     {
-      temp2[i - 1] = (byte) (temp[i] ^ chk);
-      chk = temp2[i - 1];
+      decode2[i - 1] = (byte) (decode1[i] ^ chk);
+      chk = decode2[i - 1];
     }
-
-    //    System.out.println ("\nChecksummed 342 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (temp2));
-    //    System.out.printf ("%nChecksum: %02X%n", chk ^ temp2[0]);
 
     byte[] decodedBuffer = new byte[256];
 
     for (int i = 0; i < 256; i++)
-      decodedBuffer[i] = temp2[i + 86];
+      decodedBuffer[i] = decode2[i + 86];
 
     for (int i = 0; i < 84; i++)
     {
-      int val = temp2[i] & 0xFF;
+      int val = decode2[i] & 0xFF;
       int b1 = reverse ((val & 0x0C) >> 2);
       int b2 = reverse ((val & 0x30) >> 4);
       int b3 = reverse ((val & 0xC0) >> 6);
@@ -166,7 +157,7 @@ public class Nibblizer
 
     for (int i = 84; i < 86; i++)
     {
-      int val = temp2[i] & 0xFF;
+      int val = decode2[i] & 0xFF;
       int b1 = reverse ((val & 0x0C) >> 2);
       int b2 = reverse ((val & 0x30) >> 4);
 
@@ -174,75 +165,49 @@ public class Nibblizer
       decodedBuffer[i + 86] |= b2;
     }
 
-    //    System.out.println ("\nOriginal 256 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (decodedBuffer));
-
     return decodedBuffer;
   }
 
   byte[] encode6and2 (byte[] buffer)
   {
-    //    System.out.println ("Original 256 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (buffer));
-
-    byte[] temp1 = new byte[342];
-    byte[] temp2 = new byte[343];
-    byte[] temp3 = new byte[343];
+    byte[] encodedBuffer = new byte[343];
 
     for (int i = 0; i < 256; i++)
-      temp1[i + 86] = buffer[i];
+      encode1[i + 86] = buffer[i];
 
     for (int i = 0; i < 84; i++)
     {
       int b1 = reverse (buffer[i] & 0x03) << 2;
       int b2 = reverse (buffer[i + 86] & 0x03) << 4;
       int b3 = reverse (buffer[i + 172] & 0x03) << 6;
-      temp1[i] = (byte) (b1 | b2 | b3);
+      encode1[i] = (byte) (b1 | b2 | b3);
     }
 
     for (int i = 84; i < 86; i++)
     {
       int b1 = reverse (buffer[i] & 0x03) << 2;
       int b2 = reverse (buffer[i + 86] & 0x03) << 4;
-      temp1[i] = (byte) (b1 | b2);
+      encode1[i] = (byte) (b1 | b2);
     }
 
-    //    System.out.println ("\nNew 342 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (temp1));
-
-    //    if (false)
-    //    {
-    //      temp2[0] = temp1[0];
-    //      temp2[342] = temp1[341];
-    //      for (int i = 1; i < 342; i++)
-    //        temp2[i] = (byte) (temp1[i] ^ temp1[i - 1]);
-    //    }
-    //    else
+    byte chk = 0;
+    for (int i = 0; i < 342; i++)
     {
-      byte chk = 0;
-      for (int i = 0; i < 342; i++)
-      {
-        temp2[i] = (byte) (chk ^ temp1[i]);
-        chk = temp1[i];
-      }
-      temp2[342] = chk;
+      encode2[i] = (byte) (chk ^ encode1[i]);
+      chk = encode1[i];
     }
-
-    //    System.out.println ("\nChecksummed 343 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (temp2));
+    encode2[342] = chk;
 
     for (int i = 0; i < 343; i++)
-      temp3[i] = writeTranslateTable[(temp2[i] & 0xFC) / 4];
+      encodedBuffer[i] = writeTranslateTable[(encode2[i] & 0xFC) / 4];
 
-    //    System.out.println ("\n\n\nTranslated 343 byte buffer:\n");
-    //    System.out.println (HexFormatter.format (temp3));
-    return temp3;
+    return encodedBuffer;
   }
 
-  // reverse 2 bits - 0 <= b <= 3
-  private static int reverse (int b)
+  // reverse 2 bits - 0 <= bits <= 3
+  private static int reverse (int bits)
   {
-    return b == 1 ? 2 : b == 2 ? 1 : b;
+    return bits == 1 ? 2 : bits == 2 ? 1 : bits;
   }
 
   private boolean matchBytes (byte[] buffer, int offset, byte[] valueBuffer)
@@ -275,15 +240,16 @@ public class Nibblizer
       System.out.printf ("%02X ", buffer[offset++]);
       ++count;
     }
-    //    System.out.println ();
+
     return count;
   }
 
   abstract class Field
   {
-    boolean valid;
-    byte[] buffer;
-    int offset;
+    protected boolean valid;
+    protected byte[] buffer;
+    protected int offset;
+    protected int length;
 
     public Field (byte[] buffer, int offset)
     {
@@ -296,7 +262,11 @@ public class Nibblizer
       return valid;
     }
 
-    public abstract int size ();
+    public int size ()
+    {
+      assert length > 0;
+      return length;
+    }
   }
 
   class AddressField extends Field
@@ -321,12 +291,8 @@ public class Nibblizer
         listBytes (buffer, offset, 14);
         System.out.println ();
       }
-    }
 
-    @Override
-    public int size ()
-    {
-      return 14;
+      length = 14;
     }
   }
 
@@ -352,12 +318,8 @@ public class Nibblizer
         listBytes (buffer, offset, 3);
         System.out.println ();
       }
-    }
 
-    @Override
-    public int size ()
-    {
-      return 349;
+      length = 349;
     }
   }
 }

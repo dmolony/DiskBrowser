@@ -2,9 +2,9 @@ package com.bytezone.diskbrowser.disk;
 
 public class Nibblizer
 {
-  private static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
-  private static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
-  private static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+  static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
+  static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
+  static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
 
   private static byte[] writeTranslateTable =
       { (byte) 0x96, (byte) 0x97, (byte) 0x9A, (byte) 0x9B, (byte) 0x9D, (byte) 0x9E,
@@ -92,7 +92,7 @@ public class Nibblizer
 
   public Nibblizer ()
   {
-    if (false)
+    if (false)      // test with the Beneath Apple Prodos example
     {
       byte[] testBuffer = decode6and2 (encode6and2 (xor), 0);
 
@@ -104,24 +104,24 @@ public class Nibblizer
     }
   }
 
-  public AddressField getAddressField (byte[] buffer, int offset)
+  AddressField getAddressField (byte[] buffer, int offset)
   {
     return new AddressField (buffer, offset);
   }
 
-  public DataField getDataField (byte[] buffer, int offset)
+  DataField getDataField (byte[] buffer, int offset)
   {
     return new DataField (buffer, offset);
   }
 
-  int decode4and4 (byte[] buffer, int offset)
+  private int decode4and4 (byte[] buffer, int offset)
   {
     int odds = ((buffer[offset] & 0xFF) << 1) + 1;
     int evens = buffer[offset + 1] & 0xFF;
     return odds & evens;
   }
 
-  byte[] decode6and2 (byte[] buffer, int offset)
+  private byte[] decode6and2 (byte[] buffer, int offset)
   {
     for (int i = 0; i < decode1.length; i++)
     {
@@ -168,7 +168,7 @@ public class Nibblizer
     return decodedBuffer;
   }
 
-  byte[] encode6and2 (byte[] buffer)
+  private byte[] encode6and2 (byte[] buffer)
   {
     byte[] encodedBuffer = new byte[343];
 
@@ -210,6 +210,40 @@ public class Nibblizer
     return bits == 1 ? 2 : bits == 2 ? 1 : bits;
   }
 
+  int skipBytes (byte[] buffer, int offset, byte skipValue)
+  {
+    int count = 0;
+    while (offset < buffer.length && buffer[offset++] == skipValue)
+      ++count;
+    return count;
+  }
+
+  private String listBytes (byte[] buffer, int offset, int length)
+  {
+    StringBuilder text = new StringBuilder ();
+
+    int max = Math.min (length + offset, buffer.length);
+    while (offset < max)
+      text.append (String.format ("%02X ", buffer[offset++]));
+
+    return text.toString ();
+  }
+
+  int findBytes (byte[] buffer, int offset, byte[] valueBuffer)
+  {
+    int length = valueBuffer.length;
+    int ptr = offset + length;
+
+    while (ptr < buffer.length)
+    {
+      if (matchBytes (buffer, ptr - length, valueBuffer))
+        return ptr - length;
+      ++ptr;
+    }
+
+    return -1;
+  }
+
   private boolean matchBytes (byte[] buffer, int offset, byte[] valueBuffer)
   {
     for (int i = 0; i < valueBuffer.length; i++)
@@ -220,28 +254,6 @@ public class Nibblizer
         return false;
     }
     return true;
-  }
-
-  int skipBytes (byte[] buffer, int offset, byte skipValue)
-  {
-    int count = 0;
-    while (offset < buffer.length && buffer[offset++] == skipValue)
-      ++count;
-    return count;
-  }
-
-  int listBytes (byte[] buffer, int offset, int length)
-  {
-    int count = 0;
-    for (int i = 0; i < length; i++)
-    {
-      if (offset >= buffer.length)
-        break;
-      System.out.printf ("%02X ", buffer[offset++]);
-      ++count;
-    }
-
-    return count;
   }
 
   abstract class Field
@@ -287,10 +299,7 @@ public class Nibblizer
         valid = true;
       }
       else
-      {
-        listBytes (buffer, offset, 14);
-        System.out.println ();
-      }
+        System.out.println (listBytes (buffer, offset, 14));
 
       length = 14;
     }
@@ -298,6 +307,8 @@ public class Nibblizer
 
   class DataField extends Field
   {
+    byte[] dataBuffer;
+
     public DataField (byte[] buffer, int offset)
     {
       super (buffer, offset);
@@ -305,18 +316,17 @@ public class Nibblizer
       if (matchBytes (buffer, offset, dataPrologue))
       {
         valid = true;
+        dataBuffer = decode6and2 (buffer, offset + 3);
         if (!matchBytes (buffer, offset + 346, epilogue))
         {
           System.out.print ("   bad data epilogue: ");
-          listBytes (buffer, offset + 346, 3);
-          System.out.println ();
+          System.out.println (listBytes (buffer, offset + 346, 3));
         }
       }
       else
       {
         System.out.print ("   bad data prologue: ");
-        listBytes (buffer, offset, 3);
-        System.out.println ();
+        System.out.println (listBytes (buffer, offset, 3));
       }
 
       length = 349;

@@ -37,14 +37,16 @@ public class V2dDisk
   private static int[][] interleave =
       { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
         { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
+
   private static final int DOS = 0;
   private static final int PRODOS = 1;
+
+  private static final int TRACK_LENGTH = 6304;
 
   private final Nibblizer nibbler = new Nibblizer ();
 
   final File file;
   final int tracks;
-  //  int actualTracks;
 
   final byte[] buffer = new byte[4096 * 35];
 
@@ -52,6 +54,7 @@ public class V2dDisk
   {
     this.file = file;
     int tracks = 0;
+
     try
     {
       byte[] diskBuffer = new byte[10];
@@ -65,21 +68,24 @@ public class V2dDisk
       assert diskLength + 8 == file.length ();
       assert "D5NI".equals (id);
 
+      byte[] trackHeader = new byte[4];
+      byte[] trackData = new byte[TRACK_LENGTH];
+
       for (int i = 0; i < tracks; i++)
       {
-        byte[] trackHeader = new byte[4];
         in.read (trackHeader);
         int trackNumber = HexFormatter.getShortBigEndian (trackHeader, 0);
         int trackLength = HexFormatter.getShortBigEndian (trackHeader, 2);    // 6304
 
+        assert trackLength == TRACK_LENGTH;
+
+        int dataRead = in.read (trackData);
+        assert dataRead == TRACK_LENGTH;
+
         int fullTrackNo = trackNumber / 4;
         int halfTrackNo = trackNumber % 4;
 
-        byte[] trackData = new byte[trackLength];
-        in.read (trackData);
-
-        // only process full tracks
-        if (halfTrackNo == 0)
+        if (halfTrackNo == 0)                               // only process full tracks
           processTrack (fullTrackNo, trackData, buffer);
         else
           System.out.printf ("%s skipping half track %02X / %02X%n", file.getName (),
@@ -115,23 +121,17 @@ public class V2dDisk
       if (!addressField.isValid ())
         return false;
 
+      assert addressField.track == trackNo;
+
       ptr += addressField.size ();
       ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);        // gap2
 
       DataField dataField = nibbler.getDataField (buffer, ptr);
       if (!dataField.isValid ())
-      {
-        System.out.printf ("skipping data %02X / %02X%n", addressField.track,
-            addressField.sector);
         return false;
-      }
-
-      //      System.out.printf ("decoding track %02X / %02X%n", addressField.track,
-      //          addressField.sector);
-      byte[] decodedBuffer = nibbler.decode6and2 (buffer, ptr + 3);
 
       int offset = addressField.track * 4096 + interleave[DOS][addressField.sector] * 256;
-      System.arraycopy (decodedBuffer, 0, diskBuffer, offset, 256);
+      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, 256);
 
       ptr += dataField.size ();
       ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);        // gap3

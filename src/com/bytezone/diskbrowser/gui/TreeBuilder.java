@@ -26,7 +26,7 @@ public class TreeBuilder
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
   private static final boolean FULL_TREE = false;
   private static final List<String> suffixes =
-      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk", "gz");
+      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "nib", "d13", "sdk", "gz");
 
   FileComparator fc = new FileComparator ();
   JTree tree;

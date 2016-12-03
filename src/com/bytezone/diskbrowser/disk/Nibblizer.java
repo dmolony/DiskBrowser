@@ -1,10 +1,19 @@
 package com.bytezone.diskbrowser.disk;
 
+import java.io.File;
+
 public class Nibblizer
 {
   static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
   static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
   static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+
+  private static int[][] interleave =
+      { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
+        { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
+
+  private static final int DOS = 0;
+  private static final int PRODOS = 1;
 
   private static byte[] writeTranslateTable =
       { (byte) 0x96, (byte) 0x97, (byte) 0x9A, (byte) 0x9B, (byte) 0x9D, (byte) 0x9E,
@@ -90,8 +99,12 @@ public class Nibblizer
   private final byte[] encode1 = new byte[342];
   private final byte[] encode2 = new byte[343];
 
-  public Nibblizer ()
+  private final File file;
+
+  public Nibblizer (File file)
   {
+    this.file = file;
+
     if (false)      // test with the Beneath Apple Prodos example
     {
       byte[] testBuffer = decode6and2 (encode6and2 (xor), 0);
@@ -104,12 +117,50 @@ public class Nibblizer
     }
   }
 
-  AddressField getAddressField (byte[] buffer, int offset)
+  public boolean processTrack (int trackNo, byte[] buffer, byte[] diskBuffer)
+  {
+    int ptr = 0;
+
+    while (buffer[ptr] == (byte) 0xEB)
+    {
+      System.out.printf ("%s overrun 0xEB offset %d in track %02X%n", file.getName (),
+          ptr, trackNo);
+      ++ptr;
+    }
+
+    ptr += skipBytes (buffer, ptr, (byte) 0xFF);          // gap1
+
+    while (ptr < buffer.length)
+    {
+      AddressField addressField = getAddressField (buffer, ptr);
+      if (!addressField.isValid ())
+        return false;
+
+      assert addressField.track == trackNo;
+
+      ptr += addressField.size ();
+      ptr += skipBytes (buffer, ptr, (byte) 0xFF);        // gap2
+
+      DataField dataField = getDataField (buffer, ptr);
+      if (!dataField.isValid ())
+        return false;
+
+      int offset = addressField.track * 4096 + interleave[DOS][addressField.sector] * 256;
+      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, 256);
+
+      ptr += dataField.size ();
+      ptr += skipBytes (buffer, ptr, (byte) 0xFF);        // gap3
+    }
+
+    return true;
+  }
+
+  private AddressField getAddressField (byte[] buffer, int offset)
   {
     return new AddressField (buffer, offset);
   }
 
-  DataField getDataField (byte[] buffer, int offset)
+  private DataField getDataField (byte[] buffer, int offset)
   {
     return new DataField (buffer, offset);
   }

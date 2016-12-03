@@ -224,7 +224,7 @@ public class AppleDisk implements Disk
     tracks = 35;
     trackSize = 4096;
     file = disk.file;
-    diskBuffer = disk.buffer;
+    diskBuffer = disk.diskBuffer;
 
     sectorSize = 256;
     sectors = 16;

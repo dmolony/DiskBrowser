@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class NibDisk
 {
-  private final Nibblizer nibbler = new Nibblizer ();
+  private final Nibblizer nibbler;
 
   final File file;
   int tracks;
@@ -24,6 +24,8 @@ public class NibDisk
   {
     this.file = file;
     byte[] trackBuffer = new byte[6656];
+    nibbler = new Nibblizer (file);
+
     try
     {
       BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));

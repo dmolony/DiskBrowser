@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.bytezone.diskbrowser.disk.Nibblizer.AddressField;
-import com.bytezone.diskbrowser.disk.Nibblizer.DataField;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 /*
@@ -43,27 +41,28 @@ public class V2dDisk
 
   private static final int TRACK_LENGTH = 6304;
 
-  private final Nibblizer nibbler = new Nibblizer ();
+  private final Nibblizer nibbler;
 
   final File file;
   final int tracks;
 
-  final byte[] buffer = new byte[4096 * 35];
+  final byte[] diskBuffer = new byte[4096 * 35];
 
   public V2dDisk (File file)
   {
     this.file = file;
     int tracks = 0;
+    nibbler = new Nibblizer (file);
 
     try
     {
-      byte[] diskBuffer = new byte[10];
+      byte[] header = new byte[10];
       BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
-      in.read (diskBuffer);
+      in.read (header);
 
-      int diskLength = HexFormatter.getLongBigEndian (diskBuffer, 0);   // 4 bytes
-      String id = HexFormatter.getString (diskBuffer, 4, 4);            // 4 bytes
-      tracks = HexFormatter.getShortBigEndian (diskBuffer, 8);          // 2 bytes
+      int diskLength = HexFormatter.getLongBigEndian (header, 0);   // 4 bytes
+      String id = HexFormatter.getString (header, 4, 4);            // 4 bytes
+      tracks = HexFormatter.getShortBigEndian (header, 8);          // 2 bytes
 
       assert diskLength + 8 == file.length ();
       assert "D5NI".equals (id);
@@ -86,7 +85,7 @@ public class V2dDisk
         int halfTrackNo = trackNumber % 4;
 
         if (halfTrackNo == 0)                               // only process full tracks
-          processTrack (fullTrackNo, trackData, buffer);
+          nibbler.processTrack (fullTrackNo, trackData, diskBuffer);
         else
           System.out.printf ("%s skipping half track %02X / %02X%n", file.getName (),
               fullTrackNo, halfTrackNo);
@@ -100,43 +99,5 @@ public class V2dDisk
     }
 
     this.tracks = tracks;
-  }
-
-  private boolean processTrack (int trackNo, byte[] buffer, byte[] diskBuffer)
-  {
-    int ptr = 0;
-
-    while (buffer[ptr] == (byte) 0xEB)
-    {
-      System.out.printf ("%s overrun 0xEB offset %d in track %02X%n", file.getName (),
-          ptr, trackNo);
-      ++ptr;
-    }
-
-    ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);          // gap1
-
-    while (ptr < buffer.length)
-    {
-      AddressField addressField = nibbler.getAddressField (buffer, ptr);
-      if (!addressField.isValid ())
-        return false;
-
-      assert addressField.track == trackNo;
-
-      ptr += addressField.size ();
-      ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);        // gap2
-
-      DataField dataField = nibbler.getDataField (buffer, ptr);
-      if (!dataField.isValid ())
-        return false;
-
-      int offset = addressField.track * 4096 + interleave[DOS][addressField.sector] * 256;
-      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, 256);
-
-      ptr += dataField.size ();
-      ptr += nibbler.skipBytes (buffer, ptr, (byte) 0xFF);        // gap3
-    }
-
-    return true;
   }
 }

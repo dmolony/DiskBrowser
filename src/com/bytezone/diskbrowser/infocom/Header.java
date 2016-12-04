@@ -99,33 +99,33 @@ class Header extends InfocomAbstractFile
     text.append (String.format ("Version                  %d%n", version));
     text.append ("\nDynamic memory:\n");
     text.append (String.format ("  Abbreviation table     %04X  %,6d%n",
-                                abbreviationsTable, abbreviationsTable));
+        abbreviationsTable, abbreviationsTable));
     text.append (String.format ("  Objects table          %04X  %,6d%n", objectTable,
-                                objectTable));
+        objectTable));
     text.append (String.format ("  Global variables       %04X  %,6d%n", globalsOffset,
-                                globalsOffset));
+        globalsOffset));
 
     text.append ("\nStatic memory:\n");
     text.append (String.format ("  Grammar table etc      %04X  %,6d%n", staticMemory,
-                                staticMemory));
+        staticMemory));
     text.append (String.format ("  Dictionary             %04X  %,6d%n", dictionaryOffset,
-                                dictionaryOffset));
+        dictionaryOffset));
     text.append ("\nHigh memory:\n");
-    text.append (String.format ("  ZCode                  %04X  %,6d%n", highMemory,
-                                highMemory));
+    text.append (
+        String.format ("  ZCode                  %04X  %,6d%n", highMemory, highMemory));
     text.append (String.format ("  Program counter        %04X  %,6d%n", programCounter,
-                                programCounter));
-    text.append (String.format ("\nFile length             %05X  %,6d%n", fileLength,
-                                fileLength));
-    text.append (String.format ("Checksum                 %04X  %,6d%n", checksum,
-                                checksum));
-    text.append (String.format ("%nZString offset          %05X  %,6d%n", stringPointer,
-                                stringPointer));
+        programCounter));
+    text.append (
+        String.format ("\nFile length             %05X %,7d%n", fileLength, fileLength));
+    text.append (
+        String.format ("Checksum                 %04X  %,6d%n", checksum, checksum));
+    text.append (String.format ("%nZString offset          %05X %,7d%n", stringPointer,
+        stringPointer));
 
     text.append (String.format ("Total strings                     %d%n",
-                                stringManager.strings.size ()));
+        stringManager.strings.size ()));
     text.append (String.format ("Total objects                     %d%n",
-                                objectManager.list.size ()));
+        objectManager.list.size ()));
 
     return text.toString ();
   }

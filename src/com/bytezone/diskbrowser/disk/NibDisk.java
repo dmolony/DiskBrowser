@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class NibDisk
 {
-  private final Nibblizer nibbler;
+  //  private final Nibblizer nibbler;
 
   final File file;
   int tracks;
@@ -24,7 +24,7 @@ public class NibDisk
   {
     this.file = file;
     byte[] trackBuffer = new byte[6656];
-    nibbler = new Nibblizer (file);
+    //    nibbler = new Nibblizer (file);
 
     try
     {
@@ -38,7 +38,7 @@ public class NibDisk
         int offset = 0;
         while (true)
         {
-          offset = nibbler.findBytes (trackBuffer, offset, test);
+          offset = Nibblizer.findBytes (trackBuffer, offset, test);
           if (offset < 0)
             break;
           System.out.printf ("found at %04X%n", offset);

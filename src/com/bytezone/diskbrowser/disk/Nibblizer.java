@@ -14,6 +14,10 @@ public class Nibblizer
 
   private static final int DOS = 0;
   private static final int PRODOS = 1;
+  private static final int BLOCK_SIZE = 256;
+  private static final int TRACK_SIZE = 4096;
+  private static final int RAW_BUFFER_SIZE = 342;
+  private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
 
   private static byte[] writeTranslateTable =
       { (byte) 0x96, (byte) 0x97, (byte) 0x9A, (byte) 0x9B, (byte) 0x9D, (byte) 0x9E,
@@ -29,10 +33,10 @@ public class Nibblizer
         (byte) 0xF5, (byte) 0xF6, (byte) 0xF7, (byte) 0xF9, (byte) 0xFA, (byte) 0xFB,
         (byte) 0xFC, (byte) 0xFD, (byte) 0xFE, (byte) 0xFF };
 
-  private static byte[] readTranslateTable = new byte[106];
+  private static byte[] readTranslateTable = new byte[106];   // skip first 150 blanks
 
   // this array is just here for testing - it matches the example in Beneath Apple Prodos
-  private static byte[] xor =
+  private static byte[] testData =
       { (byte) 0x00, (byte) 0x00, (byte) 0x03, (byte) 0x00, (byte) 0xFA, (byte) 0x55,
         (byte) 0x53, (byte) 0x45, (byte) 0x52, (byte) 0x53, (byte) 0x2E, (byte) 0x44,
         (byte) 0x49, (byte) 0x53, (byte) 0x4B, (byte) 0x00, //
@@ -89,15 +93,16 @@ public class Nibblizer
   {
     for (int i = 0; i < writeTranslateTable.length; i++)
     {
-      int j = (writeTranslateTable[i] & 0xFF) - 150;
-      readTranslateTable[j] = (byte) (i + 1);
+      int j = (writeTranslateTable[i] & 0xFF) - 150;      // skip first 150 blanks
+      readTranslateTable[j] = (byte) (i + 1);             // offset by 1 to avoid zero
     }
   }
 
-  private final byte[] decode1 = new byte[343];
-  private final byte[] decode2 = new byte[342];
-  private final byte[] encode1 = new byte[342];
-  private final byte[] encode2 = new byte[343];
+  private final byte[] decode1 = new byte[BUFFER_WITH_CHECKSUM_SIZE];
+  private final byte[] decode2 = new byte[RAW_BUFFER_SIZE];
+
+  private final byte[] encode1 = new byte[RAW_BUFFER_SIZE];
+  private final byte[] encode2 = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
   private final File file;
 
@@ -107,10 +112,10 @@ public class Nibblizer
 
     if (false)      // test with the Beneath Apple Prodos example
     {
-      byte[] testBuffer = decode6and2 (encode6and2 (xor), 0);
+      byte[] testBuffer = decode6and2 (encode6and2 (testData), 0);
 
-      for (int i = 0; i < 256; i++)
-        if (xor[i] != testBuffer[i])
+      for (int i = 0; i < BLOCK_SIZE; i++)
+        if (testData[i] != testBuffer[i])
           System.out.println ("bollocks");
 
       return;
@@ -145,8 +150,9 @@ public class Nibblizer
       if (!dataField.isValid ())
         return false;
 
-      int offset = addressField.track * 4096 + interleave[DOS][addressField.sector] * 256;
-      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, 256);
+      int offset = addressField.track * TRACK_SIZE
+          + interleave[DOS][addressField.sector] * BLOCK_SIZE;
+      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, BLOCK_SIZE);
 
       ptr += dataField.size ();
       ptr += skipBytes (buffer, ptr, (byte) 0xFF);        // gap3
@@ -179,77 +185,70 @@ public class Nibblizer
       int val = (buffer[offset++] & 0xFF) - 150;
       byte trans = readTranslateTable[val];
       assert trans != 0;
-      decode1[i] = (byte) ((trans - 1) << 2);
+      decode1[i] = (byte) ((trans - 1) << 2);       // readjust by 1 (see above)
     }
 
     byte chk = 0;
-    for (int i = 342; i > 0; i--)
+    for (int i = RAW_BUFFER_SIZE; i > 0; i--)
     {
       decode2[i - 1] = (byte) (decode1[i] ^ chk);
       chk = decode2[i - 1];
     }
 
-    byte[] decodedBuffer = new byte[256];
+    byte[] decodedBuffer = new byte[BLOCK_SIZE];
 
-    for (int i = 0; i < 256; i++)
+    for (int i = 0; i < BLOCK_SIZE; i++)
       decodedBuffer[i] = decode2[i + 86];
 
-    for (int i = 0; i < 84; i++)
+    for (int i = 0; i < 86; i++)
     {
-      int val = decode2[i] & 0xFF;
-      int b1 = reverse ((val & 0x0C) >> 2);
-      int b2 = reverse ((val & 0x30) >> 4);
-      int b3 = reverse ((val & 0xC0) >> 6);
+      byte val = decode2[i];
 
-      decodedBuffer[i] |= b1;
-      decodedBuffer[i + 86] |= b2;
-      decodedBuffer[i + 172] |= b3;
-    }
+      decodedBuffer[i] |= reverse ((val & 0x0C) >> 2);
+      decodedBuffer[i + 86] |= reverse ((val & 0x30) >> 4);
 
-    for (int i = 84; i < 86; i++)
-    {
-      int val = decode2[i] & 0xFF;
-      int b1 = reverse ((val & 0x0C) >> 2);
-      int b2 = reverse ((val & 0x30) >> 4);
-
-      decodedBuffer[i] |= b1;
-      decodedBuffer[i + 86] |= b2;
+      if (i < 84)
+        decodedBuffer[i + 172] |= reverse ((val & 0xC0) >> 6);
     }
 
     return decodedBuffer;
   }
 
+  // convert 256 data bytes into 342 translated bytes plus a checksum
   private byte[] encode6and2 (byte[] buffer)
   {
-    byte[] encodedBuffer = new byte[343];
+    byte[] encodedBuffer = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
-    for (int i = 0; i < 256; i++)
+    // move data buffer down to make room for the 86 extra bytes
+    for (int i = 0; i < BLOCK_SIZE; i++)
       encode1[i + 86] = buffer[i];
 
-    for (int i = 0; i < 84; i++)
+    // build extra 86 bytes from the bits stripped from the data bytes
+    for (int i = 0; i < 86; i++)
     {
       int b1 = reverse (buffer[i] & 0x03) << 2;
       int b2 = reverse (buffer[i + 86] & 0x03) << 4;
-      int b3 = reverse (buffer[i + 172] & 0x03) << 6;
-      encode1[i] = (byte) (b1 | b2 | b3);
+
+      if (i < 84)
+      {
+        int b3 = reverse (buffer[i + 172] & 0x03) << 6;
+        encode1[i] = (byte) (b1 | b2 | b3);
+      }
+      else
+        encode1[i] = (byte) (b1 | b2);
     }
 
-    for (int i = 84; i < 86; i++)
+    // convert into checksum bytes
+    byte checksum = 0;
+    for (int i = 0; i < RAW_BUFFER_SIZE; i++)
     {
-      int b1 = reverse (buffer[i] & 0x03) << 2;
-      int b2 = reverse (buffer[i + 86] & 0x03) << 4;
-      encode1[i] = (byte) (b1 | b2);
+      encode2[i] = (byte) (checksum ^ encode1[i]);
+      checksum = encode1[i];
     }
+    encode2[RAW_BUFFER_SIZE] = checksum;        // add checksum to the end
 
-    byte chk = 0;
-    for (int i = 0; i < 342; i++)
-    {
-      encode2[i] = (byte) (chk ^ encode1[i]);
-      chk = encode1[i];
-    }
-    encode2[342] = chk;
-
-    for (int i = 0; i < 343; i++)
+    // remove two bits and convert to translated bytes
+    for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)
       encodedBuffer[i] = writeTranslateTable[(encode2[i] & 0xFC) / 4];
 
     return encodedBuffer;
@@ -261,7 +260,7 @@ public class Nibblizer
     return bits == 1 ? 2 : bits == 2 ? 1 : bits;
   }
 
-  int skipBytes (byte[] buffer, int offset, byte skipValue)
+  private int skipBytes (byte[] buffer, int offset, byte skipValue)
   {
     int count = 0;
     while (offset < buffer.length && buffer[offset++] == skipValue)
@@ -280,30 +279,28 @@ public class Nibblizer
     return text.toString ();
   }
 
-  int findBytes (byte[] buffer, int offset, byte[] valueBuffer)
+  static int findBytes (byte[] buffer, int offset, byte[] valueBuffer)
   {
-    int length = valueBuffer.length;
-    int ptr = offset + length;
-
-    while (ptr < buffer.length)
+    while (offset + valueBuffer.length < buffer.length)
     {
-      if (matchBytes (buffer, ptr - length, valueBuffer))
-        return ptr - length;
-      ++ptr;
+      if (matchBytes (buffer, offset, valueBuffer))
+        return offset;
+      ++offset;
     }
 
     return -1;
   }
 
-  private boolean matchBytes (byte[] buffer, int offset, byte[] valueBuffer)
+  private static boolean matchBytes (byte[] buffer, int offset, byte[] valueBuffer)
   {
-    for (int i = 0; i < valueBuffer.length; i++)
-    {
-      if (offset >= buffer.length)
+    if (buffer.length - offset < valueBuffer.length)
+      return false;
+
+    int ptr = 0;
+    while (ptr < valueBuffer.length)
+      if (buffer[offset++] != valueBuffer[ptr++])
         return false;
-      if (buffer[offset++] != valueBuffer[i])
-        return false;
-    }
+
     return true;
   }
 
@@ -368,10 +365,11 @@ public class Nibblizer
       {
         valid = true;
         dataBuffer = decode6and2 (buffer, offset + 3);
-        if (!matchBytes (buffer, offset + 346, epilogue))
+        if (!matchBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, epilogue))
         {
           System.out.print ("   bad data epilogue: ");
-          System.out.println (listBytes (buffer, offset + 346, 3));
+          System.out
+              .println (listBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, 3));
         }
       }
       else

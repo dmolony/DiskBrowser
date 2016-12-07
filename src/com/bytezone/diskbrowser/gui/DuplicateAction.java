@@ -15,9 +15,11 @@ import java.util.Map;
 import javax.swing.*;
 
 import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.duplicates.DiskDetails;
+import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryListener;
 import com.bytezone.input.SpringUtilities;
 
-public class DuplicateAction extends DefaultAction
+public class DuplicateAction extends DefaultAction implements RootDirectoryListener
 {
   Map<String, List<DiskDetails>> duplicateDisks;
   int rootFolderLength;
@@ -27,18 +29,25 @@ public class DuplicateAction extends DefaultAction
   public DuplicateAction ()
   {
     super ("Check for duplicates...", "Check for duplicate disks",
-          "/com/bytezone/diskbrowser/icons/");
+        "/com/bytezone/diskbrowser/icons/");
 
     setIcon (Action.SMALL_ICON, "save_delete_16.png");
     setIcon (Action.LARGE_ICON_KEY, "save_delete_32.png");
   }
 
-  public void setDuplicates (File rootFolder, Map<String, List<DiskDetails>> duplicateDisks)
+  //  public void setDuplicates (File rootFolder,
+  //      Map<String, List<DiskDetails>> duplicateDisks)
+  //  {
+  //    this.duplicateDisks = duplicateDisks;
+  //    this.rootFolderLength = rootFolder.getAbsolutePath ().length ();
+  //    setEnabled (duplicateDisks.size () > 0);
+  //  }
+
+  @Override
+  public void rootDirectoryChanged (File newRootDirectory)
   {
-    this.duplicateDisks = duplicateDisks;
-    this.rootFolderLength = rootFolder.getAbsolutePath ().length ();
-    this.rootFolder = rootFolder;
-    setEnabled (duplicateDisks.size () > 0);
+    this.rootFolder = newRootDirectory;
+    System.out.println ("gotcha");
   }
 
   @Override
@@ -72,7 +81,8 @@ public class DuplicateAction extends DefaultAction
     JPanel mainPanel = new JPanel ();
 
     List<DiskDetails> disksSelected = new ArrayList<DiskDetails> ();
-    List<DuplicatePanel> duplicatePanels = new ArrayList<DuplicateAction.DuplicatePanel> ();
+    List<DuplicatePanel> duplicatePanels =
+        new ArrayList<DuplicateAction.DuplicatePanel> ();
 
     public DuplicateWindow ()
     {
@@ -82,8 +92,8 @@ public class DuplicateAction extends DefaultAction
 
       mainPanel.setLayout (new BoxLayout (mainPanel, BoxLayout.PAGE_AXIS));
 
-      JScrollPane sp =
-            new JScrollPane (mainPanel, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
+      JScrollPane sp = new JScrollPane (mainPanel, VERTICAL_SCROLLBAR_ALWAYS,
+          HORIZONTAL_SCROLLBAR_NEVER);
       sp.getVerticalScrollBar ().setUnitIncrement (100);
       add (sp, BorderLayout.CENTER);
 
@@ -109,7 +119,7 @@ public class DuplicateAction extends DefaultAction
             int count = 0;
             for (JCheckBox cb : dp.checkBoxes)
             {
-              if (count > 0 && dp.duplicateDisks.get (count).duplicate)
+              if (count > 0 && dp.duplicateDisks.get (count).isDuplicate ())
                 if (!cb.isSelected ())
                 {
                   cb.setSelected (true); // doesn't fire the actionListener!
@@ -189,9 +199,8 @@ public class DuplicateAction extends DefaultAction
     public synchronized void addResult (List<DiskDetails> duplicateDisks)
     {
       // create panel and add it to the window
-      DuplicatePanel dp =
-            new DuplicatePanel (duplicateDisks, folderNameLength, disksSelected, buttonDelete,
-                  buttonClear);
+      DuplicatePanel dp = new DuplicatePanel (duplicateDisks, folderNameLength,
+          disksSelected, buttonDelete, buttonClear);
       mainPanel.add (dp);
       duplicatePanels.add (dp);
 
@@ -213,7 +222,7 @@ public class DuplicateAction extends DefaultAction
     List<DiskDetails> duplicateDisks;
 
     public DuplicatePanel (List<DiskDetails> duplicateDisks, int folderNameLength,
-          List<DiskDetails> disksSelected, JButton deleteButton, JButton clearButton)
+        List<DiskDetails> disksSelected, JButton deleteButton, JButton clearButton)
     {
       this.duplicateDisks = duplicateDisks;
       setLayout (new SpringLayout ());
@@ -225,23 +234,23 @@ public class DuplicateAction extends DefaultAction
         JCheckBox cb = new JCheckBox ();
         checkBoxes.add (cb);
 
-        cb.addActionListener (new CheckBoxActionListener (dd, disksSelected, deleteButton,
-              clearButton));
+        cb.addActionListener (
+            new CheckBoxActionListener (dd, disksSelected, deleteButton, clearButton));
         add (cb);
         if (++count == 1)
           add (new JLabel ("Source disk"));
         else
         {
-          String text = dd.duplicate ? "Duplicate" : "OK";
+          String text = dd.isDuplicate () ? "Duplicate" : "OK";
           add (new JLabel (text));
         }
-        String checksum =
-              dd.duplicate || count == 1 ? "" : " (checksum = " + dd.getChecksum () + ")";
+        String checksum = dd.isDuplicate () || count == 1 ? ""
+            : " (checksum = " + dd.getChecksum () + ")";
         add (new JLabel (dd.getAbsolutePath ().substring (folderNameLength) + checksum));
       }
       SpringUtilities.makeCompactGrid (this, duplicateDisks.size (), 3, //rows, cols
-                                       10, 0, //initX, initY
-                                       10, 0); //xPad, yPad
+          10, 0, //initX, initY
+          10, 0); //xPad, yPad
     }
   }
 
@@ -252,8 +261,8 @@ public class DuplicateAction extends DefaultAction
     JButton deleteButton;
     JButton clearButton;
 
-    public CheckBoxActionListener (DiskDetails diskDetails, List<DiskDetails> disksSelected,
-          JButton deleteButton, JButton clearButton)
+    public CheckBoxActionListener (DiskDetails diskDetails,
+        List<DiskDetails> disksSelected, JButton deleteButton, JButton clearButton)
     {
       this.diskDetails = diskDetails;
       this.disksSelected = disksSelected;
@@ -306,7 +315,7 @@ public class DuplicateAction extends DefaultAction
         if (firstChecksum < 0)
           firstChecksum = dd.getChecksum ();
         else
-          dd.duplicate = (dd.getChecksum () == firstChecksum);
+          dd.setDuplicate (dd.getChecksum () == firstChecksum);
       }
       return duplicateDisks;
     }

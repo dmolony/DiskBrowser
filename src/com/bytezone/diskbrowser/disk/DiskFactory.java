@@ -288,7 +288,6 @@ public class DiskFactory
     return disk;
   }
 
-  //  private static DosDisk checkDos (File file)
   private static DosDisk checkDos (AppleDisk disk)
   {
     if (debug)
@@ -296,8 +295,6 @@ public class DiskFactory
 
     try
     {
-      //      int sectors = file.length () == 143360 ? 16 : 13;
-      //      AppleDisk disk = new AppleDisk (file, 35, sectors);
       if (DosDisk.isCorrectFormat (disk))
         return new DosDisk (disk);
     }
@@ -309,7 +306,6 @@ public class DiskFactory
     return null;
   }
 
-  //  private static ProdosDisk checkProdos (File file)
   private static ProdosDisk checkProdos (AppleDisk disk)
   {
     if (debug)
@@ -317,7 +313,6 @@ public class DiskFactory
 
     try
     {
-      //      AppleDisk disk = new AppleDisk (file, 35, 8);
       if (ProdosDisk.isCorrectFormat (disk))
         return new ProdosDisk (disk);
     }
@@ -348,14 +343,6 @@ public class DiskFactory
       return null;
     }
 
-    // assumes a track is 4096 bytes
-    //    if ((file.length () % 4096) != 0)
-    //    {
-    //      if (debug)
-    //   System.out.printf ("file length not divisible by 4096 : %d%n%n", file.length ());
-    //      return null;
-    //    }
-
     try
     {
       // truncate the file if necessary
@@ -372,7 +359,6 @@ public class DiskFactory
     }
     catch (Exception e)
     {
-      //      e.printStackTrace ();
       System.out.println (e);
     }
 
@@ -402,13 +388,11 @@ public class DiskFactory
     return null;
   }
 
-  //  private static FormattedDisk checkPascalDisk (File file)
   private static FormattedDisk checkPascalDisk (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking Pascal disk");
 
-    //    AppleDisk disk = new AppleDisk (file, 35, 8);
     File file = disk.getFile ();
 
     if (!PascalDisk.isCorrectFormat (disk, debug))
@@ -469,9 +453,8 @@ public class DiskFactory
     {
       String old = new String (c + "." + suffix);
       String rep = new String ((char) (c + i - 1) + "." + suffix);
-      //      System.out.printf ("[%s] [%s]%n", old, rep);
+
       File f = new File (fileName.replace (old, rep));
-      //      System.out.println (f);
       if (!f.exists () || !f.isFile ())
         return false;
 
@@ -483,37 +466,31 @@ public class DiskFactory
     return true;
   }
 
-  //  private static V2dDisk checkV2DDisk (File file)
-  //  {
-  //    //    System.out.println ("possible V2D disk");
-  //    new V2dDisk (file);
-  //
-  //    return null;
-  //  }
-
-  //  private static InfocomDisk checkInfocomDisk (File file)
   private static InfocomDisk checkInfocomDisk (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking Infocom disk");
-    //    AppleDisk disk = new AppleDisk (file, 35, 16);
+
     if (InfocomDisk.isCorrectFormat (disk))
       return new InfocomDisk (disk);
+
     if (debug)
       System.out.println ("Not an InfocomDisk disk");
+
     return null;
   }
 
-  //  private static CPMDisk checkCPMDisk (File file)
   private static CPMDisk checkCPMDisk (AppleDisk disk)
   {
     if (debug)
       System.out.println ("Checking CPM disk");
-    //    AppleDisk disk = new AppleDisk (file, 35, 16);
+
     if (CPMDisk.isCorrectFormat (disk))
       return new CPMDisk (disk);
+
     if (debug)
       System.out.println ("Not a CPM disk");
+
     return null;
   }
 }

@@ -10,8 +10,6 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Font;
 import java.io.File;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
 
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
@@ -30,20 +28,18 @@ import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 class FileSystemTab extends AbstractTab
 {
   File rootFolder;
-  Map<String, List<DiskDetails>> duplicateDisks;
+  //  Map<String, List<DiskDetails>> duplicateDisks;
 
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
-      Font font, DiskSelectedEvent diskEvent) // throws NoDisksFoundException
+      Font font, DiskSelectedEvent diskEvent)
   {
     super (navMan, selector, font);
     this.rootFolder = folder;
 
     TreeBuilder tb = new TreeBuilder (folder);
-    //    if (tb.totalDisks == 0)
-    //      throw new NoDisksFoundException ();
 
-    duplicateDisks = tb.duplicateDisks;
-    setTree (tb.tree);
+    //    duplicateDisks = tb.duplicateDisks;
+    setTree (tb.getTree ());
     setSelectionListener (tree);
 
     if (diskEvent == null)
@@ -62,36 +58,35 @@ class FileSystemTab extends AbstractTab
       System.out.println ("No disk event");
 
     // temporary code while I sort out the DOS checksum feature
-    if (tb.dosMap.keySet ().size () > 0)
-    {
-      System.out.printf ("Unique DOSs : %4d%n", tb.dosMap.keySet ().size ());
-      long lastKey = -1;
-      int beginIndex = rootFolder.getAbsolutePath ().length ();
-      for (Long key : tb.dosMap.keySet ())
-      {
-        if (key != lastKey)
-        {
-          lastKey = key;
-          System.out.printf ("%,14d  (%d)%n", key, tb.dosMap.get (key).size ());
-        }
-        for (File file : tb.dosMap.get (key))
-          System.out.printf ("                      %s%n",
-              file.getAbsolutePath ().substring (beginIndex));
-      }
-    }
+    //    if (tb.dosMap.keySet ().size () > 0)
+    //    {
+    //      System.out.printf ("Unique DOSs : %4d%n", tb.dosMap.keySet ().size ());
+    //      long lastKey = -1;
+    //      int beginIndex = rootFolder.getAbsolutePath ().length ();
+    //      for (Long key : tb.dosMap.keySet ())
+    //      {
+    //        if (key != lastKey)
+    //        {
+    //          lastKey = key;
+    //          System.out.printf ("%,14d  (%d)%n", key, tb.dosMap.get (key).size ());
+    //        }
+    //        for (File file : tb.dosMap.get (key))
+    //          System.out.printf ("                      %s%n",
+    //              file.getAbsolutePath ().substring (beginIndex));
+    //      }
+    //    }
   }
 
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
       Font font)
-  // throws NoDisksFoundException
   {
-    this (folder, selector, navMan, font, null); // default to first available disk
+    this (folder, selector, navMan, font, null);    // default to first available disk
   }
 
   @Override
   public void activate ()
   {
-    tree.setSelectionPath (null); // turn off any current selection to force an event
+    tree.setSelectionPath (null);     // turn off any current selection to force an event
     redoHandler.setCurrentData (redoData);
   }
 
@@ -101,7 +96,7 @@ class FileSystemTab extends AbstractTab
   {
     String currentDiskName = ((FileNode) getSelectedObject ()).file.getAbsolutePath ();
     TreeBuilder tb = new TreeBuilder (rootFolder);
-    setTree (tb.tree);
+    setTree (tb.getTree ());
     if (currentDiskName != null)
       showNode (findNode (currentDiskName));
     setSelectionListener (tree);

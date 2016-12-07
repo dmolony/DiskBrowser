@@ -33,11 +33,11 @@ import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
+import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
-class CatalogPanel extends JTabbedPane
-    implements RedoListener, SectorSelectionListener, QuitListener, FontChangeListener
-//      PreferenceChangeListener
+class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionListener,
+    QuitListener, FontChangeListener, RootDirectoryListener
 {
   private static final String prefsLastDiskUsed = "Last disk used";
   private static final String prefsLastDosUsed = "Last dos used";
@@ -51,13 +51,13 @@ class CatalogPanel extends JTabbedPane
   private final DocumentCreatorFactory lister;
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
   private final RedoHandler redoHandler;
-  private DuplicateAction duplicateAction; // this sux
   private CloseTabAction closeTabAction;
+  private File rootDirectoryFile;
 
   public CatalogPanel (MenuHandler mh, RedoHandler redoHandler, Preferences prefs)
   {
     //    String catalogFontName =
-    //      prefs.get (PreferencesDialog.prefsCatalogFont, PreferencesDialog.defaultFontName);
+    // prefs.get (PreferencesDialog.prefsCatalogFont, PreferencesDialog.defaultFontName);
     //    int catalogFontSize =
     //          prefs.getInt (PreferencesDialog.prefsCatalogFontSize,
     //                        PreferencesDialog.defaultFontSize);
@@ -75,11 +75,16 @@ class CatalogPanel extends JTabbedPane
     addChangeListener (new TabChangeListener ());
   }
 
+  File getRootDirectory ()
+  {
+    return rootDirectoryFile;
+  }
+
   private void createTabs (Preferences prefs)
   {
     String rootDirectory = prefs.get (prefsRootDirectory, "");
 
-    File rootDirectoryFile = new File (rootDirectory);
+    rootDirectoryFile = new File (rootDirectory);
     if (!rootDirectoryFile.exists () || !rootDirectoryFile.isDirectory ())
     {
       System.out.println ("No root directory");
@@ -113,11 +118,7 @@ class CatalogPanel extends JTabbedPane
     else
       System.out.println ("no disk selected");
 
-    fileTab =
-        new FileSystemTab (rootDirectoryFile, selector, redoHandler, font, diskEvent);
-    fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
-    lister.catalogLister.setNode (fileTab.getRootNode ());
-    insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
+    insertFileSystemTab (rootDirectoryFile, diskEvent);
 
     if (diskEvent != null)
     {
@@ -154,6 +155,27 @@ class CatalogPanel extends JTabbedPane
     }
   }
 
+  @Override
+  public void rootDirectoryChanged (File root)
+  {
+    // is the user replacing an existing root folder?
+    if (fileTab != null)
+      removeTabAt (0);
+
+    insertFileSystemTab (root, null);
+    setSelectedIndex (0);
+  }
+
+  private void insertFileSystemTab (File root, DiskSelectedEvent diskEvent)
+  {
+    rootDirectoryFile = root;
+    fileTab =
+        new FileSystemTab (rootDirectoryFile, selector, redoHandler, font, diskEvent);
+    fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
+    lister.catalogLister.setNode (fileTab.getRootNode ());
+    insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
+  }
+
   public void activate ()
   {
     if (fileTab == null)
@@ -168,43 +190,16 @@ class CatalogPanel extends JTabbedPane
       setSelectedIndex (0);
   }
 
-  void setDuplicateAction (DuplicateAction action)
-  {
-    this.duplicateAction = action;
-    if (fileTab != null && fileTab.rootFolder != null)
-      action.setDuplicates (fileTab.rootFolder, fileTab.duplicateDisks);
-  }
+  //  void setDuplicateAction (DuplicateAction action)
+  //  {
+  //    this.duplicateAction = action;
+  //    if (fileTab != null && fileTab.rootFolder != null)
+  //      action.setDuplicates (fileTab.rootFolder, fileTab.duplicateDisks);
+  //  }
 
   void setCloseTabAction (CloseTabAction action)
   {
     this.closeTabAction = action;
-  }
-
-  // called by RootDirectoryAction
-  public void changeRootPanel (File root)
-  {
-    //    try
-    //    {
-    // This might throw a NoDisksFoundException
-    FileSystemTab newFileTab = new FileSystemTab (root, selector, redoHandler, font);
-
-    // is the user replacing an existing root folder?
-    if (fileTab != null)
-      removeTabAt (0);
-
-    fileTab = newFileTab;
-    fileTab.addTreeMouseListener (new MouseListener ()); // listen for disk selection
-    lister.catalogLister.setNode (fileTab.getRootNode ());
-
-    insertTab ("Disk Tree", null, fileTab, null, 0);
-    setSelectedIndex (0);
-    duplicateAction.setDuplicates (fileTab.rootFolder, fileTab.duplicateDisks);
-    //    }
-    //    catch (NoDisksFoundException e)
-    //    {
-    //      JOptionPane.showMessageDialog (null, "Folder " + root.getAbsolutePath ()
-    //            + " has no valid disk images.", "Bad folder", JOptionPane.ERROR_MESSAGE);
-    //    }
   }
 
   // called after a double-click in the fileTab

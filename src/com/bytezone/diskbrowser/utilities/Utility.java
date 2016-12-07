@@ -3,9 +3,14 @@ package com.bytezone.diskbrowser.utilities;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
+import java.util.List;
 
 public class Utility
 {
+  public static final List<String> suffixes =
+      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "nib", "d13", "sdk", "gz");
+
   // not used - it doesn't work with Oracle's JDK
   public static boolean hasRetinaDisplay ()
   {
@@ -50,5 +55,24 @@ public class Utility
         return false;
 
     return true;
+  }
+
+  public static boolean validFileType (String filename)
+  {
+    int dotPos = filename.lastIndexOf ('.');
+    if (dotPos < 0)
+      return false;
+
+    String suffix = filename.substring (dotPos + 1).toLowerCase ();
+
+    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
+    if (dotPos2 > 0)
+    {
+      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
+      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
+        return false;
+    }
+
+    return suffixes.contains (suffix);
   }
 }

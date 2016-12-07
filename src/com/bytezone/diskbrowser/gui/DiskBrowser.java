@@ -53,8 +53,12 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
     // create actions
+    DuplicateAction duplicateAction = new DuplicateAction ();
     RootDirectoryAction rootDirectoryAction =
-        new RootDirectoryAction (null, catalogPanel);
+        new RootDirectoryAction (catalogPanel.getRootDirectory ());
+    rootDirectoryAction.addListener (catalogPanel);
+    rootDirectoryAction.addListener (duplicateAction);
+
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
     AbstractAction print = new PrintAction (dataPanel);
@@ -64,7 +68,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
     ShowFreeSectorsAction showFreeAction =
         new ShowFreeSectorsAction (menuHandler, diskLayoutPanel);
-    DuplicateAction duplicateAction = new DuplicateAction ();
     CloseTabAction closeTabAction = new CloseTabAction (catalogPanel);
 
     // add action buttons to toolbar
@@ -121,7 +124,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     quitAction.addQuitListener (diskLayoutPanel);
     quitAction.addQuitListener (this);
 
-    catalogPanel.setDuplicateAction (duplicateAction);
+    //    catalogPanel.setDuplicateAction (duplicateAction);
     catalogPanel.setCloseTabAction (closeTabAction);
 
     pack ();

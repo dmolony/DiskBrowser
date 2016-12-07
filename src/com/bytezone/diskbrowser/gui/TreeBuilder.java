@@ -4,9 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
+import java.util.Arrays;
+import java.util.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -15,61 +14,75 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.bytezone.diskbrowser.disk.AppleDisk;
-import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskFactory;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class TreeBuilder
 {
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
-  private static final boolean FULL_TREE = false;
-  private static final List<String> suffixes =
-      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "nib", "d13", "sdk", "gz");
+  private static final int DISK_13_SIZE = 116480;
+  private static final int DISK_16_SIZE = 143360;
+  private static final int DISK_800K_SIZE = 819264;
 
-  FileComparator fc = new FileComparator ();
-  JTree tree;
-  int totalDisks;
-  int totalFolders;
+  //  private static final boolean FULL_TREE_TRAVERSAL = false;
 
-  Map<String, Integer> totalFiles = new TreeMap<String, Integer> ();
+  private final FileComparator fileComparator = new FileComparator ();
+  private final JTree tree;
 
-  Map<String, List<DiskDetails>> duplicateDisks =
-      new TreeMap<String, List<DiskDetails>> ();
-  Map<String, File> diskNames = new HashMap<String, File> ();
-  Map<Long, List<File>> dosMap = new TreeMap<Long, List<File>> ();
+  //  private int totalDisks;
+  //  private int totalFolders;
+
+  //  // total files for each suffix
+  //  private final Map<String, Integer> typeList = new TreeMap<String, Integer> ();
+  //
+  //  // list of unique disk names -> List of File duplicates
+  //  final Map<String, List<DiskDetails>> duplicateDisks =
+  //      new TreeMap<String, List<DiskDetails>> ();
+  //
+  //  // list of unique disk names -> File
+  //  private final Map<String, File> diskNames = new HashMap<String, File> ();
+  //
+  //  // list of checksum -> File
+  //  final Map<Long, List<File>> dosMap = new TreeMap<Long, List<File>> ();
 
   public TreeBuilder (File folder)
   {
     assert (folder.exists ());
     assert (folder.isDirectory ());
 
-    FileNode fn = new FileNode (folder);
-    DefaultMutableTreeNode root = new DefaultMutableTreeNode (fn);
-    fn.setTreeNode (root);
+    FileNode fileNode = new FileNode (folder);
+    DefaultMutableTreeNode root = new DefaultMutableTreeNode (fileNode);
+    fileNode.setTreeNode (root);
+
     addFiles (root, folder);
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     tree = new JTree (treeModel);
 
     treeModel.setAsksAllowsChildren (true);   // allows empty nodes to appear as folders
     setDiskIcon ("/com/bytezone/diskbrowser/icons/disk.png");
-    ((FileNode) root.getUserObject ()).disks = totalDisks;
+    //    ((FileNode) root.getUserObject ()).disks = totalDisks;
 
-    if (FULL_TREE)
-    {
-      System.out.printf ("%nFolders ..... %,5d%n", totalFolders);
-      System.out.printf ("Disks ....... %,5d%n%n", totalDisks);
+    //    if (FULL_TREE_TRAVERSAL)
+    //    {
+    //      System.out.printf ("%nFolders ..... %,5d%n", totalFolders);
+    //      System.out.printf ("Disks ....... %,5d%n%n", totalDisks);
+    //
+    //      int grandTotal = 0;
+    //      for (String key : typeList.keySet ())
+    //      {
+    //        int typeTotal = typeList.get (key);
+    //        grandTotal += typeTotal;
+    //        System.out.printf ("%13.13s %,6d%n", key + " ...........", typeTotal);
+    //      }
+    //      System.out.printf ("%nTotal ....... %,6d%n%n", grandTotal);
+    //    }
+  }
 
-      int tf = 0;
-      for (String key : totalFiles.keySet ())
-      {
-        int t = totalFiles.get (key);
-        tf += t;
-        System.out.printf ("%13.13s %,5d%n", key + " ...........", t);
-      }
-      System.out.printf ("%nTotal ...... %,6d%n%n", tf);
-    }
+  public JTree getTree ()
+  {
+    return tree;
   }
 
   private void addFiles (DefaultMutableTreeNode node, File directory)
@@ -81,124 +94,127 @@ public class TreeBuilder
       return;
     }
 
-    FileNode parentNode = (FileNode) node.getUserObject ();
-    Arrays.sort (files, fc);
+    //    FileNode parentNode = (FileNode) node.getUserObject ();
+    Arrays.sort (files, fileComparator);
+
     for (File file : files)
     {
       if (file.isDirectory ())
       {
-        FileNode fn = new FileNode (file);
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fn);
-        fn.setTreeNode (newNode);
+        FileNode fileNode = new FileNode (file);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);
+        fileNode.setTreeNode (newNode);
         newNode.setAllowsChildren (true);
         node.add (newNode);
-        totalFolders++;
 
-        if (FULL_TREE)
-          addFiles (newNode, file);             // recursion!
+        //        totalFolders++;
+
+        //        if (FULL_TREE_TRAVERSAL)
+        //          addFiles (newNode, file);             // recursion!
+
         continue;
       }
 
-      if (FULL_TREE)
-      {
-        int pos = file.getName ().lastIndexOf ('.');
-        if (pos > 0)
-        {
-          String type = file.getName ().substring (pos + 1).toLowerCase ();
-          if (totalFiles.containsKey (type))
-          {
-            int t = totalFiles.get (type);
-            totalFiles.put (type, ++t);
-          }
-          else
-            totalFiles.put (type, 1);
-        }
-      }
+      //      if (FULL_TREE_TRAVERSAL)
+      //      {
+      //        int pos = file.getName ().lastIndexOf ('.');
+      //        if (pos > 0)
+      //        {
+      //          String type = file.getName ().substring (pos + 1).toLowerCase ();
+      //          if (typeList.containsKey (type))
+      //          {
+      //            int t = typeList.get (type);
+      //            typeList.put (type, ++t);
+      //          }
+      //          else
+      //            typeList.put (type, 1);
+      //        }
+      //      }
 
-      if (file.length () != 143360 && file.length () != 116480 && file.length () != 819264
-          && file.length () < 200000)
+      if (file.length () != DISK_16_SIZE && file.length () != DISK_13_SIZE
+          && file.length () != DISK_800K_SIZE && file.length () < 200000)
       {
         String name = file.getName ().toLowerCase ();
         if (!name.endsWith (".sdk") && !name.endsWith (".dsk.gz"))
           continue;
       }
 
-      parentNode.disks++;
-      String filename = file.getAbsolutePath ();
-      if (validFileType (filename))
+      //      parentNode.disks++;
+
+      if (Utility.validFileType (file.getAbsolutePath ()))
       {
-        FileNode fn = new FileNode (file);
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fn);
-        fn.setTreeNode (newNode);
+        FileNode fileNode = new FileNode (file);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);
+        fileNode.setTreeNode (newNode);
         newNode.setAllowsChildren (false);
         node.add (newNode);
 
-        if (false)
-          checkDuplicates (file);
+        //        if (false)
+        //          checkDuplicates (file);
 
-        totalDisks++;
+        //        totalDisks++;
 
-        if (false)
-          checksumDos (file);
+        //        if (false)
+        //          checksumDos (file);
       }
     }
   }
 
-  private void checksumDos (File file)
-  {
-    if (file.length () != 143360 || file.getAbsolutePath ().contains ("/ZDisks/"))
-      return;
+  //  private void checksumDos (File file)
+  //  {
+  //    if (file.length () != 143360 || file.getAbsolutePath ().contains ("/ZDisks/"))
+  //      return;
+  //
+  //    Disk disk = new AppleDisk (file, 35, 16);
+  //    byte[] buffer = disk.readSector (0, 0);
+  //
+  //    Checksum checksum = new CRC32 ();
+  //    checksum.update (buffer, 0, buffer.length);
+  //    long cs = checksum.getValue ();
+  //    List<File> files = dosMap.get (cs);
+  //    if (files == null)
+  //    {
+  //      files = new ArrayList<File> ();
+  //      dosMap.put (cs, files);
+  //    }
+  //    files.add (file);
+  //  }
 
-    Disk disk = new AppleDisk (file, 35, 16);
-    byte[] buffer = disk.readSector (0, 0);
+  //  private void checkDuplicates (File file)
+  //  {
+  //    if (diskNames.containsKey (file.getName ()))
+  //    {
+  //      List<DiskDetails> diskList = duplicateDisks.get (file.getName ());
+  //      if (diskList == null)
+  //      {
+  //        diskList = new ArrayList<DiskDetails> ();
+  //        duplicateDisks.put (file.getName (), diskList);
+  //        diskList.add (new DiskDetails (diskNames.get (file.getName ())));// add original
+  //      }
+  //      diskList.add (new DiskDetails (file));                        // add the duplicate
+  //    }
+  //    else
+  //      diskNames.put (file.getName (), file);
+  //  }
 
-    Checksum checksum = new CRC32 ();
-    checksum.update (buffer, 0, buffer.length);
-    long cs = checksum.getValue ();
-    List<File> files = dosMap.get (cs);
-    if (files == null)
-    {
-      files = new ArrayList<File> ();
-      dosMap.put (cs, files);
-    }
-    files.add (file);
-  }
-
-  private void checkDuplicates (File file)
-  {
-    if (diskNames.containsKey (file.getName ()))
-    {
-      List<DiskDetails> diskList = duplicateDisks.get (file.getName ());
-      if (diskList == null)
-      {
-        diskList = new ArrayList<DiskDetails> ();
-        duplicateDisks.put (file.getName (), diskList);
-        diskList.add (new DiskDetails (diskNames.get (file.getName ())));// add the original
-      }
-      diskList.add (new DiskDetails (file));// add the duplicate
-    }
-    else
-      diskNames.put (file.getName (), file);
-  }
-
-  private boolean validFileType (String filename)
-  {
-    int dotPos = filename.lastIndexOf ('.');
-    if (dotPos < 0)
-      return false;
-
-    String suffix = filename.substring (dotPos + 1).toLowerCase ();
-
-    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
-    if (dotPos2 > 0)
-    {
-      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
-      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
-        return false;
-    }
-
-    return suffixes.contains (suffix);
-  }
+  //  private boolean validFileType (String filename)
+  //  {
+  //    int dotPos = filename.lastIndexOf ('.');
+  //    if (dotPos < 0)
+  //      return false;
+  //
+  //    String suffix = filename.substring (dotPos + 1).toLowerCase ();
+  //
+  //    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
+  //    if (dotPos2 > 0)
+  //    {
+  //      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
+  //      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
+  //        return false;
+  //    }
+  //
+  //    return suffixes.contains (suffix);
+  //  }
 
   private void setDiskIcon (String iconName)
   {
@@ -341,19 +357,20 @@ public class TreeBuilder
     }
   }
 
-  private class FileComparator implements Comparator<File>
-  {
-    @Override
-    public int compare (File filea, File fileb)
-    {
-      boolean fileaIsDirectory = filea.isDirectory ();
-      boolean filebIsDirectory = fileb.isDirectory ();
-
-      if (fileaIsDirectory && !filebIsDirectory)
-        return -1;
-      if (!fileaIsDirectory && filebIsDirectory)
-        return 1;
-      return filea.getName ().compareToIgnoreCase (fileb.getName ());
-    }
-  }
+  //  private class FileComparator implements Comparator<File>
+  //  {
+  //    @Override
+  //    public int compare (File thisFile, File thatFile)
+  //    {
+  //      boolean thisFileIsDirectory = thisFile.isDirectory ();
+  //      boolean thatFileIsDirectory = thatFile.isDirectory ();
+  //
+  //      if (thisFileIsDirectory && !thatFileIsDirectory)
+  //        return -1;
+  //      if (!thisFileIsDirectory && thatFileIsDirectory)
+  //        return 1;
+  //
+  //      return thisFile.getName ().compareToIgnoreCase (thatFile.getName ());
+  //    }
+  //  }
 }

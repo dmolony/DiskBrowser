@@ -1,19 +1,29 @@
-package com.bytezone.diskbrowser.gui;
+package com.bytezone.diskbrowser.duplicates;
 
 import java.io.File;
 
 import com.bytezone.common.ComputeCRC32;
 
-class DiskDetails
+public class DiskDetails
 {
   private final File file;
   private long checksum = -1;
-  boolean duplicate;
+  private boolean duplicate;
 
   public DiskDetails (File file)
   {
     this.file = file;
     duplicate = false;
+  }
+
+  public boolean isDuplicate ()
+  {
+    return duplicate;
+  }
+
+  public void setDuplicate (boolean value)
+  {
+    duplicate = value;
   }
 
   public String getAbsolutePath ()
@@ -30,13 +40,14 @@ class DiskDetails
 
   public boolean delete ()
   {
-    return file.delete ();
+    //    return file.delete ();
+    return false;
   }
 
   @Override
   public String toString ()
   {
     return String.format ("%s (%s)", file.getAbsolutePath (),
-                          duplicate ? "duplicate" : "OK");
+        duplicate ? "duplicate" : "OK");
   }
 }

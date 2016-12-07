@@ -20,7 +20,6 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AppleDisk implements Disk
 {
-  private static final String newLine = String.format ("%n");
   private static final int MAX_INTERLEAVE = 3;
   private static final int SECTOR_SIZE = 256;
   private static final int BLOCK_SIZE = 512;
@@ -126,13 +125,9 @@ public class AppleDisk implements Disk
           System.out.printf ("Blocks    : %,d%n", blocks);
         }
 
-        //        int format = buffer[12] & 0xFF;
-        //        if (blocks == 0 && format == 1)
-        //        {
         this.blocks = diskData / 4096 * 8;    // reduce blocks to a multiple of 8
         if (debug)
           System.out.printf ("Blocks    : %,d%n", blocks);
-        //        }
 
         this.sectorSize = 512;
         this.trackSize = 8 * sectorSize;
@@ -169,19 +164,6 @@ public class AppleDisk implements Disk
         this.sectorSize = (int) file.length () / blocks;
         this.trackSize = sectors * sectorSize;
       }
-    }
-
-    if (false)
-    {
-      System.out.println ();
-      System.out.printf ("File name   : %s%n", file.getName ());
-      System.out.printf ("File size   : %,d%n", file.length ());
-      System.out.println ("Tracks      : " + tracks);
-      System.out.println ("Sectors     : " + sectors);
-      System.out.println ("Blocks      : " + blocks);
-      System.out.println ("Sector size : " + sectorSize);
-      System.out.println ("Track size  : " + trackSize);
-      System.out.println ();
     }
 
     if (sectorSize != 256 && sectorSize != 512)
@@ -601,13 +583,15 @@ public class AppleDisk implements Disk
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Path............ " + file.getAbsolutePath () + newLine);
+    text.append (String.format ("Path............ %s%n", file.getAbsolutePath ()));
+    text.append (String.format ("File name....... %s%n", file.getName ()));
     text.append (String.format ("File size....... %,d%n", file.length ()));
-    text.append ("Tracks.......... " + tracks + newLine);
-    text.append ("Sectors......... " + sectors + newLine);
+    text.append (String.format ("Tracks.......... %d%n", tracks));
+    text.append (String.format ("Sectors......... %d%n", sectors));
     text.append (String.format ("Blocks.......... %,d%n", blocks));
-    text.append ("Sector size..... " + sectorSize + newLine);
-    text.append ("Interleave...... " + interleave + newLine);
+    text.append (String.format ("Track size...... %,d%n", trackSize));
+    text.append (String.format ("Sector size..... %d%n", sectorSize));
+    text.append (String.format ("Interleave...... %d", interleave));
 
     return text.toString ();
   }

@@ -16,8 +16,8 @@ import com.bytezone.common.Platform;
 class RootDirectoryAction extends DefaultAction
 {
   private File rootDirectory;
-  private final List<RootDirectoryListener> listeners =
-      new ArrayList<RootDirectoryAction.RootDirectoryListener> ();
+  private final List<RootDirectoryChangeListener> listeners =
+      new ArrayList<RootDirectoryAction.RootDirectoryChangeListener> ();
 
   public RootDirectoryAction (File rootDirectory)
   {
@@ -50,19 +50,22 @@ class RootDirectoryAction extends DefaultAction
       if (file != null)
       {
         rootDirectory = file;
-        for (RootDirectoryListener listener : listeners)
+        for (RootDirectoryChangeListener listener : listeners)
           listener.rootDirectoryChanged (file);
       }
     }
   }
 
-  public void addListener (RootDirectoryListener listener)
+  public void addListener (RootDirectoryChangeListener listener)
   {
     if (!listeners.contains (listener))
+    {
       listeners.add (listener);
+      listener.rootDirectoryChanged (rootDirectory);
+    }
   }
 
-  interface RootDirectoryListener
+  interface RootDirectoryChangeListener
   {
     public void rootDirectoryChanged (File newRootDirectory);
   }

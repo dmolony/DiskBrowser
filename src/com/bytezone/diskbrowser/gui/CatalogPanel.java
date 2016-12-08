@@ -33,11 +33,11 @@ import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
-import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryListener;
+import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
 class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionListener,
-    QuitListener, FontChangeListener, RootDirectoryListener
+    QuitListener, FontChangeListener, RootDirectoryChangeListener
 {
   private static final String prefsLastDiskUsed = "Last disk used";
   private static final String prefsLastDosUsed = "Last dos used";
@@ -158,6 +158,9 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
   @Override
   public void rootDirectoryChanged (File root)
   {
+    if (root == rootDirectoryFile)      // initial call or no need to change
+      return;
+
     // is the user replacing an existing root folder?
     if (fileTab != null)
       removeTabAt (0);

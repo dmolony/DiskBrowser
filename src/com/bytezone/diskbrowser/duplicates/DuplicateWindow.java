@@ -27,9 +27,16 @@ public class DuplicateWindow extends JFrame
   List<DiskDetails> disksSelected = new ArrayList<DiskDetails> ();
   List<DuplicatePanel> duplicatePanels = new ArrayList<DuplicatePanel> ();
 
+  DuplicateHandler duplicateHandler;
+
   public DuplicateWindow (File rootFolder)
   {
     super ("Duplicate Disk Detection - " + rootFolder.getAbsolutePath ());
+
+    duplicateHandler = new DuplicateHandler (rootFolder);
+    Map<String, List<DiskDetails>> duplicateDisks = duplicateHandler.getDuplicateDisks ();
+    for (List<DiskDetails> diskList : duplicateDisks.values ())
+      new DuplicateWorker (diskList, this).execute ();
 
     unfinishedWorkers = duplicateDisks.size ();
     folderNameLength = rootFolder.getAbsolutePath ().length ();
@@ -67,7 +74,7 @@ public class DuplicateWindow extends JFrame
             if (count > 0 && dp.duplicateDisks.get (count).isDuplicate ())
               if (!cb.isSelected ())
               {
-                cb.setSelected (true); // doesn't fire the actionListener!
+                cb.setSelected (true);              // doesn't fire the actionListener!
                 disksSelected.add (dp.duplicateDisks.get (count));
               }
             ++count;
@@ -85,7 +92,8 @@ public class DuplicateWindow extends JFrame
       {
         for (DuplicatePanel dp : duplicatePanels)
           for (JCheckBox cb : dp.checkBoxes)
-            cb.setSelected (false); // doesn't fire the actionListener!
+            cb.setSelected (false);                 // doesn't fire the actionListener!
+
         disksSelected.clear ();
         buttonDelete.setEnabled (false);
         buttonClear.setEnabled (false);

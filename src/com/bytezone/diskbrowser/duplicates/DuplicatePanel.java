@@ -24,27 +24,30 @@ public class DuplicatePanel extends JPanel
     setAlignmentX (LEFT_ALIGNMENT);
 
     int count = 0;
-    for (DiskDetails dd : duplicateDisks)
+    for (DiskDetails diskDetails : duplicateDisks)
     {
-      JCheckBox cb = new JCheckBox ();
-      checkBoxes.add (cb);
+      JCheckBox checkbox = new JCheckBox ();
+      checkBoxes.add (checkbox);
 
-      cb.addActionListener (
-          new CheckBoxActionListener (dd, disksSelected, deleteButton, clearButton));
-      add (cb);
+      checkbox.addActionListener (new CheckBoxActionListener (diskDetails, disksSelected,
+          deleteButton, clearButton));
+      add (checkbox);
       if (++count == 1)
-        add (new JLabel ("Source disk"));
+        add (new JLabel ("Original disk"));
       else
       {
-        String text = dd.isDuplicate () ? "Duplicate" : "OK";
+        String text = diskDetails.isDuplicate () ? "Duplicate" : "OK";
         add (new JLabel (text));
       }
-      String checksum = dd.isDuplicate () || count == 1 ? ""
-          : " (checksum = " + dd.getChecksum () + ")";
-      add (new JLabel (dd.getAbsolutePath ().substring (folderNameLength) + checksum));
+      String checksum = diskDetails.isDuplicate () || count == 1 ? ""
+          : " (checksum = " + diskDetails.getChecksum () + ")";
+      add (new JLabel (
+          diskDetails.getAbsolutePath ().substring (folderNameLength) + checksum));
     }
-    SpringUtilities.makeCompactGrid (this, duplicateDisks.size (), 3, //rows, cols
-        10, 0, //initX, initY
-        10, 0); //xPad, yPad
+
+    SpringUtilities.makeCompactGrid (this,    //
+        duplicateDisks.size (), 3,            // rows, cols
+        10, 0,                                // initX, initY
+        10, 0);                               // xPad, yPad
   }
 }

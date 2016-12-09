@@ -8,7 +8,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class DiskTableModel extends AbstractTableModel
 {
-  static final String[] headers = { "Disk name", "Actual disk", "Checksum" };
+  static final String[] headers = { "Name", "Location", "Checksum" };
 
   Map<String, DiskDetails> fileNameMap;
   Map<Long, DiskDetails> checkSumMap;
@@ -23,31 +23,17 @@ public class DiskTableModel extends AbstractTableModel
     {
       DiskDetails original = fileNameMap.get (key);
 
-      if (false)
-      {
-        if (original.getDuplicateNames ().size () > 0)
-        {
-          lines.add (new TableLine (original));
-          for (DiskDetails duplicate : original.getDuplicateNames ())
-            lines.add (new TableLine (duplicate));
-        }
-      }
-      else
-      {
-        if (original.getDuplicateChecksums ().size () > 0)
-        {
-          lines.add (new TableLine (original));
-          for (DiskDetails duplicate : original.getDuplicateChecksums ())
-            lines.add (new TableLine (duplicate));
-        }
-        //        else if (original.isDuplicateChecksum ())
-        //        {
-        //          lines.add (new TableLine (key, original));
-        //          DiskDetails dd = checkSumMap.get (original.getChecksum ());
-        //          for (DiskDetails duplicate : dd.getDuplicateChecksums ())
-        //            lines.add (new TableLine (key, duplicate));
-        //        }
-      }
+      //      if (false)
+      //      {
+      //        if (original.getDuplicateChecksums ().size () > 0)
+      //        {
+      //          lines.add (new TableLine (original));
+      //          for (DiskDetails duplicate : original.getDuplicateChecksums ())
+      //            lines.add (new TableLine (duplicate));
+      //        }
+      //      }
+      //      else
+      lines.add (new TableLine (original));
     }
   }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
+import javax.swing.table.JTableHeader;
 
 public class DuplicateWindow extends JFrame
 {
@@ -138,7 +139,7 @@ public class DuplicateWindow extends JFrame
       }
     });
 
-    setSize (900, 700);
+    setSize (1100, 700);
     setLocationRelativeTo (null);
     setDefaultCloseOperation (HIDE_ON_CLOSE);
   }
@@ -147,9 +148,13 @@ public class DuplicateWindow extends JFrame
   {
     this.duplicateHandler = duplicateHandler;
     table.setModel (new DiskTableModel (duplicateHandler));
-    table.getColumnModel ().getColumn (0).setPreferredWidth (250);
+    table.getColumnModel ().getColumn (0).setPreferredWidth (300);
     table.getColumnModel ().getColumn (1).setPreferredWidth (500);
     table.getColumnModel ().getColumn (2).setPreferredWidth (100);
+
+    JTableHeader header = table.getTableHeader ();
+    header.setFont (header.getFont ().deriveFont ((float) 13.0));
+
     setVisible (true);
   }
 }

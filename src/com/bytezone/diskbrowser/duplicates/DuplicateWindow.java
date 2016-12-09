@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.duplicates;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -13,7 +12,7 @@ import javax.swing.*;
 
 public class DuplicateWindow extends JFrame
 {
-  int unfinishedWorkers;
+  private final JTable table;
   int folderNameLength;
   Map<String, List<DiskDetails>> duplicateDisks;
   File rootFolder;
@@ -22,10 +21,9 @@ public class DuplicateWindow extends JFrame
   JButton buttonCancel = new JButton ("Cancel");
   JButton buttonAll = new JButton ("Select all duplicates");
   JButton buttonClear = new JButton ("Clear all");
-  JPanel mainPanel = new JPanel ();
+  //  JPanel mainPanel = new JPanel ();
 
   List<DiskDetails> disksSelected = new ArrayList<DiskDetails> ();
-  List<DuplicatePanel> duplicatePanels = new ArrayList<DuplicatePanel> ();
 
   DuplicateHandler duplicateHandler;
 
@@ -33,21 +31,18 @@ public class DuplicateWindow extends JFrame
   {
     super ("Duplicate Disk Detection - " + rootFolder.getAbsolutePath ());
 
-    duplicateHandler = new DuplicateHandler (rootFolder);
-    Map<String, List<DiskDetails>> duplicateDisks = duplicateHandler.getDuplicateDisks ();
-    for (List<DiskDetails> diskList : duplicateDisks.values ())
-      new DuplicateWorker (diskList, this).execute ();
-
-    unfinishedWorkers = duplicateDisks.size ();
     folderNameLength = rootFolder.getAbsolutePath ().length ();
 
-    mainPanel.setLayout (new BoxLayout (mainPanel, BoxLayout.PAGE_AXIS));
-
-    JScrollPane sp =
-        new JScrollPane (mainPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+    table = new JTable ();
+    JScrollPane scrollPane =
+        new JScrollPane (table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    sp.getVerticalScrollBar ().setUnitIncrement (100);
-    add (sp, BorderLayout.CENTER);
+    table.setFillsViewportHeight (true);
+
+    //    table.setShowGrid (true);
+    //    table.setGridColor (Color.BLACK);
+
+    add (scrollPane, BorderLayout.CENTER);
 
     JPanel panel = new JPanel ();
     panel.add (buttonClear);
@@ -66,20 +61,20 @@ public class DuplicateWindow extends JFrame
       @Override
       public void actionPerformed (ActionEvent e)
       {
-        for (DuplicatePanel dp : duplicatePanels)
-        {
-          int count = 0;
-          for (JCheckBox cb : dp.checkBoxes)
-          {
-            if (count > 0 && dp.duplicateDisks.get (count).isDuplicate ())
-              if (!cb.isSelected ())
-              {
-                cb.setSelected (true);              // doesn't fire the actionListener!
-                disksSelected.add (dp.duplicateDisks.get (count));
-              }
-            ++count;
-          }
-        }
+        //        for (DuplicatePanel dp : duplicatePanels)
+        //        {
+        //          int count = 0;
+        //          for (JCheckBox cb : dp.checkBoxes)
+        //          {
+        //            if (count > 0 && dp.duplicateDisks.get (count).isDuplicate ())
+        //              if (!cb.isSelected ())
+        //              {
+        //                cb.setSelected (true);              // doesn't fire the actionListener!
+        //                disksSelected.add (dp.duplicateDisks.get (count));
+        //              }
+        //            ++count;
+        //          }
+        //        }
         buttonDelete.setEnabled (disksSelected.size () > 0);
         buttonClear.setEnabled (disksSelected.size () > 0);
       }
@@ -90,9 +85,9 @@ public class DuplicateWindow extends JFrame
       @Override
       public void actionPerformed (ActionEvent e)
       {
-        for (DuplicatePanel dp : duplicatePanels)
-          for (JCheckBox cb : dp.checkBoxes)
-            cb.setSelected (false);                 // doesn't fire the actionListener!
+        //        for (DuplicatePanel dp : duplicatePanels)
+        //          for (JCheckBox cb : dp.checkBoxes)
+        //            cb.setSelected (false);                 // doesn't fire the actionListener!
 
         disksSelected.clear ();
         buttonDelete.setEnabled (false);
@@ -116,55 +111,45 @@ public class DuplicateWindow extends JFrame
       {
         int totalDeleted = 0;
         int totalFailed = 0;
-        for (DuplicatePanel dp : duplicatePanels)
-        {
-          int count = 0;
-          for (JCheckBox cb : dp.checkBoxes)
-          {
-            if (cb.isSelected () && false)
-            {
-              DiskDetails dd = dp.duplicateDisks.get (count);
-              if (dd.delete ())
-              {
-                ++totalDeleted;
-                System.out.println ("Deleted : " + dd);
-              }
-              else
-              {
-                ++totalFailed;
-                System.out.println ("Failed  : " + dd);
-              }
-            }
-            ++count;
-          }
-        }
+
+        //        for (DuplicatePanel dp : duplicatePanels)
+        //        {
+        //          int count = 0;
+        //          for (JCheckBox cb : dp.checkBoxes)
+        //          {
+        //            if (cb.isSelected ())
+        //            {
+        //              DiskDetails dd = dp.duplicateDisks.get (count);
+        //              if (dd.delete ())
+        //              {
+        //                ++totalDeleted;
+        //                System.out.println ("Deleted : " + dd);
+        //              }
+        //              else
+        //              {
+        //                ++totalFailed;
+        //                System.out.println ("Failed  : " + dd);
+        //              }
+        //            }
+        //            ++count;
+        //          }
+        //        }
         System.out.printf ("Deleted : %d, Failed : %d%n", totalDeleted, totalFailed);
       }
     });
 
-    setSize (600, 700);
+    setSize (900, 700);
     setLocationRelativeTo (null);
     setDefaultCloseOperation (HIDE_ON_CLOSE);
-    setVisible (true);
   }
 
-  // create a DuplicatePanel based on the updated DiskDetails
-  public synchronized void addResult (List<DiskDetails> duplicateDisks)
+  public void setDuplicateHandler (DuplicateHandler duplicateHandler)
   {
-    // create panel and add it to the window
-    DuplicatePanel dp = new DuplicatePanel (duplicateDisks, folderNameLength,
-        disksSelected, buttonDelete, buttonClear);
-    mainPanel.add (dp);
-    duplicatePanels.add (dp);
-
-    validate ();
-
-    if (--unfinishedWorkers == 0)
-    {
-      buttonAll.setEnabled (true);
-      buttonCancel.setEnabled (true);
-    }
-    else
-      mainPanel.add (Box.createRigidArea (new Dimension (0, 20)));
+    this.duplicateHandler = duplicateHandler;
+    table.setModel (new DiskTableModel (duplicateHandler));
+    table.getColumnModel ().getColumn (0).setPreferredWidth (250);
+    table.getColumnModel ().getColumn (1).setPreferredWidth (500);
+    table.getColumnModel ().getColumn (2).setPreferredWidth (100);
+    setVisible (true);
   }
 }

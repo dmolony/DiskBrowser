@@ -1,12 +1,10 @@
 package com.bytezone.diskbrowser.duplicates;
 
 import java.io.File;
-import java.util.*;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
-import com.bytezone.diskbrowser.disk.AppleDisk;
-import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.gui.FileComparator;
 import com.bytezone.diskbrowser.utilities.Utility;
 
@@ -19,30 +17,34 @@ public class DuplicateHandler
   private final File rootFolder;
   private int totalDisks;
   private int totalFolders;
+  private final int rootFolderNameLength;
+
+  private final boolean debug = false;
 
   // total files for each suffix
   private final Map<String, Integer> typeList = new TreeMap<String, Integer> ();
 
-  // list of unique disk names -> List of File duplicates
-  final Map<String, List<DiskDetails>> duplicateDisks =
-      new TreeMap<String, List<DiskDetails>> ();
+  // list of checksum -> DiskDetails
+  final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
 
   // list of unique disk names -> File
-  private final Map<String, File> diskNames = new HashMap<String, File> ();
-
-  // list of checksum -> File
-  final Map<Long, List<File>> dosMap = new TreeMap<Long, List<File>> ();
+  private final Map<String, DiskDetails> fileNameMap =
+      new TreeMap<String, DiskDetails> ();
 
   public DuplicateHandler (File rootFolder)
   {
     this.rootFolder = rootFolder;
-
-    countDisks ();
+    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
   }
 
-  public Map<String, List<DiskDetails>> getDuplicateDisks ()
+  public Map<String, DiskDetails> getFileNameMap ()
   {
-    return duplicateDisks;
+    return fileNameMap;
+  }
+
+  public Map<Long, DiskDetails> getChecksumMap ()
+  {
+    return checksumMap;
   }
 
   void countDisks ()
@@ -62,114 +64,76 @@ public class DuplicateHandler
     System.out.printf ("%nTotal ....... %,7d%n%n", grandTotal);
   }
 
+  File getRootFolder ()
+  {
+    return rootFolder;
+  }
+
   private void traverse (File directory)
   {
     File[] files = directory.listFiles ();
+
     if (files == null || files.length == 0)
     {
       System.out.println ("Empty folder : " + directory.getAbsolutePath ());
       return;
     }
 
-    Arrays.sort (files, fileComparator);
-
-    if (false)
-      System.out.printf ("%nFolder: %s%n%n", directory.getAbsolutePath ()
-          .substring (rootFolder.getAbsolutePath ().length ()));
+    //    Arrays.sort (files, fileComparator);
 
     for (File file : files)
     {
+      String fileName = file.getName ().toLowerCase ();
+
       if (file.isDirectory ())
       {
         ++totalFolders;
         traverse (file);
       }
-      else if (Utility.validFileType (file.getName ()))
+      else if (Utility.validFileType (fileName))
       {
-        if (file.getName ().endsWith (".gz") && !file.getName ().endsWith ("dsk.gz"))
-          continue;
-
         ++totalDisks;
-
-        int pos = file.getName ().lastIndexOf ('.');
-        if (pos > 0)
-        {
-          String type = file.getName ().substring (pos + 1).toLowerCase ();
-          if (typeList.containsKey (type))
-          {
-            int t = typeList.get (type);
-            typeList.put (type, ++t);
-          }
-          else
-            typeList.put (type, 1);
-        }
-
-        if (false)
-        {
-          String name = file.getName ();
-          int nameLength = name.length ();
-          if (nameLength > MAX_NAME_WIDTH)
-            name = name.substring (0, 15) + "..."
-                + name.substring (nameLength - MAX_NAME_WIDTH + 18);
-
-          System.out.printf (FORMAT, name, file.length ());
-        }
-
-        checkDuplicates (file);
-        //        checksumDos (file);
+        incrementType (file, fileName);
+        checkDuplicates (file, fileName);
       }
     }
-
-    if (false)
-      for (String key : duplicateDisks.keySet ())
-      {
-        List<DiskDetails> diskDetailsList = duplicateDisks.get (key);
-        System.out.println (key);
-        for (DiskDetails diskDetails : diskDetailsList)
-          System.out.println (diskDetails);
-      }
   }
 
-  private void checksumDos (File file)
+  private void checkDuplicates (File file, String fileName)
   {
-    if (file.length () != 143360 || file.getAbsolutePath ().contains ("/ZDisks/"))
-      return;
+    String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
+    DiskDetails diskDetails = new DiskDetails (file, rootName, fileName);
 
-    Disk disk = new AppleDisk (file, 35, 16);
-    byte[] buffer = disk.readSector (0, 0);
-
-    Checksum checksum = new CRC32 ();
-    checksum.update (buffer, 0, buffer.length);
-    long cs = checksum.getValue ();
-    List<File> files = dosMap.get (cs);
-    if (files == null)
+    if (fileNameMap.containsKey (fileName))
     {
-      files = new ArrayList<File> ();
-      dosMap.put (cs, files);
-    }
-    files.add (file);
-  }
-
-  private void checkDuplicates (File file)
-  {
-    if (diskNames.containsKey (file.getName ()))
-    {
-      List<DiskDetails> diskList = duplicateDisks.get (file.getName ());
-      if (diskList == null)
-      {
-        diskList = new ArrayList<DiskDetails> ();
-        duplicateDisks.put (file.getName (), diskList);
-        diskList.add (new DiskDetails (diskNames.get (file.getName ())));// add original
-      }
-      diskList.add (new DiskDetails (file));                        // add the duplicate
+      DiskDetails otherDisk = fileNameMap.get (fileName);
+      otherDisk.addDuplicateName (diskDetails);
     }
     else
-      diskNames.put (file.getName (), file);
+      fileNameMap.put (fileName, diskDetails);
+
+    if (checksumMap.containsKey (diskDetails.getChecksum ()))
+    {
+      DiskDetails otherDisk = checksumMap.get (diskDetails.getChecksum ());
+      otherDisk.addDuplicateChecksum (diskDetails);
+    }
+    else
+      checksumMap.put (diskDetails.getChecksum (), diskDetails);
   }
 
-  //  public static void main (String[] args)
-  //  {
-  //    DuplicateHandler dh = new DuplicateHandler (
-  //        new File ("/Users/denismolony/Apple II stuff/AppleDisk Images II/apple disks"));
-  //  }
+  private void incrementType (File file, String fileName)
+  {
+    int pos = file.getName ().lastIndexOf ('.');
+    if (pos > 0)
+    {
+      String type = fileName.substring (pos + 1);
+      if (typeList.containsKey (type))
+      {
+        int t = typeList.get (type);
+        typeList.put (type, ++t);
+      }
+      else
+        typeList.put (type, 1);
+    }
+  }
 }

@@ -1,40 +1,87 @@
 package com.bytezone.diskbrowser.duplicates;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytezone.common.ComputeCRC32;
 
 public class DiskDetails
 {
   private final File file;
-  private long checksum = -1;
-  private boolean duplicate;
+  private final long checksum;
+  private final String rootName;            // full path without the root folder
+  private final String shortName;           // file name in lower case
 
-  public DiskDetails (File file)
+  private final List<DiskDetails> duplicateChecksums = new ArrayList<DiskDetails> ();
+  private final List<DiskDetails> duplicateNames = new ArrayList<DiskDetails> ();
+
+  private boolean isDuplicateName;
+  private boolean isDuplicateChecksum;
+
+  public DiskDetails (File file, String rootName, String shortName)
   {
     this.file = file;
-    duplicate = false;
+    this.rootName = rootName;
+    this.shortName = shortName;
+    checksum = ComputeCRC32.getChecksumValue (file);
   }
 
-  public boolean isDuplicate ()
+  //  public boolean isDuplicate ()
+  //  {
+  //    return duplicate;
+  //  }
+
+  public void addDuplicateChecksum (DiskDetails diskDetails)
   {
-    return duplicate;
+    if (this.checksum == diskDetails.checksum)
+    {
+      this.duplicateChecksums.add (diskDetails);
+      diskDetails.isDuplicateChecksum = true;
+    }
   }
 
-  public void setDuplicate (boolean value)
+  public void addDuplicateName (DiskDetails diskDetails)
   {
-    duplicate = value;
+    if (this.shortName.equals (diskDetails.shortName))
+    {
+      this.duplicateNames.add (diskDetails);
+      diskDetails.isDuplicateName = true;
+    }
   }
 
-  public String getAbsolutePath ()
+  public List<DiskDetails> getDuplicateChecksums ()
   {
-    return file.getAbsolutePath ();
+    return duplicateChecksums;
+  }
+
+  public List<DiskDetails> getDuplicateNames ()
+  {
+    return duplicateNames;
+  }
+
+  public boolean isDuplicateChecksum ()
+  {
+    return isDuplicateChecksum;
+  }
+
+  public boolean isDuplicateName ()
+  {
+    return isDuplicateName;
+  }
+
+  public String getRootName ()
+  {
+    return rootName;
+  }
+
+  public String getShortName ()
+  {
+    return shortName;
   }
 
   public long getChecksum ()
   {
-    if (checksum < 0)
-      checksum = ComputeCRC32.getChecksumValue (file);
     return checksum;
   }
 
@@ -47,7 +94,7 @@ public class DiskDetails
   @Override
   public String toString ()
   {
-    return String.format ("%s (%s)", file.getAbsolutePath (),
-        duplicate ? "duplicate" : "OK");
+    return String.format ("%-40s %3d %s %3d %s", rootName, duplicateChecksums.size (),
+        isDuplicateChecksum, duplicateNames.size (), isDuplicateName);
   }
 }

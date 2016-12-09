@@ -1,18 +1,18 @@
 package com.bytezone.diskbrowser.duplicates;
 
-import java.util.List;
+import java.io.File;
 
 import javax.swing.SwingWorker;
 
-public class DuplicateWorker extends SwingWorker<List<DiskDetails>, Void>
+public class DuplicateWorker extends SwingWorker<DuplicateHandler, String>
 {
-  List<DiskDetails> duplicateDisks;
+  DuplicateHandler duplicateHandler;
   DuplicateWindow owner;
 
-  public DuplicateWorker (List<DiskDetails> duplicateDisks, DuplicateWindow owner)
+  public DuplicateWorker (File rootFolder, DuplicateWindow owner)
   {
-    this.duplicateDisks = duplicateDisks;
     this.owner = owner;
+    duplicateHandler = new DuplicateHandler (rootFolder);
   }
 
   @Override
@@ -20,7 +20,7 @@ public class DuplicateWorker extends SwingWorker<List<DiskDetails>, Void>
   {
     try
     {
-      owner.addResult (get ());
+      owner.setDuplicateHandler (get ());
     }
     catch (Exception e)
     {
@@ -29,16 +29,10 @@ public class DuplicateWorker extends SwingWorker<List<DiskDetails>, Void>
   }
 
   @Override
-  protected List<DiskDetails> doInBackground () throws Exception
+  protected DuplicateHandler doInBackground () throws Exception
   {
-    long firstChecksum = -1;
-    for (DiskDetails dd : duplicateDisks)
-    {
-      if (firstChecksum < 0)
-        firstChecksum = dd.getChecksum ();
-      else
-        dd.setDuplicate (dd.getChecksum () == firstChecksum);
-    }
-    return duplicateDisks;
+    duplicateHandler.countDisks ();
+
+    return duplicateHandler;
   }
 }

@@ -69,8 +69,10 @@ public class Utility
     if (dotPos2 > 0)
     {
       String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
-      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
-        return false;
+      //      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
+      //        return false;
+      if (suffix.equals ("gz"))
+        return suffixes.contains (suffix2) && !"gz".equals (suffix2);
     }
 
     return suffixes.contains (suffix);

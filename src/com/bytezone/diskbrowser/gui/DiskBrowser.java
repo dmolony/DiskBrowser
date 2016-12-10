@@ -97,6 +97,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     diskLayoutPanel.addSectorSelectionListener (redoHandler);
     diskLayoutPanel.addSectorSelectionListener (catalogPanel);
 
+    duplicateAction.addTableSelectionListener (catalogPanel);
+
     redoHandler.addRedoListener (catalogPanel);
     redoHandler.addRedoListener (diskLayoutPanel);
 

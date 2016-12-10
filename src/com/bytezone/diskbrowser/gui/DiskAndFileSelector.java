@@ -59,7 +59,7 @@ class DiskAndFileSelector
   //    }
   //  }
 
-  public void fireDiskSelectionEvent (FileNode node)
+  void fireDiskSelectionEvent (FileNode node)
   {
     if (node.file.isDirectory ())
     {
@@ -71,13 +71,13 @@ class DiskAndFileSelector
       FormattedDisk fd = node.getFormattedDisk ();
       if (fd == null)
         JOptionPane.showMessageDialog (null, "Incorrect file format", "Format error",
-                                       JOptionPane.ERROR_MESSAGE);
+            JOptionPane.ERROR_MESSAGE);
       else
         fireDiskSelectionEvent (fd);
     }
   }
 
-  public void fireFileNodeSelectionEvent (FileNode node)
+  void fireFileNodeSelectionEvent (FileNode node)
   {
     FileNodeSelectedEvent e = new FileNodeSelectedEvent (this, node);
     e.redo = redo;
@@ -87,7 +87,7 @@ class DiskAndFileSelector
       listener.fileNodeSelected (e);
   }
 
-  public void fireDiskSelectionEvent (FormattedDisk disk)
+  void fireDiskSelectionEvent (FormattedDisk disk)
   {
     if (disk == currentDisk)
     {
@@ -124,7 +124,7 @@ class DiskAndFileSelector
     listenerList.remove (FileSelectionListener.class, listener);
   }
 
-  public void fireFileSelectionEvent (AppleFileSource file)
+  void fireFileSelectionEvent (AppleFileSource file)
   {
     assert file != null;
     currentDisk = null;

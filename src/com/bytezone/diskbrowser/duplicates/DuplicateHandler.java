@@ -5,21 +5,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.bytezone.diskbrowser.gui.FileComparator;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class DuplicateHandler
 {
-  private static final FileComparator fileComparator = new FileComparator ();
-  private static final int MAX_NAME_WIDTH = 34;
-  private static final String FORMAT = "%-" + MAX_NAME_WIDTH + "s %,10d%n";
+  //  private static final FileComparator fileComparator = new FileComparator ();
+  //  private static final int MAX_NAME_WIDTH = 34;
+  //  private static final String FORMAT = "%-" + MAX_NAME_WIDTH + "s %,10d%n";
 
   private final File rootFolder;
   private int totalDisks;
   private int totalFolders;
   private final int rootFolderNameLength;
 
-  private final boolean debug = false;
+  //  private final boolean debug = false;
 
   // total files for each suffix
   private final Map<String, Integer> typeList = new TreeMap<String, Integer> ();
@@ -105,20 +104,15 @@ public class DuplicateHandler
     DiskDetails diskDetails = new DiskDetails (file, rootName, fileName);
 
     if (fileNameMap.containsKey (fileName))
-    {
-      DiskDetails otherDisk = fileNameMap.get (fileName);
-      otherDisk.addDuplicateName (diskDetails);
-    }
+      fileNameMap.get (fileName).addDuplicateName (diskDetails);
     else
       fileNameMap.put (fileName, diskDetails);
 
-    if (checksumMap.containsKey (diskDetails.getChecksum ()))
-    {
-      DiskDetails otherDisk = checksumMap.get (diskDetails.getChecksum ());
-      otherDisk.addDuplicateChecksum (diskDetails);
-    }
+    long checksum = diskDetails.getChecksum ();
+    if (checksumMap.containsKey (checksum))
+      checksumMap.get (checksum).addDuplicateChecksum (diskDetails);
     else
-      checksumMap.put (diskDetails.getChecksum (), diskDetails);
+      checksumMap.put (checksum, diskDetails);
   }
 
   private void incrementType (File file, String fileName)

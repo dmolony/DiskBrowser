@@ -8,7 +8,8 @@ import javax.swing.table.AbstractTableModel;
 
 public class DiskTableModel extends AbstractTableModel
 {
-  static final String[] headers = { "Name", "Location", "Checksum" };
+  static final String[] headers =
+      { "Path", "Name", "same name", "same data", "Checksum" };
 
   Map<String, DiskDetails> fileNameMap;
   Map<Long, DiskDetails> checkSumMap;
@@ -22,18 +23,10 @@ public class DiskTableModel extends AbstractTableModel
     for (String key : fileNameMap.keySet ())
     {
       DiskDetails original = fileNameMap.get (key);
-
-      //      if (false)
-      //      {
-      //        if (original.getDuplicateChecksums ().size () > 0)
-      //        {
-      //          lines.add (new TableLine (original));
-      //          for (DiskDetails duplicate : original.getDuplicateChecksums ())
-      //            lines.add (new TableLine (duplicate));
-      //        }
-      //      }
-      //      else
       lines.add (new TableLine (original));
+
+      for (DiskDetails duplicate : original.getDuplicateNames ())
+        lines.add (new TableLine (duplicate));
     }
   }
 
@@ -58,17 +51,7 @@ public class DiskTableModel extends AbstractTableModel
   @Override
   public Class<?> getColumnClass (int columnIndex)
   {
-    switch (columnIndex)
-    {
-      case 0:
-        return String.class;
-      case 1:
-        return String.class;
-      case 2:
-        return Long.class;
-      default:
-        return Object.class;
-    }
+    return lines.isEmpty () ? Object.class : getValueAt (0, columnIndex).getClass ();
   }
 
   @Override
@@ -78,10 +61,14 @@ public class DiskTableModel extends AbstractTableModel
     switch (columnIndex)
     {
       case 0:
-        return line.shortName;
+        return line.path;
       case 1:
-        return line.diskDetails.getRootName ();
+        return line.shortName;
       case 2:
+        return line.duplicateNames;
+      case 3:
+        return line.duplicateChecksums;
+      case 4:
         return line.checksum;
       default:
         return "???";
@@ -90,15 +77,37 @@ public class DiskTableModel extends AbstractTableModel
 
   class TableLine
   {
-    String shortName;
-    DiskDetails diskDetails;
-    long checksum;
+    private final String shortName;
+    private final String path;
+    private final long checksum;
+    private final int duplicateNames;
+    private final int duplicateChecksums;
+    final DiskDetails diskDetails;
 
     public TableLine (DiskDetails diskDetails)
     {
-      this.shortName = diskDetails.getShortName ();
       this.diskDetails = diskDetails;
-      this.checksum = diskDetails.getChecksum ();
+      shortName = diskDetails.getShortName ();
+      checksum = diskDetails.getChecksum ();
+
+      String rootName = diskDetails.getRootName ();
+      path = rootName.substring (0, rootName.length () - shortName.length ());
+
+      if (diskDetails.isDuplicateChecksum ())
+      {
+        DiskDetails original = checkSumMap.get (diskDetails.getChecksum ());
+        duplicateChecksums = original.getDuplicateChecksums ().size () + 1;
+      }
+      else
+        duplicateChecksums = diskDetails.getDuplicateChecksums ().size () + 1;
+
+      if (diskDetails.isDuplicateName ())
+      {
+        DiskDetails original = fileNameMap.get (diskDetails.getShortName ());
+        duplicateNames = original.getDuplicateNames ().size () + 1;
+      }
+      else
+        duplicateNames = diskDetails.getDuplicateNames ().size () + 1;
     }
   }
 }

@@ -28,7 +28,6 @@ import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 class FileSystemTab extends AbstractTab
 {
   File rootFolder;
-  //  Map<String, List<DiskDetails>> duplicateDisks;
 
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
       Font font, DiskSelectedEvent diskEvent)
@@ -38,7 +37,6 @@ class FileSystemTab extends AbstractTab
 
     TreeBuilder tb = new TreeBuilder (folder);
 
-    //    duplicateDisks = tb.duplicateDisks;
     setTree (tb.getTree ());
     setSelectionListener (tree);
 
@@ -123,32 +121,14 @@ class FileSystemTab extends AbstractTab
       System.out.println ("Disk node not found");
   }
 
+  void selectDisk (String path)
+  {
+    showNode (findNode (rootFolder.getAbsolutePath () + path));
+  }
+
   private DefaultMutableTreeNode findNode (String absolutePath)
   {
-    DefaultMutableTreeNode rootNode = getRootNode ();
-
-    if (true)
-      return search (rootNode, absolutePath);
-
-    // old code
-    Enumeration<DefaultMutableTreeNode> children = rootNode.breadthFirstEnumeration ();
-    while (children.hasMoreElements ())
-    {
-      DefaultMutableTreeNode node = children.nextElement ();
-      FileNode fn = (FileNode) node.getUserObject ();
-      System.out.println ("Comparing : " + fn.file.getAbsolutePath ());
-
-      if (absolutePath.startsWith (fn.file.getAbsolutePath ()))
-      {
-        System.out.println ("promising");
-        fn.readFiles ();
-      }
-
-      if (fn.file.getAbsolutePath ().equals (absolutePath))
-        return node;
-    }
-    System.out.println ("Node not found : " + absolutePath);
-    return null;
+    return search (getRootNode (), absolutePath);
   }
 
   private DefaultMutableTreeNode search (DefaultMutableTreeNode node, String absolutePath)

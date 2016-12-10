@@ -1,102 +1,61 @@
 package com.bytezone.diskbrowser.duplicates;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableRowSorter;
+
+import com.bytezone.diskbrowser.gui.DuplicateAction;
+import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 
 public class DuplicateWindow extends JFrame
 {
   private final JTable table;
-  int folderNameLength;
-  Map<String, List<DiskDetails>> duplicateDisks;
-  File rootFolder;
 
-  JButton buttonDelete = new JButton ("Delete selected");
-  JButton buttonCancel = new JButton ("Cancel");
-  JButton buttonAll = new JButton ("Select all duplicates");
-  JButton buttonClear = new JButton ("Clear all");
-  //  JPanel mainPanel = new JPanel ();
+  private final JButton btnExport = new JButton ("Export");
+  private final JButton btnHide = new JButton ("Close");
 
-  List<DiskDetails> disksSelected = new ArrayList<DiskDetails> ();
+  private DuplicateHandler duplicateHandler;
+  private final List<DiskTableSelectionListener> listeners;
 
-  DuplicateHandler duplicateHandler;
-
-  public DuplicateWindow (File rootFolder)
+  public DuplicateWindow (File rootFolder,
+      List<DuplicateAction.DiskTableSelectionListener> listeners)
   {
     super ("Duplicate Disk Detection - " + rootFolder.getAbsolutePath ());
 
-    folderNameLength = rootFolder.getAbsolutePath ().length ();
+    this.listeners = listeners;
 
     table = new JTable ();
     JScrollPane scrollPane =
         new JScrollPane (table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    table.setFillsViewportHeight (true);
 
-    //    table.setShowGrid (true);
-    //    table.setGridColor (Color.BLACK);
+    table.setFillsViewportHeight (true);
+    table.setAutoCreateRowSorter (true);
+
+    table.setShowGrid (true);
+    table.setGridColor (Color.LIGHT_GRAY);
 
     add (scrollPane, BorderLayout.CENTER);
 
     JPanel panel = new JPanel ();
-    panel.add (buttonClear);
-    panel.add (buttonAll);
-    panel.add (buttonDelete);
-    panel.add (buttonCancel);
+    panel.add (btnHide);
+    panel.add (btnExport);
     add (panel, BorderLayout.SOUTH);
 
-    buttonClear.setEnabled (false);
-    buttonAll.setEnabled (false);
-    buttonDelete.setEnabled (false);
-    buttonCancel.setEnabled (false);
+    btnHide.setEnabled (true);
+    btnExport.setEnabled (false);
 
-    buttonAll.addActionListener (new ActionListener ()
-    {
-      @Override
-      public void actionPerformed (ActionEvent e)
-      {
-        //        for (DuplicatePanel dp : duplicatePanels)
-        //        {
-        //          int count = 0;
-        //          for (JCheckBox cb : dp.checkBoxes)
-        //          {
-        //            if (count > 0 && dp.duplicateDisks.get (count).isDuplicate ())
-        //              if (!cb.isSelected ())
-        //              {
-        //                cb.setSelected (true);              // doesn't fire the actionListener!
-        //                disksSelected.add (dp.duplicateDisks.get (count));
-        //              }
-        //            ++count;
-        //          }
-        //        }
-        buttonDelete.setEnabled (disksSelected.size () > 0);
-        buttonClear.setEnabled (disksSelected.size () > 0);
-      }
-    });
-
-    buttonClear.addActionListener (new ActionListener ()
-    {
-      @Override
-      public void actionPerformed (ActionEvent e)
-      {
-        //        for (DuplicatePanel dp : duplicatePanels)
-        //          for (JCheckBox cb : dp.checkBoxes)
-        //            cb.setSelected (false);                 // doesn't fire the actionListener!
-
-        disksSelected.clear ();
-        buttonDelete.setEnabled (false);
-        buttonClear.setEnabled (false);
-      }
-    });
-
-    buttonCancel.addActionListener (new ActionListener ()
+    btnHide.addActionListener (new ActionListener ()
     {
       @Override
       public void actionPerformed (ActionEvent e)
@@ -105,41 +64,7 @@ public class DuplicateWindow extends JFrame
       }
     });
 
-    buttonDelete.addActionListener (new ActionListener ()
-    {
-      @Override
-      public void actionPerformed (ActionEvent e)
-      {
-        int totalDeleted = 0;
-        int totalFailed = 0;
-
-        //        for (DuplicatePanel dp : duplicatePanels)
-        //        {
-        //          int count = 0;
-        //          for (JCheckBox cb : dp.checkBoxes)
-        //          {
-        //            if (cb.isSelected ())
-        //            {
-        //              DiskDetails dd = dp.duplicateDisks.get (count);
-        //              if (dd.delete ())
-        //              {
-        //                ++totalDeleted;
-        //                System.out.println ("Deleted : " + dd);
-        //              }
-        //              else
-        //              {
-        //                ++totalFailed;
-        //                System.out.println ("Failed  : " + dd);
-        //              }
-        //            }
-        //            ++count;
-        //          }
-        //        }
-        System.out.printf ("Deleted : %d, Failed : %d%n", totalDeleted, totalFailed);
-      }
-    });
-
-    setSize (1100, 700);
+    setSize (1200, 700);
     setLocationRelativeTo (null);
     setDefaultCloseOperation (HIDE_ON_CLOSE);
   }
@@ -147,10 +72,42 @@ public class DuplicateWindow extends JFrame
   public void setDuplicateHandler (DuplicateHandler duplicateHandler)
   {
     this.duplicateHandler = duplicateHandler;
+
     table.setModel (new DiskTableModel (duplicateHandler));
-    table.getColumnModel ().getColumn (0).setPreferredWidth (300);
-    table.getColumnModel ().getColumn (1).setPreferredWidth (500);
-    table.getColumnModel ().getColumn (2).setPreferredWidth (100);
+
+    int[] columnWidths = { 300, 300, 40, 40, 100 };
+    for (int i = 0; i < columnWidths.length; i++)
+      table.getColumnModel ().getColumn (i).setPreferredWidth (columnWidths[i]);
+
+    final TableRowSorter<DiskTableModel> sorter =
+        new TableRowSorter<DiskTableModel> ((DiskTableModel) table.getModel ());
+    table.setRowSorter (sorter);
+
+    ListSelectionModel listSelectionModel = table.getSelectionModel ();
+    listSelectionModel.addListSelectionListener (new ListSelectionListener ()
+    {
+      @Override
+      public void valueChanged (ListSelectionEvent e)
+      {
+        if (e.getValueIsAdjusting ())
+          return;
+
+        ListSelectionModel lsm = (ListSelectionModel) e.getSource ();
+        if (lsm.isSelectionEmpty ())
+          return;
+
+        table.scrollRectToVisible (
+            new Rectangle (table.getCellRect (lsm.getMinSelectionIndex (), 0, true)));
+        int selectedRow = table.getSelectedRow ();
+        int actualRow = sorter.convertRowIndexToModel (selectedRow);
+
+        DiskTableModel diskTableModel = (DiskTableModel) table.getModel ();
+        DiskDetails diskDetails = diskTableModel.lines.get (actualRow).diskDetails;
+
+        for (DiskTableSelectionListener listener : listeners)
+          listener.diskSelected (diskDetails);
+      }
+    });
 
     JTableHeader header = table.getTableHeader ();
     header.setFont (header.getFont ().deriveFont ((float) 13.0));

@@ -31,13 +31,16 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.catalog.DocumentCreatorFactory;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.duplicates.DiskDetails;
+import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
-class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionListener,
-    QuitListener, FontChangeListener, RootDirectoryChangeListener
+class CatalogPanel extends JTabbedPane
+    implements RedoListener, SectorSelectionListener, QuitListener, FontChangeListener,
+    RootDirectoryChangeListener, DiskTableSelectionListener
 {
   private static final String prefsLastDiskUsed = "Last disk used";
   private static final String prefsLastDosUsed = "Last dos used";
@@ -69,7 +72,6 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
 
     setTabPlacement (SwingConstants.BOTTOM);
     setPreferredSize (new Dimension (360, 802));          // width, height
-    //    setPreferredSize (new Dimension (360, 523)); // width, height
 
     createTabs (prefs);
     addChangeListener (new TabChangeListener ());
@@ -192,13 +194,6 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     else if (fileTab != null)
       setSelectedIndex (0);
   }
-
-  //  void setDuplicateAction (DuplicateAction action)
-  //  {
-  //    this.duplicateAction = action;
-  //    if (fileTab != null && fileTab.rootFolder != null)
-  //      action.setDuplicates (fileTab.rootFolder, fileTab.duplicateDisks);
-  //  }
 
   void setCloseTabAction (CloseTabAction action)
   {
@@ -443,5 +438,15 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
       else if (e.getClickCount () == 2)
         addDiskPanel (node.getFormattedDisk (), null, true);
     }
+  }
+
+  // a disk has been selected from the Disk Duplicates Table
+  @Override
+  public void diskSelected (DiskDetails diskDetails)
+  {
+    if (getSelectedIndex () != 0)
+      setSelectedIndex (0);
+
+    fileTab.selectDisk (diskDetails.getRootName ());
   }
 }

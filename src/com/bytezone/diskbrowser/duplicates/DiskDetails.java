@@ -27,10 +27,6 @@ public class DiskDetails
     checksum = ComputeCRC32.getChecksumValue (file);
   }
 
-  //  public boolean isDuplicate ()
-  //  {
-  //    return duplicate;
-  //  }
 
   public void addDuplicateChecksum (DiskDetails diskDetails)
   {

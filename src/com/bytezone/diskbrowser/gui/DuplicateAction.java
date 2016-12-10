@@ -4,20 +4,24 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.duplicates.DuplicateWindow;
 import com.bytezone.diskbrowser.duplicates.DuplicateWorker;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
 public class DuplicateAction extends DefaultAction implements RootDirectoryChangeListener
 {
-  int rootFolderLength;
-  File rootFolder;
-  DuplicateWindow window;
+  private File rootFolder;
+  private DuplicateWindow window;
+  private final List<DiskTableSelectionListener> listeners =
+      new ArrayList<DiskTableSelectionListener> ();
 
   public DuplicateAction ()
   {
@@ -44,10 +48,21 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
   {
     if (window == null)
     {
-      window = new DuplicateWindow (rootFolder);
+      window = new DuplicateWindow (rootFolder, listeners);
       new DuplicateWorker (rootFolder, window).execute ();
     }
     else
       window.setVisible (true);
+  }
+
+  public void addTableSelectionListener (DiskTableSelectionListener listener)
+  {
+    if (!listeners.contains (listener))
+      listeners.add (listener);
+  }
+
+  public interface DiskTableSelectionListener
+  {
+    public void diskSelected (DiskDetails diskDetails);
   }
 }

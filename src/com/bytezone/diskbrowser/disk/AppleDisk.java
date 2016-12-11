@@ -427,6 +427,18 @@ public class AppleDisk implements Disk
   }
 
   @Override
+  public DiskAddress getDiskAddress (int track, int sector)
+  {
+    if (!isValidAddress (track, sector))
+    {
+      System.out.println ("Invalid block : " + track + "/" + sector);
+      return null;
+      //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
+    }
+    return new AppleDiskAddress (this, track, sector);
+  }
+
+  @Override
   public DiskAddress getDiskAddress (int block)
   {
     if (!isValidAddress (block))
@@ -449,18 +461,6 @@ public class AppleDisk implements Disk
       addressList.add (new AppleDiskAddress (this, block));
     }
     return addressList;
-  }
-
-  @Override
-  public DiskAddress getDiskAddress (int track, int sector)
-  {
-    if (!isValidAddress (track, sector))
-    {
-      System.out.println ("Invalid block : " + track + "/" + sector);
-      return null;
-      //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
-    }
-    return new AppleDiskAddress (this, track, sector);
   }
 
   @Override

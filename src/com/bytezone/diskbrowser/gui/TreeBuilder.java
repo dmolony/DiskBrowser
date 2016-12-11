@@ -22,9 +22,9 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class TreeBuilder
 {
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
-  private static final int DISK_13_SIZE = 116480;
-  private static final int DISK_16_SIZE = 143360;
-  private static final int DISK_800K_SIZE = 819264;
+  //  private static final int DISK_13_SIZE = 116480;
+  //  private static final int DISK_16_SIZE = 143360;
+  //  private static final int DISK_800K_SIZE = 819264;
 
   private final FileComparator fileComparator = new FileComparator ();
   private final JTree tree;
@@ -75,15 +75,15 @@ public class TreeBuilder
         continue;
       }
 
-      if (file.length () != DISK_16_SIZE && file.length () != DISK_13_SIZE
-          && file.length () != DISK_800K_SIZE && file.length () < 200000)
-      {
-        String name = file.getName ().toLowerCase ();
-        if (!name.endsWith (".sdk") && !name.endsWith (".dsk.gz"))
-          continue;
-      }
+      //      if (file.length () != DISK_16_SIZE && file.length () != DISK_13_SIZE
+      //          && file.length () != DISK_800K_SIZE && file.length () < 200000)
+      //      {
+      //        String name = file.getName ().toLowerCase ();
+      //        if (!name.endsWith (".sdk") && !name.endsWith (".dsk.gz"))
+      //          continue;
+      //      }
 
-      if (Utility.validFileType (file.getAbsolutePath ()))
+      if (Utility.validFileType (file.getName ()) && file.length () > 0)
       {
         FileNode fileNode = new FileNode (file);
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);

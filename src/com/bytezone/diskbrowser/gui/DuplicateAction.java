@@ -49,8 +49,7 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
     if (window == null)
     {
       window = new DuplicateWindow (rootFolder, listeners);
-      DuplicateHandler duplicateHandler = new DuplicateHandler (rootFolder, window);
-      duplicateHandler.execute ();
+      new DuplicateHandler (rootFolder, window).execute ();
     }
     else
       window.setVisible (true);

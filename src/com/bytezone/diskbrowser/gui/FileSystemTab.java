@@ -123,9 +123,6 @@ class FileSystemTab extends AbstractTab
 
   void selectDisk (String path)
   {
-    File file = new File (rootFolder.getAbsolutePath () + path);
-    System.out.println (file);
-    System.out.println (file.exists ());
     DefaultMutableTreeNode node = findNode (rootFolder.getAbsolutePath () + path);
     if (node != null)
       showNode (node);
@@ -162,7 +159,6 @@ class FileSystemTab extends AbstractTab
 
       if (fn2.file.isDirectory () && absolutePath.startsWith (path))
       {
-        System.out.println (absolutePath.charAt (path.length ()));
         if (absolutePath.charAt (path.length ()) == File.separatorChar)
         {
           DefaultMutableTreeNode node2 = search (childNode, absolutePath);

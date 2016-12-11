@@ -24,7 +24,7 @@ public class DuplicateWindow extends JFrame
   private final JButton btnExport = new JButton ("Export");
   private final JButton btnHide = new JButton ("Close");
 
-  private DuplicateHandler duplicateHandler;
+  //  private DuplicateHandler duplicateHandler;
   private final List<DiskTableSelectionListener> listeners;
 
   public DuplicateWindow (File rootFolder,
@@ -71,7 +71,7 @@ public class DuplicateWindow extends JFrame
 
   public void setDuplicateHandler (DuplicateHandler duplicateHandler)
   {
-    this.duplicateHandler = duplicateHandler;
+    //    this.duplicateHandler = duplicateHandler;
 
     table.setModel (new DiskTableModel (duplicateHandler));
 

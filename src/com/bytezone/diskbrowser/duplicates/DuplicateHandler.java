@@ -1,11 +1,14 @@
 package com.bytezone.diskbrowser.duplicates;
 
+import java.awt.Graphics;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -15,7 +18,9 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   private final File rootFolder;
   private final int rootFolderNameLength;
   private final ProgressState progressState = new ProgressState ();
-  DuplicateWindow owner;
+  private final DuplicateWindow owner;
+  private final JDialog dialog;
+  private final ProgressPanel progressPanel;
 
   // list of checksum -> DiskDetails
   private final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
@@ -29,6 +34,14 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
     this.rootFolder = rootFolder;
     this.owner = owner;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
+
+    dialog = new JDialog (owner);
+    progressPanel = new ProgressPanel ();
+    dialog.add (progressPanel);
+    dialog.setSize (500, 400);
+    dialog.setLocationRelativeTo (null);
+    dialog.setTitle ("Reading disks");
+    dialog.setVisible (true);
   }
 
   public Map<String, DiskDetails> getFileNameMap ()
@@ -39,11 +52,6 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   public Map<Long, DiskDetails> getChecksumMap ()
   {
     return checksumMap;
-  }
-
-  public ProgressState getProgressState ()
-  {
-    return progressState;
   }
 
   File getRootFolder ()
@@ -103,6 +111,7 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   {
     try
     {
+      dialog.setVisible (false);
       owner.setDuplicateHandler (this);
     }
     catch (Exception e)
@@ -122,8 +131,18 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   @Override
   protected void process (List<ProgressState> chunks)
   {
-    if (false)
-      for (ProgressState progressState : chunks)
-        progressState.print ();
+    //      for (ProgressState progressState : chunks)
+    //        progressState.print ();
+    progressPanel.repaint ();
+  }
+
+  class ProgressPanel extends JPanel
+  {
+    @Override
+    protected void paintComponent (Graphics graphics)
+    {
+      super.paintComponent (graphics);
+      progressState.paintComponent (graphics);
+    }
   }
 }

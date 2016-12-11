@@ -133,7 +133,13 @@ abstract class AbstractTab extends JPanel implements Tab
   // Trigger the TreeSelectionListener set by the real Tab (if the value is different)
   protected void showNode (DefaultMutableTreeNode showNode)
   {
+    assert showNode != null;
     TreePath tp = getPathToNode (showNode);
+    if (tp == null)
+    {
+      System.out.println ("Not found: " + showNode);
+      return;
+    }
     tree.setSelectionPath (tp);
     tree.scrollPathToVisible (tp);
     tree.requestFocusInWindow ();
@@ -143,6 +149,8 @@ abstract class AbstractTab extends JPanel implements Tab
   {
     DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel ();
     TreeNode[] nodes = treeModel.getPathToRoot (selectNode);
+    if (nodes == null)
+      return null;
     return new TreePath (nodes);
   }
 

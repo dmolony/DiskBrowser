@@ -75,7 +75,7 @@ public class DuplicateWindow extends JFrame
 
     table.setModel (new DiskTableModel (duplicateHandler));
 
-    int[] columnWidths = { 300, 300, 40, 40, 100 };
+    int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
     for (int i = 0; i < columnWidths.length; i++)
       table.getColumnModel ().getColumn (i).setPreferredWidth (columnWidths[i]);
 

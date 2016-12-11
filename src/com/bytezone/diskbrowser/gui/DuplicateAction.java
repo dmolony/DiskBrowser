@@ -12,8 +12,8 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
+import com.bytezone.diskbrowser.duplicates.DuplicateHandler;
 import com.bytezone.diskbrowser.duplicates.DuplicateWindow;
-import com.bytezone.diskbrowser.duplicates.DuplicateWorker;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
 public class DuplicateAction extends DefaultAction implements RootDirectoryChangeListener
@@ -49,7 +49,8 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
     if (window == null)
     {
       window = new DuplicateWindow (rootFolder, listeners);
-      new DuplicateWorker (rootFolder, window).execute ();
+      DuplicateHandler duplicateHandler = new DuplicateHandler (rootFolder, window);
+      duplicateHandler.execute ();
     }
     else
       window.setVisible (true);

@@ -2,37 +2,32 @@ package com.bytezone.diskbrowser.duplicates;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.SwingWorker;
+
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class DuplicateHandler
+public class DuplicateHandler extends SwingWorker<Void, ProgressState>
 {
-  //  private static final FileComparator fileComparator = new FileComparator ();
-  //  private static final int MAX_NAME_WIDTH = 34;
-  //  private static final String FORMAT = "%-" + MAX_NAME_WIDTH + "s %,10d%n";
-
   private final File rootFolder;
-  private int totalDisks;
-  private int totalFolders;
   private final int rootFolderNameLength;
-
-  //  private final boolean debug = false;
-
-  // total files for each suffix
-  private final Map<String, Integer> typeList = new TreeMap<String, Integer> ();
+  private final ProgressState progressState = new ProgressState ();
+  DuplicateWindow owner;
 
   // list of checksum -> DiskDetails
-  final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
+  private final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
 
-  // list of unique disk names -> File
+  // list of unique disk names -> DiskDetails
   private final Map<String, DiskDetails> fileNameMap =
       new TreeMap<String, DiskDetails> ();
 
-  public DuplicateHandler (File rootFolder)
+  public DuplicateHandler (File rootFolder, DuplicateWindow owner)
   {
     this.rootFolder = rootFolder;
+    this.owner = owner;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
   }
 
@@ -46,21 +41,9 @@ public class DuplicateHandler
     return checksumMap;
   }
 
-  void countDisks ()
+  public ProgressState getProgressState ()
   {
-    traverse (rootFolder);
-
-    System.out.printf ("%nFolders ..... %,7d%n", totalFolders);
-    System.out.printf ("Disks ....... %,7d%n%n", totalDisks);
-
-    int grandTotal = 0;
-    for (String key : typeList.keySet ())
-    {
-      int typeTotal = typeList.get (key);
-      grandTotal += typeTotal;
-      System.out.printf ("%13.13s %,7d%n", key + " ...........", typeTotal);
-    }
-    System.out.printf ("%nTotal ....... %,7d%n%n", grandTotal);
+    return progressState;
   }
 
   File getRootFolder ()
@@ -78,35 +61,35 @@ public class DuplicateHandler
       return;
     }
 
-    //    Arrays.sort (files, fileComparator);
-
     for (File file : files)
     {
       String fileName = file.getName ().toLowerCase ();
 
       if (file.isDirectory ())
       {
-        ++totalFolders;
+        progressState.incrementFolders ();
         traverse (file);
       }
-      else if (Utility.validFileType (fileName))
+      else if (Utility.validFileType (fileName) && file.length () > 0)
       {
-        ++totalDisks;
-        incrementType (file, fileName);
+        progressState.incrementType (file, fileName);
         checkDuplicates (file, fileName);
+
+        if ((progressState.totalDisks % 1000) == 0)
+          publish (progressState);
       }
     }
   }
 
-  private void checkDuplicates (File file, String fileName)
+  private void checkDuplicates (File file, String filename)
   {
     String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
-    DiskDetails diskDetails = new DiskDetails (file, rootName, fileName);
+    DiskDetails diskDetails = new DiskDetails (file, rootName, filename);
 
-    if (fileNameMap.containsKey (fileName))
-      fileNameMap.get (fileName).addDuplicateName (diskDetails);
+    if (fileNameMap.containsKey (filename))
+      fileNameMap.get (filename).addDuplicateName (diskDetails);
     else
-      fileNameMap.put (fileName, diskDetails);
+      fileNameMap.put (filename, diskDetails);
 
     long checksum = diskDetails.getChecksum ();
     if (checksumMap.containsKey (checksum))
@@ -115,19 +98,32 @@ public class DuplicateHandler
       checksumMap.put (checksum, diskDetails);
   }
 
-  private void incrementType (File file, String fileName)
+  @Override
+  protected void done ()
   {
-    int pos = file.getName ().lastIndexOf ('.');
-    if (pos > 0)
+    try
     {
-      String type = fileName.substring (pos + 1);
-      if (typeList.containsKey (type))
-      {
-        int t = typeList.get (type);
-        typeList.put (type, ++t);
-      }
-      else
-        typeList.put (type, 1);
+      owner.setDuplicateHandler (this);
     }
+    catch (Exception e)
+    {
+      e.printStackTrace ();
+    }
+  }
+
+  @Override
+  protected Void doInBackground () throws Exception
+  {
+    traverse (rootFolder);
+    progressState.print ();
+    return null;
+  }
+
+  @Override
+  protected void process (List<ProgressState> chunks)
+  {
+    if (false)
+      for (ProgressState progressState : chunks)
+        progressState.print ();
   }
 }

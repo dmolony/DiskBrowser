@@ -6,10 +6,12 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.bytezone.diskbrowser.utilities.Utility;
+
 public class DiskTableModel extends AbstractTableModel
 {
   static final String[] headers =
-      { "Path", "Name", "same name", "same data", "Checksum" };
+      { "Path", "Name", "Type", "Size (bytes)", "Dup name", "Dup data", "Checksum" };
 
   Map<String, DiskDetails> fileNameMap;
   Map<Long, DiskDetails> checkSumMap;
@@ -65,10 +67,14 @@ public class DiskTableModel extends AbstractTableModel
       case 1:
         return line.shortName;
       case 2:
-        return line.duplicateNames;
+        return line.type;
       case 3:
-        return line.duplicateChecksums;
+        return line.size;
       case 4:
+        return line.duplicateNames;
+      case 5:
+        return line.duplicateChecksums;
+      case 6:
         return line.checksum;
       default:
         return "???";
@@ -83,12 +89,16 @@ public class DiskTableModel extends AbstractTableModel
     private final int duplicateNames;
     private final int duplicateChecksums;
     final DiskDetails diskDetails;
+    private final String type;
+    private final long size;
 
     public TableLine (DiskDetails diskDetails)
     {
       this.diskDetails = diskDetails;
       shortName = diskDetails.getShortName ();
       checksum = diskDetails.getChecksum ();
+      type = Utility.getSuffix (shortName);
+      size = diskDetails.getFile ().length ();
 
       String rootName = diskDetails.getRootName ();
       path = rootName.substring (0, rootName.length () - shortName.length ());

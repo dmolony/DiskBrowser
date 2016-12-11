@@ -9,10 +9,10 @@ import java.util.List;
 public class Utility
 {
   public static final List<String> suffixes =
-      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "nib", "d13", "sdk", "gz");
+      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "nib", "d13", "sdk");
 
   // not used - it doesn't work with Oracle's JDK
-  public static boolean hasRetinaDisplay ()
+  private static boolean hasRetinaDisplay ()
   {
     Object obj =
         Toolkit.getDefaultToolkit ().getDesktopProperty ("apple.awt.contentScaleFactor");
@@ -57,24 +57,49 @@ public class Utility
     return true;
   }
 
+  public static int getSuffixNo (String filename)
+  {
+    return suffixes.indexOf (getSuffix (filename));
+  }
+
+  public static String getSuffix (String filename)
+  {
+    String lcFilename = filename.toLowerCase ();
+
+    if (lcFilename.endsWith (".gz"))
+      lcFilename = lcFilename.substring (0, lcFilename.length () - 3);
+    else if (lcFilename.endsWith (".zip"))
+      lcFilename = lcFilename.substring (0, lcFilename.length () - 4);
+
+    int dotPos = lcFilename.lastIndexOf ('.');
+    if (dotPos < 0)
+      return "";
+
+    return lcFilename.substring (dotPos + 1);
+  }
+
   public static boolean validFileType (String filename)
   {
-    int dotPos = filename.lastIndexOf ('.');
-    if (dotPos < 0)
-      return false;
+    //    String lcFilename = filename.toLowerCase ();
+    //    if (lcFilename.endsWith (".gz"))
+    //      lcFilename = lcFilename.substring (0, lcFilename.length () - 3);
+    //    else if (lcFilename.endsWith (".zip"))
+    //      lcFilename = lcFilename.substring (0, lcFilename.length () - 4);
+    //
+    //    int dotPos = lcFilename.lastIndexOf ('.');
+    //    if (dotPos < 0)
+    //      return false;
+    //
+    //    String suffix = lcFilename.substring (dotPos + 1);
 
-    String suffix = filename.substring (dotPos + 1).toLowerCase ();
+    //    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
+    //    if (dotPos2 > 0)
+    //    {
+    //      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
+    //      if (suffix.equals ("gz"))
+    //        return suffixes.contains (suffix2) && !"gz".equals (suffix2);
+    //    }
 
-    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
-    if (dotPos2 > 0)
-    {
-      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
-      //      if (suffix.equals ("gz") && (suffix2.equals ("bxy") || suffix2.equals ("bny")))
-      //        return false;
-      if (suffix.equals ("gz"))
-        return suffixes.contains (suffix2) && !"gz".equals (suffix2);
-    }
-
-    return suffixes.contains (suffix);
+    return suffixes.contains (getSuffix (filename));
   }
 }

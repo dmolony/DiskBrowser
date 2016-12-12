@@ -1,50 +1,24 @@
 package com.bytezone.diskbrowser.duplicates;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
 {
-  private final File rootFolder;
   private final int rootFolderNameLength;
-  //  private final ProgressState progressState = new ProgressState ();
-  private final DuplicateWindow owner;
-  private final JDialog dialog;
-  private final ProgressPanel progressPanel;
-  private final boolean doChecksums;
   private final RootFolderData rootFolderData;
 
-  public DuplicateSwingWorker (File rootFolder, DuplicateWindow owner,
-      boolean doChecksums)
+  public DuplicateSwingWorker (RootFolderData rootFolderData)
   {
-    this.rootFolder = rootFolder;
-    this.owner = owner;
-    this.doChecksums = doChecksums;
-    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
+    this.rootFolderData = rootFolderData;
+    rootFolderNameLength = rootFolderData.rootFolder.getAbsolutePath ().length ();
 
-    rootFolderData = new RootFolderData ();
-
-    dialog = new JDialog (owner);
-    progressPanel = new ProgressPanel ();
-    progressPanel.setPreferredSize (new Dimension (485, 300));
-    dialog.add (progressPanel);
-    dialog.setTitle ("Reading disks");
-    dialog.pack ();
-    dialog.setLocationRelativeTo (null);
-    dialog.setVisible (true);
-  }
-
-  File getRootFolder ()
-  {
-    return rootFolder;
+    rootFolderData.dialog.setLocationRelativeTo (null);
+    rootFolderData.dialog.setVisible (true);
   }
 
   private void traverse (File directory)
@@ -80,14 +54,15 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   private void checkDuplicates (File file, String filename)
   {
     String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
-    DiskDetails diskDetails = new DiskDetails (file, rootName, filename, doChecksums);
+    DiskDetails diskDetails =
+        new DiskDetails (file, rootName, filename, rootFolderData.doChecksums);
 
     if (rootFolderData.fileNameMap.containsKey (filename))
       rootFolderData.fileNameMap.get (filename).addDuplicateName (diskDetails);
     else
       rootFolderData.fileNameMap.put (filename, diskDetails);
 
-    if (doChecksums)
+    if (rootFolderData.doChecksums)
     {
       long checksum = diskDetails.getChecksum ();
       if (rootFolderData.checksumMap.containsKey (checksum))
@@ -102,8 +77,9 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   {
     try
     {
-      dialog.setVisible (false);
-      owner.setTableData (rootFolderData);
+      if (!rootFolderData.showTotals)
+        rootFolderData.dialog.setVisible (false);
+      rootFolderData.window.setTableData (rootFolderData);
     }
     catch (Exception e)
     {
@@ -114,7 +90,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   @Override
   protected Void doInBackground () throws Exception
   {
-    traverse (rootFolder);
+    traverse (rootFolderData.rootFolder);
     rootFolderData.progressState.print ();
     return null;
   }
@@ -122,16 +98,6 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   @Override
   protected void process (List<ProgressState> chunks)
   {
-    progressPanel.repaint ();
-  }
-
-  class ProgressPanel extends JPanel
-  {
-    @Override
-    protected void paintComponent (Graphics graphics)
-    {
-      super.paintComponent (graphics);
-      rootFolderData.progressState.paintComponent (graphics);
-    }
+    rootFolderData.progressPanel.repaint ();
   }
 }

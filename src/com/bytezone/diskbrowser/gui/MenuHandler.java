@@ -46,6 +46,7 @@ public class MenuHandler
   JMenuItem dbItem = new JMenuItem (new CreateDatabaseAction ());
   JMenuItem closeTabItem = new JMenuItem ();
   JMenuItem duplicateItem = new JMenuItem ();
+  JMenuItem countDisksItem = new JMenuItem ();
   FontAction fontAction;
 
   // Format menu items
@@ -99,7 +100,9 @@ public class MenuHandler
       fileMenu.add (createDiskFileItem);
       fileMenu.add (dbItem);
     }
+
     fileMenu.add (duplicateItem);
+    fileMenu.add (countDisksItem);
 
     formatMenu.add (lineWrapItem);
     formatMenu.add (showCatalogItem);
@@ -152,11 +155,11 @@ public class MenuHandler
       try
       {
         if (functionName.equals ("about"))
-          OSXAdapter.setAboutHandler (action, action.getClass ()
-              .getDeclaredMethod (functionName, (Class[]) null));
+          OSXAdapter.setAboutHandler (action,
+              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
         else if (functionName.equals ("prefs"))
-          OSXAdapter.setPreferencesHandler (action, action.getClass ()
-              .getDeclaredMethod (functionName, (Class[]) null));
+          OSXAdapter.setPreferencesHandler (action,
+              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
       }
       catch (Exception e)
       {

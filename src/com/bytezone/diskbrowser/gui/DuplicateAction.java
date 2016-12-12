@@ -4,8 +4,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -15,39 +13,39 @@ import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.duplicates.DuplicateSwingWorker;
 import com.bytezone.diskbrowser.duplicates.DuplicateWindow;
+import com.bytezone.diskbrowser.duplicates.RootFolderData;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
 public class DuplicateAction extends DefaultAction implements RootDirectoryChangeListener
 {
-  private File rootFolder;
-  private DuplicateWindow window;
-  private final List<DiskTableSelectionListener> listeners =
-      new ArrayList<DiskTableSelectionListener> ();
+  RootFolderData rootFolderData;
 
-  public DuplicateAction ()
+  public DuplicateAction (RootFolderData rootFolderData)
   {
     super ("List disks...", "Display a sortable list of disks",
         "/com/bytezone/diskbrowser/icons/");
+
+    this.rootFolderData = rootFolderData;
 
     setIcon (Action.SMALL_ICON, "save_delete_16.png");
     setIcon (Action.LARGE_ICON_KEY, "save_delete_32.png");
     int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_L, mask));
-    setEnabled (false);
+    setEnabled (rootFolderData.rootFolder != null);
   }
 
   @Override
   public void rootDirectoryChanged (File rootFolder)
   {
-    this.rootFolder = rootFolder;
+    rootFolderData.rootFolder = rootFolder;
     setEnabled (rootFolder != null);
-    window = null;
+    rootFolderData.window = null;
   }
 
   @Override
   public void actionPerformed (ActionEvent arg0)
   {
-    if (window == null)
+    if (rootFolderData.window == null)
     {
       Object[] options = { "Generate checksums", "Disk names only", "Cancel" };
       int option = JOptionPane.showOptionDialog (null,
@@ -59,18 +57,19 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
           JOptionPane.QUESTION_MESSAGE, null, options, options[1]);   // just disk names
       if (option < 2)
       {
-        window = new DuplicateWindow (rootFolder, listeners);
-        new DuplicateSwingWorker (rootFolder, window, option == 0).execute ();
+        rootFolderData.doChecksums = option == 0;
+        rootFolderData.window = new DuplicateWindow (rootFolderData);
+        new DuplicateSwingWorker (rootFolderData).execute ();
       }
     }
     else
-      window.setVisible (true);
+      rootFolderData.window.setVisible (true);
   }
 
   public void addTableSelectionListener (DiskTableSelectionListener listener)
   {
-    if (!listeners.contains (listener))
-      listeners.add (listener);
+    if (!rootFolderData.listeners.contains (listener))
+      rootFolderData.listeners.add (listener);
   }
 
   public interface DiskTableSelectionListener

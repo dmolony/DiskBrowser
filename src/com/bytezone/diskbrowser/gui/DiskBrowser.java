@@ -11,6 +11,7 @@ import com.bytezone.common.Platform;
 import com.bytezone.common.QuitAction;
 import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.common.State;
+import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
 {
@@ -53,11 +54,14 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
     // create actions
-    DuplicateAction duplicateAction = new DuplicateAction ();
+    RootFolderData rootFolderData = new RootFolderData ();
+    DuplicateAction duplicateAction = new DuplicateAction (rootFolderData);
+    CountDisksAction countDisksAction = new CountDisksAction (rootFolderData);
     RootDirectoryAction rootDirectoryAction =
         new RootDirectoryAction (catalogPanel.getRootDirectory ());
     rootDirectoryAction.addListener (catalogPanel);
     rootDirectoryAction.addListener (duplicateAction);
+    rootDirectoryAction.addListener (countDisksAction);
 
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
@@ -116,6 +120,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.showLayoutItem.setAction (hideLayoutAction);
     menuHandler.showFreeSectorsItem.setAction (showFreeAction);
     menuHandler.duplicateItem.setAction (duplicateAction);
+    menuHandler.countDisksItem.setAction (countDisksAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
     final QuitAction quitAction = Platform.setQuit (this, prefs, menuHandler.fileMenu);

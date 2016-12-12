@@ -7,7 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -17,7 +17,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
-import com.bytezone.diskbrowser.gui.DuplicateAction;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.utilities.NumberRenderer;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -28,18 +27,16 @@ public class DuplicateWindow extends JFrame
 
   private final JButton btnExport = new JButton ("Export");
   private final JButton btnHide = new JButton ("Close");
-  private final JLabel lblTotalDisks = new JLabel ();
-  //  private final ButtonGroup grpFileType = new ButtonGroup ();
+  //  private final JLabel lblTotalDisks = new JLabel ();
   private final JPanel topPanel = new JPanel ();
+  private final List<JCheckBox> boxes = new ArrayList<JCheckBox> ();
+  private TableRowSorter<DiskTableModel> sorter;
+  private final CheckBoxActionListener checkBoxActionListener =
+      new CheckBoxActionListener ();
 
-  private final List<DiskTableSelectionListener> listeners;
-
-  public DuplicateWindow (File rootFolder,
-      List<DuplicateAction.DiskTableSelectionListener> listeners)
+  public DuplicateWindow (RootFolderData rootFolderData)
   {
-    super ("Duplicate Disk Detection - " + rootFolder.getAbsolutePath ());
-
-    this.listeners = listeners;
+    super ("Disk List - " + rootFolderData.rootFolder.getAbsolutePath ());
 
     table = new JTable ();
     JScrollPane scrollPane =
@@ -60,8 +57,6 @@ public class DuplicateWindow extends JFrame
     add (panel, BorderLayout.SOUTH);
 
     topPanel.setLayout (new FlowLayout (FlowLayout.LEFT, 10, 5));
-    topPanel.add (new JLabel ("Total disks:"));
-    topPanel.add (lblTotalDisks);
     add (topPanel, BorderLayout.NORTH);
 
     btnHide.setEnabled (true);
@@ -72,7 +67,7 @@ public class DuplicateWindow extends JFrame
       @Override
       public void actionPerformed (ActionEvent e)
       {
-        DuplicateWindow.this.setVisible (false);
+        setVisible (false);
       }
     });
 
@@ -81,11 +76,11 @@ public class DuplicateWindow extends JFrame
   }
 
   // called from DuplicateSwingWorker
-  public void setTableData (RootFolderData rootFolderData)
+  public void setTableData (final RootFolderData rootFolderData)
   {
     DiskTableModel diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
-    lblTotalDisks.setText (diskTableModel.getRowCount () + "");
+    //    lblTotalDisks.setText (diskTableModel.getRowCount () + "");
 
     int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
     TableColumnModel tcm = table.getColumnModel ();
@@ -94,8 +89,7 @@ public class DuplicateWindow extends JFrame
 
     tcm.getColumn (3).setCellRenderer (NumberRenderer.getIntegerRenderer ());
 
-    final TableRowSorter<DiskTableModel> sorter =
-        new TableRowSorter<DiskTableModel> ((DiskTableModel) table.getModel ());
+    sorter = new TableRowSorter<DiskTableModel> ((DiskTableModel) table.getModel ());
     table.setRowSorter (sorter);
 
     ListSelectionModel listSelectionModel = table.getSelectionModel ();
@@ -119,7 +113,7 @@ public class DuplicateWindow extends JFrame
         DiskTableModel diskTableModel = (DiskTableModel) table.getModel ();
         DiskDetails diskDetails = diskTableModel.lines.get (actualRow).diskDetails;
 
-        for (DiskTableSelectionListener listener : listeners)
+        for (DiskTableSelectionListener listener : rootFolderData.listeners)
           listener.diskSelected (diskDetails);
       }
     });
@@ -130,10 +124,15 @@ public class DuplicateWindow extends JFrame
       JCheckBox btn =
           new JCheckBox (String.format ("%s (%,d)", Utility.suffixes.get (i), total));
       topPanel.add (btn);
+      boxes.add (btn);
 
       if (total > 0)
+      {
         btn.setSelected (true);
-      //      grpFileType.add (btn);
+        btn.addActionListener (checkBoxActionListener);
+      }
+      else
+        btn.setEnabled (false);
     }
 
     JTableHeader header = table.getTableHeader ();
@@ -141,6 +140,43 @@ public class DuplicateWindow extends JFrame
 
     pack ();
     setLocationRelativeTo (null);
-    setVisible (true);
+
+    if (!rootFolderData.showTotals)
+      setVisible (true);
+  }
+
+  private String getFilterText ()
+  {
+    StringBuilder filterText = new StringBuilder ();
+    for (JCheckBox box : boxes)
+      if (box.isSelected ())
+      {
+        String text = box.getText ();
+        int pos = text.indexOf (' ');
+        filterText.append (text.substring (0, pos) + "|");
+      }
+
+    if (filterText.length () > 0)
+      filterText.deleteCharAt (filterText.length () - 1);
+
+    return filterText.toString ();
+  }
+
+  class CheckBoxActionListener implements ActionListener
+  {
+    @Override
+    public void actionPerformed (ActionEvent e)
+    {
+      RowFilter<DiskTableModel, Object> rf = null;
+      try
+      {
+        rf = RowFilter.regexFilter (getFilterText (), 2);
+      }
+      catch (java.util.regex.PatternSyntaxException exception)
+      {
+        return;
+      }
+      sorter.setRowFilter (rf);
+    }
   }
 }

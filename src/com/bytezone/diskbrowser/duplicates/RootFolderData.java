@@ -12,8 +12,9 @@ public class RootFolderData
   // list of unique disk names -> DiskDetails
   public final Map<String, DiskDetails> fileNameMap = new TreeMap<String, DiskDetails> ();
 
-  public RootFolderData ()
-  {
+  public final ProgressState progressState = new ProgressState ();
 
-  }
+  //  public RootFolderData ()
+  //  {
+  //  }
 }

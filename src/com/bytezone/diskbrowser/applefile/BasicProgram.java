@@ -91,7 +91,7 @@ public class BasicProgram extends AbstractFile
         {
           int address = subline.getAddress () + 1;              // skip the REM token
           fullText.append (text + String.format ("REM - Inline assembler @ $%02X (%d)%n",
-                                                 address, address));
+              address, address));
           String padding = "                         ".substring (0, text.length () + 2);
           for (String asm : subline.getAssembler ())
             fullText.append (padding + asm + "\n");
@@ -590,8 +590,8 @@ public class BasicProgram extends AbstractFile
             }
             catch (NumberFormatException e)
             {
-              System.out.println ("Error parsing : GOTO " + target + " in "
-                  + parent.lineNumber);
+              System.out.println (
+                  "Error parsing : GOTO " + target + " in " + parent.lineNumber);
             }
             break;
 
@@ -604,8 +604,8 @@ public class BasicProgram extends AbstractFile
             catch (NumberFormatException e)
             {
               System.out.println (HexFormatter.format (buffer, startPtr + 1, length - 2));
-              System.out.println ("Error parsing : GOSUB " + target2 + " in "
-                  + parent.lineNumber);
+              System.out.println (
+                  "Error parsing : GOSUB " + target2 + " in " + parent.lineNumber);
             }
             break;
         }
@@ -623,11 +623,11 @@ public class BasicProgram extends AbstractFile
           catch (NumberFormatException e)
           {
             System.out.printf ("b: %d, start: %d, length: %d%n", b, startPtr,
-                               (length - 1));
+                (length - 1));
             System.out.println (target);
             System.out.println (HexFormatter.format (buffer, startPtr, length - 1));
             System.out.println (e);
-            assert false;
+            //            assert false;
           }
         }
         else if (alignAssign)
@@ -638,7 +638,7 @@ public class BasicProgram extends AbstractFile
     private boolean isImpliedGoto ()
     {
       byte b = buffer[startPtr];
-      if ((b & 0x80) > 0) // token
+      if ((b & 0x80) > 0)                     // token
         return false;
       return (b >= 48 && b <= 57);
     }
@@ -651,7 +651,7 @@ public class BasicProgram extends AbstractFile
       while (buffer[p] != TOKEN_EQUALS && p < max)
         p++;
       if (buffer[p] == TOKEN_EQUALS)
-        assignEqualPos = toString ().indexOf ('='); // use expanded line
+        assignEqualPos = toString ().indexOf ('=');           // use expanded line
     }
 
     private boolean isJoinableRem ()
@@ -738,7 +738,7 @@ public class BasicProgram extends AbstractFile
           // + parent.lineNumber);
         }
         else if (b < 32) // CTRL character
-          line.append ("^" + (char) (b + 64)); // would be better in inverse text
+          line.append ("^" + (char) (b + 64));      // would be better in inverse text
         else
           line.append ((char) b);
       }

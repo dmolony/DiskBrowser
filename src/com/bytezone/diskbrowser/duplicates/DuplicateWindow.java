@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.duplicates;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +20,7 @@ import javax.swing.table.TableRowSorter;
 import com.bytezone.diskbrowser.gui.DuplicateAction;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.utilities.NumberRenderer;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class DuplicateWindow extends JFrame
 {
@@ -25,6 +28,9 @@ public class DuplicateWindow extends JFrame
 
   private final JButton btnExport = new JButton ("Export");
   private final JButton btnHide = new JButton ("Close");
+  private final JLabel lblTotalDisks = new JLabel ();
+  //  private final ButtonGroup grpFileType = new ButtonGroup ();
+  private final JPanel topPanel = new JPanel ();
 
   private final List<DiskTableSelectionListener> listeners;
 
@@ -53,6 +59,11 @@ public class DuplicateWindow extends JFrame
     panel.add (btnExport);
     add (panel, BorderLayout.SOUTH);
 
+    topPanel.setLayout (new FlowLayout (FlowLayout.LEFT, 10, 5));
+    topPanel.add (new JLabel ("Total disks:"));
+    topPanel.add (lblTotalDisks);
+    add (topPanel, BorderLayout.NORTH);
+
     btnHide.setEnabled (true);
     btnExport.setEnabled (false);
 
@@ -65,15 +76,16 @@ public class DuplicateWindow extends JFrame
       }
     });
 
-    setSize (1200, 700);
-    setLocationRelativeTo (null);
+    scrollPane.setPreferredSize (new Dimension (1200, 700));
     setDefaultCloseOperation (HIDE_ON_CLOSE);
   }
 
   // called from DuplicateSwingWorker
-  public void setTableModel (DiskTableModel diskTableModel)
+  public void setTableData (RootFolderData rootFolderData)
   {
+    DiskTableModel diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
+    lblTotalDisks.setText (diskTableModel.getRowCount () + "");
 
     int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
     TableColumnModel tcm = table.getColumnModel ();
@@ -112,9 +124,23 @@ public class DuplicateWindow extends JFrame
       }
     });
 
+    for (int i = 0; i < Utility.suffixes.size (); i++)
+    {
+      int total = rootFolderData.progressState.getTotalType (i);
+      JCheckBox btn =
+          new JCheckBox (String.format ("%s (%,d)", Utility.suffixes.get (i), total));
+      topPanel.add (btn);
+
+      if (total > 0)
+        btn.setSelected (true);
+      //      grpFileType.add (btn);
+    }
+
     JTableHeader header = table.getTableHeader ();
     header.setFont (header.getFont ().deriveFont ((float) 13.0));
 
+    pack ();
+    setLocationRelativeTo (null);
     setVisible (true);
   }
 }

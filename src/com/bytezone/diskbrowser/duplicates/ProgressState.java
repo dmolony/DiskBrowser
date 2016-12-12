@@ -20,11 +20,16 @@ public class ProgressState
   int totalFolders;
 
   // total files for each suffix (uncompressed, .gz, .zip)
-  private final int[][] typeTotals = new int[3][suffixes.size ()];
+  final int[][] typeTotals = new int[3][suffixes.size ()];
 
   public void incrementFolders ()
   {
     ++totalFolders;
+  }
+
+  public int getTotalType (int type)
+  {
+    return typeTotals[0][type] + typeTotals[1][type] + typeTotals[2][type];
   }
 
   public void incrementType (File file, String filename)

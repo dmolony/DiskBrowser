@@ -15,14 +15,15 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
 {
   private final File rootFolder;
   private final int rootFolderNameLength;
-  private final ProgressState progressState = new ProgressState ();
+  //  private final ProgressState progressState = new ProgressState ();
   private final DuplicateWindow owner;
   private final JDialog dialog;
   private final ProgressPanel progressPanel;
   private final boolean doChecksums;
   private final RootFolderData rootFolderData;
 
-  public DuplicateSwingWorker (File rootFolder, DuplicateWindow owner, boolean doChecksums)
+  public DuplicateSwingWorker (File rootFolder, DuplicateWindow owner,
+      boolean doChecksums)
   {
     this.rootFolder = rootFolder;
     this.owner = owner;
@@ -62,16 +63,16 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
 
       if (file.isDirectory ())
       {
-        progressState.incrementFolders ();
+        rootFolderData.progressState.incrementFolders ();
         traverse (file);
       }
       else if (Utility.validFileType (fileName) && file.length () > 0)
       {
-        progressState.incrementType (file, fileName);
+        rootFolderData.progressState.incrementType (file, fileName);
         checkDuplicates (file, fileName);
 
-        if ((progressState.totalDisks % 500) == 0)
-          publish (progressState);
+        if ((rootFolderData.progressState.totalDisks % 500) == 0)
+          publish (rootFolderData.progressState);
       }
     }
   }
@@ -102,7 +103,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
     try
     {
       dialog.setVisible (false);
-      owner.setTableModel (new DiskTableModel (rootFolderData));
+      owner.setTableData (rootFolderData);
     }
     catch (Exception e)
     {
@@ -114,7 +115,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   protected Void doInBackground () throws Exception
   {
     traverse (rootFolder);
-    progressState.print ();
+    rootFolderData.progressState.print ();
     return null;
   }
 
@@ -130,7 +131,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
     protected void paintComponent (Graphics graphics)
     {
       super.paintComponent (graphics);
-      progressState.paintComponent (graphics);
+      rootFolderData.progressState.paintComponent (graphics);
     }
   }
 }

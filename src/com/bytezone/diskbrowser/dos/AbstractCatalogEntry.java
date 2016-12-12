@@ -60,7 +60,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     name = getName ("", entryBuffer);
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
     String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
-                                 (entryBuffer[33] & 0xFF));
+        (entryBuffer[33] & 0xFF));
     catalogName = getName (base, entryBuffer);
   }
 
@@ -198,6 +198,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
           if (ShapeTable.isShapeTable (exactBuffer))
             appleFile = new ShapeTable (name, exactBuffer);
+          else if (name.endsWith (".S"))
+            appleFile = new MerlinSource (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer))
             appleFile = new HiResImage (name, exactBuffer);
           else if (loadAddress == 0x2000 || loadAddress == 0x4000)
@@ -210,16 +212,12 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             else
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
           }
-          else if (name.endsWith (".S"))
-            appleFile = new MerlinSource (name, exactBuffer);
           else
           {
             appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
-            //    System.out.printf ("%d %d%n", exactBuffer.length, reportedLength);
             if ((exactBuffer.length + 4) < buffer.length)
-              ((AssemblerProgram) appleFile)
-                  .setExtraBuffer (buffer, exactBuffer.length + 4,
-                                   buffer.length - (exactBuffer.length + 4));
+              ((AssemblerProgram) appleFile).setExtraBuffer (buffer,
+                  exactBuffer.length + 4, buffer.length - (exactBuffer.length + 4));
           }
           //          }
           break;

@@ -30,7 +30,7 @@ public class MerlinSource extends AbstractFile
     StringBuilder text = new StringBuilder ();
 
     text.append ("Name          : " + name + "\n");
-    if (recordLength > 0) // a prodos text file
+    if (recordLength > 0)                             // a prodos text file
     {
       text.append (String.format ("Record length : %,8d%n", recordLength));
       text.append (String.format ("End of file   : %,8d%n", eof));

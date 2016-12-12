@@ -259,6 +259,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_BINARY:
         case FILE_TYPE_RELOCATABLE:
         case FILE_TYPE_SYS:
+          //          if (name.endsWith (".S"))
+          //            file = new MerlinSource (name, exactBuffer, auxType, endOfFile);
           if (ShapeTable.isShapeTable (exactBuffer))
             file = new ShapeTable (name, exactBuffer);
           else if (SimpleText.isHTML (exactBuffer))
@@ -275,9 +277,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           {
             file = new AssemblerProgram (name, exactBuffer, auxType);
             if (exactBuffer.length < buffer.length)
-              ((AssemblerProgram) file)
-                  .setExtraBuffer (buffer, exactBuffer.length,
-                                   buffer.length - exactBuffer.length);
+              ((AssemblerProgram) file).setExtraBuffer (buffer, exactBuffer.length,
+                  buffer.length - exactBuffer.length);
           }
           break;
         case FILE_TYPE_TEXT:
@@ -384,8 +385,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         if (addresses.size () > 0)
         {
           byte[] tempBuffer = disk.readSectors (addresses);
-          buffers.add (new TextBuffer (tempBuffer, auxType,
-              logicalBlock - addresses.size ()));
+          buffers.add (
+              new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
           addresses.clear ();
         }
         logicalBlock += 256;
@@ -559,13 +560,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     String locked = (access == 0x00) ? "*" : " ";
     if (true)
       return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType],
-                            blocksUsed, locked)
-          + name;
+          blocksUsed, locked) + name;
     String timeC = created == null ? "" : parentDisk.df.format (created.getTime ());
     String timeF = modified == null ? "" : parentDisk.df.format (modified.getTime ());
     return String.format ("%s %s%-30s %3d %,10d %15s %15s",
-                          ProdosConstants.fileTypes[fileType], locked,
-                          parentDirectory.name + "/" + name, blocksUsed, endOfFile, timeC,
-                          timeF);
+        ProdosConstants.fileTypes[fileType], locked, parentDirectory.name + "/" + name,
+        blocksUsed, endOfFile, timeC, timeF);
   }
 }

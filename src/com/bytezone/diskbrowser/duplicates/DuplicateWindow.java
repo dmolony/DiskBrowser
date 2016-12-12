@@ -12,10 +12,12 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import com.bytezone.diskbrowser.gui.DuplicateAction;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
+import com.bytezone.diskbrowser.utilities.NumberRenderer;
 
 public class DuplicateWindow extends JFrame
 {
@@ -24,7 +26,6 @@ public class DuplicateWindow extends JFrame
   private final JButton btnExport = new JButton ("Export");
   private final JButton btnHide = new JButton ("Close");
 
-  //  private DuplicateHandler duplicateHandler;
   private final List<DiskTableSelectionListener> listeners;
 
   public DuplicateWindow (File rootFolder,
@@ -71,13 +72,14 @@ public class DuplicateWindow extends JFrame
 
   public void setDuplicateHandler (DuplicateHandler duplicateHandler)
   {
-    //    this.duplicateHandler = duplicateHandler;
-
     table.setModel (new DiskTableModel (duplicateHandler));
 
     int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
+    TableColumnModel tcm = table.getColumnModel ();
     for (int i = 0; i < columnWidths.length; i++)
-      table.getColumnModel ().getColumn (i).setPreferredWidth (columnWidths[i]);
+      tcm.getColumn (i).setPreferredWidth (columnWidths[i]);
+
+    tcm.getColumn (3).setCellRenderer (NumberRenderer.getIntegerRenderer ());
 
     final TableRowSorter<DiskTableModel> sorter =
         new TableRowSorter<DiskTableModel> ((DiskTableModel) table.getModel ());

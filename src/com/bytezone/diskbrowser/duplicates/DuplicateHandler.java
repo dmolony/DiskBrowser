@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.duplicates;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.io.File;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   private final DuplicateWindow owner;
   private final JDialog dialog;
   private final ProgressPanel progressPanel;
+  private final boolean doChecksums;
 
   // list of checksum -> DiskDetails
   private final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
@@ -29,18 +31,20 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   private final Map<String, DiskDetails> fileNameMap =
       new TreeMap<String, DiskDetails> ();
 
-  public DuplicateHandler (File rootFolder, DuplicateWindow owner)
+  public DuplicateHandler (File rootFolder, DuplicateWindow owner, boolean doChecksums)
   {
     this.rootFolder = rootFolder;
     this.owner = owner;
+    this.doChecksums = doChecksums;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
 
     dialog = new JDialog (owner);
     progressPanel = new ProgressPanel ();
+    progressPanel.setPreferredSize (new Dimension (485, 300));
     dialog.add (progressPanel);
-    dialog.setSize (500, 400);
-    dialog.setLocationRelativeTo (null);
     dialog.setTitle ("Reading disks");
+    dialog.pack ();
+    dialog.setLocationRelativeTo (null);
     dialog.setVisible (true);
   }
 
@@ -83,7 +87,7 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
         progressState.incrementType (file, fileName);
         checkDuplicates (file, fileName);
 
-        if ((progressState.totalDisks % 1000) == 0)
+        if ((progressState.totalDisks % 500) == 0)
           publish (progressState);
       }
     }
@@ -92,18 +96,21 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   private void checkDuplicates (File file, String filename)
   {
     String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
-    DiskDetails diskDetails = new DiskDetails (file, rootName, filename);
+    DiskDetails diskDetails = new DiskDetails (file, rootName, filename, doChecksums);
 
     if (fileNameMap.containsKey (filename))
       fileNameMap.get (filename).addDuplicateName (diskDetails);
     else
       fileNameMap.put (filename, diskDetails);
 
-    long checksum = diskDetails.getChecksum ();
-    if (checksumMap.containsKey (checksum))
-      checksumMap.get (checksum).addDuplicateChecksum (diskDetails);
-    else
-      checksumMap.put (checksum, diskDetails);
+    if (doChecksums)
+    {
+      long checksum = diskDetails.getChecksum ();
+      if (checksumMap.containsKey (checksum))
+        checksumMap.get (checksum).addDuplicateChecksum (diskDetails);
+      else
+        checksumMap.put (checksum, diskDetails);
+    }
   }
 
   @Override
@@ -131,8 +138,6 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   @Override
   protected void process (List<ProgressState> chunks)
   {
-    //      for (ProgressState progressState : chunks)
-    //        progressState.print ();
     progressPanel.repaint ();
   }
 

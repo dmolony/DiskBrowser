@@ -89,7 +89,7 @@ public class DiskFactory
         suffix = "dsk";
         compressed = true;
       }
-      catch (IOException e)
+      catch (IOException e)  // can get EOFException: Unexpected end of ZLIB input stream
       {
         e.printStackTrace ();
         return null;

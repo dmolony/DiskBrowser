@@ -14,7 +14,7 @@ public class ProgressState
   private static final String header = "      type        uncmp      .gz     .zip";
   private static final String line = "--------------  -------  -------  -------";
   private static final List<String> suffixes = Utility.suffixes;
-  private static final Font font = new Font ("Monaco", Font.BOLD, 15);
+  private static final Font font = new Font ("Monospaced", Font.BOLD, 15);
 
   int totalDisks;
   int totalFolders;
@@ -52,7 +52,7 @@ public class ProgressState
     g.setFont (font);
 
     int x = 55;
-    int y = 55;
+    int y = 25;
     int lineHeight = 23;
     String line;
 

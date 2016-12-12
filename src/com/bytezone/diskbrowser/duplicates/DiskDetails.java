@@ -19,12 +19,16 @@ public class DiskDetails
   private boolean isDuplicateName;
   private boolean isDuplicateChecksum;
 
-  public DiskDetails (File file, String rootName, String shortName)
+  public DiskDetails (File file, String rootName, String shortName, boolean doChecksum)
   {
     this.file = file;
     this.rootName = rootName;
     this.shortName = shortName;
-    checksum = ComputeCRC32.getChecksumValue (file);
+
+    if (doChecksum)
+      checksum = ComputeCRC32.getChecksumValue (file);
+    else
+      checksum = 0;
   }
 
   public File getFile ()
@@ -85,11 +89,11 @@ public class DiskDetails
     return checksum;
   }
 
-  public boolean delete ()
-  {
-    //    return file.delete ();
-    return false;
-  }
+  //  public boolean delete ()
+  //  {
+  //    //    return file.delete ();
+  //    return false;
+  //  }
 
   @Override
   public String toString ()

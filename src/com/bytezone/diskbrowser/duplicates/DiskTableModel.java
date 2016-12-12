@@ -11,7 +11,7 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class DiskTableModel extends AbstractTableModel
 {
   static final String[] headers =
-      { "Path", "Name", "Type", "Size (bytes)", "Dup name", "Dup data", "Checksum" };
+      { "Path", "Name", "Type", "Size", "Dup name", "Dup data", "Checksum" };
 
   Map<String, DiskDetails> fileNameMap;
   Map<Long, DiskDetails> checkSumMap;

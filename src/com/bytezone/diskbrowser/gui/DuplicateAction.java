@@ -13,7 +13,7 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
-import com.bytezone.diskbrowser.duplicates.DuplicateHandler;
+import com.bytezone.diskbrowser.duplicates.DuplicateSwingWorker;
 import com.bytezone.diskbrowser.duplicates.DuplicateWindow;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
@@ -50,17 +50,17 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
     if (window == null)
     {
       Object[] options = { "Generate checksums", "Disk names only", "Cancel" };
-      int n = JOptionPane.showOptionDialog (null,
+      int option = JOptionPane.showOptionDialog (null,
           "This command will list all of the disks in the root folder (including\n"
               + "nested folders). If you wish to generate a checksum for each disk, it\n"
-              + "will slow the process down considerably.\n\n"
+              + "may slow the process down considerably.\n\n"
               + "Do you wish to generate checksums?",
           "Generate Disk Listing", JOptionPane.YES_NO_CANCEL_OPTION,
-          JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-      if (n < 2)
+          JOptionPane.QUESTION_MESSAGE, null, options, options[1]);   // just disk names
+      if (option < 2)
       {
         window = new DuplicateWindow (rootFolder, listeners);
-        new DuplicateHandler (rootFolder, window, n == 0).execute ();
+        new DuplicateSwingWorker (rootFolder, window, option == 0).execute ();
       }
     }
     else

@@ -17,10 +17,10 @@ public class DiskTableModel extends AbstractTableModel
   Map<Long, DiskDetails> checkSumMap;
   List<TableLine> lines = new ArrayList<DiskTableModel.TableLine> ();
 
-  public DiskTableModel (DuplicateHandler duplicateHandler)
+  public DiskTableModel (RootFolderData rootFolderData)
   {
-    fileNameMap = duplicateHandler.getFileNameMap ();
-    checkSumMap = duplicateHandler.getChecksumMap ();
+    fileNameMap = rootFolderData.fileNameMap;
+    checkSumMap = rootFolderData.checksumMap;
 
     for (String key : fileNameMap.keySet ())
     {

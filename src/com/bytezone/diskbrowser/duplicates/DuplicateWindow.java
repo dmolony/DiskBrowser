@@ -70,9 +70,10 @@ public class DuplicateWindow extends JFrame
     setDefaultCloseOperation (HIDE_ON_CLOSE);
   }
 
-  public void setDuplicateHandler (DuplicateHandler duplicateHandler)
+  // called from DuplicateSwingWorker
+  public void setTableModel (DiskTableModel diskTableModel)
   {
-    table.setModel (new DiskTableModel (duplicateHandler));
+    table.setModel (diskTableModel);
 
     int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
     TableColumnModel tcm = table.getColumnModel ();

@@ -3,10 +3,7 @@ package com.bytezone.diskbrowser.duplicates;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -14,7 +11,7 @@ import javax.swing.SwingWorker;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class DuplicateHandler extends SwingWorker<Void, ProgressState>
+public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
 {
   private final File rootFolder;
   private final int rootFolderNameLength;
@@ -23,20 +20,16 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
   private final JDialog dialog;
   private final ProgressPanel progressPanel;
   private final boolean doChecksums;
+  private final RootFolderData rootFolderData;
 
-  // list of checksum -> DiskDetails
-  private final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
-
-  // list of unique disk names -> DiskDetails
-  private final Map<String, DiskDetails> fileNameMap =
-      new TreeMap<String, DiskDetails> ();
-
-  public DuplicateHandler (File rootFolder, DuplicateWindow owner, boolean doChecksums)
+  public DuplicateSwingWorker (File rootFolder, DuplicateWindow owner, boolean doChecksums)
   {
     this.rootFolder = rootFolder;
     this.owner = owner;
     this.doChecksums = doChecksums;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
+
+    rootFolderData = new RootFolderData ();
 
     dialog = new JDialog (owner);
     progressPanel = new ProgressPanel ();
@@ -46,16 +39,6 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
     dialog.pack ();
     dialog.setLocationRelativeTo (null);
     dialog.setVisible (true);
-  }
-
-  public Map<String, DiskDetails> getFileNameMap ()
-  {
-    return fileNameMap;
-  }
-
-  public Map<Long, DiskDetails> getChecksumMap ()
-  {
-    return checksumMap;
   }
 
   File getRootFolder ()
@@ -98,18 +81,18 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
     String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
     DiskDetails diskDetails = new DiskDetails (file, rootName, filename, doChecksums);
 
-    if (fileNameMap.containsKey (filename))
-      fileNameMap.get (filename).addDuplicateName (diskDetails);
+    if (rootFolderData.fileNameMap.containsKey (filename))
+      rootFolderData.fileNameMap.get (filename).addDuplicateName (diskDetails);
     else
-      fileNameMap.put (filename, diskDetails);
+      rootFolderData.fileNameMap.put (filename, diskDetails);
 
     if (doChecksums)
     {
       long checksum = diskDetails.getChecksum ();
-      if (checksumMap.containsKey (checksum))
-        checksumMap.get (checksum).addDuplicateChecksum (diskDetails);
+      if (rootFolderData.checksumMap.containsKey (checksum))
+        rootFolderData.checksumMap.get (checksum).addDuplicateChecksum (diskDetails);
       else
-        checksumMap.put (checksum, diskDetails);
+        rootFolderData.checksumMap.put (checksum, diskDetails);
     }
   }
 
@@ -119,7 +102,7 @@ public class DuplicateHandler extends SwingWorker<Void, ProgressState>
     try
     {
       dialog.setVisible (false);
-      owner.setDuplicateHandler (this);
+      owner.setTableModel (new DiskTableModel (rootFolderData));
     }
     catch (Exception e)
     {

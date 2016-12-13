@@ -17,14 +17,12 @@ public class CSVFileWriter
     FileWriter writer;
 
     JFileChooser fileChooser = new JFileChooser ();
-    //    fileChooser.setCurrentDirectory (new File (csvFile));
     fileChooser.setSelectedFile (new File (csvFile));
     int returnValue = fileChooser.showSaveDialog (null);
     if (returnValue != JFileChooser.APPROVE_OPTION)
       return;
 
     File selectedFile = fileChooser.getSelectedFile ();
-    System.out.println (selectedFile.getName ());
 
     try
     {

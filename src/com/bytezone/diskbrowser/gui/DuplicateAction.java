@@ -31,15 +31,14 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
     setIcon (Action.LARGE_ICON_KEY, "save_delete_32.png");
     int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_L, mask));
-    setEnabled (rootFolderData.rootFolder != null);
+    setEnabled (rootFolderData.getRootFolder () != null);
   }
 
   @Override
   public void rootDirectoryChanged (File rootFolder)
   {
-    rootFolderData.rootFolder = rootFolder;
+    rootFolderData.setRootFolder (rootFolder);
     setEnabled (rootFolder != null);
-    rootFolderData.window = null;
   }
 
   @Override

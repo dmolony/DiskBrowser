@@ -7,7 +7,7 @@ import javax.swing.SwingWorker;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
+public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
 {
   private final int rootFolderNameLength;
   private final RootFolderData rootFolderData;
@@ -15,7 +15,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   public DuplicateSwingWorker (RootFolderData rootFolderData)
   {
     this.rootFolderData = rootFolderData;
-    rootFolderNameLength = rootFolderData.rootFolder.getAbsolutePath ().length ();
+    rootFolderNameLength = rootFolderData.getRootFolder ().getAbsolutePath ().length ();
 
     rootFolderData.dialog.setLocationRelativeTo (null);
     rootFolderData.dialog.setVisible (true);
@@ -37,16 +37,16 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
 
       if (file.isDirectory ())
       {
-        rootFolderData.progressState.incrementFolders ();
+        rootFolderData.incrementFolders ();
         traverse (file);
       }
       else if (Utility.validFileType (fileName) && file.length () > 0)
       {
-        rootFolderData.progressState.incrementType (file, fileName);
+        rootFolderData.incrementType (file, fileName);
         checkDuplicates (file, fileName);
 
-        if ((rootFolderData.progressState.totalDisks % 500) == 0)
-          publish (rootFolderData.progressState);
+        if ((rootFolderData.totalDisks % 500) == 0)
+          publish (rootFolderData);
       }
     }
   }
@@ -90,13 +90,14 @@ public class DuplicateSwingWorker extends SwingWorker<Void, ProgressState>
   @Override
   protected Void doInBackground () throws Exception
   {
-    traverse (rootFolderData.rootFolder);
-    rootFolderData.progressState.print ();
+    traverse (rootFolderData.getRootFolder ());
+    publish (rootFolderData);
+    rootFolderData.print ();
     return null;
   }
 
   @Override
-  protected void process (List<ProgressState> chunks)
+  protected void process (List<RootFolderData> chunks)
   {
     rootFolderData.progressPanel.repaint ();
   }

@@ -36,7 +36,7 @@ public class DuplicateWindow extends JFrame
 
   public DuplicateWindow (RootFolderData rootFolderData)
   {
-    super ("Disk List - " + rootFolderData.rootFolder.getAbsolutePath ());
+    super ("Disk List - " + rootFolderData.getRootFolder ().getAbsolutePath ());
 
     table = new JTable ();
     JScrollPane scrollPane =
@@ -75,7 +75,7 @@ public class DuplicateWindow extends JFrame
       @Override
       public void actionPerformed (ActionEvent e)
       {
-        createCSV ();
+        CSVFileWriter.write (diskTableModel, table);
       }
     });
 
@@ -88,7 +88,6 @@ public class DuplicateWindow extends JFrame
   {
     diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
-    //    lblTotalDisks.setText (diskTableModel.getRowCount () + "");
 
     int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
     TableColumnModel tcm = table.getColumnModel ();
@@ -132,7 +131,7 @@ public class DuplicateWindow extends JFrame
 
     for (int i = 0; i < Utility.suffixes.size (); i++)
     {
-      int total = rootFolderData.progressState.getTotalType (i);
+      int total = rootFolderData.getTotalType (i);
       JCheckBox btn =
           new JCheckBox (String.format ("%s (%,d)", Utility.suffixes.get (i), total));
       topPanel.add (btn);
@@ -156,11 +155,6 @@ public class DuplicateWindow extends JFrame
 
     if (!rootFolderData.showTotals)
       setVisible (true);
-  }
-
-  private void createCSV ()
-  {
-    CSVFileWriter.write (diskTableModel, table);
   }
 
   private String getFilterText ()

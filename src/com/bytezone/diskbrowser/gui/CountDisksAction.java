@@ -26,7 +26,7 @@ public class CountDisksAction extends DefaultAction implements RootDirectoryChan
 
     int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_I, mask));
-    setEnabled (rootFolderData.rootFolder != null);
+    setEnabled (rootFolderData.getRootFolder () != null);
   }
 
   @Override
@@ -45,8 +45,7 @@ public class CountDisksAction extends DefaultAction implements RootDirectoryChan
   @Override
   public void rootDirectoryChanged (File rootFolder)
   {
-    rootFolderData.rootFolder = rootFolder;
+    rootFolderData.setRootFolder (rootFolder);
     setEnabled (rootFolder != null);
-    rootFolderData.window = null;
   }
 }

@@ -13,6 +13,7 @@
 - Track and sector display
 - Dual DOS disks
 - CPM disks
+- Comprehensive disk listing
 
 ### Documentation
 * [Usage](resources/usage.md)

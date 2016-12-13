@@ -41,7 +41,7 @@ public class RootFolderData
   {
     dialog = new JDialog (window);
     progressPanel = new ProgressPanel ();
-    progressPanel.setPreferredSize (new Dimension (485, 300));
+    progressPanel.setPreferredSize (new Dimension (560, 300));
     dialog.add (progressPanel);
     dialog.setTitle ("Disk Totals");
     dialog.pack ();

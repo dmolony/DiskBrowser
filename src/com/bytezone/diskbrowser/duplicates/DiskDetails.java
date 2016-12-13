@@ -9,7 +9,7 @@ import com.bytezone.common.ComputeCRC32;
 public class DiskDetails
 {
   private final File file;
-  private final long checksum;
+  private long checksum;
   private final String rootName;            // full path without the root folder
   private final String shortName;           // file name in lower case
 
@@ -84,16 +84,16 @@ public class DiskDetails
     return shortName;
   }
 
+  public long calculateChecksum ()
+  {
+    checksum = ComputeCRC32.getChecksumValue (file);
+    return checksum;
+  }
+
   public long getChecksum ()
   {
     return checksum;
   }
-
-  //  public boolean delete ()
-  //  {
-  //    //    return file.delete ();
-  //    return false;
-  //  }
 
   @Override
   public String toString ()

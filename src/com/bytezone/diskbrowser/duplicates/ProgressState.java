@@ -11,8 +11,9 @@ import com.bytezone.diskbrowser.utilities.Utility;
 
 public class ProgressState
 {
-  private static final String header = "      type        uncmp      .gz     .zip";
-  private static final String line = "--------------  -------  -------  -------";
+  private static final String header =
+      "      type        uncmp      .gz     .zip    total";
+  private static final String line = "--------------  -------  -------  -------  -------";
   private static final List<String> suffixes = Utility.suffixes;
   private static final Font font = new Font ("Monospaced", Font.BOLD, 15);
 
@@ -20,7 +21,7 @@ public class ProgressState
   int totalFolders;
 
   // total files for each suffix (uncompressed, .gz, .zip)
-  final int[][] typeTotals = new int[3][suffixes.size ()];
+  final int[][] typeTotals = new int[4][suffixes.size ()];
 
   public void incrementFolders ()
   {
@@ -43,6 +44,7 @@ public class ProgressState
       else if (filename.endsWith (".zip"))
         cmp = 2;
       typeTotals[cmp][pos]++;
+      typeTotals[3][pos]++;
       ++totalDisks;
     }
     else
@@ -64,13 +66,13 @@ public class ProgressState
     g.drawString (header, x, y);
     y += lineHeight + 10;
 
-    int grandTotal[] = new int[3];
+    int grandTotal[] = new int[4];
 
     for (int i = 0; i < typeTotals[0].length; i++)
     {
-      line = String.format ("%14.14s  %,7d  %,7d  %,7d",
+      line = String.format ("%14.14s  %,7d  %,7d  %,7d  %,7d",
           Utility.suffixes.get (i) + " ...........", typeTotals[0][i], typeTotals[1][i],
-          typeTotals[2][i]);
+          typeTotals[2][i], typeTotals[3][i]);
       g.drawString (line, x, y);
       for (int j = 0; j < typeTotals.length; j++)
         grandTotal[j] += typeTotals[j][i];
@@ -78,8 +80,8 @@ public class ProgressState
       y += lineHeight;
     }
 
-    line = String.format ("Total           %,7d  %,7d  %,7d%n%n", grandTotal[0],
-        grandTotal[1], grandTotal[2]);
+    line = String.format ("Total           %,7d  %,7d  %,7d  %,7d%n%n", grandTotal[0],
+        grandTotal[1], grandTotal[2], grandTotal[3]);
     y += 10;
     g.drawString (line, x, y);
   }
@@ -89,7 +91,7 @@ public class ProgressState
     System.out.printf ("%nFolders ...... %,7d%n", totalFolders);
     System.out.printf ("Disks ........ %,7d%n%n", totalDisks);
 
-    int grandTotal[] = new int[3];
+    int grandTotal[] = new int[4];
 
     System.out.println (header);
     System.out.println (line);
@@ -105,7 +107,7 @@ public class ProgressState
     }
 
     System.out.println (line);
-    System.out.printf ("Total           %,7d  %,7d  %,7d%n%n", grandTotal[0],
-        grandTotal[1], grandTotal[2]);
+    System.out.printf ("Total           %,7d  %,7d  %,7d  %,7d%n%n", grandTotal[0],
+        grandTotal[1], grandTotal[2], grandTotal[3]);
   }
 }

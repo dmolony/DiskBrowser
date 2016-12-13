@@ -81,11 +81,26 @@ public class DiskTableModel extends AbstractTableModel
     }
   }
 
+  public String getCSV (int rowIndex)
+  {
+    TableLine line = lines.get (rowIndex);
+    return String.format ("\"%s\",\"%s\",%s,%d,%s,%s,%d%n", line.path, line.shortName,
+        line.type, line.size, line.duplicateNames, line.duplicateChecksums,
+        line.checksum);
+  }
+
+  void updateChecksum (int rowIndex)
+  {
+    TableLine line = lines.get (rowIndex);
+    line.checksum = line.diskDetails.calculateChecksum ();
+    fireTableCellUpdated (rowIndex, 6);
+  }
+
   class TableLine
   {
     private final String shortName;
     private final String path;
-    private final long checksum;
+    private long checksum;
     private final int duplicateNames;
     private final int duplicateChecksums;
     final DiskDetails diskDetails;

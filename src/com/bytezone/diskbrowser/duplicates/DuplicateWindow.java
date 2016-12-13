@@ -27,12 +27,12 @@ public class DuplicateWindow extends JFrame
 
   private final JButton btnExport = new JButton ("Export");
   private final JButton btnHide = new JButton ("Close");
-  //  private final JLabel lblTotalDisks = new JLabel ();
   private final JPanel topPanel = new JPanel ();
   private final List<JCheckBox> boxes = new ArrayList<JCheckBox> ();
   private TableRowSorter<DiskTableModel> sorter;
   private final CheckBoxActionListener checkBoxActionListener =
       new CheckBoxActionListener ();
+  private DiskTableModel diskTableModel;
 
   public DuplicateWindow (RootFolderData rootFolderData)
   {
@@ -44,7 +44,6 @@ public class DuplicateWindow extends JFrame
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     table.setFillsViewportHeight (true);
-    table.setAutoCreateRowSorter (true);
 
     table.setShowGrid (true);
     table.setGridColor (Color.LIGHT_GRAY);
@@ -71,6 +70,15 @@ public class DuplicateWindow extends JFrame
       }
     });
 
+    btnExport.addActionListener (new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        createCSV ();
+      }
+    });
+
     scrollPane.setPreferredSize (new Dimension (1200, 700));
     setDefaultCloseOperation (HIDE_ON_CLOSE);
   }
@@ -78,7 +86,7 @@ public class DuplicateWindow extends JFrame
   // called from DuplicateSwingWorker
   public void setTableData (final RootFolderData rootFolderData)
   {
-    DiskTableModel diskTableModel = new DiskTableModel (rootFolderData);
+    diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
     //    lblTotalDisks.setText (diskTableModel.getRowCount () + "");
 
@@ -113,6 +121,10 @@ public class DuplicateWindow extends JFrame
         DiskTableModel diskTableModel = (DiskTableModel) table.getModel ();
         DiskDetails diskDetails = diskTableModel.lines.get (actualRow).diskDetails;
 
+        long checksum = diskDetails.getChecksum ();
+        if (checksum == 0)
+          diskTableModel.updateChecksum (actualRow);
+
         for (DiskTableSelectionListener listener : rootFolderData.listeners)
           listener.diskSelected (diskDetails);
       }
@@ -140,9 +152,15 @@ public class DuplicateWindow extends JFrame
 
     pack ();
     setLocationRelativeTo (null);
+    btnExport.setEnabled (true);
 
     if (!rootFolderData.showTotals)
       setVisible (true);
+  }
+
+  private void createCSV ()
+  {
+    CSVFileWriter.write (diskTableModel, table);
   }
 
   private String getFilterText ()

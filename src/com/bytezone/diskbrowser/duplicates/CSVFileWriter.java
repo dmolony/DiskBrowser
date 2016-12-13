@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JTable;
 
 public class CSVFileWriter
@@ -15,9 +16,19 @@ public class CSVFileWriter
 
     FileWriter writer;
 
+    JFileChooser fileChooser = new JFileChooser ();
+    //    fileChooser.setCurrentDirectory (new File (csvFile));
+    fileChooser.setSelectedFile (new File (csvFile));
+    int returnValue = fileChooser.showSaveDialog (null);
+    if (returnValue != JFileChooser.APPROVE_OPTION)
+      return;
+
+    File selectedFile = fileChooser.getSelectedFile ();
+    System.out.println (selectedFile.getName ());
+
     try
     {
-      writer = new FileWriter (csvFile);
+      writer = new FileWriter (selectedFile);
       writer.append (String
           .format ("Path,Name,Type,Size,Duplicate Name, Duplicate Data, Checksum%n"));
 

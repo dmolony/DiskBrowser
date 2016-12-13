@@ -21,22 +21,25 @@ import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.utilities.NumberRenderer;
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class DuplicateWindow extends JFrame
+public class DisksWindow extends JFrame
 {
   private final JTable table;
 
   private final JButton btnExport = new JButton ("Export");
   private final JButton btnHide = new JButton ("Close");
+  private final JButton btnTotals = new JButton ("Totals");
   private final JPanel topPanel = new JPanel ();
   private final List<JCheckBox> boxes = new ArrayList<JCheckBox> ();
   private TableRowSorter<DiskTableModel> sorter;
   private final CheckBoxActionListener checkBoxActionListener =
       new CheckBoxActionListener ();
   private DiskTableModel diskTableModel;
+  private final RootFolderData rootFolderData;
 
-  public DuplicateWindow (RootFolderData rootFolderData)
+  public DisksWindow (RootFolderData rootFolderData)
   {
     super ("Disk List - " + rootFolderData.getRootFolder ().getAbsolutePath ());
+    this.rootFolderData = rootFolderData;
 
     table = new JTable ();
     JScrollPane scrollPane =
@@ -51,6 +54,7 @@ public class DuplicateWindow extends JFrame
     add (scrollPane, BorderLayout.CENTER);
 
     JPanel panel = new JPanel ();
+    panel.add (btnTotals);
     panel.add (btnHide);
     panel.add (btnExport);
     add (panel, BorderLayout.SOUTH);
@@ -60,6 +64,15 @@ public class DuplicateWindow extends JFrame
 
     btnHide.setEnabled (true);
     btnExport.setEnabled (false);
+
+    btnTotals.addActionListener (new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        DisksWindow.this.rootFolderData.dialogTotals.setVisible (true);
+      }
+    });
 
     btnHide.addActionListener (new ActionListener ()
     {

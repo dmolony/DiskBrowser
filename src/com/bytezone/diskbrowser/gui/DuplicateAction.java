@@ -3,7 +3,6 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -12,7 +11,7 @@ import javax.swing.KeyStroke;
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.duplicates.DuplicateSwingWorker;
-import com.bytezone.diskbrowser.duplicates.DuplicateWindow;
+import com.bytezone.diskbrowser.duplicates.DisksWindow;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
@@ -35,16 +34,16 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
   }
 
   @Override
-  public void rootDirectoryChanged (File rootFolder)
+  public void rootDirectoryChanged (RootFolderData rootFolderData)
   {
-    rootFolderData.setRootFolder (rootFolder);
-    setEnabled (rootFolder != null);
+    assert rootFolderData == this.rootFolderData;
+    setEnabled (rootFolderData.getRootFolder () != null);
   }
 
   @Override
   public void actionPerformed (ActionEvent arg0)
   {
-    if (rootFolderData.window == null)
+    if (rootFolderData.windowDisks == null)
     {
       Object[] options = { "Generate checksums", "Disk names only", "Cancel" };
       int option = JOptionPane.showOptionDialog (null,
@@ -57,12 +56,12 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
       if (option < 2)
       {
         rootFolderData.doChecksums = option == 0;
-        rootFolderData.window = new DuplicateWindow (rootFolderData);
+        rootFolderData.windowDisks = new DisksWindow (rootFolderData);
         new DuplicateSwingWorker (rootFolderData).execute ();
       }
     }
     else
-      rootFolderData.window.setVisible (true);
+      rootFolderData.windowDisks.setVisible (true);
   }
 
   public void addTableSelectionListener (DiskTableSelectionListener listener)

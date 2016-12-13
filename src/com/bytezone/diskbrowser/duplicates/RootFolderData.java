@@ -20,25 +20,26 @@ import com.bytezone.diskbrowser.utilities.Utility;
 
 public class RootFolderData
 {
+  private static final String header =
+      "      type        uncmp      .gz     .zip    total";
+  private static final String line = "--------------  -------  -------  -------  -------";
+  private static final Font font = new Font ("Monospaced", Font.BOLD, 15);
+
   private File rootFolder;
+  private int rootFolderNameLength;
 
   final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
   final Map<String, DiskDetails> fileNameMap = new TreeMap<String, DiskDetails> ();
 
   final ProgressPanel progressPanel;
-  public JDialog dialog;
-  public DuplicateWindow window;
+  public JDialog dialogTotals;
+  public DisksWindow windowDisks;
 
   public final List<DiskTableSelectionListener> listeners =
       new ArrayList<DiskTableSelectionListener> ();
 
   public boolean doChecksums;
   public boolean showTotals;
-
-  private static final String header =
-      "      type        uncmp      .gz     .zip    total";
-  private static final String line = "--------------  -------  -------  -------  -------";
-  private static final Font font = new Font ("Monospaced", Font.BOLD, 15);
 
   int totalDisks;
   int totalFolders;
@@ -51,10 +52,11 @@ public class RootFolderData
     progressPanel = new ProgressPanel ();
     progressPanel.setPreferredSize (new Dimension (560, 300));
 
-    dialog = new JDialog (window);
-    dialog.add (progressPanel);
-    dialog.setTitle ("Disk Totals");
-    dialog.pack ();
+    dialogTotals = new JDialog (windowDisks);
+    dialogTotals.add (progressPanel);
+    dialogTotals.setTitle ("Disk Totals");
+    dialogTotals.pack ();
+    dialogTotals.setLocationRelativeTo (null);
   }
 
   public void setRootFolder (File rootFolder)
@@ -63,10 +65,11 @@ public class RootFolderData
     typeTotals = new int[4][Utility.suffixes.size ()];
     totalDisks = 0;
     totalFolders = 0;
-    window = null;
+    windowDisks = null;
 
     checksumMap.clear ();
     fileNameMap.clear ();
+    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
   }
 
   public File getRootFolder ()
@@ -100,6 +103,28 @@ public class RootFolderData
     }
     else
       System.out.println ("no suffix: " + filename);
+
+    checkDuplicates (file, filename);
+  }
+
+  private void checkDuplicates (File file, String filename)
+  {
+    String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
+    DiskDetails diskDetails = new DiskDetails (file, rootName, filename, doChecksums);
+
+    if (fileNameMap.containsKey (filename))
+      fileNameMap.get (filename).addDuplicateName (diskDetails);
+    else
+      fileNameMap.put (filename, diskDetails);
+
+    if (doChecksums)
+    {
+      long checksum = diskDetails.getChecksum ();
+      if (checksumMap.containsKey (checksum))
+        checksumMap.get (checksum).addDuplicateChecksum (diskDetails);
+      else
+        checksumMap.put (checksum, diskDetails);
+    }
   }
 
   public void print ()

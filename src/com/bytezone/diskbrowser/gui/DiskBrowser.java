@@ -54,14 +54,13 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
     // create actions
-    RootFolderData rootFolderData = new RootFolderData ();
+    RootFolderData rootFolderData = catalogPanel.getRootFolderData ();
     DuplicateAction duplicateAction = new DuplicateAction (rootFolderData);
-    CountDisksAction countDisksAction = new CountDisksAction (rootFolderData);
-    RootDirectoryAction rootDirectoryAction =
-        new RootDirectoryAction (catalogPanel.getRootDirectory ());
+    //    CountDisksAction countDisksAction = new CountDisksAction (rootFolderData);
+    RootDirectoryAction rootDirectoryAction = new RootDirectoryAction (rootFolderData);
     rootDirectoryAction.addListener (catalogPanel);
     rootDirectoryAction.addListener (duplicateAction);
-    rootDirectoryAction.addListener (countDisksAction);
+    //    rootDirectoryAction.addListener (countDisksAction);
 
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
@@ -120,7 +119,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.showLayoutItem.setAction (hideLayoutAction);
     menuHandler.showFreeSectorsItem.setAction (showFreeAction);
     menuHandler.duplicateItem.setAction (duplicateAction);
-    menuHandler.countDisksItem.setAction (countDisksAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
     final QuitAction quitAction = Platform.setQuit (this, prefs, menuHandler.fileMenu);
@@ -131,7 +129,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     quitAction.addQuitListener (diskLayoutPanel);
     quitAction.addQuitListener (this);
 
-    //    catalogPanel.setDuplicateAction (duplicateAction);
     catalogPanel.setCloseTabAction (closeTabAction);
 
     pack ();

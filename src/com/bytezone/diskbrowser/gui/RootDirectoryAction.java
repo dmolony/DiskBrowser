@@ -12,14 +12,15 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 import com.bytezone.common.Platform;
+import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
 class RootDirectoryAction extends DefaultAction
 {
-  private File rootDirectory;
+  private final RootFolderData rootFolderData;
   private final List<RootDirectoryChangeListener> listeners =
       new ArrayList<RootDirectoryAction.RootDirectoryChangeListener> ();
 
-  public RootDirectoryAction (File rootDirectory)
+  public RootDirectoryAction (RootFolderData rootFolderData)
   {
     super ("Set HOME folder...", "Defines root folder where the disk images are kept",
         "/com/bytezone/diskbrowser/icons/");
@@ -29,7 +30,7 @@ class RootDirectoryAction extends DefaultAction
     setIcon (Action.SMALL_ICON, "folder_explore_16.png");
     setIcon (Action.LARGE_ICON_KEY, "folder_explore_32.png");
 
-    this.rootDirectory = rootDirectory;
+    this.rootFolderData = rootFolderData;
   }
 
   @Override
@@ -38,8 +39,8 @@ class RootDirectoryAction extends DefaultAction
     JFileChooser chooser = new JFileChooser (Platform.userHome);
     chooser.setDialogTitle ("Select FOLDER containing disk images");
     chooser.setFileSelectionMode (JFileChooser.DIRECTORIES_ONLY);
-    if (rootDirectory != null)
-      chooser.setSelectedFile (rootDirectory);
+    if (rootFolderData.getRootFolder () != null)
+      chooser.setSelectedFile (rootFolderData.getRootFolder ());
 
     int result = chooser.showDialog (null, "Accept");
     if (result == JFileChooser.APPROVE_OPTION)
@@ -49,9 +50,9 @@ class RootDirectoryAction extends DefaultAction
         file = file.getParentFile ();
       if (file != null)
       {
-        rootDirectory = file;
+        rootFolderData.setRootFolder (file);
         for (RootDirectoryChangeListener listener : listeners)
-          listener.rootDirectoryChanged (file);
+          listener.rootDirectoryChanged (rootFolderData);
       }
     }
   }
@@ -59,14 +60,11 @@ class RootDirectoryAction extends DefaultAction
   public void addListener (RootDirectoryChangeListener listener)
   {
     if (!listeners.contains (listener))
-    {
       listeners.add (listener);
-      listener.rootDirectoryChanged (rootDirectory);
-    }
   }
 
   interface RootDirectoryChangeListener
   {
-    public void rootDirectoryChanged (File newRootDirectory);
+    public void rootDirectoryChanged (RootFolderData rootFolderData);
   }
 }

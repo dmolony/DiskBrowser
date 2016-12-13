@@ -46,7 +46,6 @@ public class MenuHandler
   JMenuItem dbItem = new JMenuItem (new CreateDatabaseAction ());
   JMenuItem closeTabItem = new JMenuItem ();
   JMenuItem duplicateItem = new JMenuItem ();
-  JMenuItem countDisksItem = new JMenuItem ();
   FontAction fontAction;
 
   // Format menu items
@@ -102,7 +101,6 @@ public class MenuHandler
     }
 
     fileMenu.add (duplicateItem);
-    fileMenu.add (countDisksItem);
 
     formatMenu.add (lineWrapItem);
     formatMenu.add (showCatalogItem);

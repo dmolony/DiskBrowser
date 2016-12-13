@@ -32,6 +32,7 @@ import com.bytezone.diskbrowser.catalog.DocumentCreatorFactory;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
+import com.bytezone.diskbrowser.duplicates.RootFolderData;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
@@ -55,7 +56,7 @@ class CatalogPanel extends JTabbedPane
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
   private final RedoHandler redoHandler;
   private CloseTabAction closeTabAction;
-  private File rootDirectoryFile;
+  private final RootFolderData rootFolderData = new RootFolderData ();
 
   public CatalogPanel (MenuHandler mh, RedoHandler redoHandler, Preferences prefs)
   {
@@ -77,21 +78,23 @@ class CatalogPanel extends JTabbedPane
     addChangeListener (new TabChangeListener ());
   }
 
-  File getRootDirectory ()
+  RootFolderData getRootFolderData ()
   {
-    return rootDirectoryFile;
+    return rootFolderData;
   }
 
   private void createTabs (Preferences prefs)
   {
     String rootDirectory = prefs.get (prefsRootDirectory, "");
 
-    rootDirectoryFile = new File (rootDirectory);
+    File rootDirectoryFile = new File (rootDirectory);
     if (!rootDirectoryFile.exists () || !rootDirectoryFile.isDirectory ())
     {
       System.out.println ("No root directory");
       return;
     }
+
+    rootFolderData.setRootFolder (rootDirectoryFile);
 
     String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
     int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
@@ -120,7 +123,7 @@ class CatalogPanel extends JTabbedPane
     else
       System.out.println ("no disk selected");
 
-    insertFileSystemTab (rootDirectoryFile, diskEvent);
+    insertFileSystemTab (diskEvent);
 
     if (diskEvent != null)
     {
@@ -158,24 +161,22 @@ class CatalogPanel extends JTabbedPane
   }
 
   @Override
-  public void rootDirectoryChanged (File root)
+  public void rootDirectoryChanged (RootFolderData rootFolderData)
   {
-    if (root == rootDirectoryFile)      // initial call or no need to change
-      return;
+    assert rootFolderData == this.rootFolderData;
 
     // is the user replacing an existing root folder?
     if (fileTab != null)
       removeTabAt (0);
 
-    insertFileSystemTab (root, null);
+    insertFileSystemTab (null);
     setSelectedIndex (0);
   }
 
-  private void insertFileSystemTab (File root, DiskSelectedEvent diskEvent)
+  private void insertFileSystemTab (DiskSelectedEvent diskEvent)
   {
-    rootDirectoryFile = root;
-    fileTab =
-        new FileSystemTab (rootDirectoryFile, selector, redoHandler, font, diskEvent);
+    fileTab = new FileSystemTab (rootFolderData.getRootFolder (), selector, redoHandler,
+        font, diskEvent);
     fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
     lister.catalogLister.setNode (fileTab.getRootNode ());
     insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);

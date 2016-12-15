@@ -28,7 +28,6 @@ import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.catalog.DocumentCreatorFactory;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
@@ -52,7 +51,7 @@ class CatalogPanel extends JTabbedPane
   private Font font;
   private FileSystemTab fileTab;
   private final List<AppleDiskTab> diskTabs = new ArrayList<AppleDiskTab> ();
-  private final DocumentCreatorFactory lister;
+  //  private final DocumentCreatorFactory lister;
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
   private final RedoHandler redoHandler;
   private CloseTabAction closeTabAction;
@@ -66,10 +65,10 @@ class CatalogPanel extends JTabbedPane
     //          prefs.getInt (PreferencesDialog.prefsCatalogFontSize,
     //                        PreferencesDialog.defaultFontSize);
     //    this.font = new Font (catalogFontName, Font.PLAIN, catalogFontSize);
-    this.lister = new DocumentCreatorFactory (mh);
+    //    this.lister = new DocumentCreatorFactory (mh);
     this.redoHandler = redoHandler;
 
-    selector.addDiskSelectionListener (lister.diskLister);
+    //    selector.addDiskSelectionListener (lister.diskLister);
 
     setTabPlacement (SwingConstants.BOTTOM);
     setPreferredSize (new Dimension (360, 802));          // width, height
@@ -178,7 +177,7 @@ class CatalogPanel extends JTabbedPane
     fileTab = new FileSystemTab (rootFolderData.getRootFolder (), selector, redoHandler,
         font, diskEvent);
     fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
-    lister.catalogLister.setNode (fileTab.getRootNode ());
+    //    lister.catalogLister.setNode (fileTab.getRootNode ());
     insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
   }
 
@@ -435,7 +434,9 @@ class CatalogPanel extends JTabbedPane
           (DefaultMutableTreeNode) tp.getLastPathComponent ();
       FileNode node = (FileNode) selectedNode.getUserObject ();
       if (node.file.isDirectory ())
-        lister.catalogLister.setNode (selectedNode);
+      {
+        //        lister.catalogLister.setNode (selectedNode);
+      }
       else if (e.getClickCount () == 2)
         addDiskPanel (node.getFormattedDisk (), null, true);
     }

@@ -41,9 +41,9 @@ public class MenuHandler
   JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
   JMenuItem executeDiskItem;
   JMenuItem printItem = new JMenuItem ("Print output panel...");
-  public final JMenuItem createCatalogFileItem = new JMenuItem ("Create catalog file...");
-  public final JMenuItem createDiskFileItem = new JMenuItem ("Create disk file...");
-  JMenuItem dbItem = new JMenuItem (new CreateDatabaseAction ());
+  //  public final JMenuItem createCatalogFileItem = new JMenuItem ("Create catalog file...");
+  //  public final JMenuItem createDiskFileItem = new JMenuItem ("Create disk file...");
+  //  JMenuItem dbItem = new JMenuItem (new CreateDatabaseAction ());
   JMenuItem closeTabItem = new JMenuItem ();
   JMenuItem duplicateItem = new JMenuItem ();
   FontAction fontAction;
@@ -68,6 +68,7 @@ public class MenuHandler
 
   public MenuHandler (Preferences prefs)
   {
+    long start = System.currentTimeMillis ();
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
     menuBar.add (helpMenu);
@@ -85,7 +86,9 @@ public class MenuHandler
     fileMenu.addSeparator ();
     fileMenu.add (closeTabItem);
 
+    System.out.printf ("MenuHandler 0: %d%n", System.currentTimeMillis () - start);
     fontAction = new FontAction ();
+    System.out.printf ("MenuHandler 1: %d%n", System.currentTimeMillis () - start);
     JMenuItem fontItem = new JMenuItem (fontAction);
     fileMenu.add (fontItem);
     fontAction.setSampleText ("120  FOR Z = 14 TO 24:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
@@ -95,9 +98,9 @@ public class MenuHandler
 
     if (false)
     {
-      fileMenu.add (createCatalogFileItem);
-      fileMenu.add (createDiskFileItem);
-      fileMenu.add (dbItem);
+      //      fileMenu.add (createCatalogFileItem);
+      //      fileMenu.add (createDiskFileItem);
+      //      fileMenu.add (dbItem);
     }
 
     fileMenu.add (duplicateItem);
@@ -143,7 +146,8 @@ public class MenuHandler
     interleaveGroup.add (interleave2Item);
     interleaveGroup.add (interleave3Item);
 
-    dbItem.setEnabled (false);
+    //    dbItem.setEnabled (false);
+    System.out.printf ("MenuHandler 2: %d%n", System.currentTimeMillis () - start);
   }
 
   void addHelpMenuAction (Action action, String functionName)

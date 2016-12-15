@@ -9,7 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 
-public class TextDiskCreator extends AbstractDiskCreator
+class TextDiskCreator extends AbstractDiskCreator
 {
   @Override
   public void createDisk ()

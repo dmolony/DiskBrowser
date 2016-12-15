@@ -12,15 +12,11 @@ public class DiskTableModel extends AbstractTableModel
   static final String[] headers =
       { "Path", "Name", "Type", "Size", "# names", "Checksum", "# checksums" };
 
-  //  Map<String, DiskDetails> fileNameMap;
-  //  Map<Long, DiskDetails> checkSumMap;
   private final List<TableLine> lines = new ArrayList<DiskTableModel.TableLine> ();
   private final RootFolderData rootFolderData;
 
   public DiskTableModel (RootFolderData rootFolderData)
   {
-    //    fileNameMap = rootFolderData.fileNameMap;
-    //    checkSumMap = rootFolderData.checksumMap;
     this.rootFolderData = rootFolderData;
 
     for (String key : rootFolderData.fileNameMap.keySet ())

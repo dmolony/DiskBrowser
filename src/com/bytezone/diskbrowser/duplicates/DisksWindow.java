@@ -42,7 +42,6 @@ public class DisksWindow extends JFrame
   {
     super ("Disk List - " + rootFolderData.getRootFolder ().getAbsolutePath ());
     this.rootFolderData = rootFolderData;
-    //    rootFolderData.progressPanel.cancelled = false;
 
     table = new JTable ();
     JScrollPane scrollPane =
@@ -105,14 +104,14 @@ public class DisksWindow extends JFrame
     diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
 
-    int[] columnWidths = { 300, 300, 30, 40, 40, 100 };
+    int[] columnWidths = { 300, 300, 30, 50, 30, 100 };
     TableColumnModel tcm = table.getColumnModel ();
     for (int i = 0; i < columnWidths.length; i++)
       tcm.getColumn (i).setPreferredWidth (columnWidths[i]);
 
     // extra column if doing checksums
     if (rootFolderData.doChecksums)
-      tcm.getColumn (6).setPreferredWidth (40);
+      tcm.getColumn (6).setPreferredWidth (tcm.getColumn (4).getPreferredWidth ());
 
     tcm.getColumn (3).setCellRenderer (NumberRenderer.getIntegerRenderer ());
 

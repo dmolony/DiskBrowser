@@ -50,10 +50,6 @@ public class RootFolderData
   JButton btnCancel;
   JButton btnOK;
 
-  //  public RootFolderData ()
-  //  {
-  //  }
-
   private void createWindows ()
   {
     southPanel = new JPanel ();
@@ -65,7 +61,7 @@ public class RootFolderData
 
     dialogTotals = new JDialog (disksWindow);
     dialogTotals.add (progressPanel, BorderLayout.CENTER);
-    southPanel.add (btnCancel);
+    southPanel.add (btnCancel);               // needs to be here for the pack()
     dialogTotals.add (southPanel, BorderLayout.SOUTH);
     dialogTotals.setTitle ("Disk Totals");
     dialogTotals.pack ();
@@ -135,7 +131,6 @@ public class RootFolderData
     this.rootFolder = rootFolder;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
     disksWindow = null;           // force a recount
-    //    clear ();
   }
 
   private void clear ()
@@ -226,8 +221,12 @@ public class RootFolderData
     System.out.println (line);
     System.out.printf ("Total           %,7d  %,7d  %,7d  %,7d%n%n", grandTotal[0],
         grandTotal[1], grandTotal[2], grandTotal[3]);
-    System.out.printf ("Unique checksums: %,d%n", checksumMap.size ());
-    System.out.printf ("Duplicate disks : %,d%n", totalDisks - checksumMap.size ());
+
+    if (doChecksums)
+    {
+      System.out.printf ("Unique checksums: %,7d%n", checksumMap.size ());
+      System.out.printf ("Duplicate disks : %,7d%n", totalDisks - checksumMap.size ());
+    }
   }
 
   class ProgressPanel extends JPanel

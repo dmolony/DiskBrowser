@@ -13,7 +13,7 @@ import com.bytezone.diskbrowser.disk.DiskFactory;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
-public class TextCatalogCreator extends AbstractCatalogCreator
+class TextCatalogCreator extends AbstractCatalogCreator
 {
   @Override
   public void createCatalog ()
@@ -22,13 +22,14 @@ public class TextCatalogCreator extends AbstractCatalogCreator
     if (!(o instanceof FileNode))
     {
       JOptionPane.showMessageDialog (null, "Please select a folder from the Disk Tree",
-                                     "Info", JOptionPane.INFORMATION_MESSAGE);
+          "Info", JOptionPane.INFORMATION_MESSAGE);
       return;
     }
     File f = ((FileNode) o).file;
     final File f2 = new File (f.getAbsolutePath () + "/Catalog.txt");
-    JOptionPane.showMessageDialog (null, "About to create file : " + f2.getAbsolutePath (),
-                                   "Info", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog (null,
+        "About to create file : " + f2.getAbsolutePath (), "Info",
+        JOptionPane.INFORMATION_MESSAGE);
 
     EventQueue.invokeLater (new Runnable ()
     {
@@ -43,8 +44,9 @@ public class TextCatalogCreator extends AbstractCatalogCreator
         }
         catch (IOException e)
         {
-          JOptionPane.showMessageDialog (null, "Error creating catalog : " + e.getMessage (),
-                                         "Bugger", JOptionPane.INFORMATION_MESSAGE);
+          JOptionPane.showMessageDialog (null,
+              "Error creating catalog : " + e.getMessage (), "Bugger",
+              JOptionPane.INFORMATION_MESSAGE);
         }
         finally
         {
@@ -61,7 +63,7 @@ public class TextCatalogCreator extends AbstractCatalogCreator
       }
 
       private void printDescendants (DefaultMutableTreeNode root, FileWriter out)
-            throws IOException
+          throws IOException
       {
         Object o = root.getUserObject ();
         if (o instanceof FileNode)
@@ -70,7 +72,8 @@ public class TextCatalogCreator extends AbstractCatalogCreator
           if (!f.isDirectory ())
           {
             FormattedDisk fd = DiskFactory.createDisk (f.getAbsolutePath ());
-            out.write (fd.getCatalog ().getDataSource ().getText () + String.format ("%n"));
+            out.write (
+                fd.getCatalog ().getDataSource ().getText () + String.format ("%n"));
           }
         }
 

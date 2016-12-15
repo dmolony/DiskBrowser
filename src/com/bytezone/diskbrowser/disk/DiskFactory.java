@@ -16,6 +16,7 @@ import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.NuFX;
+import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Wizardry4BootDisk;
 import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
@@ -43,13 +44,41 @@ public class DiskFactory
 
     String suffix = path.substring (path.lastIndexOf (".") + 1).toLowerCase ();
     Boolean compressed = false;
-    Path p = Paths.get (path);
+    Path originalPath = Paths.get (path);
+
+    if (suffix.equals ("gz"))
+    {
+      try
+      {
+        InputStream in = new GZIPInputStream (new FileInputStream (path));
+        File tmp = File.createTempFile ("gzip", null);
+        FileOutputStream fos = new FileOutputStream (tmp);
+
+        int bytesRead;
+        byte[] buffer = new byte[1024];
+        while ((bytesRead = in.read (buffer)) > 0)
+          fos.write (buffer, 0, bytesRead);
+
+        fos.close ();
+        in.close ();
+        tmp.deleteOnExit ();
+
+        suffix = Utility.getSuffix (file.getName ());     // ignores the .gz
+        file = tmp;
+        compressed = true;
+      }
+      catch (IOException e)  // can get EOFException: Unexpected end of ZLIB input stream
+      {
+        e.printStackTrace ();
+        return null;
+      }
+    }
 
     if (suffix.equals ("sdk"))
     {
       try
       {
-        NuFX nuFX = new NuFX (p);
+        NuFX nuFX = new NuFX (file);
         File tmp = File.createTempFile ("sdk", null);
         FileOutputStream fos = new FileOutputStream (tmp);
         fos.write (nuFX.getBuffer ());
@@ -66,32 +95,6 @@ public class DiskFactory
       }
       catch (FileFormatException e)
       {
-        return null;
-      }
-    }
-    else if (suffix.equals ("gz"))    // will be .dsk.gz
-    {
-      try
-      {
-        InputStream in = new GZIPInputStream (new FileInputStream (path));
-        File tmp = File.createTempFile ("gzip", null);
-        FileOutputStream fos = new FileOutputStream (tmp);
-
-        int bytesRead;
-        byte[] buffer = new byte[1024];
-        while ((bytesRead = in.read (buffer)) > 0)
-          fos.write (buffer, 0, bytesRead);
-
-        fos.close ();
-        in.close ();
-        tmp.deleteOnExit ();
-        file = tmp;
-        suffix = "dsk";
-        compressed = true;
-      }
-      catch (IOException e)  // can get EOFException: Unexpected end of ZLIB input stream
-      {
-        e.printStackTrace ();
         return null;
       }
     }
@@ -132,7 +135,7 @@ public class DiskFactory
       if (disk != null)
       {
         if (compressed)
-          disk.setOriginalPath (p);
+          disk.setOriginalPath (originalPath);
         return disk;
       }
 
@@ -231,7 +234,7 @@ public class DiskFactory
       if (disk != null)
       {
         if (compressed)
-          disk.setOriginalPath (p);
+          disk.setOriginalPath (originalPath);
         return disk;
       }
 
@@ -283,7 +286,7 @@ public class DiskFactory
           "Factory creating disk : " + disk.getDisk ().getFile ().getAbsolutePath ());
 
     if (disk != null && compressed)
-      disk.setOriginalPath (p);
+      disk.setOriginalPath (originalPath);
 
     return disk;
   }

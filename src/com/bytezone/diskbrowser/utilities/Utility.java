@@ -80,26 +80,6 @@ public class Utility
 
   public static boolean validFileType (String filename)
   {
-    //    String lcFilename = filename.toLowerCase ();
-    //    if (lcFilename.endsWith (".gz"))
-    //      lcFilename = lcFilename.substring (0, lcFilename.length () - 3);
-    //    else if (lcFilename.endsWith (".zip"))
-    //      lcFilename = lcFilename.substring (0, lcFilename.length () - 4);
-    //
-    //    int dotPos = lcFilename.lastIndexOf ('.');
-    //    if (dotPos < 0)
-    //      return false;
-    //
-    //    String suffix = lcFilename.substring (dotPos + 1);
-
-    //    int dotPos2 = filename.lastIndexOf ('.', dotPos - 1);
-    //    if (dotPos2 > 0)
-    //    {
-    //      String suffix2 = filename.substring (dotPos2 + 1, dotPos).toLowerCase ();
-    //      if (suffix.equals ("gz"))
-    //        return suffixes.contains (suffix2) && !"gz".equals (suffix2);
-    //    }
-
     return suffixes.contains (getSuffix (filename));
   }
 }

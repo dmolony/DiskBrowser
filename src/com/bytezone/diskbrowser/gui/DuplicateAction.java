@@ -10,8 +10,6 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
-import com.bytezone.diskbrowser.duplicates.DuplicateSwingWorker;
-import com.bytezone.diskbrowser.duplicates.DisksWindow;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
@@ -43,7 +41,7 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
   @Override
   public void actionPerformed (ActionEvent arg0)
   {
-    if (rootFolderData.windowDisks == null)
+    if (rootFolderData.disksWindow == null)
     {
       Object[] options = { "Generate checksums", "Disk names only", "Cancel" };
       int option = JOptionPane.showOptionDialog (null,
@@ -54,14 +52,10 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
           "Generate Disk Listing", JOptionPane.YES_NO_CANCEL_OPTION,
           JOptionPane.QUESTION_MESSAGE, null, options, options[1]);   // just disk names
       if (option < 2)
-      {
-        rootFolderData.doChecksums = option == 0;
-        rootFolderData.windowDisks = new DisksWindow (rootFolderData);
-        new DuplicateSwingWorker (rootFolderData).execute ();
-      }
+        rootFolderData.count (option == 0);
     }
     else
-      rootFolderData.windowDisks.setVisible (true);
+      rootFolderData.disksWindow.setVisible (true);
   }
 
   public void addTableSelectionListener (DiskTableSelectionListener listener)

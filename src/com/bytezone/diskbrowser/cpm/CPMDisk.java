@@ -161,19 +161,17 @@ public class CPMDisk extends AbstractFormattedDisk
   {
     disk.setInterleave (3);
 
-    byte[] buffer = disk.readSector (0, 8);
-    String text = new String (buffer, 16, 24);
-    if ("DIR ERA TYPESAVEREN USER".equals (text))
-      return true;
-
-    buffer = disk.readSector (0, 4);
-    text = new String (buffer, 16, 24);
-    if ("DIR ERA TYPESAVEREN USER".equals (text))
-      return true;
+    for (int i = 8; i >= 4; i -= 2)
+    {
+      byte[] buffer = disk.readSector (0, i);
+      String text = new String (buffer, 16, 24);
+      if ("DIR ERA TYPESAVEREN USER".equals (text))
+        return true;
+    }
 
     for (int sector = 0; sector < 8; sector++)
     {
-      buffer = disk.readSector (3, sector);
+      byte[] buffer = disk.readSector (3, sector);
       for (int i = 0; i < buffer.length; i += 32)
       {
         int val = buffer[i] & 0xFF;

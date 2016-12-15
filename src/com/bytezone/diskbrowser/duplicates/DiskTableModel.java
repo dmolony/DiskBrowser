@@ -2,7 +2,6 @@ package com.bytezone.diskbrowser.duplicates;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -11,25 +10,32 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class DiskTableModel extends AbstractTableModel
 {
   static final String[] headers =
-      { "Path", "Name", "Type", "Size", "Dup name", "Dup data", "Checksum" };
+      { "Path", "Name", "Type", "Size", "# names", "Checksum", "# checksums" };
 
-  Map<String, DiskDetails> fileNameMap;
-  Map<Long, DiskDetails> checkSumMap;
-  List<TableLine> lines = new ArrayList<DiskTableModel.TableLine> ();
+  //  Map<String, DiskDetails> fileNameMap;
+  //  Map<Long, DiskDetails> checkSumMap;
+  private final List<TableLine> lines = new ArrayList<DiskTableModel.TableLine> ();
+  private final RootFolderData rootFolderData;
 
   public DiskTableModel (RootFolderData rootFolderData)
   {
-    fileNameMap = rootFolderData.fileNameMap;
-    checkSumMap = rootFolderData.checksumMap;
+    //    fileNameMap = rootFolderData.fileNameMap;
+    //    checkSumMap = rootFolderData.checksumMap;
+    this.rootFolderData = rootFolderData;
 
-    for (String key : fileNameMap.keySet ())
+    for (String key : rootFolderData.fileNameMap.keySet ())
     {
-      DiskDetails original = fileNameMap.get (key);
-      lines.add (new TableLine (original));
+      DiskDetails original = rootFolderData.fileNameMap.get (key);
+      lines.add (new TableLine (original, rootFolderData));
 
       for (DiskDetails duplicate : original.getDuplicateNames ())
-        lines.add (new TableLine (duplicate));
+        lines.add (new TableLine (duplicate, rootFolderData));
     }
+  }
+
+  public DiskDetails getDiskDetails (int rowIndex)
+  {
+    return lines.get (rowIndex).diskDetails;
   }
 
   @Override
@@ -47,7 +53,10 @@ public class DiskTableModel extends AbstractTableModel
   @Override
   public int getColumnCount ()
   {
-    return headers.length;
+    if (rootFolderData.doChecksums)
+      return headers.length;
+    else
+      return headers.length - 1;
   }
 
   @Override
@@ -73,9 +82,9 @@ public class DiskTableModel extends AbstractTableModel
       case 4:
         return line.duplicateNames;
       case 5:
-        return line.duplicateChecksums;
-      case 6:
         return line.checksum;
+      case 6:
+        return line.duplicateChecksums;
       default:
         return "???";
     }
@@ -93,7 +102,7 @@ public class DiskTableModel extends AbstractTableModel
   {
     TableLine line = lines.get (rowIndex);
     line.checksum = line.diskDetails.calculateChecksum ();
-    fireTableCellUpdated (rowIndex, 6);
+    fireTableCellUpdated (rowIndex, 5);
   }
 
   class TableLine
@@ -107,7 +116,7 @@ public class DiskTableModel extends AbstractTableModel
     private final String type;
     private final long size;
 
-    public TableLine (DiskDetails diskDetails)
+    public TableLine (DiskDetails diskDetails, RootFolderData rootFolderData)
     {
       this.diskDetails = diskDetails;
       shortName = diskDetails.getShortName ();
@@ -118,17 +127,22 @@ public class DiskTableModel extends AbstractTableModel
       String rootName = diskDetails.getRootName ();
       path = rootName.substring (0, rootName.length () - shortName.length ());
 
-      if (diskDetails.isDuplicateChecksum ())
-      {
-        DiskDetails original = checkSumMap.get (diskDetails.getChecksum ());
-        duplicateChecksums = original.getDuplicateChecksums ().size () + 1;
-      }
+      if (rootFolderData.doChecksums)
+        if (diskDetails.isDuplicateChecksum ())
+        {
+          DiskDetails original =
+              rootFolderData.checksumMap.get (diskDetails.getChecksum ());
+          duplicateChecksums = original.getDuplicateChecksums ().size () + 1;
+        }
+        else
+          duplicateChecksums = diskDetails.getDuplicateChecksums ().size () + 1;
       else
-        duplicateChecksums = diskDetails.getDuplicateChecksums ().size () + 1;
+        duplicateChecksums = 0;
 
       if (diskDetails.isDuplicateName ())
       {
-        DiskDetails original = fileNameMap.get (diskDetails.getShortName ());
+        DiskDetails original =
+            rootFolderData.fileNameMap.get (diskDetails.getShortName ());
         duplicateNames = original.getDuplicateNames ().size () + 1;
       }
       else

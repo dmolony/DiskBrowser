@@ -1,10 +1,8 @@
 package com.bytezone.diskbrowser.duplicates;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
@@ -31,15 +30,12 @@ public class RootFolderData
   final Map<Long, DiskDetails> checksumMap = new HashMap<Long, DiskDetails> ();
   final Map<String, DiskDetails> fileNameMap = new TreeMap<String, DiskDetails> ();
 
-  final ProgressPanel progressPanel;
-  public JDialog dialogTotals;
-  public DisksWindow windowDisks;
+  public DisksWindow disksWindow;
 
   public final List<DiskTableSelectionListener> listeners =
       new ArrayList<DiskTableSelectionListener> ();
 
   public boolean doChecksums;
-  public boolean showTotals;
 
   int totalDisks;
   int totalFolders;
@@ -47,29 +43,109 @@ public class RootFolderData
   // total files for each suffix (uncompressed, .gz, .zip, total)
   int[][] typeTotals;
 
-  public RootFolderData ()
+  // Progress dialog
+  ProgressPanel progressPanel;
+  public JDialog dialogTotals;
+  JPanel southPanel;
+  JButton btnCancel;
+  JButton btnOK;
+
+  //  public RootFolderData ()
+  //  {
+  //  }
+
+  private void createWindows ()
   {
+    southPanel = new JPanel ();
+    btnCancel = new JButton ("Cancel");
+    btnOK = new JButton ("OK");
+
     progressPanel = new ProgressPanel ();
     progressPanel.setPreferredSize (new Dimension (560, 300));
 
-    dialogTotals = new JDialog (windowDisks);
-    dialogTotals.add (progressPanel);
+    dialogTotals = new JDialog (disksWindow);
+    dialogTotals.add (progressPanel, BorderLayout.CENTER);
+    southPanel.add (btnCancel);
+    dialogTotals.add (southPanel, BorderLayout.SOUTH);
     dialogTotals.setTitle ("Disk Totals");
     dialogTotals.pack ();
     dialogTotals.setLocationRelativeTo (null);
+    //    btnCancel.requestFocus ();
+
+    btnCancel.addActionListener (new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        progressPanel.cancelled = true;
+        dialogTotals.setVisible (false);
+      }
+    });
+
+    btnOK.addActionListener (new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        dialogTotals.setVisible (false);
+      }
+    });
+  }
+
+  public void count (boolean doChecksums)
+  {
+    if (dialogTotals == null)
+      createWindows ();
+    clear ();
+
+    setButton (btnCancel);
+
+    this.doChecksums = doChecksums;
+    progressPanel.cancelled = false;
+    disksWindow = new DisksWindow (this);
+    dialogTotals.setVisible (true);
+    new DuplicateSwingWorker (this).execute ();           // start SwingWorker
+  }
+
+  public void done ()                                     // SwingWorker has completed
+  {
+    print ();
+    dialogTotals.repaint ();
+    dialogTotals.setVisible (false);
+
+    if (progressPanel.cancelled)
+      disksWindow = null;
+    else
+    {
+      disksWindow.setTableData (this);
+      setButton (btnOK);
+    }
+  }
+
+  private void setButton (JButton button)
+  {
+    southPanel.removeAll ();
+    southPanel.add (button);
+    dialogTotals.revalidate ();
+    dialogTotals.repaint ();
   }
 
   public void setRootFolder (File rootFolder)
   {
     this.rootFolder = rootFolder;
+    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
+    disksWindow = null;           // force a recount
+    //    clear ();
+  }
+
+  private void clear ()
+  {
     typeTotals = new int[4][Utility.suffixes.size ()];
     totalDisks = 0;
     totalFolders = 0;
-    windowDisks = null;
 
     checksumMap.clear ();
     fileNameMap.clear ();
-    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
   }
 
   public File getRootFolder ()
@@ -80,11 +156,6 @@ public class RootFolderData
   public void incrementFolders ()
   {
     ++totalFolders;
-  }
-
-  public int getTotalType (int type)
-  {
-    return typeTotals[0][type] + typeTotals[1][type] + typeTotals[2][type];
   }
 
   public void incrementType (File file, String filename)
@@ -127,6 +198,11 @@ public class RootFolderData
     }
   }
 
+  public int getTotalType (int type)
+  {
+    return typeTotals[0][type] + typeTotals[1][type] + typeTotals[2][type];
+  }
+
   public void print ()
   {
     System.out.printf ("%nFolders ...... %,7d%n", totalFolders);
@@ -151,10 +227,13 @@ public class RootFolderData
     System.out.printf ("Total           %,7d  %,7d  %,7d  %,7d%n%n", grandTotal[0],
         grandTotal[1], grandTotal[2], grandTotal[3]);
     System.out.printf ("Unique checksums: %,d%n", checksumMap.size ());
+    System.out.printf ("Duplicate disks : %,d%n", totalDisks - checksumMap.size ());
   }
 
   class ProgressPanel extends JPanel
   {
+    public volatile boolean cancelled;
+
     @Override
     protected void paintComponent (Graphics graphics)
     {

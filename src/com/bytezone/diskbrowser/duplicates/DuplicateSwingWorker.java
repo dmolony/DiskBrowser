@@ -14,31 +14,19 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
   public DuplicateSwingWorker (RootFolderData rootFolderData)
   {
     this.rootFolderData = rootFolderData;
-    rootFolderData.dialogTotals.setVisible (true);
   }
 
   @Override
   protected Void doInBackground () throws Exception
   {
     traverse (rootFolderData.getRootFolder ());
-    publish (rootFolderData);
-    rootFolderData.print ();
     return null;
   }
 
   @Override
   protected void done ()
   {
-    try
-    {
-      if (!rootFolderData.showTotals)
-        rootFolderData.dialogTotals.setVisible (false);
-      rootFolderData.windowDisks.setTableData (rootFolderData);
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace ();
-    }
+    rootFolderData.done ();
   }
 
   @Override
@@ -49,6 +37,9 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
 
   private void traverse (File directory)
   {
+    if (rootFolderData.progressPanel.cancelled)
+      return;
+
     File[] files = directory.listFiles ();
 
     if (files == null || files.length == 0)
@@ -59,6 +50,9 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
 
     for (File file : files)
     {
+      if (rootFolderData.progressPanel.cancelled)
+        return;
+
       if (file.isDirectory ())
       {
         rootFolderData.incrementFolders ();
@@ -70,7 +64,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
         if (Utility.validFileType (fileName) && file.length () > 0)
         {
           rootFolderData.incrementType (file, fileName);
-          if ((rootFolderData.totalDisks % 500) == 0)
+          if ((rootFolderData.totalDisks % 250) == 0)
             publish (rootFolderData);
         }
       }

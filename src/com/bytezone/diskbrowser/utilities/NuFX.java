@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.utilities;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,11 +11,12 @@ import com.bytezone.common.Utility;
 
 public class NuFX
 {
-  private static String[] fileSystems = {//
-        "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
-            "Macintosh MFS", "Lisa File System", "Apple CP/M", "", "MS-DOS", "High Sierra",
-            "ISO 9660", "AppleShare" };
-  private final Header header;
+  private static String[] fileSystems =
+      {//
+       "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
+       "Macintosh MFS", "Lisa File System", "Apple CP/M", "", "MS-DOS", "High Sierra",
+       "ISO 9660", "AppleShare" };
+  private Header header;
   private final byte[] buffer;
   private final boolean debug = false;
 
@@ -24,6 +26,17 @@ public class NuFX
   public NuFX (Path path) throws FileFormatException, IOException
   {
     buffer = Files.readAllBytes (path);
+    readBuffer ();
+  }
+
+  public NuFX (File file) throws FileFormatException, IOException
+  {
+    buffer = Files.readAllBytes (file.toPath ());
+    readBuffer ();
+  }
+
+  private void readBuffer ()
+  {
     header = new Header (buffer);
 
     int dataPtr = 48;
@@ -138,8 +151,8 @@ public class NuFX
     private boolean isNuFile (byte[] buffer, int ptr)
     {
       if (buffer[ptr] == 0x4E && buffer[ptr + 1] == (byte) 0xF5 && buffer[ptr + 2] == 0x46
-            && buffer[ptr + 3] == (byte) 0xE9 && buffer[ptr + 4] == 0x6C
-            && buffer[ptr + 5] == (byte) 0xE5)
+          && buffer[ptr + 3] == (byte) 0xE9 && buffer[ptr + 4] == 0x6C
+          && buffer[ptr + 5] == (byte) 0xE5)
         return true;
       return false;
     }
@@ -147,7 +160,7 @@ public class NuFX
     private boolean isBin2 (byte[] buffer, int ptr)
     {
       if (buffer[ptr] == 0x0A && buffer[ptr + 1] == 0x47 && buffer[ptr + 2] == 0x4C
-            && buffer[ptr + 18] == (byte) 0x02)
+          && buffer[ptr + 18] == (byte) 0x02)
         return true;
       return false;
     }
@@ -234,7 +247,7 @@ public class NuFX
     private boolean isNuFX (byte[] buffer, int ptr)
     {
       if (buffer[ptr] == 0x4E && buffer[ptr + 1] == (byte) 0xF5 && buffer[ptr + 2] == 0x46
-            && buffer[ptr + 3] == (byte) 0xD8)
+          && buffer[ptr + 3] == (byte) 0xD8)
         return true;
       return false;
     }
@@ -249,7 +262,7 @@ public class NuFX
       text.append (String.format ("Version ........ %d%n", version));
       text.append (String.format ("Threads ........ %d%n", totThreads));
       text.append (String.format ("File sys id .... %d (%s)%n", fileSystemID,
-                                  fileSystems[fileSystemID]));
+          fileSystems[fileSystemID]));
       text.append (String.format ("Separator ...... %s%n", separator));
       text.append (String.format ("Access ......... %,d%n", access));
       text.append (String.format ("File type ...... %,d%n", fileType));

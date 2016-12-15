@@ -29,10 +29,12 @@ public class DisksWindow extends JFrame
   private final JButton btnHide = new JButton ("Close");
   private final JButton btnTotals = new JButton ("Totals");
   private final JPanel topPanel = new JPanel ();
+
   private final List<JCheckBox> boxes = new ArrayList<JCheckBox> ();
   private TableRowSorter<DiskTableModel> sorter;
   private final CheckBoxActionListener checkBoxActionListener =
       new CheckBoxActionListener ();
+
   private DiskTableModel diskTableModel;
   private final RootFolderData rootFolderData;
 
@@ -40,6 +42,7 @@ public class DisksWindow extends JFrame
   {
     super ("Disk List - " + rootFolderData.getRootFolder ().getAbsolutePath ());
     this.rootFolderData = rootFolderData;
+    //    rootFolderData.progressPanel.cancelled = false;
 
     table = new JTable ();
     JScrollPane scrollPane =
@@ -102,10 +105,14 @@ public class DisksWindow extends JFrame
     diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
 
-    int[] columnWidths = { 300, 300, 30, 40, 40, 40, 100 };
+    int[] columnWidths = { 300, 300, 30, 40, 40, 100 };
     TableColumnModel tcm = table.getColumnModel ();
     for (int i = 0; i < columnWidths.length; i++)
       tcm.getColumn (i).setPreferredWidth (columnWidths[i]);
+
+    // extra column if doing checksums
+    if (rootFolderData.doChecksums)
+      tcm.getColumn (6).setPreferredWidth (40);
 
     tcm.getColumn (3).setCellRenderer (NumberRenderer.getIntegerRenderer ());
 
@@ -131,7 +138,7 @@ public class DisksWindow extends JFrame
         int actualRow = sorter.convertRowIndexToModel (selectedRow);
 
         DiskTableModel diskTableModel = (DiskTableModel) table.getModel ();
-        DiskDetails diskDetails = diskTableModel.lines.get (actualRow).diskDetails;
+        DiskDetails diskDetails = diskTableModel.getDiskDetails (actualRow);
 
         long checksum = diskDetails.getChecksum ();
         if (checksum == 0)
@@ -166,8 +173,7 @@ public class DisksWindow extends JFrame
     setLocationRelativeTo (null);
     btnExport.setEnabled (true);
 
-    if (!rootFolderData.showTotals)
-      setVisible (true);
+    setVisible (true);
   }
 
   private String getFilterText ()

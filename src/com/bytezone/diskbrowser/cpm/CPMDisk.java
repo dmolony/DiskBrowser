@@ -172,13 +172,21 @@ public class CPMDisk extends AbstractFormattedDisk
     for (int sector = 0; sector < 8; sector++)
     {
       byte[] buffer = disk.readSector (3, sector);
+
+      // check if entire sector is empty (everything == 0xE5)
+      if (bufferContainsAll (buffer, (byte) 0xE5))
+        break;
+
+      //      System.out.println (HexFormatter.format (buffer));
       for (int i = 0; i < buffer.length; i += 32)
       {
         int val = buffer[i] & 0xFF;
+        //        System.out.printf ("%02X%n", val);
         //        if (val == 0xE5)
-        //          return true;
+        //          break;
         if (val > 31 && val != 0xE5)
           return false;
+
         for (int j = 1; j <= 8; j++)
         {
           val = buffer[i + j] & 0xFF;
@@ -188,6 +196,14 @@ public class CPMDisk extends AbstractFormattedDisk
       }
     }
 
+    return true;
+  }
+
+  private static boolean bufferContainsAll (byte[] buffer, byte value)
+  {
+    for (byte b : buffer)
+      if (b != value)
+        return false;
     return true;
   }
 }

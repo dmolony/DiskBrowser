@@ -59,16 +59,7 @@ class CatalogPanel extends JTabbedPane
 
   public CatalogPanel (MenuHandler mh, RedoHandler redoHandler, Preferences prefs)
   {
-    //    String catalogFontName =
-    // prefs.get (PreferencesDialog.prefsCatalogFont, PreferencesDialog.defaultFontName);
-    //    int catalogFontSize =
-    //          prefs.getInt (PreferencesDialog.prefsCatalogFontSize,
-    //                        PreferencesDialog.defaultFontSize);
-    //    this.font = new Font (catalogFontName, Font.PLAIN, catalogFontSize);
-    //    this.lister = new DocumentCreatorFactory (mh);
     this.redoHandler = redoHandler;
-
-    //    selector.addDiskSelectionListener (lister.diskLister);
 
     setTabPlacement (SwingConstants.BOTTOM);
     setPreferredSize (new Dimension (360, 802));          // width, height
@@ -177,7 +168,6 @@ class CatalogPanel extends JTabbedPane
     fileTab = new FileSystemTab (rootFolderData.getRootFolder (), selector, redoHandler,
         font, diskEvent);
     fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
-    //    lister.catalogLister.setNode (fileTab.getRootNode ());
     insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
   }
 

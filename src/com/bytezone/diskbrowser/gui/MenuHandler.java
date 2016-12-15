@@ -36,14 +36,10 @@ public class MenuHandler
   JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
-  JMenuItem openItem = new JMenuItem ("Open disk...");
   JMenuItem rootItem = new JMenuItem ("Set root folder...");
   JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
   JMenuItem executeDiskItem;
   JMenuItem printItem = new JMenuItem ("Print output panel...");
-  //  public final JMenuItem createCatalogFileItem = new JMenuItem ("Create catalog file...");
-  //  public final JMenuItem createDiskFileItem = new JMenuItem ("Create disk file...");
-  //  JMenuItem dbItem = new JMenuItem (new CreateDatabaseAction ());
   JMenuItem closeTabItem = new JMenuItem ();
   JMenuItem duplicateItem = new JMenuItem ();
   FontAction fontAction;
@@ -64,17 +60,12 @@ public class MenuHandler
   JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
   JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
   JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
-  //  JMenuItem retinaItem = new JCheckBoxMenuItem ("Retina display");
 
   public MenuHandler (Preferences prefs)
   {
-    long start = System.currentTimeMillis ();
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
     menuBar.add (helpMenu);
-
-    if (false)
-      fileMenu.add (openItem);
 
     fileMenu.add (rootItem);
     fileMenu.addSeparator ();
@@ -86,22 +77,13 @@ public class MenuHandler
     fileMenu.addSeparator ();
     fileMenu.add (closeTabItem);
 
-    System.out.printf ("MenuHandler 0: %d%n", System.currentTimeMillis () - start);
     fontAction = new FontAction ();
-    System.out.printf ("MenuHandler 1: %d%n", System.currentTimeMillis () - start);
     JMenuItem fontItem = new JMenuItem (fontAction);
     fileMenu.add (fontItem);
     fontAction.setSampleText ("120  FOR Z = 14 TO 24:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
         + "  PRINT AB$:\n" + "  FOR TI = 1 TO 50:\n" + "  NEXT :\n" + "  POKE 0,Z + 40:\n"
         + "  POKE 1,9:\n" + "  CALL MU:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
         + "  PRINT SPC(12):\n" + "NEXT :\n" + "VTAB 5:\n" + "HTAB 24:\n" + "PRINT AB$\n");
-
-    if (false)
-    {
-      //      fileMenu.add (createCatalogFileItem);
-      //      fileMenu.add (createDiskFileItem);
-      //      fileMenu.add (dbItem);
-    }
 
     fileMenu.add (duplicateItem);
 
@@ -127,7 +109,6 @@ public class MenuHandler
     formatMenu.add (colourQuirksItem);
     formatMenu.add (monochromeItem);
     formatMenu.add (debuggingItem);
-    //    formatMenu.add (retinaItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -145,9 +126,6 @@ public class MenuHandler
     interleaveGroup.add (interleave1Item);
     interleaveGroup.add (interleave2Item);
     interleaveGroup.add (interleave3Item);
-
-    //    dbItem.setEnabled (false);
-    System.out.printf ("MenuHandler 2: %d%n", System.currentTimeMillis () - start);
   }
 
   void addHelpMenuAction (Action action, String functionName)

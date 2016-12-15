@@ -66,7 +66,6 @@ public class RootFolderData
     dialogTotals.setTitle ("Disk Totals");
     dialogTotals.pack ();
     dialogTotals.setLocationRelativeTo (null);
-    //    btnCancel.requestFocus ();
 
     btnCancel.addActionListener (new ActionListener ()
     {

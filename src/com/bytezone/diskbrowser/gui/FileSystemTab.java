@@ -54,25 +54,6 @@ class FileSystemTab extends AbstractTab
       navMan.diskSelected (diskEvent);
     else
       System.out.println ("No disk event");
-
-    // temporary code while I sort out the DOS checksum feature
-    //    if (tb.dosMap.keySet ().size () > 0)
-    //    {
-    //      System.out.printf ("Unique DOSs : %4d%n", tb.dosMap.keySet ().size ());
-    //      long lastKey = -1;
-    //      int beginIndex = rootFolder.getAbsolutePath ().length ();
-    //      for (Long key : tb.dosMap.keySet ())
-    //      {
-    //        if (key != lastKey)
-    //        {
-    //          lastKey = key;
-    //          System.out.printf ("%,14d  (%d)%n", key, tb.dosMap.get (key).size ());
-    //        }
-    //        for (File file : tb.dosMap.get (key))
-    //          System.out.printf ("                      %s%n",
-    //              file.getAbsolutePath ().substring (beginIndex));
-    //      }
-    //    }
   }
 
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,

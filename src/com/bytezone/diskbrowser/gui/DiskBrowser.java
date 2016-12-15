@@ -22,7 +22,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   public DiskBrowser ()
   {
     super (windowTitle);
-    long start = System.currentTimeMillis ();
 
     if (false)
     {
@@ -31,9 +30,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     }
 
     JToolBar toolBar = new JToolBar ("Toolbar", JToolBar.HORIZONTAL);
-    System.out.printf ("0: %d%n", System.currentTimeMillis () - start);
     MenuHandler menuHandler = new MenuHandler (prefs);
-    System.out.printf ("1: %d%n", System.currentTimeMillis () - start);
 
     setJMenuBar (menuHandler.menuBar);
     setLayout (new BorderLayout ());
@@ -59,11 +56,9 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     // create actions
     RootFolderData rootFolderData = catalogPanel.getRootFolderData ();
     DuplicateAction duplicateAction = new DuplicateAction (rootFolderData);
-    //    CountDisksAction countDisksAction = new CountDisksAction (rootFolderData);
     RootDirectoryAction rootDirectoryAction = new RootDirectoryAction (rootFolderData);
     rootDirectoryAction.addListener (catalogPanel);
     rootDirectoryAction.addListener (duplicateAction);
-    //    rootDirectoryAction.addListener (countDisksAction);
 
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
@@ -75,7 +70,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     ShowFreeSectorsAction showFreeAction =
         new ShowFreeSectorsAction (menuHandler, diskLayoutPanel);
     CloseTabAction closeTabAction = new CloseTabAction (catalogPanel);
-    System.out.printf ("2: %d%n", System.currentTimeMillis () - start);
 
     // add action buttons to toolbar
     toolBar.add (rootDirectoryAction);
@@ -124,7 +118,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.showFreeSectorsItem.setAction (showFreeAction);
     menuHandler.duplicateItem.setAction (duplicateAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
-    System.out.printf ("3: %d%n", System.currentTimeMillis () - start);
 
     final QuitAction quitAction = Platform.setQuit (this, prefs, menuHandler.fileMenu);
 
@@ -137,7 +130,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     catalogPanel.setCloseTabAction (closeTabAction);
 
     pack ();
-    System.out.printf ("4: %d%n", System.currentTimeMillis () - start);
 
     // restore the menuHandler items before they are referenced
     quitAction.restore ();
@@ -150,7 +142,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // activate the highest panel now that the listeners are ready
     catalogPanel.activate ();
-    System.out.printf ("5: %d%n", System.currentTimeMillis () - start);
   }
 
   private JPanel addPanel (JComponent pane, String title, String location)

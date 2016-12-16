@@ -159,6 +159,8 @@ public class CPMDisk extends AbstractFormattedDisk
       text.append (newLine);
     }
     text.append (line);
+    if (version != 0)
+      text.append ("Version: " + version);
 
     return new DefaultAppleFileSource ("CPM Disk ", text.toString (), this);
   }

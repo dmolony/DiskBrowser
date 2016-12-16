@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.bytezone.diskbrowser.utilities.Utility;
-
 public class DiskTableModel extends AbstractTableModel
 {
   static final String[] headers =
@@ -119,7 +117,8 @@ public class DiskTableModel extends AbstractTableModel
       shortName = diskDetails.getShortName ();
       fileName = diskDetails.getFileName ();
       checksum = diskDetails.getChecksum ();
-      type = Utility.getSuffix (shortName);
+      //      type = Utility.getSuffix (shortName);
+      type = diskDetails.getType ();
       size = diskDetails.getFile ().length ();
 
       String rootName = diskDetails.getRootName ();

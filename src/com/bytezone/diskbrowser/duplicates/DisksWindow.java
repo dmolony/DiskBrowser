@@ -7,6 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class DisksWindow extends JFrame
   private final JTable table;
 
   private final JButton btnExport = new JButton ("Export");
+  private final JButton btnDelete = new JButton ("Duplicates");
   private final JButton btnHide = new JButton ("Close");
   private final JButton btnTotals = new JButton ("Totals");
   private final JPanel topPanel = new JPanel ();
@@ -37,6 +40,7 @@ public class DisksWindow extends JFrame
 
   private DiskTableModel diskTableModel;
   private final RootFolderData rootFolderData;
+  private final DeleteWindow deleteWindow;
 
   public DisksWindow (RootFolderData rootFolderData)
   {
@@ -59,6 +63,7 @@ public class DisksWindow extends JFrame
     panel.add (btnTotals);
     panel.add (btnHide);
     panel.add (btnExport);
+    panel.add (btnDelete);
     add (panel, BorderLayout.SOUTH);
 
     topPanel.setLayout (new FlowLayout (FlowLayout.LEFT, 10, 5));
@@ -85,6 +90,15 @@ public class DisksWindow extends JFrame
       }
     });
 
+    btnDelete.addActionListener (new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        deleteWindow.setVisible (true);
+      }
+    });
+
     btnExport.addActionListener (new ActionListener ()
     {
       @Override
@@ -96,6 +110,8 @@ public class DisksWindow extends JFrame
 
     scrollPane.setPreferredSize (new Dimension (1200, 700));
     setDefaultCloseOperation (HIDE_ON_CLOSE);
+
+    deleteWindow = new DeleteWindow (rootFolderData);
   }
 
   // called from DuplicateSwingWorker
@@ -148,6 +164,16 @@ public class DisksWindow extends JFrame
       }
     });
 
+    table.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mousePressed (MouseEvent mouseEvent)
+      {
+        if (mouseEvent.getClickCount () == 2)
+          deleteWindow.setVisible (true);
+      }
+    });
+
     for (int i = 0; i < Utility.suffixes.size (); i++)
     {
       int total = rootFolderData.getTotalType (i);
@@ -178,6 +204,7 @@ public class DisksWindow extends JFrame
   private String getFilterText ()
   {
     StringBuilder filterText = new StringBuilder ();
+
     for (JCheckBox box : boxes)
       if (box.isSelected ())
       {

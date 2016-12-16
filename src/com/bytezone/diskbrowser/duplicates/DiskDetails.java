@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.common.ComputeCRC32;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class DiskDetails
 {
@@ -12,6 +13,8 @@ public class DiskDetails
   private long checksum;
   private final String rootName;            // full path without the root folder
   private final String shortName;           // file name in lower case
+  private final String type;
+  private final long size;
 
   private final List<DiskDetails> duplicateChecksums = new ArrayList<DiskDetails> ();
   private final List<DiskDetails> duplicateNames = new ArrayList<DiskDetails> ();
@@ -24,6 +27,8 @@ public class DiskDetails
     this.file = file;
     this.rootName = rootName;
     this.shortName = shortName;
+    this.type = Utility.getSuffix (shortName);
+    this.size = file.length ();
 
     if (doChecksum)
       checksum = ComputeCRC32.getChecksumValue (file);
@@ -79,6 +84,16 @@ public class DiskDetails
     return rootName;
   }
 
+  public String getType ()
+  {
+    return type;
+  }
+
+  public long getSize ()
+  {
+    return size;
+  }
+
   public String getShortName ()
   {
     return shortName;
@@ -103,7 +118,7 @@ public class DiskDetails
   @Override
   public String toString ()
   {
-    return String.format ("%-40s %3d %s %3d %s", rootName, duplicateChecksums.size (),
-        isDuplicateChecksum, duplicateNames.size (), isDuplicateName);
+    return String.format ("%3d %1.1s %3d %1.1s %-40s  ", duplicateChecksums.size (),
+        isDuplicateChecksum, duplicateNames.size (), isDuplicateName, rootName);
   }
 }

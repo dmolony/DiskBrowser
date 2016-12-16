@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
@@ -45,7 +45,7 @@ public class RootFolderData
 
   // Progress dialog
   ProgressPanel progressPanel;
-  public JDialog dialogTotals;
+  public JFrame dialogTotals;
   JPanel southPanel;
   JButton btnCancel;
   JButton btnOK;
@@ -57,13 +57,13 @@ public class RootFolderData
     btnOK = new JButton ("OK");
 
     progressPanel = new ProgressPanel ();
-    progressPanel.setPreferredSize (new Dimension (560, 300));
+    progressPanel.setPreferredSize (new Dimension (560, 340));
 
-    dialogTotals = new JDialog (disksWindow);
+    dialogTotals = new JFrame ("Disk Totals");
     dialogTotals.add (progressPanel, BorderLayout.CENTER);
     southPanel.add (btnCancel);               // needs to be here for the pack()
     dialogTotals.add (southPanel, BorderLayout.SOUTH);
-    dialogTotals.setTitle ("Disk Totals");
+    //    dialogTotals.setTitle ("Disk Totals");
     dialogTotals.pack ();
     dialogTotals.setLocationRelativeTo (null);
 
@@ -192,6 +192,20 @@ public class RootFolderData
     }
   }
 
+  public List<DiskDetails> listDuplicates (long checksum)
+  {
+    List<DiskDetails> list = new ArrayList<DiskDetails> ();
+    DiskDetails original = checksumMap.get (checksum);
+    if (original != null)
+    {
+      list.add (original);
+      for (DiskDetails dd : original.getDuplicateChecksums ())
+        list.add (dd);
+    }
+
+    return list;
+  }
+
   public int getTotalType (int type)
   {
     return typeTotals[0][type] + typeTotals[1][type] + typeTotals[2][type];
@@ -267,6 +281,18 @@ public class RootFolderData
           grandTotal[1], grandTotal[2], grandTotal[3]);
       y += 10;
       g.drawString (line, x, y);
+
+      if (doChecksums)
+      {
+        //        line = String.format ("Unique checksums:                    %,7d%n",
+        //            checksumMap.size ());
+        //        y += lineHeight;
+        //        g.drawString (line, x, y);
+        line = String.format ("duplicates ...                             %,7d%n",
+            totalDisks - checksumMap.size ());
+        y += lineHeight + 10;
+        g.drawString (line, x, y);
+      }
     }
   }
 }

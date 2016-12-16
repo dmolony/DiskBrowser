@@ -41,10 +41,16 @@ public class CPMDisk extends AbstractFormattedDisk
 
     setEmptyByte ((byte) 0xE5);
 
-    byte[] buffer = disk.readSector (0, 8);
-    String text = new String (buffer, 16, 24);
-    if ("DIR ERA TYPESAVEREN USER".equals (text))
-      version = buffer[41] & 0xFF;
+    for (int i = 8; i >= 4; i -= 2)
+    {
+      byte[] buffer = disk.readSector (0, i);
+      String text = new String (buffer, 16, 24);
+      if ("DIR ERA TYPESAVEREN USER".equals (text))
+      {
+        version = buffer[41] & 0xFF;
+        break;
+      }
+    }
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
 
@@ -55,7 +61,7 @@ public class CPMDisk extends AbstractFormattedDisk
         break;
 
       sectorTypes[da.getBlock ()] = catalogSector;
-      buffer = disk.readSector (da);
+      byte[] buffer = disk.readSector (da);
 
       for (int i = 0; i < buffer.length; i += 32)
       {
@@ -166,7 +172,11 @@ public class CPMDisk extends AbstractFormattedDisk
       byte[] buffer = disk.readSector (0, i);
       String text = new String (buffer, 16, 24);
       if ("DIR ERA TYPESAVEREN USER".equals (text))
+      {
+        int version = buffer[41] & 0xFF;
+        System.out.printf ("CPM version %d%n", version);
         return true;
+      }
     }
 
     for (int sector = 0; sector < 8; sector++)
@@ -177,14 +187,13 @@ public class CPMDisk extends AbstractFormattedDisk
       if (bufferContainsAll (buffer, (byte) 0xE5))
         break;
 
-      //      System.out.println (HexFormatter.format (buffer));
       for (int i = 0; i < buffer.length; i += 32)
       {
         int val = buffer[i] & 0xFF;
-        //        System.out.printf ("%02X%n", val);
-        //        if (val == 0xE5)
-        //          break;
-        if (val > 31 && val != 0xE5)
+        if (val == 0xE5)
+          break;
+
+        if (val > 31)   // && val != 0xE5)
           return false;
 
         for (int j = 1; j <= 8; j++)

@@ -70,7 +70,7 @@ public class DiskTableModel extends AbstractTableModel
       case 0:
         return line.path;
       case 1:
-        return line.shortName;
+        return line.fileName;
       case 2:
         return line.type;
       case 3:
@@ -104,6 +104,7 @@ public class DiskTableModel extends AbstractTableModel
   class TableLine
   {
     private final String shortName;
+    private final String fileName;
     private final String path;
     private long checksum;
     private final int duplicateNames;
@@ -116,6 +117,7 @@ public class DiskTableModel extends AbstractTableModel
     {
       this.diskDetails = diskDetails;
       shortName = diskDetails.getShortName ();
+      fileName = diskDetails.getFileName ();
       checksum = diskDetails.getChecksum ();
       type = Utility.getSuffix (shortName);
       size = diskDetails.getFile ().length ();

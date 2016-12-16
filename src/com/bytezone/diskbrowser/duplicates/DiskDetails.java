@@ -84,6 +84,11 @@ public class DiskDetails
     return shortName;
   }
 
+  public String getFileName ()
+  {
+    return file.getName ();
+  }
+
   public long calculateChecksum ()
   {
     checksum = ComputeCRC32.getChecksumValue (file);

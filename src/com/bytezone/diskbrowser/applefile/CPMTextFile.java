@@ -21,6 +21,8 @@ public class CPMTextFile extends AbstractFile
       String line = getLine (ptr);
       text.append (line + "\n");
       ptr += line.length () + 2;
+      while (ptr < buffer.length && buffer[ptr] == 0)
+        ++ptr;
     }
 
     if (text.length () > 0)

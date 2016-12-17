@@ -134,6 +134,11 @@ public class ShapeTable extends AbstractFile
     if (totalShapes == 0)
       return false;
 
+    // this prevents large files that start with a very small value
+    //    System.out.printf ("Average shape length: %d%n", buffer.length / totalShapes);
+    if (totalShapes * 500 < buffer.length)
+      return false;
+
     for (int i = 0; i < totalShapes; i++)
     {
       // check index table entry is inside the file
@@ -149,6 +154,7 @@ public class ShapeTable extends AbstractFile
       // check offset is unique
       if (offsets.contains (offset))
         return false;
+
       offsets.add (offset);
     }
 

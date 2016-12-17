@@ -105,9 +105,7 @@ class Monster extends AbstractFile implements Comparable<Monster>
     StringBuilder text = new StringBuilder ();
 
     // these values definitely affect the damage a monster does (when breathing?)
-    int exp2 =
-        (HexFormatter.intValue (buffer[72]) * HexFormatter.intValue (buffer[74]) - 1)
-            * 20;
+    int exp2 = ((buffer[72] & 0xFF) * (buffer[74] & 0xFF) - 1) * 20;
     int exp3 = weight2[speed]; // 1-6
     int exp4 = (10 - armourClass) * 40;
     int exp5 = getBonus (35, mageSpellLevel);
@@ -191,9 +189,7 @@ class Monster extends AbstractFile implements Comparable<Monster>
   public int getExperience ()
   {
     // these values definitely affect the damage a monster does (when breathing?)
-    int exp2 =
-        (HexFormatter.intValue (buffer[72]) * HexFormatter.intValue (buffer[74]) - 1)
-            * 20;
+    int exp2 = ((buffer[72] & 0xFF) * (buffer[74] & 0xFF) - 1) * 20;
     int exp3 = weight2[speed];
     int exp4 = (10 - armourClass) * 40;
     int exp5 = getBonus (35, mageSpellLevel);

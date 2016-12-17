@@ -5,17 +5,18 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class IntegerBasicProgram extends AbstractFile
 {
   private static String[] tokens =
-        { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?", "?",
-          "HIMEM: ", "LOMEM: ", " + ", " - ", " * ", " / ", " = ", " # ", " >= ", " > ",
-          " <= ", " <> ", " < ", " AND ", " OR ", " MOD ", "^", "+", "(", ",", " THEN ",
-          " THEN ", ",", ",", "\"", "\"", "(", "!", "!", "(", "PEEK ", "RND ", "SGN", "ABS",
-          "PDL", "RNDX", "(", "+", "-", "NOT ", "(", "=", "#", "LEN(", "ASC(", "SCRN(", ",",
-          "(", "$", "$", "(", ", ", ",", ";", ";", ";", ",", ",", ",", "TEXT", "GR ", "CALL ",
-          "DIM ", "DIM ", "TAB ", "END", "INPUT ", "INPUT ", "INPUT ", "FOR ", " = ", " TO ",
-          " STEP ", "NEXT ", ",", "RETURN", "GOSUB ", "REM ", "LET ", "GOTO ", "IF ", "PRINT ",
-          "PRINT ", "PRINT", "POKE ", ",", "COLOR=", "PLOT", ",", "HLIN", ",", " AT ", "VLIN ",
-          ",", " AT ", "VTAB ", " = ", " = ", ")", ")", "LIST ", ",", "LIST ", "POP ",
-          "NODSP ", "NODSP ", "NOTRACE ", "DSP ", "DSP ", "TRACE ", "PR#", "IN#", };
+      { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?",
+        "?", "HIMEM: ", "LOMEM: ", " + ", " - ", " * ", " / ", " = ", " # ", " >= ",
+        " > ", " <= ", " <> ", " < ", " AND ", " OR ", " MOD ", "^", "+", "(", ",",
+        " THEN ", " THEN ", ",", ",", "\"", "\"", "(", "!", "!", "(", "PEEK ", "RND ",
+        "SGN", "ABS", "PDL", "RNDX", "(", "+", "-", "NOT ", "(", "=", "#", "LEN(", "ASC(",
+        "SCRN(", ",", "(", "$", "$", "(", ", ", ",", ";", ";", ";", ",", ",", ",", "TEXT",
+        "GR ", "CALL ", "DIM ", "DIM ", "TAB ", "END", "INPUT ", "INPUT ", "INPUT ",
+        "FOR ", " = ", " TO ", " STEP ", "NEXT ", ",", "RETURN", "GOSUB ", "REM ", "LET ",
+        "GOTO ", "IF ", "PRINT ", "PRINT ", "PRINT", "POKE ", ",", "COLOR=", "PLOT", ",",
+        "HLIN", ",", " AT ", "VLIN ", ",", " AT ", "VTAB ", " = ", " = ", ")", ")",
+        "LIST ", ",", "LIST ", "POP ", "NODSP ", "NODSP ", "NOTRACE ", "DSP ", "DSP ",
+        "TRACE ", "PR#", "IN#", };
 
   public IntegerBasicProgram (String name, byte[] buffer)
   {
@@ -27,8 +28,8 @@ public class IntegerBasicProgram extends AbstractFile
   {
     StringBuilder pgm = new StringBuilder ();
     pgm.append ("Name    : " + name + "\n");
-    pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
-          + ")\n\n");
+    pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length) + " ("
+        + buffer.length + ")\n\n");
     int ptr = 0;
 
     boolean looksLikeAssembler = checkForAssembler ();      // this can probably go
@@ -36,7 +37,7 @@ public class IntegerBasicProgram extends AbstractFile
 
     while (ptr < buffer.length)
     {
-      int lineLength = HexFormatter.intValue (buffer[ptr]);
+      int lineLength = buffer[ptr] & 0xFF;
       /*
        * It appears that lines ending in 00 are S-C Assembler programs, and
        * lines ending in 01 are Integer Basic programs.
@@ -86,7 +87,7 @@ public class IntegerBasicProgram extends AbstractFile
           pgm.append (' ');
         continue;
       }
-      int b = HexFormatter.intValue (buffer[i]);
+      int b = buffer[i] & 0xFF;
       pgm.append ((char) b);
     }
   }
@@ -97,7 +98,7 @@ public class IntegerBasicProgram extends AbstractFile
 
     while (ptr < buffer.length)
     {
-      int lineLength = HexFormatter.intValue (buffer[ptr]);
+      int lineLength = buffer[ptr] & 0xFF;
       if (lineLength == 255)
         System.out.printf ("Line length %d%n", lineLength);
       int p2 = ptr + lineLength - 1;
@@ -122,7 +123,7 @@ public class IntegerBasicProgram extends AbstractFile
       System.out.println ("Empty buffer array");
       return false;
     }
-    int lineLength = HexFormatter.intValue (buffer[0]);
+    int lineLength = buffer[0] & 0xFF;
     if (lineLength <= 0)
       return false;
     return buffer[lineLength - 1] == 0;
@@ -130,8 +131,7 @@ public class IntegerBasicProgram extends AbstractFile
 
   private void appendSCAssembler (StringBuilder pgm, int ptr, int lineLength)
   {
-    int lineNumber = HexFormatter.intValue (buffer[ptr + 2]) * 256
-          + HexFormatter.intValue (buffer[ptr + 1]);
+    int lineNumber = (buffer[ptr + 2] & 0xFF) * 256 + (buffer[ptr + 1] & 0xFF);
     pgm.append (String.format ("%4d: ", lineNumber));
     int p2 = ptr + 3;
     while (buffer[p2] != 0)
@@ -168,18 +168,18 @@ public class IntegerBasicProgram extends AbstractFile
 
     for (int p = ptr + 3; p < ptr + lineLength - 1; p++)
     {
-      int b = HexFormatter.intValue (buffer[p]);
+      int b = buffer[p] & 0xFF;
 
       if (b == 0x03 // token for colon (:)
-            && !inString && !inRemark && buffer[p + 1] != 1)        // not end of line
+          && !inString && !inRemark && buffer[p + 1] != 1)        // not end of line
       {
         pgm.append (":\n" + "         ".substring (0, lineTab));
         continue;
       }
 
       if (b >= 0xB0 && b <= 0xB9                        // numeric literal
-            && (buffer[p - 1] & 0x80) == 0                // not a variable name
-            && !inString && !inRemark)
+          && (buffer[p - 1] & 0x80) == 0                // not a variable name
+          && !inString && !inRemark)
       {
         pgm.append (HexFormatter.intValue (buffer[p + 1], buffer[p + 2]));
         p += 2;
@@ -217,13 +217,13 @@ public class IntegerBasicProgram extends AbstractFile
 
     pgm.append ("Name : " + name + "\n");
     pgm.append ("Length : $" + HexFormatter.format4 (buffer.length) + " (" + buffer.length
-          + ")\n\n");
+        + ")\n\n");
 
     int ptr = 0;
 
     while (ptr < buffer.length)
     {
-      int lineLength = HexFormatter.intValue (buffer[ptr]);
+      int lineLength = buffer[ptr] & 0xFF;
       int p2 = ptr + lineLength - 1;
       if (p2 < 0 || p2 >= buffer.length || buffer[p2] > 1)
       {

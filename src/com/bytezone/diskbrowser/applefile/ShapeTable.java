@@ -5,6 +5,18 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+/*-
+ *  Offset     Meaning
+ *    0        # of shapes
+ *    1        unused
+ *    2-3      offset to shape #1 (S1)
+ *    3-4      offset to shape #2 (S2)
+ *    S1-S1+1  shape definition #1
+ *    S1+n     last byte = 0
+ *    S2-S2+1  shape definition #1
+ *    S2+n     last byte = 0
+ */
+
 public class ShapeTable extends AbstractFile
 {
   private static final int SIZE = 400;
@@ -23,7 +35,7 @@ public class ShapeTable extends AbstractFile
 
     for (int i = 0; i < totalShapes; i++)
     {
-      int offset = HexFormatter.intValue (buffer[i * 2 + 2], buffer[i * 2 + 3]);
+      int offset = HexFormatter.getShort (buffer, i * 2 + 2);
       int[][] grid = new int[SIZE][SIZE];
       int row = startPos;
       int col = row;
@@ -147,7 +159,7 @@ public class ShapeTable extends AbstractFile
         return false;
 
       // check index points inside the file
-      int offset = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
+      int offset = HexFormatter.getShort (buffer, ptr);
       if (offset == 0 || offset >= buffer.length)
         return false;
 

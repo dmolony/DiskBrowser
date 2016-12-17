@@ -49,7 +49,7 @@ class ProdosCatalogSector extends AbstractSector
         addText (text, buffer, i, 1, typeText + ", " + hex2 + " = Name length");
 
       addText (text, buffer, i + 1, 4,
-               HexFormatter.getString (buffer, i + 1, nameLength));
+          HexFormatter.getString (buffer, i + 1, nameLength));
 
       switch (fileType)
       {
@@ -80,9 +80,9 @@ class ProdosCatalogSector extends AbstractSector
   private String doFileDescription (int offset)
   {
     StringBuilder text = new StringBuilder ();
-    int fileType = HexFormatter.intValue (buffer[offset + 16]);
+    int fileType = buffer[offset + 16] & 0xFF;
     addText (text, buffer, offset + 16, 1,
-             "File type (" + ProdosConstants.fileTypes[fileType] + ")");
+        "File type (" + ProdosConstants.fileTypes[fileType] + ")");
     addTextAndDecimal (text, buffer, offset + 17, 2, "Key pointer");
     addTextAndDecimal (text, buffer, offset + 19, 2, "Blocks used");
     addTextAndDecimal (text, buffer, offset + 21, 3, "EOF");
@@ -93,7 +93,7 @@ class ProdosCatalogSector extends AbstractSector
     addText (text, buffer, offset + 29, 1, "Minimum version");
     addText (text, buffer, offset + 30, 1, "Access");
     addTextAndDecimal (text, buffer, offset + 31, 2,
-                       "Auxilliary type - " + getAuxilliaryText (fileType));
+        "Auxilliary type - " + getAuxilliaryText (fileType));
     GregorianCalendar modified = HexFormatter.getAppleDate (buffer, offset + 33);
     String dateM = modified == null ? "" : parent.df.format (modified.getTime ());
     addText (text, buffer, offset + 33, 4, "Modification date : " + dateM);
@@ -191,7 +191,7 @@ class ProdosCatalogSector extends AbstractSector
   {
     StringBuilder text = new StringBuilder ();
     for (int i = offset, max = offset + 15; i < max && buffer[i] != 0; i++)
-      text.append ((char) HexFormatter.intValue (buffer[i]));
+      text.append ((char) buffer[i] & 0xFF);
     return text.toString ();
   }
 }

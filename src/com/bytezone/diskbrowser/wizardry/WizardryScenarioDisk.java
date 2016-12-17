@@ -255,7 +255,7 @@ public class WizardryScenarioDisk extends PascalDisk
     int recLen = 208;
     for (int ptr = 0; ptr < 832; ptr += recLen)
     {
-      int nameLength = HexFormatter.intValue (buffer[ptr]);
+      int nameLength = buffer[ptr] & 0xFF;
       if (nameLength == 0xC3 || buffer[ptr + 40] == 0x07)
         continue;
       String name = HexFormatter.getString (buffer, ptr + 1, nameLength);
@@ -308,7 +308,7 @@ public class WizardryScenarioDisk extends PascalDisk
     int recLen = 158;
     for (int ptr = 0; ptr < 948; ptr += recLen)
     {
-      int nameLength = HexFormatter.intValue (buffer[ptr + 32]);
+      int nameLength = buffer[ptr + 32] & 0xFF;
       if (nameLength == 0 || nameLength == 255)
         break;
       String itemName = HexFormatter.getString (buffer, ptr + 33, nameLength);

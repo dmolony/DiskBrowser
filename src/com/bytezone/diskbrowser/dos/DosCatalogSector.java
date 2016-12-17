@@ -34,8 +34,8 @@ class DosCatalogSector extends AbstractSector
         if (buffer[i] == (byte) 0xFF)
         {
           addText (text, buffer, i + 0, 2,
-                   "DEL: file @ " + HexFormatter.format2 (buffer[i + 32]) + " "
-                       + HexFormatter.format2 (buffer[i + 1]));
+              "DEL: file @ " + HexFormatter.format2 (buffer[i + 32]) + " "
+                  + HexFormatter.format2 (buffer[i + 1]));
           addText (text, buffer, i + 2, 1, "DEL: File type " + getType (buffer[i + 2]));
           if (buffer[i + 3] == 0)
             addText (text, buffer, i + 3, 4, "");
@@ -73,7 +73,7 @@ class DosCatalogSector extends AbstractSector
     int max = buffer[offset] == (byte) 0xFF ? 32 : 33;
     for (int i = 3; i < max; i++)
     {
-      int c = HexFormatter.intValue (buffer[i + offset]);
+      int c = buffer[i + offset] & 0xFF;
       if (c == 136)
       {
         if (text.length () > 0)

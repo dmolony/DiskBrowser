@@ -131,7 +131,7 @@ public class PascalDisk extends AbstractFormattedDisk
   public static boolean checkFormat (AppleDisk disk, boolean debug)
   {
     byte[] buffer = disk.readSector (2);
-    int nameLength = HexFormatter.intValue (buffer[6]);
+    int nameLength = buffer[6] & 0xFF;
     if (nameLength < 1 || nameLength > 7)
     {
       if (debug)
@@ -188,7 +188,7 @@ public class PascalDisk extends AbstractFormattedDisk
         return false;
       if (kind == 0)
         return false;
-      nameLength = HexFormatter.intValue (buffer[ptr + 6]);
+      nameLength = buffer[ptr + 6] & 0xFF;
       if (nameLength < 1 || nameLength > 15)
         return false;
       int lastByte = HexFormatter.intValue (buffer[ptr + 22], buffer[ptr + 23]);

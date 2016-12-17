@@ -26,7 +26,7 @@ class DosVTOCSector extends AbstractSector
 
     this.parentDisk = parentDisk;
     DOSVersion = buffer[3];
-    volume = HexFormatter.intValue (buffer[6]);
+    volume = buffer[6] & 0xFF;
     maxTSPairs = buffer[39];
     lastAllocTrack = buffer[48];
     direction = buffer[49];
@@ -64,9 +64,8 @@ class DosVTOCSector extends AbstractSector
         extra = "(VTOC and Catalog)";
       else
         extra = "";
-      addText (text, buffer, i, 4,
-               String.format ("Track %02X  %s  %s", (i - 56) / 4,
-                              getBitmap (buffer[i], buffer[i + 1]), extra));
+      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s", (i - 56) / 4,
+          getBitmap (buffer[i], buffer[i + 1]), extra));
     }
 
     text.deleteCharAt (text.length () - 1);

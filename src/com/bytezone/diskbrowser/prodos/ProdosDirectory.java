@@ -60,7 +60,7 @@ class ProdosDirectory extends AbstractFile
         case ProdosConstants.TYPE_PASCAL_ON_PROFILE:
         case ProdosConstants.TYPE_GSOS_EXTENDED_FILE:
         case ProdosConstants.TYPE_SUBDIRECTORY:
-          int type = HexFormatter.intValue (buffer[i + 16]);
+          int type = buffer[i + 16] & 0xFF;
           int blocks = HexFormatter.intValue (buffer[i + 19], buffer[i + 20]);
 
           GregorianCalendar created = HexFormatter.getAppleDate (buffer, i + 24);
@@ -74,7 +74,7 @@ class ProdosDirectory extends AbstractFile
               modified == null ? "" : parentFD.stf.format (modified.getTime ());
           int eof =
               HexFormatter.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
-          int fileType = HexFormatter.intValue (buffer[i + 16]);
+          int fileType = buffer[i + 16] & 0xFF;
           locked = (buffer[i + 30] & 0xE0) == 0xE0 ? " " : "*";
 
           switch (fileType)
@@ -97,17 +97,17 @@ class ProdosDirectory extends AbstractFile
           }
 
           text.append (String.format ("%s%-15s %3s   %5d  %9s %5s  %9s %5s %8d %7s%n",
-                                      locked, filename, ProdosConstants.fileTypes[type],
-                                      blocks, dateM, timeM, dateC, timeC, eof, subType));
+              locked, filename, ProdosConstants.fileTypes[type], blocks, dateM, timeM,
+              dateC, timeC, eof, subType));
           break;
 
         default:
           text.append (" <Unknown strage type : " + storageType + newLine);
       }
     }
-    text.append (String.format (
-                                "%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
-                                freeBlocks, usedBlocks, totalBlocks));
+    text.append (
+        String.format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
+            freeBlocks, usedBlocks, totalBlocks));
     return text.toString ();
   }
 

@@ -88,13 +88,13 @@ public class MazeGridV5 extends AbstractFile
     int offset = gridNo * 16 + column * 2 + row / 4;
     int value;
 
-    value = HexFormatter.intValue (buffer[offset + 0]);
+    value = buffer[offset + 0] & 0xFF;
     value >>>= (row % 4) * 2;
     cell.eastWall = ((value & 1) == 1);
     value >>>= 1;
     cell.eastDoor = ((value & 1) == 1);
 
-    value = HexFormatter.intValue (buffer[offset + 256]);
+    value = buffer[offset + 256] & 0xFF;
     value >>>= (row % 4) * 2;
     cell.northWall = ((value & 1) == 1);
     value >>>= 1;

@@ -30,9 +30,9 @@ abstract class CatalogEntry implements AppleFileSource
     name = HexFormatter.getString (entryBuffer, 1, entryBuffer[0] & 0x0F);
     storageType = (entryBuffer[0] & 0xF0) >> 4;
     created = HexFormatter.getAppleDate (entryBuffer, 24);
-    version = HexFormatter.intValue (entryBuffer[28]);
-    minVersion = HexFormatter.intValue (entryBuffer[29]);
-    access = HexFormatter.intValue (entryBuffer[30]);
+    version = entryBuffer[28] & 0xFF;
+    minVersion = entryBuffer[29] & 0xFF;
+    access = entryBuffer[30] & 0xFF;
   }
 
   @Override

@@ -32,13 +32,13 @@ class Character extends AbstractFile
     attributes = new Attributes ();
     stats = new Statistics ();
 
-    stats.race = races[HexFormatter.intValue (buffer[34])];
-    stats.typeInt = HexFormatter.intValue (buffer[36]);
+    stats.race = races[buffer[34] & 0xFF];
+    stats.typeInt = buffer[36] & 0xFF;
     stats.type = types[stats.typeInt];
     stats.ageInWeeks = HexFormatter.intValue (buffer[38], buffer[39]);
     stats.statusValue = buffer[40];
     stats.status = statuses[stats.statusValue];
-    stats.alignment = alignments[HexFormatter.intValue (buffer[42])];
+    stats.alignment = alignments[buffer[42] & 0xFF];
 
     stats.gold = HexFormatter.intValue (buffer[52], buffer[53])
         + HexFormatter.intValue (buffer[54], buffer[55]) * 10000;
@@ -50,30 +50,30 @@ class Character extends AbstractFile
     stats.hitsMax = HexFormatter.intValue (buffer[136], buffer[137]);
     stats.armourClass = buffer[176];
 
-    attributes.strength = HexFormatter.intValue (buffer[44]) % 16;
+    attributes.strength = (buffer[44] & 0xFF) % 16;
     if (attributes.strength < 3)
       attributes.strength += 16;
     attributes.array[0] = attributes.strength;
 
-    int i1 = HexFormatter.intValue (buffer[44]) / 16;
-    int i2 = HexFormatter.intValue (buffer[45]) % 4;
+    int i1 = (buffer[44] & 0xFF) / 16;
+    int i2 = (buffer[45] & 0xFF) % 4;
     attributes.intelligence = i1 / 2 + i2 * 8;
     attributes.array[1] = attributes.intelligence;
 
-    attributes.piety = HexFormatter.intValue (buffer[45]) / 4;
+    attributes.piety = (buffer[45] & 0xFF) / 4;
     attributes.array[2] = attributes.piety;
 
-    attributes.vitality = HexFormatter.intValue (buffer[46]) % 16;
+    attributes.vitality = (buffer[46] & 0xFF) % 16;
     if (attributes.vitality < 3)
       attributes.vitality += 16;
     attributes.array[3] = attributes.vitality;
 
-    int a1 = HexFormatter.intValue (buffer[46]) / 16;
-    int a2 = HexFormatter.intValue (buffer[47]) % 4;
+    int a1 = (buffer[46] & 0xFF) / 16;
+    int a2 = (buffer[47] & 0xFF) % 4;
     attributes.agility = a1 / 2 + a2 * 8;
     attributes.array[4] = attributes.agility;
 
-    attributes.luck = HexFormatter.intValue (buffer[47]) / 4;
+    attributes.luck = (buffer[47] & 0xFF) / 4;
     attributes.array[5] = attributes.luck;
   }
 
@@ -86,7 +86,7 @@ class Character extends AbstractFile
 
     for (int ptr = 60; totItems > 0; ptr += 8, totItems--)
     {
-      int itemID = HexFormatter.intValue (buffer[ptr + 6]);
+      int itemID = buffer[ptr + 6] & 0xFF;
       if (scenario == 3)
         itemID = (itemID + 24) % 256;
       if (itemID >= 0 && itemID < itemList.size ())

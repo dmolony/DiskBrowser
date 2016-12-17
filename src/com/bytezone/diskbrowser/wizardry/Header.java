@@ -186,7 +186,7 @@ class Header
       {
         for (int j = 0; j < 8; j++)
         {
-          int value = HexFormatter.intValue (buffer[i + line + j * 8]);
+          int value = buffer[i + line + j * 8] & 0xFF;
           for (int bit = 0; bit < 7; bit++)
           {
             if ((value & 0x01) == 1)
@@ -217,10 +217,10 @@ class Header
     public ScenarioData (byte[] buffer, int seq, List<DiskAddress> sectors)
     {
       int offset = 42 + seq * 2;
-      dunno = HexFormatter.intValue (buffer[offset]);
-      total = HexFormatter.intValue (buffer[offset + 16]);
-      totalBlocks = HexFormatter.intValue (buffer[offset + 32]);
-      dataOffset = HexFormatter.intValue (buffer[offset + 48]);
+      dunno = buffer[offset] & 0xFF;
+      total = buffer[offset + 16] & 0xFF;
+      totalBlocks = buffer[offset + 32] & 0xFF;
+      dataOffset = buffer[offset + 48] & 0xFF;
       type = seq;
 
       this.sectors = new ArrayList<DiskAddress> (totalBlocks);

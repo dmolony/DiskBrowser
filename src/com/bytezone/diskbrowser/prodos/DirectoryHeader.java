@@ -12,8 +12,8 @@ abstract class DirectoryHeader extends CatalogEntry
   {
     super (parentDisk, entryBuffer);
 
-    entryLength = HexFormatter.intValue (entryBuffer[31]);
-    entriesPerBlock = HexFormatter.intValue (entryBuffer[32]);
+    entryLength = entryBuffer[31] & 0xFF;
+    entriesPerBlock = entryBuffer[32] & 0xFF;
     fileCount = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
   }
 }

@@ -18,8 +18,8 @@ class SubDirectoryHeader extends DirectoryHeader
     this.parentDirectory = parent.parentDirectory;
 
     parentPointer = HexFormatter.intValue (entryBuffer[35], entryBuffer[36]);
-    parentSequence = HexFormatter.intValue (entryBuffer[37]);
-    parentSize = HexFormatter.intValue (entryBuffer[38]);
+    parentSequence = entryBuffer[37] & 0xFF;
+    parentSize = entryBuffer[38] & 0xFF;
   }
 
   @Override
@@ -27,7 +27,7 @@ class SubDirectoryHeader extends DirectoryHeader
   {
     String locked = (access == 0x01) ? "*" : " ";
     return String.format ("   %s%-40s %15s", locked, "/" + name,
-                          parentDisk.df.format (created.getTime ()));
+        parentDisk.df.format (created.getTime ()));
   }
 
   @Override

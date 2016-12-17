@@ -61,14 +61,15 @@ public class AssemblerStatement
           lastMnemonic = as.mnemonic;
           System.out.println ();
         }
-        System.out.printf ("%3s  %-15s  %s%n", as.mnemonic, AssemblerConstants.mode[as.mode], as);
+        System.out.printf ("%3s  %-15s  %s%n", as.mnemonic,
+            AssemblerConstants.mode[as.mode], as);
       }
   }
 
   public AssemblerStatement (byte opcode)
   {
     this.value = opcode;
-    this.opcode = HexFormatter.intValue (opcode);
+    this.opcode = opcode & 0xFF;
     this.mnemonic = AssemblerConstants.mnemonics[this.opcode];
     this.size = AssemblerConstants.sizes2[this.opcode];
     this.operand = "";
@@ -128,8 +129,8 @@ public class AssemblerStatement
   {
     operand1 = b;
     String address = "$" + HexFormatter.format2 (b);
-//    if (this.mnemonic.equals ("JSR"))
-//      this.target = HexFormatter.intValue (b);
+    //    if (this.mnemonic.equals ("JSR"))
+    //      this.target = HexFormatter.intValue (b);
 
     switch (this.opcode)
     {
@@ -173,7 +174,7 @@ public class AssemblerStatement
       case 0xE4:  // CPX
       case 0xE5:  // SBC
       case 0xE6:  // INC
-        target = HexFormatter.intValue (b);
+        target = b & 0xFF;
         operand = address;
         mode = 8; // Zero page
         break;
@@ -253,7 +254,7 @@ public class AssemblerStatement
       case 0xF0:  // BEQ
         offset = b;
         mode = 14; // relative
-        this.target = HexFormatter.intValue (b);
+        this.target = b & 0xFF;
         break;
 
       default:
@@ -266,10 +267,10 @@ public class AssemblerStatement
     operand1 = b1;
     operand2 = b2;
     String address = "$" + HexFormatter.format2 (b2) + HexFormatter.format2 (b1);
-//    if (this.mnemonic.equals ("JSR") || this.mnemonic.equals ("JMP")
-//          || this.mnemonic.equals ("BIT") || this.mnemonic.equals ("STA")
-//          || this.mnemonic.equals ("LDA"))
-//      this.target = HexFormatter.intValue (b1, b2);
+    //    if (this.mnemonic.equals ("JSR") || this.mnemonic.equals ("JMP")
+    //          || this.mnemonic.equals ("BIT") || this.mnemonic.equals ("STA")
+    //          || this.mnemonic.equals ("LDA"))
+    //      this.target = HexFormatter.intValue (b1, b2);
 
     switch (this.opcode)
     {
@@ -358,6 +359,7 @@ public class AssemblerStatement
   {
     if (offset == 0)
       return String.format ("%d  %3s %-10s %02X", size, mnemonic, operand, value);
-    return String.format ("%d  %3s %-10s %02X", size, mnemonic, operand + "+" + offset, value);
+    return String.format ("%d  %3s %-10s %02X", size, mnemonic, operand + "+" + offset,
+        value);
   }
 }

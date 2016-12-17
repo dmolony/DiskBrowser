@@ -151,7 +151,7 @@ public class HexFormatter
 
     for (int i = offset; i < offset + length; i++)
     {
-      int c = intValue (buffer[i]);
+      int c = buffer[i] & 0xFF;
       if (c > 127)
       {
         if (c < 160)
@@ -176,7 +176,7 @@ public class HexFormatter
 
     for (int i = offset; i < offset + length; i++)
     {
-      int c = intValue (buffer[i]);
+      int c = buffer[i] & 0xFF;
       if (c == 136 && text.length () > 0)
       {
         System.out.println (text.toString ());
@@ -241,7 +241,7 @@ public class HexFormatter
 
   public static char byteValue (byte b)
   {
-    int c = intValue (b);
+    int c = b & 0xFF;
     if (c > 127)
       c -= 128;
     if (c > 95)
@@ -288,24 +288,19 @@ public class HexFormatter
     return text;
   }
 
-  public static int intValue (byte b1)
-  {
-    //    int i1 = b1;
-    //    if (i1 < 0)
-    //      i1 += 256;
-
-    //    return i1;
-    return b1 & 0xFF;
-  }
+  //  public static int intValue (byte b1)
+  //  {
+  //    return b1 & 0xFF;
+  //  }
 
   public static int intValue (byte b1, byte b2)
   {
-    return intValue (b1) + intValue (b2) * 256;
+    return (b1 & 0xFF) + (b2 & 0xFF) * 256;
   }
 
   public static int intValue (byte b1, byte b2, byte b3)
   {
-    return intValue (b1) + intValue (b2) * 256 + intValue (b3) * 65536;
+    return (b1 & 0xFF) + (b2 & 0xFF) * 256 + (b3 & 0xFF) * 65536;
   }
 
   public static int getLong (byte[] buffer, int ptr)
@@ -323,6 +318,17 @@ public class HexFormatter
   {
     int val = 0;
     for (int i = 0; i < 4; i++)
+    {
+      val <<= 8;
+      val += buffer[ptr + i] & 0xFF;
+    }
+    return val;
+  }
+
+  public static int getShort (byte[] buffer, int ptr)
+  {
+    int val = 0;
+    for (int i = 1; i >= 0; i--)
     {
       val <<= 8;
       val += buffer[ptr + i] & 0xFF;
@@ -379,11 +385,11 @@ public class HexFormatter
   {
     double val = 0;
 
-    int exponent = HexFormatter.intValue (buffer[offset]) - 0x80;
+    int exponent = (buffer[offset] & 0xFF) - 0x80;
 
     int mantissa =
-        (buffer[offset + 1] & 0x7F) * 0x1000000 + intValue (buffer[offset + 2]) * 0x10000
-            + intValue (buffer[offset + 3]) * 0x100 + intValue (buffer[offset + 4]);
+        (buffer[offset + 1] & 0x7F) * 0x1000000 + (buffer[offset + 2] & 0xFF) * 0x10000
+            + (buffer[offset + 3] & 0xFF) * 0x100 + (buffer[offset + 4] & 0xFF);
 
     int weight1 = 1;
     long weight2 = 2147483648L;
@@ -428,8 +434,8 @@ public class HexFormatter
       int year = (date & 0xFE00) >> 9;
       int month = (date & 0x01E0) >> 5;
       int day = date & 0x001F;
-      int hour = HexFormatter.intValue (buffer[offset + 3]) & 0x1F;
-      int minute = HexFormatter.intValue (buffer[offset + 2]) & 0x3F;
+      int hour = buffer[offset + 3] & 0x1F;
+      int minute = buffer[offset + 2] & 0x3F;
       if (year < 70)
         year += 2000;
       else
@@ -441,7 +447,7 @@ public class HexFormatter
 
   public static GregorianCalendar getPascalDate (byte[] buffer, int offset)
   {
-    int year = intValue (buffer[offset + 1]);
+    int year = (buffer[offset + 1] & 0xFF);
     int day = (buffer[offset] & 0xF0) >> 4;
     int month = buffer[offset] & 0x0F;
     if (day == 0 || month == 0)
@@ -458,7 +464,7 @@ public class HexFormatter
 
   public static String getPascalString (byte[] buffer, int offset)
   {
-    int length = HexFormatter.intValue (buffer[offset]);
+    int length = buffer[offset] & 0xFF;
     return HexFormatter.getString (buffer, offset + 1, length);
   }
 }

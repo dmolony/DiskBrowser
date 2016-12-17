@@ -25,8 +25,9 @@ class CatalogEntry extends AbstractCatalogEntry
           dosDisk.sectorTypes[da.getBlock ()] = dosDisk.tsListSector;
         else
         {
-          System.out.printf ("Attempt to assign TS sector to occupied sector "
-              + ": %s from %s%n", da, name);
+          System.out.printf (
+              "Attempt to assign TS sector to occupied sector " + ": %s from %s%n", da,
+              name);
           //          break;
         }
         tsSectors.add (da);
@@ -50,7 +51,7 @@ class CatalogEntry extends AbstractCatalogEntry
           {
             System.out.print ("T/S list in sector " + i);
             System.out.printf (" contains an invalid address : %02X, %02X (file %s)%n",
-                               sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
+                sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
             break loop;
           }
           if (da.getBlock () == 0)
@@ -79,7 +80,7 @@ class CatalogEntry extends AbstractCatalogEntry
         {
           System.out.print ("Next T/S list in sector " + thisDA);
           System.out.printf (" is invalid : %02X, %02X%n", sectorBuffer[1],
-                             sectorBuffer[2]);
+              sectorBuffer[2]);
           break;
         }
 
@@ -136,9 +137,13 @@ class CatalogEntry extends AbstractCatalogEntry
       message += "Bad size (" + reportedSize + ") ";
     if (dataSectors.size () == 0)
       message += "No data ";
-    return String.format ("%1s  %1s  %03d  %-30.30s  %-5s  " + "%-13s  %2d %3d   %s",
-                          lockedFlag, getFileType (), actualSize, name, addressText,
-                          lengthText, tsSectors.size (),
-                          (dataSectors.size () - textFileGaps), message.trim ());
+
+    String text =
+        String.format ("%1s  %1s  %03d  %-30.30s  %-5s  " + "%-13s  %2d %3d   %s",
+            lockedFlag, getFileType (), actualSize, name, addressText, lengthText,
+            tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
+    if (actualSize == 0)
+      text = text.substring (0, 50);
+    return text;
   }
 }

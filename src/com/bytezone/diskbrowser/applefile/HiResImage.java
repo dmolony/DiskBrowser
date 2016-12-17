@@ -34,9 +34,14 @@ public class HiResImage extends AbstractFile
 
   public HiResImage (String name, byte[] buffer)
   {
+    this (name, buffer, false);
+  }
+
+  public HiResImage (String name, byte[] buffer, boolean scrunched)
+  {
     super (name, buffer);
 
-    if (name.equals ("FLY LOGO") || name.equals ("BIGBAT.PAC"))
+    if (scrunched)
       this.buffer = unscrunch (buffer);
 
     draw ();

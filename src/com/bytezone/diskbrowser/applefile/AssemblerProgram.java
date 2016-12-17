@@ -98,73 +98,73 @@ public class AssemblerProgram extends AbstractFile
     return pgm.append (getStringBuilder2 ()).toString ();
   }
 
-  private StringBuilder getStringBuilder ()
-  {
-    if (true)
-      return getStringBuilder2 ();
-
-    StringBuilder pgm = new StringBuilder ();
-
-    int ptr = executeOffset;
-    int address = loadAddress + executeOffset;
-
-    // if the assembly doesn't start at the beginning, just dump the bytes that 
-    // are skipped
-    for (int i = 0; i < executeOffset; i++)
-      pgm.append (String.format ("%04X: %02X%n", (loadAddress + i), buffer[i]));
-
-    while (ptr < buffer.length)
-    {
-      StringBuilder line = new StringBuilder ();
-
-      AssemblerStatement cmd = new AssemblerStatement (buffer[ptr]);
-
-      if (cmd.size == 2 && ptr < buffer.length - 1)
-        cmd.addData (buffer[ptr + 1]);
-      else if (cmd.size == 3 && ptr < buffer.length - 2)
-        cmd.addData (buffer[ptr + 1], buffer[ptr + 2]);
-      else
-        cmd.size = 1;
-
-      line.append (String.format ("%04X: ", address));
-      for (int i = 0; i < cmd.size; i++)
-        line.append (String.format ("%02X ", buffer[ptr + i]));
-      while (line.length () < 20)
-        line.append (" ");
-      line.append (cmd.mnemonic + " " + cmd.operand);
-      if (cmd.offset != 0)
-      {
-        int branch = address + cmd.offset + 2;
-        line.append (String.format ("$%04X", branch < 0 ? branch += 0xFFFF : branch));
-      }
-
-      if (cmd.target > 0
-          && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
-      {
-        while (line.length () < 40)
-          line.append (" ");
-
-        String text = equates.get (cmd.target);
-        if (text != null)
-          line.append ("; " + text);
-        else
-          for (int i = 0, max = ApplesoftConstants.tokenAddresses.length; i < max; i++)
-            if (cmd.target == ApplesoftConstants.tokenAddresses[i])
-            {
-              line.append ("; Applesoft - " + ApplesoftConstants.tokens[i]);
-              break;
-            }
-      }
-      pgm.append (line.toString () + "\n");
-      address += cmd.size;
-      ptr += cmd.size;
-    }
-
-    if (pgm.length () > 0)
-      pgm.deleteCharAt (pgm.length () - 1);
-
-    return pgm;
-  }
+  //  private StringBuilder getStringBuilder ()
+  //  {
+  //    if (true)
+  //      return getStringBuilder2 ();
+  //
+  //    StringBuilder pgm = new StringBuilder ();
+  //
+  //    int ptr = executeOffset;
+  //    int address = loadAddress + executeOffset;
+  //
+  //    // if the assembly doesn't start at the beginning, just dump the bytes that 
+  //    // are skipped
+  //    for (int i = 0; i < executeOffset; i++)
+  //      pgm.append (String.format ("%04X: %02X%n", (loadAddress + i), buffer[i]));
+  //
+  //    while (ptr < buffer.length)
+  //    {
+  //      StringBuilder line = new StringBuilder ();
+  //
+  //      AssemblerStatement cmd = new AssemblerStatement (buffer[ptr]);
+  //
+  //      if (cmd.size == 2 && ptr < buffer.length - 1)
+  //        cmd.addData (buffer[ptr + 1]);
+  //      else if (cmd.size == 3 && ptr < buffer.length - 2)
+  //        cmd.addData (buffer[ptr + 1], buffer[ptr + 2]);
+  //      else
+  //        cmd.size = 1;
+  //
+  //      line.append (String.format ("%04X: ", address));
+  //      for (int i = 0; i < cmd.size; i++)
+  //        line.append (String.format ("%02X ", buffer[ptr + i]));
+  //      while (line.length () < 20)
+  //        line.append (" ");
+  //      line.append (cmd.mnemonic + " " + cmd.operand);
+  //      if (cmd.offset != 0)
+  //      {
+  //        int branch = address + cmd.offset + 2;
+  //        line.append (String.format ("$%04X", branch < 0 ? branch += 0xFFFF : branch));
+  //      }
+  //
+  //      if (cmd.target > 0
+  //          && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
+  //      {
+  //        while (line.length () < 40)
+  //          line.append (" ");
+  //
+  //        String text = equates.get (cmd.target);
+  //        if (text != null)
+  //          line.append ("; " + text);
+  //        else
+  //          for (int i = 0, max = ApplesoftConstants.tokenAddresses.length; i < max; i++)
+  //            if (cmd.target == ApplesoftConstants.tokenAddresses[i])
+  //            {
+  //              line.append ("; Applesoft - " + ApplesoftConstants.tokens[i]);
+  //              break;
+  //            }
+  //      }
+  //      pgm.append (line.toString () + "\n");
+  //      address += cmd.size;
+  //      ptr += cmd.size;
+  //    }
+  //
+  //    if (pgm.length () > 0)
+  //      pgm.deleteCharAt (pgm.length () - 1);
+  //
+  //    return pgm;
+  //  }
 
   private StringBuilder getStringBuilder2 ()
   {
@@ -197,8 +197,7 @@ public class AssemblerProgram extends AbstractFile
         int branch = cmd.address + cmd.offset + 2;
         line.append (String.format ("$%04X", branch < 0 ? branch += 0xFFFF : branch));
       }
-
-      if (cmd.target > 0
+      else if (cmd.target > 0
           && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
       {
         while (line.length () < 40)

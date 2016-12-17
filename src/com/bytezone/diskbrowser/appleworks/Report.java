@@ -5,11 +5,11 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 abstract class Report
 {
   static final String line = "-------------------------------------------------------"
-        + "-----------------------------------\n";
+      + "-----------------------------------\n";
   static final String gap = "                                                        "
-        + "                                     ";
-  static final String[] testText = { "", "=", ">", "<", "?4", "?5", "<>", "?7", "?8", "?9",
-                                    "?10", "?11", "?12", "?13" };
+      + "                                     ";
+  static final String[] testText = { "", "=", ">", "<", "?4", "?5", "<>", "?7", "?8",
+                                     "?9", "?10", "?11", "?12", "?13" };
   static final String[] continuationText = { "", "And", "Or", "Through" };
 
   protected final AppleworksADBFile parent;
@@ -87,7 +87,8 @@ abstract class Report
 
     if (false)
     {
-      System.out.println ("==============================================================");
+      System.out
+          .println ("==============================================================");
       System.out.println ("Header");
       System.out.println (HexFormatter.formatNoHeader (buffer, offset + 213, 7));
       System.out.println ();
@@ -125,9 +126,9 @@ abstract class Report
     if (buffer[offset + 480 + fudge] == 0)      // test high byte
       for (int i = 0; i < 3; i++)
       {
-        selectionRules[i] = HexFormatter.getWord (buffer, offset + 479 + i * 2 + fudge);
-        testTypes[i] = HexFormatter.getWord (buffer, offset + 485 + i * 2 + fudge);
-        continuation[i] = HexFormatter.getWord (buffer, offset + 491 + i * 2 + fudge);
+        selectionRules[i] = HexFormatter.getShort (buffer, offset + 479 + i * 2 + fudge);
+        testTypes[i] = HexFormatter.getShort (buffer, offset + 485 + i * 2 + fudge);
+        continuation[i] = HexFormatter.getShort (buffer, offset + 491 + i * 2 + fudge);
         comparison[i] = pascalString (buffer, offset + 497 + i * 32 + fudge);
       }
     else
@@ -148,11 +149,12 @@ abstract class Report
 
     text.append (String.format ("Report name ........ %s%n", name));
     text.append (String.format ("Report type ........ %s%n", reportFormat));
-    text.append (String.format ("Spacing ............ %s  (Single/Double/Triple)%n", spacing));
+    text.append (
+        String.format ("Spacing ............ %s  (Single/Double/Triple)%n", spacing));
     text.append (String.format ("Print header ....... %s%n", printHeader));
     text.append (String.format ("Title .............. %s%n", titleLine));
-    text.append (String.format ("L/R/T/B margin ..... %d/%d/%d/%d%n", leftMargin, rightMargin,
-                                topMargin, bottomMargin));
+    text.append (String.format ("L/R/T/B margin ..... %d/%d/%d/%d%n", leftMargin,
+        rightMargin, topMargin, bottomMargin));
     text.append (String.format ("Categories ......... %s%n", categoriesOnThisReport));
     text.append (String.format ("Platen width ....... %d%n", platenWidth));
     text.append (String.format ("Chars per inch ..... %d%n", charsPerInch));
@@ -170,7 +172,7 @@ abstract class Report
       int test = testTypes[i];
       int cont = continuation[i];
       text.append (String.format ("[%s] %s [%s] %s ", parent.categoryNames[category],
-                                  testText[test], comparison[i], continuationText[cont]));
+          testText[test], comparison[i], continuationText[cont]));
     }
     text.append ("\n");
 

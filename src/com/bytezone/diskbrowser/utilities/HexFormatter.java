@@ -359,16 +359,16 @@ public class HexFormatter
     return Double.longBitsToDouble (bits);
   }
 
-  public static int getWord (byte[] buffer, int ptr)
-  {
-    int val = 0;
-    for (int i = 1; i >= 0; i--)
-    {
-      val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
-    }
-    return val;
-  }
+  //  public static int getWord (byte[] buffer, int ptr)
+  //  {
+  //    int val = 0;
+  //    for (int i = 1; i >= 0; i--)
+  //    {
+  //      val <<= 8;
+  //      val += buffer[ptr + i] & 0xFF;
+  //    }
+  //    return val;
+  //  }
 
   public static int getSignedWord (byte b1, byte b2)
   {

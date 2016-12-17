@@ -18,14 +18,14 @@ public class IconFile extends AbstractFile
     super (name, buffer);
 
     iBlkNext = HexFormatter.getLong (buffer, 0);
-    iBlkID = HexFormatter.getWord (buffer, 4);
+    iBlkID = HexFormatter.getShort (buffer, 4);
     iBlkPath = HexFormatter.getLong (buffer, 6);
     iBlkName = HexFormatter.getHexString (buffer, 10, 16);
 
     int ptr = 26;
     while (true)
     {
-      int dataLen = HexFormatter.getWord (buffer, ptr);
+      int dataLen = HexFormatter.getShort (buffer, ptr);
       if (dataLen == 0 || (dataLen + ptr) > buffer.length)
         break;
       icons.add (new Icon (buffer, ptr));
@@ -66,7 +66,7 @@ public class IconFile extends AbstractFile
 
     public Icon (byte[] fullBuffer, int ptr)
     {
-      iDataLen = HexFormatter.getWord (fullBuffer, ptr);
+      iDataLen = HexFormatter.getShort (fullBuffer, ptr);
 
       buffer = new byte[iDataLen];
       System.arraycopy (fullBuffer, ptr, buffer, 0, buffer.length);
@@ -77,8 +77,8 @@ public class IconFile extends AbstractFile
       len = buffer[66] & 0xFF;
       dataName = new String (buffer, 67, len);
 
-      iDataType = HexFormatter.getWord (buffer, 82);
-      iDataAux = HexFormatter.getWord (buffer, 84);
+      iDataType = HexFormatter.getShort (buffer, 82);
+      iDataAux = HexFormatter.getShort (buffer, 84);
 
       largeImage = new Image (buffer, 86);
       smallImage = new Image (buffer, 86 + largeImage.size ());
@@ -111,10 +111,10 @@ public class IconFile extends AbstractFile
 
     public Image (byte[] buffer, int ptr)
     {
-      iconType = HexFormatter.getWord (buffer, ptr);
-      iconSize = HexFormatter.getWord (buffer, ptr + 2);
-      iconHeight = HexFormatter.getWord (buffer, ptr + 4);
-      iconWidth = HexFormatter.getWord (buffer, ptr + 6);
+      iconType = HexFormatter.getShort (buffer, ptr);
+      iconSize = HexFormatter.getShort (buffer, ptr + 2);
+      iconHeight = HexFormatter.getShort (buffer, ptr + 4);
+      iconWidth = HexFormatter.getShort (buffer, ptr + 6);
 
       main = new byte[iconSize];
       mask = new byte[iconSize];

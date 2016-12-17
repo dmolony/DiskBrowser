@@ -89,10 +89,9 @@ public class HexFormatter
           else
             c -= 128;
         }
-        if (c < 32 || c == 127) // non-printable
+        if (c < 32 || c == 127)         // non-printable
           trans.append (".");
-        else
-          // standard ascii
+        else                            // standard ascii
           trans.append ((char) c);
       }
       while (hexLine.length () < 48)
@@ -132,7 +131,7 @@ public class HexFormatter
           c -= 128;
       }
 
-      if (c < 32 || c == 127) // non-printable
+      if (c < 32 || c == 127)       // non-printable
         trans.append (".");
       else
         trans.append ((char) c);    // standard ascii
@@ -161,10 +160,9 @@ public class HexFormatter
       }
       if (c == 13)
         text.append ("\n");
-      else if (c < 32) // non-printable
+      else if (c < 32)          // non-printable
         text.append (".");
-      else
-        // standard ascii
+      else                      // standard ascii
         text.append ((char) c);
     }
     return text.toString ();
@@ -191,10 +189,9 @@ public class HexFormatter
         else
           c -= 128;
       }
-      if (c < 32) // non-printable
+      if (c < 32)                           // non-printable
         text.append ((char) (c + 64));
-      else
-        // standard ascii
+      else                                  // standard ascii
         text.append ((char) c);
     }
     return text.toString ();
@@ -246,9 +243,9 @@ public class HexFormatter
       c -= 128;
     if (c > 95)
       c -= 64;
-    if (c < 32) // non-printable
+    if (c < 32)             // non-printable
       return '.';
-    return (char) c; // standard ascii
+    return (char) c;        // standard ascii
 
   }
 
@@ -287,11 +284,6 @@ public class HexFormatter
     String text = hex[value];
     return text;
   }
-
-  //  public static int intValue (byte b1)
-  //  {
-  //    return b1 & 0xFF;
-  //  }
 
   public static int intValue (byte b1, byte b2)
   {
@@ -342,7 +334,7 @@ public class HexFormatter
     for (int i = 0; i < 2; i++)
     {
       val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
+      val |= buffer[ptr + i] & 0xFF;
     }
     return val;
   }
@@ -358,28 +350,6 @@ public class HexFormatter
 
     return Double.longBitsToDouble (bits);
   }
-
-  //  public static int getWord (byte[] buffer, int ptr)
-  //  {
-  //    int val = 0;
-  //    for (int i = 1; i >= 0; i--)
-  //    {
-  //      val <<= 8;
-  //      val += buffer[ptr + i] & 0xFF;
-  //    }
-  //    return val;
-  //  }
-
-  public static int getSignedWord (byte b1, byte b2)
-  {
-    return (b2 << 8) | (b1 & 0xFF);
-  }
-
-  //  public static int getSignedWord (byte[] buffer, int ptr)
-  //  {
-  //    short val = buffer[ptr] << 8;
-  //    return buffer[ptr] * 256 + buffer[ptr + 1];
-  //  }
 
   public static double floatValueOld (byte[] buffer, int offset)
   {
@@ -409,7 +379,7 @@ public class HexFormatter
 
   public static double floatValue (byte[] buffer, int ptr)
   {
-    int exponent = buffer[ptr] & 0x7F; // biased 128
+    int exponent = buffer[ptr] & 0x7F;                      // biased 128
     if (exponent == 0)
       return 0.0;
 

@@ -10,7 +10,7 @@ public class CellAddress
   public CellAddress (byte[] buffer, int offset)
   {
     colRef = buffer[offset];
-    rowRef = HexFormatter.getSignedWord (buffer[offset + 1], buffer[offset + 2]);
+    rowRef = HexFormatter.intValue (buffer[offset + 1], buffer[offset + 2]);
   }
 
   @Override

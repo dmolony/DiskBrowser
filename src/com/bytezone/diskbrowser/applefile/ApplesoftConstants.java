@@ -5,7 +5,7 @@ public interface ApplesoftConstants
   String[] tokens = { "END", "FOR ", "NEXT ", "DATA ",           // 0x80 - 0x83
                       "INPUT ", "DEL", "DIM ", "READ ",          // 0x84 - 0x87
                       "GR", "TEXT", "PR#", "IN#",                // 0x88 - 0x8B
-                      "CALL ", "PLOT", "HLIN ", "VLIN ",         // 0x8C - 0x8F
+                      "CALL ", "PLOT ", "HLIN ", "VLIN ",        // 0x8C - 0x8F
                       "HGR2", "HGR", "HCOLOR=", "HPLOT ",        // 0x90
                       "DRAW ", "XDRAW ", "HTAB ", "HOME",        // 0x94
                       "ROT=", "SCALE=", "SHLOAD", "TRACE",       // 0x98

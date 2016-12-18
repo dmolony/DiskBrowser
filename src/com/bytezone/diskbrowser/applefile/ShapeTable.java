@@ -20,32 +20,65 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class ShapeTable extends AbstractFile
 {
   private static final int SIZE = 400;
+  private final int totalShapes;
+  private final int[] shapeLength;
+  private final int[] offsets;
+  private int minSize = 9999;
+  private int maxSize = 0;
 
   public ShapeTable (String name, byte[] buffer)
   {
     super (name, buffer);
+
+    totalShapes = buffer[0] & 0xFF;
+    shapeLength = new int[totalShapes];
+    offsets = new int[totalShapes];
+    int lastPtr = buffer.length;
+
+    for (int i = totalShapes - 1; i >= 0; i--)
+    {
+      int ptr = HexFormatter.getShort (buffer, i * 2 + 2);
+      int length = lastPtr - ptr;
+      lastPtr = ptr;
+      shapeLength[i] = length;
+      offsets[i] = ptr;
+      minSize = Math.min (minSize, length);
+      maxSize = Math.max (maxSize, length);
+    }
   }
 
   @Override
   public String getText ()
   {
     StringBuffer text = new StringBuffer ();
-    int totalShapes = buffer[0] & 0xFF;
+
     int startPos = SIZE / 2;
+    int maxWidth = 0;
+    int maxHeight = 0;
 
     for (int i = 0; i < totalShapes; i++)
     {
-      int offset = HexFormatter.getShort (buffer, i * 2 + 2);
       int[][] grid = new int[SIZE][SIZE];
       int row = startPos;
-      int col = row;
+      int col = startPos;       // start in the middle of the grid
       if (i > 0)
         text.append ("\n");
-      text.append ("Shape " + i + " :\n");
 
-      while (buffer[offset] != 0)
+      text.append (String.format ("Shape : %d%n", i));
+      text.append (String.format ("Size  : %d%n", shapeLength[i]));
+
+      String bytes = HexFormatter.getHexString (buffer, offsets[i], shapeLength[i]);
+      int ptr = offsets[i];
+      for (String s : split (bytes))
       {
-        int value = buffer[offset++] & 0xFF;
+        text.append (String.format ("%04X  : %s%n", ptr, s));
+        ptr += 16;
+      }
+
+      ptr = offsets[i];
+      while (buffer[ptr] != 0)
+      {
+        int value = buffer[ptr++] & 0xFF;
         int v1 = value >> 6;
         int v2 = (value & 0x38) >> 3;
         int v3 = value & 0x07;
@@ -116,6 +149,11 @@ public class ShapeTable extends AbstractFile
         }
       }
 
+      int width = maxCol - minCol + 1;
+      int height = maxRow - minRow + 1;
+      maxWidth = Math.max (maxWidth, width);
+      maxHeight = Math.max (maxHeight, height);
+
       for (row = minRow; row <= maxRow; row++)
       {
         for (col = minCol; col <= maxCol; col++)
@@ -132,13 +170,32 @@ public class ShapeTable extends AbstractFile
     }
 
     text.deleteCharAt (text.length () - 1);
-    return text.toString ();
+
+    StringBuilder header = new StringBuilder ();
+    header.append (String.format ("File Name      : %s%n", name));
+    header.append (String.format ("File size      : %,d%n", buffer.length));
+    header.append (String.format ("Total shapes   : %d%n", totalShapes));
+    header.append (String.format ("Smallest       : %d%n", minSize));
+    header.append (String.format ("Largest        : %d%n", maxSize));
+    header.append (String.format ("Max dimensions : %d x %d%n%n", maxWidth, maxHeight));
+
+    return header.toString () + text.toString ();
+  }
+
+  private List<String> split (String line)
+  {
+    List<String> list = new ArrayList<String> ();
+    while (line.length () > 48)
+    {
+      list.add (line.substring (0, 47));
+      line = line.substring (48);
+    }
+    list.add (line);
+    return list;
   }
 
   public static boolean isShapeTable (byte[] buffer)
   {
-    List<Integer> offsets = new ArrayList<Integer> ();
-
     if (buffer.length == 0 || buffer[buffer.length - 1] != 0)
       return false;
 
@@ -146,7 +203,7 @@ public class ShapeTable extends AbstractFile
     if (totalShapes == 0)
       return false;
 
-    // this prevents large files that start with a very small value
+    // this flags large files that start with a very small value
     //    System.out.printf ("Average shape length: %d%n", buffer.length / totalShapes);
     if (totalShapes * 500 < buffer.length)
       return false;
@@ -162,12 +219,6 @@ public class ShapeTable extends AbstractFile
       int offset = HexFormatter.getShort (buffer, ptr);
       if (offset == 0 || offset >= buffer.length)
         return false;
-
-      // check offset is unique
-      if (offsets.contains (offset))
-        return false;
-
-      offsets.add (offset);
     }
 
     return true;

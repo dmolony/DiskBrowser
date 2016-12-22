@@ -260,6 +260,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
         && reportedLength == 0x14FA)
       return true;
 
+    //    if (name.endsWith (".PAC"))
+    //      return true;
+
     if (name.equals ("BBROS LOGO SCRUNCHED") && reportedLength == 0x0FED)
       return true;
 

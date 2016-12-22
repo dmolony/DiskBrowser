@@ -64,12 +64,10 @@ public class ShapeTable extends AbstractFile
     int y = 10;
     int count = 0;
     Graphics2D g2d = image.createGraphics ();
+    g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
 
     for (Shape shape : shapes)
     {
-      //      System.out.println (shape);
-      g2d.setComposite (
-          AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
       g2d.drawImage (shape.image, x, y, null);
       x += maxWidth + 5;
       if (++count % cols == 0)

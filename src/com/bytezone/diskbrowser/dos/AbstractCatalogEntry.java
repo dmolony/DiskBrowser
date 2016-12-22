@@ -196,7 +196,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
           System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
 
-          if (name.endsWith (".FONT"))
+          if (name.endsWith (".FONT") || name.endsWith (".SET"))
             appleFile = new FontFile (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))
             appleFile = new ShapeTable (name, exactBuffer);

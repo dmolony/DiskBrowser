@@ -14,6 +14,7 @@ public abstract class AbstractFile implements DataSource
   public byte[] buffer;
   protected AssemblerProgram assembler;
   protected BufferedImage image;
+  protected int loadAddress;
 
   public AbstractFile (String name, byte[] buffer)
   {
@@ -39,7 +40,7 @@ public abstract class AbstractFile implements DataSource
       return "No buffer";
 
     if (assembler == null)
-      this.assembler = new AssemblerProgram (name, buffer, 0);
+      this.assembler = new AssemblerProgram (name, buffer, loadAddress);
 
     return assembler.getText ();
   }

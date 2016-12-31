@@ -157,6 +157,24 @@ public class DosDisk extends AbstractFormattedDisk
       da = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
     } while (da.getBlock () != 0);
+    // link double hi-res files
+    for (AppleFileSource fe : fileEntries)
+    {
+      String name = fe.getUniqueName ();
+      if (name.endsWith (".AUX"))
+      {
+        String partner1 = name.substring (0, name.length () - 4);
+        String partner2 = partner1 + ".BIN";
+        for (AppleFileSource fe2 : fileEntries)
+          if (fe2.getUniqueName ().equals (partner1)
+              || fe2.getUniqueName ().equals (partner2))
+          {
+            //            System.out.printf ("%s   %s%n", name, partner1);
+            ((CatalogEntry) fe2).link ((CatalogEntry) fe);
+            ((CatalogEntry) fe).link ((CatalogEntry) fe2);
+          }
+      }
+    }
 
     // add up all the free and used sectors, and label DOS sectors while we're here
     int lastDosSector = dosVTOCSector.maxSectors * 3; // first three tracks

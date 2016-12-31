@@ -27,6 +27,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   protected final List<DiskAddress> dataSectors = new ArrayList<DiskAddress> ();
   protected final List<DiskAddress> tsSectors = new ArrayList<DiskAddress> ();
 
+  private CatalogEntry link;
+
   public AbstractCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector,
       byte[] entryBuffer)
   {
@@ -196,20 +198,30 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
           System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
 
-          if (name.endsWith (".FONT") || name.endsWith (".SET"))
+          if (name.endsWith (".FONT") || name.endsWith (" FONT")
+              || name.endsWith (".SET"))
             appleFile = new FontFile (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))
             appleFile = new ShapeTable (name, exactBuffer);
           else if (name.endsWith (".S"))
             appleFile = new MerlinSource (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer))
-            appleFile = new HiResImage (name, exactBuffer);
+            appleFile = new OriginalHiResImage (name, exactBuffer, loadAddress);
+          else if (link != null)
+          {
+            byte[] auxBuffer = link.disk.readSectors (link.dataSectors);
+            byte[] exactAuxBuffer = getExactBuffer (auxBuffer);
+            if (name.endsWith (".AUX"))
+              appleFile = new DoubleHiResImage (name, exactAuxBuffer, exactBuffer);
+            else
+              appleFile = new DoubleHiResImage (name, exactBuffer, exactAuxBuffer);
+          }
           else if (loadAddress == 0x2000 || loadAddress == 0x4000)
           {
             if (reportedLength > 0x1F00 && reportedLength <= 0x4000)
-              appleFile = new HiResImage (name, exactBuffer);
+              appleFile = new OriginalHiResImage (name, exactBuffer, loadAddress);
             else if (isScrunched (reportedLength))
-              appleFile = new HiResImage (name, exactBuffer, true);
+              appleFile = new OriginalHiResImage (name, exactBuffer, loadAddress, true);
             else
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
           }
@@ -252,6 +264,33 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       e.printStackTrace ();
     }
     return appleFile;
+  }
+
+  private byte[] getExactBuffer (byte[] buffer)
+  {
+    byte[] exactBuffer;
+
+    int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
+    int reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
+    if (reportedLength == 0)
+    {
+      System.out.println (
+          name.trim () + " reported length : 0 - reverting to " + (buffer.length - 4));
+      reportedLength = buffer.length - 4;
+    }
+
+    // buffer is a multiple of the block size, so it usually needs to be reduced
+    if ((reportedLength + 4) <= buffer.length)
+    {
+      exactBuffer = new byte[reportedLength];
+      //              extraBuffer = new byte[buffer.length - reportedLength - 4];
+      //              System.arraycopy (buffer, reportedLength + 4, extraBuffer, 0,
+      //                                extraBuffer.length);
+    }
+    else
+      exactBuffer = new byte[buffer.length - 4];  // reported length is too long
+    System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
+    return exactBuffer;
   }
 
   private boolean isScrunched (int reportedLength)
@@ -303,6 +342,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     sectors.addAll (tsSectors);
     sectors.addAll (dataSectors);
     return sectors;
+  }
+
+  void link (CatalogEntry catalogEntry)
+  {
+    this.link = catalogEntry;
   }
 
   @Override

@@ -39,7 +39,10 @@
 00B7  CHRGOT
 00B8  TXTPTR
 
+00E0  X of last HPLOT
 00E4  HCOLOR
+00E6  HiRes plotting page ($20 or $40)
+00E7  Scale
 00E8  Shape table address LO
 00E9  Shape table address HI
 00EA  Collision counter

@@ -30,6 +30,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private DiskAddress masterIndexBlock;
   private final List<DiskAddress> indexBlocks = new ArrayList<DiskAddress> ();
   private boolean invalid;
+  private FileEntry link;
 
   public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
       int parentBlock)
@@ -266,11 +267,18 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (SimpleText.isHTML (exactBuffer))
             file = new SimpleText (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer))
-            file = new HiResImage (name, exactBuffer);
+            file = new OriginalHiResImage (name, exactBuffer, auxType);
+          else if (link != null)
+          {
+            if (name.endsWith (".AUX"))
+              file = new DoubleHiResImage (name, link.getBuffer (), exactBuffer);
+            else
+              file = new DoubleHiResImage (name, exactBuffer, link.getBuffer ());
+          }
           else if ((endOfFile == 0x1FF8 || endOfFile == 0x1FFF || endOfFile == 0x2000
               || endOfFile == 0x4000)
               && (auxType == 0x1FFF || auxType == 0x2000 || auxType == 0x4000))
-            file = new HiResImage (name, exactBuffer);
+            file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (endOfFile == 38400 && name.startsWith ("LVL."))
             file = new LodeRunner (name, exactBuffer);
           else
@@ -282,7 +290,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           }
           break;
         case FILE_TYPE_TEXT:
-          assert auxType == 0; // auxType > 0 handled above
+          assert auxType == 0;                        // auxType > 0 handled above
           if (name.endsWith (".S"))
             file = new MerlinSource (name, exactBuffer, auxType, endOfFile);
           else
@@ -327,10 +335,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new IconFile (name, exactBuffer);
           break;
         case FILE_TYPE_PNT:
-          file = new HiResImage (name, exactBuffer, fileType, auxType);
+          file = new OriginalHiResImage (name, exactBuffer, fileType, auxType);
           break;
         case FILE_TYPE_PIC:
-          file = new HiResImage (name, exactBuffer, fileType, auxType);
+          file = new OriginalHiResImage (name, exactBuffer, fileType, auxType);
           break;
         default:
           System.out.format ("Unknown file type : %02X%n", fileType);
@@ -549,6 +557,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       if (block.matches (da))
         return true;
     return false;
+  }
+
+  void link (FileEntry fileEntry)
+  {
+    this.link = fileEntry;
   }
 
   @Override

@@ -7,70 +7,96 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class HiResImage extends AbstractFile
+public abstract class HiResImage extends AbstractFile
 {
-  private static final int WHITE = 0xFFFFFF;
-  private static final int BLACK = 0x000000;
-  private static final int RED = 0xFF0000;
-  private static final int GREEN = 0x00FF00;
-  private static final int BLUE = 0x0000FF;
-  private static final int VIOLET = 0xBB66FF;
-  private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
   private static final byte[] pngHeader =
       { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
-  private static boolean colourQuirks;
-  private static boolean matchColourBits = false;
-  private static boolean monochrome;
+  protected static boolean colourQuirks;
+  protected static boolean monochrome;
 
-  private final int[] line = new int[280];
-  private final int[] colourBits = new int[280];
-
-  private int fileType;
-  private int auxType;
-  private byte[] unpackedBuffer;
+  protected int fileType;
+  protected int auxType;
+  protected byte[] unpackedBuffer;
 
   public HiResImage (String name, byte[] buffer)
   {
-    this (name, buffer, false);
+    super (name, buffer);
   }
 
-  public HiResImage (String name, byte[] buffer, boolean scrunched)
+  public HiResImage (String name, byte[] buffer, int loadAddress)
+  {
+    this (name, buffer, loadAddress, false);
+  }
+
+  public HiResImage (String name, byte[] buffer, int loadAddress, boolean scrunched)
   {
     super (name, buffer);
 
+    this.loadAddress = loadAddress;         // for the disassembly listing
+
     if (scrunched)
       this.buffer = unscrunch (buffer);
-
-    draw ();
-  }
-
-  private void draw ()
-  {
-    if (isGif (buffer) || isPng (buffer))
-      makeImage ();
-    else if (monochrome)
-      drawMonochrome (buffer);
-    else
-      drawColour (buffer);
   }
 
   public HiResImage (String name, byte[] buffer, int fileType, int auxType)
   {
     super (name, buffer);
+
     this.fileType = fileType;
     this.auxType = auxType;
 
-    if (fileType == 0xC0 && auxType == 1)
+    if (fileType == ProdosConstants.FILE_TYPE_PNT)
     {
-      unpackedBuffer = unpackBytes (buffer);
-      makeScreen2 (unpackedBuffer);
-    }
+      if (auxType == 1)
+      {
+        unpackedBuffer = unpackBytes (buffer);
+        makeScreen2 (unpackedBuffer);
+        System.out.println ("aux 1 - " + name);
+      }
 
-    if (fileType == 0xC0 && auxType == 2)
-      System.out.println ("yippee - Preferred picture format - " + name);
+      if (auxType == 2)
+      {
+        System.out.println ("aux 2 - " + name);
+      }
+    }
+  }
+
+  protected void createImage ()
+  {
+    if (isGif (buffer) || isPng (buffer))
+      makeImage ();
+    else if (monochrome)
+      createMonochromeImage ();
+    else
+      createColourImage ();
+  }
+
+  protected abstract void createMonochromeImage ();
+
+  protected abstract void createColourImage ();
+
+  public void setColourQuirks (boolean value)
+  {
+    if (colourQuirks == value)
+      return;
+
+    colourQuirks = value;
+
+    if (!monochrome)
+      createImage ();
+  }
+
+  public void setMonochrome (boolean value)
+  {
+    if (monochrome == value)
+      return;
+
+    monochrome = value;
+    createImage ();
   }
 
   public static void setDefaultColourQuirks (boolean value)
@@ -83,142 +109,74 @@ public class HiResImage extends AbstractFile
     monochrome = value;
   }
 
-  public void setColourQuirks (boolean value)
+  /*-
+     Mode                        Page 1    Page 2
+     280 x 192 Black & White       0         4
+     280 x 192 Limited Color       1         5
+     560 x 192 Black & White       2         6
+     140 x 192 Full Color          3         7
+   */
+
+  // SHR see - http://noboot.com/charlie/cb2e_p3.htm
+
+  @Override
+  public String getText ()
   {
-    if (colourQuirks == value)
-      return;
+    String auxText = "";
+    StringBuilder text = new StringBuilder ("Image File : " + name);
+    text.append (String.format ("%nFile type  : $%02X", fileType));
 
-    colourQuirks = value;
-
-    if (!monochrome)
-      draw ();
-  }
-
-  public void setMonochrome (boolean value)
-  {
-    if (monochrome == value)
-      return;
-
-    monochrome = value;
-    draw ();
-  }
-
-  private void drawMonochrome (byte[] buffer)
-  {
-    int rows = buffer.length <= 8192 ? 192 : 384;
-    image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_GRAY);
-    DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
-    int element = 0;
-
-    for (int page = 0; page < rows / 192; page++)
-      for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 8; j++)
-          for (int k = 0; k < 8; k++)
-          {
-            int base = page * 0x2000 + i * 0x28 + j * 0x80 + k * 0x400;
-            int max = Math.min (base + 40, buffer.length);
-            for (int ptr = base; ptr < max; ptr++)
-            {
-              int value = buffer[ptr] & 0x7F;
-              for (int px = 0; px < 7; px++)
-              {
-                int val = (value >> px) & 0x01;
-                dataBuffer.setElem (element++, val == 0 ? 0 : 255);
-              }
-            }
-          }
-  }
-
-  private void drawColour (byte[] buffer)
-  {
-    int rows = buffer.length <= 8192 ? 192 : 384;
-    image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
-    DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
-    int element = 0;
-
-    for (int page = 0; page < rows / 192; page++)
-      for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 8; j++)
-          for (int k = 0; k < 8; k++)
-          {
-            fillLine (page * 0x2000 + i * 0x28 + j * 0x80 + k * 0x400);
-            for (int pixel : line)
-              dataBuffer.setElem (element++, pixel);
-          }
-  }
-
-  private void fillLine (int base)
-  {
-    int max = Math.min (base + 40, buffer.length);
-    int linePtr = 0;
-
-    for (int ptr = base; ptr < max; ptr++)
+    switch (fileType)
     {
-      int colourBit = (buffer[ptr] & 0x80) >> 7;
-      int value = buffer[ptr] & 0x7F;
+      case ProdosConstants.FILE_TYPE_PICT:
+        if (auxType < 0x4000)
+        {
+          auxText = "Graphics File";
+          byte mode = buffer[0x78];                // 0-7
+          System.out.println ("Prodos PICT, mode=" + mode);
+        }
+        else if (auxType == 0x4000)
+          auxText = "Packed Hi-Res File";
+        else if (auxType == 0x4001)
+          auxText = "Packed Double Hi-Res File";
+        break;
 
-      for (int px = 0; px < 7; px++)
-      {
-        colourBits[linePtr] = colourBit;        // store the colour bit
-        int val = (value >> px) & 0x01;         // get the next pixel to draw
-        int column = (ptr + px) % 2;            // is it in an odd or even column?
-        line[linePtr++] = val == 0 ? 0 :        // black pixel
-            palette[colourBit][column];         // coloured pixel - use lookup table
-      }
+      case ProdosConstants.FILE_TYPE_PNT:
+        if (auxType == 1)
+        {
+          if (unpackedBuffer == null)
+            unpackedBuffer = unpackBytes (buffer);
+          auxText = "Packed Super Hi-Res Image";
+        }
+        else if (auxType == 2)
+          auxText = "Super Hi-Res Image";
+        else if (auxType == 3)
+          auxText = "Packed QuickDraw II PICT File";
+        break;
+
+      case ProdosConstants.FILE_TYPE_PIC:
+        if (auxType == 0)
+          auxText = "Super Hi-res Screen Image";
+        else if (auxType == 1)
+          auxText = "QuickDraw PICT File";
+        else if (auxType == 2)
+          auxText = "Super Hi-Res 3200 color image";
     }
 
-    // convert consecutive ON pixels to white
-    for (int x = 1; x < line.length; x++)       // skip first pixel, refer back
-    {
-      if (matchColourBits && colourBits[x - 1] != colourBits[x])
-        continue;                   // only modify values with matching colour bits
+    if (!auxText.isEmpty ())
+      text.append (String.format ("%nAux type   : $%04X  %s", auxType, auxText));
 
-      int px0 = line[x - 1];
-      int px1 = line[x];
-      if (px0 != BLACK && px1 != BLACK)
-        line[x - 1] = line[x] = WHITE;
+    text.append (String.format ("%nFile size  : %,d", buffer.length));
+    if (unpackedBuffer != null)
+    {
+      text.append (String.format ("%nUnpacked   : %,d%n%n", unpackedBuffer.length));
+      text.append (HexFormatter.format (unpackedBuffer));
     }
 
-    // optionally do physics
-    if (colourQuirks)
-      applyColourQuirks ();
+    return text.toString ();
   }
 
-  private boolean isColoured (int pixel)
-  {
-    return pixel != BLACK && pixel != WHITE;
-  }
-
-  private void applyColourQuirks ()
-  {
-    for (int x = 3; x < line.length; x++)     // skip first three pixels, refer back
-    {
-      if (matchColourBits && colourBits[x - 2] != colourBits[x - 1])
-        continue;                   // only modify values with matching colour bits
-
-      int px0 = line[x - 3];
-      int px1 = line[x - 2];
-      int px2 = line[x - 1];
-      int px3 = line[x];
-
-      if (px1 == BLACK)
-      {
-        if (px3 == BLACK && px0 == px2 && isColoured (px0))           //     V-B-V-B
-          line[x - 2] = px0;                                          // --> V-V-V-B
-        else if (px3 == WHITE && px2 == WHITE && isColoured (px0))    //     V-B-W-W
-          line[x - 2] = px0;                                          // --> V-V-W-W
-      }
-      else if (px2 == BLACK)
-      {
-        if (px0 == BLACK && px1 == px3 && isColoured (px3))           //     B-G-B-G 
-          line[x - 1] = px3;                                          // --> B-G-G-G
-        else if (px0 == WHITE && px1 == WHITE && isColoured (px3))    //     W-W-B-G
-          line[x - 1] = px3;                                          // --> W-W-G-G
-      }
-    }
-  }
-
-  private void makeScreen2 (byte[] buffer)
+  protected void makeScreen2 (byte[] buffer)
   {
     //    System.out.println (HexFormatter.format (buffer, 32000, 640));
     //    for (int table = 0; table < 200; table++)
@@ -252,42 +210,8 @@ public class HiResImage extends AbstractFile
       }
   }
 
-  // Beagle Bros routine to expand a hi-res screen
-  private byte[] unscrunch (byte[] src)
-  {
-    byte[] dst = new byte[0x2000];
-    int p1 = 0;
-    int p2 = 0;
-
-    while (p1 < dst.length)
-    {
-      byte b = src[p2++];
-      if ((b == (byte) 0x80) || (b == (byte) 0xFF))
-      {
-        b &= 0x7F;
-        int rpt = src[p2++];
-        for (int i = 0; i < rpt; i++)
-          dst[p1++] = b;
-      }
-      else
-        dst[p1++] = b;
-    }
-    return dst;
-  }
-
-  private void makeImage ()
-  {
-    try
-    {
-      image = ImageIO.read (new ByteArrayInputStream (buffer));
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace ();
-    }
-  }
-
-  private byte[] unpackBytes (byte[] buffer)
+  // Super Hi-res IIGS
+  protected byte[] unpackBytes (byte[] buffer)
   {
     // routine found here - http://kpreid.livejournal.com/4319.html
 
@@ -333,57 +257,39 @@ public class HiResImage extends AbstractFile
     return newBuf;
   }
 
-  @Override
-  public String getText ()
+  // Beagle Bros routine to expand a hi-res screen
+  private byte[] unscrunch (byte[] src)
   {
-    String auxText = "";
-    StringBuilder text = new StringBuilder ("Image File : " + name);
-    text.append (String.format ("%nFile type  : $%02X", fileType));
+    byte[] dst = new byte[0x2000];
+    int p1 = 0;
+    int p2 = 0;
 
-    switch (fileType)
+    while (p1 < dst.length)
     {
-      case 8:
-        if (auxType < 0x4000)
-          auxText = "Graphics File";
-        else if (auxType == 0x4000)
-          auxText = "Packed Hi-Res File";
-        else if (auxType == 0x4001)
-          auxText = "Packed Double Hi-Res File";
-        break;
-
-      case 192:
-        if (auxType == 1)
-        {
-          if (unpackedBuffer == null)
-            unpackedBuffer = unpackBytes (buffer);
-          auxText = "Packed Super Hi-Res Image";
-        }
-        else if (auxType == 2)
-          auxText = "Super Hi-Res Image";
-        else if (auxType == 3)
-          auxText = "Packed QuickDraw II PICT File";
-        break;
-
-      case 193:
-        if (auxType == 0)
-          auxText = "Super Hi-res Screen Image";
-        else if (auxType == 1)
-          auxText = "QuickDraw PICT File";
-        else if (auxType == 2)
-          auxText = "Super Hi-Res 3200 color image";
+      byte b = src[p2++];
+      if ((b == (byte) 0x80) || (b == (byte) 0xFF))
+      {
+        b &= 0x7F;
+        int rpt = src[p2++];
+        for (int i = 0; i < rpt; i++)
+          dst[p1++] = b;
+      }
+      else
+        dst[p1++] = b;
     }
+    return dst;
+  }
 
-    if (!auxText.isEmpty ())
-      text.append (String.format ("%nAux type   : $%04X  %s", auxType, auxText));
-
-    text.append (String.format ("%nFile size  : %,d", buffer.length));
-    if (unpackedBuffer != null)
+  protected void makeImage ()
+  {
+    try
     {
-      text.append (String.format ("%nUnpacked   : %,d%n%n", unpackedBuffer.length));
-      text.append (HexFormatter.format (unpackedBuffer));
+      image = ImageIO.read (new ByteArrayInputStream (buffer));
     }
-
-    return text.toString ();
+    catch (IOException e)
+    {
+      e.printStackTrace ();
+    }
   }
 
   public static boolean isGif (byte[] buffer)

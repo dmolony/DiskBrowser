@@ -146,6 +146,25 @@ public class ProdosDisk extends AbstractFormattedDisk
       }
       block = HexFormatter.intValue (sectorBuffer[2], sectorBuffer[3]);
     } while (block > 0);
+
+    // link double hi-res files
+    for (AppleFileSource fe : fileEntries)
+    {
+      String name = fe.getUniqueName ();
+      if (name.endsWith (".AUX"))
+      {
+        String partner1 = name.substring (0, name.length () - 4);
+        String partner2 = name.substring (0, name.length () - 4) + ".BIN";
+        for (AppleFileSource fe2 : fileEntries)
+          if (fe2.getUniqueName ().equals (partner1)
+              || fe2.getUniqueName ().equals (partner2))
+          {
+            //            System.out.printf ("%s   %s%n", name, partner1);
+            ((FileEntry) fe2).link ((FileEntry) fe);
+            ((FileEntry) fe).link ((FileEntry) fe2);
+          }
+      }
+    }
   }
 
   public static boolean isCorrectFormat (AppleDisk disk)

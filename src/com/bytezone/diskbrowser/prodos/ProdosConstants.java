@@ -1,17 +1,17 @@
 package com.bytezone.diskbrowser.prodos;
 
-interface ProdosConstants
+public interface ProdosConstants
 {
   int FILE_TYPE_TEXT = 0x04;
   int FILE_TYPE_BINARY = 0x06;
-  int FILE_TYPE_PICT = 0x08;
+  int FILE_TYPE_PICT = 0x08;                // was Apple /// FotoFile
   int FILE_TYPE_DIRECTORY = 0x0F;
   int FILE_TYPE_ADB = 0x19;
   int FILE_TYPE_AWP = 0x1A;
   int FILE_TYPE_ASP = 0x1B;
   int FILE_TYPE_ASM_SOURCE = 0xB0;
   int FILE_TYPE_ASM_OBJECT = 0xB1;
-  int FILE_TYPE_FORKED_FILE = 0xB3; // S16
+  int FILE_TYPE_FORKED_FILE = 0xB3;         // S16
   int FILE_TYPE_PNT = 0xC0;
   int FILE_TYPE_PIC = 0xC1;
   int FILE_TYPE_ICN = 0xCA;

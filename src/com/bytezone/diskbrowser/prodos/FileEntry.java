@@ -275,6 +275,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             else
               file = new DoubleHiResImage (name, exactBuffer, link.getBuffer ());
           }
+          else if (name.endsWith (".PAC"))
+            file = new DoubleHiResImage (name, exactBuffer);
           else if ((endOfFile == 0x1FF8 || endOfFile == 0x1FFF || endOfFile == 0x2000
               || endOfFile == 0x4000)
               && (auxType == 0x1FFF || auxType == 0x2000 || auxType == 0x4000))

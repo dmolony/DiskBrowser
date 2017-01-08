@@ -3,6 +3,8 @@ package com.bytezone.diskbrowser.applefile;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
+
 public class DoubleHiResImage extends HiResImage
 {
   private static final int BLACK = 0x000000;
@@ -26,6 +28,8 @@ public class DoubleHiResImage extends HiResImage
         GRAY, PINK, MEDIUM_BLUE, LIGHT_BLUE, AQUA, WHITE };
 
   private final byte[] auxBuffer;
+  private DoubleScrunch doubleScrunch;
+  byte[] packedBuffer;
 
   public DoubleHiResImage (String name, byte[] buffer, byte[] auxBuffer)
   {
@@ -34,6 +38,44 @@ public class DoubleHiResImage extends HiResImage
     this.auxBuffer = auxBuffer;
 
     createImage ();
+  }
+
+  public DoubleHiResImage (String name, byte[] buffer)
+  {
+    super (name, buffer);
+
+    assert name.endsWith (".PAC");
+
+    packedBuffer = buffer;
+    doubleScrunch = new DoubleScrunch ();
+    doubleScrunch.unscrunch (buffer);
+    auxBuffer = doubleScrunch.auxBuffer;
+    this.buffer = doubleScrunch.primaryBuffer;
+
+    createImage ();
+
+    // testes
+    if (false)
+    {
+      byte b = -1;
+      System.out.printf ("%02X  %d%n", b, b);
+      if (b < 0)
+        System.out.println ("negative");
+      b = -122;
+      for (int i = 0; i < 10; i++)
+      {
+        --b;
+        System.out.printf ("%4d  %02X%n", b, b);
+      }
+      System.out.println ();
+
+      b = (byte) 250;
+      for (int i = 0; i < 10; i++)
+      {
+        ++b;
+        System.out.printf ("%4d  %02X%n", b, b);
+      }
+    }
   }
 
   @Override
@@ -94,5 +136,23 @@ public class DoubleHiResImage extends HiResImage
             }
           }
         }
+  }
+
+  @Override
+  public String getHexDump ()
+  {
+    StringBuilder text = new StringBuilder ();
+
+    if (packedBuffer != null)
+    {
+      text.append ("Packed buffer:\n\n");
+      text.append (HexFormatter.format (packedBuffer));
+    }
+    text.append ("\n\nAuxilliary buffer:\n\n");
+    text.append (HexFormatter.format (auxBuffer));
+    text.append ("\n\nPrimary buffer:\n\n");
+    text.append (HexFormatter.format (buffer));
+
+    return text.toString ();
   }
 }

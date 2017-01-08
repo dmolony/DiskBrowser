@@ -207,6 +207,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             appleFile = new MerlinSource (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer))
             appleFile = new OriginalHiResImage (name, exactBuffer, loadAddress);
+          else if (name.endsWith (".PAC"))
+            appleFile = new DoubleHiResImage (name, exactBuffer);
           else if (link != null)
           {
             byte[] auxBuffer = link.disk.readSectors (link.dataSectors);

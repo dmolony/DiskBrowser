@@ -7,45 +7,45 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DoubleHiResImage extends HiResImage
 {
-  //  private static final int BLACK = 0x000000;
-  //  private static final int MAGENTA = 0xFF00FF;
-  //  private static final int BROWN = 0x994C00;
-  //  private static final int ORANGE = 0xFF9933;
-  //  private static final int DARK_GREEN = 0x006600;
-  //  private static final int GRAY = 0xA0A0A0;
-  //  private static final int GREEN = 0x00CC00;
-  //  private static final int YELLOW = 0xFFFF33;
-  //  private static final int DARK_BLUE = 0x0066CC;
-  //  private static final int PURPLE = 0xCC00CC;
-  //  private static final int PINK = 0xFFCCE5;
-  //  private static final int MEDIUM_BLUE = 0x3399FF;
-  //  private static final int LIGHT_BLUE = 0x99CCFF;
-  //  private static final int AQUA = 0x99FFFF;
-  //  private static final int WHITE = 0xFFFFFF;
-
-  //  private static int[] palette =
-  //      { BLACK, MAGENTA, BROWN, ORANGE, DARK_GREEN, GRAY, GREEN, YELLOW, DARK_BLUE, PURPLE,
-  //        GRAY, PINK, MEDIUM_BLUE, LIGHT_BLUE, AQUA, WHITE };
-
   private static final int BLACK = 0x000000;
-  private static final int MAGENTA = 0x722640;
-  private static final int DARK_BLUE = 0x40337F;
-  private static final int PURPLE = 0xE434FE;
-  private static final int DARK_GREEN = 0x0E5940;
-  private static final int GRAY = 0x808080;
-  private static final int MEDIUM_BLUE = 0x1B9AEF;
-  private static final int LIGHT_BLUE = 0xBFB3FF;
-  private static final int BROWN = 0x404C00;
-  private static final int ORANGE = 0xE46501;
-  private static final int PINK = 0xF1A6BF;
-  private static final int GREEN = 0x1BCB01;
-  private static final int YELLOW = 0xBFCC80;
-  private static final int AQUA = 0x8DD9BF;
+  private static final int MAGENTA = 0xFF00FF;
+  private static final int BROWN = 0x994C00;
+  private static final int ORANGE = 0xFF9933;
+  private static final int DARK_GREEN = 0x006600;
+  private static final int GRAY = 0xA0A0A0;
+  private static final int GREEN = 0x00CC00;
+  private static final int YELLOW = 0xFFFF33;
+  private static final int DARK_BLUE = 0x0066CC;
+  private static final int PURPLE = 0xCC00CC;
+  private static final int PINK = 0xFFCCE5;
+  private static final int MEDIUM_BLUE = 0x3399FF;
+  private static final int LIGHT_BLUE = 0x99CCFF;
+  private static final int AQUA = 0x99FFFF;
   private static final int WHITE = 0xFFFFFF;
 
   private static int[] palette =
-      { BLACK, MAGENTA, DARK_BLUE, PURPLE, DARK_GREEN, GRAY, MEDIUM_BLUE, LIGHT_BLUE,
-        BROWN, ORANGE, GRAY, PINK, GREEN, YELLOW, AQUA, WHITE };
+      { BLACK, MAGENTA, BROWN, ORANGE, DARK_GREEN, GRAY, GREEN, YELLOW, DARK_BLUE, PURPLE,
+        GRAY, PINK, MEDIUM_BLUE, LIGHT_BLUE, AQUA, WHITE };
+
+  //  private static final int BLACK = 0x000000;
+  //  private static final int MAGENTA = 0x722640;
+  //  private static final int DARK_BLUE = 0x40337F;
+  //  private static final int PURPLE = 0xE434FE;
+  //  private static final int DARK_GREEN = 0x0E5940;
+  //  private static final int GRAY = 0x808080;
+  //  private static final int MEDIUM_BLUE = 0x1B9AEF;
+  //  private static final int LIGHT_BLUE = 0xBFB3FF;
+  //  private static final int BROWN = 0x404C00;
+  //  private static final int ORANGE = 0xE46501;
+  //  private static final int PINK = 0xF1A6BF;
+  //  private static final int GREEN = 0x1BCB01;
+  //  private static final int YELLOW = 0xBFCC80;
+  //  private static final int AQUA = 0x8DD9BF;
+  //  private static final int WHITE = 0xFFFFFF;
+  //
+  //  private static int[] palette =
+  //      { BLACK, MAGENTA, DARK_BLUE, PURPLE, DARK_GREEN, GRAY, MEDIUM_BLUE, LIGHT_BLUE,
+  //        BROWN, ORANGE, GRAY, PINK, GREEN, YELLOW, AQUA, WHITE };
 
   private final byte[] auxBuffer;
   private DoubleScrunch doubleScrunch;
@@ -56,7 +56,6 @@ public class DoubleHiResImage extends HiResImage
     super (name, buffer);
 
     this.auxBuffer = auxBuffer;
-
     createImage ();
   }
 
@@ -73,29 +72,6 @@ public class DoubleHiResImage extends HiResImage
     this.buffer = doubleScrunch.primaryBuffer;
 
     createImage ();
-
-    // testes
-    if (false)
-    {
-      byte b = -1;
-      System.out.printf ("%02X  %d%n", b, b);
-      if (b < 0)
-        System.out.println ("negative");
-      b = -122;
-      for (int i = 0; i < 10; i++)
-      {
-        --b;
-        System.out.printf ("%4d  %02X%n", b, b);
-      }
-      System.out.println ();
-
-      b = (byte) 250;
-      for (int i = 0; i < 10; i++)
-      {
-        ++b;
-        System.out.printf ("%4d  %02X%n", b, b);
-      }
-    }
   }
 
   @Override
@@ -168,8 +144,10 @@ public class DoubleHiResImage extends HiResImage
       text.append ("Packed buffer:\n\n");
       text.append (HexFormatter.format (packedBuffer));
     }
+
     text.append ("\n\nAuxilliary buffer:\n\n");
     text.append (HexFormatter.format (auxBuffer));
+
     text.append ("\n\nPrimary buffer:\n\n");
     text.append (HexFormatter.format (buffer));
 

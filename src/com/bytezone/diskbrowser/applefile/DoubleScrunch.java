@@ -4,19 +4,21 @@ import com.bytezone.diskbrowser.utilities.CPU;
 
 public class DoubleScrunch extends CPU
 {
-  private byte mem_71D0;
-  private byte mem_71D2;
-  private byte mem_71D3;
-  private byte mem_71D4;
+  private byte mem_71D0;        // screen row index (X)
+  private byte mem_71D2;        // screen column index
+  private byte mem_71D3;        // byte to repeat
+  private byte mem_71D4;        // # of bytes to store
 
   private int src;              // base address of packed buffer
   private int dst;              // base address of main/aux memory
 
-  private byte zp_00;
+  private byte zp_00;           // input buffer offset
   private byte zp_01;
-  private byte zp_26;
+
+  private byte zp_26;           // output buffer offset
   private byte zp_27;
-  private byte zp_E6;
+
+  private byte zp_E6;           // hi-res page ($20 or $40)
 
   final byte[] auxBuffer = new byte[0x2000];
   final byte[] primaryBuffer = new byte[0x2000];
@@ -31,21 +33,14 @@ public class DoubleScrunch extends CPU
 
   void unscrunch (byte[] buffer)
   {
-    if (false)
-    {
-      ldx ((byte) 0x81);
-      calculateScreenAddress ();
-
-      return;
-    }
-
     packedBuffer = buffer;
 
     src = 0x4000;           // packed picture data
     dst = 0x2000;           // main/aux picture data
 
-    zp_00 = 0x00;
+    zp_00 = 0x00;           // load address of packed buffer
     zp_01 = 0x40;
+
     zp_E6 = 0x20;           // hi-res page 1
 
     lda (zp_E6);
@@ -55,25 +50,29 @@ public class DoubleScrunch extends CPU
     ldx ((byte) 0x01);
     mem_71D0 = stx ();
     ldy ((byte) 0x00);
-    mem_71D2 = sty ();
-    zp_26 = sty ();
+    mem_71D2 = sty ();      // line offset = 0
+    zp_26 = sty ();         // output index = 0
 
     while (true)
     {
+      // get the repetition counter (hi-bit is a flag to indicate copy/repeat)
       lda (packedBuffer, indirectY (src, zp_00, zp_01));        // LDA ($00),Y)
 
       php ();
+
+      // prepare address to get next transfer byte (done in copy/repeat routine)
       zp_00 = inc (zp_00);
       if (zero)
         zp_01 = inc (zp_01);
 
-      and ((byte) 0x7F);
-      mem_71D4 = sta ();
+      and ((byte) 0x7F);            // remove copy/repeat flag
+      mem_71D4 = sta ();            // save repetition counter
       plp ();
 
-      if (negative ? blockB () : blockA ())
+      if (negative ? copyBytes () : repeatBytes ())
         break;
 
+      // prepare address to get next repetition counter
       zp_00 = inc (zp_00);
       if (zero)
         zp_01 = inc (zp_01);
@@ -81,50 +80,54 @@ public class DoubleScrunch extends CPU
   }
 
   // $7144
-  // repeat a single byte X times
-  private boolean blockA ()
+  // copy a single byte $71D4 times
+  private boolean repeatBytes ()
   {
+    // get the byte to store
     lda (packedBuffer, indirectY (src, zp_00, zp_01));        // LDA ($00),Y)
     mem_71D3 = sta ();
 
-    do
+    while (true)
     {
-      lda (mem_71D3);
+      lda (mem_71D3);               // get the byte to store
 
-      storeByte ();
+      storeByte ();                 // store it and decrement repetition counter
 
-      function_71B1 ();
+      calculateScreenLine ();
       if (carry)
-        return true;            // completely finished
+        return true;                // completely finished
 
-      calculateScreenAddress ();
-      ldy (mem_71D4);
-    } while (!zero);
+      calculateNextScreenAddress ();
 
-    return false;               // not finished
+      ldy (mem_71D4);               // check the repetition counter
+      if (zero)
+        return false;               // not finished
+    }
   }
 
   // $717D
-  // copy X single bytes
-  private boolean blockB ()
+  // copy the next $71D4 bytes
+  private boolean copyBytes ()
   {
     while (true)
     {
+      // get the byte to store
       ldy ((byte) 0x00);
       lda (packedBuffer, indirectY (src, zp_00, zp_01));        // LDA ($00),Y)
 
-      storeByte ();
+      storeByte ();                 // store it and decrement repetition counter
 
-      function_71B1 ();
+      calculateScreenLine ();
       if (carry)
-        return true;            // completely finished
+        return true;                // completely finished
 
-      calculateScreenAddress ();
+      calculateNextScreenAddress ();
 
-      ldy (mem_71D4);
+      ldy (mem_71D4);               // check the repetition counter
       if (zero)
-        return false;           // not finished
+        return false;               // not finished
 
+      // prepare address for next read
       zp_00 = inc (zp_00);
       if (zero)
         zp_01 = inc (zp_01);
@@ -134,7 +137,7 @@ public class DoubleScrunch extends CPU
   private void storeByte ()
   {
     mem_71D4 = dec (mem_71D4);      // decrement counter
-    ldy (mem_71D2);                 // load byte to store
+    ldy (mem_71D2);                 // line offset
 
     php ();
     sei ();
@@ -154,7 +157,7 @@ public class DoubleScrunch extends CPU
   }
 
   // $70E8
-  private void calculateScreenAddress ()
+  private void calculateNextScreenAddress ()
   {
     txa ();
     and ((byte) 0xC0);              // clear bits 5-0
@@ -186,12 +189,12 @@ public class DoubleScrunch extends CPU
   }
 
   // $71B1
-  private void function_71B1 ()
+  private void calculateScreenLine ()
   {
     inx ();
     inx ();
     cpx ((byte) 0xC0);
-    if (!carry)                     // BCC $71CE (if X < 0xC0)
+    if (!carry)                     // BCC $71CE 
     {
       clc ();
       return;
@@ -206,7 +209,7 @@ public class DoubleScrunch extends CPU
       return;
     }
 
-    mem_71D2 = inc (mem_71D2);
+    mem_71D2 = inc (mem_71D2);      // increment line offset
     ldy (mem_71D2);
     cpy ((byte) 0x50);
     if (carry)                      // BCS $71CF

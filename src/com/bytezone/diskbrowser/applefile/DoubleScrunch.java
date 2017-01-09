@@ -71,18 +71,8 @@ public class DoubleScrunch extends CPU
       mem_71D4 = sta ();
       plp ();
 
-      if (negative)
-      {
-        boolean finished = blockB ();
-        if (finished)
-          break;
-      }
-      else
-      {
-        boolean finished = blockA ();
-        if (finished)
-          break;
-      }
+      if (negative ? blockB () : blockA ())
+        break;
 
       zp_00 = inc (zp_00);
       if (zero)
@@ -138,8 +128,6 @@ public class DoubleScrunch extends CPU
       zp_00 = inc (zp_00);
       if (zero)
         zp_01 = inc (zp_01);
-
-      assert !zero;
     }
   }
 
@@ -158,6 +146,8 @@ public class DoubleScrunch extends CPU
 
     // switch page
     byte[] target = carry ? primaryBuffer : auxBuffer;
+
+    // store byte
     sta (target, indirectY (dst, zp_26, zp_27));
 
     plp ();
@@ -172,7 +162,7 @@ public class DoubleScrunch extends CPU
 
     lsr ();
     lsr ();
-    ora (zp_26);
+    ora (zp_26);                    // graphics page ($20 or $40)
     zp_26 = sta ();
 
     txa ();
@@ -191,7 +181,7 @@ public class DoubleScrunch extends CPU
 
     lda (zp_27);
     and ((byte) 0x1F);              // clear bits 7-5
-    ora (zp_E6);
+    ora (zp_E6);                    // graphics page ($20 or $40)
     zp_27 = sta ();
   }
 

@@ -79,8 +79,6 @@ public abstract class CPU
     negative = (tmp & 0x80) != 0;
     carry = (aReg & 0xFF) >= (value & 0xFF);
     debug ("CMP");
-    if (debug)
-      System.out.printf ("  cmp a: %02X v: %02X%n", aReg, value);
   }
 
   protected void cpx (byte value)             // CPX
@@ -90,8 +88,6 @@ public abstract class CPU
     negative = (tmp & 0x80) != 0;
     carry = (xReg & 0xFF) >= (value & 0xFF);
     debug ("CPX");
-    if (debug)
-      System.out.printf ("  cpx x: %02X v: %02X%n", xReg, value);
   }
 
   protected void cpy (byte value)             // CPY
@@ -101,8 +97,6 @@ public abstract class CPU
     negative = (tmp & 0x80) != 0;
     carry = (yReg & 0xFF) >= (value & 0xFF);
     debug ("CPY");
-    if (debug)
-      System.out.printf ("  cpy y: %02X v: %02X%n", yReg, value);
   }
 
   protected byte dec (byte value)             // DEC
@@ -333,7 +327,10 @@ public abstract class CPU
     debug ("SEI");
   }
 
-  protected abstract String debugString ();
+  protected String debugString ()
+  {
+    return "";
+  }
 
   protected void debug (String cmd)
   {

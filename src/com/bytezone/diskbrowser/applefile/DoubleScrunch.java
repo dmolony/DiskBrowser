@@ -4,10 +4,10 @@ import com.bytezone.diskbrowser.utilities.CPU;
 
 public class DoubleScrunch extends CPU
 {
-  private byte mem_71D0;        // screen row index (X)
-  private byte mem_71D2;        // screen column index
+  private byte mem_71D0;        // varies 1/0/1/0 ...
+  private byte mem_71D2;        // column index * 2 (00-4F) increments every C0 bytes
   private byte mem_71D3;        // byte to repeat
-  private byte mem_71D4;        // # of bytes to store
+  private byte mem_71D4;        // repetition counter
 
   private int src;              // base address of packed buffer
   private int dst;              // base address of main/aux memory
@@ -20,18 +20,74 @@ public class DoubleScrunch extends CPU
 
   private byte zp_E6;           // hi-res page ($20 or $40)
 
-  final byte[] auxBuffer = new byte[0x2000];
-  final byte[] primaryBuffer = new byte[0x2000];
+  //  final byte[] auxBuffer = new byte[0x2000];
+  //  final byte[] primaryBuffer = new byte[0x2000];
+  final byte[][] memory = new byte[2][0x2000];
   private byte[] packedBuffer;
 
   private final boolean debug = false;
+  private int count;
+  private final int[] rows = new int[192];
+  private int ptr;
+  private int bank;
+  private int outPtr;
+  private int column;
 
   public DoubleScrunch ()
   {
-    setDebug (debug);
+    int row = 0;
+
+    for (int a = 0x400; a >= 0; a -= 0x400)           // reversed!
+      for (int b = 0; b < 0x78; b += 0x28)
+        for (int c = 0; c < 0x400; c += 0x80)
+          for (int d = 0; d < 0x2000; d += 0x800)
+            rows[row++] = a + b + c + d;
   }
 
   void unscrunch (byte[] buffer)
+  {
+    packedBuffer = buffer;
+
+    while (true)
+    {
+      int rep = packedBuffer[ptr++] & 0xFF;
+
+      if ((rep & 0x80) == 0)            // repeat same byte
+      {
+        byte val = packedBuffer[ptr++];
+        while (rep-- > 0)
+          if (move (val))
+            return;
+      }
+      else                              // copy bytes
+      {
+        rep &= 0x7F;
+        while (rep-- > 0)
+          if (move (packedBuffer[ptr++]))
+            return;
+      }
+    }
+  }
+
+  private boolean move (byte val)
+  {
+    memory[bank][rows[outPtr++] + column] = val;
+
+    if (outPtr % 192 == 0)        // screen column for this bank is finished
+    {
+      outPtr = 0;
+      if (++bank > 1)             // both banks are finished
+      {
+        bank = 0;
+        if (++column >= 40)       // whole screen is finished
+          return true;
+      }
+    }
+    return false;
+  }
+
+  // no longer needed, it was used to decipher the Beagle Bros routine
+  void oldUnscrunch (byte[] buffer)
   {
     packedBuffer = buffer;
 
@@ -48,9 +104,10 @@ public class DoubleScrunch extends CPU
     zp_27 = sta ();
 
     ldx ((byte) 0x01);
-    mem_71D0 = stx ();
+    mem_71D0 = stx ();      // X and 71D0 are both set to 1
+
     ldy ((byte) 0x00);
-    mem_71D2 = sty ();      // line offset = 0
+    mem_71D2 = sty ();      // column index = 0
     zp_26 = sty ();         // output index = 0
 
     while (true)
@@ -60,27 +117,27 @@ public class DoubleScrunch extends CPU
 
       php ();
 
-      // prepare address to get next transfer byte (done in copy/repeat routine)
+      // increment address to get next transfer byte (done in copy/repeat routine)
       zp_00 = inc (zp_00);
       if (zero)
         zp_01 = inc (zp_01);
 
       and ((byte) 0x7F);            // remove copy/repeat flag
-      mem_71D4 = sta ();            // save repetition counter
+      mem_71D4 = sta ();            // save repetition counter (RC)
       plp ();
 
+      // copy or repeat RC bytes
       if (negative ? copyBytes () : repeatBytes ())
         break;
 
-      // prepare address to get next repetition counter
+      // increment address to get next repetition counter
       zp_00 = inc (zp_00);
       if (zero)
         zp_01 = inc (zp_01);
     }
   }
 
-  // $7144
-  // copy a single byte $71D4 times
+  // copy a single byte RC times
   private boolean repeatBytes ()
   {
     // get the byte to store
@@ -93,7 +150,7 @@ public class DoubleScrunch extends CPU
 
       storeByte ();                 // store it and decrement repetition counter
 
-      calculateScreenLine ();
+      calculateScreenColumn ();
       if (carry)
         return true;                // completely finished
 
@@ -105,8 +162,7 @@ public class DoubleScrunch extends CPU
     }
   }
 
-  // $717D
-  // copy the next $71D4 bytes
+  // copy the next RC bytes
   private boolean copyBytes ()
   {
     while (true)
@@ -117,7 +173,7 @@ public class DoubleScrunch extends CPU
 
       storeByte ();                 // store it and decrement repetition counter
 
-      calculateScreenLine ();
+      calculateScreenColumn ();
       if (carry)
         return true;                // completely finished
 
@@ -134,33 +190,72 @@ public class DoubleScrunch extends CPU
     }
   }
 
+  // store the byte currently in Acc
   private void storeByte ()
   {
-    mem_71D4 = dec (mem_71D4);      // decrement counter
-    ldy (mem_71D2);                 // line offset
+    mem_71D4 = dec (mem_71D4);      // decrement repetition counter (RC)
+    ldy (mem_71D2);                 // column index (times 2)
 
     php ();
-    sei ();
+    //    sei ();
     pha ();
     tya ();
-    lsr ();                         // divide by 2 ?
+    lsr ();                         // divide by 2, put odd/even value in carry (bank)
     tay ();
     pla ();
 
-    // switch page
-    byte[] target = carry ? primaryBuffer : auxBuffer;
-
     // store byte
-    sta (target, indirectY (dst, zp_26, zp_27));
+    if (false)
+      System.out.printf (
+          "%04X  D0: %02X  D2: %02X  xReg: %02X  bank: %d  %02X -> %02X %02X + %02X%n",
+          count++, mem_71D0, mem_71D2, stx (), carry ? 0 : 1, sta (), zp_27, zp_26,
+          sty ());
+    sta (memory[carry ? 1 : 0], indirectY (dst, zp_26, zp_27));
 
     plp ();
   }
 
-  // $70E8
+  // $71B1
+  private void calculateScreenColumn ()
+  {
+    // increment X by 2 - X varies 01, 03, 05 -> BF, then 00, 02, 04 -> BE
+    inx ();
+    inx ();
+    cpx ((byte) 0xC0);              // # screen lines
+    if (!carry)                     // X < $C0
+      return;                       // continue current phase
+
+    // carry is now set, current phase is finished
+
+    // change phase
+    mem_71D0 = dec (mem_71D0);      // either 1 -> 0, or 0 -> -1
+    if (!negative)                  //          
+    {
+      assert mem_71D0 == 0;
+      // start second phase of screen column
+      ldx ((byte) 0x00);            // start X at 0
+      //      mem_71D0 = stx ();            // phase 2 (not necessary, was already 0)
+      clc ();
+      return;                       // start phase 2
+    }
+
+    // start a new screen column (and start phase 1)
+    mem_71D2 = inc (mem_71D2);      // increment column index
+    ldy (mem_71D2);
+    cpy ((byte) 0x50);              // test for end of line (2 x 0x28)
+    if (carry)                      // Y >= $50
+      return;                       // program finished
+
+    ldx ((byte) 0x01);              // start X at 1
+    mem_71D0 = stx ();              // start phase 1
+    clc ();
+  }
+
+  // set locations $26-27 (address of first location in screen line)
   private void calculateNextScreenAddress ()
   {
     txa ();
-    and ((byte) 0xC0);              // clear bits 5-0
+    and ((byte) 0xC0);              // get 2 hi bits - 00/40/80
     zp_26 = sta ();
 
     lsr ();
@@ -186,39 +281,6 @@ public class DoubleScrunch extends CPU
     and ((byte) 0x1F);              // clear bits 7-5
     ora (zp_E6);                    // graphics page ($20 or $40)
     zp_27 = sta ();
-  }
-
-  // $71B1
-  private void calculateScreenLine ()
-  {
-    inx ();
-    inx ();
-    cpx ((byte) 0xC0);
-    if (!carry)                     // BCC $71CE 
-    {
-      clc ();
-      return;
-    }
-
-    mem_71D0 = dec (mem_71D0);
-    if (!negative)                 // BPL $71C9         
-    {
-      ldx ((byte) 0);
-      mem_71D0 = stx ();
-      clc ();
-      return;
-    }
-
-    mem_71D2 = inc (mem_71D2);      // increment line offset
-    ldy (mem_71D2);
-    cpy ((byte) 0x50);
-    if (carry)                      // BCS $71CF
-      return;                       // program finished
-
-    ldx ((byte) 0x01);
-    //    bit ((byte) 0xA2);              // ??
-    mem_71D0 = stx ();
-    clc ();
   }
 
   @Override

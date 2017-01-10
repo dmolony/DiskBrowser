@@ -7,25 +7,46 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DoubleHiResImage extends HiResImage
 {
+  //  private static final int BLACK = 0x000000;
+  //  private static final int MAGENTA = 0xFF00FF;
+  //  private static final int BROWN = 0x994C00;
+  //  private static final int ORANGE = 0xFF9933;
+  //  private static final int DARK_GREEN = 0x006600;
+  //  private static final int GRAY = 0xA0A0A0;
+  //  private static final int GREEN = 0x00CC00;
+  //  private static final int YELLOW = 0xFFFF33;
+  //  private static final int DARK_BLUE = 0x0066CC;
+  //  private static final int PURPLE = 0xCC00CC;
+  //  private static final int PINK = 0xFFCCE5;
+  //  private static final int MEDIUM_BLUE = 0x3399FF;
+  //  private static final int LIGHT_BLUE = 0x99CCFF;
+  //  private static final int AQUA = 0x99FFFF;
+  //  private static final int WHITE = 0xFFFFFF;
+  //  private static int[] palette =
+  //  private static int[] palette =
+  //    { BLACK, MAGENTA, BROWN, ORANGE, DARK_GREEN, GRAY, GREEN, YELLOW, DARK_BLUE,
+  //      PURPLE, GRAY, PINK, MEDIUM_BLUE, LIGHT_BLUE, AQUA, WHITE };
+
   private static final int BLACK = 0x000000;
-  private static final int MAGENTA = 0xFF00FF;
-  private static final int BROWN = 0x994C00;
-  private static final int ORANGE = 0xFF9933;
-  private static final int DARK_GREEN = 0x006600;
-  private static final int GRAY = 0xA0A0A0;
-  private static final int GREEN = 0x00CC00;
-  private static final int YELLOW = 0xFFFF33;
-  private static final int DARK_BLUE = 0x0066CC;
-  private static final int PURPLE = 0xCC00CC;
-  private static final int PINK = 0xFFCCE5;
-  private static final int MEDIUM_BLUE = 0x3399FF;
-  private static final int LIGHT_BLUE = 0x99CCFF;
-  private static final int AQUA = 0x99FFFF;
+  private static final int MAGENTA = 0xDD0033;
+  private static final int BROWN = 0x885500;
+  private static final int ORANGE = 0xFF6600;
+  private static final int DARK_GREEN = 0x007722;
+  private static final int GRAY1 = 0x555555;
+  private static final int GREEN = 0x11DD00;
+  private static final int YELLOW = 0xFFFF00;
+  private static final int DARK_BLUE = 0x000099;
+  private static final int PURPLE = 0xDD22DD;
+  private static final int GRAY2 = 0xAAAAAA;
+  private static final int PINK = 0xFF9988;
+  private static final int MEDIUM_BLUE = 0x2222FF;
+  private static final int LIGHT_BLUE = 0x66AAFF;
+  private static final int AQUA = 0x44FF99;
   private static final int WHITE = 0xFFFFFF;
 
   private static int[] palette =
-      { BLACK, MAGENTA, BROWN, ORANGE, DARK_GREEN, GRAY, GREEN, YELLOW, DARK_BLUE, PURPLE,
-        GRAY, PINK, MEDIUM_BLUE, LIGHT_BLUE, AQUA, WHITE };
+      { BLACK, MAGENTA, DARK_BLUE, PURPLE, DARK_GREEN, GRAY1, MEDIUM_BLUE, LIGHT_BLUE,
+        BROWN, ORANGE, GRAY2, PINK, GREEN, YELLOW, AQUA, WHITE };
 
   //  private static final int BLACK = 0x000000;
   //  private static final int MAGENTA = 0x722640;
@@ -68,8 +89,8 @@ public class DoubleHiResImage extends HiResImage
     packedBuffer = buffer;
     doubleScrunch = new DoubleScrunch ();
     doubleScrunch.unscrunch (buffer);
-    auxBuffer = doubleScrunch.auxBuffer;
-    this.buffer = doubleScrunch.primaryBuffer;
+    auxBuffer = doubleScrunch.memory[0];
+    this.buffer = doubleScrunch.memory[1];
 
     createImage ();
   }

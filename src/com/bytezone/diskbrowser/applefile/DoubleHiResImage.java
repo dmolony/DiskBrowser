@@ -125,7 +125,7 @@ public class DoubleHiResImage extends HiResImage
   private final byte[] auxBuffer;
   private DoubleScrunch doubleScrunch;
   byte[] packedBuffer;
-  private final int paletteIndex = 2;
+  //  private final int paletteIndex = 2;
 
   public DoubleHiResImage (String name, byte[] buffer, byte[] auxBuffer)
   {
@@ -198,6 +198,8 @@ public class DoubleHiResImage extends HiResImage
   @Override
   protected void createColourImage ()
   {
+    int paletteNdx = paletteIndex % palette2.length;
+
     // image will be doubled horizontally
     image = new BufferedImage (140 * 2, 192, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
@@ -217,8 +219,8 @@ public class DoubleHiResImage extends HiResImage
             for (int px = 0; px < 28; px += 4)
             {
               int val = (value >> px) & 0x0F;
-              dataBuffer.setElem (ndx++, palette2[paletteIndex][val]);
-              dataBuffer.setElem (ndx++, palette2[paletteIndex][val]);  // repeat pixel
+              dataBuffer.setElem (ndx++, palette2[paletteNdx][val]);
+              dataBuffer.setElem (ndx++, palette2[paletteNdx][val]);  // repeat pixel
             }
           }
         }

@@ -60,6 +60,7 @@ public class MenuHandler
   JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
   JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
   JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
+  JMenuItem paletteItem = new JMenuItem ("Cycle Palette");
 
   public MenuHandler (Preferences prefs)
   {
@@ -109,6 +110,7 @@ public class MenuHandler
     formatMenu.add (colourQuirksItem);
     formatMenu.add (monochromeItem);
     formatMenu.add (debuggingItem);
+    formatMenu.add (paletteItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 

@@ -130,6 +130,17 @@ class DataPanel extends JTabbedPane
     mh.colourQuirksItem.setAction (new ColourQuirksAction (this));
     mh.monochromeItem.setAction (new MonochromeAction (this));
     mh.debuggingItem.setAction (new DebuggingAction (this));
+    mh.paletteItem.setAction (new PaletteAction (this));
+  }
+
+  public void cyclePalette ()
+  {
+    if (currentDataSource instanceof HiResImage)
+    {
+      HiResImage image = (HiResImage) currentDataSource;
+      image.cyclePalette ();
+      imagePanel.setImage (image.getImage ());
+    }
   }
 
   public void setColourQuirks (boolean value)

@@ -17,6 +17,7 @@ public abstract class HiResImage extends AbstractFile
 
   protected static boolean colourQuirks;
   protected static boolean monochrome;
+  protected static int paletteIndex;
 
   protected int fileType;
   protected int auxType;
@@ -78,6 +79,13 @@ public abstract class HiResImage extends AbstractFile
   protected abstract void createMonochromeImage ();
 
   protected abstract void createColourImage ();
+
+  public void cyclePalette ()
+  {
+    ++paletteIndex;
+    if (!monochrome)
+      createImage ();
+  }
 
   public void setColourQuirks (boolean value)
   {

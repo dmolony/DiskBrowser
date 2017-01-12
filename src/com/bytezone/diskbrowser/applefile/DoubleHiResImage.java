@@ -52,6 +52,24 @@ public class DoubleHiResImage extends HiResImage
 
   private static int[][] //
   palette = {
+              // my preferences
+              { 0x000000, // 0 black        A
+                0xFF0000, // 1 red          C
+                0xA52A2A, // 2 brown        E  (8)
+                0xFFA500, // 3 orange       G  (9)
+                0x008000, // 4 dark green   I
+                0x808080, // 5 grey1        K
+                0x90EE90, // 6 light green  M  (C)
+                0xFFFF00, // 7 yellow       O  (D)
+                0x00008B, // 8 dark blue    B  (2)
+                0x800080, // 9 purple       D  (3)
+                0xC0C0C0, // A grey2        F
+                0xFFC0CB, // B pink         H
+                0x00BFFF, // C med blue     J  (6)
+                0x87CEFA, // D light blue   L  (7)
+                0x00FFFF, // E aqua         N
+                0xFFFFFF  // F white        P
+              },
               // Virtual II
               { 0x000000, // 0 black
                 0xDD0033, // 1 magenta
@@ -88,23 +106,23 @@ public class DoubleHiResImage extends HiResImage
                 0x62F699, // E aqua     
                 0xFFFFFF  // F white    
               },
-              // no idea
-              { 0x000000, // black
-                0x722640, // magenta
-                0x404C00, // dark green
-                0xE46501, // orange
-                0x0E5940, // dark green
-                0x808080, // grey
-                0x1B9AEF, // blue
-                0xBFB3FF, // lilac
-                0x40337F, // dark purple
-                0xE434FE, // mauve
-                0x808080, // dark grey
-                0xF1A6BF, // pink
-                0x1BCB01, // bright green
-                0xBFCC80, // light green
-                0x8DD9BF, // green
-                0xFFFFFF  // white
+              // no idea - green beagle
+              { 0x000000, // 0 black
+                0x722640, // 1 magenta
+                0x404C00, // 2 dark green
+                0xE46501, // 3 orange
+                0x0E5940, // 4 dark green
+                0x808080, // 5 grey
+                0x1B9AEF, // 6 blue
+                0xBFB3FF, // 7 lilac
+                0x40337F, // 8 dark purple
+                0xE434FE, // 9 mauve
+                0x808080, // A dark grey
+                0xF1A6BF, // B pink
+                0x1BCB01, // C bright green
+                0xBFCC80, // D light green
+                0x8DD9BF, // E green
+                0xFFFFFF  // F white
               },
               // Authentic (MP)
               { 0x000000, // black
@@ -178,6 +196,7 @@ public class DoubleHiResImage extends HiResImage
   public DoubleHiResImage (String name, byte[] buffer, byte[] auxBuffer)
   {
     super (name, buffer);
+    //    switchColours ();
 
     this.auxBuffer = auxBuffer;
     createImage ();
@@ -186,6 +205,7 @@ public class DoubleHiResImage extends HiResImage
   public DoubleHiResImage (String name, byte[] buffer)
   {
     super (name, buffer);
+    //    switchColours ();
 
     assert name.endsWith (".PAC") || name.endsWith ("A2FC");
 
@@ -292,6 +312,23 @@ public class DoubleHiResImage extends HiResImage
     text.append (HexFormatter.format (buffer));
 
     return text.toString ();
+  }
+
+  private void switchColours ()
+  {
+    for (int i = 0; i < palette.length; i++)
+    {
+      for (int c = 2; c <= 6; c += 4)
+      {
+        int temp = palette[i][c];
+        palette[i][c] = palette[i][c + 6];
+        palette[i][c + 6] = temp;
+
+        temp = palette[i][c + 1];
+        palette[i][c + 1] = palette[i][c + 7];
+        palette[i][c + 7] = temp;
+      }
+    }
   }
 
   private static int rgb (int red, int green, int blue)

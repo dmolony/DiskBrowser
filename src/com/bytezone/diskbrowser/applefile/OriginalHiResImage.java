@@ -7,11 +7,12 @@ public class OriginalHiResImage extends HiResImage
 {
   private static final int WHITE = 0xFFFFFF;
   private static final int BLACK = 0x000000;
-  private static final int RED = 0xFF0000;
-  private static final int GREEN = 0x00CC00;
-  private static final int BLUE = 0x0000FF;
-  private static final int VIOLET = 0xBB66FF;
-  private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
+  //  private static final int RED = 0xFF0000;
+  //  private static final int GREEN = 0x00CC00;
+  //  private static final int BLUE = 0x0000FF;
+  //  private static final int VIOLET = 0xBB66FF;
+  //  private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
+  private static final int[][] paletteTable = { { 9, 6 }, { 12, 3 } };
 
   private static boolean matchColourBits = false;
 
@@ -88,6 +89,8 @@ public class OriginalHiResImage extends HiResImage
 
   private void fillLine (int base)
   {
+    int paletteNdx = paletteIndex % palette.length;
+
     int max = Math.min (base + 40, buffer.length);
     int linePtr = 0;
     assert colourBits != null;
@@ -103,7 +106,8 @@ public class OriginalHiResImage extends HiResImage
         int val = (value >> px) & 0x01;         // get the next pixel to draw
         int column = (ptr + px) % 2;            // is it in an odd or even column?
         line[linePtr++] = val == 0 ? 0 :        // black pixel
-            palette[colourBit][column];         // coloured pixel - use lookup table
+        //  palette[colourBit][column];         // coloured pixel - use lookup table
+            palette[paletteNdx][paletteTable[colourBit][column]]; // coloured pixel - use lookup table
       }
     }
 

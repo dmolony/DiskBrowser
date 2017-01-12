@@ -7,7 +7,6 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class DoubleHiResImage extends HiResImage
 {
-  //  private static final int BLACK = 0x000000;
   //  private static final int MAGENTA = 0xFF00FF;
   //  private static final int BROWN = 0x994C00;
   //  private static final int ORANGE = 0xFF9933;
@@ -21,34 +20,22 @@ public class DoubleHiResImage extends HiResImage
   //  private static final int MEDIUM_BLUE = 0x3399FF;
   //  private static final int LIGHT_BLUE = 0x99CCFF;
   //  private static final int AQUA = 0x99FFFF;
-  //  private static final int WHITE = 0xFFFFFF;
-  //  private static int[] palette =
-  //  private static int[] palette =
-  //    { BLACK, MAGENTA, BROWN, ORANGE, DARK_GREEN, GRAY, GREEN, YELLOW, DARK_BLUE,
-  //      PURPLE, GRAY, PINK, MEDIUM_BLUE, LIGHT_BLUE, AQUA, WHITE };
 
-  private static final int BLACK = 0x000000;
-  private static final int MAGENTA = 0xDD0033;
-  private static final int BROWN = 0x885500;
-  private static final int ORANGE = 0xFF6600;
-  private static final int DARK_GREEN = 0x007722;
-  private static final int GRAY1 = 0x555555;
-  private static final int GREEN = 0x11DD00;
-  private static final int YELLOW = 0xFFFF00;
-  private static final int DARK_BLUE = 0x000099;
-  private static final int PURPLE = 0xDD22DD;
-  private static final int GRAY2 = 0xAAAAAA;
-  private static final int PINK = 0xFF9988;
-  private static final int MEDIUM_BLUE = 0x2222FF;
-  private static final int LIGHT_BLUE = 0x66AAFF;
-  private static final int AQUA = 0x44FF99;
-  private static final int WHITE = 0xFFFFFF;
+  //  private static final int MAGENTA = 0xDD0033;
+  //  private static final int BROWN = 0x885500;
+  //  private static final int ORANGE = 0xFF6600;
+  //  private static final int DARK_GREEN = 0x007722;
+  //  private static final int GRAY1 = 0x555555;
+  //  private static final int GREEN = 0x11DD00;
+  //  private static final int YELLOW = 0xFFFF00;
+  //  private static final int DARK_BLUE = 0x000099;
+  //  private static final int PURPLE = 0xDD22DD;
+  //  private static final int GRAY2 = 0xAAAAAA;
+  //  private static final int PINK = 0xFF9988;
+  //  private static final int MEDIUM_BLUE = 0x2222FF;
+  //  private static final int LIGHT_BLUE = 0x66AAFF;
+  //  private static final int AQUA = 0x44FF99;
 
-  //  private static int[] palette =
-  //      { BLACK, MAGENTA, DARK_BLUE, PURPLE, DARK_GREEN, GRAY1, MEDIUM_BLUE, LIGHT_BLUE,
-  //        BROWN, ORANGE, GRAY2, PINK, GREEN, YELLOW, AQUA, WHITE };
-
-  //  private static final int BLACK = 0x000000;
   //  private static final int MAGENTA = 0x722640;
   //  private static final int DARK_BLUE = 0x40337F;
   //  private static final int PURPLE = 0xE434FE;
@@ -62,37 +49,99 @@ public class DoubleHiResImage extends HiResImage
   //  private static final int GREEN = 0x1BCB01;
   //  private static final int YELLOW = 0xBFCC80;
   //  private static final int AQUA = 0x8DD9BF;
-  //  private static final int WHITE = 0xFFFFFF;
-  //
-  //  private static int[] palette =
-  //      { BLACK, MAGENTA, DARK_BLUE, PURPLE, DARK_GREEN, GRAY, MEDIUM_BLUE, LIGHT_BLUE,
-  //        BROWN, ORANGE, GRAY, PINK, GREEN, YELLOW, AQUA, WHITE };
 
-  private static int[][] palette2 =
-      { { 0x000000, 0xDD0033, 0x885500, 0xFF6600, 0x007722, 0x555555, 0x11DD00, 0xFFFF00,
-          0x000099, 0xDD22DD, 0xAAAAAA, 0xFF9988, 0x2222FF, 0x66AAFF, 0x44FF99,
-          0xFFFFFF },
-        {//
-         rgb (0, 0, 0),         // black    
-         rgb (157, 9, 102),     // red      
-         rgb (42, 42, 229),     // dk blue  
-         rgb (199, 52, 255),    // purple   
-         rgb (0, 118, 26),      // dk green 
-         rgb (128, 128, 128),   // gray     
-         rgb (13, 161, 255),    // med blue 
-         rgb (170, 170, 255),   // lt blue  
-         rgb (85, 85, 0),       // brown    
-         rgb (242, 94, 0),      // orange   
-         rgb (192, 192, 192),   // grey     
-         rgb (255, 137, 229),   // pink     
-         rgb (56, 203, 0),      // lt green 
-         rgb (213, 213, 26),    // yellow   
-         rgb (98, 246, 153),    // aqua     
-         rgb (255, 255, 255)    // white    
-        }, //
-        { 0x000000, 0x722640, 0x40337F, 0xE434FE, 0x0E5940, 0x808080, 0x1B9AEF, 0xBFB3FF,
-          0x404C00, 0xE46501, 0x808080, 0xF1A6BF, 0x1BCB01, 0xBFCC80, 0x8DD9BF,
-          0xFFFFFF } };
+  private static int[][] //
+  palette = {
+              // Virtual II
+              { 0x000000, // 0 black
+                0xDD0033, // 1 magenta
+                0x885500, // 2 brown         (8)
+                0xFF6600, // 3 orange        (9)
+                0x007722, // 4 dark green
+                0x555555, // 5 grey1
+                0x11DD00, // 6 light green   (C)
+                0xFFFF00, // 7 yellow        (D)
+                0x000099, // 8 dark blue     (2)
+                0xDD22DD, // 9 purple        (3)
+                0xAAAAAA, // A grey2
+                0xFF9988, // B pink
+                0x2222FF, // C med blue      (6)
+                0x66AAFF, // D light blue    (7)
+                0x44FF99, // E aqua
+                0xFFFFFF  // F white
+              },
+              // Bill Buckels
+              { 0x000000, // 0 black    
+                0x9D0966, // 1 red    
+                0x555500, // 2 brown    
+                0xF25E00, // 3 orange     
+                0x00761A, // 4 dk green 
+                0x808080, // 5 gray     
+                0x38CB00, // 6 lt green 
+                0xD5D51A, // 7 yellow   
+                0x2A2AE5, // 8 dk blue  
+                0xC734FF, // 9 purple   
+                0xC0C0C0, // A grey     
+                0xFF89E5, // B pink     
+                0x0DA1FF, // C med blue 
+                0xAAAAFF, // D lt blue  
+                0x62F699, // E aqua     
+                0xFFFFFF  // F white    
+              },
+              // no idea
+              { 0x000000, // black
+                0x722640, // magenta
+                0x404C00, // dark green
+                0xE46501, // orange
+                0x0E5940, // dark green
+                0x808080, // grey
+                0x1B9AEF, // blue
+                0xBFB3FF, // lilac
+                0x40337F, // dark purple
+                0xE434FE, // mauve
+                0x808080, // dark grey
+                0xF1A6BF, // pink
+                0x1BCB01, // bright green
+                0xBFCC80, // light green
+                0x8DD9BF, // green
+                0xFFFFFF  // white
+              },
+              // Authentic (MP)
+              { 0x000000, // black
+                0xD00030, // magenta
+                0x805000, // brown
+                0xF06000, // orange
+                0x007020, // dark green
+                0x505050, // grey1
+                0x10D000, // light green
+                0xF0F000, // yellow
+                0x000090, // dark blue
+                0xD020D0, // purple
+                0xA0A0A0, // grey2
+                0xF09080, // pink
+                0x2020F0, // med blue
+                0x60A0F0, // light blue
+                0x44FF99, // aqua
+                0xFFFFFF  // white
+              },
+              // NTSC Corrected (MP)
+              { 0x000000, // black
+                0x901740, // magenta
+                0x405400, // brown
+                0xD06A1A, // orange
+                0x006940, // dark green
+                0x808080, // grey1
+                0x2FBC1A, // light green
+                0xBFD35A, // yellow
+                0x402CA5, // dark blue
+                0xD043E5, // purple
+                0x808080, // grey2
+                0xFF96BF, // pink
+                0x2F95E5, // med blue
+                0xBFABFF, // light blue
+                0x6FE8BF, // aqua
+                0xFFFFFF  // white
+              }, };
 
   /*-
    *  Michael Pohoreski - The Apple II Forever Anthology
@@ -125,7 +174,6 @@ public class DoubleHiResImage extends HiResImage
   private final byte[] auxBuffer;
   private DoubleScrunch doubleScrunch;
   byte[] packedBuffer;
-  //  private final int paletteIndex = 2;
 
   public DoubleHiResImage (String name, byte[] buffer, byte[] auxBuffer)
   {
@@ -198,7 +246,7 @@ public class DoubleHiResImage extends HiResImage
   @Override
   protected void createColourImage ()
   {
-    int paletteNdx = paletteIndex % palette2.length;
+    int paletteNdx = paletteIndex % palette.length;
 
     // image will be doubled horizontally
     image = new BufferedImage (140 * 2, 192, BufferedImage.TYPE_INT_RGB);
@@ -219,8 +267,8 @@ public class DoubleHiResImage extends HiResImage
             for (int px = 0; px < 28; px += 4)
             {
               int val = (value >> px) & 0x0F;
-              dataBuffer.setElem (ndx++, palette2[paletteNdx][val]);
-              dataBuffer.setElem (ndx++, palette2[paletteNdx][val]);  // repeat pixel
+              dataBuffer.setElem (ndx++, palette[paletteNdx][val]);
+              dataBuffer.setElem (ndx++, palette[paletteNdx][val]);  // repeat pixel
             }
           }
         }
@@ -248,6 +296,8 @@ public class DoubleHiResImage extends HiResImage
 
   private static int rgb (int red, int green, int blue)
   {
+    System.out.printf ("%3d %3d %3d = 0x%06X%n", red, green, blue,
+        (red << 16 | green << 8 | blue));
     return red << 16 | green << 8 | blue;
   }
 }

@@ -48,6 +48,25 @@ public class PaletteFactory
                     0xFFFFFF  // F white
         }));
 
+    //    palettes.add (new Palette ("Virtual II xx",
+    //        new int[] { 0x000000, // 0 black
+    //                    0x000099, // 8 dark blue     (2)  --> magenta
+    //                    0x007722, // 4 dark green         --> brown
+    //                    0x2222FF, // C med blue      (6)  --> orange
+    //                    0x885500, // 2 brown         (8)  --> dark green
+    //                    0xAAAAAA, // A grey2              --> grey1
+    //                    0x11DD00, // 6 light green   (C)
+    //                    0x44FF99, // E aqua               --> yellow
+    //                    0xDD0033, // 1 magenta            --> dark blue
+    //                    0xDD22DD, // 9 purple        (3)
+    //                    0x555555, // 5 grey1              --> grey2
+    //                    0x66AAFF, // D light blue    (7)  --> pink
+    //                    0xFF6600, // 3 orange        (9)  --> med blue
+    //                    0xFF9988, // B pink               --> light blue
+    //                    0xFFFF00, // 7 yellow        (D)  --> aqua
+    //                    0xFFFFFF  // F white
+    //        }));
+
     // Applewin new (BB)
     palettes.add (new Palette ("Applewin (new)",
         new int[] { 0x000000, // 0 black    
@@ -230,8 +249,8 @@ public class PaletteFactory
 
   private int rgb (int red, int green, int blue)
   {
-    System.out.printf ("%3d %3d %3d = 0x%06X%n", red, green, blue,
-        (red << 16 | green << 8 | blue));
+    //    System.out.printf ("%3d %3d %3d = 0x%06X%n", red, green, blue,
+    //        (red << 16 | green << 8 | blue));
     return red << 16 | green << 8 | blue;
   }
 }

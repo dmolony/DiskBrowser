@@ -54,7 +54,7 @@ class DataPanel extends JTabbedPane
 
     formattedText = new JTextArea (10, TEXT_WIDTH);
     formattedPane = setPanel (formattedText, "Formatted");
-    formattedText.setLineWrap (mh.lineWrapItem.isSelected ());
+    formattedText.setLineWrap (menuHandler.lineWrapItem.isSelected ());
     formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"
@@ -117,14 +117,14 @@ class DataPanel extends JTabbedPane
       }
     });
 
-    mh.lineWrapItem.setAction (new LineWrapAction (formattedText));
-    mh.colourQuirksItem.setAction (new ColourQuirksAction (this));
-    mh.monochromeItem.setAction (new MonochromeAction (this));
-    mh.debuggingItem.setAction (new DebuggingAction (this));
+    menuHandler.lineWrapItem.setAction (new LineWrapAction (formattedText));
+    menuHandler.colourQuirksItem.setAction (new ColourQuirksAction (this));
+    menuHandler.monochromeItem.setAction (new MonochromeAction (this));
+    menuHandler.debuggingItem.setAction (new DebuggingAction (this));
 
     // fill in the placeholders created by the MenuHandler
     List<Palette> palettes = HiResImage.getPalettes ();
-    ButtonGroup buttonGroup = mh.paletteGroup;
+    ButtonGroup buttonGroup = menuHandler.paletteGroup;
     Enumeration<AbstractButton> enumeration = buttonGroup.getElements ();
     int ndx = 0;
     while (enumeration.hasMoreElements ())
@@ -132,30 +132,30 @@ class DataPanel extends JTabbedPane
       JCheckBoxMenuItem item = (JCheckBoxMenuItem) enumeration.nextElement ();
       item.setAction (new PaletteAction (this, palettes.get (ndx++)));
     }
-    mh.nextPaletteItem.setAction (new NextPaletteAction (this, buttonGroup));
-    mh.prevPaletteItem.setAction (new PreviousPaletteAction (this, buttonGroup));
+    menuHandler.nextPaletteItem.setAction (new NextPaletteAction (this, buttonGroup));
+    menuHandler.prevPaletteItem.setAction (new PreviousPaletteAction (this, buttonGroup));
   }
 
   public void selectPalette (Palette palette)
   {
+    HiResImage.getPaletteFactory ().setCurrentPalette (palette);
     if (currentDataSource instanceof HiResImage)
     {
       HiResImage image = (HiResImage) currentDataSource;
-      image.setPalette (palette);
+      image.setPalette ();
       imagePanel.setImage (image.getImage ());
     }
   }
 
   public Palette cyclePalette (CycleDirection direction)
   {
+    Palette palette = HiResImage.getPaletteFactory ().cyclePalette (direction);
     if (currentDataSource instanceof HiResImage)
     {
       HiResImage image = (HiResImage) currentDataSource;
-      Palette palette = image.cyclePalette (direction);
       imagePanel.setImage (image.getImage ());
-      return palette;
     }
-    return null;
+    return palette;
   }
 
   public void setColourQuirks (boolean value)
@@ -225,7 +225,8 @@ class DataPanel extends JTabbedPane
       hexText.setText ("");
       disassemblyText.setText ("");
       removeImage ();
-      menuHandler.colourMenu.setEnabled (false);
+      //      if (!menuHandler.colourMenu.isEnabled ())
+      //        menuHandler.colourMenu.setEnabled (false);
       return;
     }
 
@@ -262,13 +263,16 @@ class DataPanel extends JTabbedPane
     if (image == null)
     {
       removeImage ();
-      menuHandler.colourMenu.setEnabled (false);
+      //      if (menuHandler.colourMenu.isEnabled ())
+      //        menuHandler.colourMenu.setEnabled (false);
     }
     else
     {
       imagePanel.setImage (image);
       imagePane.setViewportView (imagePanel);
-      menuHandler.colourMenu.setEnabled (true);
+      //      if (!menuHandler.colourMenu.isEnabled ())
+      //        menuHandler.colourMenu.setEnabled (true);
+
       if (!imageVisible)
       {
         int selected = getSelectedIndex ();
@@ -381,17 +385,6 @@ class DataPanel extends JTabbedPane
     else
       setDataSource (new SectorList (event.getFormattedDisk (), sectors));
   }
-
-  //  @Override
-  //  public void preferenceChange (PreferenceChangeEvent evt)
-  //  {
-  //    if (evt.getKey ().equals (PreferencesDialog.prefsDataFont))
-  //      font = new Font (evt.getNewValue (), Font.PLAIN, font.getSize ());
-  //    if (evt.getKey ().equals (PreferencesDialog.prefsDataFontSize))
-  //      font = new Font (font.getFontName (), 
-  // Font.PLAIN, Integer.parseInt (evt.getNewValue ()));
-  //    setTabsFont (font);
-  //  }
 
   @Override
   public void fileNodeSelected (FileNodeSelectedEvent event)

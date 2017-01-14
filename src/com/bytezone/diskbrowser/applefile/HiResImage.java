@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -21,7 +20,6 @@ public abstract class HiResImage extends AbstractFile
 
   protected static boolean colourQuirks;
   protected static boolean monochrome;
-  //  protected Palette palette;
 
   protected int fileType;
   protected int auxType;
@@ -30,7 +28,6 @@ public abstract class HiResImage extends AbstractFile
   public HiResImage (String name, byte[] buffer)
   {
     super (name, buffer);
-    //    palette = paletteFactory.getCurrentPalette ();
   }
 
   public HiResImage (String name, byte[] buffer, int loadAddress)
@@ -85,19 +82,10 @@ public abstract class HiResImage extends AbstractFile
 
   protected abstract void createColourImage ();
 
-  public void setPalette (Palette palette)
+  public void setPalette ()
   {
-    paletteFactory.setCurrentPalette (palette);
     if (!monochrome)
       createImage ();
-  }
-
-  public Palette cyclePalette (CycleDirection direction)
-  {
-    Palette palette = paletteFactory.cyclePalette (direction);
-    if (!monochrome)
-      createImage ();
-    return palette;
   }
 
   public void setColourQuirks (boolean value)

@@ -90,6 +90,7 @@ public class DoubleHiResImage extends HiResImage
     image = new BufferedImage (140 * 2, 192, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
     int ndx = 0;
+    int[] swap = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
 
     for (int i = 0; i < 3; i++)
       for (int j = 0; j < 8; j++)
@@ -105,8 +106,9 @@ public class DoubleHiResImage extends HiResImage
             for (int px = 0; px < 28; px += 4)
             {
               int val = (value >> px) & 0x0F;
-              dataBuffer.setElem (ndx++, colours[val]);
-              dataBuffer.setElem (ndx++, colours[val]);  // repeat pixel
+              int val2 = swap[val];
+              dataBuffer.setElem (ndx++, colours[val2]);
+              dataBuffer.setElem (ndx++, colours[val2]);  // repeat pixel
             }
           }
         }

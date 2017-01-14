@@ -18,20 +18,23 @@ class PrintAction extends DefaultAction
 
   public PrintAction (DataPanel owner)
   {
-    super ("Print...", "Print the contents of the output panel", "/com/bytezone/diskbrowser/icons/");
+    super ("Print...", "Print the contents of the output panel",
+        "/com/bytezone/diskbrowser/icons/");
     int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_P, mask));
-    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_P);
+    //    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_P);
     this.owner = owner;
 
     setIcon (Action.SMALL_ICON, "printer_16.png");
     setIcon (Action.LARGE_ICON_KEY, "printer_32.png");
   }
 
+  @Override
   public void actionPerformed (ActionEvent e)
   {
     Runnable runner = new Runnable ()
     {
+      @Override
       public void run ()
       {
         try

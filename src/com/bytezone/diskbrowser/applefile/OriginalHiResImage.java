@@ -71,6 +71,7 @@ public class OriginalHiResImage extends HiResImage
   @Override
   protected void createColourImage ()
   {
+    paletteIndex = paletteFactory.getCurrentPaletteIndex ();
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();

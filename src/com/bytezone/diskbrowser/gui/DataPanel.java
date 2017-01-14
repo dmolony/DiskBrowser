@@ -269,6 +269,11 @@ class DataPanel extends JTabbedPane
     }
     else
     {
+      if (dataSource instanceof HiResImage)
+      {
+        ((HiResImage) dataSource).checkPalette ();
+        image = dataSource.getImage ();
+      }
       imagePanel.setImage (image);
       imagePane.setViewportView (imagePanel);
       //      if (!menuHandler.colourMenu.isEnabled ())

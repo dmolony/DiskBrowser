@@ -24,6 +24,7 @@ public abstract class HiResImage extends AbstractFile
   protected int fileType;
   protected int auxType;
   protected byte[] unpackedBuffer;
+  protected int paletteIndex;
 
   public HiResImage (String name, byte[] buffer)
   {
@@ -81,6 +82,12 @@ public abstract class HiResImage extends AbstractFile
   protected abstract void createMonochromeImage ();
 
   protected abstract void createColourImage ();
+
+  public void checkPalette ()
+  {
+    if (!monochrome && paletteIndex != paletteFactory.getCurrentPaletteIndex ())
+      createImage ();
+  }
 
   public void setPalette ()
   {

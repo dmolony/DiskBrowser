@@ -10,24 +10,24 @@ public class PaletteFactory
 
   public PaletteFactory ()
   {
-    palettes.add (new Palette ("Palette 1",
-        new int[] { 0x000000, // 0 black        A
-                    0xFF0000, // 1 red          C
-                    0xA52A2A, // 2 brown        E  (8)
-                    0xFFA500, // 3 orange       G  (9)
-                    0x008000, // 4 dark green   I
-                    0x808080, // 5 grey1        K
-                    0x90EE90, // 6 light green  M  (C)
-                    0xFFFF00, // 7 yellow       O  (D)
-                    0x00008B, // 8 dark blue    B  (2)
-                    0x800080, // 9 purple       D  (3)
-                    0xC0C0C0, // A grey2        F
-                    0xFFC0CB, // B pink         H
-                    0x00BFFF, // C med blue     J  (6)
-                    0x87CEFA, // D light blue   L  (7)
-                    0x00FFFF, // E aqua         N
-                    0xFFFFFF  // F white        P
-        }));
+    //    palettes.add (new Palette ("Palette 1",
+    //        new int[] { 0x000000, // 0 black        A
+    //                    0xFF0000, // 1 red          C
+    //                    0xA52A2A, // 2 brown        E  (8)
+    //                    0xFFA500, // 3 orange       G  (9)
+    //                    0x008000, // 4 dark green   I
+    //                    0x808080, // 5 grey1        K
+    //                    0x90EE90, // 6 light green  M  (C)
+    //                    0xFFFF00, // 7 yellow       O  (D)
+    //                    0x00008B, // 8 dark blue    B  (2)
+    //                    0x800080, // 9 purple       D  (3)
+    //                    0xC0C0C0, // A grey2        F
+    //                    0xFFC0CB, // B pink         H
+    //                    0x00BFFF, // C med blue     J  (6)
+    //                    0x87CEFA, // D light blue   L  (7)
+    //                    0x00FFFF, // E aqua         N
+    //                    0xFFFFFF  // F white        P
+    //        }));
 
     palettes.add (new Palette ("Virtual II",
         new int[] { 0x000000, // 0 black

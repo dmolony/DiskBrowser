@@ -83,6 +83,7 @@ public class DoubleHiResImage extends HiResImage
   @Override
   protected void createColourImage ()
   {
+    paletteIndex = paletteFactory.getCurrentPaletteIndex ();
     Palette palette = paletteFactory.getCurrentPalette ();
     int[] colours = palette.getColours ();
 

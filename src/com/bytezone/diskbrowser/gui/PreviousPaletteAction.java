@@ -27,7 +27,7 @@ public class PreviousPaletteAction extends AbstractAction
   public void actionPerformed (ActionEvent e)
   {
     Palette palette = owner.cyclePalette (CycleDirection.BACKWARDS);
-    owner.selectPalette (palette);
+    //    owner.selectPalette (palette);
 
     if (palette != null)
     {

@@ -8,27 +8,13 @@ public class PaletteFactory
   private final List<Palette> palettes = new ArrayList<Palette> ();
   private int currentPalette;
 
+  public enum CycleDirection
+  {
+    FORWARDS, BACKWARDS
+  }
+
   public PaletteFactory ()
   {
-    //    palettes.add (new Palette ("Palette 1",
-    //        new int[] { 0x000000, // 0 black        A
-    //                    0xFF0000, // 1 red          C
-    //                    0xA52A2A, // 2 brown        E  (8)
-    //                    0xFFA500, // 3 orange       G  (9)
-    //                    0x008000, // 4 dark green   I
-    //                    0x808080, // 5 grey1        K
-    //                    0x90EE90, // 6 light green  M  (C)
-    //                    0xFFFF00, // 7 yellow       O  (D)
-    //                    0x00008B, // 8 dark blue    B  (2)
-    //                    0x800080, // 9 purple       D  (3)
-    //                    0xC0C0C0, // A grey2        F
-    //                    0xFFC0CB, // B pink         H
-    //                    0x00BFFF, // C med blue     J  (6)
-    //                    0x87CEFA, // D light blue   L  (7)
-    //                    0x00FFFF, // E aqua         N
-    //                    0xFFFFFF  // F white        P
-    //        }));
-
     palettes.add (new Palette ("Virtual II",
         new int[] { 0x000000, // 0 black
                     0xDD0033, // 1 magenta
@@ -48,26 +34,6 @@ public class PaletteFactory
                     0xFFFFFF  // F white
         }));
 
-    // Applewin new (BB)
-    palettes.add (new Palette ("Applewin (new)",
-        new int[] { 0x000000, // 0 black    
-                    0x9D0966, // 1 red    
-                    0x555500, // 2 brown    
-                    0xF25E00, // 3 orange     
-                    0x00761A, // 4 dk green 
-                    0x808080, // 5 gray     
-                    0x38CB00, // 6 lt green 
-                    0xD5D51A, // 7 yellow   
-                    0x2A2AE5, // 8 dk blue  
-                    0xC734FF, // 9 purple   
-                    0xC0C0C0, // A grey     
-                    0xFF89E5, // B pink     
-                    0x0DA1FF, // C med blue 
-                    0xAAAAFF, // D lt blue  
-                    0x62F699, // E aqua     
-                    0xFFFFFF  // F white    
-        }));
-    // Applewin old (BB)
     palettes.add (new Palette ("Applewin (old)",
         new int[] { rgb (0, 0, 0),        // black    */
                     rgb (208, 0, 48),     // red      */
@@ -86,7 +52,26 @@ public class PaletteFactory
                     rgb (64, 255, 144),   // aqua     */
                     rgb (255, 255, 255)   // white
         }));
-    // Kegs (BB)
+
+    palettes.add (new Palette ("Applewin (new)",
+        new int[] { 0x000000, // 0 black    
+                    0x9D0966, // 1 red    
+                    0x555500, // 2 brown    
+                    0xF25E00, // 3 orange     
+                    0x00761A, // 4 dk green 
+                    0x808080, // 5 gray     
+                    0x38CB00, // 6 lt green 
+                    0xD5D51A, // 7 yellow   
+                    0x2A2AE5, // 8 dk blue  
+                    0xC734FF, // 9 purple   
+                    0xC0C0C0, // A grey     
+                    0xFF89E5, // B pink     
+                    0x0DA1FF, // C med blue 
+                    0xAAAAFF, // D lt blue  
+                    0x62F699, // E aqua     
+                    0xFFFFFF  // F white    
+        }));
+
     palettes.add (new Palette ("Kegs",
         new int[] { rgb (0, 0, 0),        // black    */
                     rgb (221, 0, 51),     // red      */
@@ -105,7 +90,7 @@ public class PaletteFactory
                     rgb (0, 255, 153),    // aqua     */
                     rgb (255, 255, 255)   // white
         }));
-    // Authentic (MP)
+
     palettes.add (new Palette ("Authentic",
         new int[] { 0x000000, // black
                     0xD00030, // magenta
@@ -124,7 +109,7 @@ public class PaletteFactory
                     0x40F090, // aqua
                     0xFFFFFF  // white
         }));
-    // Tweaked (MP)
+
     palettes.add (new Palette ("Tweaked",
         new int[] { 0x000000, // black
                     0xD00030, // magenta
@@ -143,7 +128,7 @@ public class PaletteFactory
                     0x40FF90, // aqua
                     0xFFFFFF  // white
         }));
-    // NTSC Corrected (MP)
+
     palettes.add (new Palette ("NTSC corrected",
         new int[] { 0x000000, // black
                     0x901740, // magenta
@@ -162,11 +147,25 @@ public class PaletteFactory
                     0x6FE8BF, // aqua
                     0xFFFFFF  // white
         }));
-  }
 
-  public enum CycleDirection
-  {
-    FORWARDS, BACKWARDS
+    palettes.add (new Palette ("Wikipedia",
+        new int[] { rgb (0, 0, 0),        // black */
+                    rgb (114, 38, 64),    // red */
+                    rgb (64, 76, 0),      // brown */
+                    rgb (228, 101, 1),    // orange */
+                    rgb (14, 89, 64),     // dk green */
+                    rgb (128, 128, 128),  // gray */
+                    rgb (27, 203, 1),     // lt green */
+                    rgb (191, 204, 128),  // yellow */
+                    rgb (64, 51, 127),    // dk blue */
+                    rgb (228, 52, 254),   // purple */
+                    rgb (128, 128, 128),  // grey */
+                    rgb (241, 166, 191),  // pink */
+                    rgb (27, 154, 254),   // med blue */
+                    rgb (191, 179, 255),  // lt blue */
+                    rgb (141, 217, 191),  // aqua */
+                    rgb (255, 255, 255)   // white */
+        }));
   }
 
   public Palette cyclePalette (CycleDirection direction)

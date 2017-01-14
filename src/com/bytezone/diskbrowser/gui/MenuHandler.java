@@ -3,6 +3,8 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
@@ -13,6 +15,8 @@ import com.bytezone.common.OSXAdapter;
 import com.bytezone.common.Platform;
 import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.Palette;
+import com.bytezone.diskbrowser.applefile.PaletteFactory;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -27,12 +31,14 @@ public class MenuHandler
   private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
   private static final String PREFS_MONOCHROME = "monochrome";
   private static final String PREFS_DEBUGGING = "debugging";
+  private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
 
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
   JMenu formatMenu = new JMenu ("Format");
+  JMenu colourMenu = new JMenu ("Colours");
   JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
@@ -60,12 +66,16 @@ public class MenuHandler
   JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
   JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
   JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
-  JMenuItem paletteItem = new JMenuItem ("Cycle Palette");
+  JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
+  JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
+
+  ButtonGroup paletteGroup = new ButtonGroup ();
 
   public MenuHandler (Preferences prefs)
   {
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
+    menuBar.add (colourMenu);
     menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
@@ -87,6 +97,7 @@ public class MenuHandler
         + "  PRINT SPC(12):\n" + "NEXT :\n" + "VTAB 5:\n" + "HTAB 24:\n" + "PRINT AB$\n");
 
     fileMenu.add (duplicateItem);
+    fileMenu.add (debuggingItem);
 
     formatMenu.add (lineWrapItem);
     formatMenu.add (showCatalogItem);
@@ -105,12 +116,21 @@ public class MenuHandler
     formatMenu.add (sector256Item);
     formatMenu.add (sector512Item);
 
-    formatMenu.addSeparator ();
+    // set placeholders for the palettes
+    List<Palette> palettes = HiResImage.getPalettes ();
+    for (int i = 0; i < palettes.size (); i++)
+    {
+      JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem ("x");
+      paletteGroup.add (menuItem);
+      colourMenu.add (menuItem);
+    }
 
-    formatMenu.add (colourQuirksItem);
-    formatMenu.add (monochromeItem);
-    formatMenu.add (debuggingItem);
-    formatMenu.add (paletteItem);
+    colourMenu.addSeparator ();
+    colourMenu.add (colourQuirksItem);
+    colourMenu.add (monochromeItem);
+    colourMenu.addSeparator ();
+    colourMenu.add (nextPaletteItem);
+    colourMenu.add (prevPaletteItem);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -184,6 +204,8 @@ public class MenuHandler
     prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
     prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
     prefs.putBoolean (PREFS_DEBUGGING, debuggingItem.isSelected ());
+    prefs.putInt (PREFS_PALETTE,
+        HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
   }
 
   @Override
@@ -196,6 +218,21 @@ public class MenuHandler
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
     monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
     debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
+
+    int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
+    PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();
+    paletteFactory.setCurrentPalette (paletteIndex);
+    Palette palette = paletteFactory.getCurrentPalette ();
+    Enumeration<AbstractButton> enumeration = paletteGroup.getElements ();
+    while (enumeration.hasMoreElements ())
+    {
+      JCheckBoxMenuItem item = (JCheckBoxMenuItem) enumeration.nextElement ();
+      if (item.getText ().equals (palette.getName ()))
+      {
+        item.setSelected (true);
+        break;
+      }
+    }
 
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
     HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());

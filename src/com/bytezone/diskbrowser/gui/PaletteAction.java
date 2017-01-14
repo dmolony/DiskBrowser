@@ -1,28 +1,28 @@
 package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.KeyStroke;
+
+import com.bytezone.diskbrowser.applefile.Palette;
 
 public class PaletteAction extends AbstractAction
 {
+  private final Palette palette;
   private final DataPanel owner;
 
-  public PaletteAction (DataPanel owner)
+  public PaletteAction (DataPanel owner, Palette palette)
   {
-    super ("Cycle Palette");
-    putValue (Action.SHORT_DESCRIPTION, "Select next color palette");
-    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt P"));
-    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_P);
+    super (palette.getName ());
+    putValue (Action.SHORT_DESCRIPTION, "Select color palette: " + palette.getName ());
     this.owner = owner;
+    this.palette = palette;
   }
 
   @Override
   public void actionPerformed (ActionEvent e)
   {
-    owner.cyclePalette ();
+    owner.selectPalette (palette);
   }
 }

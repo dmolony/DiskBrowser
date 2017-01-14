@@ -14,7 +14,7 @@ public class ColourQuirksAction extends AbstractAction
 
   public ColourQuirksAction (DataPanel owner)
   {
-    super ("Colour quirks");
+    super ("Smear HGR");
     putValue (Action.SHORT_DESCRIPTION, "Display pixels like a TV screen");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt Q"));
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_Q);

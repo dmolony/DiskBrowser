@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -13,6 +14,8 @@ import javax.swing.event.ChangeListener;
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.Palette;
+import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
@@ -42,19 +45,10 @@ class DataPanel extends JTabbedPane
   boolean assemblerTextValid;
   DataSource currentDataSource;
 
-  //  private Font font;
   final MenuHandler menuHandler;
 
   public DataPanel (MenuHandler mh, Preferences prefs)
   {
-    //    String dataFontName =
-    //    prefs.get (PreferencesDialog.prefsDataFont, PreferencesDialog.defaultFontName);
-    //    System.out.println (dataFontName);
-    //    int dataFontSize =
-    //  prefs.getInt (PreferencesDialog.prefsDataFontSize, 
-    // PreferencesDialog.defaultFontSize);
-    //    font = new Font (dataFontName, Font.PLAIN, dataFontSize);
-
     this.menuHandler = mh;
     setTabPlacement (SwingConstants.BOTTOM);
 
@@ -79,9 +73,6 @@ class DataPanel extends JTabbedPane
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     imagePane.getVerticalScrollBar ().setUnitIncrement (50);
     imagePane.getHorizontalScrollBar ().setUnitIncrement (25);
-
-    //    setTabsFont (font);
-    //    this.setMinimumSize (new Dimension (800, 200));
 
     addChangeListener (new ChangeListener ()
     {
@@ -130,17 +121,41 @@ class DataPanel extends JTabbedPane
     mh.colourQuirksItem.setAction (new ColourQuirksAction (this));
     mh.monochromeItem.setAction (new MonochromeAction (this));
     mh.debuggingItem.setAction (new DebuggingAction (this));
-    mh.paletteItem.setAction (new PaletteAction (this));
+
+    // fill in the placeholders created by the MenuHandler
+    List<Palette> palettes = HiResImage.getPalettes ();
+    ButtonGroup buttonGroup = mh.paletteGroup;
+    Enumeration<AbstractButton> enumeration = buttonGroup.getElements ();
+    int ndx = 0;
+    while (enumeration.hasMoreElements ())
+    {
+      JCheckBoxMenuItem item = (JCheckBoxMenuItem) enumeration.nextElement ();
+      item.setAction (new PaletteAction (this, palettes.get (ndx++)));
+    }
+    mh.nextPaletteItem.setAction (new NextPaletteAction (this, buttonGroup));
+    mh.prevPaletteItem.setAction (new PreviousPaletteAction (this, buttonGroup));
   }
 
-  public void cyclePalette ()
+  public void selectPalette (Palette palette)
   {
     if (currentDataSource instanceof HiResImage)
     {
       HiResImage image = (HiResImage) currentDataSource;
-      image.cyclePalette ();
+      image.setPalette (palette);
       imagePanel.setImage (image.getImage ());
     }
+  }
+
+  public Palette cyclePalette (CycleDirection direction)
+  {
+    if (currentDataSource instanceof HiResImage)
+    {
+      HiResImage image = (HiResImage) currentDataSource;
+      Palette palette = image.cyclePalette (direction);
+      imagePanel.setImage (image.getImage ());
+      return palette;
+    }
+    return null;
   }
 
   public void setColourQuirks (boolean value)
@@ -210,6 +225,7 @@ class DataPanel extends JTabbedPane
       hexText.setText ("");
       disassemblyText.setText ("");
       removeImage ();
+      menuHandler.colourMenu.setEnabled (false);
       return;
     }
 
@@ -244,11 +260,15 @@ class DataPanel extends JTabbedPane
 
     BufferedImage image = dataSource.getImage ();
     if (image == null)
+    {
       removeImage ();
+      menuHandler.colourMenu.setEnabled (false);
+    }
     else
     {
       imagePanel.setImage (image);
       imagePane.setViewportView (imagePanel);
+      menuHandler.colourMenu.setEnabled (true);
       if (!imageVisible)
       {
         int selected = getSelectedIndex ();

@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.applefile;
 
-import static com.bytezone.diskbrowser.applefile.HiResImage.palette;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 
@@ -17,7 +15,6 @@ public class DoubleHiResImage extends HiResImage
   public DoubleHiResImage (String name, byte[] buffer, byte[] auxBuffer)
   {
     super (name, buffer);
-    //    switchColours ();
 
     this.auxBuffer = auxBuffer;
     createImage ();
@@ -26,7 +23,6 @@ public class DoubleHiResImage extends HiResImage
   public DoubleHiResImage (String name, byte[] buffer)
   {
     super (name, buffer);
-    //    switchColours ();
 
     assert name.endsWith (".PAC") || name.endsWith ("A2FC");
 
@@ -87,7 +83,8 @@ public class DoubleHiResImage extends HiResImage
   @Override
   protected void createColourImage ()
   {
-    int paletteNdx = paletteIndex % palette.length;
+    Palette palette = paletteFactory.getCurrentPalette ();
+    int[] colours = palette.getColours ();
 
     // image will be doubled horizontally
     image = new BufferedImage (140 * 2, 192, BufferedImage.TYPE_INT_RGB);
@@ -108,8 +105,8 @@ public class DoubleHiResImage extends HiResImage
             for (int px = 0; px < 28; px += 4)
             {
               int val = (value >> px) & 0x0F;
-              dataBuffer.setElem (ndx++, palette[paletteNdx][val]);
-              dataBuffer.setElem (ndx++, palette[paletteNdx][val]);  // repeat pixel
+              dataBuffer.setElem (ndx++, colours[val]);
+              dataBuffer.setElem (ndx++, colours[val]);  // repeat pixel
             }
           }
         }

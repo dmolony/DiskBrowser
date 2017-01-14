@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.gui;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -15,9 +16,9 @@ public class DebuggingAction extends AbstractAction
   public DebuggingAction (DataPanel owner)
   {
     super ("Debugging");
+    int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
+    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_D, mask));
     putValue (Action.SHORT_DESCRIPTION, "Show debugging information");
-    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt G"));
-    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_G);
     this.owner = owner;
   }
 

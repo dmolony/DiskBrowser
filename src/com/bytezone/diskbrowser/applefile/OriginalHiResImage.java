@@ -89,7 +89,8 @@ public class OriginalHiResImage extends HiResImage
 
   private void fillLine (int base)
   {
-    int paletteNdx = paletteIndex % palette.length;
+    Palette palette = paletteFactory.getCurrentPalette ();
+    int[] colours = palette.getColours ();
 
     int max = Math.min (base + 40, buffer.length);
     int linePtr = 0;
@@ -107,7 +108,7 @@ public class OriginalHiResImage extends HiResImage
         int column = (ptr + px) % 2;            // is it in an odd or even column?
         line[linePtr++] = val == 0 ? 0 :        // black pixel
         //  palette[colourBit][column];         // coloured pixel - use lookup table
-            palette[paletteNdx][paletteTable[colourBit][column]]; // coloured pixel - use lookup table
+            colours[paletteTable[colourBit][column]]; // coloured pixel - use lookup table
       }
     }
 

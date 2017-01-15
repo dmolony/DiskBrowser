@@ -58,7 +58,7 @@ public abstract class HiResImage extends AbstractFile
       if (auxType == 1)
       {
         unpackedBuffer = unpackBytes (buffer);
-        makeScreen2 (unpackedBuffer);
+        makeScreen (unpackedBuffer);
         System.out.println ("aux 1 - " + name);
       }
 
@@ -192,21 +192,8 @@ public abstract class HiResImage extends AbstractFile
     return text.toString ();
   }
 
-  protected void makeScreen2 (byte[] buffer)
+  protected void makeScreen (byte[] buffer)
   {
-    //    System.out.println (HexFormatter.format (buffer, 32000, 640));
-    //    for (int table = 0; table < 200; table++)
-    //    {
-    //      System.out.println (HexFormatter.format (buffer, ptr, 32));
-    //      for (int color = 0; color < 16; color++)
-    //      {
-    //        int red = buffer[ptr++] & 0x0F;
-    //        int green = (buffer[ptr] & 0xF0) >> 4;
-    //        int blue = buffer[ptr++] & 0x0F;
-    //        Color c = new Color (red, green, blue);
-    //      }
-    //    }
-
     image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
     DataBuffer db = image.getRaster ().getDataBuffer ();
 

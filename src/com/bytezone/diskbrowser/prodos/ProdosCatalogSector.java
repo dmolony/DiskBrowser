@@ -81,6 +81,7 @@ class ProdosCatalogSector extends AbstractSector
   {
     StringBuilder text = new StringBuilder ();
     int fileType = buffer[offset + 16] & 0xFF;
+    int auxType = HexFormatter.getShort (buffer, offset + 31);
     addText (text, buffer, offset + 16, 1,
         "File type (" + ProdosConstants.fileTypes[fileType] + ")");
     addTextAndDecimal (text, buffer, offset + 17, 2, "Key pointer");
@@ -93,7 +94,7 @@ class ProdosCatalogSector extends AbstractSector
     addText (text, buffer, offset + 29, 1, "Minimum version");
     addText (text, buffer, offset + 30, 1, "Access");
     addTextAndDecimal (text, buffer, offset + 31, 2,
-        "Auxilliary type - " + getAuxilliaryText (fileType));
+        "Auxilliary type - " + getAuxilliaryText (fileType, auxType));
     GregorianCalendar modified = HexFormatter.getAppleDate (buffer, offset + 33);
     String dateM = modified == null ? "" : parent.df.format (modified.getTime ());
     addText (text, buffer, offset + 33, 4, "Modification date : " + dateM);
@@ -140,7 +141,7 @@ class ProdosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
-  private String getAuxilliaryText (int fileType)
+  private String getAuxilliaryText (int fileType, int auxType)
   {
     switch (fileType)
     {
@@ -154,6 +155,11 @@ class ProdosCatalogSector extends AbstractSector
         return "load address";
       case 0xB3:
         return "forked";
+      case 0xC1:
+        return "PIC";
+      case 0xC8:
+        return auxType == 0 ? "QuickDraw bitmap font"
+            : auxType == 1 ? "Pointless truetype font" : "??";
       default:
         return "???";
     }

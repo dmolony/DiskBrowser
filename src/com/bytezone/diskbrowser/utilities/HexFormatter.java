@@ -60,19 +60,9 @@ public class HexFormatter
         line.append ("\n");
 
       // print offset
-      for (int temp = i + startingAddress, max = 65536; max > 0; max /= 16)
-      {
-        if (temp >= max)
-        {
-          line.append (hex[temp / max]);
-          temp %= max;
-        }
-        else
-          line.append ("0");
-      }
+      line.append (String.format ("%05X : ", (startingAddress + i - offset)));
 
       // print hex values
-      line.append (" : ");
       StringBuffer trans = new StringBuffer ();
       StringBuffer hexLine = new StringBuffer ();
 
@@ -234,6 +224,13 @@ public class HexFormatter
     if (length > 0 && space)
       hex.deleteCharAt (hex.length () - 1);
     return hex.toString ();
+  }
+
+  public static String getBitString (byte b)
+  {
+    String s = "0000000" + Integer.toBinaryString (b & 0xFF);
+    s = s.replaceAll ("0", ".");
+    return s.substring (s.length () - 8);
   }
 
   public static char byteValue (byte b)

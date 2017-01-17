@@ -321,6 +321,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_APPLETALK:
           file = new DefaultAppleFile (name + " (Appletalk file)", buffer);
           break;
+        case FILE_TYPE_GWP:
+          // using full buffer because the ENDFILE can be 512 for multi-block files
+          // SimpleText will now terminate at 0x00 (see Fonts.po)
+          file = new SimpleText (name, buffer);
+          break;
         case FILE_TYPE_AWP:
           file = new AppleworksWPFile (name + " (Appleworks Word Processor)", buffer);
           break;
@@ -341,6 +346,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
         case FILE_TYPE_PIC:
           file = new OriginalHiResImage (name, exactBuffer, fileType, auxType);
+          break;
+        case FILE_TYPE_FONT:
+          file = new QuickDrawFont (name, exactBuffer, fileType, auxType);
           break;
         default:
           System.out.format ("Unknown file type : %02X%n", fileType);

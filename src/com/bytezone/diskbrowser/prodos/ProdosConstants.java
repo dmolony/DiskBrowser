@@ -9,19 +9,21 @@ public interface ProdosConstants
   int FILE_TYPE_ADB = 0x19;
   int FILE_TYPE_AWP = 0x1A;
   int FILE_TYPE_ASP = 0x1B;
+  int FILE_TYPE_GWP = 0x50;
   int FILE_TYPE_ASM_SOURCE = 0xB0;
   int FILE_TYPE_ASM_OBJECT = 0xB1;
   int FILE_TYPE_FORKED_FILE = 0xB3;         // S16
   int FILE_TYPE_PNT = 0xC0;
   int FILE_TYPE_PIC = 0xC1;
+  int FILE_TYPE_FONT = 0xC8;
   int FILE_TYPE_ICN = 0xCA;
+  int FILE_TYPE_APPLETALK = 0xE2;
   int FILE_TYPE_INTEGER_BASIC = 0xFA;
   int FILE_TYPE_INTEGER_BASIC_VARS = 0xFB;
   int FILE_TYPE_APPLESOFT_BASIC = 0xFC;
   int FILE_TYPE_APPLESOFT_BASIC_VARS = 0xFD;
   int FILE_TYPE_RELOCATABLE = 0xFE;
   int FILE_TYPE_SYS = 0xFF;
-  int FILE_TYPE_APPLETALK = 0xE2;
 
   int TYPE_DIRECTORY_HEADER = 15;
   int TYPE_SUBDIRECTORY_HEADER = 14;
@@ -33,31 +35,39 @@ public interface ProdosConstants
   int TYPE_SEEDLING = 1;
   int TYPE_FREE = 0;
 
-  String[] fileTypes =
-      { "NON", "BAD", "PCD", "PTX", "TXT", "PDA", "BIN", "FNT", "FOT", "BA3", "DA3",
-        "WPF", "SOS", "$0D", "$0E", "DIR", "RPD", "RPI", "AFD", "AFM", "AFR", "SCL",
-        "PFS", "$17", "$18", "ADB", "AWP", "ASP", "$1C", "$1D", "$1E", "$1F", "TDM",
-        "$21", "$22", "$23", "$24", "$25", "$26", "$27", "$28", "$29", "8SC", "8OB",
-        "8IC", "8LD", "P8C", "$2F", "$30", "$31", "$32", "$33", "$34", "$35", "$36",
-        "$37", "$38", "$39", "$3A", "$3B", "$3C", "$3D", "$3E", "$3F", "DIC", "OCR",
-        "FTD", "$43", "$44", "$45", "$46", "$47", "$48", "$49", "$4A", "$4B", "$4C",
-        "$4D", "$4E", "$4F", "GWP", "GSS", "GDB", "DRW", "GDP", "HMD", "EDU", "STN",
-        "HLP", "COM", "CFG", "ANM", "MUM", "ENT", "DVU", "FIN", "$60", "$61", "$62",
-        "$63", "$64", "$65", "$66", "$67", "$68", "$69", "$6A", "BIO", "$6C", "TDR",
-        "PRE", "HDV", "$70", "$71", "$72", "$73", "$74", "$75", "$76", "$77", "$78",
-        "$79", "$7A", "$7B", "$7C", "$7D", "$7E", "$7F", "GES", "GEA", "GEO", "GED",
-        "GEF", "GEP", "GEI", "GEX", "$88", "GEV", "$8A", "GEC", "GEK", "GEW", "$8E",
-        "$8F", "$90", "$91", "$92", "$93", "$94", "$95", "$96", "$97", "$98", "$99",
-        "$9A", "$9B", "$9C", "$9D", "$9E", "$9F", "WP ", "$A1", "$A2", "$A3", "$A4",
-        "$A5", "$A6", "$A7", "$A8", "$A9", "$AA", "GSB", "TDF", "BDF", "$AE", "$AF",
-        "SRC", "OBJ", "LIB", "S16", "RTL", "EXE", "PIF", "TIF", "NDA", "CDA", "TOL",
-        "DVR", "LDF", "FST", "$BE", "DOC", "PNT", "PIC", "ANI", "PAL", "$C4", "OOG",
-        "SCR", "CDV", "FON", "FND", "ICN", "$CB", "$CC", "$CD", "$CE", "$CF", "$D0",
-        "$D1", "$D2", "$D3", "$D4", "MUS", "INS", "MDI", "SND", "$D9", "$DA", "DBM",
-        "$DC", "DDD", "$DE", "$DF", "LBR", "$E1", "ATK", "$E3", "$E4", "$E5", "$E6",
-        "$E7", "$E8", "$E9", "$EA", "$EB", "$EC", "$ED", "R16", "PAS", "CMD", "$F1",
-        "$F2", "$F3", "$F4", "$F5", "$F6", "$F7", "$F8", "OS ", "INT", "IVR", "BAS",
-        "VAR", "REL", "SYS" };
+  String[] fileTypes = { //
+                        "NON", "BAD", "PCD", "PTX", "TXT", "PDA", "BIN", "FNT", //
+                        "FOT", "BA3", "DA3", "WPF", "SOS", "$0D", "$0E", "DIR", //
+                        "RPD", "RPI", "AFD", "AFM", "AFR", "SCL", "PFS", "$17", //
+                        "$18", "ADB", "AWP", "ASP", "$1C", "$1D", "$1E", "$1F", //
+                        "TDM", "$21", "$22", "$23", "$24", "$25", "$26", "$27", //
+                        "$28", "$29", "8SC", "8OB", "8IC", "8LD", "P8C", "$2F", //
+                        "$30", "$31", "$32", "$33", "$34", "$35", "$36", "$37", //
+                        "$38", "$39", "$3A", "$3B", "$3C", "$3D", "$3E", "$3F", //
+                        "DIC", "OCR", "FTD", "$43", "$44", "$45", "$46", "$47", //
+                        "$48", "$49", "$4A", "$4B", "$4C", "$4D", "$4E", "$4F", //
+                        "GWP", "GSS", "GDB", "DRW", "GDP", "HMD", "EDU", "STN", //
+                        "HLP", "COM", "CFG", "ANM", "MUM", "ENT", "DVU", "FIN", //
+                        "$60", "$61", "$62", "$63", "$64", "$65", "$66", "$67", //
+                        "$68", "$69", "$6A", "BIO", "$6C", "TDR", "PRE", "HDV", //
+                        "$70", "$71", "$72", "$73", "$74", "$75", "$76", "$77", //
+                        "$78", "$79", "$7A", "$7B", "$7C", "$7D", "$7E", "$7F", //
+                        "GES", "GEA", "GEO", "GED", "GEF", "GEP", "GEI", "GEX", //
+                        "$88", "GEV", "$8A", "GEC", "GEK", "GEW", "$8E", "$8F", //
+                        "$90", "$91", "$92", "$93", "$94", "$95", "$96", "$97", //
+                        "$98", "$99", "$9A", "$9B", "$9C", "$9D", "$9E", "$9F", //
+                        "WP ", "$A1", "$A2", "$A3", "$A4", "$A5", "$A6", "$A7", //
+                        "$A8", "$A9", "$AA", "GSB", "TDF", "BDF", "$AE", "$AF", //
+                        "SRC", "OBJ", "LIB", "S16", "RTL", "EXE", "PIF", "TIF", //
+                        "NDA", "CDA", "TOL", "DVR", "LDF", "FST", "$BE", "DOC", //
+                        "PNT", "PIC", "ANI", "PAL", "$C4", "OOG", "SCR", "CDV", //
+                        "FON", "FND", "ICN", "$CB", "$CC", "$CD", "$CE", "$CF", //
+                        "$D0", "$D1", "$D2", "$D3", "$D4", "MUS", "INS", "MDI", //
+                        "SND", "$D9", "$DA", "DBM", "$DC", "DDD", "$DE", "$DF", //
+                        "LBR", "$E1", "ATK", "$E3", "$E4", "$E5", "$E6", "$E7", //
+                        "$E8", "$E9", "$EA", "$EB", "$EC", "$ED", "R16", "PAS", //
+                        "CMD", "$F1", "$F2", "$F3", "$F4", "$F5", "$F6", "$F7", //
+                        "$F8", "OS ", "INT", "IVR", "BAS", "VAR", "REL", "SYS" };
 
   int ENTRY_SIZE = 39;
   int ENTRIES_PER_BLOCK = 13;

@@ -32,7 +32,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   private boolean showFreeSectors;
   private final DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
   private boolean redo;
-  private boolean retinaTest;
+  private boolean isRetina;
 
   // set defaults (used until a real disk is set)
   private int bw = 30;
@@ -64,8 +64,9 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     selectionHandler.setSelection (null);
 
     Graphics2D g = (Graphics2D) this.getGraphics ();
-    retinaTest = g.getFontRenderContext ().getTransform ()
-        .equals (AffineTransform.getScaleInstance (2.0, 2.0));
+    if (g != null)        // panel might not be showing
+      isRetina = g.getFontRenderContext ().getTransform ()
+          .equals (AffineTransform.getScaleInstance (2.0, 2.0));
 
     repaint ();
   }
@@ -138,9 +139,9 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 
     Rectangle rect = new Rectangle (x, y, bw, bh);
 
-    int width = rect.width - (retinaTest ? 2 : 3);
-    int height = rect.height - (retinaTest ? 2 : 3);
-    int offset2 = retinaTest ? 1 : 2;
+    int width = rect.width - (isRetina ? 2 : 3);
+    int height = rect.height - (isRetina ? 2 : 3);
+    int offset2 = isRetina ? 1 : 2;
 
     // draw frame
     if (true)

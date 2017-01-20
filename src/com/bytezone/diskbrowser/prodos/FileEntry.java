@@ -380,7 +380,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       exactBuffer = new byte[buffer.length];
       System.arraycopy (buffer, 0, exactBuffer, 0, buffer.length);
     }
-    else if (buffer.length == endOfFile)
+    else if (buffer.length == endOfFile || endOfFile == 512)    // 512 seems like crap
       exactBuffer = buffer;
     else
     {

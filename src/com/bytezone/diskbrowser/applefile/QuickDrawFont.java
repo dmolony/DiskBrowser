@@ -169,7 +169,7 @@ public class QuickDrawFont extends AbstractFile
       int charsHigh = (totalCharacters - 1) / charsWide + 1;
 
       image = new BufferedImage (charsWide * (widMax + spacing) + base * 2,
-          charsHigh * (fRectHeight + leading) + base * 2, BufferedImage.TYPE_BYTE_GRAY);
+          charsHigh * (fRectHeight + spacing) + base * 2, BufferedImage.TYPE_BYTE_GRAY);
 
       Graphics2D g2d = image.createGraphics ();
       g2d.setComposite (
@@ -194,7 +194,7 @@ public class QuickDrawFont extends AbstractFile
         if (++count % charsWide == 0)
         {
           x = base;
-          y += fRectHeight + leading;
+          y += fRectHeight + spacing;
         }
       }
       g2d.dispose ();

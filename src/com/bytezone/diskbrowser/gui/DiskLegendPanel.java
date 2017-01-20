@@ -24,7 +24,7 @@ class DiskLegendPanel extends JPanel
   private FormattedDisk disk;
   private LayoutDetails layoutDetails;
   private final Font font;
-  private boolean retinaTest;
+  private boolean isRetina;
 
   public DiskLegendPanel ()
   {
@@ -38,8 +38,9 @@ class DiskLegendPanel extends JPanel
     layoutDetails = details;
 
     Graphics2D g = (Graphics2D) this.getGraphics ();
-    retinaTest = g.getFontRenderContext ().getTransform ()
-        .equals (AffineTransform.getScaleInstance (2.0, 2.0));
+    if (g != null)      // panel might not be showing
+      isRetina = g.getFontRenderContext ().getTransform ()
+          .equals (AffineTransform.getScaleInstance (2.0, 2.0));
 
     repaint ();
   }
@@ -62,9 +63,9 @@ class DiskLegendPanel extends JPanel
 
     int count = 0;
     int lineHeight = 20;
-    int width = layoutDetails.block.width - (retinaTest ? 2 : 3);
-    int height = layoutDetails.block.height - (retinaTest ? 2 : 3);
-    int offset = retinaTest ? 1 : 2;
+    int width = layoutDetails.block.width - (isRetina ? 2 : 3);
+    int height = layoutDetails.block.height - (isRetina ? 2 : 3);
+    int offset = isRetina ? 1 : 2;
 
     for (SectorType type : disk.getSectorTypeList ())
     {
@@ -88,13 +89,14 @@ class DiskLegendPanel extends JPanel
     int val = disk.falseNegativeBlocks ();
     if (val > 0)
     {
-      g.drawString (val + " empty sector" + (val == 1 ? "" : "s")
-          + " marked as unavailable", 10, y);
+      g.drawString (
+          val + " empty sector" + (val == 1 ? "" : "s") + " marked as unavailable", 10,
+          y);
       y += lineHeight;
     }
     val = disk.falsePositiveBlocks ();
     if (val > 0)
       g.drawString (val + " used sector" + (val == 1 ? "" : "s") + " marked as available",
-                    10, y);
+          10, y);
   }
 }

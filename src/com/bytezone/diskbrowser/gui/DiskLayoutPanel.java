@@ -36,7 +36,7 @@ class DiskLayoutPanel extends JPanel
   private final Preferences prefs;
   private final MenuHandler mh;
 
-  private final DiskLayoutImage image;
+  private final DiskLayoutImage diskLayoutImage;
   private final ScrollRuler verticalRuler;
   private final ScrollRuler horizontalRuler;
   private final DiskLegendPanel legendPanel;
@@ -50,15 +50,16 @@ class DiskLayoutPanel extends JPanel
     this.prefs = prefs;
     this.mh = mh;
 
-    image = new DiskLayoutImage ();
-    verticalRuler = new ScrollRuler (image, ScrollRuler.VERTICAL);
-    horizontalRuler = new ScrollRuler (image, ScrollRuler.HORIZONTAL);
+    diskLayoutImage = new DiskLayoutImage ();
+    verticalRuler = new ScrollRuler (diskLayoutImage, ScrollRuler.VERTICAL);
+    horizontalRuler = new ScrollRuler (diskLayoutImage, ScrollRuler.HORIZONTAL);
     legendPanel = new DiskLegendPanel ();
 
     setBackground (Color.WHITE);
     setOpaque (true);
 
-    sp = new JScrollPane (image, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
+    sp = new JScrollPane (diskLayoutImage, VERTICAL_SCROLLBAR_ALWAYS,
+        HORIZONTAL_SCROLLBAR_ALWAYS);
     sp.setBackground (Color.WHITE);
     sp.setOpaque (true);
     sp.setColumnHeaderView (horizontalRuler);
@@ -72,24 +73,16 @@ class DiskLayoutPanel extends JPanel
     // this is just so the pack is correct
     add (sp, BorderLayout.CENTER);
     add (legendPanel, BorderLayout.SOUTH);
-
-    //    mh.retinaItem.setAction (new RetinaAction (this));
   }
-
-  //  public DiskLayoutPanel (FormattedDisk disk)
-  //  {
-  //    this ();
-  //    setDisk (disk);
-  //  }
 
   public void setDisk (final FormattedDisk disk)
   {
     layout = new LayoutDetails (disk);
-    image.setDisk (disk, layout);
+    diskLayoutImage.setDisk (disk, layout);
     verticalRuler.setLayout (layout);
     horizontalRuler.setLayout (layout);
     legendPanel.setDisk (disk, layout);
-    sp.setViewportView (image); // this is the only way I know of to force a refresh
+    sp.setViewportView (diskLayoutImage);     // this is the only way I know of to force a refresh
 
     setLayout (new BorderLayout ());
     if (disk.getGridLayout ().height == 35)
@@ -111,7 +104,7 @@ class DiskLayoutPanel extends JPanel
       {
         LayoutDetails layout = new LayoutDetails (disk);
 
-        image.setDisk (disk, layout);
+        diskLayoutImage.setDisk (disk, layout);
         legendPanel.setDisk (disk, layout);
 
         verticalRuler.setLayout (layout);
@@ -121,12 +114,6 @@ class DiskLayoutPanel extends JPanel
 
     repaint ();
   }
-
-  //  public void setRetina (boolean value)
-  //  {
-  //    image.setRetina (value);
-  //    legendPanel.setRetina (value);
-  //  }
 
   public void setHex (boolean hex)
   {
@@ -142,17 +129,17 @@ class DiskLayoutPanel extends JPanel
 
   public void setFree (boolean free)
   {
-    image.setShowFreeSectors (free);
+    diskLayoutImage.setShowFreeSectors (free);
   }
 
   public void addSectorSelectionListener (SectorSelectionListener listener)
   {
-    image.addSectorSelectionListener (listener);
+    diskLayoutImage.addSectorSelectionListener (listener);
   }
 
   public void removeSectorSelectionListener (SectorSelectionListener listener)
   {
-    image.removeSectorSelectionListener (listener);
+    diskLayoutImage.removeSectorSelectionListener (listener);
   }
 
   @Override
@@ -168,7 +155,7 @@ class DiskLayoutPanel extends JPanel
     checkCorrectDisk (event.file.getFormattedDisk ());
 
     // This may need to allow for sparse text files with null DiskAddresses
-    image.setSelection (event.file.getSectors ());
+    diskLayoutImage.setSelection (event.file.getSectors ());
   }
 
   class LayoutDetails
@@ -239,17 +226,17 @@ class DiskLayoutPanel extends JPanel
     // This can happen if sectors are selected from a dual-dos disk
     checkCorrectDisk (((SectorSelectedEvent) event.value).getFormattedDisk ());
 
-    image.redo (event);
+    diskLayoutImage.redo (event);
   }
 
   private void checkCorrectDisk (FormattedDisk newDisk)
   {
     if (newDisk instanceof DualDosDisk)
       newDisk = ((DualDosDisk) newDisk).getCurrentDisk (); // never set to a Dual-dos disk
-    if (newDisk != image.getDisk ())
+    if (newDisk != diskLayoutImage.getDisk ())
     {
       LayoutDetails layout = new LayoutDetails (newDisk);
-      image.setDisk (newDisk, layout);
+      diskLayoutImage.setDisk (newDisk, layout);
       legendPanel.setDisk (newDisk, layout);
     }
   }

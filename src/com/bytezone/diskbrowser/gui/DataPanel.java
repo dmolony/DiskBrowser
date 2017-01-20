@@ -22,7 +22,6 @@ import com.bytezone.diskbrowser.disk.SectorList;
 
 class DataPanel extends JTabbedPane
     implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
-    //      PreferenceChangeListener, 
     FileNodeSelectionListener, FontChangeListener
 {
   private static final int TEXT_WIDTH = 65;
@@ -226,14 +225,12 @@ class DataPanel extends JTabbedPane
       hexText.setText ("");
       disassemblyText.setText ("");
       removeImage ();
-      //      if (!menuHandler.colourMenu.isEnabled ())
-      //        menuHandler.colourMenu.setEnabled (false);
       return;
     }
 
     switch (getSelectedIndex ())
     {
-      case 0:
+      case 0:             // Formated/Image
         try
         {
           setText (formattedText, dataSource.getText ());
@@ -246,27 +243,26 @@ class DataPanel extends JTabbedPane
         hexTextValid = false;
         assemblerTextValid = false;
         break;
-      case 1:
+
+      case 1:             // Hex Dump
         setText (hexText, dataSource.getHexDump ());
         formattedTextValid = false;
         assemblerTextValid = false;
         break;
-      case 2:
+
+      case 2:             // Disassembly
         setText (disassemblyText, dataSource.getAssembler ());
         hexTextValid = false;
         formattedTextValid = false;
         break;
+
       default:
         System.out.println ("Invalid index selected in DataPanel");
     }
 
     BufferedImage image = dataSource.getImage ();
     if (image == null)
-    {
       removeImage ();
-      //      if (menuHandler.colourMenu.isEnabled ())
-      //        menuHandler.colourMenu.setEnabled (false);
-    }
     else
     {
       if (dataSource instanceof HiResImage)
@@ -276,8 +272,6 @@ class DataPanel extends JTabbedPane
       }
       imagePanel.setImage (image);
       imagePane.setViewportView (imagePanel);
-      //      if (!menuHandler.colourMenu.isEnabled ())
-      //        menuHandler.colourMenu.setEnabled (true);
 
       if (!imageVisible)
       {
@@ -332,16 +326,17 @@ class DataPanel extends JTabbedPane
         height = image.getHeight ();
       }
       else
-      {
         width = height = 0;
-      }
 
-      if (width < 400)
-        scale = (400 - 1) / width + 1;
-      else
-        scale = 1;
-      if (scale > 4)
-        scale = 4;
+      if (true)
+      {
+        if (width < 400)
+          scale = (400 - 1) / width + 1;
+        else
+          scale = 1;
+        if (scale > 4)
+          scale = 4;
+      }
 
       setPreferredSize (new Dimension (width * scale, height * scale));
       repaint ();

@@ -134,20 +134,17 @@ public class QuickDrawFont extends AbstractFile
       imageLines[i] = bits.toString ().replaceAll ("1", "#");
     }
 
-    //    System.out.println ("\n  Location table       o/w table\n");
     for (int i = 0, max = totalCharacters + 1; i < max; i++)
     {
       int location = HexFormatter.unsignedShort (locationTable, i * 2);
-      int offset = offsetWidthTable[i * 2] & 0xFF;
-      int width = offsetWidthTable[i * 2 + 1] & 0xFF;
+      //      int offset = offsetWidthTable[i * 2] & 0xFF;
+      //      int width = offsetWidthTable[i * 2 + 1] & 0xFF;
 
       int j = i + 1;
       if (j < max)
       {
         int nextLocation = HexFormatter.unsignedShort (locationTable, j * 2);
         int pixelWidth = nextLocation - location;
-        //        System.out.printf ("%3d  %04X  %04X  %2d     %02X  %02X%n", i, location,
-        //            nextLocation, pixelWidth, offset, width);
         if (pixelWidth < 0)
         {
           System.out.println ("*********** Bad pixelWidth");
@@ -165,7 +162,7 @@ public class QuickDrawFont extends AbstractFile
       int base = 10;
       int spacing = 5;
 
-      int charsWide = (int) Math.sqrt (totalCharacters);
+      int charsWide = (int) (Math.sqrt (totalCharacters) + .5);
       int charsHigh = (totalCharacters - 1) / charsWide + 1;
 
       image = new BufferedImage (charsWide * (widMax + spacing) + base * 2,

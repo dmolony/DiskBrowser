@@ -314,7 +314,7 @@ public class HexFormatter
     return val;
   }
 
-  public static int getShort (byte[] buffer, int ptr)
+  public static int unsignedShort (byte[] buffer, int ptr)
   {
     int val = 0;
     for (int i = 1; i >= 0; i--)
@@ -323,6 +323,11 @@ public class HexFormatter
       val += buffer[ptr + i] & 0xFF;
     }
     return val;
+  }
+
+  public static int signedShort (byte[] buffer, int ptr)
+  {
+    return (short) (((buffer[ptr] & 0xFF) << 8) | (buffer[ptr + 1] & 0xFF));
   }
 
   public static int getShortBigEndian (byte[] buffer, int ptr)

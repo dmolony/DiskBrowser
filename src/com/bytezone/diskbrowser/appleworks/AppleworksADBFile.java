@@ -48,7 +48,7 @@ public class AppleworksADBFile extends AbstractFile
 
     dbMinVersion = buffer[218] & 0xFF;
 
-    headerSize = HexFormatter.getShort (buffer, 0);
+    headerSize = HexFormatter.unsignedShort (buffer, 0);
     cursorDirectionSRL = buffer[30];
     cursorDirectionMRL = (char) buffer[31];
     currentDisplay = (char) buffer[34];
@@ -56,7 +56,7 @@ public class AppleworksADBFile extends AbstractFile
     categoryNames = new String[categories];
 
     totalReports = buffer[38] & 0xFF;
-    int recs = HexFormatter.getShort (buffer, 36);
+    int recs = HexFormatter.unsignedShort (buffer, 36);
     totalRecords = dbMinVersion == 0 ? recs : recs & 0x7FFF;
 
     for (int i = 0; i < 30; i++)
@@ -75,9 +75,9 @@ public class AppleworksADBFile extends AbstractFile
 
     for (int i = 0; i < 3; i++)
     {
-      selectionRules[i] = HexFormatter.getShort (buffer, 223 + i * 2);
-      testTypes[i] = HexFormatter.getShort (buffer, 229 + i * 2);
-      continuation[i] = HexFormatter.getShort (buffer, 235 + i * 2);
+      selectionRules[i] = HexFormatter.unsignedShort (buffer, 223 + i * 2);
+      testTypes[i] = HexFormatter.unsignedShort (buffer, 229 + i * 2);
+      continuation[i] = HexFormatter.unsignedShort (buffer, 235 + i * 2);
       comparison[i] = new String (buffer, 241 + i * 20, 20);
     }
 
@@ -102,7 +102,7 @@ public class AppleworksADBFile extends AbstractFile
       ptr += 600;
     }
 
-    int length = HexFormatter.getShort (buffer, ptr);
+    int length = HexFormatter.unsignedShort (buffer, ptr);
     ptr += 2;
 
     if (length == 0)
@@ -114,7 +114,7 @@ public class AppleworksADBFile extends AbstractFile
 
       for (int recordNo = 0; recordNo < totalRecords; recordNo++)
       {
-        length = HexFormatter.getShort (buffer, ptr);
+        length = HexFormatter.unsignedShort (buffer, ptr);
         ptr += 2;
         if (length == 0)
           break;

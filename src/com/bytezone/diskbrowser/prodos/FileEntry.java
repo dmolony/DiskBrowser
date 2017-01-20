@@ -36,6 +36,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       int parentBlock)
   {
     super (fDisk, entryBuffer);
+    assert parent != null;
     this.parentDirectory = parent;
     this.catalogBlock = this.disk.getDiskAddress (parentBlock);
 
@@ -93,8 +94,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             case ProdosConstants.TYPE_SAPLING:
               traverseIndex (keyBlock);
               break;
+            case ProdosConstants.TYPE_TREE:
+              traverseMasterIndex (keyBlock);
+              break;
             default:
-              System.out.println ("fork not a sapling or seedling!!!");
+              System.out.println ("fork not a tree, sapling or seedling!!!");
           }
         }
         break;
@@ -335,8 +339,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_ASP:
           file = new AppleworksSSFile (name + " (Appleworks Spreadsheet File)", buffer);
           break;
-        case FILE_TYPE_ASM_SOURCE:
+        case FILE_TYPE_IIGS_SOURCE:       // I think this has a resource fork
           file = new SimpleText (name, exactBuffer);
+          break;
+        case FILE_TYPE_IIGS_APPLICATION:
+          //          file =
+          //              new DefaultAppleFile (name, buffer, "S16 Apple IIgs Application Program");
+          file = new AssemblerProgram (name, buffer, auxType);
           break;
         case FILE_TYPE_ICN:
           file = new IconFile (name, exactBuffer);
@@ -352,11 +361,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
         default:
           System.out.format ("Unknown file type : %02X%n", fileType);
-          if (fileType == 0xB3)
-            file = new DefaultAppleFile (name, exactBuffer,
-                "S16 Apple IIgs Application Program");
-          else
-            file = new DefaultAppleFile (name, exactBuffer);
+          file = new DefaultAppleFile (name, exactBuffer);
       }
     }
     catch (Exception e)

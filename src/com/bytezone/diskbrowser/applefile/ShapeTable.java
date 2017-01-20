@@ -122,7 +122,7 @@ public class ShapeTable extends AbstractFile
         return false;
 
       // check index points inside the file
-      int offset = HexFormatter.getShort (buffer, ptr);
+      int offset = HexFormatter.unsignedShort (buffer, ptr);
       if (offset == 0 || offset >= buffer.length)
         return false;
     }
@@ -156,7 +156,7 @@ public class ShapeTable extends AbstractFile
       int row = startRow;
       int col = startCol;
 
-      offset = HexFormatter.getShort (buffer, index * 2 + 2);
+      offset = HexFormatter.unsignedShort (buffer, index * 2 + 2);
 
       int ptr = offset;
       while (ptr < buffer.length)

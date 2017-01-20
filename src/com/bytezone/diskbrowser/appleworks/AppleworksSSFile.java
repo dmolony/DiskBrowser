@@ -20,7 +20,7 @@ public class AppleworksSSFile extends AbstractFile
     int ptr = header.ssMinVers == 0 ? 300 : 302;
     while (ptr < buffer.length)
     {
-      int length = HexFormatter.getShort (buffer, ptr);
+      int length = HexFormatter.unsignedShort (buffer, ptr);
 
       if (length == 0xFFFF)
         break;
@@ -92,7 +92,7 @@ public class AppleworksSSFile extends AbstractFile
 
       calcOrder = (char) buffer[131];
       calcFrequency = (char) buffer[132];
-      lastRow = HexFormatter.getShort (buffer, 133);
+      lastRow = HexFormatter.unsignedShort (buffer, 133);
       lastColumn = buffer[135] & 0xFF;
       windowLayout = (char) buffer[136];
       windowSynch = buffer[137] != 0;
@@ -193,15 +193,15 @@ public class AppleworksSSFile extends AbstractFile
 
       r1 = buffer[offset + 3] & 0xFF;
       c1 = buffer[offset + 4] & 0xFF;
-      r2 = HexFormatter.getShort (buffer, offset + 5);
+      r2 = HexFormatter.unsignedShort (buffer, offset + 5);
       c2 = buffer[offset + 7] & 0xFF;
-      r3 = HexFormatter.getShort (buffer, offset + 8);
+      r3 = HexFormatter.unsignedShort (buffer, offset + 8);
       c3 = buffer[offset + 10] & 0xFF;
-      r4 = HexFormatter.getShort (buffer, offset + 11);
+      r4 = HexFormatter.unsignedShort (buffer, offset + 11);
       c4 = buffer[offset + 13] & 0xFF;
       r5 = buffer[offset + 14] & 0xFF;
       c5 = buffer[offset + 15] & 0xFF;
-      r6 = HexFormatter.getShort (buffer, offset + 16);
+      r6 = HexFormatter.unsignedShort (buffer, offset + 16);
       c6 = buffer[offset + 18] & 0xFF;
       r7 = buffer[offset + 19] & 0xFF;
       c7 = buffer[offset + 20] & 0xFF;
@@ -252,7 +252,7 @@ public class AppleworksSSFile extends AbstractFile
 
     public Row (int ptr)
     {
-      rowNumber = HexFormatter.getShort (buffer, ptr);
+      rowNumber = HexFormatter.unsignedShort (buffer, ptr);
       ptr += 2;                                   // first control byte
 
       int column = 0;

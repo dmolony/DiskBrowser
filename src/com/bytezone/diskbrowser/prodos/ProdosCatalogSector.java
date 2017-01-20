@@ -81,7 +81,7 @@ class ProdosCatalogSector extends AbstractSector
   {
     StringBuilder text = new StringBuilder ();
     int fileType = buffer[offset + 16] & 0xFF;
-    int auxType = HexFormatter.getShort (buffer, offset + 31);
+    int auxType = HexFormatter.unsignedShort (buffer, offset + 31);
     addText (text, buffer, offset + 16, 1,
         "File type (" + ProdosConstants.fileTypes[fileType] + ")");
     addTextAndDecimal (text, buffer, offset + 17, 2, "Key pointer");

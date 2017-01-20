@@ -57,4 +57,18 @@ abstract class CatalogEntry implements AppleFileSource
         return true;
     return false;
   }
+
+  @Override
+  public String toString ()
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append (String.format ("Name .......... %s%n", name));
+    text.append (String.format ("Storage type... %02X%n", storageType));
+    text.append (String.format ("Created ....... %s%n",
+        created == null ? "" : parentDisk.df.format (created.getTime ())));
+    text.append (String.format ("Version ....... %d%n", version));
+
+    return text.toString ();
+  }
 }

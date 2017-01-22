@@ -17,9 +17,9 @@ public class IconFile extends AbstractFile
   {
     super (name, buffer);
 
-    iBlkNext = HexFormatter.getLong (buffer, 0);
+    iBlkNext = HexFormatter.unsignedLong (buffer, 0);
     iBlkID = HexFormatter.unsignedShort (buffer, 4);
-    iBlkPath = HexFormatter.getLong (buffer, 6);
+    iBlkPath = HexFormatter.unsignedLong (buffer, 6);
     iBlkName = HexFormatter.getHexString (buffer, 10, 16);
 
     int ptr = 26;
@@ -183,12 +183,12 @@ public class IconFile extends AbstractFile
 
     private void appendIcon (StringBuilder text, byte[] buffer)
     {
-      int rowBytes = 1 + (iconWidth - 1) / 2;
+      int rowBytes = (iconWidth - 1) / 2 + 1;
       for (int i = 0; i < main.length; i += rowBytes)
       {
         for (int ptr = i, max = i + rowBytes; ptr < max; ptr++)
         {
-          int left = (byte) ((buffer[ptr] & 0xF0) >> 4);
+          int left = (byte) ((buffer[ptr] & 0xF0) >>> 4);
           int right = (byte) (buffer[ptr] & 0x0F);
           text.append (String.format ("%X %X ", left, right));
         }

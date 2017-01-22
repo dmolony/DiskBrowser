@@ -292,7 +292,7 @@ public class HexFormatter
     return (b1 & 0xFF) + (b2 & 0xFF) * 256 + (b3 & 0xFF) * 65536;
   }
 
-  public static int getLong (byte[] buffer, int ptr)
+  public static int unsignedLong (byte[] buffer, int ptr)
   {
     int val = 0;
     for (int i = 3; i >= 0; i--)
@@ -301,6 +301,12 @@ public class HexFormatter
       val += buffer[ptr + i] & 0xFF;
     }
     return val;
+  }
+
+  public static int signedLong (byte[] buffer, int ptr)
+  {
+    return (((buffer[ptr] & 0xFF) << 24) | ((buffer[ptr] & 0xFF) << 16)
+        | ((buffer[ptr] & 0xFF) << 8) | (buffer[ptr + 1] & 0xFF));
   }
 
   public static int getLongBigEndian (byte[] buffer, int ptr)

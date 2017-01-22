@@ -17,7 +17,7 @@ public class SimpleText extends AbstractFile
     text.append (String.format ("End of file   : %,8d%n%n", buffer.length));
 
     int ptr = 0;
-    while (ptr < buffer.length)
+    while (ptr < buffer.length && buffer[ptr] != 0x00)
     {
       String line = getLine (ptr);
       text.append (line + "\n");

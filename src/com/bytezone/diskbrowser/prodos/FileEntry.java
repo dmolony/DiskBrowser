@@ -359,6 +359,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_FONT:
           file = new QuickDrawFont (name, exactBuffer, fileType, auxType);
           break;
+        case FILE_TYPE_DESCRIPTOR_TABLE:
+          file = new FileTypeDescriptorTable (name, exactBuffer);
+          break;
+        case FILE_TYPE_GSOS_FILE_SYSTEM_TRANSLATOR:
+          file = new FileSystemTranslator (name, exactBuffer);
+          break;
         default:
           System.out.format ("Unknown file type : %02X%n", fileType);
           file = new DefaultAppleFile (name, exactBuffer);

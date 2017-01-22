@@ -15,6 +15,7 @@ public interface ProdosConstants
   int FILE_TYPE_IIGS_OBJECT = 0xB1;
   //  int FILE_TYPE_FORKED_FILE = 0xB3;         // S16
   int FILE_TYPE_IIGS_APPLICATION = 0xB3;
+  int FILE_TYPE_IIGS_DEVICE_DRIVER = 0xBB;
   int FILE_TYPE_GSOS_FILE_SYSTEM_TRANSLATOR = 0xBD;
   int FILE_TYPE_PNT = 0xC0;
   int FILE_TYPE_PIC = 0xC1;

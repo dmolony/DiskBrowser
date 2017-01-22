@@ -347,6 +347,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           //              new DefaultAppleFile (name, buffer, "S16 Apple IIgs Application Program");
           file = new AssemblerProgram (name, buffer, auxType);
           break;
+        case FILE_TYPE_IIGS_DEVICE_DRIVER:
+          file = new DeviceDriver (name, exactBuffer, auxType);
+          break;
         case FILE_TYPE_ICN:
           file = new IconFile (name, exactBuffer);
           break;

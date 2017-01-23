@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -73,6 +74,7 @@ public class IconFile extends AbstractFile
       ptr += dataLen;
     }
 
+    // calculate maximum width and height for every icon
     int maxHeight = 0;
     int maxWidth = 0;
     for (Icon icon : icons)
@@ -88,12 +90,17 @@ public class IconFile extends AbstractFile
     int x = base;
     int y = base;
     int gap = 5;
-    int columns = 4;
+    int columns = Math.min (icons.size (), 4);
     int rows = (icons.size () - 1) / columns + 1;
     //    System.out.printf ("Rows: %d, cols: %d%n", rows, columns);
 
     image = new BufferedImage (columns * maxWidth + 2 * base + (columns - 1) * gap,
         rows * maxHeight + 2 * base + (rows - 1) * gap, BufferedImage.TYPE_INT_RGB);
+
+    Graphics2D graphics = image.createGraphics ();
+    graphics.setBackground (Color.WHITE);
+    graphics.clearRect (0, 0, image.getWidth (), image.getHeight ());
+
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
 
@@ -185,8 +192,9 @@ public class IconFile extends AbstractFile
     int iconSize;
     int iconHeight;
     int iconWidth;
-    byte[] main;
-    byte[] mask;
+    byte[] iconImage;
+    byte[] iconMask;
+    boolean colour;
     private final BufferedImage image;
 
     public Image (byte[] buffer, int ptr)
@@ -196,38 +204,36 @@ public class IconFile extends AbstractFile
       iconHeight = HexFormatter.unsignedShort (buffer, ptr + 4);
       iconWidth = HexFormatter.unsignedShort (buffer, ptr + 6);
 
-      main = new byte[iconSize];
-      mask = new byte[iconSize];
+      iconImage = new byte[iconSize];
+      iconMask = new byte[iconSize];
 
-      System.arraycopy (buffer, ptr + 8, main, 0, iconSize);
-      System.arraycopy (buffer, ptr + 8 + iconSize, mask, 0, iconSize);
+      colour = (iconType & 0x80) != 0;
+
+      System.arraycopy (buffer, ptr + 8, iconImage, 0, iconSize);
+      System.arraycopy (buffer, ptr + 8 + iconSize, iconMask, 0, iconSize);
 
       int[] colours = palette.getColours ();
       int gap = 5;
 
       image = new BufferedImage (iconWidth, iconHeight, BufferedImage.TYPE_INT_RGB);
+
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
 
       int rowBytes = (iconWidth - 1) / 2 + 1;
-      for (int i = 0; i < main.length; i += rowBytes)
-      {
-        for (int j = i, max = i + rowBytes; j < max; j++)
+      if (true)
+        for (int i = 0; i < iconImage.length; i += rowBytes)
         {
-          int left = (byte) ((main[j] & 0xF0) >>> 4);
-          int right = (byte) (main[j] & 0x0F);
-          dataBuffer.setElem (element++, colours[left]);
-          dataBuffer.setElem (element++, colours[right]);
+          for (int j = i, max = i + rowBytes; j < max; j++)
+          {
+            int left = (byte) ((iconImage[j] & 0xF0) >>> 4);
+            int right = (byte) (iconImage[j] & 0x0F);
+            int maskLeft = (byte) ((iconMask[j] & 0xF0) >>> 4);
+            int maskRight = (byte) (iconMask[j] & 0x0F);
+            dataBuffer.setElem (element++, colours[left & maskLeft]);
+            dataBuffer.setElem (element++, colours[right & maskRight]);
+          }
         }
-        //        element += gap;
-        //        for (int j = i, max = i + rowBytes; j < max; j++)
-        //        {
-        //          int left = (byte) ((mask[j] & 0xF0) >>> 4);
-        //          int right = (byte) (mask[j] & 0x0F);
-        //          dataBuffer.setElem (element++, colours[left]);
-        //          dataBuffer.setElem (element++, colours[right]);
-        //        }
-      }
     }
 
     public int size ()
@@ -244,9 +250,9 @@ public class IconFile extends AbstractFile
       text.append (String.format ("Icon size .... %d%n", iconSize));
       text.append (String.format ("Icon height .. %d%n", iconHeight));
       text.append (String.format ("Icon width ... %d%n%n", iconWidth));
-      appendIcon (text, main);
+      appendIcon (text, iconImage);
       text.append ("\n\n");
-      appendIcon (text, mask);
+      appendIcon (text, iconMask);
 
       return text.toString ();
     }
@@ -291,7 +297,7 @@ public class IconFile extends AbstractFile
     private void appendIcon (StringBuilder text, byte[] buffer)
     {
       int rowBytes = (iconWidth - 1) / 2 + 1;
-      for (int i = 0; i < main.length; i += rowBytes)
+      for (int i = 0; i < iconImage.length; i += rowBytes)
       {
         for (int ptr = i, max = i + rowBytes; ptr < max; ptr++)
         {

@@ -1,5 +1,9 @@
 package com.bytezone.diskbrowser.applefile;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +11,43 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class IconFile extends AbstractFile
 {
+  private static Palette palette = new Palette ("Virtual II",
+      new int[] { 0x000000, // 0 black
+                  0xDD0033, // 1 magenta
+                  0x885500, // 2 brown         (8)
+                  0xFF6600, // 3 orange        (9)
+                  0x007722, // 4 dark green
+                  0x555555, // 5 grey1
+                  0x11DD00, // 6 light green   (C)
+                  0xFFFF00, // 7 yellow        (D)
+                  0x000099, // 8 dark blue     (2)
+                  0xDD22DD, // 9 purple        (3)
+                  0xAAAAAA, // A grey2
+                  0xFF9988, // B pink
+                  0x2222FF, // C med blue      (6)
+                  0x66AAFF, // D light blue    (7)
+                  0x44FF99, // E aqua
+                  0xFFFFFF  // F white
+      });
+  //  private static Palette palette = new Palette ("Icon palette",
+  //      new int[] { 0x000000, // 0 black
+  //                  0x2222FF, // C med blue      (6)
+  //                  0xFFFF00, // 7 yellow        (D)
+  //                  0xFFFFFF,  // F white
+  //                  0x000000, //   black
+  //                  0xDD0033, // 1 magenta
+  //                  0x11DD00, // 6 light green   (C)
+  //                  0xFFFFFF,  // F white
+  //                  0x000000, // 0 black
+  //                  0x2222FF, // C med blue      (6)
+  //                  0xFFFF00, // 7 yellow        (D)
+  //                  0xFFFFFF,  // F white
+  //                  0x000000, //   black
+  //                  0xDD0033, // 1 magenta
+  //                  0x11DD00, // 6 light green   (C)
+  //                  0xFFFFFF,  // F white
+  //      });
+
   private final int iBlkNext;
   private final int iBlkID;
   private final int iBlkPath;
@@ -31,6 +72,44 @@ public class IconFile extends AbstractFile
       icons.add (new Icon (buffer, ptr));
       ptr += dataLen;
     }
+
+    int maxHeight = 0;
+    int maxWidth = 0;
+    for (Icon icon : icons)
+    {
+      maxHeight = Math.max (maxHeight, icon.largeImage.iconHeight);
+      maxWidth = Math.max (maxWidth, icon.largeImage.iconWidth);
+    }
+
+    //    System.out.printf ("Icons: %d, Max height: %d, max width: %d%n", icons.size (),
+    //        maxHeight, maxWidth);
+
+    int base = 10;
+    int x = base;
+    int y = base;
+    int gap = 5;
+    int columns = 4;
+    int rows = (icons.size () - 1) / columns + 1;
+    //    System.out.printf ("Rows: %d, cols: %d%n", rows, columns);
+
+    image = new BufferedImage (columns * maxWidth + 2 * base + (columns - 1) * gap,
+        rows * maxHeight + 2 * base + (rows - 1) * gap, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2d = image.createGraphics ();
+    g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
+
+    int count = 0;
+    for (Icon icon : icons)
+    {
+      g2d.drawImage (icon.largeImage.image, x, y, null);
+      x += maxWidth + gap;
+      count++;
+      if (count % columns == 0)
+      {
+        x = base;
+        y += maxHeight + gap;
+      }
+    }
+    g2d.dispose ();
   }
 
   @Override
@@ -108,6 +187,7 @@ public class IconFile extends AbstractFile
     int iconWidth;
     byte[] main;
     byte[] mask;
+    private final BufferedImage image;
 
     public Image (byte[] buffer, int ptr)
     {
@@ -121,6 +201,33 @@ public class IconFile extends AbstractFile
 
       System.arraycopy (buffer, ptr + 8, main, 0, iconSize);
       System.arraycopy (buffer, ptr + 8 + iconSize, mask, 0, iconSize);
+
+      int[] colours = palette.getColours ();
+      int gap = 5;
+
+      image = new BufferedImage (iconWidth, iconHeight, BufferedImage.TYPE_INT_RGB);
+      DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
+      int element = 0;
+
+      int rowBytes = (iconWidth - 1) / 2 + 1;
+      for (int i = 0; i < main.length; i += rowBytes)
+      {
+        for (int j = i, max = i + rowBytes; j < max; j++)
+        {
+          int left = (byte) ((main[j] & 0xF0) >>> 4);
+          int right = (byte) (main[j] & 0x0F);
+          dataBuffer.setElem (element++, colours[left]);
+          dataBuffer.setElem (element++, colours[right]);
+        }
+        //        element += gap;
+        //        for (int j = i, max = i + rowBytes; j < max; j++)
+        //        {
+        //          int left = (byte) ((mask[j] & 0xF0) >>> 4);
+        //          int right = (byte) (mask[j] & 0x0F);
+        //          dataBuffer.setElem (element++, colours[left]);
+        //          dataBuffer.setElem (element++, colours[right]);
+        //        }
+      }
     }
 
     public int size ()

@@ -62,10 +62,10 @@ public abstract class HiResImage extends AbstractFile
         System.out.println ("aux 1 - " + name);
       }
 
-      if (auxType == 2)
-      {
-        System.out.println ("aux 2 - " + name);
-      }
+      //      if (auxType == 2)
+      //      {
+      //        System.out.println ("aux 2 - " + name);
+      //      }
     }
   }
 
@@ -224,8 +224,8 @@ public abstract class HiResImage extends AbstractFile
     int ptr = 0, newPtr = 0;
     while (ptr < buffer.length)
     {
-      int type = (buffer[ptr] & 0xC0) >> 6;
-      int count = (buffer[ptr++] & 0x3F) + 1;
+      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
       switch (type)
       {

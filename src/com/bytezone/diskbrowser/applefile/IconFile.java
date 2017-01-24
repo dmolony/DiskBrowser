@@ -219,19 +219,29 @@ public class IconFile extends AbstractFile
 
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
+      //      System.out.println ("*** " + dataBuffer.getSize ());
+      //      System.out.printf ("width %d height %d%n", iconWidth, iconHeight);
+      //      System.out.printf ("icon image length %d%n", iconImage.length);
 
       int rowBytes = (iconWidth - 1) / 2 + 1;
       if (true)
         for (int i = 0; i < iconImage.length; i += rowBytes)
         {
-          for (int j = i, max = i + rowBytes; j < max; j++)
+          int max = Math.min (i + rowBytes, dataBuffer.getSize ());
+          //          System.out.printf ("max %d%n", max);
+          for (int j = i; j < max; j++)
           {
             int left = (byte) ((iconImage[j] & 0xF0) >>> 4);
             int right = (byte) (iconImage[j] & 0x0F);
             int maskLeft = (byte) ((iconMask[j] & 0xF0) >>> 4);
             int maskRight = (byte) (iconMask[j] & 0x0F);
-            dataBuffer.setElem (element++, colours[left & maskLeft]);
-            dataBuffer.setElem (element++, colours[right & maskRight]);
+
+            // see WhatIsThe2gs/System 6 and Free Games.hdv/SWAREGAME.ICONS
+            if (element < dataBuffer.getSize ())
+            {
+              dataBuffer.setElem (element++, colours[left & maskLeft]);
+              dataBuffer.setElem (element++, colours[right & maskRight]);
+            }
           }
         }
     }

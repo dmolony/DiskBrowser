@@ -15,6 +15,11 @@ public class HexFormatter
     return format (buffer, 0, buffer.length);
   }
 
+  public static String formatNoHeader (byte[] buffer)
+  {
+    return formatNoHeader (buffer, 0, buffer.length);
+  }
+
   public static String format (byte[] buffer, int offset, int length)
   {
     return format (buffer, offset, length, true, 0);
@@ -331,9 +336,14 @@ public class HexFormatter
     return val;
   }
 
+  //  public static int signedShort (byte[] buffer, int ptr)
+  //  {
+  //    return (short) (((buffer[ptr] & 0xFF) << 8) | (buffer[ptr + 1] & 0xFF));
+  //  }
+
   public static int signedShort (byte[] buffer, int ptr)
   {
-    return (short) (((buffer[ptr] & 0xFF) << 8) | (buffer[ptr + 1] & 0xFF));
+    return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));
   }
 
   public static int getShortBigEndian (byte[] buffer, int ptr)

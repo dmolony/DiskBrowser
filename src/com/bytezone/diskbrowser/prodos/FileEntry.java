@@ -326,9 +326,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new DefaultAppleFile (name + " (Appletalk file)", buffer);
           break;
         case FILE_TYPE_GWP:
-          // using full buffer because the ENDFILE can be 512 for multi-block files
-          // SimpleText will now terminate at 0x00 (see Fonts.po)
-          file = new SimpleText (name, buffer);
+          file = new SimpleText (name, exactBuffer);
           break;
         case FILE_TYPE_AWP:
           file = new AppleworksWPFile (name + " (Appleworks Word Processor)", buffer);
@@ -343,8 +341,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new SimpleText (name, exactBuffer);
           break;
         case FILE_TYPE_IIGS_APPLICATION:
-          //          file =
-          //              new DefaultAppleFile (name, buffer, "S16 Apple IIgs Application Program");
           file = new AssemblerProgram (name, buffer, auxType);
           break;
         case FILE_TYPE_IIGS_DEVICE_DRIVER:

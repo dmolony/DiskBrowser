@@ -52,21 +52,6 @@ public abstract class HiResImage extends AbstractFile
 
     this.fileType = fileType;
     this.auxType = auxType;
-
-    if (fileType == ProdosConstants.FILE_TYPE_PNT)
-    {
-      if (auxType == 1)
-      {
-        unpackedBuffer = unpackBytes (buffer);
-        makeScreen (unpackedBuffer);
-        System.out.println ("aux 1 - " + name);
-      }
-
-      //      if (auxType == 2)
-      //      {
-      //        System.out.println ("aux 2 - " + name);
-      //      }
-    }
   }
 
   protected void createImage ()
@@ -159,11 +144,7 @@ public abstract class HiResImage extends AbstractFile
 
       case ProdosConstants.FILE_TYPE_PNT:
         if (auxType == 1)
-        {
-          if (unpackedBuffer == null)
-            unpackedBuffer = unpackBytes (buffer);
           auxText = "Packed Super Hi-Res Image";
-        }
         else if (auxType == 2)
           auxText = "Super Hi-Res Image";
         else if (auxType == 3)

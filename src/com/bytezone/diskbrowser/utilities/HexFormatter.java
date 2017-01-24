@@ -205,9 +205,10 @@ public class HexFormatter
   public static String getHexString (byte[] buffer, int offset, int length, boolean space)
   {
     StringBuilder hex = new StringBuilder ();
-    for (int i = 0; i < length; i++)
+    int max = Math.min (offset + length, buffer.length);
+    for (int i = offset; i < max; i++)
     {
-      hex.append (String.format ("%02X", buffer[offset + i]));
+      hex.append (String.format ("%02X", buffer[i]));
       if (space)
         hex.append (' ');
     }

@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class PaintFile extends HiResImage
+public class SHRPictureFile extends HiResImage
 {
   List<Block> blocks = new ArrayList<Block> ();
 
-  public PaintFile (String name, byte[] buffer, int fileType, int auxType)
+  public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType)
   {
     super (name, buffer, fileType, auxType);
 
@@ -131,6 +131,76 @@ public class PaintFile extends HiResImage
         System.arraycopy (data, ptr, packedScanLines[i], 0, len);
         ptr += len;
       }
+
+      if (true)
+      {
+        byte[] newBuf = new byte[32768];
+        ptr = 0;
+        for (int line = 0; line < numScanLines; line++)
+        {
+          byte[] lineBuffer = packedScanLines[line];
+          if (lineBuffer.length % 2 == 1 && isEmpty (lineBuffer))
+          {
+            System.out.println ("Odd number of bytes in empty buffer in " + name);
+            break;
+          }
+          ptr = unpackLine (lineBuffer, newBuf, ptr);
+        }
+        makeScreen (newBuf);
+      }
+    }
+
+    // Super Hi-res IIGS
+    protected int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
+    {
+      byte[] fourBuf = new byte[4];
+
+      int ptr = 0;
+      while (ptr < buffer.length)
+      {
+        int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+        int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
+
+        switch (type)
+        {
+          case 0:
+            while (count-- != 0)
+              //              if (ptr < buffer.length)                // fixes a bug in some images
+              newBuf[newPtr++] = buffer[ptr++];
+            break;
+
+          case 1:
+            byte b = buffer[ptr++];
+            while (count-- != 0)
+              newBuf[newPtr++] = b;
+            break;
+
+          case 2:
+            for (int i = 0; i < 4; i++)
+              fourBuf[i] = buffer[ptr++];
+            while (count-- != 0)
+              for (int i = 0; i < 4; i++)
+                newBuf[newPtr++] = fourBuf[i];
+            break;
+
+          case 3:
+            b = buffer[ptr++];
+            count *= 4;
+            while (count-- != 0)
+              newBuf[newPtr++] = b;
+            break;
+        }
+      }
+
+      return newPtr;
+    }
+
+    private boolean isEmpty (byte[] buffer)
+    {
+      for (byte b : buffer)
+        if (b != 0)
+          return false;
+      return true;
     }
 
     @Override
@@ -166,15 +236,26 @@ public class PaintFile extends HiResImage
       text.append ("\nScan Lines\n");
       text.append ("----------\n\n");
 
-      text.append (" #   Mode         Packed Data\n");
-      text.append ("---  ----  ---------------------------------------------");
+      text.append (" #   Mode  Len       Packed Data\n");
+      text.append ("---  ----  ---   ---------------------------------------");
       text.append ("------------------------------------------\n");
+
+      int lineSize = 24;
       for (int i = 0; i < scanLineDirectory.length; i++)
       {
         DirEntry dirEntry = scanLineDirectory[i];
         byte[] packedScanLine = packedScanLines[i];
-        text.append (String.format ("%3d   %2d   ", i, dirEntry.mode));
-        text.append (HexFormatter.getHexString (packedScanLine));
+        text.append (String.format ("%3d   %2d   %3d   ", i, dirEntry.mode,
+            packedScanLine.length));
+        int ptr = 0;
+        while (true)
+        {
+          text.append (HexFormatter.getHexString (packedScanLine, ptr, lineSize));
+          ptr += lineSize;
+          if (ptr >= packedScanLine.length)
+            break;
+          text.append ("\n                 ");
+        }
         text.append ("\n");
       }
 

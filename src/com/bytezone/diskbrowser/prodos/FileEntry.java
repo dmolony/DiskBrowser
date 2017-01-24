@@ -354,8 +354,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new IconFile (name, exactBuffer);
           break;
         case FILE_TYPE_PNT:
+          if (auxType == 1)
+            file = new PackedSHR (name, exactBuffer, fileType, auxType);
           if (auxType == 2)
-            file = new PaintFile (name, exactBuffer, fileType, auxType);
+            file = new SHRPictureFile (name, exactBuffer, fileType, auxType);
           else
             file = new OriginalHiResImage (name, exactBuffer, fileType, auxType);
           break;
@@ -387,10 +389,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private byte[] getExactBuffer (byte[] buffer)
   {
     if (buffer.length < endOfFile)
-    {
-      System.out.println ("Buffer shorter than EOF in " + name);
-      System.out.printf ("   buffer %,d, eof %,d%n", buffer.length, endOfFile);
-    }
+      System.out.printf ("Buffer (%,d) shorter than EOF (%,d) in %s%n", buffer.length,
+          endOfFile, name);
 
     byte[] exactBuffer;
     if (buffer.length < endOfFile)

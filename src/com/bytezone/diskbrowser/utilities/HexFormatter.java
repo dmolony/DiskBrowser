@@ -71,7 +71,9 @@ public class HexFormatter
       StringBuffer trans = new StringBuffer ();
       StringBuffer hexLine = new StringBuffer ();
 
-      for (int j = i; (j < i + 16) && (j < offset + length); j++)
+      int max = Math.min (i + 16, offset + length);
+      max = Math.min (max, buffer.length);
+      for (int j = i; j < max; j++)
       {
         int c = buffer[j] & 0xFF;
         freq[c]++;

@@ -12,6 +12,7 @@ public class SHRPictureFile extends HiResImage
 {
   List<Block> blocks = new ArrayList<Block> ();
   Main mainBlock;
+  Multipal multipalBlock;
 
   public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType)
   {
@@ -30,6 +31,11 @@ public class SHRPictureFile extends HiResImage
       {
         mainBlock = new Main (kind, data);
         blocks.add (mainBlock);
+      }
+      else if ("MULTIPAL".equals (kind))
+      {
+        multipalBlock = new Multipal (kind, data);
+        blocks.add (multipalBlock);
       }
       else
         blocks.add (new Block (kind, data));
@@ -58,7 +64,9 @@ public class SHRPictureFile extends HiResImage
       DirEntry dirEntry = mainBlock.scanLineDirectory[row];
       int hi = dirEntry.mode & 0xFF00;
       int lo = dirEntry.mode & 0x00FF;
-      ColorTable colorTable = mainBlock.colorTables[lo & 0x0F];
+
+      ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[row]
+          : mainBlock.colorTables[lo & 0x0F];
       boolean fillMode = (lo & 0x20) != 0;
 
       if (fillMode)
@@ -68,8 +76,10 @@ public class SHRPictureFile extends HiResImage
       {
         int left = (unpackedBuffer[ptr] & 0xF0) >> 4;
         int right = unpackedBuffer[ptr] & 0x0F;
+
         dataBuffer.setElem (element++, colorTable.entries[left].color.getRGB ());
         dataBuffer.setElem (element++, colorTable.entries[right].color.getRGB ());
+
         ptr++;
       }
     }
@@ -115,6 +125,31 @@ public class SHRPictureFile extends HiResImage
       text.append (HexFormatter.format (data));
 
       return text.toString ();
+    }
+  }
+
+  class Multipal extends Block
+  {
+    int numPalettes;
+    ColorTable[] colorTables;
+
+    public Multipal (String kind, byte[] data)
+    {
+      super (kind, data);
+
+      int ptr = 5 + kind.length ();
+      numPalettes = HexFormatter.unsignedShort (data, ptr);
+
+      ptr += 2;
+      colorTables = new ColorTable[numPalettes];
+      for (int i = 0; i < numPalettes; i++)
+      {
+        if (ptr < data.length - 32)
+          colorTables[i] = new ColorTable (i, data, ptr);
+        else
+          colorTables[i] = new ColorTable ();      // default empty table
+        ptr += 32;
+      }
     }
   }
 
@@ -303,6 +338,16 @@ public class SHRPictureFile extends HiResImage
     int id;
     ColorEntry[] entries = new ColorEntry[16];
 
+    public ColorTable ()
+    {
+      // default empty table
+      id = -1;
+      for (int i = 0; i < 16; i++)
+      {
+        entries[i] = new ColorEntry ();
+      }
+    }
+
     public ColorTable (int id, byte[] data, int offset)
     {
       this.id = id;
@@ -346,12 +391,20 @@ public class SHRPictureFile extends HiResImage
     int value;          // 0RGB
     Color color;
 
+    public ColorEntry ()
+    {
+      // default empty entry
+      value = 0;
+      color = new Color (0, 0, 0);
+    }
+
     public ColorEntry (byte[] data, int offset)
     {
       value = HexFormatter.unsignedShort (data, offset);
-      int red = (value & 0x0F00) >>> 8 | (value & 0x0F00) >>> 4;
-      int green = (value & 0x00F0) | (value & 0x00F0) >>> 4;
-      int blue = (value & 0x000F) | (value & 0x000F) << 4;
+
+      int red = ((value >> 8) & 0x0f) * 17;
+      int green = ((value >> 4) & 0x0f) * 17;
+      int blue = (value & 0x0f) * 17;
       color = new Color (red, green, blue);
     }
 

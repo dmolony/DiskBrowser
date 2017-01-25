@@ -193,6 +193,20 @@ public abstract class HiResImage extends AbstractFile
       }
   }
 
+  /*
+  * Unpack the Apple PackBytes format.
+  *
+  * Format is:
+  *  <flag><data> ...
+  *
+  * Flag values (first 6 bits of flag byte):
+  *  00xxxxxx: (0-63) 1 to 64 bytes follow, all different
+  *  01xxxxxx: (0-63) 1 to 64 repeats of next byte
+  *  10xxxxxx: (0-63) 1 to 64 repeats of next 4 bytes
+  *  11xxxxxx: (0-63) 1 to 64 repeats of next byte taken as 4 bytes
+  *              (as in 10xxxxxx case)
+  */
+
   // Super Hi-res IIGS
   protected byte[] unpackBytes (byte[] buffer)
   {

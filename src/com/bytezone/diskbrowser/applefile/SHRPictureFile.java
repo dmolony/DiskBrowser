@@ -1,5 +1,8 @@
 package com.bytezone.diskbrowser.applefile;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +11,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class SHRPictureFile extends HiResImage
 {
   List<Block> blocks = new ArrayList<Block> ();
+  Main mainBlock;
 
   public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType)
   {
@@ -23,29 +27,58 @@ public class SHRPictureFile extends HiResImage
       System.arraycopy (buffer, ptr, data, 0, data.length);
 
       if ("MAIN".equals (kind))
-        blocks.add (new Main (kind, data));
+      {
+        mainBlock = new Main (kind, data);
+        blocks.add (mainBlock);
+      }
       else
         blocks.add (new Block (kind, data));
 
       ptr += len;
     }
+    createImage ();
   }
 
   @Override
   protected void createMonochromeImage ()
   {
+    makeScreen (unpackedBuffer);
   }
 
   @Override
   protected void createColourImage ()
   {
+    image = new BufferedImage (320, 200, BufferedImage.TYPE_INT_RGB);
+    DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
+
+    int element = 0;
+    int ptr = 0;
+    for (int row = 0; row < 200; row++)
+    {
+      DirEntry dirEntry = mainBlock.scanLineDirectory[row];
+      int hi = dirEntry.mode & 0xFF00;
+      int lo = dirEntry.mode & 0x00FF;
+      ColorTable colorTable = mainBlock.colorTables[lo & 0x0F];
+      boolean fillMode = (lo & 0x20) != 0;
+
+      if (fillMode)
+        System.out.println ("fillmode " + fillMode);
+
+      for (int col = 0; col < 160; col++)
+      {
+        int left = (unpackedBuffer[ptr] & 0xF0) >> 4;
+        int right = unpackedBuffer[ptr] & 0x0F;
+        dataBuffer.setElem (element++, colorTable.entries[left].color.getRGB ());
+        dataBuffer.setElem (element++, colorTable.entries[right].color.getRGB ());
+        ptr++;
+      }
+    }
   }
 
   @Override
   public String getText ()
   {
     StringBuilder text = new StringBuilder (super.getText ());
-    text.append ("\n\n");
 
     for (Block block : blocks)
     {
@@ -53,8 +86,11 @@ public class SHRPictureFile extends HiResImage
       text.append ("\n\n");
     }
 
-    text.deleteCharAt (text.length () - 1);
-    text.deleteCharAt (text.length () - 1);
+    if (blocks.size () > 0)
+    {
+      text.deleteCharAt (text.length () - 1);
+      text.deleteCharAt (text.length () - 1);
+    }
 
     return text.toString ();
   }
@@ -134,7 +170,7 @@ public class SHRPictureFile extends HiResImage
 
       if (true)
       {
-        byte[] newBuf = new byte[32768];
+        unpackedBuffer = new byte[32768];
         ptr = 0;
         for (int line = 0; line < numScanLines; line++)
         {
@@ -144,9 +180,8 @@ public class SHRPictureFile extends HiResImage
             System.out.println ("Odd number of bytes in empty buffer in " + name);
             break;
           }
-          ptr = unpackLine (lineBuffer, newBuf, ptr);
+          ptr = unpackLine (lineBuffer, unpackedBuffer, ptr);
         }
-        makeScreen (newBuf);
       }
     }
 
@@ -309,10 +344,15 @@ public class SHRPictureFile extends HiResImage
   class ColorEntry
   {
     int value;          // 0RGB
+    Color color;
 
     public ColorEntry (byte[] data, int offset)
     {
       value = HexFormatter.unsignedShort (data, offset);
+      int red = (value & 0x0F00) >>> 8 | (value & 0x0F00) >>> 4;
+      int green = (value & 0x00F0) | (value & 0x00F0) >>> 4;
+      int blue = (value & 0x000F) | (value & 0x000F) << 4;
+      color = new Color (red, green, blue);
     }
 
     @Override

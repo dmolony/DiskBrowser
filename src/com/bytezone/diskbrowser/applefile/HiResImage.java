@@ -9,7 +9,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public abstract class HiResImage extends AbstractFile
 {
@@ -146,7 +145,7 @@ public abstract class HiResImage extends AbstractFile
         if (auxType == 1)
           auxText = "Packed Super Hi-Res Image";
         else if (auxType == 2)
-          auxText = "Super Hi-Res Image";
+          auxText = "Super Hi-Res Image (Apple Preferred)";
         else if (auxType == 3)
           auxText = "Packed QuickDraw II PICT File";
         break;
@@ -167,7 +166,7 @@ public abstract class HiResImage extends AbstractFile
     if (unpackedBuffer != null)
     {
       text.append (String.format ("%nUnpacked   : %,d%n%n", unpackedBuffer.length));
-      text.append (HexFormatter.format (unpackedBuffer));
+      //          text.append (HexFormatter.format (unpackedBuffer));
     }
 
     return text.toString ();

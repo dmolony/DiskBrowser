@@ -203,7 +203,7 @@ public class MenuHandler
     prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
     prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
     prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
-    prefs.putBoolean (PREFS_DEBUGGING, debuggingItem.isSelected ());
+    //    prefs.putBoolean (PREFS_DEBUGGING, debuggingItem.isSelected ());
     prefs.putInt (PREFS_PALETTE,
         HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
   }
@@ -217,7 +217,7 @@ public class MenuHandler
     showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
     monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
-    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
+    //    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
 
     int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
     PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();

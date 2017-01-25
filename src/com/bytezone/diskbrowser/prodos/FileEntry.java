@@ -270,7 +270,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new ShapeTable (name, exactBuffer);
           else if (SimpleText.isHTML (exactBuffer))
             file = new SimpleText (name, exactBuffer);
-          else if (HiResImage.isGif (exactBuffer))
+          else if (HiResImage.isGif (exactBuffer) || HiResImage.isPng (exactBuffer))
+            file = new OriginalHiResImage (name, exactBuffer, auxType);
+          else if (name.endsWith (".BMP") && HiResImage.isBmp (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (link != null)
           {

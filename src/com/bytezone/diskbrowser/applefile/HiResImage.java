@@ -55,7 +55,7 @@ public abstract class HiResImage extends AbstractFile
 
   protected void createImage ()
   {
-    if (isGif (buffer) || isPng (buffer))
+    if (isGif (buffer) || isPng (buffer) || isBmp (buffer))
       makeImage ();
     else if (monochrome)
       createMonochromeImage ();
@@ -287,6 +287,11 @@ public abstract class HiResImage extends AbstractFile
     {
       e.printStackTrace ();
     }
+    catch (IndexOutOfBoundsException e)     // some BMP files cause this
+    {
+      System.out.println ("Error in makeImage()");
+      System.out.println (e.getMessage ());
+    }
   }
 
   public static boolean isGif (byte[] buffer)
@@ -308,6 +313,15 @@ public abstract class HiResImage extends AbstractFile
         return false;
 
     return true;
+  }
+
+  public static boolean isBmp (byte[] buffer)
+  {
+    if (buffer.length < 2)
+      return false;
+
+    String text = new String (buffer, 0, 2);
+    return text.equals ("BM");
   }
 
   public static PaletteFactory getPaletteFactory ()

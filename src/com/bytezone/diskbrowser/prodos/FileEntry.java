@@ -353,14 +353,21 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
         case FILE_TYPE_PNT:
           if (auxType == 1)
-            file = new PackedSHR (name, exactBuffer, fileType, auxType);
-          if (auxType == 2)
-            file = new SHRPictureFile (name, exactBuffer, fileType, auxType);
+            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
+          else if (auxType == 2)
+            file = new SHRPictureFile (name, exactBuffer, fileType, auxType, endOfFile);
           else
-            file = new OriginalHiResImage (name, exactBuffer, fileType, auxType);
+            file =
+                new OriginalHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           break;
         case FILE_TYPE_PIC:
-          file = new OriginalHiResImage (name, exactBuffer, fileType, auxType);
+          if (auxType == 1)
+            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
+          else if (auxType == 2)
+            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
+          else
+            file =
+                new OriginalHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           break;
         case FILE_TYPE_FONT:
           file = new QuickDrawFont (name, exactBuffer, fileType, auxType);
@@ -386,14 +393,15 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private byte[] getExactBuffer (byte[] buffer)
   {
-    if (buffer.length < endOfFile)
-      System.out.printf ("Buffer (%,d) shorter than EOF (%,d) in %s%n", buffer.length,
-          endOfFile, name);
+    //    if (buffer.length < endOfFile && fileType != FILE_TYPE_DIRECTORY)
+    //      System.out.printf ("Buffer (%,d) shorter than EOF (%,d) in %s %02X%n",
+    //          buffer.length, endOfFile, name, fileType);
 
     byte[] exactBuffer;
     if (buffer.length < endOfFile)
     {
-      exactBuffer = new byte[buffer.length];
+      //      exactBuffer = new byte[buffer.length];
+      exactBuffer = new byte[endOfFile];
       System.arraycopy (buffer, 0, exactBuffer, 0, buffer.length);
     }
     else if (buffer.length == endOfFile || endOfFile == 512)    // 512 seems like crap

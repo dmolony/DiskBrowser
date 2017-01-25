@@ -14,9 +14,9 @@ public class SHRPictureFile extends HiResImage
   Main mainBlock;
   Multipal multipalBlock;
 
-  public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType)
+  public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
-    super (name, buffer, fileType, auxType);
+    super (name, buffer, fileType, auxType, eof);
 
     int ptr = 0;
     while (ptr < buffer.length)
@@ -54,12 +54,12 @@ public class SHRPictureFile extends HiResImage
   @Override
   protected void createColourImage ()
   {
-    image = new BufferedImage (320, 200, BufferedImage.TYPE_INT_RGB);
+    image = new BufferedImage (320, mainBlock.numScanLines, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
     int element = 0;
     int ptr = 0;
-    for (int row = 0; row < 200; row++)
+    for (int row = 0; row < mainBlock.numScanLines; row++)
     {
       DirEntry dirEntry = mainBlock.scanLineDirectory[row];
       int hi = dirEntry.mode & 0xFF00;
@@ -205,7 +205,7 @@ public class SHRPictureFile extends HiResImage
 
       if (true)
       {
-        unpackedBuffer = new byte[32768];
+        unpackedBuffer = new byte[numScanLines * 160];
         ptr = 0;
         for (int line = 0; line < numScanLines; line++)
         {
@@ -231,33 +231,40 @@ public class SHRPictureFile extends HiResImage
         int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
         int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
+        if (ptr >= buffer.length)
+          break;
+
         switch (type)
         {
           case 0:
             while (count-- != 0)
-              //              if (ptr < buffer.length)                // fixes a bug in some images
-              newBuf[newPtr++] = buffer[ptr++];
+              if (newPtr < unpackedBuffer.length && ptr < buffer.length)
+                newBuf[newPtr++] = buffer[ptr++];
             break;
 
           case 1:
             byte b = buffer[ptr++];
             while (count-- != 0)
-              newBuf[newPtr++] = b;
+              if (newPtr < unpackedBuffer.length)
+                newBuf[newPtr++] = b;
             break;
 
           case 2:
             for (int i = 0; i < 4; i++)
-              fourBuf[i] = buffer[ptr++];
+              if (ptr < buffer.length)
+                fourBuf[i] = buffer[ptr++];
             while (count-- != 0)
               for (int i = 0; i < 4; i++)
-                newBuf[newPtr++] = fourBuf[i];
+                if (newPtr < unpackedBuffer.length)
+                  newBuf[newPtr++] = fourBuf[i];
             break;
 
           case 3:
             b = buffer[ptr++];
             count *= 4;
             while (count-- != 0)
-              newBuf[newPtr++] = b;
+              if (newPtr < unpackedBuffer.length)
+                newBuf[newPtr++] = b;
             break;
         }
       }
@@ -297,6 +304,7 @@ public class SHRPictureFile extends HiResImage
         text.append (" ---- ");
       text.deleteCharAt (text.length () - 1);
       text.append ("\n");
+
       for (ColorTable colorTable : colorTables)
       {
         text.append (colorTable.toLine ());
@@ -315,8 +323,8 @@ public class SHRPictureFile extends HiResImage
       {
         DirEntry dirEntry = scanLineDirectory[i];
         byte[] packedScanLine = packedScanLines[i];
-        text.append (String.format ("%3d   %2d   %3d   ", i, dirEntry.mode,
-            packedScanLine.length));
+        text.append (
+            String.format ("%3d   %3d  %3d   ", i, dirEntry.mode, packedScanLine.length));
         int ptr = 0;
         while (true)
         {

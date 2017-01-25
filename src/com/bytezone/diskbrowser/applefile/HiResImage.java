@@ -22,6 +22,8 @@ public abstract class HiResImage extends AbstractFile
 
   protected int fileType;
   protected int auxType;
+  protected int eof;
+
   protected byte[] unpackedBuffer;
   protected int paletteIndex;
 
@@ -45,12 +47,13 @@ public abstract class HiResImage extends AbstractFile
       this.buffer = unscrunch (buffer);
   }
 
-  public HiResImage (String name, byte[] buffer, int fileType, int auxType)
+  public HiResImage (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
     super (name, buffer);
 
     this.fileType = fileType;
     this.auxType = auxType;
+    this.eof = eof;
   }
 
   protected void createImage ()
@@ -163,6 +166,7 @@ public abstract class HiResImage extends AbstractFile
       text.append (String.format ("%nAux type   : $%04X  %s", auxType, auxText));
 
     text.append (String.format ("%nFile size  : %,d", buffer.length));
+    text.append (String.format ("%nEOF        : %,d", eof));
     if (unpackedBuffer != null)
     {
       text.append (String.format ("%nUnpacked   : %,d%n%n", unpackedBuffer.length));

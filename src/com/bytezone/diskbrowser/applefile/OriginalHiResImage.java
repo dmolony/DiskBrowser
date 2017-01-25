@@ -34,9 +34,10 @@ public class OriginalHiResImage extends HiResImage
     createImage ();
   }
 
-  public OriginalHiResImage (String name, byte[] buffer, int fileType, int auxType)
+  public OriginalHiResImage (String name, byte[] buffer, int fileType, int auxType,
+      int eof)
   {
-    super (name, buffer, fileType, auxType);
+    super (name, buffer, fileType, auxType, eof);
 
     //    createImage ();
   }

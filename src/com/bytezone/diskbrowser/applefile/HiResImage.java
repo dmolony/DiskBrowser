@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public abstract class HiResImage extends AbstractFile
 {
@@ -127,16 +127,17 @@ public abstract class HiResImage extends AbstractFile
   {
     String auxText = "";
     StringBuilder text = new StringBuilder ("Image File : " + name);
-    text.append (String.format ("%nFile type  : $%02X", fileType));
+    text.append (String.format ("%nFile type  : $%02X    %s", fileType,
+        ProdosConstants.fileTypes[fileType]));
 
     switch (fileType)
     {
-      case ProdosConstants.FILE_TYPE_PICT:
+      case ProdosConstants.FILE_TYPE_PICT:          // 0x08
         if (auxType < 0x4000)
         {
-          auxText = "Graphics File";
+          auxText = "Apple II Graphics File";
           byte mode = buffer[0x78];                // 0-7
-          System.out.println ("Prodos PICT, mode=" + mode);
+          System.out.println ("Prodos PICT, mode=" + mode);   // see mode table above
         }
         else if (auxType == 0x4000)
           auxText = "Packed Hi-Res File";
@@ -144,8 +145,10 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Packed Double Hi-Res File";
         break;
 
-      case ProdosConstants.FILE_TYPE_PNT:
-        if (auxType == 1)
+      case ProdosConstants.FILE_TYPE_PNT:           // 0xC0
+        if (auxType == 0)
+          auxText = "Paintworks Packed SHR Image";
+        else if (auxType == 1)
           auxText = "Packed Super Hi-Res Image";
         else if (auxType == 2)
           auxText = "Super Hi-Res Image (Apple Preferred)";
@@ -153,7 +156,7 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Packed QuickDraw II PICT File";
         break;
 
-      case ProdosConstants.FILE_TYPE_PIC:
+      case ProdosConstants.FILE_TYPE_PIC:           // 0xC1
         if (auxType == 0)
           auxText = "Super Hi-res Screen Image";
         else if (auxType == 1)
@@ -176,27 +179,6 @@ public abstract class HiResImage extends AbstractFile
     return text.toString ();
   }
 
-  protected void makeScreen (byte[] buffer)
-  {
-    image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
-    DataBuffer db = image.getRaster ().getDataBuffer ();
-
-    int element = 0;
-    int ptr = 0;
-    for (int row = 0; row < 200; row++)
-      for (int col = 0; col < 160; col++)
-      {
-        int pix1 = (buffer[ptr] & 0xF0) >> 4;
-        int pix2 = buffer[ptr] & 0x0F;
-        if (pix1 > 0)
-          db.setElem (element, 255);
-        if (pix2 > 0)
-          db.setElem (element + 1, 255);
-        element += 2;
-        ptr++;
-      }
-  }
-
   /*
   * Unpack the Apple PackBytes format.
   *
@@ -216,7 +198,7 @@ public abstract class HiResImage extends AbstractFile
   {
     // routine found here - http://kpreid.livejournal.com/4319.html
 
-    byte[] newBuf = new byte[32768];
+    byte[] newBuf = new byte[32768];        // this might be wrong
     byte[] fourBuf = new byte[4];
 
     int ptr = 0, newPtr = 0;
@@ -256,6 +238,58 @@ public abstract class HiResImage extends AbstractFile
     }
 
     return newBuf;
+  }
+
+  // Super Hi-res IIGS
+  protected int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
+  {
+    byte[] fourBuf = new byte[4];
+
+    int ptr = 0;
+    while (ptr < buffer.length)
+    {
+      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
+
+      if (ptr >= buffer.length)
+        break;
+
+      switch (type)
+      {
+        case 0:
+          while (count-- != 0)
+            if (newPtr < unpackedBuffer.length && ptr < buffer.length)
+              newBuf[newPtr++] = buffer[ptr++];
+          break;
+
+        case 1:
+          byte b = buffer[ptr++];
+          while (count-- != 0)
+            if (newPtr < unpackedBuffer.length)
+              newBuf[newPtr++] = b;
+          break;
+
+        case 2:
+          for (int i = 0; i < 4; i++)
+            if (ptr < buffer.length)
+              fourBuf[i] = buffer[ptr++];
+          while (count-- != 0)
+            for (int i = 0; i < 4; i++)
+              if (newPtr < unpackedBuffer.length)
+                newBuf[newPtr++] = fourBuf[i];
+          break;
+
+        case 3:
+          b = buffer[ptr++];
+          count *= 4;
+          while (count-- != 0)
+            if (newPtr < unpackedBuffer.length)
+              newBuf[newPtr++] = b;
+          break;
+      }
+    }
+
+    return newPtr;
   }
 
   // Beagle Bros routine to expand a hi-res screen
@@ -336,5 +370,115 @@ public abstract class HiResImage extends AbstractFile
   public static List<Palette> getPalettes ()
   {
     return paletteFactory.getPalettes ();
+  }
+
+  class ColorTable
+  {
+    int id;
+    ColorEntry[] entries = new ColorEntry[16];
+
+    public ColorTable ()
+    {
+      // default empty table
+      id = -1;
+      for (int i = 0; i < 16; i++)
+      {
+        entries[i] = new ColorEntry ();
+      }
+    }
+
+    public ColorTable (int id, byte[] data, int offset)
+    {
+      this.id = id;
+      for (int i = 0; i < 16; i++)
+      {
+        entries[i] = new ColorEntry (data, offset);
+        offset += 2;
+      }
+    }
+
+    String toLine ()
+    {
+
+      StringBuilder text = new StringBuilder ();
+
+      text.append (String.format (" %X", id));
+      for (int i = 0; i < 16; i++)
+        text.append (String.format ("  %04X", entries[i].value));
+
+      return text.toString ();
+    }
+
+    void reverse ()
+    {
+      for (int i = 0; i < 8; i++)
+      {
+        ColorEntry temp = entries[i];
+        entries[i] = entries[15 - i];
+        entries[15 - i] = temp;
+      }
+    }
+
+    @Override
+    public String toString ()
+    {
+      StringBuilder text = new StringBuilder ();
+
+      text.append (String.format ("%2d ColorTable%n", id));
+      for (int i = 0; i < 8; i++)
+        text.append (String.format ("  %2d: %04X", i, entries[i].value));
+      text.append ("\n");
+      for (int i = 8; i < 16; i++)
+        text.append (String.format ("  %2d: %04X", i, entries[i].value));
+
+      return text.toString ();
+    }
+  }
+
+  class ColorEntry
+  {
+    int value;          // 0RGB
+    Color color;
+
+    public ColorEntry ()
+    {
+      // default empty entry
+      value = 0;
+      color = new Color (0, 0, 0);
+    }
+
+    public ColorEntry (byte[] data, int offset)
+    {
+      value = HexFormatter.unsignedShort (data, offset);
+
+      int red = ((value >> 8) & 0x0f) * 17;
+      int green = ((value >> 4) & 0x0f) * 17;
+      int blue = (value & 0x0f) * 17;
+      color = new Color (red, green, blue);
+    }
+
+    @Override
+    public String toString ()
+    {
+      return String.format ("ColorEntry: %04X", value);
+    }
+  }
+
+  class DirEntry
+  {
+    int numBytes;
+    int mode;
+
+    public DirEntry (byte[] data, int offset)
+    {
+      numBytes = HexFormatter.unsignedShort (data, offset);
+      mode = HexFormatter.unsignedShort (data, offset + 2);
+    }
+
+    @Override
+    public String toString ()
+    {
+      return String.format ("Bytes: %5d, mode: %02X", numBytes, mode);
+    }
   }
 }

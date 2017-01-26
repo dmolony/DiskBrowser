@@ -352,7 +352,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new IconFile (name, exactBuffer);
           break;
         case FILE_TYPE_PNT:
-          if (auxType == 1)
+          if (auxType == 0)
+            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
+          else if (auxType == 1)
             file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           else if (auxType == 2)
             file = new SHRPictureFile (name, exactBuffer, fileType, auxType, endOfFile);
@@ -361,13 +363,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
                 new OriginalHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           break;
         case FILE_TYPE_PIC:
-          if (auxType == 1)
-            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
-          else if (auxType == 2)
-            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
-          else
-            file =
-                new OriginalHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
+          //          if (auxType == 1)
+          file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
+          //          else if (auxType == 2)
+          //            file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
+          //          else
+          //            file =
+          //                new OriginalHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           break;
         case FILE_TYPE_FONT:
           file = new QuickDrawFont (name, exactBuffer, fileType, auxType);

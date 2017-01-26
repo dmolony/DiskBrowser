@@ -17,8 +17,7 @@ public class NextPaletteAction extends AbstractAction
   {
     super ("Next Palette");
     putValue (Action.SHORT_DESCRIPTION, "Select next color palette");
-    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt N"));
-    //    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_N);
+    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("meta alt N"));
     this.owner = owner;
     this.buttonGroup = buttonGroup;
   }
@@ -27,7 +26,6 @@ public class NextPaletteAction extends AbstractAction
   public void actionPerformed (ActionEvent e)
   {
     Palette palette = owner.cyclePalette (CycleDirection.FORWARDS);
-    //    owner.selectPalette (palette);
 
     if (palette != null)
     {

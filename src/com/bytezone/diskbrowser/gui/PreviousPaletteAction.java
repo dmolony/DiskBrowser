@@ -17,8 +17,7 @@ public class PreviousPaletteAction extends AbstractAction
   {
     super ("Previous Palette");
     putValue (Action.SHORT_DESCRIPTION, "Select previous color palette");
-    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt P"));
-    //    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_P);
+    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("meta alt P"));
     this.owner = owner;
     this.buttonGroup = buttonGroup;
   }
@@ -27,7 +26,6 @@ public class PreviousPaletteAction extends AbstractAction
   public void actionPerformed (ActionEvent e)
   {
     Palette palette = owner.cyclePalette (CycleDirection.BACKWARDS);
-    //    owner.selectPalette (palette);
 
     if (palette != null)
     {

@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.applefile;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
@@ -48,7 +47,24 @@ public class SHRPictureFile extends HiResImage
   @Override
   protected void createMonochromeImage ()
   {
-    makeScreen (unpackedBuffer);
+    //    makeScreen (unpackedBuffer);
+    image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
+    DataBuffer db = image.getRaster ().getDataBuffer ();
+
+    int element = 0;
+    int ptr = 0;
+    for (int row = 0; row < 200; row++)
+      for (int col = 0; col < 160; col++)
+      {
+        int pix1 = (unpackedBuffer[ptr] & 0xF0) >> 4;
+        int pix2 = unpackedBuffer[ptr] & 0x0F;
+        if (pix1 > 0)
+          db.setElem (element, 255);
+        if (pix2 > 0)
+          db.setElem (element + 1, 255);
+        element += 2;
+        ptr++;
+      }
   }
 
   @Override
@@ -220,58 +236,6 @@ public class SHRPictureFile extends HiResImage
       }
     }
 
-    // Super Hi-res IIGS
-    protected int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
-    {
-      byte[] fourBuf = new byte[4];
-
-      int ptr = 0;
-      while (ptr < buffer.length)
-      {
-        int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
-        int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
-
-        if (ptr >= buffer.length)
-          break;
-
-        switch (type)
-        {
-          case 0:
-            while (count-- != 0)
-              if (newPtr < unpackedBuffer.length && ptr < buffer.length)
-                newBuf[newPtr++] = buffer[ptr++];
-            break;
-
-          case 1:
-            byte b = buffer[ptr++];
-            while (count-- != 0)
-              if (newPtr < unpackedBuffer.length)
-                newBuf[newPtr++] = b;
-            break;
-
-          case 2:
-            for (int i = 0; i < 4; i++)
-              if (ptr < buffer.length)
-                fourBuf[i] = buffer[ptr++];
-            while (count-- != 0)
-              for (int i = 0; i < 4; i++)
-                if (newPtr < unpackedBuffer.length)
-                  newBuf[newPtr++] = fourBuf[i];
-            break;
-
-          case 3:
-            b = buffer[ptr++];
-            count *= 4;
-            while (count-- != 0)
-              if (newPtr < unpackedBuffer.length)
-                newBuf[newPtr++] = b;
-            break;
-        }
-      }
-
-      return newPtr;
-    }
-
     private boolean isEmpty (byte[] buffer)
     {
       for (byte b : buffer)
@@ -338,106 +302,6 @@ public class SHRPictureFile extends HiResImage
       }
 
       return text.toString ();
-    }
-  }
-
-  class ColorTable
-  {
-    int id;
-    ColorEntry[] entries = new ColorEntry[16];
-
-    public ColorTable ()
-    {
-      // default empty table
-      id = -1;
-      for (int i = 0; i < 16; i++)
-      {
-        entries[i] = new ColorEntry ();
-      }
-    }
-
-    public ColorTable (int id, byte[] data, int offset)
-    {
-      this.id = id;
-      for (int i = 0; i < 16; i++)
-      {
-        entries[i] = new ColorEntry (data, offset);
-        offset += 2;
-      }
-    }
-
-    String toLine ()
-    {
-
-      StringBuilder text = new StringBuilder ();
-
-      text.append (String.format (" %X", id));
-      for (int i = 0; i < 16; i++)
-        text.append (String.format ("  %04X", entries[i].value));
-
-      return text.toString ();
-    }
-
-    @Override
-    public String toString ()
-    {
-      StringBuilder text = new StringBuilder ();
-
-      text.append (String.format ("%2d ColorTable%n", id));
-      for (int i = 0; i < 8; i++)
-        text.append (String.format ("  %2d: %04X", i, entries[i].value));
-      text.append ("\n");
-      for (int i = 8; i < 16; i++)
-        text.append (String.format ("  %2d: %04X", i, entries[i].value));
-
-      return text.toString ();
-    }
-  }
-
-  class ColorEntry
-  {
-    int value;          // 0RGB
-    Color color;
-
-    public ColorEntry ()
-    {
-      // default empty entry
-      value = 0;
-      color = new Color (0, 0, 0);
-    }
-
-    public ColorEntry (byte[] data, int offset)
-    {
-      value = HexFormatter.unsignedShort (data, offset);
-
-      int red = ((value >> 8) & 0x0f) * 17;
-      int green = ((value >> 4) & 0x0f) * 17;
-      int blue = (value & 0x0f) * 17;
-      color = new Color (red, green, blue);
-    }
-
-    @Override
-    public String toString ()
-    {
-      return String.format ("ColorEntry: %04X", value);
-    }
-  }
-
-  class DirEntry
-  {
-    int numBytes;
-    int mode;
-
-    public DirEntry (byte[] data, int offset)
-    {
-      numBytes = HexFormatter.unsignedShort (data, offset);
-      mode = HexFormatter.unsignedShort (data, offset + 2);
-    }
-
-    @Override
-    public String toString ()
-    {
-      return String.format ("Bytes: %5d, mode: %02X", numBytes, mode);
     }
   }
 }

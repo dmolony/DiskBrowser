@@ -14,7 +14,21 @@ public class SHRPictureFile2 extends HiResImage
   {
     super (name, buffer, fileType, auxType, eof);
 
-    if (fileType == ProdosConstants.FILE_TYPE_PIC)          // 0xC1
+    if (fileType == ProdosConstants.FILE_TYPE_PNT)                // 0xC0
+    {
+      if (auxType == 0)
+      {
+        System.out.println ("0xC0 aux 0 not written");
+      }
+      else if (auxType == 1)          // Eagle/PackBytes
+      {
+        // this unpacks directly to the screen locations
+        System.out.println ("0xC0 aux 1 not written");
+      }
+      else
+        System.out.println ("unknown aux " + auxType);
+    }
+    else if (fileType == ProdosConstants.FILE_TYPE_PIC)           // 0xC1
     {
       if (auxType == 0)
       {
@@ -37,19 +51,6 @@ public class SHRPictureFile2 extends HiResImage
           colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
           colorTables[i].reverse ();
         }
-      }
-      else
-        System.out.println ("unknown aux " + auxType);
-    }
-    else if (fileType == ProdosConstants.FILE_TYPE_PNT)     // 0xC0
-    {
-      if (auxType == 0)
-      {
-        System.out.println ("0xC0 aux 0 not written");
-      }
-      else if (auxType == 1)
-      {
-        System.out.println ("0xC0 aux 1 not written");
       }
       else
         System.out.println ("unknown aux " + auxType);
@@ -98,8 +99,16 @@ public class SHRPictureFile2 extends HiResImage
     text.append ("\n\n");
 
     if (scb != null)
-      for (int i = 0; i < scb.length; i++)
-        text.append (String.format ("%3d  %02X%n", i, scb[i]));
+    {
+      text.append ("SCB\n---\n");
+      for (int i = 0; i < scb.length; i += 8)
+      {
+        for (int j = 0; j < 8; j++)
+          text.append (String.format ("  %3d:  %02X  ", i + j, scb[i + j]));
+        text.append ("\n");
+      }
+      text.append ("\n");
+    }
 
     for (ColorTable colorTable : colorTables)
     {

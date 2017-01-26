@@ -9,10 +9,11 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class SHRPictureFile extends HiResImage
 {
-  List<Block> blocks = new ArrayList<Block> ();
-  Main mainBlock;
-  Multipal multipalBlock;
+  private final List<Block> blocks = new ArrayList<Block> ();
+  private Main mainBlock;
+  private Multipal multipalBlock;
 
+  // 0xC0 aux = 2
   public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
     super (name, buffer, fileType, auxType, eof);
@@ -21,9 +22,9 @@ public class SHRPictureFile extends HiResImage
     while (ptr < buffer.length)
     {
       int len = HexFormatter.unsignedLong (buffer, ptr);
-      int nameLen = buffer[ptr + 4] & 0xFF;
+      //      int nameLen = buffer[ptr + 4] & 0xFF;
       String kind = HexFormatter.getPascalString (buffer, ptr + 4);
-      byte[] data = new byte[Math.min (len - (nameLen + 5), buffer.length - ptr)];
+      byte[] data = new byte[Math.min (len, buffer.length - ptr)];
       System.arraycopy (buffer, ptr, data, 0, data.length);
 
       if ("MAIN".equals (kind))
@@ -37,7 +38,10 @@ public class SHRPictureFile extends HiResImage
         blocks.add (multipalBlock);
       }
       else
+      {
         blocks.add (new Block (kind, data));
+        System.out.println ("Unknown block type: " + kind + " in " + name);
+      }
 
       ptr += len;
     }
@@ -47,7 +51,6 @@ public class SHRPictureFile extends HiResImage
   @Override
   protected void createMonochromeImage ()
   {
-    //    makeScreen (unpackedBuffer);
     image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
     DataBuffer db = image.getRaster ().getDataBuffer ();
 
@@ -83,8 +86,8 @@ public class SHRPictureFile extends HiResImage
 
       ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[row]
           : mainBlock.colorTables[lo & 0x0F];
-      boolean fillMode = (lo & 0x20) != 0;
 
+      boolean fillMode = (lo & 0x20) != 0;
       if (fillMode)
         System.out.println ("fillmode " + fillMode);
 
@@ -121,7 +124,7 @@ public class SHRPictureFile extends HiResImage
     return text.toString ();
   }
 
-  class Block
+  private class Block
   {
     String kind;
     byte[] data;
@@ -144,7 +147,7 @@ public class SHRPictureFile extends HiResImage
     }
   }
 
-  class Multipal extends Block
+  private class Multipal extends Block
   {
     int numPalettes;
     ColorTable[] colorTables;
@@ -169,7 +172,7 @@ public class SHRPictureFile extends HiResImage
     }
   }
 
-  class Main extends Block
+  private class Main extends Block
   {
     int masterMode;
     int pixelsPerScanLine;

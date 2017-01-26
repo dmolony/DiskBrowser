@@ -22,6 +22,8 @@ public class SHRPictureFile extends HiResImage
     while (ptr < buffer.length)
     {
       int len = HexFormatter.unsignedLong (buffer, ptr);
+      if (len == 0)
+        break;
       //      int nameLen = buffer[ptr + 4] & 0xFF;
       String kind = HexFormatter.getPascalString (buffer, ptr + 4);
       byte[] data = new byte[Math.min (len, buffer.length - ptr)];

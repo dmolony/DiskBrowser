@@ -172,6 +172,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     parentDisk.setSectorType (keyBlock, parentDisk.indexSector);
     indexBlocks.add (disk.getDiskAddress (keyBlock));
     byte[] buffer = disk.readSector (keyBlock);
+
+    int maxBlocks = (endOfFile - 1) / 512 + 1;
+
     for (int i = 0; i < 256; i++)
     {
       int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
@@ -181,12 +184,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         invalid = true;
         break;
       }
-      // System.out.printf ("%4d  %02X  %02X%n", block, fileType, auxType);
-      // should we break if block == 0 and it's not a text file?
-      // if (block == 0 && !(fileType == ProdosConstants.FILE_TYPE_TEXT && auxType > 0))
-      // if (block == 0 && fileType != 4)
-      // break;
-      if (block != 0)
+
+      if (dataBlocks.size () == maxBlocks)
+        break;
+
+      if (block == 0)
+        dataBlocks.add (null);        // allow for sparse image files
+      else
       {
         parentDisk.setSectorType (block, parentDisk.dataSector);
         dataBlocks.add (disk.getDiskAddress (block));
@@ -232,11 +236,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     if (file != null)
       return file;
+
     if (invalid)
     {
       file = new DefaultAppleFile (name, null);
       return file;
     }
+
     /*
      * Text files with reclen > 0 are random access, possibly with gaps between
      * records, so they need to be handled separately.
@@ -432,6 +438,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
     if (buffers.size () == 1 && name.endsWith (".S"))
       return new MerlinSource (name, buffers.get (0).buffer, auxType, endOfFile);
+
     return new TextFile (name, buffers, auxType, endOfFile);
   }
 
@@ -440,8 +447,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     List<TextBuffer> buffers = new ArrayList<TextBuffer> ();
     List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
     readIndexBlock (keyPtr, addresses, buffers, 0);
+
     if (buffers.size () == 1 && name.endsWith (".S"))
       return new MerlinSource (name, buffers.get (0).buffer, auxType, endOfFile);
+
     return new TextFile (name, buffers, auxType, endOfFile);
   }
 
@@ -454,8 +463,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       System.arraycopy (buffer, 0, exactBuffer, 0, endOfFile);
       buffer = exactBuffer;
     }
+
     if (name.endsWith (".S"))
       return new MerlinSource (name, buffer, auxType, endOfFile);
+
     return new TextFile (name, buffer, auxType, endOfFile);
   }
 

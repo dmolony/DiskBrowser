@@ -24,13 +24,13 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 public class MenuHandler
     implements DiskSelectionListener, FileSelectionListener, QuitListener
 {
-  private static final String PREFS_LINE_WRAP = "line wrap";
+  static final String PREFS_LINE_WRAP = "line wrap";
   private static final String PREFS_SHOW_CATALOG = "show catalog";
   private static final String PREFS_SHOW_LAYOUT = "show layout";
   private static final String PREFS_SHOW_FREE_SECTORS = "show free sectors";
   private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
   private static final String PREFS_MONOCHROME = "monochrome";
-  private static final String PREFS_DEBUGGING = "debugging";
+  //  private static final String PREFS_DEBUGGING = "debugging";
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;

@@ -54,7 +54,7 @@ class DataPanel extends JTabbedPane
 
     formattedText = new JTextArea (10, TEXT_WIDTH);
     formattedPane = setPanel (formattedText, "Formatted");
-    formattedText.setLineWrap (menuHandler.lineWrapItem.isSelected ());
+    formattedText.setLineWrap (prefs.getBoolean (MenuHandler.PREFS_LINE_WRAP, true));
     formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"

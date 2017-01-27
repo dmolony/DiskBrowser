@@ -26,10 +26,16 @@ public class SHRPictureFile2 extends HiResImage
         System.out.println ("0xC0 aux 1 not written");
       }
       else
-        System.out.println ("unknown aux " + auxType);
+        System.out.println ("C0 unknown aux " + auxType);
     }
     else if (fileType == ProdosConstants.FILE_TYPE_PIC)           // 0xC1
     {
+      if (auxType > 2)
+      {
+        System.out.printf ("Changing aux from %04X to 0 in %s%n", auxType, name);
+        auxType = 0;
+      }
+
       if (auxType == 0)
       {
         scb = new byte[200];
@@ -53,12 +59,13 @@ public class SHRPictureFile2 extends HiResImage
         }
       }
       else
-        System.out.println ("unknown aux " + auxType);
+        System.out.println ("C1 unknown aux " + auxType);
     }
     else
       System.out.println ("unknown filetype " + fileType);
 
-    createImage ();
+    if (colorTables != null)
+      createImage ();
   }
 
   @Override
@@ -110,11 +117,12 @@ public class SHRPictureFile2 extends HiResImage
       text.append ("\n");
     }
 
-    for (ColorTable colorTable : colorTables)
-    {
-      text.append (colorTable);
-      text.append ("\n\n");
-    }
+    if (colorTables != null)
+      for (ColorTable colorTable : colorTables)
+      {
+        text.append (colorTable);
+        text.append ("\n\n");
+      }
 
     text.deleteCharAt (text.length () - 1);
     text.deleteCharAt (text.length () - 1);

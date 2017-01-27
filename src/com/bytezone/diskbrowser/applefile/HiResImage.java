@@ -143,6 +143,8 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Packed Hi-Res File";
         else if (auxType == 0x4001)
           auxText = "Packed Double Hi-Res File";
+        else
+          auxText = "Unknown aux: " + auxType;
         break;
 
       case ProdosConstants.FILE_TYPE_PNT:           // 0xC0
@@ -154,6 +156,8 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Super Hi-Res Image (Apple Preferred)";
         else if (auxType == 3)
           auxText = "Packed QuickDraw II PICT File";
+        else
+          auxText = "Unknown aux: " + auxType;
         break;
 
       case ProdosConstants.FILE_TYPE_PIC:           // 0xC1
@@ -163,6 +167,8 @@ public abstract class HiResImage extends AbstractFile
           auxText = "QuickDraw PICT File";
         else if (auxType == 2)
           auxText = "Super Hi-Res 3200 color image";
+        else
+          auxText = "Unknown aux: " + auxType;
     }
 
     if (!auxText.isEmpty ())
@@ -454,6 +460,7 @@ public abstract class HiResImage extends AbstractFile
       int red = ((value >> 8) & 0x0f) * 17;
       int green = ((value >> 4) & 0x0f) * 17;
       int blue = (value & 0x0f) * 17;
+
       color = new Color (red, green, blue);
     }
 

@@ -137,7 +137,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private void traverseMasterIndex (int keyPtr)
   {
-    byte[] buffer = disk.readSector (keyPtr); // master index
+    byte[] buffer = disk.readSector (keyPtr);               // master index
     // find the last used index block
     // get the file size from the catalog and only check those blocks
     int highestBlock = 0;
@@ -189,7 +189,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
 
       if (block == 0)
-        dataBlocks.add (null);        // allow for sparse image files
+        dataBlocks.add (null);                    // allow for sparse image files
       else
       {
         parentDisk.setSectorType (block, parentDisk.dataSector);
@@ -200,8 +200,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private void traverseGEOSMasterIndex (int keyPtr)
   {
-    byte[] buffer = disk.readSector (keyPtr); // master index
-    // int length = HexFormatter.intValue (buffer[0xFF], buffer[0x1FF]);
+    byte[] buffer = disk.readSector (keyPtr);               // master index
     for (int i = 0; i < 0x80; i++)
     {
       int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
@@ -218,7 +217,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     parentDisk.setSectorType (keyPtr, parentDisk.indexSector);
     indexBlocks.add (disk.getDiskAddress (keyPtr));
     byte[] buffer = disk.readSector (keyPtr);
-    // int length = HexFormatter.intValue (buffer[0xFF], buffer[0x1FF]);
+
     for (int i = 0; i < 0x80; i++)
     {
       int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
@@ -589,13 +588,15 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   @Override
   public boolean contains (DiskAddress da)
   {
+    if (da == null)
+      return false;
     if (da.equals (masterIndexBlock))
       return true;
     for (DiskAddress block : indexBlocks)
-      if (block.matches (da))
+      if (da.matches (block))
         return true;
     for (DiskAddress block : dataBlocks)
-      if (block.matches (da))
+      if (da.matches (block))
         return true;
     return false;
   }

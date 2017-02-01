@@ -359,13 +359,33 @@ public abstract class HiResImage extends AbstractFile
     return true;
   }
 
+  // http://www.daubnet.com/en/file-format-bmp
   public static boolean isBmp (byte[] buffer)
   {
-    if (buffer.length < 2)
+    if (buffer.length < 26)
       return false;
 
     String text = new String (buffer, 0, 2);
-    return text.equals ("BM");
+    int size = HexFormatter.unsignedLong (buffer, 2);
+
+    if (false)
+    {
+      int empty = HexFormatter.unsignedLong (buffer, 6);
+      int offset = HexFormatter.unsignedLong (buffer, 10);
+      int header = HexFormatter.unsignedLong (buffer, 14);
+      int width = HexFormatter.unsignedLong (buffer, 18);
+      int height = HexFormatter.unsignedLong (buffer, 22);
+
+      System.out.println (buffer.length);
+      System.out.println (size);
+      System.out.println (empty);
+      System.out.println (offset);
+      System.out.println (header);
+      System.out.println (width);
+      System.out.println (height);
+    }
+
+    return text.equals ("BM") && size <= buffer.length;
   }
 
   public static PaletteFactory getPaletteFactory ()
@@ -408,7 +428,7 @@ public abstract class HiResImage extends AbstractFile
 
       StringBuilder text = new StringBuilder ();
 
-      text.append (String.format (" %X", id));
+      text.append (String.format ("%02X", id));
       for (int i = 0; i < 16; i++)
         text.append (String.format ("  %04X", entries[i].value));
 

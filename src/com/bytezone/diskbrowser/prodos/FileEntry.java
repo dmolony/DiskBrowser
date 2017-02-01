@@ -242,22 +242,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       return file;
     }
 
-    /*
-     * Text files with reclen > 0 are random access, possibly with gaps between
-     * records, so they need to be handled separately.
-     */
-    if (fileType == FILE_TYPE_TEXT && auxType > 0)
-    {
-      switch (storageType)
-      {
-        case TYPE_TREE:
-          return getTreeTextFile ();
-        case TYPE_SAPLING:
-          return getSaplingTextFile ();
-        case TYPE_SEEDLING:
-          return getSeedlingTextFile ();
-      }
-    }
+    if (fileType == FILE_TYPE_TEXT && auxType > 0)      // random access file
+      return getRandomAccessTextFile ();
 
     byte[] buffer = isGEOSFile () ? getGEOSBuffer () : getBuffer ();
     byte[] exactBuffer = getExactBuffer (buffer);
@@ -410,6 +396,25 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return exactBuffer;
   }
 
+  private DataSource getRandomAccessTextFile ()
+  {
+    // Text files with aux (reclen) > 0 are random access, possibly with 
+    // non-contiguous records, so they need to be handled differently
+
+    switch (storageType)
+    {
+      case TYPE_TREE:
+        return getTreeTextFile ();
+      case TYPE_SAPLING:
+        return getSaplingTextFile ();
+      case TYPE_SEEDLING:
+        return getSeedlingTextFile ();
+      default:
+        System.out.println ("Impossible: text file: " + storageType);
+        return null;
+    }
+  }
+
   private DataSource getTreeTextFile ()
   {
     List<TextBuffer> buffers = new ArrayList<TextBuffer> ();
@@ -477,11 +482,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       case TYPE_SAPLING:
       case TYPE_TREE:
         return disk.readSectors (dataBlocks);
-      case TYPE_GSOS_EXTENDED_FILE:
-        // this will return the data fork and the resource fork concatenated
-        return disk.readSectors (dataBlocks);
+
       case TYPE_SUBDIRECTORY:
-        byte[] fullBuffer = new byte[dataBlocks.size () * BLOCK_ENTRY_SIZE]; // 39 * 13 = 507
+        byte[] fullBuffer = new byte[dataBlocks.size () * BLOCK_ENTRY_SIZE];
         int offset = 0;
         for (DiskAddress da : dataBlocks)
         {
@@ -490,6 +493,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           offset += BLOCK_ENTRY_SIZE;
         }
         return fullBuffer;
+
+      case TYPE_GSOS_EXTENDED_FILE:
+        return disk.readSectors (dataBlocks);   // data and resource forks concatenated
+
       default:
         System.out.println ("Unknown storage type in getBuffer : " + storageType);
         return new byte[512];
@@ -501,7 +508,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     switch (storageType)
     {
       case TYPE_SEEDLING:
-        System.out.println ("Seedling GEOS file : " + name); // not sure if this is possible
+        System.out.println ("Seedling GEOS file : " + name); // not sure if possible
         return disk.readSectors (dataBlocks);
       case TYPE_SAPLING:
         return getIndexFile (keyPtr);

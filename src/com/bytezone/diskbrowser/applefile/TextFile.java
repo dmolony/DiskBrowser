@@ -6,28 +6,31 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class TextFile extends AbstractFile
 {
-  private int recordLength;
-  private List<TextBuffer> buffers; // only used if it is a Prodos text file
+  private int recordLength;               // prodos aux
+  private List<TextBuffer> buffers;       // only used if it is a Prodos text file
   private int eof;
+  private boolean prodosFile;
 
   public TextFile (String name, byte[] buffer)
   {
     super (name, buffer);
   }
 
-  public TextFile (String name, byte[] buffer, int recordLength, int eof)
+  public TextFile (String name, byte[] buffer, int auxType, int eof)
   {
     this (name, buffer);
     this.eof = eof;
-    this.recordLength = recordLength;
+    recordLength = auxType;
+    prodosFile = true;
   }
 
-  public TextFile (String name, List<TextBuffer> buffers, int recordLength, int eof)
+  public TextFile (String name, List<TextBuffer> buffers, int auxType, int eof)
   {
     super (name, null);
     this.buffers = buffers;
     this.eof = eof;
-    this.recordLength = recordLength;
+    recordLength = auxType;
+    prodosFile = true;
   }
 
   @Override
@@ -54,7 +57,7 @@ public class TextFile extends AbstractFile
     StringBuilder text = new StringBuilder ();
 
     text.append ("Name          : " + name + "\n");
-    if (recordLength > 0) // a prodos text file
+    if (prodosFile)
     {
       text.append (String.format ("Record length : %,8d%n", recordLength));
       text.append (String.format ("End of file   : %,8d%n", eof));
@@ -72,7 +75,8 @@ public class TextFile extends AbstractFile
       return unknownLength (text);
 
     text.append ("Offset   Record  Text values\n");
-    text.append ("------  -------  -------------------------------------------------------\n");
+    text.append (
+        "------  -------  -------------------------------------------------------\n");
     return knownLength (text, 0).toString ();
   }
 
@@ -102,7 +106,7 @@ public class TextFile extends AbstractFile
         bytes--;
 
       text.append (String.format ("%,6d %,8d  %s%n", ptr, recNo++,
-                                  HexFormatter.getString (buffer, ptr, bytes)));
+          HexFormatter.getString (buffer, ptr, bytes)));
     }
     return text;
   }
@@ -119,7 +123,7 @@ public class TextFile extends AbstractFile
     {
       text.append ("Offset   Text values\n");
       text.append ("------  -------------------------------------------------------"
-            + "-------------------\n");
+          + "-------------------\n");
       if (size == 0)
         return text.toString ();
 

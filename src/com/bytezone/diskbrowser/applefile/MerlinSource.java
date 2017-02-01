@@ -7,6 +7,7 @@ public class MerlinSource extends AbstractFile
   private static int TAB_POS = tabs[2];
   private final int recordLength;
   private final int eof;
+  private boolean prodosFile;
 
   // Source : Prodos text file
   public MerlinSource (String name, byte[] buffer, int recordLength, int eof)
@@ -14,6 +15,7 @@ public class MerlinSource extends AbstractFile
     super (name, buffer);
     this.eof = eof;
     this.recordLength = recordLength;
+    prodosFile = true;
   }
 
   // Source : Dos binary file
@@ -29,14 +31,14 @@ public class MerlinSource extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Name          : " + name + "\n");
-    if (recordLength > 0)                             // a prodos text file
+    text.append ("Merlin source : " + name + "\n");
+    if (prodosFile)
     {
       text.append (String.format ("Record length : %,8d%n", recordLength));
-      text.append (String.format ("End of file   : %,8d%n", eof));
+      text.append (String.format ("EOF (aux)     : %,8d%n", eof));
     }
     else
-      text.append (String.format ("End of file   : %,8d%n", buffer.length));
+      text.append (String.format ("Buffer size   : %,8d%n", buffer.length));
     text.append ("\n");
 
     ptr = 0;

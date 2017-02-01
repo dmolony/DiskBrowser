@@ -4,11 +4,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class SHRPictureFile2 extends HiResImage
 {
   ColorTable[] colorTables;
-  byte[] scb;
+  byte[] scb;                     // 0xC1 aux=0
 
   public SHRPictureFile2 (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
@@ -36,7 +37,7 @@ public class SHRPictureFile2 extends HiResImage
         auxType = 0;
       }
 
-      if (auxType == 0)
+      if (auxType == 0)               // 32,768
       {
         scb = new byte[200];
         System.arraycopy (buffer, 32000, scb, 0, scb.length);
@@ -49,7 +50,7 @@ public class SHRPictureFile2 extends HiResImage
       {
         System.out.println ("0xC1 aux 1 not written");
       }
-      else if (auxType == 2)          // Brooks
+      else if (auxType == 2)          // Brooks 38,400
       {
         colorTables = new ColorTable[200];
         for (int i = 0; i < colorTables.length; i++)
@@ -118,11 +119,27 @@ public class SHRPictureFile2 extends HiResImage
     }
 
     if (colorTables != null)
+    {
+      text.append ("Color Table\n\n #");
+      for (int i = 0; i < 16; i++)
+        text.append (String.format ("   %02X ", i));
+      text.append ("\n--");
+      for (int i = 0; i < 16; i++)
+        text.append ("  ----");
+      text.append ("\n");
       for (ColorTable colorTable : colorTables)
       {
-        text.append (colorTable);
-        text.append ("\n\n");
+        text.append (colorTable.toLine ());
+        text.append ("\n");
       }
+    }
+
+    text.append ("\nScreen lines\n\n");
+    for (int i = 0; i < 200; i++)
+    {
+      text.append (HexFormatter.format (buffer, i * 160, 160));
+      text.append ("\n\n");
+    }
 
     text.deleteCharAt (text.length () - 1);
     text.deleteCharAt (text.length () - 1);

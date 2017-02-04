@@ -16,6 +16,7 @@ import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
+import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
@@ -189,7 +190,9 @@ class DataPanel extends JTabbedPane
       VisicalcFile.setDebug (value);
       setText (formattedText, visicalcFile.getText ());
     }
-    else if (currentDataSource instanceof HiResImage)
+    // should implement an interface for this
+    else if (currentDataSource instanceof HiResImage
+        || currentDataSource instanceof QuickDrawFont)
     {
       setDataSource (currentDataSource);      // toggles text/image
     }

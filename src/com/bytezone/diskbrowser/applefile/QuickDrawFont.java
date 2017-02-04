@@ -41,17 +41,14 @@ public class QuickDrawFont extends AbstractFile
   private final int rowWords;
 
   private final int totalCharacters;
-  private final String[] imageLines;
-
-  private final byte[] locationTable;
-  private final byte[] offsetWidthTable;
 
   private final int fontDefinitionOffset;
   private final int bitImageOffset;
   private final int locationTableOffset;
   private final int offsetWidthTableOffset;
+  private int offsetWidthTableSize;
 
-  private final BitSet[] strike;
+  private final BitSet[] strike;        // bit image of all characters
 
   public QuickDrawFont (String name, byte[] buffer, int fileType, int auxType)
   {
@@ -86,7 +83,6 @@ public class QuickDrawFont extends AbstractFile
     nDescent = HexFormatter.signedShort (buffer, ptr + 10);
     fRectWidth = HexFormatter.unsignedShort (buffer, ptr + 12);
     fRectHeight = HexFormatter.unsignedShort (buffer, ptr + 14);
-    imageLines = new String[fRectHeight];
 
     owTLoc = HexFormatter.unsignedShort (buffer, ptr + 16);
 
@@ -99,21 +95,22 @@ public class QuickDrawFont extends AbstractFile
     leading = HexFormatter.unsignedShort (buffer, ptr + 22);
     rowWords = HexFormatter.unsignedShort (buffer, ptr + 24);
 
-    totalCharacters = lastChar - firstChar + 2;       // includes missing character
+    totalCharacters = lastChar - firstChar + 2;       // includes 'missing' character
 
-    strike = new BitSet[fRectHeight];
-    for (int i = 0; i < fRectHeight; i++)
-      strike[i] = new BitSet (rowWords * 16);
+    offsetWidthTableSize = (totalCharacters + 1) * 2;
 
-    locationTable = new byte[(totalCharacters + 1) * 2];
-    offsetWidthTable = new byte[(totalCharacters + 1) * 2];
-
-    if (offsetWidthTableOffset + offsetWidthTable.length > buffer.length)
+    if (offsetWidthTableOffset + offsetWidthTableSize > buffer.length)
     {
       System.out.println ("*********** Bad ow length");
+      strike = null;
       corrupt = true;
       return;
     }
+
+    // create bitset for each row
+    strike = new BitSet[fRectHeight];
+    for (int i = 0; i < fRectHeight; i++)
+      strike[i] = new BitSet (rowWords * 16);
 
     // convert image data to bitset
     int rowLenBits = rowWords * 16;                     // # bits in each row
@@ -121,23 +118,20 @@ public class QuickDrawFont extends AbstractFile
     for (int row = 0; row < fRectHeight; row++)         // for each row
       for (int j = 0; j < rowLenBits; j++)              // for each bit in the row
       {
-        int b = buffer[bitImageOffset + row * rowLenBytes + j / 8] & 0xFF;
+        byte b = buffer[bitImageOffset + row * rowLenBytes + j / 8];
         strike[row].set (j, ((b & (0x80 >>> (j % 8))) != 0));
       }
 
-    System.arraycopy (buffer, locationTableOffset, locationTable, 0,
-        locationTable.length);
-    System.arraycopy (buffer, offsetWidthTableOffset, offsetWidthTable, 0,
-        offsetWidthTable.length);
-
     for (int i = 0, max = totalCharacters + 1; i < max; i++)
     {
-      int location = HexFormatter.unsignedShort (locationTable, i * 2);
+      // index into the strike
+      int location = HexFormatter.unsignedShort (buffer, locationTableOffset + i * 2);
 
-      int j = i + 1;
+      int j = i + 1;      // next character
       if (j < max)
       {
-        int nextLocation = HexFormatter.unsignedShort (locationTable, j * 2);
+        int nextLocation =
+            HexFormatter.unsignedShort (buffer, locationTableOffset + j * 2);
         int pixelWidth = nextLocation - location;
         if (pixelWidth < 0)
         {
@@ -151,29 +145,32 @@ public class QuickDrawFont extends AbstractFile
       }
     }
 
-    int base = 10;
+    int inset = 10;
     int spacing = 5;
 
     int charsWide = (int) (Math.sqrt (totalCharacters) + .5);
     int charsHigh = (totalCharacters - 1) / charsWide + 1;
 
-    image = new BufferedImage (charsWide * (widMax + spacing) + base * 2,
-        charsHigh * (fRectHeight + spacing) + base * 2, BufferedImage.TYPE_BYTE_GRAY);
+    image = new BufferedImage (charsWide * (widMax + spacing) + inset * 2,
+        charsHigh * (fRectHeight + spacing) + inset * 2, BufferedImage.TYPE_BYTE_GRAY);
 
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
 
-    int x = base;
-    int y = base;
+    int x = inset;
+    int y = inset;
     int count = 0;
 
     for (int i = 0; i < totalCharacters + 1; i++)
     {
-      Character character;
-      if (characters.containsKey (i))
-        character = characters.get (i);
-      else
-        character = characters.get (lastChar + 1);
+      int pos = characters.containsKey (i) ? i : lastChar + 1;
+      Character character = characters.get (pos);
+
+      // how the character image to be drawn should be positioned with 
+      // respect to the current pen location
+      int offset = buffer[offsetWidthTableOffset + i * 2 + 1];
+      // how far the pen should be advanced after the character is drawn
+      int width = buffer[offsetWidthTableOffset + i * 2] & 0xFF;
 
       if (character != null)
         g2d.drawImage (character.image, x, y, null);
@@ -181,7 +178,7 @@ public class QuickDrawFont extends AbstractFile
       x += widMax + spacing;
       if (++count % charsWide == 0)
       {
-        x = base;
+        x = inset;
         y += fRectHeight + spacing;
       }
     }
@@ -199,6 +196,7 @@ public class QuickDrawFont extends AbstractFile
     text.append (String.format ("Aux type  : %04X  (%s)%n%n", auxType, auxTypeText));
     text.append (String.format ("Font name    : %s%n", fontName));
     text.append (String.format ("Font family  : %d%n", fontFamily));
+    text.append (String.format ("File type    : %d%n", fileType));
     text.append (String.format ("Font style   : %d%n", fontStyle));
     text.append (String.format ("Font size    : %d%n", fontSize));
     text.append (String.format ("Font version : %d.%d%n", versionMajor, versionMinor));
@@ -225,14 +223,15 @@ public class QuickDrawFont extends AbstractFile
 
     for (int i = 0; i < totalCharacters; i++)
     {
-      int offset = offsetWidthTable[i * 2] & 0xFF;
-      int width = offsetWidthTable[i * 2 + 1] & 0xFF;
+      int offset = buffer[offsetWidthTableOffset + i * 2 + 1] & 0xFF;
+      int width = buffer[offsetWidthTableOffset + i * 2] & 0xFF;
 
       if (offset == 255 && width == 255)
         continue;
 
-      int location = HexFormatter.unsignedShort (locationTable, i * 2);
-      int nextLocation = HexFormatter.unsignedShort (locationTable, (i + 1) * 2);
+      int location = HexFormatter.unsignedShort (buffer, locationTableOffset + i * 2);
+      int nextLocation =
+          HexFormatter.unsignedShort (buffer, locationTableOffset + (i + 1) * 2);
       int pixelWidth = nextLocation - location;
 
       text.append (String.format (
@@ -247,14 +246,14 @@ public class QuickDrawFont extends AbstractFile
   {
     private final BufferedImage image;
 
-    public Character (int offset, int width)
+    public Character (int strikeOffset, int strikeWidth)
     {
-      image = new BufferedImage (width, fRectHeight, BufferedImage.TYPE_BYTE_GRAY);
+      image = new BufferedImage (strikeWidth, fRectHeight, BufferedImage.TYPE_BYTE_GRAY);
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
       int element = 0;
       for (int row = 0; row < fRectHeight; row++)
-        for (int j = offset; j < offset + width; j++)
+        for (int j = strikeOffset; j < strikeOffset + strikeWidth; j++)
           dataBuffer.setElem (element++, strike[row].get (j) ? 255 : 0);
     }
   }

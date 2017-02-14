@@ -48,7 +48,7 @@ public class QuickDrawFont extends AbstractFile
   private final int offsetWidthTableOffset;
   private int offsetWidthTableSize;
 
-  private final BitSet[] strike;        // bit image of all characters
+  private BitSet[] strike;        // bit image of all characters
 
   public QuickDrawFont (String name, byte[] buffer, int fileType, int auxType)
   {
@@ -107,6 +107,14 @@ public class QuickDrawFont extends AbstractFile
       return;
     }
 
+    createStrike ();
+    createCharacters ();
+    if (!corrupt)
+      buildDisplay ();
+  }
+
+  private void createStrike ()
+  {
     // create bitset for each row
     strike = new BitSet[fRectHeight];
     for (int i = 0; i < fRectHeight; i++)
@@ -115,13 +123,17 @@ public class QuickDrawFont extends AbstractFile
     // convert image data to bitset
     int rowLenBits = rowWords * 16;                     // # bits in each row
     int rowLenBytes = rowWords * 2;                     // # bytes in each row
-    for (int row = 0; row < fRectHeight; row++)         // for each row
-      for (int j = 0; j < rowLenBits; j++)              // for each bit in the row
-      {
-        byte b = buffer[bitImageOffset + row * rowLenBytes + j / 8];
-        strike[row].set (j, ((b & (0x80 >>> (j % 8))) != 0));
-      }
 
+    for (int row = 0; row < fRectHeight; row++)         // for each row in character
+      for (int bit = 0; bit < rowLenBits; bit++)        // for each bit in the row
+      {
+        byte b = buffer[bitImageOffset + row * rowLenBytes + bit / 8];
+        strike[row].set (bit, ((b & (0x80 >>> (bit % 8))) != 0));
+      }
+  }
+
+  private void createCharacters ()
+  {
     for (int i = 0, max = totalCharacters + 1; i < max; i++)
     {
       // index into the strike
@@ -144,7 +156,10 @@ public class QuickDrawFont extends AbstractFile
           characters.put (i, new Character (location, pixelWidth));
       }
     }
+  }
 
+  private void buildDisplay ()
+  {
     int inset = 10;
     int spacing = 5;
 

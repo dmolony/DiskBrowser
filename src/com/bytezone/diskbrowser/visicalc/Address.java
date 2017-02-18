@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import java.util.Arrays;
+
 class Address implements Comparable<Address>
 {
   private static final int MAX_ROWS = 255;
@@ -57,7 +59,9 @@ class Address implements Comparable<Address>
     }
     catch (NumberFormatException e)
     {
+      System.out.printf ("sCol:%s,sRow:%s%n", sCol, sRow);
       System.out.printf ("NFE: %s%n", sRow);
+      System.out.println (Arrays.toString (Thread.currentThread ().getStackTrace ()));
     }
   }
 

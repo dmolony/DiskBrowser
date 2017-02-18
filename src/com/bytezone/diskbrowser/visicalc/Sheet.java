@@ -154,6 +154,8 @@ public class Sheet
       ptr += length + 1;            // +1 for end-of-line token
     }
 
+    // might have to keep recalculating until nothing changes??
+    calculate (recalculationOrder);
     calculate (recalculationOrder);
 
     if (false)
@@ -179,7 +181,6 @@ public class Sheet
   private void processLine (String line)
   {
     assert !line.isEmpty ();
-    //    System.out.println (line);
 
     if (line.startsWith ("/"))
     {

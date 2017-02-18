@@ -1,10 +1,13 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Count extends RangeFunction
+class Count extends Function
 {
+  private final Range range;
+
   public Count (Sheet parent, String text)
   {
     super (parent, text);
+    range = new Range (text);
   }
 
   @Override

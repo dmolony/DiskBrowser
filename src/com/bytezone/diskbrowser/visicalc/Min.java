@@ -1,10 +1,13 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Min extends RangeFunction
+class Min extends Function
 {
+  private final Range range;
+
   public Min (Sheet parent, String text)
   {
     super (parent, text);
+    range = new Range (text);
   }
 
   @Override

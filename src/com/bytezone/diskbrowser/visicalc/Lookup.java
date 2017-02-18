@@ -1,7 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Lookup extends RangeFunction
+class Lookup extends Function
 {
+  protected final Range range;
   String sourceText;
   String rangeText;
   Expression source;
@@ -13,6 +14,7 @@ class Lookup extends RangeFunction
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);
     rangeText = text.substring (pos + 1, text.length () - 1);
+    range = new Range (rangeText);
   }
 
   @Override
@@ -34,7 +36,7 @@ class Lookup extends RangeFunction
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.getValue () > sourceValue)
+      if (cell != null && cell.getValue () > sourceValue)     // past the value
         break;
       target = address;
     }
@@ -52,4 +54,7 @@ class Lookup extends RangeFunction
 
     return this;
   }
+
+  // @LOOKUP(B8,F3...F16)
+  // @LOOKUP(.2*K8+K7,F3...F16)
 }

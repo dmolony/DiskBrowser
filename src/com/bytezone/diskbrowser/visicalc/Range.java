@@ -4,18 +4,41 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Range implements Iterable<Address>
 {
+  private static final Pattern rangePattern =
+      Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})");
+  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
+
   Address from, to;
   List<Address> range = new ArrayList<Address> ();
+
+  public Range (String rangeText)
+  {
+    setRange (rangeText);
+  }
 
   public Range (Address from, Address to)
   {
     this.from = from;
     this.to = to;
 
+    addRange ();
+  }
+
+  public Range (String[] cells)
+  {
+    for (String s : cells)
+      range.add (new Address (s));
+  }
+
+  private void addRange ()
+  {
     range.add (from);
+    Address tempFrom = from;
 
     if (from.row == to.row)
       while (from.compareTo (to) < 0)
@@ -31,12 +54,7 @@ class Range implements Iterable<Address>
       }
     else
       throw new InvalidParameterException ();
-  }
-
-  public Range (String[] cells)
-  {
-    for (String s : cells)
-      range.add (new Address (s));
+    from = tempFrom;
   }
 
   boolean isHorizontal ()
@@ -54,6 +72,47 @@ class Range implements Iterable<Address>
   }
 
   @Override
+  public Iterator<Address> iterator ()
+  {
+    return range.iterator ();
+  }
+
+  private void setRange (String text)
+  {
+    Matcher m = rangePattern.matcher (text);
+    if (m.find ())
+    {
+      from = new Address (m.group (1), m.group (2));
+      to = new Address (m.group (3), m.group (4));
+      addRange ();
+      return;
+    }
+
+    m = addressList.matcher (text);
+    if (m.find ())
+    {
+      System.out.printf ("Address list:%s%n", text);
+      String[] cells = m.group (1).split (",");
+      for (String s : cells)
+        range.add (new Address (s));
+      return;
+    }
+
+    int pos = text.indexOf ("...");
+    if (pos > 0)
+    {
+      String fromAddress = text.substring (0, pos);
+      String toAddress = text.substring (pos + 3);
+      from = new Address (fromAddress);
+      to = new Address (toAddress);
+      addRange ();
+      return;
+    }
+
+    System.out.printf ("null range [%s]%n", text);
+  }
+
+  @Override
   public String toString ()
   {
     if (from == null || to == null)
@@ -66,11 +125,5 @@ class Range implements Iterable<Address>
       return text.toString ();
     }
     return String.format ("      %s -> %s", from.text, to.text);
-  }
-
-  @Override
-  public Iterator<Address> iterator ()
-  {
-    return range.iterator ();
   }
 }

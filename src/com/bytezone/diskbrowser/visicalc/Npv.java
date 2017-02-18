@@ -1,15 +1,17 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Npv extends RangeFunction
+public class Npv extends Function
 {
   //  private final String valueText;
   //  private final String rangeText;
   //
   //  private final Expression valueExp;
+  private final Range range;
 
   Npv (Sheet parent, String text)
   {
     super (parent, text);
+    range = new Range (text);
 
     //    int pos = text.indexOf (',');
     //    valueText = text.substring (8, pos);

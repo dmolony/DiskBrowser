@@ -11,6 +11,7 @@ import java.util.Map;
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// see big red computer club folder
 public class QuickDrawFont extends AbstractFile
 {
   Map<Integer, Character> characters = new HashMap<Integer, Character> ();
@@ -57,6 +58,9 @@ public class QuickDrawFont extends AbstractFile
     assert fileType == ProdosConstants.FILE_TYPE_FONT;
     this.fileType = fileType;
     this.auxType = auxType;
+
+    if (auxType != 0)
+      System.out.printf ("Font aux: %04X%n", auxType);
 
     fontName = HexFormatter.getPascalString (buffer, 0);
     int nameLength = (buffer[0] & 0xFF);
@@ -134,23 +138,25 @@ public class QuickDrawFont extends AbstractFile
 
   private void createCharacters ()
   {
+    //    System.out.printf ("Total chars: %d%n", totalCharacters);
     for (int i = 0, max = totalCharacters + 1; i < max; i++)
     {
       // index into the strike
       int location = HexFormatter.unsignedShort (buffer, locationTableOffset + i * 2);
 
+      //      System.out.printf ("%3d  %04X %n", i, location);
       int j = i + 1;      // next character
       if (j < max)
       {
         int nextLocation =
             HexFormatter.unsignedShort (buffer, locationTableOffset + j * 2);
         int pixelWidth = nextLocation - location;
-        if (pixelWidth < 0)
-        {
-          System.out.println ("*********** Bad pixelWidth");
-          corrupt = true;
-          return;
-        }
+        //        if (pixelWidth < 0)
+        //        {
+        //          System.out.println ("*********** Bad pixelWidth");
+        //          corrupt = true;
+        //          return;
+        //        }
 
         if (pixelWidth > 0)
           characters.put (i, new Character (location, pixelWidth));

@@ -12,7 +12,6 @@ class If extends Function
   public If (Sheet parent, String text)
   {
     super (parent, text);
-    //    System.out.println (text);
 
     int pos1 = functionText.indexOf (',');
     int pos2 = functionText.indexOf (',', pos1 + 1);

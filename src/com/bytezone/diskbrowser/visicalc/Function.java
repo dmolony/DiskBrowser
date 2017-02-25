@@ -1,8 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 // http://www.bricklin.com/history/refcard1.htm
 // Functions:
@@ -33,10 +31,7 @@ abstract class Function extends AbstractValue implements Iterable<Value>
   protected String functionText;
   protected String fullText;
 
-  protected ValueType valueType;
-  protected double value;
-
-  protected List<Value> values = new ArrayList<Value> ();
+  //  protected List<Value> values = new ArrayList<Value> ();
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -115,40 +110,6 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     {
       functionName = "";
       functionText = "";
-    }
-  }
-
-  @Override
-  public ValueType getValueType ()
-  {
-    return valueType;
-  }
-
-  @Override
-  public boolean isValueType (ValueType type)
-  {
-    return valueType == type;
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return value;
-  }
-
-  @Override
-  public String getText ()
-  {
-    switch (valueType)
-    {
-      case NA:
-        return "NA";
-      case ERROR:
-        return "Error";
-      //      case NAN:
-      //        return "NaN";
-      default:
-        return "";
     }
   }
 

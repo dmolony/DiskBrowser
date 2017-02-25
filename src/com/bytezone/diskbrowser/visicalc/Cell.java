@@ -10,12 +10,11 @@ class Cell extends AbstractValue implements Comparable<Cell>
   private final Sheet parent;
   private CellType cellType;
   private final Format format = new Format ();
+  private String expressionText;
 
   private String repeatingText;
   private String repeat = "";
   private String label;
-
-  private String expressionText;
   private Value value;
 
   enum CellType
@@ -84,6 +83,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
     // FUTURE.VC
     if (false)
+    {
+      System.out.println ("****** Hardcoded values ******");
       if (address.rowKey == 67)
         expressionText = "1000";
       else if (address.rowKey == 131)
@@ -92,9 +93,12 @@ class Cell extends AbstractValue implements Comparable<Cell>
         expressionText = "12";
       else if (address.rowKey == 259)
         expressionText = "8";
+    }
 
     // IRA.VC
-    if (true)
+    if (false)
+    {
+      System.out.println ("****** Hardcoded values ******");
       if (address.rowKey == 66)
         expressionText = "10";
       else if (address.rowKey == 130)
@@ -105,9 +109,12 @@ class Cell extends AbstractValue implements Comparable<Cell>
         expressionText = "1000";
       else if (address.rowKey == 386)
         expressionText = "15";
+    }
 
     // CARLOAN.VC
     if (false)
+    {
+      System.out.println ("****** Hardcoded values ******");
       if (address.rowKey == 67)
         expressionText = "9375";
       else if (address.rowKey == 131)
@@ -116,6 +123,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
         expressionText = "24";
       else if (address.rowKey == 259)
         expressionText = "11.9";
+    }
   }
 
   // format cell value for output
@@ -193,8 +201,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
         expressionText = "";
 
       Expression expression = new Expression (parent, expressionText);
-      value = expression.size () == 1 ? expression.get (0) : expression;
+      //      value = expression.size () == 1 ? expression.get (0) : expression;
+      value = expression.reduce ();
     }
+
     value.calculate ();
 
     return this;
@@ -228,8 +238,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
         text.append (String.format ("| VALUE      : %-69s |%n", expressionText));
         if (value == null)
           text.append (String.format ("| Value      : %-69s |%n", "null"));
-        //        else if (value instanceof Expression)
-        //          text.append (getExpressionComponents ((Expression) value, 1));
         else
           text.append (getValueText (value, 0));
         break;
@@ -257,31 +265,19 @@ class Cell extends AbstractValue implements Comparable<Cell>
           String.format ("| %-10s : %-69s |%n", typeText, value.getValueType ()));
 
     if (value instanceof Expression)
-      text.append (getExpressionComponents ((Expression) value, depth + 1));
+    {
+      text.append (
+          String.format ("| Expression : %-69s |%n", ((Expression) value).fullText ()));
+      for (Value v : (Expression) value)
+        text.append (getValueText (v, depth + 1));
+    }
     else if (value instanceof Function)
-      text.append (getFunctionComponents ((Function) value, depth + 1));
-
-    return text.toString ();
-  }
-
-  private String getExpressionComponents (Expression expression, int depth)
-  {
-    StringBuilder text = new StringBuilder ();
-
-    text.append (String.format ("| Expression : %-69s |%n", expression.fullText ()));
-    for (Value value : expression)
-      text.append (getValueText (value, depth));
-
-    return text.toString ();
-  }
-
-  private String getFunctionComponents (Function function, int depth)
-  {
-    StringBuilder text = new StringBuilder ();
-
-    text.append (String.format ("| Function   : %-69s |%n", function.fullText));
-    for (Value value : function)
-      text.append (getValueText (value, depth));
+    {
+      text.append (
+          String.format ("| Function   : %-69s |%n", ((Function) value).fullText));
+      for (Value v : (Function) value)
+        text.append (getValueText (v, depth + 1));
+    }
 
     return text.toString ();
   }

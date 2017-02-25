@@ -29,12 +29,10 @@ class Expression extends AbstractValue implements Iterable<Value>
   // [.3*(B4+B7+B8+B9)]
   // [+N12+(P12*(.2*K12+K9-O12))]
 
-  private final List<Value> values = new ArrayList<Value> ();
+  //  private final List<Value> values = new ArrayList<Value> ();
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  private ValueType valueType = ValueType.VALUE;
-  private double value;
   private String text;
 
   public Expression (Sheet parent, String text)
@@ -128,6 +126,13 @@ class Expression extends AbstractValue implements Iterable<Value>
       System.out.printf ("Nothing[%s]%n", text);
   }
 
+  Value reduce ()
+  {
+    if (values.size () == 1 && signs.get (0).equals ("(+)"))
+      return values.get (0);
+    return this;
+  }
+
   int size ()
   {
     return values.size ();
@@ -208,48 +213,6 @@ class Expression extends AbstractValue implements Iterable<Value>
     }
 
     return this;
-  }
-
-  @Override
-  public ValueType getValueType ()
-  {
-    return valueType;
-  }
-
-  @Override
-  public boolean isValueType (ValueType type)
-  {
-    return valueType == type;
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return value;
-  }
-
-  @Override
-  public String getText ()
-  {
-    if (valueType == null && values.size () > 0)
-      calculate ();
-
-    if (valueType == null)
-    {
-      System.out.printf ("null valuetype in exp [%s]%n", text);
-      System.out.println (values.size ());
-    }
-    switch (valueType)
-    {
-      case NA:
-        return "NA";
-      case ERROR:
-        return "Error";
-      //      case NAN:
-      //        return "NaN";
-      default:
-        return "???";
-    }
   }
 
   private String checkBrackets (String input)

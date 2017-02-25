@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.visicalc;
 import com.bytezone.diskbrowser.visicalc.Value.ValueType;
 
 // Predicate
-class Condition
+class Condition //extends AbstractValue
 {
   private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
 
@@ -18,8 +18,8 @@ class Condition
 
   public Condition (Sheet parent, String text)
   {
+    //    super ("Condition");
     this.parent = parent;
-    //    System.out.println (text);
 
     for (String comp : comparators)
     {

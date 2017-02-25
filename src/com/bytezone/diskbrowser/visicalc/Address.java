@@ -85,10 +85,21 @@ class Address implements Comparable<Address>
     return "" + (c1 == '@' ? "" : c1) + c2 + row;
   }
 
+  public String getText ()
+  {
+    return text;
+  }
+
+  public String getDetails ()
+  {
+    return String.format ("Row:%3d  Col:%3d  rKey:%5d  cKey:%5d", row, column, rowKey,
+        columnKey);
+  }
+
   @Override
   public String toString ()
   {
-    return String.format ("%-4s %3d %3d %4d", text, row, column, rowKey);
+    return String.format ("%-6s Row:%3d Col:%3d Key:%4d", text, row, column, rowKey);
   }
 
   @Override

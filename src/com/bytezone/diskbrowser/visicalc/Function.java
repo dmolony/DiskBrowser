@@ -1,5 +1,9 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 // http://www.bricklin.com/history/refcard1.htm
 // Functions:
 // @AVERAGE
@@ -21,14 +25,18 @@ package com.bytezone.diskbrowser.visicalc;
 // @TAN
 // @ATAN
 
-abstract class Function implements Value
+// should Function extend Expression? should it be Iterable<Expression>?
+abstract class Function extends AbstractValue implements Iterable<Value>
 {
   protected final Sheet parent;
   protected String functionName;
   protected String functionText;
+  protected String fullText;
 
   protected ValueType valueType;
   protected double value;
+
+  protected List<Value> values = new ArrayList<Value> ();
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -92,7 +100,9 @@ abstract class Function implements Value
 
   Function (Sheet parent, String text)
   {
+    super ("Function");
     this.parent = parent;
+    fullText = text;
 
     // get function's parameter string
     int pos = text.indexOf ('(');
@@ -123,7 +133,6 @@ abstract class Function implements Value
   @Override
   public double getValue ()
   {
-    assert valueType == ValueType.VALUE : "Function ValueType = " + valueType;
     return value;
   }
 
@@ -136,11 +145,17 @@ abstract class Function implements Value
         return "NA";
       case ERROR:
         return "Error";
-      case NAN:
-        return "NaN";
+      //      case NAN:
+      //        return "NaN";
       default:
         return "";
     }
+  }
+
+  @Override
+  public Iterator<Value> iterator ()
+  {
+    return values.iterator ();
   }
 
   @Override

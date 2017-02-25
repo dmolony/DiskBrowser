@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
-import com.bytezone.diskbrowser.visicalc.Value.ValueType;
+import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 public class Sheet
 {
@@ -21,7 +21,7 @@ public class Sheet
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
   private final List<String> lines = new ArrayList<String> ();
 
-  private Cell currentCell = null;
+  //  private Cell currentCell = null;
   private char defaultFormat;
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
@@ -116,7 +116,7 @@ public class Sheet
    
   /S   STORAGE COMMANDS
       /SS  SAVE
-      /SL  LOAD
+      /SL  LOAD (left/right arrow to scroll through catalog)
       /SD  DELETES SPECIFIED FILE ON DISK
       /SI  INITIALIZE A DISK ON SPECIFIED DRIVE
       /SQ  QUITS VISICALC
@@ -149,14 +149,27 @@ public class Sheet
     {
       int length = getLineLength (buffer, ptr);
       String line = HexFormatter.getString (buffer, ptr, length);
+      assert !line.isEmpty ();
       lines.add (line);
-      processLine (line);
+
+      if (line.startsWith ("/"))
+        doFormat (line);
+      else if (line.startsWith (">"))       // GOTO cell
+        processLine (line);
+      else
+        System.out.printf ("Error [%s]%n", line);
+
       ptr += length + 1;            // +1 for end-of-line token
     }
 
     // might have to keep recalculating until nothing changes??
-    calculate (recalculationOrder);
-    calculate (recalculationOrder);
+    if (recalculation == 'A')             // auto
+    {
+      //      recalculationOrder = 'R';
+      //      System.out.printf ("Calculation order: %s%n", recalculationOrder);
+      calculate (recalculationOrder);
+      calculate (recalculationOrder);
+    }
 
     if (false)
       printDebug ();
@@ -166,70 +179,23 @@ public class Sheet
   {
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
-      if (cell.isValueType (ValueType.VALUE))
+      if (cell.isCellType (CellType.VALUE))
         cell.calculate ();
   }
 
   private int getLineLength (byte[] buffer, int offset)
   {
     int ptr = offset;
-    while (buffer[ptr] != END_OF_LINE_TOKEN)        // end-of-line token
+    while (buffer[ptr] != END_OF_LINE_TOKEN)
       ptr++;
     return ptr - offset;
   }
 
   private void processLine (String line)
   {
-    assert !line.isEmpty ();
+    Cell currentCell = null;
 
-    if (line.startsWith ("/"))
-    {
-      switch (line.charAt (1))
-      {
-        case 'W':
-          //          System.out.printf ("Skipping [%s]%n", line);
-          break;
-        case 'G':
-          switch (line.charAt (2))
-          {
-            case 'R':
-              recalculation = line.charAt (3);
-              break;
-            case 'O':
-              recalculationOrder = line.charAt (3);
-              break;
-            case 'P':
-              //              System.out.printf ("Skipping [%s]%n", line);
-              break;
-            case 'C':
-              columnWidth = Integer.parseInt (line.substring (3));
-              break;
-            case 'F':
-              defaultFormat = line.charAt (3);
-              break;
-            default:
-              System.out.printf ("Unknown global format [%s]%n", line);
-              break;
-          }
-          break;
-        case 'X':
-          //          System.out.printf ("Skipping [%s]%n", line);
-          break;
-        default:
-          System.out.printf ("Skipping [%s]%n", line);
-      }
-      return;
-    }
-
-    if (!line.startsWith (">"))                               // GOTO cell
-    {
-      System.out.printf ("Error [%s]%n", line);
-      return;
-    }
-
-    currentCell = null;
-
-    Matcher m = addressPattern.matcher (line);
+    Matcher m = addressPattern.matcher (line);          // <cell address>:<contents>
     if (m.find ())
     {
       Address address = new Address (m.group (1), m.group (2));
@@ -258,7 +224,7 @@ public class Sheet
       if (line.charAt (2) == 'C' && line.charAt (3) == 'C')
       {
         int width = Integer.parseInt (line.substring (4));
-        columnWidths.put (currentCell.address.column, width);
+        columnWidths.put (currentCell.getAddress ().column, width);
       }
       else
         System.out.printf ("Unknown Global:[%s]%n", line);
@@ -270,35 +236,36 @@ public class Sheet
     String format = "";
     while (line.startsWith ("/"))
     {
-      String fmt = line.substring (0, FORMAT_LENGTH);
-      line = line.substring (FORMAT_LENGTH);
-
-      if (fmt.equals ("/TH") || fmt.equals ("/TV"))     // lock titles ??
+      if (line.charAt (1) == '-')     // repeating label
       {
-        // ignore
+        currentCell.setFormat (line);
+        line = "";
+        format += line;
       }
       else
-        currentCell.format (fmt);                       // formatting command
-
-      format += fmt;
+      {
+        String fmt = line.substring (0, FORMAT_LENGTH);
+        line = line.substring (FORMAT_LENGTH);
+        currentCell.setFormat (fmt);                       // formatting command
+        format += fmt;
+      }
     }
 
+    // if there is anything left it must be an expression
     if (!line.isEmpty ())
       currentCell.setValue (line);                      // expression
 
     if (false)
-      System.out.printf ("[%s][%-3s][%s]%n", currentCell.address, format, line);
+      System.out.printf ("[%s][%-3s][%s]%n", currentCell.getAddress (), format, line);
   }
 
   private void addCell (Cell cell)
   {
-    rowOrderCells.put (cell.address.rowKey, cell);
-    columnOrderCells.put (cell.address.columnKey, cell);
+    rowOrderCells.put (cell.getAddress ().rowKey, cell);
+    columnOrderCells.put (cell.getAddress ().columnKey, cell);
 
-    if (cell.address.row > highestRow)
-      highestRow = cell.address.row;
-    if (cell.address.column > highestColumn)
-      highestColumn = cell.address.column;
+    highestRow = Math.max (highestRow, cell.getAddress ().row);
+    highestColumn = Math.max (highestColumn, cell.getAddress ().column);
   }
 
   Cell getCell (String addressText)
@@ -314,6 +281,44 @@ public class Sheet
   public int size ()
   {
     return rowOrderCells.size ();
+  }
+
+  private void doFormat (String line)
+  {
+    switch (line.charAt (1))
+    {
+      case 'W':
+        //          System.out.printf ("Skipping [%s]%n", line);
+        break;
+      case 'G':
+        switch (line.charAt (2))
+        {
+          case 'R':
+            recalculation = line.charAt (3);
+            break;
+          case 'O':
+            recalculationOrder = line.charAt (3);
+            break;
+          case 'P':
+            //              System.out.printf ("Skipping [%s]%n", line);
+            break;
+          case 'C':
+            columnWidth = Integer.parseInt (line.substring (3));
+            break;
+          case 'F':
+            defaultFormat = line.charAt (3);
+            break;
+          default:
+            System.out.printf ("Unknown global format [%s]%n", line);
+            break;
+        }
+        break;
+      case 'X':
+        //          System.out.printf ("Skipping [%s]%n", line);
+        break;
+      default:
+        System.out.printf ("Skipping [%s]%n", line);
+    }
   }
 
   public String getLines ()
@@ -376,7 +381,7 @@ public class Sheet
 
     for (Cell cell : rowOrderCells.values ())
     {
-      Address cellAddress = cell.address;
+      Address cellAddress = cell.getAddress ();
       while (lastRow < cellAddress.row)
       {
         ++lastRow;
@@ -404,6 +409,24 @@ public class Sheet
 
       text.append (cell.getText (colWidth, defaultFormat));
     }
+
+    if (debug)
+    {
+      text.append ("\n\n");
+      int last = -1;
+      for (Cell cell : columnOrderCells.values ())
+      {
+        if (last < cell.getAddress ().column)
+        {
+          text.append ("\n                                    *** Column "
+              + cell.getAddress ().column + " ***\n\n");
+          last = cell.getAddress ().column;
+        }
+        text.append (cell.getDebugText ());
+        text.append ("\n");
+      }
+    }
+
     return text.toString ();
   }
 
@@ -417,7 +440,7 @@ public class Sheet
     System.out.println ();
     System.out.println ("Cells:");
     for (Cell cell : rowOrderCells.values ())
-      System.out.println (cell);
+      System.out.println (cell.getDebugText ());
 
     System.out.println ();
     System.out.println ("Column widths:");

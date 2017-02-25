@@ -1,12 +1,14 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Number implements Value
+class Number extends AbstractValue
 {
   private double value;
   private ValueType valueType;
 
   public Number (String text)
   {
+    super ("Constant");
+
     try
     {
       value = Double.parseDouble (text);
@@ -15,32 +17,10 @@ class Number implements Value
     catch (NumberFormatException e)
     {
       valueType = ValueType.ERROR;
+      e.printStackTrace ();
     }
   }
 
-  //  @Override
-  //  public boolean isValue ()
-  //  {
-  //    return valueType == ValueType.VALUE;
-  //  }
-  //
-  //  @Override
-  //  public boolean isError ()
-  //  {
-  //    return valueType == ValueType.ERROR;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotAvailable ()
-  //  {
-  //    return valueType == ValueType.NA;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotANumber ()
-  //  {
-  //    return valueType == ValueType.NAN;
-  //  }
   @Override
   public boolean isValueType (ValueType type)
   {
@@ -59,13 +39,6 @@ class Number implements Value
     return value;
   }
 
-  //  @Override
-  //  public String getText ()
-  //  {
-  //    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
-  //    //    return valueType == ValueType.ERROR ? "Error" : "";
-  //  }
-
   @Override
   public String getText ()
   {
@@ -75,8 +48,8 @@ class Number implements Value
         return "NA";
       case ERROR:
         return "Error";
-      case NAN:
-        return "NaN";
+      //      case NAN:
+      //        return "NaN";
       default:
         return "";
     }

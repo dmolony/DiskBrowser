@@ -19,6 +19,7 @@ class Condition
   public Condition (Sheet parent, String text)
   {
     this.parent = parent;
+    //    System.out.println (text);
 
     for (String comp : comparators)
     {
@@ -54,9 +55,13 @@ class Condition
 
       conditionExpression.calculate ();
       valueExpression.calculate ();
+
+      //      expressions.add (conditionExpression);
+      //      expressions.add (valueExpression);
     }
 
-    if (conditionExpression.isValueType (ValueType.ERROR) || valueExpression.isValueType (ValueType.ERROR))
+    if (conditionExpression.isValueType (ValueType.ERROR)
+        || valueExpression.isValueType (ValueType.ERROR))
       return false;
 
     double conditionResult = conditionExpression.getValue ();
@@ -84,6 +89,6 @@ class Condition
   public String toString ()
   {
     return String.format ("[cond=%s, op=%s, value=%s]", conditionText, comparator,
-                          valueText);
+        valueText);
   }
 }

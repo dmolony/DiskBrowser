@@ -21,7 +21,10 @@ class Lookup extends Function
   public Value calculate ()
   {
     if (source == null)
+    {
       source = new Expression (parent, sourceText);
+      values.add (source);
+    }
 
     source.calculate ();
     if (!source.isValueType (ValueType.VALUE))
@@ -41,16 +44,16 @@ class Lookup extends Function
       target = address;
     }
 
-    if (target != null)
+    if (target == null)
+      valueType = ValueType.NA;
+    else
     {
-      if (range.isVertical ())
-        value = parent.getCell (target.nextColumn ()).getValue ();
-      else
-        value = parent.getCell (target.nextRow ()).getValue ();
+      Address adjacentAddress =
+          range.isVertical () ? target.nextColumn () : target.nextRow ();
+      Cell adjacentCell = parent.getCell (adjacentAddress);
+      value = adjacentCell.getValue ();
       valueType = ValueType.VALUE;
     }
-    else
-      System.out.println ("Target is null!");
 
     return this;
   }

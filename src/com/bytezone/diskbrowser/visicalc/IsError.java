@@ -15,7 +15,7 @@ class IsError extends Function
     if (cell == null)
       cell = parent.getCell (functionText);
 
-    value = cell == null ? 1 : 0;
+    value = cell == null ? 1 : cell.isValueType (ValueType.ERROR) ? 1 : 0;
     valueType = ValueType.VALUE;
 
     return this;

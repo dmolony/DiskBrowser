@@ -12,6 +12,7 @@ class If extends Function
   public If (Sheet parent, String text)
   {
     super (parent, text);
+    //    System.out.println (text);
 
     int pos1 = functionText.indexOf (',');
     int pos2 = functionText.indexOf (',', pos1 + 1);
@@ -27,29 +28,32 @@ class If extends Function
   {
     valueType = ValueType.VALUE;
 
-    //    System.out.println (functionText);
     if (condition.getResult ())
     {
-      //      System.out.println ("true");
       if (expTrue == null)
+      {
         expTrue = new Expression (parent, textTrue);
+        values.add (expTrue);
+      }
 
       expTrue.calculate ();
 
-      if (expTrue.isValueType (ValueType.ERROR) || expTrue.isValueType (ValueType.NA))
+      if (!expTrue.isValueType (ValueType.VALUE))
         valueType = expTrue.getValueType ();
       else
         value = expTrue.getValue ();
     }
     else
     {
-      //      System.out.println ("false");
       if (expFalse == null)
+      {
         expFalse = new Expression (parent, textFalse);
+        values.add (expFalse);
+      }
 
       expFalse.calculate ();
 
-      if (expFalse.isValueType (ValueType.ERROR) || expFalse.isValueType (ValueType.NA))
+      if (!expFalse.isValueType (ValueType.VALUE))
         valueType = expFalse.getValueType ();
       else
         value = expFalse.getValue ();

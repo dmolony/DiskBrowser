@@ -13,6 +13,7 @@ public class Int extends Function
   {
     Expression exp = new Expression (parent, functionText);
     value = (int) exp.getValue ();
+    valueType = exp.getValueType ();
     return this;
   }
 }

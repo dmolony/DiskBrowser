@@ -5,19 +5,8 @@ public class Na extends Function
   public Na (Sheet parent, String text)
   {
     super (parent, text);
+    valueType = ValueType.NA;
   }
-
-  //  @Override
-  //  public boolean isError ()
-  //  {
-  //    return false;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotAvailable ()
-  //  {
-  //    return true;
-  //  }
 
   @Override
   public double getValue ()

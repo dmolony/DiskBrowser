@@ -1,9 +1,10 @@
 package com.bytezone.diskbrowser.visicalc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-class Expression implements Value
+class Expression extends AbstractValue implements Iterable<Value>
 {
   // Expressions:
   //   number
@@ -32,13 +33,15 @@ class Expression implements Value
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  private ValueType valueType;
+  private ValueType valueType = ValueType.VALUE;
   private double value;
   private String text;
 
   public Expression (Sheet parent, String text)
   {
+    super ("Exp");
     this.text = text;
+
     String line = checkBrackets (text);
 
     int ptr = 0;
@@ -92,7 +95,10 @@ class Expression implements Value
             ptr += addressText.length ();
             Cell cell = parent.getCell (addressText);
             if (cell == null)
+            {
+              System.out.println ("adding NA");
               values.add (Function.getInstance (parent, "@NA"));
+            }
             else
               values.add (parent.getCell (addressText));
           }
@@ -117,23 +123,43 @@ class Expression implements Value
       }
     }
 
-    assert values.size () > 0;
+    //    assert values.size () > 0;
+    if (values.size () == 0)
+      System.out.printf ("Nothing[%s]%n", text);
+  }
+
+  int size ()
+  {
+    return values.size ();
+  }
+
+  Value get (int index)
+  {
+    return values.get (index);
   }
 
   @Override
   public Value calculate ()
   {
+    if (values.size () == 0)
+    {
+      System.out.println ("nothing to calculate: " + text);
+      return this;
+    }
+
     try
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
-      if (thisValue.isValueType (ValueType.ERROR))
+
+      value = 0;
+      if (thisValue.isValueType (ValueType.VALUE))
+        value = thisValue.getValue ();
+      else
       {
         valueType = thisValue.getValueType ();
         return this;
       }
-
-      value = thisValue.isValueType (ValueType.NA) ? 0 : thisValue.getValue ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -143,13 +169,15 @@ class Expression implements Value
       {
         thisValue = values.get (i);
         thisValue.calculate ();
-        if (thisValue.isValueType (ValueType.ERROR))
+
+        double nextValue = 0;
+        if (thisValue.isValueType (ValueType.VALUE))
+          nextValue = thisValue.getValue ();
+        else
         {
           valueType = thisValue.getValueType ();
           return this;
         }
-
-        double nextValue = thisValue.isValueType (ValueType.NA) ? 0 : thisValue.getValue ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -169,13 +197,14 @@ class Expression implements Value
       }
 
       if (Double.isNaN (value))
-        valueType = ValueType.NAN;
+        valueType = ValueType.ERROR;
       else
         valueType = ValueType.VALUE;
     }
     catch (Exception e)
     {
       valueType = ValueType.ERROR;
+      e.printStackTrace ();
     }
 
     return this;
@@ -187,29 +216,6 @@ class Expression implements Value
     return valueType;
   }
 
-  //  @Override
-  //  public boolean isValue ()
-  //  {
-  //    return valueType == ValueType.VALUE;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotAvailable ()
-  //  {
-  //    return valueType == ValueType.NA;
-  //  }
-  //
-  //  @Override
-  //  public boolean isNotANumber ()
-  //  {
-  //    return valueType == ValueType.NAN;
-  //  }
-  //
-  //  @Override
-  //  public boolean isError ()
-  //  {
-  //    return valueType == ValueType.ERROR;
-  //  }
   @Override
   public boolean isValueType (ValueType type)
   {
@@ -219,30 +225,30 @@ class Expression implements Value
   @Override
   public double getValue ()
   {
-    //    assert valueType == ValueType.VALUE : "Expression ValueType = " + valueType;
     return value;
   }
-
-  //  @Override
-  //  public String getText ()
-  //  {
-  //    return isNotAvailable () ? "NA" : isError () ? "Error" : isNotANumber () ? "NaN" : "";
-  //    //    return isNotAvailable () ? "NA" : isError () ? "Error" : "";
-  //  }
 
   @Override
   public String getText ()
   {
+    if (valueType == null && values.size () > 0)
+      calculate ();
+
+    if (valueType == null)
+    {
+      System.out.printf ("null valuetype in exp [%s]%n", text);
+      System.out.println (values.size ());
+    }
     switch (valueType)
     {
       case NA:
         return "NA";
       case ERROR:
         return "Error";
-      case NAN:
-        return "NaN";
+      //      case NAN:
+      //        return "NaN";
       default:
-        return "";
+        return "???";
     }
   }
 
@@ -264,7 +270,7 @@ class Expression implements Value
       if (rightBracket > leftBracket)
       {
         System.out.printf ("**** Unbalanced brackets: left:%d, right:%d  ****%n",
-                           leftBracket, rightBracket);
+            leftBracket, rightBracket);
         System.out.println (input);
         return "@ERROR";
       }
@@ -324,29 +330,28 @@ class Expression implements Value
     return text.substring (0, ptr);
   }
 
+  public String fullText ()
+  {
+    StringBuilder text = new StringBuilder ();
+
+    int ptr = 0;
+    for (Value value : values)
+    {
+      assert value != null;
+      text.append (signs.get (ptr));
+      text.append (value.getValue ());
+      if (ptr < operators.size ())
+        text.append (operators.get (ptr++));
+    }
+
+    return text.toString ();
+
+  }
+
   @Override
   public String toString ()
   {
-    //    StringBuilder text = new StringBuilder ();
-    //
-    //    int ptr = 0;
-    //    for (Value value : values)
-    //    {
-    //      assert value != null;
-    //      text.append (signs.get (ptr));
-    //      //      value.calculate ();
-    //      //      if (value.isValue ())
-    //      //        text.append (value.getValue ());
-    //      if (ptr < operators.size ())
-    //      {
-    //        //        System.out.println (operators.get (ptr));
-    //        text.append (operators.get (ptr++));
-    //      }
-    //    }
-    //    //    System.out.println ("finished building");
-    //
-    //    return text.toString ();
-    return "Expression: " + text;
+    return "Expression : " + text;
   }
 
   public static void main (String[] args)
@@ -354,5 +359,11 @@ class Expression implements Value
     Expression ex = new Expression (null, "-5+((-4-(20-(2^3))+6/3))*-2");
     System.out.println (ex.getValue ());
     System.out.println (ex);
+  }
+
+  @Override
+  public Iterator<Value> iterator ()
+  {
+    return values.iterator ();
   }
 }

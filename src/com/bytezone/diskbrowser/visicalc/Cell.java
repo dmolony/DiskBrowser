@@ -1,17 +1,17 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.text.DecimalFormat;
-
-class Cell implements Comparable<Cell>, Value
+class Cell extends AbstractValue implements Comparable<Cell>
 {
-  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
+  //  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
+  private static final String line = "+----------------------------------------"
+      + "--------------------------------------------+";
 
-  final Address address;
+  private final Address address;
   private final Sheet parent;
   private CellType cellType;
-  private char cellFormat = ' ';
+  private final Format format = new Format ();
 
-  private char repeatingChar;
+  private String repeatingText;
   private String repeat = "";
   private String label;
 
@@ -20,44 +20,58 @@ class Cell implements Comparable<Cell>, Value
 
   enum CellType
   {
-    LABEL, REPEATING_CHARACTER, VALUE
+    LABEL, REPEATING_CHARACTER, VALUE, EMPTY
   }
 
   public Cell (Sheet parent, Address address)
   {
+    super ("Cell " + address.text);
+
     this.parent = parent;
     this.address = address;
 
-    cellType = CellType.VALUE;          // default to VALUE, formatting may change it
-    value = new Number ("0.0");
+    cellType = CellType.EMPTY;
   }
 
-  void format (String format)
+  Address getAddress ()
+  {
+    return address;
+  }
+
+  void setFormat (String formatText)
   {
     //  /FG - general
     //  /FD - default
     //  /FI - integer
-    //  /F$ - dollars and cents
+    //  /F$ - two decimal places
     //  /FL - left justified
     //  /FR - right justified
     //  /F* - graph (histogram)
 
-    if (format.startsWith ("/F"))
-      this.cellFormat = format.charAt (2);
-    else if (format.startsWith ("/-"))
+    if (formatText.equals ("/TH") || formatText.equals ("/TV"))     // lock titles
+      return;
+
+    if (formatText.startsWith ("/F"))
     {
-      repeatingChar = format.charAt (2);
-      for (int i = 0; i < 20; i++)
-        repeat += repeatingChar;
-      cellType = CellType.REPEATING_CHARACTER;
+      format.cellFormat = formatText.charAt (2);
+      return;
     }
-    else
-      System.out.printf ("Unexpected format [%s]%n", format);
+
+    if (formatText.startsWith ("/-"))
+    {
+      repeatingText = formatText.substring (2);
+      for (int i = 0; i < 20; i++)
+        repeat += repeatingText;
+      cellType = CellType.REPEATING_CHARACTER;
+      return;
+    }
+
+    System.out.printf ("Unexpected format [%s]%n", formatText);
   }
 
   void setValue (String command)
   {
-    if (command.charAt (0) == '"')
+    if (!command.isEmpty () && command.charAt (0) == '"')
     {
       label = command.substring (1);
       cellType = CellType.LABEL;
@@ -80,7 +94,7 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "8";
 
     // IRA.VC
-    if (false)
+    if (true)
       if (address.rowKey == 66)
         expressionText = "10";
       else if (address.rowKey == 130)
@@ -104,75 +118,37 @@ class Cell implements Comparable<Cell>, Value
         expressionText = "11.9";
   }
 
+  // format cell value for output
   String getText (int colWidth, char defaultFormat)
   {
-    char format = cellFormat != ' ' ? cellFormat : defaultFormat;
-
     switch (cellType)
     {
       case LABEL:
-        return justify (label, colWidth, cellFormat);
+        return format.justify (label, colWidth, format.cellFormat);
 
       case REPEATING_CHARACTER:
-        return justify (repeat, colWidth, format);
+        return format.justify (repeat, colWidth, ' ');
+
+      case EMPTY:
+        return "";
 
       case VALUE:
-        if (value.isValueType (ValueType.ERROR) || value.isValueType (ValueType.NA)
-            || value.isValueType (ValueType.NAN))
-          return justify (value.getText (), colWidth, format);
+        if (value == null)
+          calculate ();
+        return format.format (value, defaultFormat, colWidth);
 
-        Double thisValue = value.getValue ();
-
-        if (format == 'I')
-        {
-          String integerFormat = String.format ("%%%d.0f", colWidth);
-          return String.format (integerFormat, thisValue);
-        }
-        else if (format == '$')
-        {
-          String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-          return String.format (currencyFormat, nf.format (thisValue));
-        }
-        else if (format == '*')
-        {
-          String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-          // this is not finished
-          return String.format (graphFormat, "********************");
-        }
-        else
-        {
-          // this could be improved
-          String numberFormat = String.format ("%%%d.3f", colWidth + 4);
-          String val = String.format (numberFormat, thisValue);
-          while (val.endsWith ("0"))
-            val = ' ' + val.substring (0, val.length () - 1);
-          if (val.endsWith ("."))
-            val = ' ' + val.substring (0, val.length () - 1);
-          if (val.length () > colWidth)
-            val = val.substring (val.length () - colWidth);
-          return val;
-        }
+      default:
+        assert false;
+        return getText ();        // not possible
     }
-    return getText ();
-  }
-
-  private String justify (String text, int colWidth, char format)
-  {
-    // right justify
-    if (format == 'R' || format == '$' || format == 'I')
-    {
-      String labelFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-      return (String.format (labelFormat, text));
-    }
-
-    // left justify
-    String labelFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-    return (String.format (labelFormat, text));
   }
 
   @Override
   public double getValue ()
   {
+    if (value == null)
+      calculate ();
+
     return value.getValue ();
   }
 
@@ -185,12 +161,18 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public String getText ()
   {
+    if (value == null)
+      calculate ();
+
     return value.getText ();
   }
 
   @Override
   public boolean isValueType (ValueType type)
   {
+    if (value == null)
+      calculate ();
+
     return value.isValueType (type);
   }
 
@@ -202,21 +184,106 @@ class Cell implements Comparable<Cell>, Value
   @Override
   public Value calculate ()
   {
-    if (!isCellType (CellType.VALUE))
+    if (value != null && value.isValueType (ValueType.VALUE))
       return this;
 
-    if (expressionText == null)
+    if (value == null)
     {
-      System.out.printf ("%s null expression text %n", address);
-      value = Function.getInstance (parent, "@ERROR");
+      if (expressionText == null)
+        expressionText = "";
+
+      Expression expression = new Expression (parent, expressionText);
+      value = expression.size () == 1 ? expression.get (0) : expression;
+    }
+    value.calculate ();
+
+    return this;
+  }
+
+  public String getDebugText ()
+  {
+    StringBuilder text = new StringBuilder ();
+    text.append (line);
+    text.append ("\n");
+    text.append (String.format ("| %-21s  %s  %17s |%n", address.getText (),
+        address.getDetails (), "Format : " + format.cellFormat));
+    text.append (line);
+    text.append ("\n");
+
+    switch (cellType)
+    {
+      case LABEL:
+        text.append (String.format ("| LABEL      : %-69s |%n", label));
+        break;
+
+      case REPEATING_CHARACTER:
+        text.append (String.format ("| REPEAT     : %-69s |%n", repeatingText));
+        break;
+
+      case EMPTY:
+        text.append (String.format ("| EMPTY      : %-69s |%n", ""));
+        break;
+
+      case VALUE:
+        text.append (String.format ("| VALUE      : %-69s |%n", expressionText));
+        if (value == null)
+          text.append (String.format ("| Value      : %-69s |%n", "null"));
+        //        else if (value instanceof Expression)
+        //          text.append (getExpressionComponents ((Expression) value, 1));
+        else
+          text.append (getValueText (value, 0));
+        break;
+
+      default:
+        text.append ("Unknown CellType: " + cellType + "\n");
+    }
+
+    text.append (line);
+    return text.toString ();
+  }
+
+  private String getValueText (Value value, int depth)
+  {
+    StringBuilder text = new StringBuilder ();
+
+    String typeText = "  " + value.getTypeText ();
+    if (value.isValueType (ValueType.VALUE))
+    {
+      String valueText = String.format ("%f", value.getValue ());
+      text.append (String.format ("| %-10s : %-69s |%n", typeText, valueText));
     }
     else
-    {
-      // should use Number or Cell or Function for simple Values
-      value = new Expression (parent, expressionText);
-      value.calculate ();
-    }
-    return this;
+      text.append (
+          String.format ("| %-10s : %-69s |%n", typeText, value.getValueType ()));
+
+    if (value instanceof Expression)
+      text.append (getExpressionComponents ((Expression) value, depth + 1));
+    else if (value instanceof Function)
+      text.append (getFunctionComponents ((Function) value, depth + 1));
+
+    return text.toString ();
+  }
+
+  private String getExpressionComponents (Expression expression, int depth)
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append (String.format ("| Expression : %-69s |%n", expression.fullText ()));
+    for (Value value : expression)
+      text.append (getValueText (value, depth));
+
+    return text.toString ();
+  }
+
+  private String getFunctionComponents (Function function, int depth)
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append (String.format ("| Function   : %-69s |%n", function.fullText));
+    for (Value value : function)
+      text.append (getValueText (value, depth));
+
+    return text.toString ();
   }
 
   @Override
@@ -230,11 +297,13 @@ class Cell implements Comparable<Cell>, Value
         contents = "Labl: " + label;
         break;
       case REPEATING_CHARACTER:
-        contents = "Rept: " + repeatingChar;
+        contents = "Rept: " + repeatingText;
         break;
       case VALUE:
         contents = "Exp : " + expressionText;
         break;
+      case EMPTY:
+        contents = "Empty";
     }
 
     return String.format ("[Cell:%5s %s]", address, contents);

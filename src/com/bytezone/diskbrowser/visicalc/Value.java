@@ -4,7 +4,7 @@ interface Value
 {
   enum ValueType
   {
-    VALUE, ERROR, NA, NAN
+    VALUE, ERROR, NA
   }
 
   public double getValue ();
@@ -16,4 +16,6 @@ interface Value
   public ValueType getValueType ();
 
   public Value calculate ();
+
+  public String getTypeText ();
 }

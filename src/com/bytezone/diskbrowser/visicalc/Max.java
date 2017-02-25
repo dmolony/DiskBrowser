@@ -22,9 +22,9 @@ class Max extends Function
       if (cell == null || cell.isValueType (ValueType.NA))
         continue;
 
-      if (cell.isValueType (ValueType.ERROR))
+      if (!cell.isValueType (ValueType.VALUE))
       {
-        valueType = ValueType.ERROR;
+        valueType = cell.getValueType ();
         break;
       }
 

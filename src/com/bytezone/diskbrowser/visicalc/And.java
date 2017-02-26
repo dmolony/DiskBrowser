@@ -19,11 +19,14 @@ class And extends Function
   public Value calculate ()
   {
     for (Condition condition : conditions)
-      if (!condition.getResult ())
+    {
+      condition.calculate ();
+      if (condition.getValue () == 0)
       {
         value = 0;
         return this;
       }
+    }
     value = 1;
     return this;
   }

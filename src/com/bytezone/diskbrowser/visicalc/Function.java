@@ -23,15 +23,12 @@ import java.util.Iterator;
 // @TAN
 // @ATAN
 
-// should Function extend Expression? should it be Iterable<Expression>?
 abstract class Function extends AbstractValue implements Iterable<Value>
 {
   protected final Sheet parent;
   protected String functionName;
   protected String functionText;
   protected String fullText;
-
-  //  protected List<Value> values = new ArrayList<Value> ();
 
   static Function getInstance (Sheet parent, String text)
   {
@@ -41,35 +38,26 @@ abstract class Function extends AbstractValue implements Iterable<Value>
       return new Error (parent, "@ERROR");
     }
 
-    if (text.startsWith ("@LOOKUP("))
-      return new Lookup (parent, text);
-
-    if (text.startsWith ("@COUNT("))
-      return new Count (parent, text);
-
-    if (text.startsWith ("@MIN("))
-      return new Min (parent, text);
-
-    if (text.startsWith ("@MAX("))
-      return new Max (parent, text);
-
-    if (text.startsWith ("@SUM("))
-      return new Sum (parent, text);
-
-    if (text.startsWith ("@IF("))
-      return new If (parent, text);
-
-    if (text.startsWith ("@OR("))
-      return new Or (parent, text);
+    if (text.startsWith ("@ABS("))
+      return new Abs (parent, text);
 
     if (text.startsWith ("@AND("))
       return new And (parent, text);
 
-    if (text.startsWith ("@NPV("))
-      return new Npv (parent, text);
+    if (text.startsWith ("@AVERAGE("))
+      return new Average (parent, text);
 
-    if (text.startsWith ("@ABS("))
-      return new Abs (parent, text);
+    if (text.startsWith ("@COUNT("))
+      return new Count (parent, text);
+
+    if (text.startsWith ("@CHOOSE("))
+      return new Choose (parent, text);
+
+    if (text.startsWith ("@ERROR"))
+      return new Error (parent, text);
+
+    if (text.startsWith ("@IF("))
+      return new If (parent, text);
 
     if (text.startsWith ("@INT("))
       return new Int (parent, text);
@@ -80,14 +68,29 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     if (text.startsWith ("@ISNA("))
       return new IsNa (parent, text);
 
-    if (text.startsWith ("@PI"))
-      return new Pi (parent, text);
+    if (text.startsWith ("@LOOKUP("))
+      return new Lookup (parent, text);
 
-    if (text.startsWith ("@ERROR"))
-      return new Error (parent, text);
+    if (text.startsWith ("@MIN("))
+      return new Min (parent, text);
+
+    if (text.startsWith ("@MAX("))
+      return new Max (parent, text);
 
     if (text.equals ("@NA"))
       return new Na (parent, text);
+
+    if (text.startsWith ("@NPV("))
+      return new Npv (parent, text);
+
+    if (text.startsWith ("@OR("))
+      return new Or (parent, text);
+
+    if (text.startsWith ("@PI"))
+      return new Pi (parent, text);
+
+    if (text.startsWith ("@SUM("))
+      return new Sum (parent, text);
 
     System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, "@ERROR");

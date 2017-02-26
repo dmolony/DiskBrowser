@@ -17,6 +17,7 @@ class If extends Function
     int pos2 = functionText.indexOf (',', pos1 + 1);
 
     condition = new Condition (parent, functionText.substring (0, pos1));
+    values.add (condition);
 
     textTrue = functionText.substring (pos1 + 1, pos2);
     textFalse = functionText.substring (pos2 + 1);
@@ -26,8 +27,9 @@ class If extends Function
   public Value calculate ()
   {
     valueType = ValueType.VALUE;
+    condition.calculate ();
 
-    if (condition.getResult ())
+    if (condition.getValue () == 1)
     {
       if (expTrue == null)
       {

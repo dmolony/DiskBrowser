@@ -19,11 +19,14 @@ class Or extends Function
   public Value calculate ()
   {
     for (Condition condition : conditions)
-      if (condition.getResult ())
+    {
+      condition.calculate ();
+      if (condition.getValue () == 1)
       {
         value = 1;
         return this;
       }
+    }
     value = 0;
     return this;
   }

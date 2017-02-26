@@ -61,6 +61,7 @@ public class Sheet
   //  /GRA            Recalculation Auto
   //  /GO             Global 
   //  /GOC            Calculation Order - Columns first
+  //  /GOR            Calculation Order - Rows first
 
   //  /T              Titles (HVBN)
   //  /TH             fix Horizontal Titles
@@ -137,6 +138,8 @@ public class Sheet
   
   /-  REPEATING LABEL
   */
+
+  // /X!/X>A3:>A7:      A3:top-left cell in window, A7:cell to place cursor
 
   public Sheet (byte[] buffer)
   {
@@ -382,6 +385,8 @@ public class Sheet
     for (Cell cell : rowOrderCells.values ())
     {
       Address cellAddress = cell.getAddress ();
+
+      // insert newlines for empty rows
       while (lastRow < cellAddress.row)
       {
         ++lastRow;
@@ -392,6 +397,7 @@ public class Sheet
           text.append ("\n");
       }
 
+      // pad out empty columns
       while (lastColumn < cellAddress.column)
       {
         int width = columnWidth;
@@ -418,8 +424,10 @@ public class Sheet
       {
         if (last < cell.getAddress ().column)
         {
-          text.append ("\n                                    *** Column "
-              + cell.getAddress ().column + " ***\n\n");
+          String columnName = Address.getCellName (1, cell.getAddress ().column);
+          columnName = columnName.substring (0, columnName.length () - 1);
+          text.append ("\n                                    *** Column " + columnName
+              + " ***\n\n");
           last = cell.getAddress ().column;
         }
         text.append (cell.getDebugText ());

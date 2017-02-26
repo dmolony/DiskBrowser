@@ -5,6 +5,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
   //  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
   private static final String line = "+----------------------------------------"
       + "--------------------------------------------+";
+  private static final String empty = "                                        ";
 
   private final Address address;
   private final Sheet parent;
@@ -47,7 +48,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
     //  /FR - right justified
     //  /F* - graph (histogram)
 
-    if (formatText.equals ("/TH") || formatText.equals ("/TV"))     // lock titles
+    if (formatText.startsWith ("/T"))             // lock titles
       return;
 
     if (formatText.startsWith ("/F"))
@@ -138,7 +139,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
         return format.justify (repeat, colWidth, ' ');
 
       case EMPTY:
-        return "";
+        return format.justify (empty, colWidth, ' ');
 
       case VALUE:
         if (value == null)
@@ -200,9 +201,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
       if (expressionText == null)
         expressionText = "";
 
-      Expression expression = new Expression (parent, expressionText);
-      //      value = expression.size () == 1 ? expression.get (0) : expression;
-      value = expression.reduce ();
+      value = new Expression (parent, expressionText).reduce ();
     }
 
     value.calculate ();
@@ -276,6 +275,13 @@ class Cell extends AbstractValue implements Comparable<Cell>
       text.append (
           String.format ("| Function   : %-69s |%n", ((Function) value).fullText));
       for (Value v : (Function) value)
+        text.append (getValueText (v, depth + 1));
+    }
+    else if (value instanceof Condition)
+    {
+      text.append (
+          String.format ("| Condition  : %-69s |%n", ((Condition) value).fullText));
+      for (Value v : (Condition) value)
         text.append (getValueText (v, depth + 1));
     }
 

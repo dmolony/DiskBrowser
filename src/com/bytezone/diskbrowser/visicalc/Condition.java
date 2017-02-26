@@ -1,9 +1,9 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import com.bytezone.diskbrowser.visicalc.Value.ValueType;
+import java.util.Iterator;
 
 // Predicate
-class Condition //extends AbstractValue
+class Condition extends AbstractValue implements Iterable<Value>
 {
   private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
 
@@ -12,14 +12,16 @@ class Condition //extends AbstractValue
   private String comparator;
   private String conditionText;
   private String valueText;
+  protected String fullText;
 
   private Expression conditionExpression;
   private Expression valueExpression;
 
   public Condition (Sheet parent, String text)
   {
-    //    super ("Condition");
+    super ("Cond");
     this.parent = parent;
+    fullText = text;
 
     for (String comp : comparators)
     {
@@ -46,8 +48,11 @@ class Condition //extends AbstractValue
     }
   }
 
-  public boolean getResult ()
+  @Override
+  public Value calculate ()
   {
+    value = 0;
+
     if (conditionExpression == null)
     {
       conditionExpression = new Expression (parent, conditionText);
@@ -56,33 +61,33 @@ class Condition //extends AbstractValue
       conditionExpression.calculate ();
       valueExpression.calculate ();
 
-      //      expressions.add (conditionExpression);
-      //      expressions.add (valueExpression);
+      values.add (conditionExpression);
+      values.add (valueExpression);
     }
 
     if (conditionExpression.isValueType (ValueType.ERROR)
         || valueExpression.isValueType (ValueType.ERROR))
-      return false;
+      return this;
 
     double conditionResult = conditionExpression.getValue ();
     double valueResult = valueExpression.getValue ();
 
     if (comparator.equals ("="))
-      return conditionResult == valueResult;
+      value = conditionResult == valueResult ? 1 : 0;
     else if (comparator.equals ("<>"))
-      return conditionResult != valueResult;
+      value = conditionResult != valueResult ? 1 : 0;
     else if (comparator.equals ("<"))
-      return conditionResult < valueResult;
+      value = conditionResult < valueResult ? 1 : 0;
     else if (comparator.equals (">"))
-      return conditionResult > valueResult;
+      value = conditionResult > valueResult ? 1 : 0;
     else if (comparator.equals ("<="))
-      return conditionResult <= valueResult;
+      value = conditionResult <= valueResult ? 1 : 0;
     else if (comparator.equals (">="))
-      return conditionResult >= valueResult;
+      value = conditionResult >= valueResult ? 1 : 0;
     else
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
 
-    return false;               // flag error?
+    return this;
   }
 
   @Override
@@ -90,5 +95,11 @@ class Condition //extends AbstractValue
   {
     return String.format ("[cond=%s, op=%s, value=%s]", conditionText, comparator,
         valueText);
+  }
+
+  @Override
+  public Iterator<Value> iterator ()
+  {
+    return values.iterator ();
   }
 }

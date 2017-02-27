@@ -21,8 +21,7 @@ public class Sheet
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
   private final List<String> lines = new ArrayList<String> ();
 
-  //  private Cell currentCell = null;
-  private char defaultFormat;
+  private char globalFormat;
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   private int columnWidth = 12;
@@ -173,9 +172,6 @@ public class Sheet
       calculate (recalculationOrder);
       calculate (recalculationOrder);
     }
-
-    if (false)
-      printDebug ();
   }
 
   private void calculate (char order)
@@ -309,7 +305,7 @@ public class Sheet
             columnWidth = Integer.parseInt (line.substring (3));
             break;
           case 'F':
-            defaultFormat = line.charAt (3);
+            globalFormat = line.charAt (3);
             break;
           default:
             System.out.printf ("Unknown global format [%s]%n", line);
@@ -413,7 +409,7 @@ public class Sheet
       if (columnWidths.containsKey (cellAddress.column))
         colWidth = columnWidths.get (cellAddress.column);
 
-      text.append (cell.getText (colWidth, defaultFormat));
+      text.append (cell.getText (colWidth, globalFormat));
     }
 
     if (debug)
@@ -436,24 +432,5 @@ public class Sheet
     }
 
     return text.toString ();
-  }
-
-  private void printDebug ()
-  {
-    System.out.println ();
-    System.out.println ("Lines:");
-    for (String line : lines)
-      System.out.println (line);
-
-    System.out.println ();
-    System.out.println ("Cells:");
-    for (Cell cell : rowOrderCells.values ())
-      System.out.println (cell.getDebugText ());
-
-    System.out.println ();
-    System.out.println ("Column widths:");
-    System.out.printf ("Default width : %3d%n", columnWidth);
-    for (Map.Entry<Integer, Integer> entry : columnWidths.entrySet ())
-      System.out.printf ("    column %3d: %3d%n", entry.getKey (), entry.getValue ());
   }
 }

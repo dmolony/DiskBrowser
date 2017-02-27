@@ -7,17 +7,11 @@ import com.bytezone.diskbrowser.visicalc.Value.ValueType;
 public class Format
 {
   private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
-  char cellFormat = ' ';
 
-  String format (Value value, char defaultFormat, int colWidth)
+  static String format (Value value, char formatChar, int colWidth)
   {
-    char formatChar = cellFormat != ' ' ? cellFormat : defaultFormat;
-
     if (!value.isValueType (ValueType.VALUE))
-    {
-      //      char formatChar = format.cellFormat != ' ' ? format.cellFormat : defaultFormat;
       return justify (value.getText (), colWidth, formatChar);
-    }
 
     if (formatChar == 'I')
     {
@@ -38,7 +32,7 @@ public class Format
     else
     {
       // this could be improved
-      String numberFormat = String.format ("%%%d.3f", colWidth + 4);
+      String numberFormat = String.format ("%%%d.5f", colWidth + 6);
       String val = String.format (numberFormat, value.getValue ());
       while (val.endsWith ("0"))
         val = ' ' + val.substring (0, val.length () - 1);
@@ -50,7 +44,7 @@ public class Format
     }
   }
 
-  String justify (String text, int colWidth, char format)
+  static String justify (String text, int colWidth, char format)
   {
     // right justify
     if (format == 'R' || format == '$' || format == 'I')

@@ -10,8 +10,9 @@ class Cell extends AbstractValue implements Comparable<Cell>
   private final Address address;
   private final Sheet parent;
   private CellType cellType;
-  private final Format format = new Format ();
+  //  private final Format format = new Format ();
   private String expressionText;
+  private char cellFormat = ' ';
 
   private String repeatingText;
   private String repeat = "";
@@ -53,7 +54,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
     if (formatText.startsWith ("/F"))
     {
-      format.cellFormat = formatText.charAt (2);
+      cellFormat = formatText.charAt (2);
       return;
     }
 
@@ -128,23 +129,24 @@ class Cell extends AbstractValue implements Comparable<Cell>
   }
 
   // format cell value for output
-  String getText (int colWidth, char defaultFormat)
+  String getText (int colWidth, char globalFormat)
   {
     switch (cellType)
     {
       case LABEL:
-        return format.justify (label, colWidth, format.cellFormat);
+        return Format.justify (label, colWidth, cellFormat);
 
       case REPEATING_CHARACTER:
-        return format.justify (repeat, colWidth, ' ');
+        return Format.justify (repeat, colWidth, ' ');
 
       case EMPTY:
-        return format.justify (empty, colWidth, ' ');
+        return Format.justify (empty, colWidth, ' ');
 
       case VALUE:
         if (value == null)
           calculate ();
-        return format.format (value, defaultFormat, colWidth);
+        char formatChar = cellFormat != ' ' ? cellFormat : globalFormat;
+        return Format.format (value, formatChar, colWidth);
 
       default:
         assert false;
@@ -215,7 +217,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
     text.append (line);
     text.append ("\n");
     text.append (String.format ("| %-21s  %s  %17s |%n", address.getText (),
-        address.getDetails (), "Format : " + format.cellFormat));
+        address.getDetails (), "Format : " + cellFormat));
     text.append (line);
     text.append ("\n");
 
@@ -246,45 +248,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
     }
 
     text.append (line);
-    return text.toString ();
-  }
-
-  private String getValueText (Value value, int depth)
-  {
-    StringBuilder text = new StringBuilder ();
-
-    String typeText = "  " + value.getTypeText ();
-    if (value.isValueType (ValueType.VALUE))
-    {
-      String valueText = String.format ("%f", value.getValue ());
-      text.append (String.format ("| %-10s : %-69s |%n", typeText, valueText));
-    }
-    else
-      text.append (
-          String.format ("| %-10s : %-69s |%n", typeText, value.getValueType ()));
-
-    if (value instanceof Expression)
-    {
-      text.append (
-          String.format ("| Expression : %-69s |%n", ((Expression) value).fullText ()));
-      for (Value v : (Expression) value)
-        text.append (getValueText (v, depth + 1));
-    }
-    else if (value instanceof Function)
-    {
-      text.append (
-          String.format ("| Function   : %-69s |%n", ((Function) value).fullText));
-      for (Value v : (Function) value)
-        text.append (getValueText (v, depth + 1));
-    }
-    else if (value instanceof Condition)
-    {
-      text.append (
-          String.format ("| Condition  : %-69s |%n", ((Condition) value).fullText));
-      for (Value v : (Condition) value)
-        text.append (getValueText (v, depth + 1));
-    }
-
     return text.toString ();
   }
 

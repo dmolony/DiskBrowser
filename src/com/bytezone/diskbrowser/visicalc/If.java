@@ -24,7 +24,7 @@ class If extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     valueType = ValueType.VALUE;
     condition.calculate ();
@@ -59,8 +59,6 @@ class If extends Function
       else
         value = expFalse.getValue ();
     }
-
-    return this;
   }
 
   @Override

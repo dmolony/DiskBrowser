@@ -11,7 +11,7 @@ class Count extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     value = 0;
     valueType = ValueType.VALUE;
@@ -31,7 +31,5 @@ class Count extends Function
       if (cell.getValue () != 0.0)
         value++;
     }
-
-    return this;
   }
 }

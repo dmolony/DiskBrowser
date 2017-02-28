@@ -2,7 +2,6 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Cell extends AbstractValue implements Comparable<Cell>
 {
-  //  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
   private static final String line = "+----------------------------------------"
       + "--------------------------------------------+";
   private static final String empty = "                                        ";
@@ -10,7 +9,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
   private final Address address;
   private final Sheet parent;
   private CellType cellType;
-  //  private final Format format = new Format ();
   private String expressionText;
   private char cellFormat = ' ';
 
@@ -72,6 +70,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
   void setValue (String command)
   {
+    assert cellType == CellType.EMPTY;
+
     if (!command.isEmpty () && command.charAt (0) == '"')
     {
       label = command.substring (1);
@@ -143,10 +143,11 @@ class Cell extends AbstractValue implements Comparable<Cell>
         return Format.justify (empty, colWidth, ' ');
 
       case VALUE:
-        if (value == null)
-          calculate ();
+        if (!isValueType (ValueType.VALUE))
+          return Format.justify (value.getText (), colWidth, 'R');
+
         char formatChar = cellFormat != ' ' ? cellFormat : globalFormat;
-        return Format.format (value, formatChar, colWidth);
+        return " " + Format.format (value, formatChar, colWidth - 1);
 
       default:
         assert false;
@@ -193,10 +194,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     if (value != null && value.isValueType (ValueType.VALUE))
-      return this;
+      return;
 
     if (value == null)
     {
@@ -208,7 +209,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
     value.calculate ();
 
-    return this;
+    return;
   }
 
   public String getDebugText ()
@@ -240,7 +241,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
         if (value == null)
           text.append (String.format ("| Value      : %-69s |%n", "null"));
         else
-          text.append (getValueText (value, 0));
+          text.append (((AbstractValue) value).getValueText (0));
         break;
 
       default:

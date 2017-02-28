@@ -49,7 +49,7 @@ class Condition extends AbstractValue implements Iterable<Value>
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     value = 0;
 
@@ -67,7 +67,7 @@ class Condition extends AbstractValue implements Iterable<Value>
 
     if (conditionExpression.isValueType (ValueType.ERROR)
         || valueExpression.isValueType (ValueType.ERROR))
-      return this;
+      return;
 
     double conditionResult = conditionExpression.getValue ();
     double valueResult = valueExpression.getValue ();
@@ -86,8 +86,6 @@ class Condition extends AbstractValue implements Iterable<Value>
       value = conditionResult >= valueResult ? 1 : 0;
     else
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
-
-    return this;
   }
 
   @Override

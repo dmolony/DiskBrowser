@@ -2,45 +2,63 @@ package com.bytezone.diskbrowser.visicalc;
 
 import java.text.DecimalFormat;
 
-import com.bytezone.diskbrowser.visicalc.Value.ValueType;
-
 public class Format
 {
   private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
 
   static String format (Value value, char formatChar, int colWidth)
   {
-    if (!value.isValueType (ValueType.VALUE))
-      return justify (value.getText (), colWidth, formatChar);
+    double actualValue = value.getValue ();
+    if (actualValue == -0.0)
+      actualValue = 0;
 
-    if (formatChar == 'I')
+    switch (formatChar)
     {
-      String integerFormat = String.format ("%%%d.0f", colWidth);
-      return String.format (integerFormat, value.getValue ());
-    }
-    else if (formatChar == '$')
-    {
-      String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-      return String.format (currencyFormat, nf.format (value.getValue ()));
-    }
-    else if (formatChar == '*')
-    {
-      String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-      // this is not finished
-      return String.format (graphFormat, "********************");
-    }
-    else
-    {
-      // this could be improved
-      String numberFormat = String.format ("%%%d.5f", colWidth + 6);
-      String val = String.format (numberFormat, value.getValue ());
-      while (val.endsWith ("0"))
-        val = ' ' + val.substring (0, val.length () - 1);
-      if (val.endsWith ("."))
-        val = ' ' + val.substring (0, val.length () - 1);
-      if (val.length () > colWidth)
-        val = val.substring (val.length () - colWidth);
-      return val;
+      case 'L':
+      case 'R':
+      case ' ':
+        // this could be improved
+        String numberFormat = String.format ("%%%d.5f", colWidth + 6);
+        String val = String.format (numberFormat, actualValue);
+
+        while (val.endsWith ("0"))
+          val = val.substring (0, val.length () - 1);
+        if (val.endsWith ("."))
+          val = val.substring (0, val.length () - 1);
+        if (val.startsWith ("0."))
+          val = val.substring (1);
+
+        if (val.length () > colWidth)
+          val = val.substring (val.length () - colWidth);
+
+        //      System.out.printf ("len:%d fmt: %s%n", val.length (), formatChar);
+        if (val.startsWith (" ") && formatChar == 'L')
+        {
+          String leftFormat = String.format ("%%-%ds", colWidth);
+          val = String.format (leftFormat, val.trim ());
+        }
+
+        return val;
+
+      case 'I':
+        String integerFormat = String.format ("%%%d.0f", colWidth);
+        String result = String.format (integerFormat, actualValue);
+        if (result.length () > colWidth)
+          return ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>".substring (0, colWidth);
+        return result;
+
+      case '$':
+        String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
+        return String.format (currencyFormat, nf.format (actualValue));
+
+      case '*':
+        String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
+        // this is not finished
+        return String.format (graphFormat, "********************");
+
+      default:
+        System.out.printf ("[%s]%n", formatChar);
+        return "??????????????????????".substring (0, colWidth);
     }
   }
 

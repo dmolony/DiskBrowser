@@ -21,7 +21,7 @@ public class Npv extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     value = 0;
     valueType = ValueType.VALUE;
@@ -40,7 +40,5 @@ public class Npv extends Function
 
       double temp = cell.getValue ();
     }
-
-    return this;
   }
 }

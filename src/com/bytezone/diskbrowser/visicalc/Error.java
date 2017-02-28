@@ -13,10 +13,4 @@ class Error extends Function
   {
     return 0;
   }
-
-  @Override
-  public Value calculate ()
-  {
-    return this;
-  }
 }

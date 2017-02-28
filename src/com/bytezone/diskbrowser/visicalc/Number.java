@@ -22,10 +22,4 @@ class Number extends AbstractValue
   {
     return String.format ("Number: %f", value);
   }
-
-  @Override
-  public Value calculate ()
-  {
-    return this;
-  }
 }

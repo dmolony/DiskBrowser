@@ -10,7 +10,7 @@ public class IsNa extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     if (expression == null)
       expression = new Expression (parent, functionText);
@@ -18,6 +18,5 @@ public class IsNa extends Function
     expression.calculate ();
     value = expression.getValue ();
     valueType = expression.getValueType ();
-    return this;
   }
 }

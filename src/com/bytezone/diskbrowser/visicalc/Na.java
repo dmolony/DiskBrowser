@@ -13,10 +13,4 @@ public class Na extends Function
   {
     return 0;
   }
-
-  @Override
-  public Value calculate ()
-  {
-    return this;
-  }
 }

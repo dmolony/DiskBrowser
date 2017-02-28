@@ -11,7 +11,7 @@ public class Average extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     double total = 0.0;
     int totalChecked = 0;
@@ -39,7 +39,5 @@ public class Average extends Function
       value = total / totalChecked;
       valueType = ValueType.VALUE;
     }
-
-    return this;
   }
 }

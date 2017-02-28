@@ -11,7 +11,7 @@ class Sum extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     value = 0;
     valueType = ValueType.VALUE;
@@ -30,7 +30,5 @@ class Sum extends Function
 
       value += cell.getValue ();
     }
-
-    return this;
   }
 }

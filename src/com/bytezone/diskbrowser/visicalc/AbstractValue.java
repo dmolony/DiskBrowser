@@ -47,46 +47,51 @@ public abstract class AbstractValue implements Value
       case NA:
         return "NA";
       case ERROR:
-        return "Error";
+        return "ERROR";
       default:
         return "";
     }
   }
 
-  String getValueText (Value value, int depth)
+  @Override
+  public void calculate ()
+  {
+  }
+
+  // for debugging
+  String getValueText (int depth)
   {
     StringBuilder text = new StringBuilder ();
 
-    String typeText = "  " + value.getTypeText ();
-    if (value.isValueType (ValueType.VALUE))
+    String typeText = "  " + getTypeText ();
+    if (isValueType (ValueType.VALUE))
     {
-      String valueText = String.format ("%f", value.getValue ());
+      String valueText = String.format ("%f", getValue ());
       text.append (String.format ("| %-10s : %-69s |%n", typeText, valueText));
     }
     else
-      text.append (
-          String.format ("| %-10s : %-69s |%n", typeText, value.getValueType ()));
+      text.append (String.format ("| %-10s : %-69s |%n", typeText, getValueType ()));
 
-    if (value instanceof Expression)
+    if (this instanceof Expression)
     {
       text.append (
-          String.format ("| Expression : %-69s |%n", ((Expression) value).fullText ()));
-      for (Value v : (Expression) value)
-        text.append (getValueText (v, depth + 1));
+          String.format ("| Expression : %-69s |%n", ((Expression) this).fullText ()));
+      for (Value v : (Expression) this)
+        text.append (((AbstractValue) v).getValueText (depth + 1));
     }
-    else if (value instanceof Function)
+    else if (this instanceof Function)
     {
       text.append (
-          String.format ("| Function   : %-69s |%n", ((Function) value).fullText));
-      for (Value v : (Function) value)
-        text.append (getValueText (v, depth + 1));
+          String.format ("| Function   : %-69s |%n", ((Function) this).fullText));
+      for (Value v : (Function) this)
+        text.append (((AbstractValue) v).getValueText (depth + 1));
     }
-    else if (value instanceof Condition)
+    else if (this instanceof Condition)
     {
       text.append (
-          String.format ("| Condition  : %-69s |%n", ((Condition) value).fullText));
-      for (Value v : (Condition) value)
-        text.append (getValueText (v, depth + 1));
+          String.format ("| Condition  : %-69s |%n", ((Condition) this).fullText));
+      for (Value v : (Condition) this)
+        text.append (((AbstractValue) v).getValueText (depth + 1));
     }
 
     return text.toString ();

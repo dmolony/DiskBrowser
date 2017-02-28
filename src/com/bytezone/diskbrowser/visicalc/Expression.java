@@ -29,7 +29,6 @@ class Expression extends AbstractValue implements Iterable<Value>
   // [.3*(B4+B7+B8+B9)]
   // [+N12+(P12*(.2*K12+K9-O12))]
 
-  //  private final List<Value> values = new ArrayList<Value> ();
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
@@ -144,12 +143,12 @@ class Expression extends AbstractValue implements Iterable<Value>
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     if (values.size () == 0)
     {
       System.out.println ("nothing to calculate: " + text);
-      return this;
+      return;
     }
 
     try
@@ -163,7 +162,7 @@ class Expression extends AbstractValue implements Iterable<Value>
       else
       {
         valueType = thisValue.getValueType ();
-        return this;
+        return;
       }
 
       String sign = signs.get (0);
@@ -181,7 +180,7 @@ class Expression extends AbstractValue implements Iterable<Value>
         else
         {
           valueType = thisValue.getValueType ();
-          return this;
+          return;
         }
 
         sign = signs.get (i);
@@ -211,8 +210,6 @@ class Expression extends AbstractValue implements Iterable<Value>
       valueType = ValueType.ERROR;
       e.printStackTrace ();
     }
-
-    return this;
   }
 
   private String checkBrackets (String input)

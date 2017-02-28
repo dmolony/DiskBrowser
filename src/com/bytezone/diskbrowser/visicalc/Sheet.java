@@ -21,7 +21,7 @@ public class Sheet
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
   private final List<String> lines = new ArrayList<String> ();
 
-  private char globalFormat;
+  private char globalFormat = ' ';
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   private int columnWidth = 12;

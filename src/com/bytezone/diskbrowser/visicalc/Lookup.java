@@ -18,7 +18,7 @@ class Lookup extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     if (source == null)
     {
@@ -30,7 +30,7 @@ class Lookup extends Function
     if (!source.isValueType (ValueType.VALUE))
     {
       valueType = source.getValueType ();
-      return this;
+      return;
     }
 
     double sourceValue = source.getValue ();
@@ -54,8 +54,6 @@ class Lookup extends Function
       value = adjacentCell.getValue ();
       valueType = ValueType.VALUE;
     }
-
-    return this;
   }
 
   // @LOOKUP(B8,F3...F16)

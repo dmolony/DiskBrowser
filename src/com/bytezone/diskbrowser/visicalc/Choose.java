@@ -17,10 +17,4 @@ public class Choose extends Function
     range = new Range (rangeText);
     source = new Number (sourceText);
   }
-
-  @Override
-  public Value calculate ()
-  {
-    return null;
-  }
 }

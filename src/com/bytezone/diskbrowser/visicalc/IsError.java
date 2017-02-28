@@ -10,14 +10,12 @@ class IsError extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     if (cell == null)
       cell = parent.getCell (functionText);
 
     value = cell == null ? 1 : cell.isValueType (ValueType.ERROR) ? 1 : 0;
     valueType = ValueType.VALUE;
-
-    return this;
   }
 }

@@ -7,10 +7,4 @@ class Pi extends Function
     super (parent, text);
     value = Math.PI;
   }
-
-  @Override
-  public Value calculate ()
-  {
-    return this;
-  }
 }

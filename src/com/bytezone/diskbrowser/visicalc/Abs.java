@@ -10,7 +10,7 @@ public class Abs extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     if (source == null)
     {
@@ -20,7 +20,5 @@ public class Abs extends Function
 
     value = Math.abs (source.getValue ());
     valueType = source.getValueType ();
-
-    return this;
   }
 }

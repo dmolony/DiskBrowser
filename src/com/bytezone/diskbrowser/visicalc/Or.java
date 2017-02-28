@@ -16,7 +16,7 @@ class Or extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     for (Condition condition : conditions)
     {
@@ -24,10 +24,9 @@ class Or extends Function
       if (condition.getValue () == 1)
       {
         value = 1;
-        return this;
+        return;
       }
     }
     value = 0;
-    return this;
   }
 }

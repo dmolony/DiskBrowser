@@ -11,7 +11,7 @@ class Max extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     value = Double.MIN_VALUE;
     int totalChecked = 0;
@@ -38,7 +38,5 @@ class Max extends Function
       valueType = ValueType.NA;
     else
       valueType = ValueType.VALUE;
-
-    return this;
   }
 }

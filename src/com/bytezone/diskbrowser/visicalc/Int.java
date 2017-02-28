@@ -9,11 +9,10 @@ public class Int extends Function
   }
 
   @Override
-  public Value calculate ()
+  public void calculate ()
   {
     Expression exp = new Expression (parent, functionText);
     value = (int) exp.getValue ();
     valueType = exp.getValueType ();
-    return this;
   }
 }

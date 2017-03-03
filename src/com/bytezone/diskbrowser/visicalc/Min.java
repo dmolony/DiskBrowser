@@ -7,7 +7,7 @@ class Min extends Function
   public Min (Sheet parent, String text)
   {
     super (parent, text);
-    range = new Range (text);
+    range = new Range (parent, text);
   }
 
   @Override

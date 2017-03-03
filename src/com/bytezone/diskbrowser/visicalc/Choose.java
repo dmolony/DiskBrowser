@@ -14,7 +14,7 @@ public class Choose extends Function
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);
     rangeText = text.substring (pos + 1, text.length () - 1);
-    range = new Range (rangeText);
+    range = new Range (parent, rangeText);
     source = new Number (sourceText);
   }
 }

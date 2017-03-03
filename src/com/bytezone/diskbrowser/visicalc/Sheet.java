@@ -164,6 +164,7 @@ public class Sheet
       ptr += length + 1;            // +1 for end-of-line token
     }
 
+    System.out.println ("** Start of calculation **");
     // might have to keep recalculating until nothing changes??
     if (recalculation == 'A')             // auto
     {
@@ -260,6 +261,7 @@ public class Sheet
 
   private void addCell (Cell cell)
   {
+    //    System.out.printf ("Adding: %s%n", cell);
     rowOrderCells.put (cell.getAddress ().rowKey, cell);
     columnOrderCells.put (cell.getAddress ().columnKey, cell);
 
@@ -274,7 +276,19 @@ public class Sheet
 
   Cell getCell (Address address)
   {
-    return rowOrderCells.get (address.rowKey);
+    Cell cell = rowOrderCells.get (address.rowKey);
+    if (cell == null)
+    {
+      //      System.out.printf ("cell not found, creating: %s%n", address);
+      cell = new Cell (this, address);
+      addCell (cell);
+    }
+    return cell;
+  }
+
+  boolean cellExists (Address address)
+  {
+    return rowOrderCells.get (address.rowKey) != null;
   }
 
   public int size ()

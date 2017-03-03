@@ -7,7 +7,7 @@ class Sum extends Function
   public Sum (Sheet parent, String text)
   {
     super (parent, text);
-    range = new Range (text);
+    range = new Range (parent, text);
   }
 
   @Override

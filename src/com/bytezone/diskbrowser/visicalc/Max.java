@@ -7,7 +7,7 @@ class Max extends Function
   public Max (Sheet parent, String text)
   {
     super (parent, text);
-    range = new Range (text);
+    range = new Range (parent, text);
   }
 
   @Override

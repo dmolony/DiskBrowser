@@ -11,7 +11,7 @@ public class Npv extends Function
   Npv (Sheet parent, String text)
   {
     super (parent, text);
-    range = new Range (text);
+    range = new Range (parent, text);
 
     //    int pos = text.indexOf (',');
     //    valueText = text.substring (8, pos);

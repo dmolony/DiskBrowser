@@ -7,7 +7,7 @@ public class Average extends Function
   public Average (Sheet parent, String text)
   {
     super (parent, text);
-    range = new Range (text);
+    range = new Range (parent, text);
   }
 
   @Override

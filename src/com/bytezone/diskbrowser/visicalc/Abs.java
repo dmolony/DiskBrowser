@@ -16,6 +16,7 @@ public class Abs extends Function
     {
       source = new Expression (parent, functionText);
       values.add (source);
+      source.calculate ();
     }
 
     value = Math.abs (source.getValue ());

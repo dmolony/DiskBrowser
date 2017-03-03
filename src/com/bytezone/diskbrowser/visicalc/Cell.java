@@ -81,6 +81,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
     {
       expressionText = command;
       cellType = CellType.VALUE;
+      value = new Expression (parent, expressionText).reduce ();
     }
 
     // FUTURE.VC
@@ -144,7 +145,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
       case VALUE:
         if (!isValueType (ValueType.VALUE))
-          return Format.justify (value.getText (), colWidth, 'R');
+        {
+          char fmt = cellFormat != ' ' ? cellFormat : globalFormat;
+          return Format.justify (value.getText (), colWidth, fmt);
+        }
 
         char formatChar = cellFormat != ' ' ? cellFormat : globalFormat;
         return " " + Format.format (value, formatChar, colWidth - 1);
@@ -158,8 +162,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public double getValue ()
   {
-    if (value == null)
-      calculate ();
+    //    if (value == null)
+    //      calculate ();
+    if (cellType != CellType.VALUE)
+      return 0;
 
     return value.getValue ();
   }
@@ -167,14 +173,21 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public ValueType getValueType ()
   {
+    //    if (value == null)
+    //      calculate ();
+    if (cellType == CellType.EMPTY)
+      return ValueType.NA;
+
     return value.getValueType ();
   }
 
   @Override
   public String getText ()
   {
-    if (value == null)
-      calculate ();
+    //    if (value == null)
+    //      calculate ();
+    if (cellType == CellType.EMPTY)
+      return "";
 
     return value.getText ();
   }
@@ -182,9 +195,15 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public boolean isValueType (ValueType type)
   {
-    if (value == null)
-      calculate ();
+    //    if (value == null || value.getValueType () != ValueType.VALUE)
+    //      calculate ();
+    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
+      return type == ValueType.VALUE;
 
+    if (cellType == CellType.EMPTY)
+      return type == ValueType.NA;
+
+    assert value != null : "bollocks " + address;
     return value.isValueType (type);
   }
 
@@ -196,20 +215,15 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public void calculate ()
   {
-    if (value != null && value.isValueType (ValueType.VALUE))
-      return;
+    //    if (value != null && value.isValueType (ValueType.VALUE))
+    //      return;
+    //
+    //    if (expressionText == null)
+    //      expressionText = "";
 
-    if (value == null)
-    {
-      if (expressionText == null)
-        expressionText = "";
-
-      value = new Expression (parent, expressionText).reduce ();
-    }
-
-    value.calculate ();
-
-    return;
+    //    value = new Expression (parent, expressionText).reduce ();
+    if (value != null)
+      value.calculate ();
   }
 
   public String getDebugText ()

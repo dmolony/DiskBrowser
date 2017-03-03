@@ -7,7 +7,7 @@ class Count extends Function
   public Count (Sheet parent, String text)
   {
     super (parent, text);
-    range = new Range (text);
+    range = new Range (parent, text);
   }
 
   @Override

@@ -15,24 +15,41 @@ class Range implements Iterable<Address>
 
   Address from, to;
   List<Address> range = new ArrayList<Address> ();
+  Sheet parent;
 
-  public Range (String rangeText)
+  public Range (Sheet parent, String rangeText)
   {
+    this.parent = parent;
     setRange (rangeText);
+
+    createCells ();
   }
 
-  public Range (Address from, Address to)
+  public Range (Sheet parent, Address from, Address to)
   {
     this.from = from;
     this.to = to;
+    this.parent = parent;
 
     addRange ();
+
+    createCells ();
   }
 
-  public Range (String[] cells)
+  public Range (Sheet parent, String[] cells)
   {
+    this.parent = parent;
+
     for (String s : cells)
       range.add (new Address (s));
+
+    createCells ();
+  }
+
+  private void createCells ()
+  {
+    for (Address address : range)
+      parent.getCell (address);
   }
 
   private void addRange ()
@@ -54,6 +71,7 @@ class Range implements Iterable<Address>
       }
     else
       throw new InvalidParameterException ();
+
     from = tempFrom;
   }
 
@@ -75,6 +93,17 @@ class Range implements Iterable<Address>
   public Iterator<Address> iterator ()
   {
     return range.iterator ();
+  }
+
+  public int size ()
+  {
+    int total = 0;
+
+    for (Address address : range)
+      if (parent.getCell (address) != null)
+        ++total;
+
+    return total;
   }
 
   private void setRange (String text)

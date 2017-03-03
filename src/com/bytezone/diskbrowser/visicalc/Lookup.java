@@ -13,23 +13,26 @@ class Lookup extends Function
 
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);
+    source = new Expression (parent, sourceText);
+    values.add (source);
     rangeText = text.substring (pos + 1, text.length () - 1);
-    range = new Range (rangeText);
+    range = new Range (parent, rangeText);
   }
 
   @Override
   public void calculate ()
   {
-    if (source == null)
-    {
-      source = new Expression (parent, sourceText);
-      values.add (source);
-    }
-
     source.calculate ();
+
     if (!source.isValueType (ValueType.VALUE))
     {
       valueType = source.getValueType ();
+      return;
+    }
+
+    if (range.size () == 0)
+    {
+      valueType = ValueType.NA;
       return;
     }
 
@@ -44,15 +47,26 @@ class Lookup extends Function
       target = address;
     }
 
+    //    System.out.printf ("*****-----**** %s%n", target);
     if (target == null)
       valueType = ValueType.NA;
     else
     {
       Address adjacentAddress =
           range.isVertical () ? target.nextColumn () : target.nextRow ();
-      Cell adjacentCell = parent.getCell (adjacentAddress);
-      value = adjacentCell.getValue ();
-      valueType = ValueType.VALUE;
+
+      if (parent.cellExists (adjacentAddress))
+      {
+        Cell adjacentCell = parent.getCell (adjacentAddress);
+        if (adjacentCell != null)
+          value = adjacentCell.getValue ();
+        valueType = ValueType.VALUE;
+      }
+      else
+      {
+        value = 0;
+        valueType = ValueType.VALUE;
+      }
     }
   }
 

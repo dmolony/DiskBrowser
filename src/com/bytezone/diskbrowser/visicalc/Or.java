@@ -5,11 +5,12 @@ import java.util.List;
 
 class Or extends Function
 {
-  List<Condition> conditions = new ArrayList<Condition> ();
+  private final List<Condition> conditions = new ArrayList<Condition> ();
 
   public Or (Sheet parent, String text)
   {
     super (parent, text);
+
     String list[] = text.split (",");
     for (String s : list)
       conditions.add (new Condition (parent, s));

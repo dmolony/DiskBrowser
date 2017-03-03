@@ -2,10 +2,10 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Lookup extends Function
 {
-  protected final Range range;
-  String sourceText;
-  String rangeText;
-  Expression source;
+  private final String sourceText;
+  private final String rangeText;
+  private final Expression source;
+  private final Range range;
 
   public Lookup (Sheet parent, String text)
   {
@@ -14,9 +14,10 @@ class Lookup extends Function
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);
     source = new Expression (parent, sourceText);
-    values.add (source);
     rangeText = text.substring (pos + 1, text.length () - 1);
     range = new Range (parent, rangeText);
+
+    values.add (source);
   }
 
   @Override
@@ -47,7 +48,6 @@ class Lookup extends Function
       target = address;
     }
 
-    //    System.out.printf ("*****-----**** %s%n", target);
     if (target == null)
       valueType = ValueType.NA;
     else
@@ -57,9 +57,7 @@ class Lookup extends Function
 
       if (parent.cellExists (adjacentAddress))
       {
-        Cell adjacentCell = parent.getCell (adjacentAddress);
-        if (adjacentCell != null)
-          value = adjacentCell.getValue ();
+        value = parent.getCell (adjacentAddress).getValue ();
         valueType = ValueType.VALUE;
       }
       else

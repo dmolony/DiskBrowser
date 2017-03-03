@@ -6,8 +6,8 @@ class If extends Function
   private final String textTrue;
   private final String textFalse;
 
-  private Expression expTrue;
-  private Expression expFalse;
+  private final Expression expTrue;
+  private final Expression expFalse;
 
   public If (Sheet parent, String text)
   {
@@ -21,6 +21,11 @@ class If extends Function
 
     textTrue = functionText.substring (pos1 + 1, pos2);
     textFalse = functionText.substring (pos2 + 1);
+
+    expTrue = new Expression (parent, textTrue);
+    values.add (expTrue);
+    expFalse = new Expression (parent, textFalse);
+    values.add (expFalse);
   }
 
   @Override
@@ -31,12 +36,6 @@ class If extends Function
 
     if (condition.getValue () == 1)
     {
-      if (expTrue == null)
-      {
-        expTrue = new Expression (parent, textTrue);
-        values.add (expTrue);
-      }
-
       expTrue.calculate ();
 
       if (!expTrue.isValueType (ValueType.VALUE))
@@ -46,12 +45,6 @@ class If extends Function
     }
     else
     {
-      if (expFalse == null)
-      {
-        expFalse = new Expression (parent, textFalse);
-        values.add (expFalse);
-      }
-
       expFalse.calculate ();
 
       if (!expFalse.isValueType (ValueType.VALUE))

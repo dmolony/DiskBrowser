@@ -89,7 +89,7 @@ public abstract class AbstractValue implements Value
     else if (this instanceof Condition)
     {
       text.append (
-          String.format ("| Condition  : %-69s |%n", ((Condition) this).fullText));
+          String.format ("| Condition  : %-69s |%n", ((Condition) this).getFullText ()));
       for (Value v : (Condition) this)
         text.append (((AbstractValue) v).getValueText (depth + 1));
     }

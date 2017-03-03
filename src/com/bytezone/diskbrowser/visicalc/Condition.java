@@ -12,7 +12,7 @@ class Condition extends AbstractValue implements Iterable<Value>
   private String comparator;
   private String conditionText;
   private String valueText;
-  protected String fullText;
+  private final String fullText;
 
   private Expression conditionExpression;
   private Expression valueExpression;
@@ -30,6 +30,10 @@ class Condition extends AbstractValue implements Iterable<Value>
       {
         conditionText = text.substring (0, pos);
         valueText = text.substring (pos + comp.length ());
+        conditionExpression = new Expression (parent, conditionText);
+        valueExpression = new Expression (parent, valueText);
+        values.add (conditionExpression);
+        values.add (valueExpression);
         comparator = comp;
         break;
       }
@@ -53,17 +57,8 @@ class Condition extends AbstractValue implements Iterable<Value>
   {
     value = 0;
 
-    if (conditionExpression == null)
-    {
-      conditionExpression = new Expression (parent, conditionText);
-      valueExpression = new Expression (parent, valueText);
-
-      conditionExpression.calculate ();
-      valueExpression.calculate ();
-
-      values.add (conditionExpression);
-      values.add (valueExpression);
-    }
+    conditionExpression.calculate ();
+    valueExpression.calculate ();
 
     if (conditionExpression.isValueType (ValueType.ERROR)
         || valueExpression.isValueType (ValueType.ERROR))
@@ -86,6 +81,11 @@ class Condition extends AbstractValue implements Iterable<Value>
       value = conditionResult >= valueResult ? 1 : 0;
     else
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
+  }
+
+  String getFullText ()
+  {
+    return fullText;
   }
 
   @Override

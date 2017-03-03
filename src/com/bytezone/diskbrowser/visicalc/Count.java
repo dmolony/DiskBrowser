@@ -7,6 +7,7 @@ class Count extends Function
   public Count (Sheet parent, String text)
   {
     super (parent, text);
+
     range = new Range (parent, text);
   }
 
@@ -19,7 +20,8 @@ class Count extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell == null || cell.isValueType (ValueType.NA))
+
+      if (cell.isValueType (ValueType.NA))
         continue;
 
       if (!cell.isValueType (ValueType.VALUE))

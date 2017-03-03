@@ -7,10 +7,10 @@ class Address implements Comparable<Address>
   private static final int MAX_ROWS = 255;
   private static final int MAX_COLUMNS = 64;
 
-  int row, column;
-  int rowKey;
-  int columnKey;
-  String text;
+  private int row, column;
+  private int rowKey;
+  private int columnKey;
+  private String text;
 
   public Address (String column, String row)
   {
@@ -65,6 +65,26 @@ class Address implements Comparable<Address>
     }
   }
 
+  boolean rowMatches (Address other)
+  {
+    return row == other.row;
+  }
+
+  boolean columnMatches (Address other)
+  {
+    return column == other.column;
+  }
+
+  int getRow ()
+  {
+    return row;
+  }
+
+  int getColumn ()
+  {
+    return column;
+  }
+
   Address nextRow ()
   {
     Address next = new Address (column, row + 1);
@@ -88,6 +108,16 @@ class Address implements Comparable<Address>
   public String getText ()
   {
     return text;
+  }
+
+  int getRowKey ()
+  {
+    return rowKey;
+  }
+
+  int getColumnKey ()
+  {
+    return columnKey;
   }
 
   public String getDetails ()

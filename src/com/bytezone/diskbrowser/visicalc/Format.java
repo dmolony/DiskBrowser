@@ -6,6 +6,11 @@ public class Format
 {
   private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
 
+  private Format ()
+  {
+
+  }
+
   static String format (Value value, char formatChar, int colWidth)
   {
     double actualValue = value.getValue ();

@@ -2,22 +2,20 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Abs extends Function
 {
-  Expression source;
+  private final Expression source;
 
   Abs (Sheet parent, String text)
   {
     super (parent, text);
+
+    source = new Expression (parent, functionText);
+    values.add (source);
   }
 
   @Override
   public void calculate ()
   {
-    if (source == null)
-    {
-      source = new Expression (parent, functionText);
-      values.add (source);
-      source.calculate ();
-    }
+    source.calculate ();
 
     value = Math.abs (source.getValue ());
     valueType = source.getValueType ();

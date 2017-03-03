@@ -13,9 +13,9 @@ class Range implements Iterable<Address>
       Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
-  Address from, to;
-  List<Address> range = new ArrayList<Address> ();
-  Sheet parent;
+  private Address from, to;
+  private final List<Address> range = new ArrayList<Address> ();
+  private final Sheet parent;
 
   public Range (Sheet parent, String rangeText)
   {
@@ -57,13 +57,13 @@ class Range implements Iterable<Address>
     range.add (from);
     Address tempFrom = from;
 
-    if (from.row == to.row)
+    if (from.rowMatches (to))
       while (from.compareTo (to) < 0)
       {
         from = from.nextColumn ();
         range.add (from);
       }
-    else if (from.column == to.column)
+    else if (from.columnMatches (to))
       while (from.compareTo (to) < 0)
       {
         from = from.nextRow ();
@@ -79,14 +79,14 @@ class Range implements Iterable<Address>
   {
     Address first = range.get (0);
     Address last = range.get (range.size () - 1);
-    return first.row == last.row;
+    return first.rowMatches (last);
   }
 
   boolean isVertical ()
   {
     Address first = range.get (0);
     Address last = range.get (range.size () - 1);
-    return first.column == last.column;
+    return first.columnMatches (last);
   }
 
   @Override
@@ -148,11 +148,11 @@ class Range implements Iterable<Address>
     {
       StringBuilder text = new StringBuilder ();
       for (Address address : range)
-        text.append (address.text + ",");
+        text.append (address.getText () + ",");
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);
       return text.toString ();
     }
-    return String.format ("      %s -> %s", from.text, to.text);
+    return String.format ("      %s -> %s", from.getText (), to.getText ());
   }
 }

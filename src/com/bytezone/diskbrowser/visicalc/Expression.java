@@ -32,7 +32,7 @@ class Expression extends AbstractValue implements Iterable<Value>
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  private String text;
+  private final String text;
 
   public Expression (Sheet parent, String text)
   {
@@ -93,9 +93,8 @@ class Expression extends AbstractValue implements Iterable<Value>
             Cell cell = parent.getCell (addressText);
             if (cell == null)
             {
-              // should this (or parent) create a new empty cell?
-              //              cell = parent.addCell (addressText);
-              values.add (new Number ("0"));
+              assert false : "Impossible";
+              //              values.add (new Number ("0"));
             }
             else
               values.add (parent.getCell (addressText));
@@ -155,17 +154,16 @@ class Expression extends AbstractValue implements Iterable<Value>
     try
     {
       Value thisValue = values.get (0);
-      if (thisValue != null)    // || thisValue.getValueType () != ValueType.VALUE)
-        thisValue.calculate ();
+      thisValue.calculate ();
 
       value = 0;
-      if (!thisValue.isValueType (ValueType.VALUE))
+      if (thisValue.isValueType (ValueType.ERROR))
       {
         valueType = thisValue.getValueType ();
         return;
       }
 
-      value = thisValue.getValue ();
+      value = thisValue.getValue ();                  // NA returns zero
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -174,17 +172,15 @@ class Expression extends AbstractValue implements Iterable<Value>
       for (int i = 1; i < values.size (); i++)
       {
         thisValue = values.get (i);
-        if (thisValue != null)    // || thisValue.getValueType () != ValueType.VALUE)
-          thisValue.calculate ();
+        thisValue.calculate ();
 
-        if (!thisValue.isValueType (ValueType.VALUE))
-        //        if (thisValue.isValueType (ValueType.ERROR))
+        if (thisValue.isValueType (ValueType.ERROR))
         {
           valueType = thisValue.getValueType ();
           return;
         }
 
-        double nextValue = thisValue.getValue ();
+        double nextValue = thisValue.getValue ();     // NA returns zero
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))

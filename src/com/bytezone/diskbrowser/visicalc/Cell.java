@@ -24,7 +24,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
   public Cell (Sheet parent, Address address)
   {
-    super ("Cell " + address.text);
+    super ("Cell " + address.getText ());
 
     this.parent = parent;
     this.address = address;
@@ -88,13 +88,13 @@ class Cell extends AbstractValue implements Comparable<Cell>
     if (false)
     {
       System.out.println ("****** Hardcoded values ******");
-      if (address.rowKey == 67)
+      if (address.getRowKey () == 67)
         expressionText = "1000";
-      else if (address.rowKey == 131)
+      else if (address.getRowKey () == 131)
         expressionText = "10.5";
-      else if (address.rowKey == 195)
+      else if (address.getRowKey () == 195)
         expressionText = "12";
-      else if (address.rowKey == 259)
+      else if (address.getRowKey () == 259)
         expressionText = "8";
     }
 
@@ -102,15 +102,15 @@ class Cell extends AbstractValue implements Comparable<Cell>
     if (false)
     {
       System.out.println ("****** Hardcoded values ******");
-      if (address.rowKey == 66)
+      if (address.getRowKey () == 66)
         expressionText = "10";
-      else if (address.rowKey == 130)
+      else if (address.getRowKey () == 130)
         expressionText = "30";
-      else if (address.rowKey == 194)
+      else if (address.getRowKey () == 194)
         expressionText = "65";
-      else if (address.rowKey == 258)
+      else if (address.getRowKey () == 258)
         expressionText = "1000";
-      else if (address.rowKey == 386)
+      else if (address.getRowKey () == 386)
         expressionText = "15";
     }
 
@@ -118,13 +118,13 @@ class Cell extends AbstractValue implements Comparable<Cell>
     if (false)
     {
       System.out.println ("****** Hardcoded values ******");
-      if (address.rowKey == 67)
+      if (address.getRowKey () == 67)
         expressionText = "9375";
-      else if (address.rowKey == 131)
+      else if (address.getRowKey () == 131)
         expressionText = "4500";
-      else if (address.rowKey == 195)
+      else if (address.getRowKey () == 195)
         expressionText = "24";
-      else if (address.rowKey == 259)
+      else if (address.getRowKey () == 259)
         expressionText = "11.9";
     }
   }
@@ -173,10 +173,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public ValueType getValueType ()
   {
-    //    if (value == null)
-    //      calculate ();
     if (cellType == CellType.EMPTY)
       return ValueType.NA;
+    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
+      return ValueType.VALUE;
 
     return value.getValueType ();
   }
@@ -184,8 +184,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public String getText ()
   {
-    //    if (value == null)
-    //      calculate ();
     if (cellType == CellType.EMPTY)
       return "";
 
@@ -195,16 +193,15 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public boolean isValueType (ValueType type)
   {
-    //    if (value == null || value.getValueType () != ValueType.VALUE)
-    //      calculate ();
-    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
-      return type == ValueType.VALUE;
-
-    if (cellType == CellType.EMPTY)
-      return type == ValueType.NA;
-
-    assert value != null : "bollocks " + address;
-    return value.isValueType (type);
+    //    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
+    //      return type == ValueType.VALUE;
+    //
+    //    if (cellType == CellType.EMPTY)
+    //      return type == ValueType.NA;
+    //
+    //    assert value != null : "bollocks " + address;
+    //    return value.isValueType (type);
+    return type == getValueType ();
   }
 
   public boolean isCellType (CellType type)

@@ -199,7 +199,7 @@ public class Sheet
     if (m.find ())
     {
       Address address = new Address (m.group (1), m.group (2));
-      currentCell = rowOrderCells.get (address.rowKey);
+      currentCell = rowOrderCells.get (address.getRowKey ());
 
       int pos = line.indexOf (':');                     // end of cell address
       line = line.substring (pos + 1);                  // remove address from line
@@ -224,7 +224,7 @@ public class Sheet
       if (line.charAt (2) == 'C' && line.charAt (3) == 'C')
       {
         int width = Integer.parseInt (line.substring (4));
-        columnWidths.put (currentCell.getAddress ().column, width);
+        columnWidths.put (currentCell.getAddress ().getColumn (), width);
       }
       else
         System.out.printf ("Unknown Global:[%s]%n", line);
@@ -262,11 +262,11 @@ public class Sheet
   private void addCell (Cell cell)
   {
     //    System.out.printf ("Adding: %s%n", cell);
-    rowOrderCells.put (cell.getAddress ().rowKey, cell);
-    columnOrderCells.put (cell.getAddress ().columnKey, cell);
+    rowOrderCells.put (cell.getAddress ().getRowKey (), cell);
+    columnOrderCells.put (cell.getAddress ().getColumnKey (), cell);
 
-    highestRow = Math.max (highestRow, cell.getAddress ().row);
-    highestColumn = Math.max (highestColumn, cell.getAddress ().column);
+    highestRow = Math.max (highestRow, cell.getAddress ().getRow ());
+    highestColumn = Math.max (highestColumn, cell.getAddress ().getColumn ());
   }
 
   Cell getCell (String addressText)
@@ -276,7 +276,7 @@ public class Sheet
 
   Cell getCell (Address address)
   {
-    Cell cell = rowOrderCells.get (address.rowKey);
+    Cell cell = rowOrderCells.get (address.getRowKey ());
     if (cell == null)
     {
       //      System.out.printf ("cell not found, creating: %s%n", address);
@@ -288,7 +288,7 @@ public class Sheet
 
   boolean cellExists (Address address)
   {
-    return rowOrderCells.get (address.rowKey) != null;
+    return rowOrderCells.get (address.getRowKey ()) != null;
   }
 
   public int size ()
@@ -397,7 +397,7 @@ public class Sheet
       Address cellAddress = cell.getAddress ();
 
       // insert newlines for empty rows
-      while (lastRow < cellAddress.row)
+      while (lastRow < cellAddress.getRow ())
       {
         ++lastRow;
         lastColumn = 0;
@@ -408,7 +408,7 @@ public class Sheet
       }
 
       // pad out empty columns
-      while (lastColumn < cellAddress.column)
+      while (lastColumn < cellAddress.getColumn ())
       {
         int width = columnWidth;
         if (columnWidths.containsKey (lastColumn))
@@ -420,8 +420,8 @@ public class Sheet
       ++lastColumn;
 
       int colWidth = columnWidth;
-      if (columnWidths.containsKey (cellAddress.column))
-        colWidth = columnWidths.get (cellAddress.column);
+      if (columnWidths.containsKey (cellAddress.getColumn ()))
+        colWidth = columnWidths.get (cellAddress.getColumn ());
 
       text.append (cell.getText (colWidth, globalFormat));
     }
@@ -432,13 +432,13 @@ public class Sheet
       int last = -1;
       for (Cell cell : columnOrderCells.values ())
       {
-        if (last < cell.getAddress ().column)
+        if (last < cell.getAddress ().getColumn ())
         {
-          String columnName = Address.getCellName (1, cell.getAddress ().column);
+          String columnName = Address.getCellName (1, cell.getAddress ().getColumn ());
           columnName = columnName.substring (0, columnName.length () - 1);
           text.append ("\n                                    *** Column " + columnName
               + " ***\n\n");
-          last = cell.getAddress ().column;
+          last = cell.getAddress ().getColumn ();
         }
         text.append (cell.getDebugText ());
         text.append ("\n");

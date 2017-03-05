@@ -24,12 +24,6 @@ public class VisicalcFile extends AbstractFile
     text.append ("Cells    : " + sheet.size () + "\n\n");
     text.append (sheet.getTextDisplay (debug));
 
-    if (debug)
-    {
-      text.append ("\n");
-      text.append (sheet.getLines ());
-    }
-
     return text.toString ();
   }
 

@@ -146,7 +146,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
       case VALUE:
         if (!isValueType (ValueType.VALUE))
         {
-          char fmt = cellFormat != ' ' ? cellFormat : globalFormat;
+          char fmt =
+              cellFormat != ' ' ? cellFormat : globalFormat != ' ' ? globalFormat : 'R';
           return Format.justify (value.getText (), colWidth, fmt);
         }
 

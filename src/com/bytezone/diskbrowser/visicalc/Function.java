@@ -92,6 +92,9 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     if (text.startsWith ("@SUM("))
       return new Sum (parent, text);
 
+    if (text.startsWith ("@SQRT("))
+      return new Sqrt (parent, text);
+
     System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, "@ERROR");
   }

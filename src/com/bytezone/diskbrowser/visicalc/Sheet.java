@@ -21,16 +21,17 @@ public class Sheet
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
   private final List<String> lines = new ArrayList<String> ();
 
-  private char globalFormat = ' ';
-
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
-  private int columnWidth = 12;
+  private int columnWidth = 9;
 
+  private char globalFormat = ' ';
   private char recalculation = 'A';               // auto/manual
   private char recalculationOrder = 'C';          // row/column 
 
-  private int highestColumn;
-  private int highestRow;
+  private int minColumn = 9999;
+  private int maxColumn;
+  private int minRow = 9999;
+  private int maxRow;
 
   // Maximum cell = BK254
 
@@ -164,12 +165,9 @@ public class Sheet
       ptr += length + 1;            // +1 for end-of-line token
     }
 
-    System.out.println ("** Start of calculation **");
     // might have to keep recalculating until nothing changes??
     if (recalculation == 'A')             // auto
     {
-      //      recalculationOrder = 'R';
-      //      System.out.printf ("Calculation order: %s%n", recalculationOrder);
       calculate (recalculationOrder);
       calculate (recalculationOrder);
     }
@@ -233,40 +231,35 @@ public class Sheet
     }
 
     // check for formatting commands
-    String format = "";
     while (line.startsWith ("/"))
     {
-      if (line.charAt (1) == '-')     // repeating label
+      if (line.charAt (1) == '-')                 // repeating label
       {
         currentCell.setFormat (line);
         line = "";
-        format += line;
       }
       else
       {
-        String fmt = line.substring (0, FORMAT_LENGTH);
+        currentCell.setFormat (line.substring (0, FORMAT_LENGTH));
         line = line.substring (FORMAT_LENGTH);
-        currentCell.setFormat (fmt);                       // formatting command
-        format += fmt;
       }
     }
 
     // if there is anything left it must be an expression
     if (!line.isEmpty ())
-      currentCell.setValue (line);                      // expression
-
-    if (false)
-      System.out.printf ("[%s][%-3s][%s]%n", currentCell.getAddress (), format, line);
+      currentCell.setValue (line);               // expression
   }
 
   private void addCell (Cell cell)
   {
-    //    System.out.printf ("Adding: %s%n", cell);
     rowOrderCells.put (cell.getAddress ().getRowKey (), cell);
     columnOrderCells.put (cell.getAddress ().getColumnKey (), cell);
 
-    highestRow = Math.max (highestRow, cell.getAddress ().getRow ());
-    highestColumn = Math.max (highestColumn, cell.getAddress ().getColumn ());
+    minRow = Math.min (minRow, cell.getAddress ().getRow ());
+    minColumn = Math.min (minColumn, cell.getAddress ().getColumn ());
+
+    maxRow = Math.max (maxRow, cell.getAddress ().getRow ());
+    maxColumn = Math.max (maxColumn, cell.getAddress ().getColumn ());
   }
 
   Cell getCell (String addressText)
@@ -279,7 +272,6 @@ public class Sheet
     Cell cell = rowOrderCells.get (address.getRowKey ());
     if (cell == null)
     {
-      //      System.out.printf ("cell not found, creating: %s%n", address);
       cell = new Cell (this, address);
       addCell (cell);
     }
@@ -300,54 +292,41 @@ public class Sheet
   {
     switch (line.charAt (1))
     {
-      case 'W':
-        //          System.out.printf ("Skipping [%s]%n", line);
-        break;
       case 'G':
-        switch (line.charAt (2))
-        {
-          case 'R':
-            recalculation = line.charAt (3);
-            break;
-          case 'O':
-            recalculationOrder = line.charAt (3);
-            break;
-          case 'P':
-            //              System.out.printf ("Skipping [%s]%n", line);
-            break;
-          case 'C':
-            columnWidth = Integer.parseInt (line.substring (3));
-            break;
-          case 'F':
-            globalFormat = line.charAt (3);
-            break;
-          default:
-            System.out.printf ("Unknown global format [%s]%n", line);
-            break;
-        }
+        setGlobal (line);
+        break;
+      case 'W':
         break;
       case 'X':
-        //          System.out.printf ("Skipping [%s]%n", line);
         break;
       default:
         System.out.printf ("Skipping [%s]%n", line);
     }
   }
 
-  public String getLines ()
+  private void setGlobal (String line)
   {
-    StringBuilder text = new StringBuilder ();
-
-    for (String line : lines)
+    switch (line.charAt (2))
     {
-      text.append (line);
-      text.append ("\n");
+      case 'C':
+        columnWidth = Integer.parseInt (line.substring (3));
+        break;
+      case 'O':
+        recalculationOrder = line.charAt (3);
+        break;
+      case 'R':
+        recalculation = line.charAt (3);
+        break;
+      case 'F':
+        globalFormat = line.charAt (3);
+        break;
+      case 'P':
+        //              System.out.printf ("Skipping [%s]%n", line);
+        break;
+      default:
+        System.out.printf ("Unknown global format [%s]%n", line);
+        break;
     }
-
-    if (text.length () > 0)
-      text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
   }
 
   public String getTextDisplay (boolean debug)
@@ -367,7 +346,7 @@ public class Sheet
     int lastColumn = 0;
 
     StringBuilder heading = new StringBuilder ("    ");
-    for (int column = 0; column <= highestColumn; column++)
+    for (int column = 0; column <= maxColumn; column++)
     {
       int width = columnWidth;
       if (columnWidths.containsKey (column))
@@ -385,6 +364,20 @@ public class Sheet
       else
         heading.append (String.format (fmt, underline));
     }
+
+    text.append (String.format ("Global format       : %s%n", globalFormat));
+    text.append (String.format ("Column width        : %d%n", columnWidth));
+    text.append (String.format ("Recalculation order : %s%n",
+        recalculationOrder == 'R' ? "Row" : "Column"));
+    text.append (String.format ("Recalculation       : %s%n",
+        recalculation == 'A' ? "Automatic" : "Manual"));
+
+    if (rowOrderCells.size () > 0)
+      text.append (String.format ("Range               : %s:%s%n%n",
+          Address.getCellName (minRow + 1, minColumn),
+          Address.getCellName (maxRow + 1, maxColumn)));
+    else
+      text.append ("\n\n");
 
     if (debug)
     {
@@ -443,6 +436,16 @@ public class Sheet
         text.append (cell.getDebugText ());
         text.append ("\n");
       }
+
+      text.append ("\n");
+      for (String line : lines)
+      {
+        text.append (line);
+        text.append ("\n");
+      }
+
+      if (text.length () > 0)
+        text.deleteCharAt (text.length () - 1);
     }
 
     return text.toString ();

@@ -19,4 +19,11 @@ public class Choose extends Function
 
     values.add (source);
   }
+
+  @Override
+  public void calculate ()
+  {
+    source.calculate ();
+    System.out.println ("@CHOOSE not written yet");
+  }
 }

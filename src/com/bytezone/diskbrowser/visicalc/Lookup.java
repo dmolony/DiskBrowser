@@ -12,8 +12,10 @@ class Lookup extends Function
     super (parent, text);
 
     int pos = text.indexOf (',');
+
     sourceText = text.substring (8, pos);
     source = new Expression (parent, sourceText);
+
     rangeText = text.substring (pos + 1, text.length () - 1);
     range = new Range (parent, rangeText);
 
@@ -43,7 +45,9 @@ class Lookup extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell != null && cell.getValue () > sourceValue)     // past the value
+      if (cell.isValueType (ValueType.NA))
+        continue;
+      if (cell.getValue () > sourceValue)     // past the value
         break;
       target = address;
     }

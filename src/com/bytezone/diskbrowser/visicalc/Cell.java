@@ -132,10 +132,14 @@ class Cell extends AbstractValue implements Comparable<Cell>
   // format cell value for output
   String getText (int colWidth, char globalFormat)
   {
+    char fmtChar = cellFormat != ' ' ? cellFormat : globalFormat;
+
     switch (cellType)
     {
       case LABEL:
-        return Format.justify (label, colWidth, cellFormat);
+        if (fmtChar == ' ')
+          fmtChar = 'L';
+        return Format.justify (label, colWidth, fmtChar);
 
       case REPEATING_CHARACTER:
         return Format.justify (repeat, colWidth, ' ');
@@ -146,29 +150,23 @@ class Cell extends AbstractValue implements Comparable<Cell>
       case VALUE:
         if (!isValueType (ValueType.VALUE))
         {
-          char fmt =
-              cellFormat != ' ' ? cellFormat : globalFormat != ' ' ? globalFormat : 'R';
-          return Format.justify (value.getText (), colWidth, fmt);
+          if (fmtChar == ' ')
+            fmtChar = 'R';
+          return " " + Format.justify (value.getText (), colWidth - 1, fmtChar);
         }
 
-        char formatChar = cellFormat != ' ' ? cellFormat : globalFormat;
-        return " " + Format.format (value, formatChar, colWidth - 1);
+        return " " + Format.format (value, fmtChar, colWidth - 1);
 
       default:
         assert false;
-        return getText ();        // not possible
+        return "Impossible";
     }
   }
 
   @Override
   public double getValue ()
   {
-    //    if (value == null)
-    //      calculate ();
-    if (cellType != CellType.VALUE)
-      return 0;
-
-    return value.getValue ();
+    return cellType == CellType.VALUE ? value.getValue () : 0;
   }
 
   @Override
@@ -188,39 +186,20 @@ class Cell extends AbstractValue implements Comparable<Cell>
     if (cellType == CellType.EMPTY)
       return "";
 
+    assert cellType == CellType.VALUE;
     return value.getText ();
   }
 
   @Override
   public boolean isValueType (ValueType type)
   {
-    //    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
-    //      return type == ValueType.VALUE;
-    //
-    //    if (cellType == CellType.EMPTY)
-    //      return type == ValueType.NA;
-    //
-    //    assert value != null : "bollocks " + address;
-    //    return value.isValueType (type);
     return type == getValueType ();
-  }
-
-  public boolean isCellType (CellType type)
-  {
-    return cellType == type;
   }
 
   @Override
   public void calculate ()
   {
-    //    if (value != null && value.isValueType (ValueType.VALUE))
-    //      return;
-    //
-    //    if (expressionText == null)
-    //      expressionText = "";
-
-    //    value = new Expression (parent, expressionText).reduce ();
-    if (value != null)
+    if (cellType == CellType.VALUE)
       value.calculate ();
   }
 

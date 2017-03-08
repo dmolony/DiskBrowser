@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
-import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 public class Sheet
 {
@@ -177,8 +176,7 @@ public class Sheet
   {
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
-      if (cell.isCellType (CellType.VALUE))
-        cell.calculate ();
+      cell.calculate ();
   }
 
   private int getLineLength (byte[] buffer, int offset)
@@ -371,8 +369,9 @@ public class Sheet
         recalculationOrder == 'R' ? "Row" : "Column"));
     text.append (String.format ("Recalculation       : %s%n",
         recalculation == 'A' ? "Automatic" : "Manual"));
+    text.append (String.format ("Cells               : %d%n", size ()));
 
-    if (rowOrderCells.size () > 0)
+    if (size () > 0)
       text.append (String.format ("Range               : %s:%s%n%n",
           Address.getCellName (minRow + 1, minColumn),
           Address.getCellName (maxRow + 1, maxColumn)));

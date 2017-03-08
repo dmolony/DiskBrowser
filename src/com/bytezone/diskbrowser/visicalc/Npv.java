@@ -2,23 +2,24 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Npv extends Function
 {
-  //  private final String valueText;
-  //  private final String rangeText;
-  //
-  //  private final Expression valueExp;
+  private final String valueText;
+  private final String rangeText;
+
+  private final Expression rateExp;
   private final Range range;
 
   Npv (Sheet parent, String text)
   {
     super (parent, text);
 
-    range = new Range (parent, text);
+    int pos = text.indexOf (',');
+    valueText = text.substring (5, pos);
+    rangeText = text.substring (pos + 1, text.length () - 1);
 
-    //    int pos = text.indexOf (',');
-    //    valueText = text.substring (8, pos);
-    //    rangeText = text.substring (pos + 1, text.length () - 1);
-    //
-    //    valueExp = new Expression (parent, valueText);
+    rateExp = new Expression (parent, valueText);
+    range = new Range (parent, rangeText);
+
+    values.add (rateExp);
   }
 
   @Override
@@ -27,8 +28,20 @@ public class Npv extends Function
     value = 0;
     valueType = ValueType.VALUE;
 
+    rateExp.calculate ();
+    if (!rateExp.isValueType (ValueType.VALUE))
+    {
+      valueType = rateExp.getValueType ();
+      return;
+    }
+
+    double rate = 1 + rateExp.getValue ();
+
+    int period = 0;
     for (Address address : range)
     {
+      ++period;
+
       Cell cell = parent.getCell (address);
       if (cell.isValueType (ValueType.NA))
         continue;
@@ -36,10 +49,10 @@ public class Npv extends Function
       if (!cell.isValueType (ValueType.VALUE))
       {
         valueType = cell.getValueType ();
-        break;
+        return;
       }
 
-      double temp = cell.getValue ();
+      value += cell.getValue () / Math.pow (rate, period);
     }
   }
 }

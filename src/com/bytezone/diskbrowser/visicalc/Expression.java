@@ -194,7 +194,14 @@ class Expression extends AbstractValue implements Iterable<Value>
         else if (operator.equals ("*"))
           value *= nextValue;
         else if (operator.equals ("/"))
+        {
+          if (nextValue == 0)
+          {
+            valueType = ValueType.ERROR;
+            return;
+          }
           value /= nextValue;
+        }
         else if (operator.equals ("^"))
           value = Math.pow (value, nextValue);
       }

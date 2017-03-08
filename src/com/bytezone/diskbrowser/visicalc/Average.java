@@ -20,13 +20,14 @@ public class Average extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
+
       if (cell.isValueType (ValueType.NA))
         continue;
 
       if (!cell.isValueType (ValueType.VALUE))
       {
         valueType = cell.getValueType ();
-        break;
+        return;
       }
 
       total += cell.getValue ();
@@ -34,11 +35,12 @@ public class Average extends Function
     }
 
     if (totalChecked == 0)
-      valueType = ValueType.NA;
-    else
     {
-      value = total / totalChecked;
-      valueType = ValueType.VALUE;
+      valueType = ValueType.ERROR;
+      return;
     }
+
+    value = total / totalChecked;
+    valueType = ValueType.VALUE;
   }
 }

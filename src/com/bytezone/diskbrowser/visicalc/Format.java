@@ -1,10 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.text.DecimalFormat;
-
 public class Format
 {
-  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
+  //  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
 
   private Format ()
   {
@@ -23,9 +21,10 @@ public class Format
       case 'R':
       case ' ':
         // this could be improved
-        String numberFormat = String.format ("%%%d.5f", colWidth + 6);
+        String numberFormat = String.format ("%%%d.7f", colWidth + 8);
         String val = String.format (numberFormat, actualValue);
 
+        val = val.trim ();
         while (val.endsWith ("0"))
           val = val.substring (0, val.length () - 1);
         if (val.endsWith ("."))
@@ -33,15 +32,25 @@ public class Format
         if (val.startsWith ("0."))
           val = val.substring (1);
 
-        if (val.length () > colWidth)
-          val = val.substring (val.length () - colWidth);
+        if (val.length () > colWidth && val.indexOf ('.') >= 0)
+        {
+          val = val.substring (0, colWidth);
+        }
 
         //      System.out.printf ("len:%d fmt: %s%n", val.length (), formatChar);
-        if (val.startsWith (" ") && formatChar == 'L')
+        if (formatChar == 'L')
         {
           String leftFormat = String.format ("%%-%ds", colWidth);
-          val = String.format (leftFormat, val.trim ());
+          val = String.format (leftFormat, val);
         }
+        else
+        {
+          String rightFormat = String.format ("%%%ds", colWidth);
+          val = String.format (rightFormat, val);
+        }
+
+        if (val.length () > colWidth)
+          return ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>".substring (0, colWidth);
 
         return val;
 
@@ -53,8 +62,15 @@ public class Format
         return result;
 
       case '$':
-        String currencyFormat = String.format ("%%%d.%ds", colWidth, colWidth);
-        return String.format (currencyFormat, nf.format (actualValue));
+        String currencyFormat = String.format ("%%%d.%df", colWidth + 3, 2);
+        result = String.format (currencyFormat, actualValue).trim ();
+        String rightFormat = String.format ("%%%ds", colWidth);
+        val = String.format (rightFormat, result);
+        //        System.out.println (result);
+        //        System.out.println (val);
+        if (result.length () > colWidth)
+          return ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>".substring (0, colWidth);
+        return val;
 
       case '*':
         String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);

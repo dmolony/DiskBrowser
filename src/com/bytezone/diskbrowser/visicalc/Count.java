@@ -27,11 +27,10 @@ class Count extends Function
       if (!cell.isValueType (ValueType.VALUE))
       {
         valueType = cell.getValueType ();
-        break;
+        return;
       }
 
-      if (cell.getValue () != 0.0)
-        value++;
+      value++;
     }
   }
 }

@@ -2,7 +2,9 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Format
 {
-  //  private static final DecimalFormat nf = new DecimalFormat ("#####0.00");
+  private static final String OVERFLOW = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+  private static final String HISTOGRAM = "***********************************";
+  private static final String UNKNOWN = "???????????????????????????????????";
 
   private Format ()
   {
@@ -19,8 +21,8 @@ public class Format
     {
       case 'L':
       case 'R':
+      case 'G':
       case ' ':
-        // this could be improved
         String numberFormat = String.format ("%%%d.7f", colWidth + 8);
         String val = String.format (numberFormat, actualValue);
 
@@ -33,11 +35,8 @@ public class Format
           val = val.substring (1);
 
         if (val.length () > colWidth && val.indexOf ('.') >= 0)
-        {
           val = val.substring (0, colWidth);
-        }
 
-        //      System.out.printf ("len:%d fmt: %s%n", val.length (), formatChar);
         if (formatChar == 'L')
         {
           String leftFormat = String.format ("%%-%ds", colWidth);
@@ -50,36 +49,33 @@ public class Format
         }
 
         if (val.length () > colWidth)
-          return ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>".substring (0, colWidth);
+          return OVERFLOW.substring (0, colWidth);
 
         return val;
 
       case 'I':
-        String integerFormat = String.format ("%%%d.0f", colWidth);
-        String result = String.format (integerFormat, actualValue);
+        String integerFormat = String.format ("%%%dd", colWidth);
+        String result = String.format (integerFormat, (int) actualValue);
         if (result.length () > colWidth)
-          return ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>".substring (0, colWidth);
+          return OVERFLOW.substring (0, colWidth);
         return result;
 
       case '$':
-        String currencyFormat = String.format ("%%%d.%df", colWidth + 3, 2);
+        String currencyFormat = String.format ("%%%d.2f", colWidth + 3);
         result = String.format (currencyFormat, actualValue).trim ();
         String rightFormat = String.format ("%%%ds", colWidth);
         val = String.format (rightFormat, result);
-        //        System.out.println (result);
-        //        System.out.println (val);
         if (result.length () > colWidth)
-          return ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>".substring (0, colWidth);
+          return OVERFLOW.substring (0, colWidth);
         return val;
 
       case '*':
         String graphFormat = String.format ("%%-%d.%ds", colWidth, colWidth);
-        // this is not finished
-        return String.format (graphFormat, "********************");
+        return String.format (graphFormat, HISTOGRAM.substring (0, (int) actualValue));
 
       default:
         System.out.printf ("[%s]%n", formatChar);
-        return "??????????????????????".substring (0, colWidth);
+        return UNKNOWN.substring (0, colWidth);
     }
   }
 

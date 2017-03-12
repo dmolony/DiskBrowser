@@ -165,11 +165,8 @@ public class Sheet
     }
 
     // might have to keep recalculating until nothing changes??
-    if (recalculation == 'A')             // auto
-    {
-      calculate (recalculationOrder);
-      calculate (recalculationOrder);
-    }
+    calculate (recalculationOrder);
+    calculate (recalculationOrder);
   }
 
   private void calculate (char order)
@@ -363,16 +360,16 @@ public class Sheet
         heading.append (String.format (fmt, underline));
     }
 
-    text.append (String.format ("Global format       : %s%n", globalFormat));
-    text.append (String.format ("Column width        : %d%n", columnWidth));
-    text.append (String.format ("Recalculation order : %s%n",
+    text.append (String.format ("Global format : %s%n", globalFormat));
+    text.append (String.format ("Column width  : %d%n", columnWidth));
+    text.append (String.format ("Recalc  order : %s%n",
         recalculationOrder == 'R' ? "Row" : "Column"));
-    text.append (String.format ("Recalculation       : %s%n",
+    text.append (String.format ("Recalculation : %s%n",
         recalculation == 'A' ? "Automatic" : "Manual"));
-    text.append (String.format ("Cells               : %d%n", size ()));
+    text.append (String.format ("Cells         : %d%n", size ()));
 
     if (size () > 0)
-      text.append (String.format ("Range               : %s:%s%n%n",
+      text.append (String.format ("Range         : %s:%s%n%n",
           Address.getCellName (minRow + 1, minColumn),
           Address.getCellName (maxRow + 1, maxColumn)));
     else

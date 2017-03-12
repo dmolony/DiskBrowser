@@ -22,7 +22,7 @@ import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
 public class DiskFactory
 {
-  private static boolean debug = false;
+  private static boolean debug = true;
 
   private DiskFactory ()
   {
@@ -36,7 +36,7 @@ public class DiskFactory
   public static FormattedDisk createDisk (String path)
   {
     if (debug)
-      System.out.println ("Factory : " + path);
+      System.out.println ("\nFactory : " + path);
 
     File file = new File (path);
     if (!file.exists ())
@@ -48,6 +48,8 @@ public class DiskFactory
 
     if (suffix.equals ("gz"))
     {
+      if (debug)
+        System.out.println (" ** gzip **");
       try
       {
         InputStream in = new GZIPInputStream (new FileInputStream (path));
@@ -76,6 +78,8 @@ public class DiskFactory
 
     if (suffix.equals ("sdk"))
     {
+      if (debug)
+        System.out.println (" ** sdk **");
       try
       {
         NuFX nuFX = new NuFX (file);
@@ -104,6 +108,8 @@ public class DiskFactory
 
     if (suffix.equals ("hdv"))
     {
+      if (debug)
+        System.out.println (" ** hdv **");
       ProdosDisk prodosDisk = checkHardDisk (file);
       if (prodosDisk != null)
         return prodosDisk;
@@ -118,6 +124,8 @@ public class DiskFactory
 
     if (suffix.equals ("2mg"))
     {
+      if (debug)
+        System.out.println (" ** 2mg **");
       disk2 = check2mgDisk (file);
       if (disk2 != null)
         return disk2;
@@ -129,7 +137,7 @@ public class DiskFactory
     if (((suffix.equals ("po") || suffix.equals ("dsk")) && file.length () > 143360))
     {
       if (debug)
-        System.out.println ("Checking po or dsk hard drive: " + file.length ());
+        System.out.println ("  Checking po or dsk hard drive: " + file.length ());
 
       disk = checkHardDisk (file);
       if (disk != null)
@@ -140,25 +148,27 @@ public class DiskFactory
       }
 
       if (debug)
-        System.out.println ("Creating a data disk from bad length");
+        System.out.println ("  Creating a data disk from bad length");
 
       try
       {
         AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
         if (debug)
-          System.out.println ("created");
+          System.out.println ("  created data usk");
         return new DataDisk (appleDisk);
       }
       catch (FileFormatException e)
       {
         if (debug)
-          System.out.println ("Creating AppleDisk failed");
+          System.out.println ("  Creating AppleDisk failed");
         return null;
       }
     }
 
     if (suffix.equals ("v2d"))
     {
+      if (debug)
+        System.out.println (" ** v2d **");
       V2dDisk v2dDisk = new V2dDisk (file);
       AppleDisk appleDisk16 = new AppleDisk (v2dDisk);
       disk = checkDos (appleDisk16);
@@ -167,6 +177,8 @@ public class DiskFactory
 
     if (suffix.equals ("nib"))
     {
+      if (debug)
+        System.out.println (" ** nib **");
       NibDisk nibDisk = new NibDisk (file);
       AppleDisk appleDisk16 = new AppleDisk (nibDisk);
       disk = checkDos (appleDisk16);
@@ -177,6 +189,8 @@ public class DiskFactory
 
     if (length == 116480)           // 13 sector disk
     {
+      if (debug)
+        System.out.println (" ** 13 sector **");
       if (!suffix.equals ("d13"))
         System.out.printf ("%s should have a d13 suffix%n", file.getName ());
 
@@ -192,38 +206,75 @@ public class DiskFactory
       return null;
     }
 
-    AppleDisk appleDisk16 = new AppleDisk (file, 35, 16);
-    AppleDisk appleDisk8 = new AppleDisk (file, 35, 8);
+    AppleDisk appleDisk256 = new AppleDisk (file, 35, 16);
+    AppleDisk appleDisk512 = new AppleDisk (file, 35, 8);
 
     if (true)
     {
-      long checksum = appleDisk16.getBootChecksum ();
+      //      if (debug)
+      //        System.out.println ("  trying checksums");
+      long checksum = appleDisk256.getBootChecksum ();
 
-      if (checksum == 3176296590L || checksum == 108825457L || checksum == 1439356606L
-          || checksum == 1550012074L || checksum == 1614602459L || checksum == 940889336L
-          || checksum == 990032697 || checksum == 2936955085L || checksum == 1348415927L
-          || checksum == 3340889101L || checksum == 18315788L || checksum == 993895235L)
+      if (checksum == 3176296590L       //
+          || checksum == 108825457L     //
+          || checksum == 1439356606L    //
+          || checksum == 1550012074L    //
+          || checksum == 1614602459L    //
+          || checksum == 940889336L     //
+          || checksum == 2936955085L    //
+          || checksum == 1348415927L    //
+          || checksum == 3340889101L    //
+          || checksum == 18315788L      //
+          || checksum == 993895235L     //
+          || checksum == 2378342794L)   // LazerPascal1.dsk
       {
-        disk = checkDos (appleDisk16);
-        disk2 = checkProdos (appleDisk8);
-        if (disk2 != null && disk != null)
+        if (debug)
+          System.out.println ("  known DOS checksum : " + checksum);
+        disk = checkDos (appleDisk256);
+        disk2 = checkProdos (appleDisk512);     // no need for this
+        if (disk2 != null && disk != null)      // should be impossible
+        {
+          if (debug)
+            System.out.println ("  --> Dual dos/prodos 1");
+          System.out.println ("** impossible **");
           disk = new DualDosDisk (disk, disk2);
+        }
       }
-      else if (checksum == 1737448647L || checksum == 170399908L)
+      else if (checksum == 1737448647L      //
+          || checksum == 170399908L         //
+          || checksum == 990032697)         // Apple Assembly Line
       {
-        disk = checkProdos (appleDisk8);
-        disk2 = checkDos (appleDisk16);
+        if (debug)
+          System.out.println ("  known PRODOS checksum : " + checksum);
+        disk = checkProdos (appleDisk512);
+        disk2 = checkDos (appleDisk256);
         if (disk2 != null && disk != null)
+        {
+          if (debug)
+            System.out.println ("  --> Dual prodos/dos 2");
           disk = new DualDosDisk (disk, disk2);
+        }
       }
-      else if (checksum == 2803644711L || checksum == 3317783349L
-          || checksum == 1728863694L || checksum == 198094178L)
+      else if (checksum == 2803644711L    // Apple Pascal disk 0
+          || checksum == 3317783349L      //
+          || checksum == 1728863694L      // Wizardry_I_boot.dsk
+          || checksum == 227968344L       // wizardry_I/australia16.dsk
+          || checksum == 198094178L       //
+          || checksum == 227968344L)      // lauren.dsk
       {
-        //        disk = checkPascalDisk (file);
-        disk = checkPascalDisk (appleDisk8);
+        if (debug)
+          System.out.println ("  known PASCAL checksum : " + checksum);
+        disk = checkPascalDisk (appleDisk512);
       }
-      else if (checksum == 3028642627L || checksum == 2070151659L)
-        disk = checkInfocomDisk (appleDisk16);
+      else if (checksum == 3028642627L    // 
+          || checksum == 2070151659L)     // Enchanter
+      {
+        if (debug)
+          System.out.println ("  known INFOCOM checksum : " + checksum);
+        disk = checkInfocomDisk (appleDisk256);
+      }
+      else if (debug)
+        System.out.println ("  unknown checksum : " + checksum);
 
       //      else if (checksum == 1212926910L || checksum == 1365043894L
       //          || checksum == 2128073918L)
@@ -243,43 +294,48 @@ public class DiskFactory
         System.out.println ("Unknown checksum : " + checksum + " : " + path);
     }
 
+    if (debug)
+      System.out.println ("  checksum no help");
+    if (debug)
+      System.out.println ("  Suffix : " + suffix);
+
     if (suffix.equals ("dsk") || suffix.equals ("do"))
     {
-      disk = checkDos (appleDisk16);
+      disk = checkDos (appleDisk256);
       if (disk == null)
-        disk = checkProdos (appleDisk8);
+        disk = checkProdos (appleDisk512);
       else
       {
         if (debug)
           System.out.println ("Checking DualDos disk");
 
-        disk2 = checkProdos (appleDisk8);
+        disk2 = checkProdos (appleDisk512);
         if (disk2 != null)
           disk = new DualDosDisk (disk, disk2);
       }
     }
     else if (suffix.equals ("po"))
     {
-      disk = checkProdos (appleDisk8);
+      disk = checkProdos (appleDisk512);
       if (disk == null)
-        disk = checkDos (appleDisk16);
+        disk = checkDos (appleDisk256);
     }
 
     if (disk == null)
-      disk = checkPascalDisk (appleDisk8);
+      disk = checkPascalDisk (appleDisk512);
 
     if (disk == null)
-      disk = checkCPMDisk (appleDisk16);
+      disk = checkCPMDisk (appleDisk256);
 
     if (disk == null)
     {
-      disk2 = checkInfocomDisk (appleDisk16);
+      disk2 = checkInfocomDisk (appleDisk256);
       if (disk2 != null)
         disk = disk2;
     }
 
     if (disk == null)
-      disk = new DataDisk (appleDisk16);
+      disk = new DataDisk (appleDisk256);
 
     if (debug)
       System.out.println (
@@ -299,13 +355,17 @@ public class DiskFactory
     try
     {
       if (DosDisk.isCorrectFormat (disk))
+      {
+        if (debug)
+          System.out.println ("  --> DOS");
         return new DosDisk (disk);
+      }
     }
     catch (Exception e)
     {
     }
     if (debug)
-      System.out.println ("Not a DOS disk");
+      System.out.println ("  not a DOS disk");
     return null;
   }
 
@@ -317,13 +377,17 @@ public class DiskFactory
     try
     {
       if (ProdosDisk.isCorrectFormat (disk))
+      {
+        if (debug)
+          System.out.println ("  --> PRODOS");
         return new ProdosDisk (disk);
+      }
     }
     catch (Exception e)
     {
     }
     if (debug)
-      System.out.println ("Not a Prodos disk");
+      System.out.println ("  not a Prodos disk");
     return null;
   }
 
@@ -353,10 +417,7 @@ public class DiskFactory
       if (ProdosDisk.isCorrectFormat (disk))
       {
         if (debug)
-        {
-          System.out.println ("Yay, it's a prodos hard disk");
-          System.out.println (disk);
-        }
+          System.out.println ("  --> PRODOS hard disk");
         return new ProdosDisk (disk);
       }
     }
@@ -366,7 +427,7 @@ public class DiskFactory
     }
 
     if (debug)
-      System.out.println ("Not a Prodos hard disk\n");
+      System.out.println ("  not a Prodos hard disk\n");
 
     return null;
   }
@@ -494,7 +555,11 @@ public class DiskFactory
       System.out.println ("Checking Infocom disk");
 
     if (InfocomDisk.isCorrectFormat (disk))
+    {
+      if (debug)
+        System.out.println ("  --> INFOCOM");
       return new InfocomDisk (disk);
+    }
 
     if (debug)
       System.out.println ("Not an InfocomDisk disk");

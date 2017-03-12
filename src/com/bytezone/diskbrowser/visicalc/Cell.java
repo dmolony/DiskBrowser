@@ -137,7 +137,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
     switch (cellType)
     {
       case LABEL:
-        if (fmtChar == ' ')
+        //        if (fmtChar == ' ' || fmtChar == 'I' || fmtChar == '$')
+        if (fmtChar != 'R')
           fmtChar = 'L';
         return Format.justify (label, colWidth, fmtChar);
 

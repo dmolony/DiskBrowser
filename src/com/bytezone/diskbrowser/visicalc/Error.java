@@ -7,10 +7,4 @@ class Error extends Function
     super (parent, text);
     valueType = ValueType.ERROR;
   }
-
-  @Override
-  public double getValue ()
-  {
-    return 0;
-  }
 }

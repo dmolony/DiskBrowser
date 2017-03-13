@@ -157,13 +157,13 @@ class Expression extends AbstractValue implements Iterable<Value>
       thisValue.calculate ();
 
       value = 0;
-      if (thisValue.isValueType (ValueType.ERROR))
+      if (!thisValue.isValueType (ValueType.VALUE))
       {
         valueType = thisValue.getValueType ();
         return;
       }
 
-      value = thisValue.getValue ();                  // NA returns zero
+      value = thisValue.getValue ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -174,13 +174,13 @@ class Expression extends AbstractValue implements Iterable<Value>
         thisValue = values.get (i);
         thisValue.calculate ();
 
-        if (thisValue.isValueType (ValueType.ERROR))
+        if (!thisValue.isValueType (ValueType.VALUE))
         {
           valueType = thisValue.getValueType ();
           return;
         }
 
-        double nextValue = thisValue.getValue ();     // NA returns zero
+        double nextValue = thisValue.getValue ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))

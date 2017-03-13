@@ -22,7 +22,7 @@ import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
 public class DiskFactory
 {
-  private static boolean debug = true;
+  private static boolean debug = false;
 
   private DiskFactory ()
   {
@@ -211,11 +211,15 @@ public class DiskFactory
 
     if (true)
     {
-      //      if (debug)
-      //        System.out.println ("  trying checksums");
       long checksum = appleDisk256.getBootChecksum ();
 
-      if (checksum == 3176296590L       //
+      if (checksum == 227968344L)       // empty boot sector
+      {
+        // could be wizardry data, visialc data ...
+        if (debug)
+          System.out.println ("  empty sector checksum : " + checksum);
+      }
+      else if (checksum == 3176296590L  //
           || checksum == 108825457L     //
           || checksum == 1439356606L    //
           || checksum == 1550012074L    //
@@ -258,9 +262,7 @@ public class DiskFactory
       else if (checksum == 2803644711L    // Apple Pascal disk 0
           || checksum == 3317783349L      //
           || checksum == 1728863694L      // Wizardry_I_boot.dsk
-          || checksum == 227968344L       // wizardry_I/australia16.dsk
-          || checksum == 198094178L       //
-          || checksum == 227968344L)      // lauren.dsk
+          || checksum == 198094178L)      //
       {
         if (debug)
           System.out.println ("  known PASCAL checksum : " + checksum);

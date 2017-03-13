@@ -30,6 +30,7 @@ class Lookup extends Function
     if (!source.isValueType (ValueType.VALUE))
     {
       valueType = source.getValueType ();
+      //      valueType = ValueType.NA;
       return;
     }
 
@@ -45,15 +46,23 @@ class Lookup extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      if (cell.isValueType (ValueType.NA))
-        continue;
+      //      if (cell.isValueType (ValueType.NA))
+      //      {
+      //        //        System.out.println ("NA1");
+      //        break;
+      //        //        continue;
+      //      }
       if (cell.getValue () > sourceValue)     // past the value
         break;
       target = address;
     }
 
     if (target == null)
+    {
       valueType = ValueType.NA;
+      //      System.out.println ("NA2");
+      value = 0;
+    }
     else
     {
       Address adjacentAddress =

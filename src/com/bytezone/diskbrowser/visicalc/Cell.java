@@ -173,9 +173,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public ValueType getValueType ()
   {
-    if (cellType == CellType.EMPTY)
-      return ValueType.NA;
-    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
+    if (cellType == CellType.EMPTY || cellType == CellType.LABEL
+        || cellType == CellType.REPEATING_CHARACTER)
       return ValueType.VALUE;
 
     return value.getValueType ();

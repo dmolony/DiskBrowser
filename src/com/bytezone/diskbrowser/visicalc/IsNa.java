@@ -14,11 +14,8 @@ public class IsNa extends Function
   @Override
   public void calculate ()
   {
-    //    if (expression == null)
-    //      expression = new Expression (parent, functionText);
-
     expression.calculate ();
-    value = expression.getValue ();
+    value = expression.isValueType (ValueType.NA) ? 1 : 0;
     valueType = expression.getValueType ();
   }
 }

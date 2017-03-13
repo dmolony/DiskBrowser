@@ -17,18 +17,33 @@ public class Format
     if (actualValue == -0.0)
       actualValue = 0;
 
+    String valueText = String.valueOf ((int) actualValue);
+    if (valueText.startsWith ("0"))
+      valueText = valueText.substring (1);
+    int digits = valueText.length ();
+    if (digits > colWidth)
+      return OVERFLOW.substring (0, colWidth);
+
     switch (formatChar)
     {
       case 'L':
       case 'R':
       case 'G':
       case ' ':
-        String numberFormat = String.format ("%%%d.7f", colWidth + 8);
+        int precision = colWidth - (digits + 1);
+        if (digits == 0)
+          precision = colWidth - 1;
+        if (precision < 0)
+          precision = 0;
+        String numberFormat = String.format ("%%%d.%df", colWidth, precision);
         String val = String.format (numberFormat, actualValue);
+        //        System.out.printf ("%s %2d  %2d  %s  %15.8f  %s  : ", formatChar, colWidth,
+        //            digits, numberFormat, actualValue, val);
 
         val = val.trim ();
-        while (val.endsWith ("0"))
-          val = val.substring (0, val.length () - 1);
+        if (val.indexOf ('.') >= 0)
+          while (val.endsWith ("0"))
+            val = val.substring (0, val.length () - 1);
         if (val.endsWith ("."))
           val = val.substring (0, val.length () - 1);
         if (val.startsWith ("0."))
@@ -48,14 +63,16 @@ public class Format
           val = String.format (rightFormat, val);
         }
 
+        //        System.out.printf ("[%s]%n", val);
+
         if (val.length () > colWidth)
           return OVERFLOW.substring (0, colWidth);
 
         return val;
 
       case 'I':
-        String integerFormat = String.format ("%%%dd", colWidth);
-        String result = String.format (integerFormat, (int) actualValue);
+        String integerFormat = String.format ("%%%d.0f", colWidth);
+        String result = String.format (integerFormat, actualValue);
         if (result.length () > colWidth)
           return OVERFLOW.substring (0, colWidth);
         return result;

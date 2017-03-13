@@ -264,12 +264,12 @@ public class DosDisk extends AbstractFormattedDisk
     if (buffer[53] != 16 && buffer[53] != 13)         // tracks per sector
       return 0;
 
-    if (buffer[49] < -1 || buffer[49] > 1)            // direction of next file save
-    {
-      System.out.println ("Bad direction : " + buffer[49]);
-      // Visicalc data disk had 0xF8
-      //      return 0;
-    }
+    //    if (buffer[49] < -1 || buffer[49] > 1)      // direction of next file save
+    //    {
+    //      System.out.println ("Bad direction : " + buffer[49]);
+    //      // Visicalc data disk had 0xF8
+    //      //      return 0;
+    //    }
 
     int version = buffer[3];
     if (version < -1 || version > 4)

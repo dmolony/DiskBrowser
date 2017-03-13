@@ -7,10 +7,4 @@ public class Na extends Function
     super (parent, text);
     valueType = ValueType.NA;
   }
-
-  @Override
-  public double getValue ()
-  {
-    return 0;
-  }
 }

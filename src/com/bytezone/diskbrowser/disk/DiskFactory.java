@@ -426,6 +426,7 @@ public class DiskFactory
     catch (Exception e)
     {
       System.out.println (e);
+      System.out.println ("Prodos hard disk had error");
     }
 
     if (debug)

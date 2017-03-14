@@ -85,12 +85,11 @@ public class ProdosDisk extends AbstractFormattedDisk
       byte[] sectorBuffer = disk.readSector (block);
       sectorTypes[block] = currentSectorType;
 
-      for (int ptr = 4, max =
-          disk.getBlockSize () - ProdosConstants.ENTRY_SIZE; ptr < max; ptr +=
-              ProdosConstants.ENTRY_SIZE)
+      int max = disk.getBlockSize () - ProdosConstants.ENTRY_SIZE;
+      for (int ptr = 4; ptr < max; ptr += ProdosConstants.ENTRY_SIZE)
       {
         int storageType = (sectorBuffer[ptr] & 0xF0) >> 4;
-        if (storageType == 0) // deleted or unused
+        if (storageType == 0)                                   // deleted or unused
           continue;
 
         byte[] entry = new byte[ProdosConstants.ENTRY_SIZE];

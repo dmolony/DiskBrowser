@@ -123,21 +123,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return ((fileType & 0xF0) == 0x80);
   }
 
-  private void removeEmptyBlocks ()
-  {
-    while (dataBlocks.size () > 0)
-    {
-      DiskAddress da = dataBlocks.get (dataBlocks.size () - 1);
-      if (da.getBlock () == 0)
-        dataBlocks.remove (dataBlocks.size () - 1);
-      else
-        break;
-    }
-  }
-
   private void traverseMasterIndex (int keyPtr)
   {
     byte[] buffer = disk.readSector (keyPtr);               // master index
+
     // find the last used index block
     // get the file size from the catalog and only check those blocks
     int highestBlock = 0;
@@ -151,9 +140,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
       }
     }
+
     for (int i = 0; i <= highestBlock; i++)
     {
-      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]); // index
+      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);       // index
       if (block != 0)
         traverseIndex (block);
       else
@@ -164,7 +154,21 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           dataBlocks.add (da);
       }
     }
+
     removeEmptyBlocks ();
+  }
+
+  private void removeEmptyBlocks ()
+  {
+    while (dataBlocks.size () > 0)
+    {
+      DiskAddress da = dataBlocks.get (dataBlocks.size () - 1);
+
+      if (da == null || da.getBlock () != 0)
+        break;
+
+      dataBlocks.remove (dataBlocks.size () - 1);
+    }
   }
 
   private void traverseIndex (int keyBlock)

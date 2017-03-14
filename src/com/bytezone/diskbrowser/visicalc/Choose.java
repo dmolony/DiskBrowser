@@ -7,9 +7,9 @@ public class Choose extends Function
   private final String rangeText;
   private final Number source;
 
-  Choose (Sheet parent, String text)
+  Choose (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     int pos = text.indexOf (',');
     sourceText = text.substring (8, pos);

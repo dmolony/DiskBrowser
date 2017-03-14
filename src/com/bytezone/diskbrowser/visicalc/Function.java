@@ -26,83 +26,85 @@ import java.util.Iterator;
 abstract class Function extends AbstractValue implements Iterable<Value>
 {
   protected final Sheet parent;
+  protected final Cell cell;
   protected String functionName;
   protected String functionText;
   protected String fullText;
 
-  static Function getInstance (Sheet parent, String text)
+  static Function getInstance (Sheet parent, Cell cell, String text)
   {
     if (text.charAt (0) != '@')
     {
       System.out.printf ("Unknown function: [%s]%n", text);
-      return new Error (parent, "@ERROR");
+      return new Error (parent, cell, "@ERROR");
     }
 
     if (text.startsWith ("@ABS("))
-      return new Abs (parent, text);
+      return new Abs (parent, cell, text);
 
     if (text.startsWith ("@AND("))
-      return new And (parent, text);
+      return new And (parent, cell, text);
 
     if (text.startsWith ("@AVERAGE("))
-      return new Average (parent, text);
+      return new Average (parent, cell, text);
 
     if (text.startsWith ("@COUNT("))
-      return new Count (parent, text);
+      return new Count (parent, cell, text);
 
     if (text.startsWith ("@CHOOSE("))
-      return new Choose (parent, text);
+      return new Choose (parent, cell, text);
 
     if (text.startsWith ("@ERROR"))
-      return new Error (parent, text);
+      return new Error (parent, cell, text);
 
     if (text.startsWith ("@IF("))
-      return new If (parent, text);
+      return new If (parent, cell, text);
 
     if (text.startsWith ("@INT("))
-      return new Int (parent, text);
+      return new Int (parent, cell, text);
 
     if (text.startsWith ("@ISERROR("))
-      return new IsError (parent, text);
+      return new IsError (parent, cell, text);
 
     if (text.startsWith ("@ISNA("))
-      return new IsNa (parent, text);
+      return new IsNa (parent, cell, text);
 
     if (text.startsWith ("@LOOKUP("))
-      return new Lookup (parent, text);
+      return new Lookup (parent, cell, text);
 
     if (text.startsWith ("@MIN("))
-      return new Min (parent, text);
+      return new Min (parent, cell, text);
 
     if (text.startsWith ("@MAX("))
-      return new Max (parent, text);
+      return new Max (parent, cell, text);
 
     if (text.equals ("@NA"))
-      return new Na (parent, text);
+      return new Na (parent, cell, text);
 
     if (text.startsWith ("@NPV("))
-      return new Npv (parent, text);
+      return new Npv (parent, cell, text);
 
     if (text.startsWith ("@OR("))
-      return new Or (parent, text);
+      return new Or (parent, cell, text);
 
     if (text.startsWith ("@PI"))
-      return new Pi (parent, text);
+      return new Pi (parent, cell, text);
 
     if (text.startsWith ("@SUM("))
-      return new Sum (parent, text);
+      return new Sum (parent, cell, text);
 
     if (text.startsWith ("@SQRT("))
-      return new Sqrt (parent, text);
+      return new Sqrt (parent, cell, text);
 
     System.out.printf ("Unknown function: [%s]%n", text);
-    return new Error (parent, "@ERROR");
+    return new Error (parent, cell, "@ERROR");
   }
 
-  Function (Sheet parent, String text)
+  Function (Sheet parent, Cell cell, String text)
   {
     super ("Function");
     this.parent = parent;
+    this.cell = cell;
     fullText = text;
 
     // get function's parameter string

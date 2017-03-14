@@ -4,9 +4,9 @@ class Sum extends Function
 {
   private final Range range;
 
-  public Sum (Sheet parent, String text)
+  public Sum (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     range = new Range (parent, text);
   }

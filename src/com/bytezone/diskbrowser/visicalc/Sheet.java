@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 public class Sheet
 {
@@ -165,15 +166,23 @@ public class Sheet
     }
 
     // might have to keep recalculating until nothing changes??
+    System.out.println ("\n*********** Calculating\n");
     calculate (recalculationOrder);
-    calculate (recalculationOrder);
+    //    System.out.println ("\n*********** Calculating\n");
+    //    calculate (recalculationOrder);
   }
 
   private void calculate (char order)
   {
+    int count = 0;
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
-      cell.calculate ();
+      if (cell.isCellType (CellType.VALUE))
+      {
+        System.out.printf ("%5d  start %s%n", count, cell.getAddressText ());
+        cell.calculate ();
+        System.out.printf ("%5d  stop  %s%n", count++, cell.getAddressText ());
+      }
   }
 
   private int getLineLength (byte[] buffer, int offset)
@@ -336,6 +345,13 @@ public class Sheet
           + "                                                                      ";
     String underline = "---------------------------------------------------------"
         + "-----------------------------------------------------------------";
+    String left = "";
+    String right = "";
+    if (columnWidth > 2)
+    {
+      left = underline.substring (0, (columnWidth - 2) / 2);
+      right = underline.substring (0, columnWidth - 3 - left.length ()) + "+";
+    }
 
     int lastRow = 0;
     int lastColumn = 0;
@@ -350,14 +366,19 @@ public class Sheet
       char letter1 = column < 26 ? ' ' : column < 52 ? 'A' : 'B';
       char letter2 = (char) ((column % 26) + 'A');
 
-      String fmt =
-          String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
       if (width == 1)
         heading.append (letter2);
       else if (width == 2)
         heading.append (String.format ("%s%s", letter1, letter2));
       else
+      {
+        String fmt =
+            String.format ("%s%s%%%d.%ds", letter1, letter2, (width - 2), (width - 2));
         heading.append (String.format (fmt, underline));
+        //        heading.append (left);
+        //        heading.append (String.format ("%s%s", letter1, letter2));
+        //        heading.append (right);
+      }
     }
 
     text.append (String.format ("Global format : %s%n", globalFormat));

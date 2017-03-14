@@ -4,11 +4,11 @@ class IsError extends Function
 {
   Value expression;
 
-  public IsError (Sheet parent, String text)
+  public IsError (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
-    expression = new Expression (parent, functionText).reduce ();
+    expression = new Expression (parent, cell, functionText).reduce ();
   }
 
   @Override

@@ -7,14 +7,14 @@ class Lookup extends Function
   private final Expression source;
   private final Range range;
 
-  public Lookup (Sheet parent, String text)
+  public Lookup (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     int pos = text.indexOf (',');
 
     sourceText = text.substring (8, pos);
-    source = new Expression (parent, sourceText);
+    source = new Expression (parent, cell, sourceText);
 
     rangeText = text.substring (pos + 1, text.length () - 1);
     range = new Range (parent, rangeText);

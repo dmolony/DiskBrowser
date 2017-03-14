@@ -4,9 +4,9 @@ public class Average extends Function
 {
   private final Range range;
 
-  public Average (Sheet parent, String text)
+  public Average (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     range = new Range (parent, text);
   }

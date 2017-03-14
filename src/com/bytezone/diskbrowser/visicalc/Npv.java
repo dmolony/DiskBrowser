@@ -8,15 +8,15 @@ public class Npv extends Function
   private final Expression rateExp;
   private final Range range;
 
-  Npv (Sheet parent, String text)
+  Npv (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     int pos = text.indexOf (',');
     valueText = text.substring (5, pos);
     rangeText = text.substring (pos + 1, text.length () - 1);
 
-    rateExp = new Expression (parent, valueText);
+    rateExp = new Expression (parent, cell, valueText);
     range = new Range (parent, rangeText);
 
     values.add (rateExp);

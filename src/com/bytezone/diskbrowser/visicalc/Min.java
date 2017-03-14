@@ -4,10 +4,11 @@ class Min extends Function
 {
   private final Range range;
 
-  public Min (Sheet parent, String text)
+  public Min (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
+    System.out.println (text);
     range = new Range (parent, text);
   }
 

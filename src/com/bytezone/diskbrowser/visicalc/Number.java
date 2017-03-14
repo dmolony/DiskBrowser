@@ -9,12 +9,19 @@ class Number extends AbstractValue
     try
     {
       value = Double.parseDouble (text);
+      isVolatile = false;
     }
     catch (NumberFormatException e)
     {
       valueType = ValueType.ERROR;
       e.printStackTrace ();
     }
+  }
+
+  @Override
+  public String getText ()
+  {
+    return value + "";
   }
 
   @Override

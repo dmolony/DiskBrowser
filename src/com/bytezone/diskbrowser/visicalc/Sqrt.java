@@ -4,10 +4,10 @@ public class Sqrt extends Function
 {
   private final Expression source;
 
-  Sqrt (Sheet parent, String text)
+  Sqrt (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
-    source = new Expression (parent, text.substring (5, text.length () - 1));
+    super (parent, cell, text);
+    source = new Expression (parent, cell, text.substring (5, text.length () - 1));
     values.add (source);
   }
 

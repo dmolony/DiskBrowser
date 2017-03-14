@@ -17,7 +17,7 @@ class Condition extends AbstractValue implements Iterable<Value>
   private Expression conditionExpression;
   private Expression valueExpression;
 
-  public Condition (Sheet parent, String text)
+  public Condition (Sheet parent, Cell cell, String text)
   {
     super ("Cond");
     this.parent = parent;
@@ -30,8 +30,8 @@ class Condition extends AbstractValue implements Iterable<Value>
       {
         conditionText = text.substring (0, pos);
         valueText = text.substring (pos + comp.length ());
-        conditionExpression = new Expression (parent, conditionText);
-        valueExpression = new Expression (parent, valueText);
+        conditionExpression = new Expression (parent, cell, conditionText);
+        valueExpression = new Expression (parent, cell, valueText);
         values.add (conditionExpression);
         values.add (valueExpression);
         comparator = comp;

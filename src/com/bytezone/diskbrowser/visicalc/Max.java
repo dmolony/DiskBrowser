@@ -4,9 +4,9 @@ class Max extends Function
 {
   private final Range range;
 
-  public Max (Sheet parent, String text)
+  public Max (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     range = new Range (parent, text);
   }

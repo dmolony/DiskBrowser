@@ -7,13 +7,13 @@ class Or extends Function
 {
   private final List<Condition> conditions = new ArrayList<Condition> ();
 
-  public Or (Sheet parent, String text)
+  public Or (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
     String list[] = text.split (",");
     for (String s : list)
-      conditions.add (new Condition (parent, s));
+      conditions.add (new Condition (parent, cell, s));
   }
 
   @Override

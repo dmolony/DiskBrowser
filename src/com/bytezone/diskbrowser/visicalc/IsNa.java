@@ -4,11 +4,11 @@ public class IsNa extends Function
 {
   Value expression;
 
-  IsNa (Sheet parent, String text)
+  IsNa (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
-    expression = new Expression (parent, functionText).reduce ();
+    expression = new Expression (parent, cell, functionText).reduce ();
   }
 
   @Override

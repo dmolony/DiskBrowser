@@ -4,11 +4,11 @@ public class Abs extends Function
 {
   private final Expression source;
 
-  Abs (Sheet parent, String text)
+  Abs (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
-    source = new Expression (parent, functionText);
+    source = new Expression (parent, cell, functionText);
     values.add (source);
   }
 

@@ -35,6 +35,7 @@ class Address implements Comparable<Address>
 
   public Address (String address)
   {
+    assert address.length () >= 2;
     if (address.charAt (1) < 'A')
       set (address.substring (0, 1), address.substring (1));
     else

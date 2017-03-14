@@ -4,11 +4,11 @@ public class Int extends Function
 {
   Expression source;
 
-  Int (Sheet parent, String text)
+  Int (Sheet parent, Cell cell, String text)
   {
-    super (parent, text);
+    super (parent, cell, text);
 
-    source = new Expression (parent, functionText);
+    source = new Expression (parent, cell, functionText);
     values.add (source);
   }
 

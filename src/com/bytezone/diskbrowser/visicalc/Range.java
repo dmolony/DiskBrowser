@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 class Range implements Iterable<Address>
 {
+  private static final Pattern cellAddress = Pattern.compile ("[A-B]?[A-Z][0-9]{1,3}");
   private static final Pattern rangePattern =
       Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})");
   private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
@@ -120,10 +121,20 @@ class Range implements Iterable<Address>
     m = addressList.matcher (text);
     if (m.find ())
     {
-      System.out.printf ("Address list:%s%n", text);
+      System.out.printf ("Address list: %s%n", text);
       String[] cells = m.group (1).split (",");
       for (String s : cells)
-        range.add (new Address (s));
+      {
+        System.out.println (s);
+        if (cellAddress.matcher (s).matches ())
+          range.add (new Address (s));
+        else
+        {
+          System.out.println ("Not a cell address: " + s);
+        }
+      }
+
+      System.out.println ();
       return;
     }
 

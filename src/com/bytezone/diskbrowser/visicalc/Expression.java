@@ -29,17 +29,19 @@ class Expression extends AbstractValue implements Iterable<Value>
   // [.3*(B4+B7+B8+B9)]
   // [+N12+(P12*(.2*K12+K9-O12))]
 
+  private final Cell cell;
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
   private final String text;
 
-  public Expression (Sheet parent, String text)
+  public Expression (Sheet parent, Cell cell, String text)
   {
     super ("Exp");
+    this.cell = cell;
     this.text = text;
 
-    String line = checkBrackets (text);
+    String line = balanceBrackets (text);     // add trailing right brackets if required
 
     int ptr = 0;
     while (ptr < line.length ())
@@ -62,15 +64,16 @@ class Expression extends AbstractValue implements Iterable<Value>
       switch (ch)
       {
         case '@':                                           // function
-          String functionText = getFunctionText (line.substring (ptr));
+          String functionText = getBalancedText (line.substring (ptr));
+          //          System.out.println ("Func : " + functionText);
           ptr += functionText.length ();
-          values.add (Function.getInstance (parent, functionText));
+          values.add (Function.getInstance (parent, cell, functionText));
           break;
 
         case '(':                                           // parentheses block
-          String bracketText = getFunctionText (line.substring (ptr));
+          String bracketText = getBalancedText (line.substring (ptr));
           ptr += bracketText.length ();
-          values.add (new Expression (parent,
+          values.add (new Expression (parent, cell,
               bracketText.substring (1, bracketText.length () - 1)));
           break;
 
@@ -90,14 +93,7 @@ class Expression extends AbstractValue implements Iterable<Value>
           {
             String addressText = getAddressText (line.substring (ptr));
             ptr += addressText.length ();
-            Cell cell = parent.getCell (addressText);
-            if (cell == null)
-            {
-              assert false : "Impossible";
-              //              values.add (new Number ("0"));
-            }
-            else
-              values.add (parent.getCell (addressText));
+            values.add (parent.getCell (addressText));
           }
           else
           {
@@ -120,9 +116,9 @@ class Expression extends AbstractValue implements Iterable<Value>
       }
     }
 
-    //    assert values.size () > 0;
-    if (values.size () == 0)
-      System.out.printf ("Nothing[%s]%n", text);
+    assert values.size () > 0;
+    //    if (values.size () == 0)
+    //      System.out.printf ("Nothing[%s]%n", text);
   }
 
   Value reduce ()
@@ -150,6 +146,13 @@ class Expression extends AbstractValue implements Iterable<Value>
       System.out.println ("nothing to calculate: " + text);
       return;
     }
+    System.out.printf ("           calc %-6s %s%n", cell.getAddressText (), text);
+    if (!isVolatile)
+      return;
+
+    boolean currentVolatile = false;
+    //    System.out.printf ("exp %s is currently %svolatile%n", text,
+    //        isVolatile ? " " : "not ");
 
     try
     {
@@ -164,6 +167,10 @@ class Expression extends AbstractValue implements Iterable<Value>
       }
 
       value = thisValue.getValue ();
+      //      System.out.printf ("exp %s is currently %svolatile%n", thisValue.getText (),
+      //          thisValue.isVolatile () ? " " : "not ");
+      if (!currentVolatile)
+        currentVolatile = thisValue.isVolatile ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -181,6 +188,10 @@ class Expression extends AbstractValue implements Iterable<Value>
         }
 
         double nextValue = thisValue.getValue ();
+        //        System.out.printf ("exp %s is currently %svolatile%n", thisValue.getText (),
+        //            thisValue.isVolatile () ? " " : "not ");
+        if (!currentVolatile)
+          currentVolatile = thisValue.isVolatile ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -215,10 +226,14 @@ class Expression extends AbstractValue implements Iterable<Value>
     {
       valueType = ValueType.ERROR;
       e.printStackTrace ();
+      return;
     }
+
+    isVolatile = currentVolatile;
+    //    System.out.println (currentVolatile);
   }
 
-  private String checkBrackets (String input)
+  private String balanceBrackets (String input)
   {
     String line = input.trim ();
 
@@ -250,7 +265,8 @@ class Expression extends AbstractValue implements Iterable<Value>
     return line;
   }
 
-  private String getFunctionText (String text)
+  // called for functions and expressions
+  static String getBalancedText (String text)
   {
     int ptr = text.indexOf ('(');         // find first left parenthesis
     if (ptr < 0)
@@ -322,7 +338,7 @@ class Expression extends AbstractValue implements Iterable<Value>
 
   public static void main (String[] args)
   {
-    Expression ex = new Expression (null, "-5+((-4-(20-(2^3))+6/3))*-2");
+    Expression ex = new Expression (null, null, "-5+((-4-(20-(2^3))+6/3))*-2");
     System.out.println (ex.getValue ());
     System.out.println (ex);
   }

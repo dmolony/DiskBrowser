@@ -30,11 +30,28 @@ class Cell extends AbstractValue implements Comparable<Cell>
     this.address = address;
 
     cellType = CellType.EMPTY;
+    isVolatile = true;
+  }
+
+  boolean isCellType (CellType cellType)
+  {
+    return this.cellType == cellType;
+  }
+
+  @Override
+  public boolean isVolatile ()
+  {
+    return isVolatile;
   }
 
   Address getAddress ()
   {
     return address;
+  }
+
+  String getAddressText ()
+  {
+    return address.getText ();
   }
 
   void setFormat (String formatText)
@@ -62,6 +79,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
       for (int i = 0; i < 20; i++)
         repeat += repeatingText;
       cellType = CellType.REPEATING_CHARACTER;
+      isVolatile = false;
       return;
     }
 
@@ -76,12 +94,22 @@ class Cell extends AbstractValue implements Comparable<Cell>
     {
       label = command.substring (1);
       cellType = CellType.LABEL;
+      isVolatile = false;
     }
     else
     {
-      expressionText = command;
-      cellType = CellType.VALUE;
-      value = new Expression (parent, expressionText).reduce ();
+      try
+      {
+        expressionText = command;
+        value = new Expression (parent, this, expressionText).reduce ();
+        cellType = CellType.VALUE;
+
+        isVolatile = value.isVolatile ();
+      }
+      catch (IllegalArgumentException e)
+      {
+        System.out.println ("ignoring error: " + command);
+      }
     }
 
     // FUTURE.VC
@@ -186,6 +214,12 @@ class Cell extends AbstractValue implements Comparable<Cell>
     if (cellType == CellType.EMPTY)
       return "";
 
+    if (cellType == CellType.LABEL)
+      return "LBL";
+
+    if (cellType == CellType.REPEATING_CHARACTER)
+      return "RPT";
+
     assert cellType == CellType.VALUE;
     return value.getText ();
   }
@@ -200,7 +234,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
   public void calculate ()
   {
     if (cellType == CellType.VALUE)
+    {
       value.calculate ();
+      isVolatile = value.isVolatile ();
+    }
   }
 
   public String getDebugText ()
@@ -208,8 +245,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
     StringBuilder text = new StringBuilder ();
     text.append (line);
     text.append ("\n");
-    text.append (String.format ("| %-21s  %s  %17s |%n", address.getText (),
-        address.getDetails (), "Format : " + cellFormat));
+    text.append (String.format ("| %-11s  %s    Volatile: %1.1s    Format: %s  |%n",
+        address.getText (), address.getDetails (), isVolatile, cellFormat));
     text.append (line);
     text.append ("\n");
 

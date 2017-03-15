@@ -42,6 +42,12 @@ class Address implements Comparable<Address>
       set (address.substring (0, 2), address.substring (2));
   }
 
+  public boolean matches (String addressText)
+  {
+    Address address = new Address (addressText);
+    return this.rowMatches (address) && this.columnMatches (address);
+  }
+
   private void set (String sCol, String sRow)
   {
     if (sCol.length () == 1)

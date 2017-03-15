@@ -30,7 +30,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
     this.address = address;
 
     cellType = CellType.EMPTY;
-    isVolatile = true;
+    isVolatile = false;
   }
 
   boolean isCellType (CellType cellType)
@@ -103,8 +103,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
         expressionText = command;
         value = new Expression (parent, this, expressionText).reduce ();
         cellType = CellType.VALUE;
-
-        isVolatile = value.isVolatile ();
+        isVolatile = true;
       }
       catch (IllegalArgumentException e)
       {
@@ -200,20 +199,14 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public ValueType getValueType ()
   {
-    if (cellType == CellType.EMPTY)
-      return ValueType.NA;
-
-    if (cellType == CellType.LABEL || cellType == CellType.REPEATING_CHARACTER)
-      return ValueType.VALUE;
-
-    return value.getValueType ();
+    return cellType == CellType.VALUE ? value.getValueType () : ValueType.VALUE;
   }
 
   @Override
   public String getText ()
   {
     if (cellType == CellType.EMPTY)
-      return "";
+      return "MPT";
 
     if (cellType == CellType.LABEL)
       return "LBL";
@@ -236,8 +229,11 @@ class Cell extends AbstractValue implements Comparable<Cell>
   {
     if (cellType == CellType.VALUE)
     {
-      value.calculate ();
-      isVolatile = value.isVolatile ();
+      if (isVolatile)
+      {
+        value.calculate ();
+        isVolatile = value.isVolatile ();
+      }
     }
   }
 
@@ -301,7 +297,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
         contents = "Empty";
     }
 
-    return String.format ("[Cell:%5s %s]", address, contents);
+    return String.format ("[Cell:%5s %s %s]", address, contents,
+        isVolatile ? "volatile" : "fixed");
   }
 
   @Override

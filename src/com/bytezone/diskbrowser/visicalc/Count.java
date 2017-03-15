@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import com.bytezone.diskbrowser.visicalc.Cell.CellType;
+
 class Count extends Function
 {
   private final ExpressionList list;
@@ -26,14 +28,8 @@ class Count extends Function
       {
         v.calculate ();
 
-        if (v instanceof Cell && v.isValueType (ValueType.NA))
+        if (v instanceof Cell && ((Cell) v).isCellType (CellType.EMPTY))
           continue;
-
-        if (!v.isValueType (ValueType.VALUE))
-        {
-          valueType = v.getValueType ();
-          return;
-        }
 
         value++;
       }

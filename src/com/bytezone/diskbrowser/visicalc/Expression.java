@@ -146,18 +146,32 @@ class Expression extends AbstractValue implements Iterable<Value>
       System.out.println ("nothing to calculate: " + text);
       return;
     }
-    System.out.printf ("           calc %-6s %s%n", cell.getAddressText (), text);
+
+    //    System.out.printf ("           calc %-6s %s%n", cell.getAddressText (), text);
     if (!isVolatile)
       return;
 
     boolean currentVolatile = false;
-    //    System.out.printf ("exp %s is currently %svolatile%n", text,
-    //        isVolatile ? " " : "not ");
+
+    //    boolean debug = cell.getAddress ().matches ("C8");
+    boolean debug = false;
+    if (debug)
+    {
+      System.out.println (this);
+      System.out.printf ("(1) exp %s is currently %svolatile%n", text,
+          isVolatile ? " " : "not ");
+    }
 
     try
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
+      if (debug)
+      {
+        System.out.println (this);
+        System.out.printf ("(2) exp %s is currently %svolatile%n", thisValue.getText (),
+            thisValue.isVolatile () ? " " : "not ");
+      }
 
       value = 0;
       if (!thisValue.isValueType (ValueType.VALUE))
@@ -167,8 +181,6 @@ class Expression extends AbstractValue implements Iterable<Value>
       }
 
       value = thisValue.getValue ();
-      //      System.out.printf ("exp %s is currently %svolatile%n", thisValue.getText (),
-      //          thisValue.isVolatile () ? " " : "not ");
       if (!currentVolatile)
         currentVolatile = thisValue.isVolatile ();
 
@@ -188,8 +200,12 @@ class Expression extends AbstractValue implements Iterable<Value>
         }
 
         double nextValue = thisValue.getValue ();
-        //        System.out.printf ("exp %s is currently %svolatile%n", thisValue.getText (),
-        //            thisValue.isVolatile () ? " " : "not ");
+        if (debug)
+        {
+          System.out.println (this);
+          System.out.printf ("(3.%d) exp %s is currently %svolatile%n", i,
+              thisValue.getText (), thisValue.isVolatile () ? " " : "not ");
+        }
         if (!currentVolatile)
           currentVolatile = thisValue.isVolatile ();
 
@@ -230,7 +246,13 @@ class Expression extends AbstractValue implements Iterable<Value>
     }
 
     isVolatile = currentVolatile;
-    //    System.out.println (currentVolatile);
+    if (debug)
+    {
+      System.out.println (this);
+      System.out.printf ("(4) exp %s is currently %svolatile%n", text,
+          isVolatile ? " " : "not ");
+      System.out.println ();
+    }
   }
 
   private String balanceBrackets (String input)

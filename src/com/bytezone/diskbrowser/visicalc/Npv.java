@@ -17,7 +17,7 @@ public class Npv extends Function
     rangeText = text.substring (pos + 1, text.length () - 1);
 
     rateExp = new Expression (parent, cell, valueText);
-    range = new Range (parent, rangeText);
+    range = new Range (parent, cell, rangeText);
 
     values.add (rateExp);
   }

@@ -15,7 +15,7 @@ public class Choose extends Function
     sourceText = text.substring (8, pos);
     source = new Number (sourceText);
     rangeText = text.substring (pos + 1, text.length () - 1);
-    range = new Range (parent, rangeText);
+    range = new Range (parent, cell, rangeText);
 
     values.add (source);
   }

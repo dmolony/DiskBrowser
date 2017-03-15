@@ -363,7 +363,7 @@ public class Sheet
       if (columnWidths.containsKey (column))
         width = columnWidths.get (column);
 
-      char letter1 = column < 26 ? ' ' : column < 52 ? 'A' : 'B';
+      char letter1 = column < 26 ? '-' : column < 52 ? 'A' : 'B';
       char letter2 = (char) ((column % 26) + 'A');
 
       if (width == 1)

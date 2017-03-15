@@ -2,14 +2,14 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Min extends Function
 {
-  private final Range range;
+  private final ExpressionList list;
 
   public Min (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
     System.out.println (text);
-    range = new Range (parent, text);
+    list = new ExpressionList (parent, cell, functionText);
   }
 
   @Override
@@ -18,19 +18,16 @@ class Min extends Function
     value = Double.MAX_VALUE;
     int totalChecked = 0;
 
-    for (Address address : range)
+    for (Value v : list)
     {
-      Cell cell = parent.getCell (address);
-      if (cell.isValueType (ValueType.NA))
-        continue;
-
-      if (!cell.isValueType (ValueType.VALUE))
+      v.calculate ();
+      if (!v.isValueType (ValueType.VALUE))
       {
         valueType = cell.getValueType ();
         break;
       }
 
-      double temp = cell.getValue ();
+      double temp = v.getValue ();
       if (temp < value)
         value = temp;
       totalChecked++;

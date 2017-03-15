@@ -2,13 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Max extends Function
 {
-  private final Range range;
+  private final ExpressionList list;
 
   public Max (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    range = new Range (parent, text);
+    list = new ExpressionList (parent, cell, functionText);
   }
 
   @Override
@@ -17,19 +17,16 @@ class Max extends Function
     value = Double.MIN_VALUE;
     int totalChecked = 0;
 
-    for (Address address : range)
+    for (Value v : list)
     {
-      Cell cell = parent.getCell (address);
-      if (cell.isValueType (ValueType.NA))
-        continue;
-
-      if (!cell.isValueType (ValueType.VALUE))
+      v.calculate ();
+      if (!v.isValueType (ValueType.VALUE))
       {
         valueType = cell.getValueType ();
         break;
       }
 
-      double temp = cell.getValue ();
+      double temp = v.getValue ();
       if (temp > value)
         value = temp;
       totalChecked++;

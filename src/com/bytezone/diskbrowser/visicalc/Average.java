@@ -2,13 +2,15 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Average extends Function
 {
-  private final Range range;
+  //  private final Range range;
+  private final ExpressionList list;
 
   public Average (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    range = new Range (parent, text);
+    //    range = new Range (parent, cell, text);           // use list instead
+    list = new ExpressionList (parent, cell, functionText);
   }
 
   @Override
@@ -17,20 +19,21 @@ public class Average extends Function
     double total = 0.0;
     int totalChecked = 0;
 
-    for (Address address : range)
+    for (Value v : list)
     {
-      Cell cell = parent.getCell (address);
+      v.calculate ();
+      //      Cell cell = parent.getCell (address);
 
-      if (cell.isValueType (ValueType.NA))
+      if (v.isValueType (ValueType.NA))
         continue;
 
-      if (!cell.isValueType (ValueType.VALUE))
+      if (!v.isValueType (ValueType.VALUE))
       {
-        valueType = cell.getValueType ();
+        valueType = v.getValueType ();
         return;
       }
 
-      total += cell.getValue ();
+      total += v.getValue ();
       totalChecked++;
     }
 

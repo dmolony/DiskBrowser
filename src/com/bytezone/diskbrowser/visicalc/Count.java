@@ -2,13 +2,15 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Count extends Function
 {
-  private final Range range;
+  private final ExpressionList list;
+  private final boolean isRange;
 
   public Count (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    range = new Range (parent, text);
+    list = new ExpressionList (parent, cell, functionText);
+    isRange = functionText.indexOf ("...") > 0;
   }
 
   @Override
@@ -17,20 +19,23 @@ class Count extends Function
     value = 0;
     valueType = ValueType.VALUE;
 
-    for (Address address : range)
-    {
-      Cell cell = parent.getCell (address);
-
-      if (cell.isValueType (ValueType.NA))
-        continue;
-
-      if (!cell.isValueType (ValueType.VALUE))
+    if (!isRange)
+      value = list.size ();
+    else
+      for (Value v : list)
       {
-        valueType = cell.getValueType ();
-        return;
-      }
+        v.calculate ();
 
-      value++;
-    }
+        if (v instanceof Cell && v.isValueType (ValueType.NA))
+          continue;
+
+        if (!v.isValueType (ValueType.VALUE))
+        {
+          valueType = v.getValueType ();
+          return;
+        }
+
+        value++;
+      }
   }
 }

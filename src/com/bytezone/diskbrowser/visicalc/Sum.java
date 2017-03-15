@@ -2,13 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Sum extends Function
 {
-  private final Range range;
+  private final ExpressionList list;
 
   public Sum (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    range = new Range (parent, text);
+    list = new ExpressionList (parent, cell, functionText);
   }
 
   @Override
@@ -17,20 +17,20 @@ class Sum extends Function
     value = 0;
     valueType = ValueType.VALUE;
 
-    for (Address address : range)
+    for (Value v : list)
     {
-      Cell cell = parent.getCell (address);
+      v.calculate ();
 
-      if (cell.isValueType (ValueType.NA))
+      if (v.isValueType (ValueType.NA))
         continue;
 
-      if (!cell.isValueType (ValueType.VALUE))
+      if (!v.isValueType (ValueType.VALUE))
       {
-        valueType = cell.getValueType ();
+        valueType = v.getValueType ();
         break;
       }
 
-      value += cell.getValue ();
+      value += v.getValue ();
     }
   }
 }

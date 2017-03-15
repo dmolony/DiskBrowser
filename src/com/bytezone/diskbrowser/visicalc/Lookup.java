@@ -17,7 +17,7 @@ class Lookup extends Function
     source = new Expression (parent, cell, sourceText);
 
     rangeText = text.substring (pos + 1, text.length () - 1);
-    range = new Range (parent, rangeText);
+    range = new Range (parent, cell, rangeText);
 
     values.add (source);
   }

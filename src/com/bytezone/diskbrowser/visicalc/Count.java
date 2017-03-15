@@ -26,11 +26,10 @@ class Count extends Function
     else
       for (Value v : list)
       {
-        v.calculate ();
-
         if (v instanceof Cell && ((Cell) v).isCellType (CellType.EMPTY))
           continue;
 
+        v.calculate ();     // is this required?
         value++;
       }
   }

@@ -33,8 +33,7 @@ class Range implements Iterable<Address>
       populateRange ();
     }
     else
-      throw new IllegalArgumentException ();
-
+      throw new IllegalArgumentException (rangeText);
   }
 
   public Range (Sheet parent, Address from, Address to)
@@ -46,16 +45,6 @@ class Range implements Iterable<Address>
     isHorizontal = from.rowMatches (to);
     populateRange ();
   }
-
-  //  public Range (Sheet parent, String[] cells)
-  //  {
-  //    this.parent = parent;
-  //
-  //    for (String s : cells)
-  //      range.add (new Address (s));
-  //
-  //    createCells ();
-  //  }
 
   private void populateRange ()
   {
@@ -81,29 +70,15 @@ class Range implements Iterable<Address>
       throw new InvalidParameterException ();
 
     from = tempFrom;
-
-    //    createCells ();
   }
-
-  //  private void createCells ()
-  //  {
-  //    for (Address address : range)
-  //      parent.getCell (address);         // ensure that the cell exists
-  //  }
 
   boolean isHorizontal ()
   {
-    //    Address first = range.get (0);
-    //    Address last = range.get (range.size () - 1);
-    //    return first.rowMatches (last);
     return isHorizontal;
   }
 
   boolean isVertical ()
   {
-    //    Address first = range.get (0);
-    //    Address last = range.get (range.size () - 1);
-    //    return first.columnMatches (last);
     return !isHorizontal;
   }
 
@@ -115,59 +90,8 @@ class Range implements Iterable<Address>
 
   public int size ()
   {
-    //    int total = 0;
-    //
-    //    for (Address address : range)
-    //      if (parent.getCell (address) != null)
-    //        ++total;
-
     return range.size ();
   }
-
-  //  private void setRange (String text)
-  //  {
-  //    Matcher m = rangePattern.matcher (text);
-  //    if (m.find ())
-  //    {
-  //      from = new Address (m.group (1), m.group (2));
-  //      to = new Address (m.group (3), m.group (4));
-  //      populateRange ();
-  //      return;
-  //    }
-  //
-  //    //    m = addressList.matcher (text);
-  //    //    if (m.find ())
-  //    //    {
-  //    //      System.out.printf ("Address list: %s%n", text);
-  //    //      String[] cells = m.group (1).split (",");
-  //    //      for (String s : cells)
-  //    //      {
-  //    //        System.out.println (s);
-  //    //        if (cellAddress.matcher (s).matches ())
-  //    //          range.add (new Address (s));
-  //    //        else
-  //    //        {
-  //    //          System.out.println ("Not a cell address: " + s);
-  //    //        }
-  //    //      }
-  //    //
-  //    //      System.out.println ();
-  //    //      return;
-  //    //    }
-  //
-  //    int pos = text.indexOf ("...");
-  //    if (pos > 0)
-  //    {
-  //      String fromAddress = text.substring (0, pos);
-  //      String toAddress = text.substring (pos + 3);
-  //      from = new Address (fromAddress);
-  //      to = new Address (toAddress);
-  //      populateRange ();
-  //      return;
-  //    }
-  //
-  //    System.out.printf ("null range [%s]%n", text);
-  //  }
 
   @Override
   public String toString ()

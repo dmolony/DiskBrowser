@@ -8,7 +8,6 @@ class Min extends Function
   {
     super (parent, cell, text);
 
-    System.out.println (text);
     list = new ExpressionList (parent, cell, functionText);
   }
 
@@ -24,18 +23,13 @@ class Min extends Function
       if (!v.isValueType (ValueType.VALUE))
       {
         valueType = cell.getValueType ();
-        break;
+        return;
       }
 
-      double temp = v.getValue ();
-      if (temp < value)
-        value = temp;
+      value = Math.min (value, v.getValue ());
       totalChecked++;
     }
 
-    if (totalChecked == 0)
-      valueType = ValueType.NA;
-    else
-      valueType = ValueType.VALUE;
+    valueType = totalChecked == 0 ? ValueType.NA : ValueType.VALUE;
   }
 }

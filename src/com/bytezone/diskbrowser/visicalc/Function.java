@@ -2,27 +2,6 @@ package com.bytezone.diskbrowser.visicalc;
 
 import java.util.Iterator;
 
-// http://www.bricklin.com/history/refcard1.htm
-// Functions:
-// @AVERAGE
-// @NPV
-// @LOOKUP(v,range)
-// @NA
-// @ERROR
-// @PI
-// @ABS
-// @INT
-// @EXP
-// @SQRT
-// @LN
-// @LOG10
-// @SIN
-// @ASIN
-// @COS
-// @ACOS
-// @TAN
-// @ATAN
-
 abstract class Function extends AbstractValue implements Iterable<Value>
 {
   protected final Sheet parent;
@@ -39,89 +18,112 @@ abstract class Function extends AbstractValue implements Iterable<Value>
       return new Error (parent, cell, "@ERROR");
     }
 
-    if (text.startsWith ("@ABS("))
-      return new Abs (parent, cell, text);
+    if (text.charAt (1) == 'A')
+    {
+      if (text.startsWith ("@ABS("))
+        return new Abs (parent, cell, text);
 
-    if (text.startsWith ("@ACOS("))
-      return new Acos (parent, cell, text);
+      if (text.startsWith ("@ACOS("))
+        return new Acos (parent, cell, text);
 
-    if (text.startsWith ("@AND("))
-      return new And (parent, cell, text);
+      if (text.startsWith ("@AND("))
+        return new And (parent, cell, text);
 
-    if (text.startsWith ("@ASIN("))
-      return new Asin (parent, cell, text);
+      if (text.startsWith ("@ASIN("))
+        return new Asin (parent, cell, text);
 
-    if (text.startsWith ("@ATAN("))
-      return new Atan (parent, cell, text);
+      if (text.startsWith ("@ATAN("))
+        return new Atan (parent, cell, text);
 
-    if (text.startsWith ("@AVERAGE("))
-      return new Average (parent, cell, text);
+      if (text.startsWith ("@AVERAGE("))
+        return new Average (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'C')
+    {
+      if (text.startsWith ("@COUNT("))
+        return new Count (parent, cell, text);
 
-    if (text.startsWith ("@COUNT("))
-      return new Count (parent, cell, text);
+      if (text.startsWith ("@CHOOSE("))
+        return new Choose (parent, cell, text);
 
-    if (text.startsWith ("@CHOOSE("))
-      return new Choose (parent, cell, text);
+      if (text.startsWith ("@COS("))
+        return new Cos (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'E')
+    {
+      if (text.startsWith ("@ERROR"))
+        return new Error (parent, cell, text);
 
-    if (text.startsWith ("@COS("))
-      return new Cos (parent, cell, text);
+      if (text.startsWith ("@EXP"))
+        return new Exp (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'I')
+    {
+      if (text.startsWith ("@IF("))
+        return new If (parent, cell, text);
 
-    if (text.startsWith ("@ERROR"))
-      return new Error (parent, cell, text);
+      if (text.startsWith ("@INT("))
+        return new Int (parent, cell, text);
 
-    if (text.startsWith ("@EXP"))
-      return new Exp (parent, cell, text);
+      if (text.startsWith ("@ISERROR("))
+        return new IsError (parent, cell, text);
 
-    if (text.startsWith ("@IF("))
-      return new If (parent, cell, text);
+      if (text.startsWith ("@ISNA("))
+        return new IsNa (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'L')
+    {
+      if (text.startsWith ("@LOG10("))
+        return new Log10 (parent, cell, text);
 
-    if (text.startsWith ("@INT("))
-      return new Int (parent, cell, text);
+      if (text.startsWith ("@LOOKUP("))
+        return new Lookup (parent, cell, text);
 
-    if (text.startsWith ("@ISERROR("))
-      return new IsError (parent, cell, text);
+      if (text.startsWith ("@LN("))
+        return new Ln (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'M')
+    {
+      if (text.startsWith ("@MIN("))
+        return new Min (parent, cell, text);
 
-    if (text.startsWith ("@ISNA("))
-      return new IsNa (parent, cell, text);
+      if (text.startsWith ("@MAX("))
+        return new Max (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'N')
+    {
+      if (text.equals ("@NA"))
+        return new Na (parent, cell, text);
 
-    if (text.startsWith ("@LOG10("))
-      return new Log10 (parent, cell, text);
+      if (text.startsWith ("@NPV("))
+        return new Npv (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'O')
+    {
+      if (text.startsWith ("@OR("))
+        return new Or (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'P')
+    {
+      if (text.startsWith ("@PI"))
+        return new Pi (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'S')
+    {
+      if (text.startsWith ("@SIN("))
+        return new Sin (parent, cell, text);
 
-    if (text.startsWith ("@LOOKUP("))
-      return new Lookup (parent, cell, text);
+      if (text.startsWith ("@SUM("))
+        return new Sum (parent, cell, text);
 
-    if (text.startsWith ("@LN("))
-      return new Ln (parent, cell, text);
-
-    if (text.startsWith ("@MIN("))
-      return new Min (parent, cell, text);
-
-    if (text.startsWith ("@MAX("))
-      return new Max (parent, cell, text);
-
-    if (text.equals ("@NA"))
-      return new Na (parent, cell, text);
-
-    if (text.startsWith ("@NPV("))
-      return new Npv (parent, cell, text);
-
-    if (text.startsWith ("@OR("))
-      return new Or (parent, cell, text);
-
-    if (text.startsWith ("@PI"))
-      return new Pi (parent, cell, text);
-
-    if (text.startsWith ("@SIN("))
-      return new Sin (parent, cell, text);
-
-    if (text.startsWith ("@SUM("))
-      return new Sum (parent, cell, text);
-
-    if (text.startsWith ("@SQRT("))
-      return new Sqrt (parent, cell, text);
-
-    if (text.startsWith ("@TAN("))
-      return new Tan (parent, cell, text);
+      if (text.startsWith ("@SQRT("))
+        return new Sqrt (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'T')
+    {
+      if (text.startsWith ("@TAN("))
+        return new Tan (parent, cell, text);
+    }
 
     System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, cell, "@ERROR");

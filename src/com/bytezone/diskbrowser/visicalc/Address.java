@@ -21,6 +21,7 @@ class Address implements Comparable<Address>
   {
     assert column <= MAX_COLUMNS;
     assert row <= MAX_ROWS;
+
     this.row = row;
     this.column = column;
     rowKey = row * MAX_COLUMNS + column;

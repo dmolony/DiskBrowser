@@ -2,13 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Min extends Function
 {
-  private final ExpressionList list;
+  private final ValueList list;
 
   public Min (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    list = new ExpressionList (parent, cell, functionText);
+    list = new ValueList (parent, cell, functionText);
   }
 
   @Override

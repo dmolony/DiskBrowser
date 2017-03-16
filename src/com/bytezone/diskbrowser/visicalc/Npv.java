@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import com.bytezone.diskbrowser.visicalc.Cell.CellType;
+
 public class Npv extends Function
 {
   private final String valueText;
@@ -43,7 +45,7 @@ public class Npv extends Function
       ++period;
 
       Cell cell = parent.getCell (address);
-      if (cell.isValueType (ValueType.NA))
+      if (cell.isCellType (CellType.EMPTY))
         continue;
 
       if (!cell.isValueType (ValueType.VALUE))

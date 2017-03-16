@@ -1,16 +1,18 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import com.bytezone.diskbrowser.visicalc.Cell.CellType;
+
 public class Average extends Function
 {
-  //  private final Range range;
-  private final ExpressionList list;
+  private final ValueList list;
+  private final boolean isRange;      // may affect how the count is done
 
   public Average (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    //    range = new Range (parent, cell, text);           // use list instead
-    list = new ExpressionList (parent, cell, functionText);
+    list = new ValueList (parent, cell, functionText);
+    isRange = functionText.indexOf ("...") > 0;
   }
 
   @Override
@@ -21,8 +23,10 @@ public class Average extends Function
 
     for (Value v : list)
     {
+      if (v instanceof Cell && ((Cell) v).isCellType (CellType.EMPTY))
+        continue;
+
       v.calculate ();
-      //      Cell cell = parent.getCell (address);
 
       if (v.isValueType (ValueType.NA))
         continue;

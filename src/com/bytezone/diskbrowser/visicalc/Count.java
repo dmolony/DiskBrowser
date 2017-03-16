@@ -4,14 +4,14 @@ import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 class Count extends Function
 {
-  private final ExpressionList list;
+  private final ValueList list;
   private final boolean isRange;
 
   public Count (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    list = new ExpressionList (parent, cell, functionText);
+    list = new ValueList (parent, cell, functionText);
     isRange = functionText.indexOf ("...") > 0;
   }
 

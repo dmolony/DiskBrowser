@@ -93,6 +93,11 @@ class Range implements Iterable<Address>
     return range.size ();
   }
 
+  public Address get (int index)
+  {
+    return range.get (index);
+  }
+
   @Override
   public String toString ()
   {

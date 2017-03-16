@@ -56,10 +56,10 @@ public class Sheet
   //  /GF             Global Format (DGILR$*)
   //  /GFI            Global Format Integer
   //  /GF$            Global Format Currency
-  //  /GC             Global Column <width>
-  //  /GR             Global 
+  //  /GC             Global Column <width>  3-37
+  //  /GR             Global Recalculation A/M
   //  /GRA            Recalculation Auto
-  //  /GO             Global 
+  //  /GO             Global Calculation Order C/R
   //  /GOC            Calculation Order - Columns first
   //  /GOR            Calculation Order - Rows first
 
@@ -69,9 +69,12 @@ public class Sheet
   //  /TB             fix Both Titles
   //  /TN             fix Neither
 
-  //  /W              Window (HV1SU)
+  //  /W              Window split (HV1SU)
   //  /WV             Window Vertical (split on cursor column)
   //  /WH             Window Horizontal (split on cursor row)
+  //  /W1             Window (return to single window)
+  //  /WS             Window (synchronised)
+  //  /WU             Window (unsynchronised)
 
   /*
   from: Apple II TextFiles

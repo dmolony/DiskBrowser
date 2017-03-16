@@ -2,13 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Max extends Function
 {
-  private final ExpressionList list;
+  private final ValueList list;
 
   public Max (Sheet parent, Cell cell, String text)
   {
     super (parent, cell, text);
 
-    list = new ExpressionList (parent, cell, functionText);
+    list = new ValueList (parent, cell, functionText);
   }
 
   @Override

@@ -1,11 +1,12 @@
 ```
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-Java                           216           3940           1178          22680
--------------------------------------------------------------------------------
-SUM:                           216           3940           1178          22680
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ Language             Files        Lines        Blank      Comment         Code
+--------------------------------------------------------------------------------
+ Java                   262        34927         5136         1530        28261
+ Plain Text               1          235           18            0          217
+--------------------------------------------------------------------------------
+ Total                  263        35162         5154         1530        28478
+--------------------------------------------------------------------------------
 └── diskbrowser
     ├── applefile
     │   ├── AbstractFile.java
@@ -20,12 +21,21 @@ SUM:                           216           3940           1178          22680
     │   ├── Charset.java
     │   ├── Command.java
     │   ├── DefaultAppleFile.java
+    │   ├── DeviceDriver.java
+    │   ├── DoubleHiResImage.java
+    │   ├── DoubleScrunch.java
     │   ├── ErrorMessageFile.java
+    │   ├── FileSystemTranslator.java
+    │   ├── FileTypeDescriptorTable.java
+    │   ├── FontFile.java
     │   ├── HiResImage.java
     │   ├── IconFile.java
     │   ├── IntegerBasicProgram.java
     │   ├── LodeRunner.java
     │   ├── MerlinSource.java
+    │   ├── OriginalHiResImage.java
+    │   ├── Palette.java
+    │   ├── PaletteFactory.java
     │   ├── PascalCode.java
     │   ├── PascalCodeStatement.java
     │   ├── PascalConstants.java
@@ -33,6 +43,10 @@ SUM:                           216           3940           1178          22680
     │   ├── PascalProcedure.java
     │   ├── PascalSegment.java
     │   ├── PascalText.java
+    │   ├── QuickDrawFont.java
+    │   ├── SHRPictureFile.java
+    │   ├── SHRPictureFile2.java
+    │   ├── SegmentDictionary.java
     │   ├── ShapeTable.java
     │   ├── SimpleText.java
     │   ├── SimpleText2.java
@@ -57,14 +71,6 @@ SUM:                           216           3940           1178          22680
     │   ├── Record.java
     │   ├── Report.java
     │   └── TableReport.java
-    ├── catalog
-    │   ├── AbstractCatalogCreator.java
-    │   ├── AbstractDiskCreator.java
-    │   ├── CatalogLister.java
-    │   ├── DiskLister.java
-    │   ├── DocumentCreatorFactory.java
-    │   ├── TextCatalogCreator.java
-    │   └── TextDiskCreator.java
     ├── cpm
     │   ├── CPMCatalogSector.java
     │   ├── CPMDisk.java
@@ -83,9 +89,12 @@ SUM:                           216           3940           1178          22680
     │   ├── DiskFactory.java
     │   ├── DualDosDisk.java
     │   ├── FormattedDisk.java
+    │   ├── NibDisk.java
+    │   ├── Nibblizer.java
     │   ├── SectorList.java
     │   ├── SectorListConverter.java
-    │   └── SectorType.java
+    │   ├── SectorType.java
+    │   └── V2dDisk.java
     ├── dos
     │   ├── AbstractCatalogEntry.java
     │   ├── CatalogEntry.java
@@ -94,6 +103,14 @@ SUM:                           216           3940           1178          22680
     │   ├── DosDisk.java
     │   ├── DosTSListSector.java
     │   └── DosVTOCSector.java
+    ├── duplicates
+    │   ├── CSVFileWriter.java
+    │   ├── DeleteWindow.java
+    │   ├── DiskDetails.java
+    │   ├── DiskTableModel.java
+    │   ├── DisksWindow.java
+    │   ├── DuplicateSwingWorker.java
+    │   └── RootFolderData.java
     ├── gui
     │   ├── AboutAction.java
     │   ├── AbstractTab.java
@@ -107,7 +124,6 @@ SUM:                           216           3940           1178          22680
     │   ├── DebuggingAction.java
     │   ├── DiskAndFileSelector.java
     │   ├── DiskBrowser.java
-    │   ├── DiskDetails.java
     │   ├── DiskLayoutImage.java
     │   ├── DiskLayoutPanel.java
     │   ├── DiskLayoutSelection.java
@@ -116,6 +132,7 @@ SUM:                           216           3940           1178          22680
     │   ├── DiskSelectionListener.java
     │   ├── DuplicateAction.java
     │   ├── ExecuteDiskAction.java
+    │   ├── FileComparator.java
     │   ├── FileNodeSelectedEvent.java
     │   ├── FileNodeSelectionListener.java
     │   ├── FileSelectedEvent.java
@@ -127,10 +144,12 @@ SUM:                           216           3940           1178          22680
     │   ├── LineWrapAction.java
     │   ├── MenuHandler.java
     │   ├── MonochromeAction.java
+    │   ├── NextPaletteAction.java
     │   ├── NoDisksFoundException.java
-    │   ├── OpenFileAction.java
+    │   ├── PaletteAction.java
     │   ├── PreferencesAction.java
     │   ├── PreferencesDialog.java
+    │   ├── PreviousPaletteAction.java
     │   ├── PrintAction.java
     │   ├── PrintDocument.java
     │   ├── RedoHandler.java
@@ -202,29 +221,43 @@ SUM:                           216           3940           1178          22680
     │   ├── SubDirectoryHeader.java
     │   └── VolumeDirectoryHeader.java
     ├── utilities
+    │   ├── CPU.java
     │   ├── DateTime.java
     │   ├── FileFormatException.java
+    │   ├── FormatRenderer.java
     │   ├── HexFormatter.java
     │   ├── LZW.java
     │   ├── LZW1.java
     │   ├── LZW2.java
     │   ├── NuFX.java
+    │   ├── NumberRenderer.java
     │   ├── Thread.java
     │   └── Utility.java
     ├── visicalc
     │   ├── Abs.java
+    │   ├── AbstractValue.java
+    │   ├── Acos.java
     │   ├── Address.java
     │   ├── And.java
+    │   ├── Asin.java
+    │   ├── Atan.java
+    │   ├── Average.java
     │   ├── Cell.java
+    │   ├── Choose.java
     │   ├── Condition.java
+    │   ├── Cos.java
     │   ├── Count.java
     │   ├── Error.java
+    │   ├── Exp.java
     │   ├── Expression.java
+    │   ├── Format.java
     │   ├── Function.java
     │   ├── If.java
     │   ├── Int.java
     │   ├── IsError.java
     │   ├── IsNa.java
+    │   ├── Ln.java
+    │   ├── Log10.java
     │   ├── Lookup.java
     │   ├── Max.java
     │   ├── Min.java
@@ -235,27 +268,41 @@ SUM:                           216           3940           1178          22680
     │   ├── Pi.java
     │   ├── Range.java
     │   ├── Sheet.java
+    │   ├── Sin.java
+    │   ├── Sqrt.java
     │   ├── Sum.java
-    │   └── Value.java
+    │   ├── Tan.java
+    │   ├── Value.java
+    │   └── ValueList.java
     └── wizardry
         ├── AbstractImage.java
         ├── Character.java
         ├── CodedMessage.java
         ├── Dice.java
+        ├── DragonData.java
         ├── ExperienceLevel.java
         ├── Header.java
+        ├── Huffman.java
         ├── Image.java
         ├── ImageV2.java
         ├── Item.java
         ├── MazeAddress.java
         ├── MazeCell.java
+        ├── MazeGridV5.java
         ├── MazeLevel.java
         ├── Message.java
+        ├── MessageBlock.java
+        ├── MessageDataBlock.java
         ├── Monster.java
         ├── PlainMessage.java
+        ├── Relocator.java
         ├── Reward.java
         ├── Spell.java
+        ├── Wiz4Image.java
+        ├── Wiz4Monsters.java
+        ├── Wiz5Monsters.java
+        ├── Wizardry4BootDisk.java
         └── WizardryScenarioDisk.java
-
-15 directories, 235 files
+        
+15 directories, 281 files
 ```

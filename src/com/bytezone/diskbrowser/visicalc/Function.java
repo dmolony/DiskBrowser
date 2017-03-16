@@ -42,8 +42,17 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     if (text.startsWith ("@ABS("))
       return new Abs (parent, cell, text);
 
+    if (text.startsWith ("@ACOS("))
+      return new Acos (parent, cell, text);
+
     if (text.startsWith ("@AND("))
       return new And (parent, cell, text);
+
+    if (text.startsWith ("@ASIN("))
+      return new Asin (parent, cell, text);
+
+    if (text.startsWith ("@ATAN("))
+      return new Atan (parent, cell, text);
 
     if (text.startsWith ("@AVERAGE("))
       return new Average (parent, cell, text);
@@ -54,8 +63,14 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     if (text.startsWith ("@CHOOSE("))
       return new Choose (parent, cell, text);
 
+    if (text.startsWith ("@COS("))
+      return new Cos (parent, cell, text);
+
     if (text.startsWith ("@ERROR"))
       return new Error (parent, cell, text);
+
+    if (text.startsWith ("@EXP"))
+      return new Exp (parent, cell, text);
 
     if (text.startsWith ("@IF("))
       return new If (parent, cell, text);
@@ -69,8 +84,14 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     if (text.startsWith ("@ISNA("))
       return new IsNa (parent, cell, text);
 
+    if (text.startsWith ("@LOG10("))
+      return new Log10 (parent, cell, text);
+
     if (text.startsWith ("@LOOKUP("))
       return new Lookup (parent, cell, text);
+
+    if (text.startsWith ("@LN("))
+      return new Ln (parent, cell, text);
 
     if (text.startsWith ("@MIN("))
       return new Min (parent, cell, text);
@@ -90,11 +111,17 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     if (text.startsWith ("@PI"))
       return new Pi (parent, cell, text);
 
+    if (text.startsWith ("@SIN("))
+      return new Sin (parent, cell, text);
+
     if (text.startsWith ("@SUM("))
       return new Sum (parent, cell, text);
 
     if (text.startsWith ("@SQRT("))
       return new Sqrt (parent, cell, text);
+
+    if (text.startsWith ("@TAN("))
+      return new Tan (parent, cell, text);
 
     System.out.printf ("Unknown function: [%s]%n", text);
     return new Error (parent, cell, "@ERROR");

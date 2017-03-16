@@ -24,7 +24,14 @@ public class Choose extends Function
   public void calculate ()
   {
     source.calculate ();
-    Address address = range.get ((int) source.getValue () - 1);
+    int index = (int) source.getValue () - 1;
+    if (index < 0 || index >= range.size ())
+    {
+      valueType = ValueType.NA;
+      return;
+    }
+
+    Address address = range.get (index);
     if (address == null)
       valueType = ValueType.NA;
     else

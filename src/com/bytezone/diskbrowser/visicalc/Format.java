@@ -48,6 +48,8 @@ public class Format
           val = val.substring (0, val.length () - 1);
         if (val.startsWith ("0."))
           val = val.substring (1);
+        if (val.startsWith ("-0."))
+          val = "-" + val.substring (2);
 
         if (val.length () > colWidth && val.indexOf ('.') >= 0)
           val = val.substring (0, colWidth);

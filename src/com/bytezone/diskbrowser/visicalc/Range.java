@@ -95,7 +95,7 @@ class Range implements Iterable<Address>
 
   public Address get (int index)
   {
-    return range.get (index);
+    return index < 0 || index >= range.size () ? null : range.get (index);
   }
 
   @Override

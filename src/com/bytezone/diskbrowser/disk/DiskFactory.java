@@ -90,7 +90,6 @@ public class DiskFactory
         while (entries.hasMoreElements ())        // loop until first valid name
         {
           ZipEntry entry = entries.nextElement ();
-          System.out.println (entry.getName ());
           if (Utility.validFileType (entry.getName ()))
           {
             InputStream stream = zipFile.getInputStream (entry);

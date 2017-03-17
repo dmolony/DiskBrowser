@@ -14,52 +14,20 @@ class If extends Function
   {
     super (parent, cell, text);
 
-    int pos1 = functionText.indexOf (',');
-    int pos2 = -1;
-    if (pos1 < 0)
-      throw new IllegalArgumentException ("Not enough parameters for IF: " + text);
+    conditionText = Expression.getParameter (functionText);
+    textTrue =
+        Expression.getParameter (functionText.substring (conditionText.length () + 1));
+    textFalse = Expression.getParameter (
+        functionText.substring (conditionText.length () + textTrue.length () + 2));
 
-    conditionText = functionText.substring (0, pos1);
     condition = new Condition (parent, cell, conditionText);
-    //    System.out.printf ("Cond : %s%n", conditionText);
     values.add (condition);
 
-    if (functionText.charAt (pos1 + 1) == '@')
-    {
-      String functionName = Expression.getFunctionName (functionText, pos1 + 1);
-      int nameLength = functionName.length ();
-      if (functionText.charAt (pos1 + nameLength + 1) == ',')    // no brackets or parameters
-      {
-        //        System.out.printf ("no parameters [%s]%n", functionName);
-        textTrue = functionName;
-      }
-      else
-      {
-        textTrue = Expression.getBalancedText (functionText.substring (pos1 + 1));
-        //        System.out.printf ("parameters [%s]%n", textTrue);
-      }
-      //      System.out.printf ("True : %s%n", textTrue);
-      expTrue = new Expression (parent, cell, textTrue);
-      pos2 = functionText.indexOf (',', pos1 + textTrue.length () + 1);
-    }
-    else
-    {
-      pos2 = functionText.indexOf (',', pos1 + 1);
-      textTrue = functionText.substring (pos1 + 1, pos2);
-      //      System.out.printf ("True : %s%n", textTrue);
-      expTrue = new Expression (parent, cell, functionText.substring (pos1 + 1, pos2));
-    }
+    expTrue = new Expression (parent, cell, textTrue);
     values.add (expTrue);
 
-    if (pos2 < 0)
-      throw new IllegalArgumentException ("Not enough parameters for IF: " + text);
-
-    textFalse = functionText.substring (pos2 + 1);
-    //    System.out.printf ("False: %s%n", textFalse);
     expFalse = new Expression (parent, cell, textFalse);
     values.add (expFalse);
-
-    //    System.out.println ();
   }
 
   @Override

@@ -310,14 +310,43 @@ class Expression extends AbstractValue implements Iterable<Value>
     return text.substring (0, ptr + 1);   // include closing parenthesis
   }
 
-  static String getFunctionName (String text, int offset)
+  // reads text up to the next comma that is not part of a function
+  // text does not include the outer brackets or calling function name
+  static String getParameter (String text)
   {
-    int pos1 = text.indexOf ('(', offset);
-    int pos2 = text.indexOf (',', offset);
+    int depth = 0;
+    int ptr = 0;
 
-    if (pos1 > offset && pos1 < pos2)
-      return text.substring (offset, pos1);
-    return text.substring (offset, pos2);
+    while (ptr < text.length ())
+    {
+      char c = text.charAt (ptr);
+      if (c == '(')
+        ++depth;
+      else if (c == ')')
+        --depth;
+      else if (c == ',' && depth == 0)
+        break;
+      ++ptr;
+    }
+
+    return text.substring (0, ptr);
+  }
+
+  // receives a string starting with the function call
+  static String getFunctionCall (String text)
+  {
+    if (text.charAt (0) != '@')
+      throw new IllegalArgumentException ("Bad function name: " + text);
+
+    for (String functionName : Function.functionList)
+      if (text.startsWith (functionName))
+      {
+        if (functionName.endsWith ("("))          // if function has parameters
+          return getBalancedText (text);          // return full function call
+        return functionName;                      // return function name only
+      }
+
+    throw new IllegalArgumentException ("Bad function name: " + text);
   }
 
   private String getNumberText (String text)

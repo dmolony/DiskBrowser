@@ -4,6 +4,12 @@ import java.util.Iterator;
 
 abstract class Function extends AbstractValue implements Iterable<Value>
 {
+  static final String[] functionList =
+      { "@ABS(", "@ACOS(", "@AND(", "@ASIN(", "@ATAN(", "@AVERAGE(", "@COUNT(",
+        "@CHOOSE(", "@COS(", "@ERROR", "@EXP(", "@FALSE", "@IF(", "@INT(", "@ISERROR(",
+        "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NPV", "@OR(",
+        "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
+
   protected final Sheet parent;
   protected final Cell cell;
   protected String functionName;
@@ -54,8 +60,13 @@ abstract class Function extends AbstractValue implements Iterable<Value>
       if (text.startsWith ("@ERROR"))
         return new Error (parent, cell, text);
 
-      if (text.startsWith ("@EXP"))
+      if (text.startsWith ("@EXP("))
         return new Exp (parent, cell, text);
+    }
+    else if (text.charAt (1) == 'F')
+    {
+      if (text.startsWith ("@FALSE"))
+        return new False (parent, cell, text);
     }
     else if (text.charAt (1) == 'I')
     {
@@ -123,6 +134,9 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     {
       if (text.startsWith ("@TAN("))
         return new Tan (parent, cell, text);
+
+      if (text.startsWith ("@TRUE"))
+        return new True (parent, cell, text);
     }
 
     System.out.printf ("Unknown function: [%s]%n", text);

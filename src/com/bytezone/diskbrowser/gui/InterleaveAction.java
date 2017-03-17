@@ -12,11 +12,11 @@ public class InterleaveAction extends DefaultAction
 {
   int interleave;
   FormattedDisk currentDisk;
-  static String[] names = { "DOS", "Prodos", "Infocom", "CPM" };
+  static String[] names = { "No Interleave", "Prodos/Pascal", "Infocom", "CPM" };
 
   public InterleaveAction (int interleave)
   {
-    super (names[interleave] + " interleave", "Alter interleave");
+    super (names[interleave], "Alter interleave");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt " + interleave));
     this.interleave = interleave;
   }

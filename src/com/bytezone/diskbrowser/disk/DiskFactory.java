@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import com.bytezone.diskbrowser.cpm.CPMDisk;
 import com.bytezone.diskbrowser.dos.DosDisk;
@@ -65,11 +68,55 @@ public class DiskFactory
         in.close ();
         tmp.deleteOnExit ();
 
-        suffix = Utility.getSuffix (file.getName ());     // ignores the .gz
+        suffix = Utility.getSuffix (file.getName ());     // ignores the .gz and .zip
         file = tmp;
         compressed = true;
       }
       catch (IOException e)  // can get EOFException: Unexpected end of ZLIB input stream
+      {
+        e.printStackTrace ();
+        return null;
+      }
+    }
+    else if (suffix.equals ("zip"))
+    {
+      if (debug)
+        System.out.println (" ** zip **");
+      try
+      {
+        ZipFile zipFile = new ZipFile (path);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries ();
+
+        while (entries.hasMoreElements ())        // loop until first valid name
+        {
+          ZipEntry entry = entries.nextElement ();
+          System.out.println (entry.getName ());
+          if (Utility.validFileType (entry.getName ()))
+          {
+            InputStream stream = zipFile.getInputStream (entry);
+            File tmp = File.createTempFile ("zip", null);
+            FileOutputStream fos = new FileOutputStream (tmp);
+
+            int bytesRead;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = stream.read (buffer)) > 0)
+              fos.write (buffer, 0, bytesRead);
+
+            stream.close ();
+            fos.close ();
+            tmp.deleteOnExit ();
+
+            suffix = Utility.getSuffix (file.getName ());   // ignores the .gz and .zip
+            file = tmp;
+            compressed = true;
+
+            break;
+          }
+        }
+
+        zipFile.close ();
+      }
+      catch (IOException e)
       {
         e.printStackTrace ();
         return null;
@@ -116,7 +163,11 @@ public class DiskFactory
 
       disk2 = check2mgDisk (file);
       if (disk2 != null)
+      {
+        if (compressed)
+          disk2.setOriginalPath (originalPath);
         return disk2;
+      }
 
       AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
       return new DataDisk (appleDisk);
@@ -128,7 +179,11 @@ public class DiskFactory
         System.out.println (" ** 2mg **");
       disk2 = check2mgDisk (file);
       if (disk2 != null)
+      {
+        if (compressed)
+          disk2.setOriginalPath (originalPath);
         return disk2;
+      }
 
       AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
       return new DataDisk (appleDisk);
@@ -438,20 +493,34 @@ public class DiskFactory
   /*
   offset | size | description
   ------ | ---- | -----------
-  +$000  | Long |  The integer constant '2IMG'. This integer should be little-endian, so on the Apple IIgs, this is equivalent to the four characters 'GMI2'; in ORCA/C 2.1, you can use the integer constant '2IMG'.
-  +$004  | Long |  A four-character tag identifying the application that created the file.
+  +$000  | Long |  The integer constant '2IMG'. This integer should be little-endian, 
+                   so on the Apple IIgs, this is equivalent to the four characters 
+                   'GMI2'; in ORCA/C 2.1, you can use the integer constant '2IMG'.
+  +$004  | Long |  A four-character tag identifying the application that created the 
+                   file.
   +$008  | Word |  The length of this header, in bytes. Should be 52.
   +$00A  | Word |  The version number of the image file format. Should be 1.
   +$00C  | Long |  The image format. See table below.
   +$010  | Long |  Flags. See table below.
-  +$014  | Long |  The number of 512-byte blocks in the disk image. This value should be zero unless the image format is 1 (ProDOS order).
-  +$018  | Long |  Offset to the first byte of the first block of the disk in the image file, from the beginning of the file. The disk data must come before the comment and creator-specific chunks.
-  +$01C  | Long |  Length of the disk data in bytes. This should be the number of blocks * 512.
-  +$020  | Long |  Offset to the first byte of the image comment. Can be zero if there's no comment. The comment must come after the data chunk, but before the creator-specific chunk. The comment, if it exists, should be raw text; no length byte or C-style null terminator byte is required (that's what the next field is for).
+  +$014  | Long |  The number of 512-byte blocks in the disk image. This value should 
+                   be zero unless the image format is 1 (ProDOS order).
+  +$018  | Long |  Offset to the first byte of the first block of the disk in the image 
+                   file, from the beginning of the file. The disk data must come before 
+                   the comment and creator-specific chunks.
+  +$01C  | Long |  Length of the disk data in bytes. This should be the number of 
+                   blocks * 512.
+  +$020  | Long |  Offset to the first byte of the image comment. Can be zero if 
+                   there's no comment. The comment must come after the data chunk, but 
+                   before the creator-specific chunk. The comment, if it exists, should 
+                   be raw text; no length byte or C-style null terminator byte is 
+                   required (that's what the next field is for).
   +$024  | Long |  Length of the comment chunk. Zero if there's no comment.
-  +$028  | Long |  Offset to the first byte of the creator-specific data chunk, or zero if there is none.
-  +$02C  | Long |  Length of the creator-specific chunk; zero if there is no creator-specific data.
-  +$030  | 16 bytes |  Reserved space; this pads the header to 64 bytes. These values must all be zero.
+  +$028  | Long |  Offset to the first byte of the creator-specific data chunk, or zero 
+                   if there is none.
+  +$02C  | Long |  Length of the creator-specific chunk; zero if there is no 
+                   creator-specific data.
+  +$030  | 16 bytes |  Reserved space; this pads the header to 64 bytes. These values 
+                   must all be zero.
   */
 
   private static FormattedDisk check2mgDisk (File file)
@@ -462,11 +531,12 @@ public class DiskFactory
     try
     {
       AppleDisk disk = new AppleDisk (file, 0, 0);
-      if (ProdosDisk.isCorrectFormat (disk))
+      if (disk.getTotalBlocks () > 0 && ProdosDisk.isCorrectFormat (disk))
         return new ProdosDisk (disk);
     }
     catch (Exception e)
     {
+      System.out.println (e);
     }
     if (debug)
       System.out.println ("Not a Prodos 2mg disk");

@@ -54,6 +54,7 @@ public abstract class AbstractFile implements DataSource
     if (buffer.length <= 999999)
       return HexFormatter.format (buffer, 0, buffer.length);
 
+    System.out.println ("**** truncating hex dump");
     return HexFormatter.format (buffer, 0, 999999);
   }
 
@@ -66,7 +67,7 @@ public abstract class AbstractFile implements DataSource
   @Override
   public JComponent getComponent ()
   {
-    System.out.println ("In AbstractFile.getComponent()");
+    //    System.out.println ("In AbstractFile.getComponent()");
     JPanel panel = new JPanel ();
     return panel;
   }

@@ -182,6 +182,8 @@ class Cell extends AbstractValue implements Comparable<Cell>
           return " " + Format.justify (value.getText (), colWidth - 1, fmtChar);
         }
 
+        if (colWidth == 1)
+          return ".";
         return " " + Format.format (value, fmtChar, colWidth - 1);
 
       default:

@@ -29,12 +29,14 @@ class Condition extends AbstractValue implements Iterable<Value>
       if (pos > 0)
       {
         conditionText = text.substring (0, pos);
-        valueText = text.substring (pos + comp.length ());
         conditionExpression = new Expression (parent, cell, conditionText);
-        valueExpression = new Expression (parent, cell, valueText);
         values.add (conditionExpression);
-        values.add (valueExpression);
+
         comparator = comp;
+
+        valueText = text.substring (pos + comp.length ());
+        valueExpression = new Expression (parent, cell, valueText);
+        values.add (valueExpression);
         break;
       }
     }
@@ -44,8 +46,14 @@ class Condition extends AbstractValue implements Iterable<Value>
       if (text.startsWith ("@"))
       {
         conditionText = text;
-        valueText = "1";
+        conditionExpression = new Expression (parent, cell, text);
+        values.add (conditionExpression);
+
         comparator = "=";
+
+        valueText = "1";
+        valueExpression = new Expression (parent, cell, valueText);
+        values.add (valueExpression);
       }
       else
         System.out.println ("No comparator and not a function");

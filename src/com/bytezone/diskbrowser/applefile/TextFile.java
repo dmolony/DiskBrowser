@@ -118,6 +118,7 @@ public class TextFile extends AbstractFile
     int size = buffer.length;
     int lastVal = 0;
     boolean newFormat = true;
+    boolean showAllOffsets = false;
 
     if (newFormat)
     {
@@ -133,10 +134,10 @@ public class TextFile extends AbstractFile
 
     while (ptr < size)
     {
-      int val = buffer[ptr++] & 0x7F; // strip hi-order bit
+      int val = buffer[ptr++] & 0x7F;                   // strip hi-order bit
       if (val == 0)
         ++nulls;
-      else if (val == 0x0D) // carriage return
+      else if (val == 0x0D)                             // carriage return
         text.append ("\n");
       else
       {
@@ -149,7 +150,10 @@ public class TextFile extends AbstractFile
           nulls = 0;
         }
         else if (lastVal == 0x0D && newFormat)
-          text.append ("        ");
+          if (showAllOffsets)
+            text.append (String.format ("%6d  ", ptr - 1));
+          else
+            text.append ("        ");
 
         text.append ((char) val);
       }

@@ -26,7 +26,18 @@ class If extends Function
 
     if (functionText.charAt (pos1 + 1) == '@')
     {
-      textTrue = Expression.getBalancedText (functionText.substring (pos1 + 1));
+      String functionName = Expression.getFunctionName (functionText, pos1 + 1);
+      int nameLength = functionName.length ();
+      if (functionText.charAt (pos1 + nameLength + 1) == ',')    // no brackets or parameters
+      {
+        //        System.out.printf ("no parameters [%s]%n", functionName);
+        textTrue = functionName;
+      }
+      else
+      {
+        textTrue = Expression.getBalancedText (functionText.substring (pos1 + 1));
+        //        System.out.printf ("parameters [%s]%n", textTrue);
+      }
       //      System.out.printf ("True : %s%n", textTrue);
       expTrue = new Expression (parent, cell, textTrue);
       pos2 = functionText.indexOf (',', pos1 + textTrue.length () + 1);

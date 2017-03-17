@@ -148,7 +148,7 @@ public abstract class HiResImage extends AbstractFile
         break;
 
       case ProdosConstants.FILE_TYPE_PNT:           // 0xC0
-        if (auxType == 0)
+        if (auxType == 0)  // see Asimov disks/images/gs/programming/fta_code/GIFT5.SDK
           auxText = "Paintworks Packed SHR Image";
         else if (auxType == 1)
           auxText = "Packed Super Hi-Res Image";

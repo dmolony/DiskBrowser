@@ -310,6 +310,16 @@ class Expression extends AbstractValue implements Iterable<Value>
     return text.substring (0, ptr + 1);   // include closing parenthesis
   }
 
+  static String getFunctionName (String text, int offset)
+  {
+    int pos1 = text.indexOf ('(', offset);
+    int pos2 = text.indexOf (',', offset);
+
+    if (pos1 > offset && pos1 < pos2)
+      return text.substring (offset, pos1);
+    return text.substring (offset, pos2);
+  }
+
   private String getNumberText (String text)
   {
     int ptr = 0;

@@ -7,7 +7,7 @@ abstract class Function extends AbstractValue implements Iterable<Value>
   static final String[] functionList =
       { "@ABS(", "@ACOS(", "@AND(", "@ASIN(", "@ATAN(", "@AVERAGE(", "@COUNT(",
         "@CHOOSE(", "@COS(", "@ERROR", "@EXP(", "@FALSE", "@IF(", "@INT(", "@ISERROR(",
-        "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NPV", "@OR(",
+        "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NPV(", "@OR(",
         "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
 
   protected final Sheet parent;

@@ -182,6 +182,13 @@ class Cell extends AbstractValue implements Comparable<Cell>
           return " " + Format.justify (value.getText (), colWidth - 1, fmtChar);
         }
 
+        if (value.isBoolean ())     // consider ValueType of BOOLEAN
+        {
+          if (fmtChar != 'L')
+            fmtChar = 'R';
+          return Format.justify (value.getText (), colWidth, fmtChar);
+        }
+
         if (colWidth == 1)
           return ".";
         return " " + Format.format (value, fmtChar, colWidth - 1);

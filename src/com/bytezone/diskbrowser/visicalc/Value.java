@@ -20,4 +20,6 @@ interface Value
   public String getTypeText ();       // Number/Function/Expression etc
 
   public boolean isVolatile ();
+
+  public boolean isBoolean ();
 }

@@ -7,5 +7,18 @@ public class False extends Function
     super (parent, cell, text);
 
     value = 0;
+    valueType = ValueType.VALUE;
+  }
+
+  @Override
+  public boolean isBoolean ()
+  {
+    return true;
+  }
+
+  @Override
+  public String getText ()
+  {
+    return value == 0 ? "FALSE" : "TRUE";
   }
 }

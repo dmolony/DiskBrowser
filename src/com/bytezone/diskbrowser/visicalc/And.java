@@ -39,4 +39,16 @@ class And extends Function
     }
     value = 1;
   }
+
+  @Override
+  public boolean isBoolean ()
+  {
+    return true;
+  }
+
+  @Override
+  public String getText ()
+  {
+    return value == 0 ? "FALSE" : "TRUE";
+  }
 }

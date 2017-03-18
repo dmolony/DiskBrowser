@@ -7,5 +7,18 @@ public class True extends Function
     super (parent, cell, text);
 
     value = 1;
+    valueType = ValueType.VALUE;
+  }
+
+  @Override
+  public boolean isBoolean ()
+  {
+    return true;
+  }
+
+  @Override
+  public String getText ()
+  {
+    return value == 0 ? "FALSE" : "TRUE";
   }
 }

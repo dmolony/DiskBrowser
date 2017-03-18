@@ -65,6 +65,12 @@ public abstract class AbstractValue implements Value
   {
   }
 
+  @Override
+  public boolean isBoolean ()
+  {
+    return false;
+  }
+
   // for debugging
   String getValueText (int depth)
   {

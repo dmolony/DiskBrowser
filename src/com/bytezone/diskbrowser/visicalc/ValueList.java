@@ -8,9 +8,11 @@ public class ValueList implements Iterable<Value>
 {
   protected List<Value> values = new ArrayList<Value> ();
 
-  public ValueList (Sheet parent, Cell cell, String text)
+  public ValueList (Cell cell, String text)
   {
+    Sheet parent = cell.getParent ();
     String remainder = text;
+
     while (true)
     {
       String parameter = Expression.getParameter (remainder);
@@ -23,6 +25,7 @@ public class ValueList implements Iterable<Value>
 
       if (remainder.length () == parameter.length ())
         break;
+
       remainder = remainder.substring (parameter.length () + 1);
     }
   }

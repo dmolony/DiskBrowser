@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Asin extends Function
 {
-  Value v;
+  private final Value source;
 
   Asin (Cell cell, String text)
   {
@@ -10,23 +10,22 @@ public class Asin extends Function
 
     assert text.startsWith ("@ASIN(") : text;
 
-    v = new Expression (parent, cell, functionText).reduce ();
-    valueType = ValueType.VALUE;
+    source = new Expression (parent, cell, functionText).reduce ();
+    values.add (source);
   }
 
   @Override
   public void calculate ()
   {
-    v.calculate ();
-    if (!v.isValueType (ValueType.VALUE))
+    source.calculate ();
+
+    if (!source.isValueType (ValueType.VALUE))
     {
-      valueType = v.getValueType ();
+      valueType = source.getValueType ();
       return;
     }
 
-    value = Math.asin (v.getValue ());
-
-    if (Double.isNaN (value))
-      valueType = ValueType.ERROR;
+    value = Math.asin (source.getValue ());
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

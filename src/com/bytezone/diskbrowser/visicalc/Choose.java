@@ -2,10 +2,11 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Choose extends Function
 {
-  private final Range range;
   private final String sourceText;
   private final String rangeText;
+
   private final Value source;
+  private final Range range;
 
   Choose (Cell cell, String text)
   {
@@ -13,8 +14,6 @@ public class Choose extends Function
 
     assert text.startsWith ("@CHOOSE(") : text;
 
-    //    int pos = functionText.indexOf (',');
-    //    sourceText = functionText.substring (0, pos);
     sourceText = Expression.getParameter (functionText);
     source = new Expression (parent, cell, sourceText).reduce ();
     values.add (source);

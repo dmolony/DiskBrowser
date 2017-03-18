@@ -17,10 +17,7 @@ class And extends Function
     while (true)
     {
       String parameter = Expression.getParameter (remainder);
-      //      System.out.printf ("cond: [%s]%n", parameter);
       conditions.add (new Condition (parent, cell, parameter));
-      //      System.out.printf ("  [%s]%n", remainder);
-      //      System.out.printf ("  [%s]%n", parameter);
       if (remainder.length () == parameter.length ())
         break;
       remainder = remainder.substring (parameter.length () + 1);

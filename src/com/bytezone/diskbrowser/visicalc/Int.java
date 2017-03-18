@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Int extends Function
 {
-  Expression source;
+  private final Value source;
 
   Int (Cell cell, String text)
   {
@@ -10,7 +10,7 @@ public class Int extends Function
 
     assert text.startsWith ("@INT(") : text;
 
-    source = new Expression (parent, cell, functionText);
+    source = new Expression (parent, cell, functionText).reduce ();
     values.add (source);
   }
 
@@ -18,7 +18,8 @@ public class Int extends Function
   public void calculate ()
   {
     source.calculate ();
+
     value = (int) source.getValue ();
-    valueType = source.getValueType ();
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

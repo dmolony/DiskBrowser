@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Abs extends Function
 {
-  private final Expression source;
+  private final Value source;
 
   Abs (Cell cell, String text)
   {
@@ -10,7 +10,7 @@ public class Abs extends Function
 
     assert text.startsWith ("@ABS(") : text;
 
-    source = new Expression (parent, cell, functionText);
+    source = new Expression (parent, cell, functionText).reduce ();
     values.add (source);
   }
 
@@ -19,7 +19,13 @@ public class Abs extends Function
   {
     source.calculate ();
 
+    if (!source.isValueType (ValueType.VALUE))
+    {
+      valueType = source.getValueType ();
+      return;
+    }
+
     value = Math.abs (source.getValue ());
-    valueType = source.getValueType ();
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Ln extends Function
 {
-  Value v;
+  private final Value source;
 
   Ln (Cell cell, String text)
   {
@@ -10,20 +10,22 @@ public class Ln extends Function
 
     assert text.startsWith ("@LN(") : text;
 
-    v = new Expression (parent, cell, functionText).reduce ();
-    valueType = ValueType.VALUE;
+    source = new Expression (parent, cell, functionText).reduce ();
+    values.add (source);
   }
 
   @Override
   public void calculate ()
   {
-    v.calculate ();
-    if (!v.isValueType (ValueType.VALUE))
+    source.calculate ();
+
+    if (!source.isValueType (ValueType.VALUE))
     {
-      valueType = v.getValueType ();
+      valueType = source.getValueType ();
       return;
     }
 
-    value = Math.log (v.getValue ());
+    value = Math.log (source.getValue ());
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

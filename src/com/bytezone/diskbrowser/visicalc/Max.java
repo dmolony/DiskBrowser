@@ -10,7 +10,10 @@ class Max extends Function
 
     assert text.startsWith ("@MAX(") : text;
 
-    list = new ValueList (parent, cell, functionText);
+    list = new ValueList (cell, functionText);
+
+    for (Value v : list)
+      values.add (v);
   }
 
   @Override

@@ -10,7 +10,10 @@ class Sum extends Function
 
     assert text.startsWith ("@SUM(") : text;
 
-    list = new ValueList (parent, cell, functionText);
+    list = new ValueList (cell, functionText);
+
+    for (Value v : list)
+      values.add (v);
   }
 
   @Override

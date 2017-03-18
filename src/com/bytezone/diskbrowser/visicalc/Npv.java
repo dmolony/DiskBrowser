@@ -4,10 +4,10 @@ import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 public class Npv extends Function
 {
-  private final String valueText;
+  private final String sourceText;
   private final String rangeText;
 
-  private final Expression rateExp;
+  private final Value source;
   private final Range range;
 
   Npv (Cell cell, String text)
@@ -16,11 +16,11 @@ public class Npv extends Function
 
     assert text.startsWith ("@NPV(") : text;
 
-    valueText = Expression.getParameter (functionText);
-    rateExp = new Expression (parent, cell, valueText);
-    values.add (rateExp);
+    sourceText = Expression.getParameter (functionText);
+    source = new Expression (parent, cell, sourceText).reduce ();
+    values.add (source);
 
-    rangeText = functionText.substring (valueText.length () + 1);
+    rangeText = functionText.substring (sourceText.length () + 1);
     range = new Range (parent, cell, rangeText);
   }
 
@@ -30,14 +30,14 @@ public class Npv extends Function
     value = 0;
     valueType = ValueType.VALUE;
 
-    rateExp.calculate ();
-    if (!rateExp.isValueType (ValueType.VALUE))
+    source.calculate ();
+    if (!source.isValueType (ValueType.VALUE))
     {
-      valueType = rateExp.getValueType ();
+      valueType = source.getValueType ();
       return;
     }
 
-    double rate = 1 + rateExp.getValue ();
+    double rate = 1 + source.getValue ();
 
     int period = 0;
     for (Address address : range)

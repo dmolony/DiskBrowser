@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Atan extends Function
 {
-  Value v;
+  private final Value source;
 
   Atan (Cell cell, String text)
   {
@@ -10,23 +10,22 @@ public class Atan extends Function
 
     assert text.startsWith ("@ATAN(") : text;
 
-    v = new Expression (parent, cell, functionText).reduce ();
-    valueType = ValueType.VALUE;
+    source = new Expression (parent, cell, functionText).reduce ();
+    values.add (source);
   }
 
   @Override
   public void calculate ()
   {
-    v.calculate ();
-    if (!v.isValueType (ValueType.VALUE))
+    source.calculate ();
+
+    if (!source.isValueType (ValueType.VALUE))
     {
-      valueType = v.getValueType ();
+      valueType = source.getValueType ();
       return;
     }
 
-    value = Math.atan (v.getValue ());
-
-    if (Double.isNaN (value))
-      valueType = ValueType.ERROR;
+    value = Math.atan (source.getValue ());
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

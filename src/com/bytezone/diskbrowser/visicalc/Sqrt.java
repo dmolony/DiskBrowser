@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Sqrt extends Function
 {
-  private final Expression source;
+  private final Value source;
 
   Sqrt (Cell cell, String text)
   {
@@ -10,7 +10,7 @@ public class Sqrt extends Function
 
     assert text.startsWith ("@SQRT(") : text;
 
-    source = new Expression (parent, cell, functionText);
+    source = new Expression (parent, cell, functionText).reduce ();
     values.add (source);
   }
 
@@ -26,6 +26,6 @@ public class Sqrt extends Function
     }
 
     value = Math.sqrt (source.getValue ());
-    valueType = ValueType.VALUE;
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

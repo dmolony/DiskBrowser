@@ -13,8 +13,11 @@ public class Average extends Function
 
     assert text.startsWith ("@AVERAGE(") : text;
 
-    list = new ValueList (parent, cell, functionText);
+    list = new ValueList (cell, functionText);
     isRange = functionText.indexOf ("...") > 0;
+
+    for (Value v : list)
+      values.add (v);
   }
 
   @Override

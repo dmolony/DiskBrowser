@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Sin extends Function
 {
-  Value v;
+  private final Value source;
 
   Sin (Cell cell, String text)
   {
@@ -10,20 +10,22 @@ public class Sin extends Function
 
     assert text.startsWith ("@SIN(") : text;
 
-    v = new Expression (parent, cell, functionText).reduce ();
-    valueType = ValueType.VALUE;
+    source = new Expression (parent, cell, functionText).reduce ();
+    values.add (source);
   }
 
   @Override
   public void calculate ()
   {
-    v.calculate ();
-    if (!v.isValueType (ValueType.VALUE))
+    source.calculate ();
+
+    if (!source.isValueType (ValueType.VALUE))
     {
-      valueType = v.getValueType ();
+      valueType = source.getValueType ();
       return;
     }
 
-    value = Math.sin (v.getValue ());
+    value = Math.sin (source.getValue ());
+    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 }

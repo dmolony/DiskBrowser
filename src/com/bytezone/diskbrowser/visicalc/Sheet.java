@@ -393,12 +393,13 @@ public class Sheet
         String name = Function.functionList[i];
         if (name.endsWith ("("))
           name = name.substring (0, name.length () - 1);
-        counts.add (String.format ("%-10s %d", name, functionTotals[i]));
+        counts.add (String.format ("%-10s%d", name, functionTotals[i]));
       }
 
     while (counts.size () < 18)
       counts.add ("");
 
+    text.append (String.format ("%-85.85s%n", underline));
     text.append (String.format ("Global format : %-18s %-18s %-18s %s%n", globalFormat,
         counts.get (0), counts.get (6), counts.get (12)));
     text.append (String.format ("Column width  : %-2d %-15s %-18s %-18s %s%n",
@@ -412,13 +413,11 @@ public class Sheet
     text.append (String.format ("Cells         : %-5d  %-11s %-18s %-18s %s%n", size (),
         "", counts.get (4), counts.get (10), counts.get (16)));
 
-    if (size () > 0)
-      text.append (String.format ("Range         : %-18s %-18s %-18s %s%n%n",
-          Address.getCellName (minRow + 1, minColumn) + ":"
-              + Address.getCellName (maxRow + 1, maxColumn),
-          counts.get (5), counts.get (11), counts.get (17)));
-    else
-      text.append ("\n\n");
+    String rangeText = size () > 0 ? Address.getCellName (minRow + 1, minColumn) + ":"
+        + Address.getCellName (maxRow + 1, maxColumn) : "";
+    text.append (String.format ("Range         : %-18s %-18s %-18s %s%n", rangeText,
+        counts.get (5), counts.get (11), counts.get (17)));
+    text.append (String.format ("%-85.85s%n", underline));
 
     if (debug)
     {

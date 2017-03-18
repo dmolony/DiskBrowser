@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 class IsError extends Function
 {
-  Value expression;
+  private final Value source;
 
   public IsError (Cell cell, String text)
   {
@@ -10,14 +10,16 @@ class IsError extends Function
 
     assert text.startsWith ("@ISERROR(") : text;
 
-    expression = new Expression (parent, cell, functionText).reduce ();
+    source = new Expression (parent, cell, functionText).reduce ();
+    values.add (source);
   }
 
   @Override
   public void calculate ()
   {
-    expression.calculate ();
-    value = expression.isValueType (ValueType.ERROR) ? 1 : 0;
+    source.calculate ();
+
+    value = source.isValueType (ValueType.ERROR) ? 1 : 0;
     valueType = ValueType.VALUE;
   }
 }

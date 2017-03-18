@@ -4,7 +4,8 @@ class Lookup extends Function
 {
   private final String sourceText;
   private final String rangeText;
-  private final Expression source;
+
+  private final Value source;
   private final Range range;
 
   public Lookup (Cell cell, String text)
@@ -14,7 +15,7 @@ class Lookup extends Function
     assert text.startsWith ("@LOOKUP(") : text;
 
     sourceText = Expression.getParameter (functionText);
-    source = new Expression (parent, cell, sourceText);
+    source = new Expression (parent, cell, sourceText).reduce ();
     values.add (source);
 
     rangeText = functionText.substring (sourceText.length () + 1);
@@ -29,7 +30,6 @@ class Lookup extends Function
     if (!source.isValueType (ValueType.VALUE))
     {
       valueType = source.getValueType ();
-      //      valueType = ValueType.NA;
       return;
     }
 
@@ -45,12 +45,6 @@ class Lookup extends Function
     for (Address address : range)
     {
       Cell cell = parent.getCell (address);
-      //      if (cell.isValueType (ValueType.NA))
-      //      {
-      //        //        System.out.println ("NA1");
-      //        break;
-      //        //        continue;
-      //      }
       if (cell.getValue () > sourceValue)     // past the value
         break;
       target = address;
@@ -59,7 +53,6 @@ class Lookup extends Function
     if (target == null)
     {
       valueType = ValueType.NA;
-      //      System.out.println ("NA2");
       value = 0;
     }
     else

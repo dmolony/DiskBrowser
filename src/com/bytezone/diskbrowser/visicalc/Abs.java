@@ -4,9 +4,9 @@ public class Abs extends Function
 {
   private final Expression source;
 
-  Abs (Sheet parent, Cell cell, String text)
+  Abs (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     source = new Expression (parent, cell, functionText);
     values.add (source);

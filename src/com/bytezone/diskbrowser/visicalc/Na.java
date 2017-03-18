@@ -2,9 +2,9 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Na extends Function
 {
-  public Na (Sheet parent, Cell cell, String text)
+  public Na (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
     valueType = ValueType.NA;
   }
 }

@@ -4,9 +4,9 @@ public class Ln extends Function
 {
   Value v;
 
-  Ln (Sheet parent, Cell cell, String text)
+  Ln (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

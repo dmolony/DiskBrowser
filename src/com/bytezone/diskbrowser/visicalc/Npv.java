@@ -10,9 +10,9 @@ public class Npv extends Function
   private final Expression rateExp;
   private final Range range;
 
-  Npv (Sheet parent, Cell cell, String text)
+  Npv (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     int pos = text.indexOf (',');
     valueText = text.substring (5, pos);

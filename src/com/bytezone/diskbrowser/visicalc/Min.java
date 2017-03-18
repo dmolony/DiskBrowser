@@ -4,9 +4,9 @@ class Min extends Function
 {
   private final ValueList list;
 
-  public Min (Sheet parent, Cell cell, String text)
+  public Min (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     list = new ValueList (parent, cell, functionText);
   }

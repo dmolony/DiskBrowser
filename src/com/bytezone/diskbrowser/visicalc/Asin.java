@@ -4,9 +4,9 @@ public class Asin extends Function
 {
   Value v;
 
-  Asin (Sheet parent, Cell cell, String text)
+  Asin (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

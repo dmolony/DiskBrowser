@@ -4,9 +4,9 @@ class Max extends Function
 {
   private final ValueList list;
 
-  public Max (Sheet parent, Cell cell, String text)
+  public Max (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     list = new ValueList (parent, cell, functionText);
   }

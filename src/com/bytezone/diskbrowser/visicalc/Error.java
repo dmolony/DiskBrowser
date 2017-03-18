@@ -2,9 +2,9 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Error extends Function
 {
-  public Error (Sheet parent, Cell cell, String text)
+  public Error (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
     valueType = ValueType.ERROR;
   }
 }

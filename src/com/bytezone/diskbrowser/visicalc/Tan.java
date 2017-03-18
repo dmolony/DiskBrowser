@@ -4,9 +4,9 @@ public class Tan extends Function
 {
   Value v;
 
-  Tan (Sheet parent, Cell cell, String text)
+  Tan (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

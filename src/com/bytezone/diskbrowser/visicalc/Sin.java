@@ -4,9 +4,9 @@ public class Sin extends Function
 {
   Value v;
 
-  Sin (Sheet parent, Cell cell, String text)
+  Sin (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

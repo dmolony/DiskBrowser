@@ -4,9 +4,9 @@ public class Sqrt extends Function
 {
   private final Expression source;
 
-  Sqrt (Sheet parent, Cell cell, String text)
+  Sqrt (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
     source = new Expression (parent, cell, text.substring (5, text.length () - 1));
     values.add (source);
   }

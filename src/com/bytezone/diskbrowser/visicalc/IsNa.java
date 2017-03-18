@@ -4,9 +4,9 @@ public class IsNa extends Function
 {
   Value expression;
 
-  IsNa (Sheet parent, Cell cell, String text)
+  IsNa (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     expression = new Expression (parent, cell, functionText).reduce ();
   }

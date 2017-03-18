@@ -38,6 +38,11 @@ class Cell extends AbstractValue implements Comparable<Cell>
     return this.cellType == cellType;
   }
 
+  Sheet getParent ()
+  {
+    return parent;
+  }
+
   @Override
   public boolean isVolatile ()
   {

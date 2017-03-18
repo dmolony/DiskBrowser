@@ -4,9 +4,9 @@ public class Log10 extends Function
 {
   Value v;
 
-  Log10 (Sheet parent, Cell cell, String text)
+  Log10 (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

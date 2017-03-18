@@ -41,7 +41,7 @@ class Expression extends AbstractValue implements Iterable<Value>
     this.cell = cell;
     this.text = text;
 
-    String line = balanceBrackets (text);     // add trailing right brackets if required
+    String line = balanceBrackets (text);   // add trailing right brackets if necessary
 
     int ptr = 0;
     while (ptr < line.length ())
@@ -66,7 +66,7 @@ class Expression extends AbstractValue implements Iterable<Value>
         case '@':                                           // function
           String functionText = getFunctionCall (line.substring (ptr));
           ptr += functionText.length ();
-          values.add (Function.getInstance (parent, cell, functionText));
+          values.add (parent.getFunction (cell, functionText));
           break;
 
         case '(':                                           // parentheses block
@@ -116,8 +116,6 @@ class Expression extends AbstractValue implements Iterable<Value>
     }
 
     assert values.size () > 0;
-    //    if (values.size () == 0)
-    //      System.out.printf ("Nothing[%s]%n", text);
   }
 
   Value reduce ()
@@ -146,7 +144,6 @@ class Expression extends AbstractValue implements Iterable<Value>
       return;
     }
 
-    //    System.out.printf ("           calc %-6s %s%n", cell.getAddressText (), text);
     if (!isVolatile)
       return;
 
@@ -331,7 +328,7 @@ class Expression extends AbstractValue implements Iterable<Value>
     return text.substring (0, ptr);
   }
 
-  // receives a string starting with the function call
+  // receives a string starting with the function name
   private String getFunctionCall (String text)
   {
     if (text.charAt (0) != '@')
@@ -341,7 +338,7 @@ class Expression extends AbstractValue implements Iterable<Value>
       if (text.startsWith (functionName))
       {
         if (functionName.endsWith ("("))          // if function has parameters
-          return getBalancedText (text);          // return full function call
+          return getBalancedText (text);          //   return full function call
         return functionName;                      // return function name only
       }
 
@@ -387,25 +384,17 @@ class Expression extends AbstractValue implements Iterable<Value>
     }
 
     return text.toString ();
-
-  }
-
-  @Override
-  public String toString ()
-  {
-    return "Expression : " + text;
-  }
-
-  public static void main (String[] args)
-  {
-    Expression ex = new Expression (null, null, "-5+((-4-(20-(2^3))+6/3))*-2");
-    System.out.println (ex.getValue ());
-    System.out.println (ex);
   }
 
   @Override
   public Iterator<Value> iterator ()
   {
     return values.iterator ();
+  }
+
+  @Override
+  public String toString ()
+  {
+    return "Expression : " + text;
   }
 }

@@ -7,9 +7,9 @@ class Count extends Function
   private final ValueList list;
   private final boolean isRange;
 
-  public Count (Sheet parent, Cell cell, String text)
+  public Count (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     list = new ValueList (parent, cell, functionText);
     isRange = functionText.indexOf ("...") > 0;

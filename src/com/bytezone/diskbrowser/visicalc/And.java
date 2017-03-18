@@ -7,9 +7,9 @@ class And extends Function
 {
   private final List<Condition> conditions = new ArrayList<Condition> ();
 
-  public And (Sheet parent, Cell cell, String text)
+  public And (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     String remainder = functionText;
     while (true)

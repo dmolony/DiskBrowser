@@ -4,9 +4,9 @@ public class Exp extends Function
 {
   Value v;
 
-  Exp (Sheet parent, Cell cell, String text)
+  Exp (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

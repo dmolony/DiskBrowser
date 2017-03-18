@@ -4,9 +4,9 @@ public class Atan extends Function
 {
   Value v;
 
-  Atan (Sheet parent, Cell cell, String text)
+  Atan (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

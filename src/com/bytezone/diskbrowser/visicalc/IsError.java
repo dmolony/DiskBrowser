@@ -4,9 +4,9 @@ class IsError extends Function
 {
   Value expression;
 
-  public IsError (Sheet parent, Cell cell, String text)
+  public IsError (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     expression = new Expression (parent, cell, functionText).reduce ();
   }

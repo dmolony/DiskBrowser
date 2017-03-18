@@ -4,9 +4,9 @@ class Sum extends Function
 {
   private final ValueList list;
 
-  public Sum (Sheet parent, Cell cell, String text)
+  public Sum (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     list = new ValueList (parent, cell, functionText);
   }

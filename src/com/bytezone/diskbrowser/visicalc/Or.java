@@ -7,9 +7,9 @@ class Or extends Function
 {
   private final List<Condition> conditions = new ArrayList<Condition> ();
 
-  public Or (Sheet parent, Cell cell, String text)
+  public Or (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     String remainder = functionText;
     while (true)

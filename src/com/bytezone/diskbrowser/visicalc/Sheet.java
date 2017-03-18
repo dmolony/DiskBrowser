@@ -33,6 +33,8 @@ public class Sheet
   private int minRow = 9999;
   private int maxRow;
 
+  int[] functionTotals = new int[Function.functionList.length];
+
   // Maximum cell = BK254
 
   //Commands:
@@ -384,18 +386,37 @@ public class Sheet
       }
     }
 
-    text.append (String.format ("Global format : %s%n", globalFormat));
-    text.append (String.format ("Column width  : %d%n", columnWidth));
-    text.append (String.format ("Recalc  order : %s%n",
-        recalculationOrder == 'R' ? "Row" : "Column"));
-    text.append (String.format ("Recalculation : %s%n",
-        recalculation == 'A' ? "Automatic" : "Manual"));
-    text.append (String.format ("Cells         : %d%n", size ()));
+    List<String> counts = new ArrayList<String> ();
+    for (int i = 0; i < functionTotals.length; i++)
+      if (functionTotals[i] > 0)
+      {
+        String name = Function.functionList[i];
+        if (name.endsWith ("("))
+          name = name.substring (0, name.length () - 1);
+        counts.add (String.format ("%-10s %d", name, functionTotals[i]));
+      }
+
+    while (counts.size () < 18)
+      counts.add ("");
+
+    text.append (String.format ("Global format : %-18s %-18s %-18s %s%n", globalFormat,
+        counts.get (0), counts.get (6), counts.get (12)));
+    text.append (String.format ("Column width  : %-2d %-15s %-18s %-18s %s%n",
+        columnWidth, "", counts.get (1), counts.get (7), counts.get (13)));
+    text.append (String.format ("Recalc  order : %-18s %-18s %-18s %s%n",
+        recalculationOrder == 'R' ? "Row" : "Column", counts.get (2), counts.get (8),
+        counts.get (14)));
+    text.append (String.format ("Recalculation : %-18s %-18s %-18s %s%n",
+        recalculation == 'A' ? "Automatic" : "Manual", counts.get (3), counts.get (9),
+        counts.get (15)));
+    text.append (String.format ("Cells         : %-5d  %-11s %-18s %-18s %s%n", size (),
+        "", counts.get (4), counts.get (10), counts.get (16)));
 
     if (size () > 0)
-      text.append (String.format ("Range         : %s:%s%n%n",
-          Address.getCellName (minRow + 1, minColumn),
-          Address.getCellName (maxRow + 1, maxColumn)));
+      text.append (String.format ("Range         : %-18s %-18s %-18s %s%n%n",
+          Address.getCellName (minRow + 1, minColumn) + ":"
+              + Address.getCellName (maxRow + 1, maxColumn),
+          counts.get (5), counts.get (11), counts.get (17)));
     else
       text.append ("\n\n");
 
@@ -469,5 +490,139 @@ public class Sheet
     }
 
     return text.toString ();
+  }
+
+  Function getFunction (Cell cell, String text)
+  {
+    if (text.charAt (0) != '@')
+    {
+      System.out.printf ("Unknown function: [%s]%n", text);
+      return new Error (cell, "@ERROR");
+    }
+
+    for (int i = 0; i < Function.functionList.length; i++)
+      if (text.startsWith (Function.functionList[i]))
+      {
+        functionTotals[i]++;
+        break;
+      }
+
+    if (text.charAt (1) == 'A')
+    {
+      if (text.startsWith ("@ABS("))
+        return new Abs (cell, text);
+
+      if (text.startsWith ("@ACOS("))
+        return new Acos (cell, text);
+
+      if (text.startsWith ("@AND("))
+        return new And (cell, text);
+
+      if (text.startsWith ("@ASIN("))
+        return new Asin (cell, text);
+
+      if (text.startsWith ("@ATAN("))
+        return new Atan (cell, text);
+
+      if (text.startsWith ("@AVERAGE("))
+        return new Average (cell, text);
+    }
+    else if (text.charAt (1) == 'C')
+    {
+      if (text.startsWith ("@COUNT("))
+        return new Count (cell, text);
+
+      if (text.startsWith ("@CHOOSE("))
+        return new Choose (cell, text);
+
+      if (text.startsWith ("@COS("))
+        return new Cos (cell, text);
+    }
+    else if (text.charAt (1) == 'E')
+    {
+      if (text.startsWith ("@ERROR"))
+        return new Error (cell, text);
+
+      if (text.startsWith ("@EXP("))
+        return new Exp (cell, text);
+    }
+    else if (text.charAt (1) == 'F')
+    {
+      if (text.startsWith ("@FALSE"))
+        return new False (cell, text);
+    }
+    else if (text.charAt (1) == 'I')
+    {
+      if (text.startsWith ("@IF("))
+        return new If (cell, text);
+
+      if (text.startsWith ("@INT("))
+        return new Int (cell, text);
+
+      if (text.startsWith ("@ISERROR("))
+        return new IsError (cell, text);
+
+      if (text.startsWith ("@ISNA("))
+        return new IsNa (cell, text);
+    }
+    else if (text.charAt (1) == 'L')
+    {
+      if (text.startsWith ("@LOG10("))
+        return new Log10 (cell, text);
+
+      if (text.startsWith ("@LOOKUP("))
+        return new Lookup (cell, text);
+
+      if (text.startsWith ("@LN("))
+        return new Ln (cell, text);
+    }
+    else if (text.charAt (1) == 'M')
+    {
+      if (text.startsWith ("@MIN("))
+        return new Min (cell, text);
+
+      if (text.startsWith ("@MAX("))
+        return new Max (cell, text);
+    }
+    else if (text.charAt (1) == 'N')
+    {
+      if (text.equals ("@NA"))
+        return new Na (cell, text);
+
+      if (text.startsWith ("@NPV("))
+        return new Npv (cell, text);
+    }
+    else if (text.charAt (1) == 'O')
+    {
+      if (text.startsWith ("@OR("))
+        return new Or (cell, text);
+    }
+    else if (text.charAt (1) == 'P')
+    {
+      if (text.startsWith ("@PI"))
+        return new Pi (cell, text);
+    }
+    else if (text.charAt (1) == 'S')
+    {
+      if (text.startsWith ("@SIN("))
+        return new Sin (cell, text);
+
+      if (text.startsWith ("@SUM("))
+        return new Sum (cell, text);
+
+      if (text.startsWith ("@SQRT("))
+        return new Sqrt (cell, text);
+    }
+    else if (text.charAt (1) == 'T')
+    {
+      if (text.startsWith ("@TAN("))
+        return new Tan (cell, text);
+
+      if (text.startsWith ("@TRUE"))
+        return new True (cell, text);
+    }
+
+    System.out.printf ("Unknown function: [%s]%n", text);
+    return new Error (cell, "@ERROR");
   }
 }

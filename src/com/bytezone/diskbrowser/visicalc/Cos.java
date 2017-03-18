@@ -4,9 +4,9 @@ public class Cos extends Function
 {
   Value v;
 
-  Cos (Sheet parent, Cell cell, String text)
+  Cos (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;

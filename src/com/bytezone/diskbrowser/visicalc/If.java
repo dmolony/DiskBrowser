@@ -10,9 +10,9 @@ class If extends Function
   private final Expression expTrue;
   private final Expression expFalse;
 
-  public If (Sheet parent, Cell cell, String text)
+  public If (Cell cell, String text)
   {
-    super (parent, cell, text);
+    super (cell, text);
 
     conditionText = Expression.getParameter (functionText);
     textTrue =

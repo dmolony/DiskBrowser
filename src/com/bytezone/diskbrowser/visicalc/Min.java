@@ -8,6 +8,8 @@ class Min extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@MIN(") : text;
+
     list = new ValueList (parent, cell, functionText);
   }
 

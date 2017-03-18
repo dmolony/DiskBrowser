@@ -8,6 +8,8 @@ class Sum extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@SUM(") : text;
+
     list = new ValueList (parent, cell, functionText);
   }
 

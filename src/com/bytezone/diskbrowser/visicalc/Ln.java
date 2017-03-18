@@ -8,6 +8,8 @@ public class Ln extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@LN(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

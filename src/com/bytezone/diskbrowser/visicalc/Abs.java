@@ -8,6 +8,8 @@ public class Abs extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@ABS(") : text;
+
     source = new Expression (parent, cell, functionText);
     values.add (source);
   }

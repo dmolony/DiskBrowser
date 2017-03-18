@@ -14,14 +14,14 @@ public class Npv extends Function
   {
     super (cell, text);
 
-    int pos = text.indexOf (',');
-    valueText = text.substring (5, pos);
-    rangeText = text.substring (pos + 1, text.length () - 1);
+    assert text.startsWith ("@NPV(") : text;
 
+    valueText = Expression.getParameter (functionText);
     rateExp = new Expression (parent, cell, valueText);
-    range = new Range (parent, cell, rangeText);
-
     values.add (rateExp);
+
+    rangeText = functionText.substring (valueText.length () + 1);
+    range = new Range (parent, cell, rangeText);
   }
 
   @Override

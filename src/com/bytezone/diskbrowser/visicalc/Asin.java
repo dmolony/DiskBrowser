@@ -8,6 +8,8 @@ public class Asin extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@ASIN(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

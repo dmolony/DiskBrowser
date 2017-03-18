@@ -11,14 +11,13 @@ class Or extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@OR(") : text;
+
     String remainder = functionText;
     while (true)
     {
       String parameter = Expression.getParameter (remainder);
-      //      System.out.printf ("cond: [%s]%n", parameter);
       conditions.add (new Condition (parent, cell, parameter));
-      //      System.out.printf ("  [%s]%n", remainder);
-      //      System.out.printf ("  [%s]%n", parameter);
       if (remainder.length () == parameter.length ())
         break;
       remainder = remainder.substring (parameter.length () + 1);

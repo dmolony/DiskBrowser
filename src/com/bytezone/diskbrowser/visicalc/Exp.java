@@ -8,6 +8,8 @@ public class Exp extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@EXP(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

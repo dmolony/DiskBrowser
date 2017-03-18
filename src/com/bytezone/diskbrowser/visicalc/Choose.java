@@ -11,6 +11,8 @@ public class Choose extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@CHOOSE(") : text;
+
     //    int pos = functionText.indexOf (',');
     //    sourceText = functionText.substring (0, pos);
     sourceText = Expression.getParameter (functionText);

@@ -7,7 +7,10 @@ public class Sqrt extends Function
   Sqrt (Cell cell, String text)
   {
     super (cell, text);
-    source = new Expression (parent, cell, text.substring (5, text.length () - 1));
+
+    assert text.startsWith ("@SQRT(") : text;
+
+    source = new Expression (parent, cell, functionText);
     values.add (source);
   }
 

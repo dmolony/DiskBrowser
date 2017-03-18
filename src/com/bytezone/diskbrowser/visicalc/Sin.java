@@ -8,6 +8,8 @@ public class Sin extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@SIN(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

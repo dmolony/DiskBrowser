@@ -11,6 +11,8 @@ class Count extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@COUNT(") : text;
+
     list = new ValueList (parent, cell, functionText);
     isRange = functionText.indexOf ("...") > 0;
   }

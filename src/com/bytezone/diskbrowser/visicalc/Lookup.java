@@ -11,17 +11,14 @@ class Lookup extends Function
   {
     super (cell, text);
 
-    //    int pos = text.indexOf (',');
+    assert text.startsWith ("@LOOKUP(") : text;
+
     sourceText = Expression.getParameter (functionText);
-
-    //    sourceText = text.substring (8, pos);
     source = new Expression (parent, cell, sourceText);
+    values.add (source);
 
-    //    rangeText = text.substring (pos + 1, text.length () - 1);
     rangeText = functionText.substring (sourceText.length () + 1);
     range = new Range (parent, cell, rangeText);
-
-    values.add (source);
   }
 
   @Override

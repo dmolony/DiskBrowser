@@ -6,6 +6,8 @@ public class True extends Function
   {
     super (cell, text);
 
+    assert text.equals ("@TRUE") : text;
+
     value = 1;
     valueType = ValueType.VALUE;
   }

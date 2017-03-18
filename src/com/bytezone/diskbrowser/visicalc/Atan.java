@@ -8,6 +8,8 @@ public class Atan extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@ATAN(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

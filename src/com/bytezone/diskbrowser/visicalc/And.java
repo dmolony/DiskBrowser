@@ -11,6 +11,8 @@ class And extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@AND(") : text;
+
     String remainder = functionText;
     while (true)
     {

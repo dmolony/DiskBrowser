@@ -7,6 +7,9 @@ class Pi extends Function
     super (cell, text);
 
     value = Math.PI;
+
+    assert text.equals ("@PI") : text;
+
     valueType = ValueType.VALUE;
   }
 }

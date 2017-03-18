@@ -8,6 +8,8 @@ class IsError extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@ISERROR(") : text;
+
     expression = new Expression (parent, cell, functionText).reduce ();
   }
 

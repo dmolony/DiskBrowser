@@ -500,129 +500,118 @@ public class Sheet
       return new Error (cell, "@ERROR");
     }
 
+    String functionName = "";
+    int functionId = -1;
     for (int i = 0; i < Function.functionList.length; i++)
       if (text.startsWith (Function.functionList[i]))
       {
+        functionId = i;
         functionTotals[i]++;
+        functionName = Function.functionList[i];
         break;
       }
 
-    if (text.charAt (1) == 'A')
+    if (functionName.isEmpty ())
     {
-      if (text.startsWith ("@ABS("))
+      System.out.printf ("Unknown function: [%s]%n", text);
+      return new Error (cell, "@ERROR");
+    }
+
+    switch (functionId)
+    {
+      case 0:
         return new Abs (cell, text);
 
-      if (text.startsWith ("@ACOS("))
+      case 1:
         return new Acos (cell, text);
 
-      if (text.startsWith ("@AND("))
+      case 2:
         return new And (cell, text);
 
-      if (text.startsWith ("@ASIN("))
+      case 3:
         return new Asin (cell, text);
 
-      if (text.startsWith ("@ATAN("))
+      case 4:
         return new Atan (cell, text);
 
-      if (text.startsWith ("@AVERAGE("))
+      case 5:
         return new Average (cell, text);
-    }
-    else if (text.charAt (1) == 'C')
-    {
-      if (text.startsWith ("@COUNT("))
+
+      case 6:
         return new Count (cell, text);
 
-      if (text.startsWith ("@CHOOSE("))
+      case 7:
         return new Choose (cell, text);
 
-      if (text.startsWith ("@COS("))
+      case 8:
         return new Cos (cell, text);
-    }
-    else if (text.charAt (1) == 'E')
-    {
-      if (text.startsWith ("@ERROR"))
+
+      case 9:
         return new Error (cell, text);
 
-      if (text.startsWith ("@EXP("))
+      case 10:
         return new Exp (cell, text);
-    }
-    else if (text.charAt (1) == 'F')
-    {
-      if (text.startsWith ("@FALSE"))
+
+      case 11:
         return new False (cell, text);
-    }
-    else if (text.charAt (1) == 'I')
-    {
-      if (text.startsWith ("@IF("))
+
+      case 12:
         return new If (cell, text);
 
-      if (text.startsWith ("@INT("))
+      case 13:
         return new Int (cell, text);
 
-      if (text.startsWith ("@ISERROR("))
+      case 14:
         return new IsError (cell, text);
 
-      if (text.startsWith ("@ISNA("))
+      case 15:
         return new IsNa (cell, text);
-    }
-    else if (text.charAt (1) == 'L')
-    {
-      if (text.startsWith ("@LOG10("))
+
+      case 16:
         return new Log10 (cell, text);
 
-      if (text.startsWith ("@LOOKUP("))
+      case 17:
         return new Lookup (cell, text);
 
-      if (text.startsWith ("@LN("))
+      case 18:
         return new Ln (cell, text);
-    }
-    else if (text.charAt (1) == 'M')
-    {
-      if (text.startsWith ("@MIN("))
+
+      case 19:
         return new Min (cell, text);
 
-      if (text.startsWith ("@MAX("))
+      case 20:
         return new Max (cell, text);
-    }
-    else if (text.charAt (1) == 'N')
-    {
-      if (text.equals ("@NA"))
+
+      case 21:
         return new Na (cell, text);
 
-      if (text.startsWith ("@NPV("))
+      case 22:
         return new Npv (cell, text);
-    }
-    else if (text.charAt (1) == 'O')
-    {
-      if (text.startsWith ("@OR("))
+
+      case 23:
         return new Or (cell, text);
-    }
-    else if (text.charAt (1) == 'P')
-    {
-      if (text.startsWith ("@PI"))
+
+      case 24:
         return new Pi (cell, text);
-    }
-    else if (text.charAt (1) == 'S')
-    {
-      if (text.startsWith ("@SIN("))
+
+      case 25:
         return new Sin (cell, text);
 
-      if (text.startsWith ("@SUM("))
+      case 26:
         return new Sum (cell, text);
 
-      if (text.startsWith ("@SQRT("))
+      case 27:
         return new Sqrt (cell, text);
-    }
-    else if (text.charAt (1) == 'T')
-    {
-      if (text.startsWith ("@TAN("))
+
+      case 28:
         return new Tan (cell, text);
 
-      if (text.startsWith ("@TRUE"))
+      case 29:
         return new True (cell, text);
-    }
 
-    System.out.printf ("Unknown function: [%s]%n", text);
-    return new Error (cell, "@ERROR");
+      default:
+        System.out.printf ("Unknown function: [%s]%n", text);
+        return new Error (cell, "@ERROR");
+    }
   }
 }

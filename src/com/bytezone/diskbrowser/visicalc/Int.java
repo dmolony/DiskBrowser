@@ -8,6 +8,8 @@ public class Int extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@INT(") : text;
+
     source = new Expression (parent, cell, functionText);
     values.add (source);
   }

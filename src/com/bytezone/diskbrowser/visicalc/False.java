@@ -6,6 +6,8 @@ public class False extends Function
   {
     super (cell, text);
 
+    assert text.equals ("@FALSE") : text;
+
     value = 0;
     valueType = ValueType.VALUE;
   }

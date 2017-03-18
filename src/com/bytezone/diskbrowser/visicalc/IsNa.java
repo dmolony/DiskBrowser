@@ -8,6 +8,8 @@ public class IsNa extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@ISNA(") : text;
+
     expression = new Expression (parent, cell, functionText).reduce ();
   }
 

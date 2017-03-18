@@ -8,6 +8,8 @@ public class Log10 extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@LOG10(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

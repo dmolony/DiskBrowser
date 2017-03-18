@@ -8,6 +8,8 @@ public class Acos extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@ACOS(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

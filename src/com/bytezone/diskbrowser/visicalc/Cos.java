@@ -8,6 +8,8 @@ public class Cos extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@COS(") : text;
+
     v = new Expression (parent, cell, functionText).reduce ();
     valueType = ValueType.VALUE;
   }

@@ -11,6 +11,8 @@ public class Average extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@AVERAGE(") : text;
+
     list = new ValueList (parent, cell, functionText);
     isRange = functionText.indexOf ("...") > 0;
   }

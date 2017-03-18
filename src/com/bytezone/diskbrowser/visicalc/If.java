@@ -14,6 +14,8 @@ class If extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@IF(") : text;
+
     conditionText = Expression.getParameter (functionText);
     textTrue =
         Expression.getParameter (functionText.substring (conditionText.length () + 1));

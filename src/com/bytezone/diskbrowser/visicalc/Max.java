@@ -8,6 +8,8 @@ class Max extends Function
   {
     super (cell, text);
 
+    assert text.startsWith ("@MAX(") : text;
+
     list = new ValueList (parent, cell, functionText);
   }
 

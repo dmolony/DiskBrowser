@@ -64,8 +64,7 @@ class Expression extends AbstractValue implements Iterable<Value>
       switch (ch)
       {
         case '@':                                           // function
-          String functionText = getBalancedText (line.substring (ptr));
-          //          System.out.println ("Func : " + functionText);
+          String functionText = getFunctionCall (line.substring (ptr));
           ptr += functionText.length ();
           values.add (Function.getInstance (parent, cell, functionText));
           break;
@@ -288,7 +287,7 @@ class Expression extends AbstractValue implements Iterable<Value>
   }
 
   // called for functions and expressions
-  static String getBalancedText (String text)
+  private String getBalancedText (String text)
   {
     int ptr = text.indexOf ('(');         // find first left parenthesis
     if (ptr < 0)
@@ -333,7 +332,7 @@ class Expression extends AbstractValue implements Iterable<Value>
   }
 
   // receives a string starting with the function call
-  static String getFunctionCall (String text)
+  private String getFunctionCall (String text)
   {
     if (text.charAt (0) != '@')
       throw new IllegalArgumentException ("Bad function name: " + text);

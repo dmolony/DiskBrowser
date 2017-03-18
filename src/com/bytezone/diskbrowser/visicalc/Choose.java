@@ -11,19 +11,26 @@ public class Choose extends Function
   {
     super (parent, cell, text);
 
-    int pos = functionText.indexOf (',');
-    sourceText = functionText.substring (0, pos);
+    //    int pos = functionText.indexOf (',');
+    //    sourceText = functionText.substring (0, pos);
+    sourceText = Expression.getParameter (functionText);
     source = new Expression (parent, cell, sourceText).reduce ();
-    rangeText = functionText.substring (pos + 1);
-    range = new Range (parent, cell, rangeText);
-
     values.add (source);
+
+    rangeText = functionText.substring (sourceText.length () + 1);
+    range = new Range (parent, cell, rangeText);
   }
 
   @Override
   public void calculate ()
   {
     source.calculate ();
+    if (!source.isValueType (ValueType.VALUE))
+    {
+      valueType = source.getValueType ();
+      return;
+    }
+
     int index = (int) source.getValue () - 1;
     if (index < 0 || index >= range.size ())
     {

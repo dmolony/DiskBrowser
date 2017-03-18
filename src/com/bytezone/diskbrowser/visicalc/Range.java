@@ -72,6 +72,11 @@ class Range implements Iterable<Address>
     from = tempFrom;
   }
 
+  static boolean isRange (String text)
+  {
+    return rangePattern.matcher (text).matches ();
+  }
+
   boolean isHorizontal ()
   {
     return isHorizontal;

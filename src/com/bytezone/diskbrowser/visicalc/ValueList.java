@@ -30,6 +30,11 @@ public class ValueList implements Iterable<Value>
     }
   }
 
+  public Value get (int index)
+  {
+    return values.get (index);
+  }
+
   public int size ()
   {
     return values.size ();

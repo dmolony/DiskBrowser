@@ -197,9 +197,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             exactBuffer = new byte[buffer.length - 4];  // reported length is too long
 
           System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
-
-          if (name.endsWith (".FONT") || name.endsWith (" FONT") || name.endsWith (".SET")
-              || name.startsWith ("ASCII."))
+          if ((name.endsWith (".FONT") || name.endsWith (" FONT")
+              || name.endsWith (".SET") || name.startsWith ("ASCII."))
+              && FontFile.isFont (exactBuffer))
             appleFile = new FontFile (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))
             appleFile = new ShapeTable (name, exactBuffer);

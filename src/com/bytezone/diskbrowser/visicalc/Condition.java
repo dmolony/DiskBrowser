@@ -7,8 +7,6 @@ class Condition extends AbstractValue implements Iterable<Value>
 {
   private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
 
-  private final Sheet parent;
-
   private String comparator;
   private String conditionText;
   private String valueText;
@@ -17,10 +15,9 @@ class Condition extends AbstractValue implements Iterable<Value>
   private Expression conditionExpression;
   private Expression valueExpression;
 
-  public Condition (Sheet parent, Cell cell, String text)
+  public Condition (Cell cell, String text)
   {
     super ("Cond");
-    this.parent = parent;
     fullText = text;
 
     for (String comp : comparators)

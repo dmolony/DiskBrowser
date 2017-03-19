@@ -6,17 +6,17 @@ import java.util.List;
 
 public class ConditionList implements Iterable<Condition>
 {
-  protected final List<Condition> conditions = new ArrayList<Condition> ();
+  private final List<Condition> conditions = new ArrayList<Condition> ();
 
   public ConditionList (Cell cell, String text)
   {
-    Sheet parent = cell.getParent ();
+    //    Sheet parent = cell.getParent ();
     String remainder = text;
 
     while (true)
     {
       String parameter = Expression.getParameter (remainder);
-      conditions.add (new Condition (parent, cell, parameter));
+      conditions.add (new Condition (cell, parameter));
       if (remainder.length () == parameter.length ())
         break;
       remainder = remainder.substring (parameter.length () + 1);

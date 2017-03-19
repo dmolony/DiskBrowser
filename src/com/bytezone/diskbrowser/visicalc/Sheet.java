@@ -399,25 +399,25 @@ public class Sheet
     while (counts.size () < 18)
       counts.add ("");
 
-    text.append (String.format ("%-85.85s%n", underline));
-    text.append (String.format ("Global format : %-18s %-18s %-18s %s%n", globalFormat,
-        counts.get (0), counts.get (6), counts.get (12)));
-    text.append (String.format ("Column width  : %-2d %-15s %-18s %-18s %s%n",
+    text.append (String.format ("+%-83.83s+%n", underline));
+    text.append (String.format ("|  Global format : %-18s %-14s %-14s %-14s  |%n",
+        globalFormat, counts.get (0), counts.get (6), counts.get (12)));
+    text.append (String.format ("|  Column width  : %-2d %-15s %-14s %-14s %-14s  |%n",
         columnWidth, "", counts.get (1), counts.get (7), counts.get (13)));
-    text.append (String.format ("Recalc  order : %-18s %-18s %-18s %s%n",
+    text.append (String.format ("|  Recalc  order : %-18s %-14s %-14s %-14s  |%n",
         recalculationOrder == 'R' ? "Row" : "Column", counts.get (2), counts.get (8),
         counts.get (14)));
-    text.append (String.format ("Recalculation : %-18s %-18s %-18s %s%n",
+    text.append (String.format ("|  Recalculation : %-18s %-14s %-14s %-14s  |%n",
         recalculation == 'A' ? "Automatic" : "Manual", counts.get (3), counts.get (9),
         counts.get (15)));
-    text.append (String.format ("Cells         : %-5d  %-11s %-18s %-18s %s%n", size (),
-        "", counts.get (4), counts.get (10), counts.get (16)));
+    text.append (String.format ("|  Cells         : %-5d  %-11s %-14s %-14s %-14s  |%n",
+        size (), "", counts.get (4), counts.get (10), counts.get (16)));
 
     String rangeText = size () > 0 ? Address.getCellName (minRow + 1, minColumn) + ":"
         + Address.getCellName (maxRow + 1, maxColumn) : "";
-    text.append (String.format ("Range         : %-18s %-18s %-18s %s%n", rangeText,
-        counts.get (5), counts.get (11), counts.get (17)));
-    text.append (String.format ("%-85.85s%n", underline));
+    text.append (String.format ("|  Range         : %-18s %-14s %-14s %-14s  |%n",
+        rangeText, counts.get (5), counts.get (11), counts.get (17)));
+    text.append (String.format ("+%-83.83s+%n", underline));
 
     if (debug)
     {

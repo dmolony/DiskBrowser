@@ -66,6 +66,16 @@ public class FontFile extends AbstractFile
     return text.toString ();
   }
 
+  public static boolean isFont (byte[] buffer)
+  {
+    if (buffer.length % 8 != 0)
+      return false;
+    for (int i = 0; i < 8; i++)
+      if (buffer[i] != 0 && buffer[i] != 0x7F)
+        return false;
+    return true;
+  }
+
   class Character
   {
     String[] lines = new String[8];

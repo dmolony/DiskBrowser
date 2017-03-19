@@ -6,7 +6,8 @@ import java.util.List;
 
 public class ValueList implements Iterable<Value>
 {
-  protected List<Value> values = new ArrayList<Value> ();
+  private final List<Value> values = new ArrayList<Value> ();
+  private boolean rangeFound;
 
   public ValueList (Cell cell, String text)
   {
@@ -18,8 +19,11 @@ public class ValueList implements Iterable<Value>
       String parameter = Expression.getParameter (remainder);
 
       if (Range.isRange (parameter))
+      {
+        rangeFound = true;
         for (Address address : new Range (parent, cell, parameter))
           values.add (parent.getCell (address));
+      }
       else
         values.add (new Expression (cell, parameter).reduce ());
 
@@ -28,6 +32,11 @@ public class ValueList implements Iterable<Value>
 
       remainder = remainder.substring (parameter.length () + 1);
     }
+  }
+
+  public boolean hasRange ()
+  {
+    return rangeFound;
   }
 
   public Value get (int index)

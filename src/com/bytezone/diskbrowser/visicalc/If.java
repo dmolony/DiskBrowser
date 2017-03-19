@@ -22,7 +22,7 @@ class If extends Function
     textFalse = Expression.getParameter (
         functionText.substring (conditionText.length () + textTrue.length () + 2));
 
-    condition = new Condition (parent, cell, conditionText);
+    condition = new Condition (cell, conditionText);
     values.add (condition);
 
     expTrue = new Expression (cell, textTrue);

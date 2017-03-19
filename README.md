@@ -9,7 +9,7 @@
 - Appleworks
 - Visicalc
 - HDV and 2mg
-- Compressed disks - ShrinkIt, gzip, zip
+- Compressed disks - shrinkIt, gzip, zip
 - Track and sector display
 - Dual DOS disks
 - CPM disks

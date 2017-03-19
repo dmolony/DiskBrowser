@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Log10 extends Function
 {
-  private final Value source;
-
   Log10 (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@LOG10(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

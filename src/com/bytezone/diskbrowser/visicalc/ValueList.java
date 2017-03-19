@@ -21,7 +21,7 @@ public class ValueList implements Iterable<Value>
         for (Address address : new Range (parent, cell, parameter))
           values.add (parent.getCell (address));
       else
-        values.add (new Expression (parent, cell, parameter).reduce ());
+        values.add (new Expression (cell, parameter).reduce ());
 
       if (remainder.length () == parameter.length ())
         break;

@@ -25,10 +25,10 @@ class If extends Function
     condition = new Condition (parent, cell, conditionText);
     values.add (condition);
 
-    expTrue = new Expression (parent, cell, textTrue);
+    expTrue = new Expression (cell, textTrue);
     values.add (expTrue);
 
-    expFalse = new Expression (parent, cell, textFalse);
+    expFalse = new Expression (cell, textFalse);
     values.add (expFalse);
   }
 

@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Exp extends Function
 {
-  private final Value source;
-
   Exp (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@EXP(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

@@ -16,9 +16,14 @@ abstract class Function extends AbstractValue implements Iterable<Value>
   protected String functionText;
   protected String fullText;
 
+  protected Value source;
+  protected ValueList list;
+  protected Range range;
+
   Function (Cell cell, String text)
   {
     super ("Function");
+
     this.parent = cell.getParent ();
     this.cell = cell;
     fullText = text;

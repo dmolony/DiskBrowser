@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Sqrt extends Function
 {
-  private final Value source;
-
   Sqrt (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@SQRT(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

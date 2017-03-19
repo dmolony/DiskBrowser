@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class IsNa extends Function
 {
-  private final Value source;
-
   IsNa (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@ISNA(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

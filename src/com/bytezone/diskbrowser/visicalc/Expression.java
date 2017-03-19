@@ -35,11 +35,12 @@ class Expression extends AbstractValue implements Iterable<Value>
 
   private final String text;
 
-  public Expression (Sheet parent, Cell cell, String text)
+  public Expression (Cell cell, String text)
   {
     super ("Exp");
     this.cell = cell;
     this.text = text;
+    Sheet parent = cell.getParent ();
 
     String line = balanceBrackets (text);   // add trailing right brackets if necessary
 
@@ -66,13 +67,13 @@ class Expression extends AbstractValue implements Iterable<Value>
         case '@':                                           // function
           String functionText = getFunctionCall (line.substring (ptr));
           ptr += functionText.length ();
-          values.add (parent.getFunction (cell, functionText));
+          values.add (cell.getFunction (functionText));
           break;
 
         case '(':                                           // parentheses block
           String bracketText = getBalancedText (line.substring (ptr));
           ptr += bracketText.length ();
-          values.add (new Expression (parent, cell,
+          values.add (new Expression (cell,
               bracketText.substring (1, bracketText.length () - 1)));
           break;
 

@@ -493,24 +493,16 @@ public class Sheet
 
   Function getFunction (Cell cell, String text)
   {
-    if (text.charAt (0) != '@')
-    {
-      System.out.printf ("Unknown function: [%s]%n", text);
-      return new Error (cell, "@ERROR");
-    }
-
-    String functionName = "";
     int functionId = -1;
     for (int i = 0; i < Function.functionList.length; i++)
       if (text.startsWith (Function.functionList[i]))
       {
         functionId = i;
         functionTotals[i]++;
-        functionName = Function.functionList[i];
         break;
       }
 
-    if (functionName.isEmpty ())
+    if (functionId < 0)
     {
       System.out.printf ("Unknown function: [%s]%n", text);
       return new Error (cell, "@ERROR");
@@ -609,7 +601,7 @@ public class Sheet
         return new True (cell, text);
 
       default:
-        System.out.printf ("Unknown function: [%s]%n", text);
+        System.out.printf ("Unknown function ID: %d%n", functionId);
         return new Error (cell, "@ERROR");
     }
   }

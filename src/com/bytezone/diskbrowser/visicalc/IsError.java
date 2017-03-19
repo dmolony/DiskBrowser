@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 class IsError extends Function
 {
-  private final Value source;
-
   public IsError (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@ISERROR(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

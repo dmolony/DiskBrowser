@@ -33,6 +33,16 @@ class Cell extends AbstractValue implements Comparable<Cell>
     isVolatile = false;
   }
 
+  Function getFunction (String text)
+  {
+    return parent.getFunction (this, text);
+  }
+
+  Value getExpressionValue (String text)
+  {
+    return new Expression (this, text).reduce ();
+  }
+
   boolean isCellType (CellType cellType)
   {
     return this.cellType == cellType;
@@ -106,7 +116,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
       try
       {
         expressionText = command;
-        value = new Expression (parent, this, expressionText).reduce ();
+        value = new Expression (this, expressionText).reduce ();
         cellType = CellType.VALUE;
         isVolatile = true;
       }

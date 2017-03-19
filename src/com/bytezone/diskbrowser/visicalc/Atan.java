@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Atan extends Function
 {
-  private final Value source;
-
   Atan (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@ATAN(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

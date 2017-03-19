@@ -4,23 +4,17 @@ import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 public class Npv extends Function
 {
-  private final String sourceText;
-  private final String rangeText;
-
-  private final Value source;
-  private final Range range;
-
   Npv (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@NPV(") : text;
 
-    sourceText = Expression.getParameter (functionText);
-    source = new Expression (parent, cell, sourceText).reduce ();
+    String sourceText = Expression.getParameter (functionText);
+    source = cell.getExpressionValue (sourceText);
     values.add (source);
 
-    rangeText = functionText.substring (sourceText.length () + 1);
+    String rangeText = functionText.substring (sourceText.length () + 1);
     range = new Range (parent, cell, rangeText);
   }
 

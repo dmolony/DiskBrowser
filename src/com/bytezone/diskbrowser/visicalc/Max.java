@@ -2,8 +2,6 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Max extends Function
 {
-  private final ValueList list;
-
   public Max (Cell cell, String text)
   {
     super (cell, text);

@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Ln extends Function
 {
-  private final Value source;
-
   Ln (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@LN(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

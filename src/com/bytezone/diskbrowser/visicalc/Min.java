@@ -2,8 +2,6 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Min extends Function
 {
-  private final ValueList list;
-
   public Min (Cell cell, String text)
   {
     super (cell, text);

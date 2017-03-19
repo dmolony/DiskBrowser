@@ -4,7 +4,6 @@ import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 class Count extends Function
 {
-  private final ValueList list;
   private final boolean isRange;
 
   public Count (Cell cell, String text)

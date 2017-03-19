@@ -4,7 +4,6 @@ import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
 public class Average extends Function
 {
-  private final ValueList list;
   private final boolean isRange;      // may affect how the count is done
 
   public Average (Cell cell, String text)

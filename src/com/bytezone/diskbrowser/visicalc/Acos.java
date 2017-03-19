@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.visicalc;
 
 public class Acos extends Function
 {
-  private final Value source;
-
   Acos (Cell cell, String text)
   {
     super (cell, text);
 
     assert text.startsWith ("@ACOS(") : text;
 
-    source = new Expression (parent, cell, functionText).reduce ();
+    source = cell.getExpressionValue (functionText);
     values.add (source);
   }
 

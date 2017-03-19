@@ -2,8 +2,6 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Sum extends Function
 {
-  private final ValueList list;
-
   public Sum (Cell cell, String text)
   {
     super (cell, text);

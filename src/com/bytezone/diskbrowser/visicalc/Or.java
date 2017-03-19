@@ -1,11 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class Or extends Function
 {
-  private final List<Condition> conditions = new ArrayList<Condition> ();
+  ConditionList conditions;
 
   public Or (Cell cell, String text)
   {
@@ -13,15 +10,7 @@ class Or extends Function
 
     assert text.startsWith ("@OR(") : text;
 
-    String remainder = functionText;
-    while (true)
-    {
-      String parameter = Expression.getParameter (remainder);
-      conditions.add (new Condition (parent, cell, parameter));
-      if (remainder.length () == parameter.length ())
-        break;
-      remainder = remainder.substring (parameter.length () + 1);
-    }
+    conditions = new ConditionList (cell, functionText);
   }
 
   @Override

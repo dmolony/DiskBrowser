@@ -12,6 +12,7 @@ abstract class Function extends AbstractValue implements Iterable<Value>
 
   protected final Sheet parent;
   protected final Cell cell;
+
   protected String functionName;
   protected String functionText;
   protected String fullText;

@@ -13,6 +13,12 @@ public class IsNa extends Function
   }
 
   @Override
+  public boolean isBoolean ()
+  {
+    return true;
+  }
+
+  @Override
   public void calculate ()
   {
     source.calculate ();

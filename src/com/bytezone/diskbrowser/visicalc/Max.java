@@ -1,17 +1,11 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Max extends Function
+class Max extends ValueListFunction
 {
   public Max (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@MAX(") : text;
-
-    list = new ValueList (cell, functionText);
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

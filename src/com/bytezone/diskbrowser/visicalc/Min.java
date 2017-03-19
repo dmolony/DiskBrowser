@@ -1,17 +1,11 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Min extends Function
+class Min extends ValueListFunction
 {
   public Min (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@MIN(") : text;
-
-    list = new ValueList (cell, functionText);
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

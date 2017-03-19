@@ -2,19 +2,12 @@ package com.bytezone.diskbrowser.visicalc;
 
 import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
-public class Npv extends Function
+public class Npv extends ValueListFunction
 {
   Npv (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@NPV(") : text;
-
-    // parameters are a Value, followed by a Range
-    list = new ValueList (cell, functionText);
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

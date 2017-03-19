@@ -1,18 +1,11 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Lookup extends Function
+class Lookup extends ValueListFunction
 {
   public Lookup (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@LOOKUP(") : text;
-
-    // parameters are a Value, followed by a Range
-    list = new ValueList (cell, functionText);
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

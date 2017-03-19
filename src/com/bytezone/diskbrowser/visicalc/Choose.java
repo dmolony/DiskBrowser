@@ -2,19 +2,12 @@ package com.bytezone.diskbrowser.visicalc;
 
 import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
-public class Choose extends Function
+public class Choose extends ValueListFunction
 {
   Choose (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@CHOOSE(") : text;
-
-    // parameters are a Value, followed by a Range
-    list = new ValueList (cell, functionText);
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

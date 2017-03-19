@@ -2,21 +2,12 @@ package com.bytezone.diskbrowser.visicalc;
 
 import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
-public class Average extends Function
+public class Average extends ValueListFunction
 {
-  private final boolean isRange;      // may affect how the count is done
-
   public Average (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@AVERAGE(") : text;
-
-    list = new ValueList (cell, functionText);
-    isRange = functionText.indexOf ("...") > 0;
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

@@ -1,17 +1,11 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Sum extends Function
+class Sum extends ValueListFunction
 {
   public Sum (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@SUM(") : text;
-
-    list = new ValueList (cell, functionText);
-
-    for (Value v : list)
-      values.add (v);
   }
 
   @Override

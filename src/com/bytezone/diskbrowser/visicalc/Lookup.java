@@ -57,7 +57,6 @@ class Lookup extends Function
     {
       Address adjacentAddress = isVertical ? target.nextColumn () : target.nextRow ();
 
-      //      Sheet parent = cell.getParent ();
       if (cell.cellExists (adjacentAddress))
       {
         value = cell.getCell (adjacentAddress).getValue ();

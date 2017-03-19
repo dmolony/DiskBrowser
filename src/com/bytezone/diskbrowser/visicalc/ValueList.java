@@ -11,7 +11,6 @@ public class ValueList implements Iterable<Value>
 
   public ValueList (Cell cell, String text)
   {
-    //    Sheet parent = cell.getParent ();
     String remainder = text;
 
     while (true)

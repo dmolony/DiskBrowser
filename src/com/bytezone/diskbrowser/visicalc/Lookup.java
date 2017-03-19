@@ -8,17 +8,11 @@ class Lookup extends Function
 
     assert text.startsWith ("@LOOKUP(") : text;
 
+    // parameters are a Value, followed by a Range
     list = new ValueList (cell, functionText);
 
     for (Value v : list)
       values.add (v);
-
-    //    String sourceText = Expression.getParameter (functionText);
-    //    source = cell.getExpressionValue (sourceText);
-    //    values.add (source);
-    //
-    //    String rangeText = functionText.substring (sourceText.length () + 1);
-    //    range = new Range (parent, cell, rangeText);
   }
 
   @Override
@@ -46,11 +40,10 @@ class Lookup extends Function
     Cell lastCell = (Cell) list.get (list.size () - 1);
     boolean isVertical = firstCell.getAddress ().columnMatches (lastCell.getAddress ());
 
-    for (int i = 1; i < list.size (); i++)
+    for (int i = 1; i < list.size (); i++)        // skip first entry
     {
       Cell cell = (Cell) list.get (i);
-      //      Cell cell = parent.getCell (address);
-      if (cell.getValue () > sourceValue)     // past the value
+      if (cell.getValue () > sourceValue)         // past the value
         break;
       target = cell.getAddress ();
     }
@@ -63,56 +56,6 @@ class Lookup extends Function
     else
     {
       Address adjacentAddress = isVertical ? target.nextColumn () : target.nextRow ();
-
-      if (parent.cellExists (adjacentAddress))
-      {
-        value = parent.getCell (adjacentAddress).getValue ();
-        valueType = ValueType.VALUE;
-      }
-      else
-      {
-        value = 0;
-        valueType = ValueType.VALUE;
-      }
-    }
-  }
-
-  public void calculate2 ()
-  {
-    source.calculate ();
-
-    if (!source.isValueType (ValueType.VALUE))
-    {
-      valueType = source.getValueType ();
-      return;
-    }
-
-    if (range.size () == 0)
-    {
-      valueType = ValueType.NA;
-      return;
-    }
-
-    double sourceValue = source.getValue ();
-    Address target = null;
-
-    for (Address address : range)
-    {
-      Cell cell = parent.getCell (address);
-      if (cell.getValue () > sourceValue)     // past the value
-        break;
-      target = address;
-    }
-
-    if (target == null)
-    {
-      valueType = ValueType.NA;
-      value = 0;
-    }
-    else
-    {
-      Address adjacentAddress =
-          range.isVertical () ? target.nextColumn () : target.nextRow ();
 
       if (parent.cellExists (adjacentAddress))
       {

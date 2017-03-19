@@ -10,16 +10,11 @@ public class Npv extends Function
 
     assert text.startsWith ("@NPV(") : text;
 
+    // parameters are a Value, followed by a Range
     list = new ValueList (cell, functionText);
 
     for (Value v : list)
       values.add (v);
-    //    String sourceText = Expression.getParameter (functionText);
-    //    source = cell.getExpressionValue (sourceText);
-    //    values.add (source);
-    //
-    //    String rangeText = functionText.substring (sourceText.length () + 1);
-    //    range = new Range (parent, cell, rangeText);
   }
 
   @Override
@@ -46,40 +41,6 @@ public class Npv extends Function
 
       ++period;
 
-      //      Cell cell = parent.getCell (address);
-      if (cell.isCellType (CellType.EMPTY))
-        continue;
-
-      if (!cell.isValueType (ValueType.VALUE))
-      {
-        valueType = cell.getValueType ();
-        return;
-      }
-
-      value += cell.getValue () / Math.pow (rate, period);
-    }
-  }
-
-  public void calculate2 ()
-  {
-    value = 0;
-    valueType = ValueType.VALUE;
-
-    source.calculate ();
-    if (!source.isValueType (ValueType.VALUE))
-    {
-      valueType = source.getValueType ();
-      return;
-    }
-
-    double rate = 1 + source.getValue ();
-
-    int period = 0;
-    for (Address address : range)
-    {
-      ++period;
-
-      Cell cell = parent.getCell (address);
       if (cell.isCellType (CellType.EMPTY))
         continue;
 

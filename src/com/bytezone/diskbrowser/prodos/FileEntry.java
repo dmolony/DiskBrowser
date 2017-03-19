@@ -259,6 +259,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_BINARY:
         case FILE_TYPE_RELOCATABLE:
         case FILE_TYPE_SYS:
+        case FILE_TYPE_USER_DEFINED_1:
           //          if (name.endsWith (".S"))
           //            file = new MerlinSource (name, exactBuffer, auxType, endOfFile);
           if (ShapeTable.isShapeTable (exactBuffer))
@@ -365,7 +366,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new FileSystemTranslator (name, exactBuffer);
           break;
         default:
-          System.out.format ("Unknown file type : %02X%n", fileType);
+          System.out.format ("%s - Unknown file type : %02X%n", name, fileType);
           file = new DefaultAppleFile (name, exactBuffer);
       }
     }

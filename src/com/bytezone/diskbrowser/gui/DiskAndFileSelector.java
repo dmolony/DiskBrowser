@@ -70,7 +70,7 @@ class DiskAndFileSelector
     {
       FormattedDisk fd = node.getFormattedDisk ();
       if (fd == null)
-        JOptionPane.showMessageDialog (null, "Incorrect file format", "Format error",
+        JOptionPane.showMessageDialog (null, "Unrecognised file format", "Format error",
             JOptionPane.ERROR_MESSAGE);
       else
         fireDiskSelectionEvent (fd);

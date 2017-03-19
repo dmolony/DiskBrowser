@@ -22,6 +22,7 @@ public interface ProdosConstants
   int FILE_TYPE_FONT = 0xC8;
   int FILE_TYPE_ICN = 0xCA;
   int FILE_TYPE_APPLETALK = 0xE2;
+  int FILE_TYPE_USER_DEFINED_1 = 0xF1;
   int FILE_TYPE_INTEGER_BASIC = 0xFA;
   int FILE_TYPE_INTEGER_BASIC_VARS = 0xFB;
   int FILE_TYPE_APPLESOFT_BASIC = 0xFC;
@@ -70,8 +71,8 @@ public interface ProdosConstants
                         "SND", "$D9", "$DA", "DBM", "$DC", "DDD", "$DE", "$DF", //
                         "LBR", "$E1", "ATK", "$E3", "$E4", "$E5", "$E6", "$E7", //
                         "$E8", "$E9", "$EA", "$EB", "$EC", "$ED", "R16", "PAS", //
-                        "CMD", "$F1", "$F2", "$F3", "$F4", "$F5", "$F6", "$F7", //
-                        "$F8", "OS ", "INT", "IVR", "BAS", "VAR", "REL", "SYS" };
+                        "CMD", "OVL", "UD2", "UD3", "UD4", "BAT", "UD6", "UD7", //
+                        "PRG", "P16", "INT", "IVR", "BAS", "VAR", "REL", "SYS" };
 
   int ENTRY_SIZE = 39;
   int ENTRIES_PER_BLOCK = 13;

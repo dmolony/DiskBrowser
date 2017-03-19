@@ -11,7 +11,7 @@ public class ValueList implements Iterable<Value>
 
   public ValueList (Cell cell, String text)
   {
-    Sheet parent = cell.getParent ();
+    //    Sheet parent = cell.getParent ();
     String remainder = text;
 
     while (true)
@@ -21,8 +21,8 @@ public class ValueList implements Iterable<Value>
       if (Range.isRange (parameter))
       {
         rangeFound = true;
-        for (Address address : new Range (parent, cell, parameter))
-          values.add (parent.getCell (address));
+        for (Address address : new Range (cell, parameter))
+          values.add (cell.getCell (address));
       }
       else
         values.add (new Expression (cell, parameter).reduce ());

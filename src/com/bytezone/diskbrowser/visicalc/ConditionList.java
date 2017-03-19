@@ -10,7 +10,6 @@ public class ConditionList implements Iterable<Condition>
 
   public ConditionList (Cell cell, String text)
   {
-    //    Sheet parent = cell.getParent ();
     String remainder = text;
 
     while (true)

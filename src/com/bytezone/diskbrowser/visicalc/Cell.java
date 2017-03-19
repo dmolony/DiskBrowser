@@ -33,6 +33,21 @@ class Cell extends AbstractValue implements Comparable<Cell>
     isVolatile = false;
   }
 
+  Cell getCell (Address address)
+  {
+    return parent.getCell (address);
+  }
+
+  Cell getCell (String addressText)
+  {
+    return parent.getCell (addressText);
+  }
+
+  boolean cellExists (Address address)
+  {
+    return parent.cellExists (address);
+  }
+
   Function getFunction (String text)
   {
     return parent.getFunction (this, text);

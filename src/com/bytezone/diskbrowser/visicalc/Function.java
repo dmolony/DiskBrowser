@@ -10,7 +10,6 @@ abstract class Function extends AbstractValue implements Iterable<Value>
         "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NPV(", "@OR(",
         "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
 
-  protected final Sheet parent;
   protected final Cell cell;
 
   protected String functionName;
@@ -25,7 +24,6 @@ abstract class Function extends AbstractValue implements Iterable<Value>
   {
     super ("Function");
 
-    this.parent = cell.getParent ();
     this.cell = cell;
     fullText = text;
 

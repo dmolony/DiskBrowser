@@ -16,13 +16,13 @@ class Range implements Iterable<Address>
 
   private Address from, to;
   private final List<Address> range = new ArrayList<Address> ();
-  private final Sheet parent;
+  private final Cell cell;
 
   private boolean isHorizontal;
 
-  public Range (Sheet parent, Cell cell, String rangeText)
+  public Range (Cell cell, String rangeText)
   {
-    this.parent = parent;
+    this.cell = cell;
 
     Matcher m = rangePattern.matcher (rangeText);
     if (m.find ())
@@ -36,20 +36,10 @@ class Range implements Iterable<Address>
       throw new IllegalArgumentException (rangeText);
   }
 
-  public Range (Sheet parent, Address from, Address to)
-  {
-    this.parent = parent;
-    this.from = from;
-    this.to = to;
-
-    isHorizontal = from.rowMatches (to);
-    populateRange ();
-  }
-
   private void populateRange ()
   {
     range.add (from);
-    parent.getCell (from);
+    cell.getCell (from);
     Address tempFrom = from;
 
     if (from.rowMatches (to))
@@ -57,14 +47,14 @@ class Range implements Iterable<Address>
       {
         from = from.nextColumn ();
         range.add (from);
-        parent.getCell (from);
+        cell.getCell (from);
       }
     else if (from.columnMatches (to))
       while (from.compareTo (to) < 0)
       {
         from = from.nextRow ();
         range.add (from);
-        parent.getCell (from);
+        cell.getCell (from);
       }
     else
       throw new InvalidParameterException ();

@@ -40,7 +40,6 @@ class Expression extends AbstractValue implements Iterable<Value>
     super ("Exp");
     this.cell = cell;
     this.text = text;
-    Sheet parent = cell.getParent ();
 
     String line = balanceBrackets (text);   // add trailing right brackets if necessary
 
@@ -93,7 +92,7 @@ class Expression extends AbstractValue implements Iterable<Value>
           {
             String addressText = getAddressText (line.substring (ptr));
             ptr += addressText.length ();
-            values.add (parent.getCell (addressText));
+            values.add (cell.getCell (addressText));
           }
           else
           {

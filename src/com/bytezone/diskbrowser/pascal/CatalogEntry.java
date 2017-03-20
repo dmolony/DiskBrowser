@@ -29,7 +29,8 @@ abstract class CatalogEntry implements AppleFileSource
 
     firstBlock = HexFormatter.intValue (buffer[0], buffer[1]);
     lastBlock = HexFormatter.intValue (buffer[2], buffer[3]);
-    fileType = HexFormatter.intValue (buffer[4], buffer[5]);
+    //    fileType = HexFormatter.intValue (buffer[4], buffer[5]);
+    fileType = buffer[4] & 0xFF;
     name = HexFormatter.getPascalString (buffer, 6);
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
 
@@ -71,6 +72,8 @@ abstract class CatalogEntry implements AppleFileSource
   public String toString ()
   {
     int size = lastBlock - firstBlock;
-    return String.format ("%03d  %s  %-15s", size, parent.fileTypes[fileType], name);
+    String fileTypeText = fileType < 0 || fileType >= parent.fileTypes.length ? "????"
+        : parent.fileTypes[fileType];
+    return String.format ("%03d  %s  %-15s", size, fileTypeText, name);
   }
 }

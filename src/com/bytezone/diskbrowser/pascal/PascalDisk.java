@@ -264,9 +264,10 @@ public class PascalDisk extends AbstractFormattedDisk
       usedBlocks += size;
       date = ce.date == null ? "--" : df.format (ce.date.getTime ());
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
+      String fileType = ce.fileType < 0 || ce.fileType >= fileTypes.length ? "????"
+          : fileTypes[ce.fileType];
       text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X   $%03X%n",
-          size, ce.name, fileTypes[ce.fileType], date, bytes, ce.firstBlock, ce.lastBlock,
-          size));
+          size, ce.name, fileType, date, bytes, ce.firstBlock, ce.lastBlock, size));
     }
     text.append (line);
     text.append (

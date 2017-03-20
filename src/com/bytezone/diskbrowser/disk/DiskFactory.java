@@ -190,6 +190,14 @@ public class DiskFactory
 
     if (((suffix.equals ("po") || suffix.equals ("dsk")) && file.length () > 143360))
     {
+      if (file.length () < 143500)        // slightly bigger than a floppy
+      {
+        System.out.println ("File length is wrong: " + file.length ());
+        disk = checkDos (new AppleDisk (file, 35, 16));
+        if (disk != null)
+          return disk;
+      }
+
       if (debug)
         System.out.println ("  Checking po or dsk hard drive: " + file.length ());
 

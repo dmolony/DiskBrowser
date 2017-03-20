@@ -9,8 +9,8 @@ public class Ln extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.log (source.getValue ());
+    return Math.log (source.getValue ());
   }
 }

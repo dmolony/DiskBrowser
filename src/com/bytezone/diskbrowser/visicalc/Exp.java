@@ -9,8 +9,8 @@ public class Exp extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.exp (source.getValue ());
+    return Math.exp (source.getValue ());
   }
 }

@@ -9,8 +9,8 @@ public class Sqrt extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.sqrt (source.getValue ());
+    return Math.sqrt (source.getValue ());
   }
 }

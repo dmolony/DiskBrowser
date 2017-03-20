@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.visicalc;
 
 class Or extends Function
 {
-  ConditionList conditions;
+  private final ConditionList conditions;
 
   public Or (Cell cell, String text)
   {

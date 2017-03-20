@@ -1,9 +1,10 @@
 package com.bytezone.diskbrowser.visicalc;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractValue implements Value
+public abstract class AbstractValue implements Value, Iterable<Value>
 {
   protected final String typeText;
   protected double value;
@@ -69,6 +70,12 @@ public abstract class AbstractValue implements Value
   public boolean isBoolean ()
   {
     return false;
+  }
+
+  @Override
+  public Iterator<Value> iterator ()
+  {
+    return values.iterator ();
   }
 
   // for debugging

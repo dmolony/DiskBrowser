@@ -15,8 +15,16 @@ public class IsNa extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public void calculate ()
   {
-    value = source.isValueType (ValueType.NA) ? 1 : 0;
+    source.calculate ();
+    value = calculateValue ();
+    valueType = ValueType.VALUE;      // do not use source.getValueType()
+  }
+
+  @Override
+  public double calculateValue ()
+  {
+    return source.isValueType (ValueType.NA) ? 1 : 0;
   }
 }

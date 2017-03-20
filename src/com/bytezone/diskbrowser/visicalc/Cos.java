@@ -9,8 +9,8 @@ public class Cos extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.cos (source.getValue ());
+    return Math.cos (source.getValue ());
   }
 }

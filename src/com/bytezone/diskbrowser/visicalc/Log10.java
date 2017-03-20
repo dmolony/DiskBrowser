@@ -9,8 +9,8 @@ public class Log10 extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.log10 (source.getValue ());
+    return Math.log10 (source.getValue ());
   }
 }

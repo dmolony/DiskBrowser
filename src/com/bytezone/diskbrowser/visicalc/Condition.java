@@ -96,7 +96,7 @@ class Condition extends AbstractValue implements Iterable<Value>
   @Override
   public String toString ()
   {
-    return String.format ("[cond=%s, op=%s, value=%s]", conditionText, comparator,
+    return String.format ("[cond=%s, op:%s, value=%s]", conditionText, comparator,
         valueText);
   }
 

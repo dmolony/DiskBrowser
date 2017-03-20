@@ -9,8 +9,8 @@ public class Asin extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.asin (source.getValue ());
+    return Math.asin (source.getValue ());
   }
 }

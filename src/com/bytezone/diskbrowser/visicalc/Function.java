@@ -1,8 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.util.Iterator;
-
-abstract class Function extends AbstractValue implements Iterable<Value>
+abstract class Function extends AbstractValue
 {
   static final String[] functionList =
       { "@ABS(", "@ACOS(", "@AND(", "@ASIN(", "@ATAN(", "@AVERAGE(", "@COUNT(",
@@ -11,13 +9,10 @@ abstract class Function extends AbstractValue implements Iterable<Value>
         "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
 
   protected final Cell cell;
+  protected final String fullText;
 
-  protected String functionName;
-  protected String functionText;
-  protected String fullText;
-
-  protected Value source;
-  protected Range range;
+  protected final String functionName;
+  protected final String functionText;
 
   Function (Cell cell, String text)
   {
@@ -35,15 +30,9 @@ abstract class Function extends AbstractValue implements Iterable<Value>
     }
     else
     {
-      functionName = "";
+      functionName = text;
       functionText = "";
     }
-  }
-
-  @Override
-  public Iterator<Value> iterator ()
-  {
-    return values.iterator ();
   }
 
   @Override

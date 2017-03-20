@@ -9,8 +9,8 @@ public class Sin extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.sin (source.getValue ());
+    return Math.sin (source.getValue ());
   }
 }

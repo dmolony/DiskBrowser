@@ -5,13 +5,12 @@ public class Acos extends ValueFunction
   Acos (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@ACOS(") : text;
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.acos (source.getValue ());
+    return Math.acos (source.getValue ());
   }
 }

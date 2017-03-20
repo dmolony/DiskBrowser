@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.visicalc;
 
 public abstract class ValueFunction extends Function
 {
+  protected Value source;
+
   ValueFunction (Cell cell, String text)
   {
     super (cell, text);
@@ -21,10 +23,9 @@ public abstract class ValueFunction extends Function
       return;
     }
 
-    //    value = Math.abs (source.getValue ());
-    setValue ();
+    value = calculateValue ();
     valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
   }
 
-  abstract void setValue ();
+  abstract double calculateValue ();
 }

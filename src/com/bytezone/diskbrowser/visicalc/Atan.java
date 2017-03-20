@@ -9,8 +9,8 @@ public class Atan extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = Math.atan (source.getValue ());
+    return Math.atan (source.getValue ());
   }
 }

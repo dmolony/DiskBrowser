@@ -9,8 +9,8 @@ public class Int extends ValueFunction
   }
 
   @Override
-  public void setValue ()
+  public double calculateValue ()
   {
-    value = (int) source.getValue ();
+    return (int) source.getValue ();
   }
 }

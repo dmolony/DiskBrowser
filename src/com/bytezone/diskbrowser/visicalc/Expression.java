@@ -1,10 +1,9 @@
 package com.bytezone.diskbrowser.visicalc;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-class Expression extends AbstractValue implements Iterable<Value>
+class Expression extends AbstractValue //implements Iterable<Value>
 {
   // Expressions:
   //   number
@@ -386,11 +385,11 @@ class Expression extends AbstractValue implements Iterable<Value>
     return text.toString ();
   }
 
-  @Override
-  public Iterator<Value> iterator ()
-  {
-    return values.iterator ();
-  }
+  //  @Override
+  //  public Iterator<Value> iterator ()
+  //  {
+  //    return values.iterator ();
+  //  }
 
   @Override
   public String toString ()

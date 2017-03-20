@@ -9,8 +9,8 @@ public class Abs extends ValueFunction
   }
 
   @Override
-  void setValue ()
+  double calculateValue ()
   {
-    value = Math.abs (source.getValue ());
+    return Math.abs (source.getValue ());
   }
 }

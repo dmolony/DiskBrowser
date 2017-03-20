@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class False extends Function
+public class False extends ConstantFunction
 {
   False (Cell cell, String text)
   {

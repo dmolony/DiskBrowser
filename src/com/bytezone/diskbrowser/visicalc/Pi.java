@@ -1,15 +1,14 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Pi extends Function
+class Pi extends ConstantFunction
 {
   Pi (Cell cell, String text)
   {
     super (cell, text);
 
-    value = Math.PI;
-
     assert text.equals ("@PI") : text;
 
+    value = Math.PI;
     valueType = ValueType.VALUE;
   }
 }

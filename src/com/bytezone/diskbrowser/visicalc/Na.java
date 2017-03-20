@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class Na extends Function
+public class Na extends ConstantFunction
 {
   public Na (Cell cell, String text)
   {

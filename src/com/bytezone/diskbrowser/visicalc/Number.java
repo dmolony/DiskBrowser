@@ -9,7 +9,6 @@ class Number extends AbstractValue
     try
     {
       value = Double.parseDouble (text);
-      isVolatile = false;
     }
     catch (NumberFormatException e)
     {

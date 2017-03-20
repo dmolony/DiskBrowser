@@ -10,17 +10,10 @@ public abstract class AbstractValue implements Value, Iterable<Value>
   protected double value;
   protected ValueType valueType = ValueType.VALUE;
   protected List<Value> values = new ArrayList<Value> ();
-  protected boolean isVolatile = true;
 
   public AbstractValue (String typeText)
   {
     this.typeText = typeText;
-  }
-
-  @Override
-  public boolean isVolatile ()
-  {
-    return isVolatile;
   }
 
   @Override

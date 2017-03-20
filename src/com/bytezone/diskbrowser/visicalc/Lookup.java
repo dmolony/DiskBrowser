@@ -11,8 +11,7 @@ class Lookup extends ValueListFunction
   @Override
   public void calculate ()
   {
-    Value source = list.get (0);
-
+    Value source = list.get (0);                 // first Value is the value to look up
     source.calculate ();
 
     if (!source.isValueType (ValueType.VALUE))
@@ -29,6 +28,8 @@ class Lookup extends ValueListFunction
 
     double sourceValue = source.getValue ();
     Address target = null;
+
+    // is the range horizontal or vertical?
     Cell firstCell = (Cell) list.get (1);
     Cell lastCell = (Cell) list.get (list.size () - 1);
     boolean isVertical = firstCell.getAddress ().columnMatches (lastCell.getAddress ());
@@ -38,28 +39,26 @@ class Lookup extends ValueListFunction
       Cell cell = (Cell) list.get (i);
       if (cell.getValue () > sourceValue)         // past the value
         break;
-      target = cell.getAddress ();
+      target = cell.getAddress ();                // this could be the one
     }
 
     if (target == null)
     {
       valueType = ValueType.NA;
-      value = 0;
+      return;
+    }
+
+    Address adjacentAddress = isVertical ? target.nextColumn () : target.nextRow ();
+
+    if (cell.cellExists (adjacentAddress))
+    {
+      value = cell.getCell (adjacentAddress).getValue ();
+      valueType = ValueType.VALUE;
     }
     else
     {
-      Address adjacentAddress = isVertical ? target.nextColumn () : target.nextRow ();
-
-      if (cell.cellExists (adjacentAddress))
-      {
-        value = cell.getCell (adjacentAddress).getValue ();
-        valueType = ValueType.VALUE;
-      }
-      else
-      {
-        value = 0;
-        valueType = ValueType.VALUE;
-      }
+      value = 0;
+      valueType = ValueType.VALUE;
     }
   }
 }

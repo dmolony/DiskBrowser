@@ -143,30 +143,10 @@ class Expression extends AbstractValue //implements Iterable<Value>
       return;
     }
 
-    if (!isVolatile)
-      return;
-
-    boolean currentVolatile = false;
-
-    //    boolean debug = cell.getAddress ().matches ("C8");
-    boolean debug = false;
-    if (debug)
-    {
-      System.out.println (this);
-      System.out.printf ("(1) exp %s is currently %svolatile%n", text,
-          isVolatile ? " " : "not ");
-    }
-
     try
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
-      if (debug)
-      {
-        System.out.println (this);
-        System.out.printf ("(2) exp %s is currently %svolatile%n", thisValue.getText (),
-            thisValue.isVolatile () ? " " : "not ");
-      }
 
       value = 0;
       if (!thisValue.isValueType (ValueType.VALUE))
@@ -176,8 +156,6 @@ class Expression extends AbstractValue //implements Iterable<Value>
       }
 
       value = thisValue.getValue ();
-      if (!currentVolatile)
-        currentVolatile = thisValue.isVolatile ();
 
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
@@ -195,14 +173,6 @@ class Expression extends AbstractValue //implements Iterable<Value>
         }
 
         double nextValue = thisValue.getValue ();
-        if (debug)
-        {
-          System.out.println (this);
-          System.out.printf ("(3.%d) exp %s is currently %svolatile%n", i,
-              thisValue.getText (), thisValue.isVolatile () ? " " : "not ");
-        }
-        if (!currentVolatile)
-          currentVolatile = thisValue.isVolatile ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -238,15 +208,6 @@ class Expression extends AbstractValue //implements Iterable<Value>
       valueType = ValueType.ERROR;
       e.printStackTrace ();
       return;
-    }
-
-    isVolatile = currentVolatile;
-    if (debug)
-    {
-      System.out.println (this);
-      System.out.printf ("(4) exp %s is currently %svolatile%n", text,
-          isVolatile ? " " : "not ");
-      System.out.println ();
     }
   }
 
@@ -384,12 +345,6 @@ class Expression extends AbstractValue //implements Iterable<Value>
 
     return text.toString ();
   }
-
-  //  @Override
-  //  public Iterator<Value> iterator ()
-  //  {
-  //    return values.iterator ();
-  //  }
 
   @Override
   public String toString ()

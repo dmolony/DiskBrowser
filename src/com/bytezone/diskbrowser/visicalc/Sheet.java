@@ -171,23 +171,16 @@ public class Sheet
     }
 
     // might have to keep recalculating until nothing changes??
-    //    System.out.println ("\n*********** Calculating\n");
     calculate (recalculationOrder);
-    //    System.out.println ("\n*********** Calculating\n");
     //    calculate (recalculationOrder);
   }
 
   private void calculate (char order)
   {
-    int count = 0;
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
       if (cell.isCellType (CellType.VALUE))
-      {
-        //        System.out.printf ("%5d  start %s%n", count, cell.getAddressText ());
         cell.calculate ();
-        //        System.out.printf ("%5d  stop  %s%n", count++, cell.getAddressText ());
-      }
   }
 
   private int getLineLength (byte[] buffer, int offset)

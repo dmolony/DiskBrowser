@@ -16,7 +16,7 @@ public class Npv extends ValueListFunction
     value = 0;
     valueType = ValueType.VALUE;
 
-    Value source = list.get (0);
+    Value source = list.get (0);                    // first Value is the rate
     source.calculate ();
     if (!source.isValueType (ValueType.VALUE))
     {
@@ -25,15 +25,13 @@ public class Npv extends ValueListFunction
     }
 
     double rate = 1 + source.getValue ();
-
     int period = 0;
-    int pos = 0;
-    for (int i = 1; i < list.size (); i++)
-    {
-      Cell cell = (Cell) list.get (i);
 
+    for (int i = 1; i < list.size (); i++)          // remaining Values are Cells
+    {
       ++period;
 
+      Cell cell = (Cell) list.get (i);
       if (cell.isCellType (CellType.EMPTY))
         continue;
 

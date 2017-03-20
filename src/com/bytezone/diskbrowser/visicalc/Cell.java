@@ -16,6 +16,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
   private String repeat = "";
   private String label;
   private Value value;
+  private boolean hasCalculated;
 
   enum CellType
   {
@@ -30,7 +31,11 @@ class Cell extends AbstractValue implements Comparable<Cell>
     this.address = address;
 
     cellType = CellType.EMPTY;
-    isVolatile = false;
+  }
+
+  void reset ()
+  {
+    hasCalculated = false;
   }
 
   Cell getCell (Address address)
@@ -68,12 +73,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
     return parent;
   }
 
-  @Override
-  public boolean isVolatile ()
-  {
-    return isVolatile;
-  }
-
   Address getAddress ()
   {
     return address;
@@ -109,7 +108,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
       for (int i = 0; i < 20; i++)
         repeat += repeatingText;
       cellType = CellType.REPEATING_CHARACTER;
-      isVolatile = false;
       return;
     }
 
@@ -124,7 +122,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
     {
       label = command.substring (1);
       cellType = CellType.LABEL;
-      isVolatile = false;
     }
     else
     {
@@ -133,7 +130,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
         expressionText = command;
         value = new Expression (this, expressionText).reduce ();
         cellType = CellType.VALUE;
-        isVolatile = true;
       }
       catch (IllegalArgumentException e)
       {
@@ -268,16 +264,17 @@ class Cell extends AbstractValue implements Comparable<Cell>
   {
     if (cellType == CellType.VALUE)
     {
-      if (isVolatile)
+      if (!hasCalculated)
       {
         value.calculate ();
-        isVolatile = value.isVolatile ();
+        hasCalculated = true;
       }
     }
   }
 
   public String getDebugText ()
   {
+    boolean isVolatile = false;
     StringBuilder text = new StringBuilder ();
     text.append (line);
     text.append ("\n");
@@ -336,8 +333,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
         contents = "Empty";
     }
 
-    return String.format ("[Cell:%5s %s %s]", address, contents,
-        isVolatile ? "volatile" : "fixed");
+    return String.format ("[Cell:%5s %s]", address, contents);
   }
 
   @Override

@@ -7,19 +7,17 @@ interface Value
     VALUE, ERROR, NA
   }
 
-  public double getValue ();          // if ValueType == VALUE
-
-  public String getText ();           // if ValueType != VALUE
-
   public boolean isValueType (ValueType valueType);
 
   public ValueType getValueType ();
+
+  public double getValue ();          // if ValueType == VALUE
+
+  public String getText ();           // if ValueType != VALUE
 
   public void calculate ();
 
   public String getTypeText ();       // Number/Function/Expression etc
 
-  public boolean isVolatile ();
-
-  public boolean isBoolean ();
+  public boolean isBoolean ();        // display TRUE/FALSE instead of 1/0
 }

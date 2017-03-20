@@ -449,7 +449,7 @@ public class Sheet
       if (columnWidths.containsKey (cellAddress.getColumn ()))
         colWidth = columnWidths.get (cellAddress.getColumn ());
 
-      text.append (cell.getText (colWidth, globalFormat));
+      text.append (cell.getFormattedText (colWidth, globalFormat));
     }
 
     if (debug)

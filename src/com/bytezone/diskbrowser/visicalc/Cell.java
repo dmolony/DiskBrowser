@@ -16,7 +16,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
   private String repeat = "";
   private String label;
   private Value value;
-  private boolean hasCalculated;
+  private boolean calculated;
 
   enum CellType
   {
@@ -35,7 +35,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
   void reset ()
   {
-    hasCalculated = false;
+    calculated = false;
   }
 
   Cell getCell (Address address)
@@ -183,7 +183,7 @@ class Cell extends AbstractValue implements Comparable<Cell>
   }
 
   // format cell value for output
-  String getText (int colWidth, char globalFormat)
+  String getFormattedText (int colWidth, char globalFormat)
   {
     char fmtChar = cellFormat != ' ' ? cellFormat : globalFormat;
 
@@ -240,16 +240,10 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public String getText ()
   {
-    if (cellType == CellType.EMPTY)
-      return "MPT";
-
-    if (cellType == CellType.LABEL)
-      return "LBL";
-
-    if (cellType == CellType.REPEATING_CHARACTER)
-      return "RPT";
-
+    // cell points to another cell which is ERROR or NA
     assert cellType == CellType.VALUE;
+    assert !value.isValueType (ValueType.VALUE);
+
     return value.getText ();
   }
 
@@ -262,24 +256,20 @@ class Cell extends AbstractValue implements Comparable<Cell>
   @Override
   public void calculate ()
   {
-    if (cellType == CellType.VALUE)
+    if (cellType == CellType.VALUE && !calculated)
     {
-      if (!hasCalculated)
-      {
-        value.calculate ();
-        hasCalculated = true;
-      }
+      value.calculate ();
+      calculated = true;
     }
   }
 
   public String getDebugText ()
   {
-    boolean isVolatile = false;
     StringBuilder text = new StringBuilder ();
     text.append (line);
     text.append ("\n");
-    text.append (String.format ("| %-11s  %s    Volatile: %1.1s    Format: %s  |%n",
-        address.getText (), address.getDetails (), isVolatile, cellFormat));
+    text.append (String.format ("| %-11s         %s            Format: %s  |%n",
+        address.getText (), address.getDetails (), cellFormat));
     text.append (line);
     text.append ("\n");
 

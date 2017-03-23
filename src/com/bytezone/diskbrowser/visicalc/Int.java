@@ -11,6 +11,6 @@ public class Int extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return (int) source.getValue ();
+    return (int) source.getDouble ();
   }
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ConditionList implements Iterable<Condition>
+public class ConditionList implements Iterable<Value>
 {
-  private final List<Condition> conditions = new ArrayList<Condition> ();
+  private final List<Value> conditions = new ArrayList<Value> ();
 
   public ConditionList (Cell cell, String text)
   {
@@ -15,14 +15,22 @@ public class ConditionList implements Iterable<Condition>
     while (true)
     {
       String parameter = Expression.getParameter (remainder);
-      conditions.add (new Condition (cell, parameter));
+      if (Range.isRange (parameter))
+        for (Address address : new Range (cell, parameter))
+        {
+          Cell target = cell.getCell (address);
+          conditions.add (target);
+        }
+      else
+        conditions.add (new Condition (cell, parameter));
+
       if (remainder.length () == parameter.length ())
         break;
       remainder = remainder.substring (parameter.length () + 1);
     }
   }
 
-  public Condition get (int index)
+  public Value get (int index)
   {
     return conditions.get (index);
   }
@@ -33,7 +41,7 @@ public class ConditionList implements Iterable<Condition>
   }
 
   @Override
-  public Iterator<Condition> iterator ()
+  public Iterator<Value> iterator ()
   {
     return conditions.iterator ();
   }

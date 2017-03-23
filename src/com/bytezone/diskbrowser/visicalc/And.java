@@ -1,42 +1,25 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class And extends Function
+class And extends ConditionListFunction
 {
-  private final ConditionList conditions;
-
   public And (Cell cell, String text)
   {
     super (cell, text);
-
     assert text.startsWith ("@AND(") : text;
-
-    conditions = new ConditionList (cell, functionText);
   }
 
   @Override
   public void calculate ()
   {
-    for (Condition condition : conditions)
+    for (Value condition : conditions)
     {
       condition.calculate ();
-      if (condition.getValue () == 0)
+      if (!condition.getBoolean ())
       {
-        value = 0;
+        bool = false;
         return;
       }
     }
-    value = 1;
-  }
-
-  @Override
-  public boolean isBoolean ()
-  {
-    return true;
-  }
-
-  @Override
-  public String getText ()
-  {
-    return value == 0 ? "FALSE" : "TRUE";
+    bool = true;
   }
 }

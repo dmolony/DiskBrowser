@@ -1,23 +1,28 @@
 package com.bytezone.diskbrowser.visicalc;
 
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 // Predicate
 class Condition extends AbstractValue implements Iterable<Value>
 {
+  private static final Pattern cellAddress = Pattern.compile ("[A-B]?[A-Z][0-9]{1,3}");
   private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
 
   private String comparator;
   private String conditionText;
   private String valueText;
   private final String fullText;
+  //  private Address address; 
 
   private Expression conditionExpression;
   private Expression valueExpression;
 
   public Condition (Cell cell, String text)
   {
-    super ("Cond");
+    super (cell, text);
+
+    valueType = ValueType.BOOLEAN;
     fullText = text;
 
     for (String comp : comparators)
@@ -46,63 +51,130 @@ class Condition extends AbstractValue implements Iterable<Value>
         conditionExpression = new Expression (cell, text);
         values.add (conditionExpression);
 
-        comparator = "=";
-
-        valueText = "1";
-        valueExpression = new Expression (cell, valueText);
-        values.add (valueExpression);
+        //        comparator = "=";
+        //
+        //        valueText = "1";
+        //        valueExpression = new Expression (cell, valueText);
+        //        values.add (valueExpression);
+      }
+      else if (cellAddress.matcher (text).matches ())
+      {
+        conditionText = text;
+        conditionExpression = new Expression (cell, text);
+        conditionExpression.valueType = ValueType.BOOLEAN;
+        values.add (conditionExpression);
       }
       else
-        System.out.println ("No comparator and not a function");
+      {
+        System.out.println ("No comparator and not a function: " + text);
+        throw new IllegalArgumentException ("No comparator and not a function: " + text);
+      }
     }
   }
 
   @Override
   public void calculate ()
   {
-    value = 0;
+    //    System.out.printf ("********Calc: %s%n", fullText);
+    valueResult = ValueResult.VALID;
 
     conditionExpression.calculate ();
-    valueExpression.calculate ();
-
-    if (conditionExpression.isValueType (ValueType.ERROR)
-        || valueExpression.isValueType (ValueType.ERROR))
+    if (!conditionExpression.isValid ())
+    {
+      valueResult = conditionExpression.getValueResult ();
       return;
+    }
 
-    double conditionResult = conditionExpression.getValue ();
-    double valueResult = valueExpression.getValue ();
+    // a boolean won't have a comparator or a valueExpression
+    if (conditionExpression.getValueType () == ValueType.BOOLEAN)
+    {
+      bool = conditionExpression.getBoolean ();
+      //      System.out.printf ("********Bool: %s%n", bool);
+      return;
+    }
+
+    valueExpression.calculate ();
+    if (!valueExpression.isValid ())
+    {
+      valueResult = valueExpression.getValueResult ();
+      return;
+    }
+
+    double conditionResult = conditionExpression.getDouble ();
+    double expressionResult = valueExpression.getDouble ();
 
     if (comparator.equals ("="))
-      value = conditionResult == valueResult ? 1 : 0;
+      bool = conditionResult == expressionResult;
     else if (comparator.equals ("<>"))
-      value = conditionResult != valueResult ? 1 : 0;
+      bool = conditionResult != expressionResult;
     else if (comparator.equals ("<"))
-      value = conditionResult < valueResult ? 1 : 0;
+      bool = conditionResult < expressionResult;
     else if (comparator.equals (">"))
-      value = conditionResult > valueResult ? 1 : 0;
+      bool = conditionResult > expressionResult;
     else if (comparator.equals ("<="))
-      value = conditionResult <= valueResult ? 1 : 0;
+      bool = conditionResult <= expressionResult;
     else if (comparator.equals (">="))
-      value = conditionResult >= valueResult ? 1 : 0;
+      bool = conditionResult >= expressionResult;
     else
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
+    //    System.out.printf ("********Bool: %s%n", bool);
   }
 
-  String getFullText ()
+  @Override
+  public String getFullText ()
   {
     return fullText;
   }
 
   @Override
-  public String toString ()
+  public String getType ()
   {
-    return String.format ("[cond=%s, op:%s, value=%s]", conditionText, comparator,
-        valueText);
+    return "Condition";
+  }
+
+  static boolean isCondition (String text)
+  {
+    int ptr = 0;
+    int depth = 0;
+    while (ptr < text.length ())
+    {
+      char c = text.charAt (ptr);
+      if (c == '(')
+        ++depth;
+      else if (c == ')')
+        --depth;
+      else if (depth == 0 && (c == '=' || c == '<' || c == '>'))
+        return true;
+
+      ++ptr;
+    }
+
+    return false;
   }
 
   @Override
   public Iterator<Value> iterator ()
   {
     return values.iterator ();
+  }
+
+  @Override
+  public String toString ()
+  {
+    String line = "+-------------------------------------------------------------+";
+    StringBuilder text = new StringBuilder ();
+    text.append (line + "\n");
+    text.append (String.format ("| %-10.10s: CND : %-34.34s%-8.8s|%n",
+        cell.getAddressText (), getFullText (), valueType));
+    text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Condition",
+        conditionText, conditionExpression.getValueType ()));
+    if (comparator != null)
+    {
+      text.append (String.format ("| %-10.10s: %-60.60s|%n", "Comparatr", comparator));
+      text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Value", valueText,
+          valueExpression.getValueType ()));
+    }
+    text.append (line);
+    return text.toString ();
   }
 }

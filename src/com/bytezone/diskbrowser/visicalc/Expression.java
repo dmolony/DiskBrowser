@@ -28,19 +28,21 @@ class Expression extends AbstractValue //implements Iterable<Value>
   // [.3*(B4+B7+B8+B9)]
   // [+N12+(P12*(.2*K12+K9-O12))]
 
-  private final Cell cell;
   private final List<String> operators = new ArrayList<String> ();
   private final List<String> signs = new ArrayList<String> ();
 
-  private final String text;
-
   public Expression (Cell cell, String text)
   {
-    super ("Exp");
-    this.cell = cell;
-    this.text = text;
+    super (cell, text);
 
     String line = balanceBrackets (text);   // add trailing right brackets if necessary
+
+    if (Condition.isCondition (text))
+    {
+      values.add (new Condition (cell, text));
+      signs.add ("(+)");                        // reduce() needs this
+      return;
+    }
 
     int ptr = 0;
     while (ptr < line.length ())
@@ -85,7 +87,7 @@ class Expression extends AbstractValue //implements Iterable<Value>
           {
             String numberText = getNumberText (line.substring (ptr));
             ptr += numberText.length ();
-            values.add (new Number (numberText));
+            values.add (new Number (cell, numberText));
           }
           else if (ch >= 'A' && ch <= 'Z')                  // cell address
           {
@@ -100,7 +102,7 @@ class Expression extends AbstractValue //implements Iterable<Value>
           }
       }
 
-      // check for optional continuation operator
+      // check for possible continuation operator
       if (ptr < line.length ())
       {
         ch = line.charAt (ptr);
@@ -115,13 +117,12 @@ class Expression extends AbstractValue //implements Iterable<Value>
     }
 
     assert values.size () > 0;
+    valueType = values.get (0).getValueType ();
   }
 
   Value reduce ()
   {
-    if (values.size () == 1 && signs.get (0).equals ("(+)"))
-      return values.get (0);
-    return this;
+    return values.size () == 1 && signs.get (0).equals ("(+)") ? values.get (0) : this;
   }
 
   int size ()
@@ -131,48 +132,52 @@ class Expression extends AbstractValue //implements Iterable<Value>
 
   Value get (int index)
   {
+    if (index < 0 || index >= values.size ())
+      throw new IllegalArgumentException ();
     return values.get (index);
+  }
+
+  @Override
+  public String getType ()
+  {
+    return "Expression";
   }
 
   @Override
   public void calculate ()
   {
-    if (values.size () == 0)
-    {
-      System.out.println ("nothing to calculate: " + text);
-      return;
-    }
+    assert values.size () > 0;
 
     try
     {
       Value thisValue = values.get (0);
       thisValue.calculate ();
 
-      value = 0;
-      if (!thisValue.isValueType (ValueType.VALUE))
+      value = thisValue.getDouble ();
+      bool = thisValue.getBoolean ();
+
+      if (!thisValue.isValid ())            // ERROR / NA
       {
         valueType = thisValue.getValueType ();
         return;
       }
 
-      value = thisValue.getValue ();
-
       String sign = signs.get (0);
       if (sign.equals ("(-)"))
         value *= -1;
 
-      for (int i = 1; i < values.size (); i++)
+      for (int i = 1; i < values.size (); i++)      // only NUMBER will enter here
       {
         thisValue = values.get (i);
         thisValue.calculate ();
 
-        if (!thisValue.isValueType (ValueType.VALUE))
+        if (!thisValue.isValid ())
         {
           valueType = thisValue.getValueType ();
           return;
         }
 
-        double nextValue = thisValue.getValue ();
+        double nextValue = thisValue.getDouble ();
 
         sign = signs.get (i);
         if (sign.equals ("(-)"))
@@ -189,23 +194,24 @@ class Expression extends AbstractValue //implements Iterable<Value>
         {
           if (nextValue == 0)
           {
-            valueType = ValueType.ERROR;
+            valueResult = ValueResult.ERROR;
             return;
           }
           value /= nextValue;
         }
         else if (operator.equals ("^"))
           value = Math.pow (value, nextValue);
-      }
 
-      if (Double.isNaN (value))
-        valueType = ValueType.ERROR;
-      else
-        valueType = ValueType.VALUE;
+        if (Double.isNaN (value))
+        {
+          valueResult = ValueResult.ERROR;
+          return;
+        }
+      }
     }
     catch (Exception e)
     {
-      valueType = ValueType.ERROR;
+      valueResult = ValueResult.ERROR;
       e.printStackTrace ();
       return;
     }
@@ -338,7 +344,7 @@ class Expression extends AbstractValue //implements Iterable<Value>
     {
       assert value != null;
       text.append (signs.get (ptr));
-      text.append (value.getValue ());
+      text.append (value.getDouble ());
       if (ptr < operators.size ())
         text.append (operators.get (ptr++));
     }
@@ -349,6 +355,25 @@ class Expression extends AbstractValue //implements Iterable<Value>
   @Override
   public String toString ()
   {
-    return "Expression : " + text;
+    String line = "+-------------------------------------------------------------+";
+    StringBuilder text = new StringBuilder ();
+    text.append (line + "\n");
+    text.append (String.format ("| %-10.10s: EXP : %-34.34s%-8.8s|%n",
+        cell.getAddressText (), getFullText (), valueType));
+    int index = 0;
+    for (Value value : values)
+    {
+      String sign = signs.get (index);
+      if (!"(+)".equals (sign))
+        text.append (String.format ("| %-10.10s: %-40.40s|%n", "sign", sign));
+      text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Value",
+          value.getFullText (), value.getValueType ()));
+      if (index < operators.size ())
+        text.append (
+            String.format ("| %-10.10s: %-48.48s|%n", "operator", operators.get (index)));
+      ++index;
+    }
+    text.append (line);
+    return text.toString ();
   }
 }

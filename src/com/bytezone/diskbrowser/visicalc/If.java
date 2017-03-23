@@ -7,8 +7,8 @@ class If extends Function
   private final String textFalse;
 
   private final Condition condition;
-  private final Expression expTrue;
-  private final Expression expFalse;
+  private final Value expTrue;
+  private final Value expFalse;
 
   public If (Cell cell, String text)
   {
@@ -17,50 +17,79 @@ class If extends Function
     assert text.startsWith ("@IF(") : text;
 
     conditionText = Expression.getParameter (functionText);
-    textTrue =
-        Expression.getParameter (functionText.substring (conditionText.length () + 1));
-    textFalse = Expression.getParameter (
-        functionText.substring (conditionText.length () + textTrue.length () + 2));
+
+    int ptr = conditionText.length () + 1;
+    if (ptr >= functionText.length ())
+      throw new IllegalArgumentException (text);
+
+    textTrue = Expression.getParameter (functionText.substring (ptr));
+
+    ptr = conditionText.length () + textTrue.length () + 2;
+    if (ptr >= functionText.length ())
+      throw new IllegalArgumentException (text);
+
+    textFalse = Expression.getParameter (functionText.substring (ptr));
 
     condition = new Condition (cell, conditionText);
     values.add (condition);
 
-    expTrue = new Expression (cell, textTrue);
+    expTrue = new Expression (cell, textTrue).reduce ();
     values.add (expTrue);
 
-    expFalse = new Expression (cell, textFalse);
+    expFalse = new Expression (cell, textFalse).reduce ();
     values.add (expFalse);
+
+    valueType = expTrue.getValueType ();
   }
 
   @Override
   public void calculate ()
   {
-    valueType = ValueType.VALUE;
+    valueResult = ValueResult.VALID;
+
     condition.calculate ();
 
-    if (condition.getValue () == 1)
+    if (condition.getBoolean ())        // true
     {
       expTrue.calculate ();
 
-      if (!expTrue.isValueType (ValueType.VALUE))
-        valueType = expTrue.getValueType ();
+      if (!expTrue.isValid ())
+        valueResult = expTrue.getValueResult ();
       else
-        value = expTrue.getValue ();
+        value = expTrue.getDouble ();
     }
-    else
+    else                                // false
     {
       expFalse.calculate ();
 
-      if (!expFalse.isValueType (ValueType.VALUE))
-        valueType = expFalse.getValueType ();
+      if (!expFalse.isValid ())
+        valueResult = expTrue.getValueResult ();
       else
-        value = expFalse.getValue ();
+        value = expFalse.getDouble ();
     }
+  }
+
+  @Override
+  public String getType ()
+  {
+    return "If";
   }
 
   @Override
   public String toString ()
   {
-    return String.format ("[IF:%s, True:%s, False:%s]", condition, textTrue, textFalse);
+    String line = "+-------------------------------------------------------------+";
+    StringBuilder text = new StringBuilder ();
+    text.append (line + "\n");
+    text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", cell.getAddressText (),
+        fullText, valueType));
+    text.append (String.format ("| condition : %-40.40s%-8.8s|%n", conditionText,
+        condition.getValueType ()));
+    text.append (String.format ("| true      : %-40.40s%-8.8s|%n", textTrue,
+        expTrue.getValueType ()));
+    text.append (String.format ("| false     : %-40.40s%-8.8s|%n", textFalse,
+        expFalse.getValueType ()));
+    text.append (line);
+    return text.toString ();
   }
 }

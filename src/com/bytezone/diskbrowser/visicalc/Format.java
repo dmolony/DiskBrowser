@@ -13,7 +13,7 @@ public class Format
 
   static String format (Value value, char formatChar, int colWidth)
   {
-    double actualValue = value.getValue ();
+    double actualValue = value.getDouble ();
     if (actualValue == -0.0)
       actualValue = 0;
 

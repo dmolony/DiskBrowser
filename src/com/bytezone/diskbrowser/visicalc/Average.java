@@ -7,7 +7,9 @@ public class Average extends ValueListFunction
   public Average (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@AVERAGE(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
@@ -15,6 +17,7 @@ public class Average extends ValueListFunction
   {
     double total = 0.0;
     int totalChecked = 0;
+    valueResult = ValueResult.VALID;
 
     for (Value v : list)
     {
@@ -23,26 +26,25 @@ public class Average extends ValueListFunction
 
       v.calculate ();
 
-      if (v.isValueType (ValueType.NA))
+      if (v.getValueResult () == ValueResult.NA)
         continue;
 
-      if (!v.isValueType (ValueType.VALUE))
+      if (!v.isValid ())
       {
-        valueType = v.getValueType ();
+        valueResult = v.getValueResult ();
         return;
       }
 
-      total += v.getValue ();
+      total += v.getDouble ();
       totalChecked++;
     }
 
     if (totalChecked == 0)
     {
-      valueType = ValueType.ERROR;
+      valueResult = ValueResult.ERROR;
       return;
     }
 
     value = total / totalChecked;
-    valueType = ValueType.VALUE;
   }
 }

@@ -11,6 +11,6 @@ public class Tan extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.tan (source.getValue ());
+    return Math.tan (source.getDouble ());
   }
 }

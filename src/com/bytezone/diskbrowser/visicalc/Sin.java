@@ -11,6 +11,6 @@ public class Sin extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.sin (source.getValue ());
+    return Math.sin (source.getDouble ());
   }
 }

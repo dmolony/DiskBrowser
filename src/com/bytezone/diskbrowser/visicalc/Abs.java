@@ -11,6 +11,6 @@ public class Abs extends ValueFunction
   @Override
   double calculateValue ()
   {
-    return Math.abs (source.getValue ());
+    return Math.abs (source.getDouble ());
   }
 }

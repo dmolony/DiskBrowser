@@ -1,30 +1,19 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class IsNa extends ValueFunction
+public class IsNa extends BooleanFunction
 {
   IsNa (Cell cell, String text)
   {
     super (cell, text);
-    assert text.startsWith ("@ISNA(") : text;
-  }
 
-  @Override
-  public boolean isBoolean ()
-  {
-    return true;
+    assert text.startsWith ("@ISNA(") : text;
+    valueType = ValueType.BOOLEAN;
   }
 
   @Override
   public void calculate ()
   {
     source.calculate ();
-    value = calculateValue ();
-    valueType = ValueType.VALUE;      // do not use source.getValueType()
-  }
-
-  @Override
-  public double calculateValue ()
-  {
-    return source.isValueType (ValueType.NA) ? 1 : 0;
+    bool = source.getValueResult () == ValueResult.NA;
   }
 }

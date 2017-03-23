@@ -5,28 +5,32 @@ class Lookup extends ValueListFunction
   public Lookup (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@LOOKUP(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
   public void calculate ()
   {
     Value source = list.get (0);                 // first Value is the value to look up
+    valueResult = ValueResult.VALID;
+
     source.calculate ();
 
-    if (!source.isValueType (ValueType.VALUE))
+    if (!source.isValid ())
     {
-      valueType = source.getValueType ();
+      valueResult = source.getValueResult ();
       return;
     }
 
     if (list.size () <= 1)
     {
-      valueType = ValueType.NA;
+      valueResult = ValueResult.NA;
       return;
     }
 
-    double sourceValue = source.getValue ();
+    double sourceValue = source.getDouble ();
     Address target = null;
 
     // is the range horizontal or vertical?
@@ -37,14 +41,14 @@ class Lookup extends ValueListFunction
     for (int i = 1; i < list.size (); i++)        // skip first entry
     {
       Cell cell = (Cell) list.get (i);
-      if (cell.getValue () > sourceValue)         // past the value
+      if (cell.getDouble () > sourceValue)        // past the value
         break;
       target = cell.getAddress ();                // this could be the one
     }
 
     if (target == null)
     {
-      valueType = ValueType.NA;
+      valueResult = ValueResult.NA;
       return;
     }
 
@@ -52,13 +56,11 @@ class Lookup extends ValueListFunction
 
     if (cell.cellExists (adjacentAddress))
     {
-      value = cell.getCell (adjacentAddress).getValue ();
-      valueType = ValueType.VALUE;
+      value = cell.getCell (adjacentAddress).getDouble ();
     }
     else
     {
       value = 0;
-      valueType = ValueType.VALUE;
     }
   }
 }

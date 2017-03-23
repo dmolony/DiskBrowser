@@ -11,6 +11,6 @@ public class Acos extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.acos (source.getValue ());
+    return Math.acos (source.getDouble ());
   }
 }

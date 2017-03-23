@@ -5,7 +5,9 @@ class Max extends ValueListFunction
   public Max (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@MAX(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
@@ -13,20 +15,22 @@ class Max extends ValueListFunction
   {
     value = Double.MIN_VALUE;
     int totalChecked = 0;
+    valueResult = ValueResult.VALID;
 
     for (Value v : list)
     {
       v.calculate ();
-      if (!v.isValueType (ValueType.VALUE))
+      if (!v.isValid ())
       {
-        valueType = cell.getValueType ();
+        valueResult = cell.getValueResult ();
         return;
       }
 
-      value = Math.max (value, v.getValue ());
+      value = Math.max (value, v.getDouble ());
       totalChecked++;
     }
 
-    valueType = totalChecked == 0 ? ValueType.NA : ValueType.VALUE;
+    if (totalChecked == 0)
+      valueResult = ValueResult.NA;
   }
 }

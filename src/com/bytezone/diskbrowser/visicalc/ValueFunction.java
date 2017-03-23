@@ -10,22 +10,33 @@ public abstract class ValueFunction extends Function
 
     source = cell.getExpressionValue (functionText);
     values.add (source);
+    // is valueType NUMBER?
   }
 
   @Override
   public void calculate ()
   {
+    valueResult = ValueResult.VALID;
+
     source.calculate ();
 
-    if (!source.isValueType (ValueType.VALUE))
+    if (!source.isValid ())
     {
-      valueType = source.getValueType ();
+      valueResult = source.getValueResult ();
       return;
     }
 
     value = calculateValue ();
-    valueType = Double.isNaN (value) ? ValueType.ERROR : ValueType.VALUE;
+
+    if (Double.isNaN (value))
+      valueResult = ValueResult.ERROR;
   }
 
   abstract double calculateValue ();
+
+  @Override
+  public String getType ()
+  {
+    return "ValueFunction";
+  }
 }

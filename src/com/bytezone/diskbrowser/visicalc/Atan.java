@@ -11,6 +11,6 @@ public class Atan extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.atan (source.getValue ());
+    return Math.atan (source.getDouble ());
   }
 }

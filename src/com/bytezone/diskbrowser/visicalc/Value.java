@@ -4,20 +4,29 @@ interface Value
 {
   enum ValueType
   {
-    VALUE, ERROR, NA
+    NUMBER, BOOLEAN
   }
 
-  public boolean isValueType (ValueType valueType);
-
-  public ValueType getValueType ();
-
-  public double getValue ();          // if ValueType == VALUE
-
-  public String getText ();           // if ValueType != VALUE
+  enum ValueResult
+  {
+    ERROR, NA, VALID
+  }
 
   public void calculate ();
 
-  public String getTypeText ();       // Number/Function/Expression etc
+  public boolean isValid ();                  // ValueResult.VALID
 
-  public boolean isBoolean ();        // display TRUE/FALSE instead of 1/0
+  public ValueType getValueType ();           // NUMBER, BOOLEAN
+
+  public ValueResult getValueResult ();       // ERROR, NA, VALID
+
+  public double getDouble ();                 // if ValueType == NUMBER
+
+  public String getText ();                   // if ValueType == ERROR / NA / BOOLEAN
+
+  public boolean getBoolean ();               // if ValueType == BOOLEAN
+
+  public String getFullText ();               // original text
+
+  public String getType ();                   // FUNCTION, CONDITION, EXPRESSION
 }

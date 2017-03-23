@@ -14,7 +14,7 @@ class Count extends ValueListFunction
   public void calculate ()
   {
     value = 0;
-    valueType = ValueType.VALUE;
+    valueType = ValueType.NUMBER;
 
     if (!isRange)
       value = list.size ();

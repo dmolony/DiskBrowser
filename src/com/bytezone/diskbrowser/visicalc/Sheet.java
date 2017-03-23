@@ -160,6 +160,8 @@ public class Sheet
       assert !line.isEmpty ();
       lines.add (line);
 
+      System.out.println (line);
+
       if (line.startsWith ("/"))
         doFormat (line);
       else if (line.startsWith (">"))       // GOTO cell
@@ -172,7 +174,12 @@ public class Sheet
 
     // might have to keep recalculating until nothing changes??
     calculate (recalculationOrder);
-    //    calculate (recalculationOrder);
+    if (false)
+    {
+      for (Cell cell : rowOrderCells.values ())
+        cell.reset ();
+      calculate (recalculationOrder);
+    }
   }
 
   private void calculate (char order)
@@ -466,7 +473,15 @@ public class Sheet
               + " ***\n\n");
           last = cell.getAddress ().getColumn ();
         }
-        text.append (cell.getDebugText ());
+        //        text.append (cell.getDebugText ());
+        //        text.append (cell);
+        //        text.append ("\n");
+        if (cell.isCellType (CellType.VALUE))
+        {
+          text.append (cell.getValue ());
+          text.append ("\n");
+        }
+
         text.append ("\n");
       }
 

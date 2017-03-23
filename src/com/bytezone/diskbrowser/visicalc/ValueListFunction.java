@@ -15,4 +15,10 @@ public abstract class ValueListFunction extends Function
     for (Value v : list)
       values.add (v);
   }
+
+  @Override
+  public String getType ()
+  {
+    return "ValueListFunction";
+  }
 }

@@ -5,29 +5,31 @@ class Sum extends ValueListFunction
   public Sum (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@SUM(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
   public void calculate ()
   {
     value = 0;
-    valueType = ValueType.VALUE;
+    valueResult = ValueResult.VALID;
 
     for (Value v : list)
     {
       v.calculate ();
 
-      if (v.isValueType (ValueType.NA))
+      if (v.getValueResult () == ValueResult.NA)
         continue;
 
-      if (!v.isValueType (ValueType.VALUE))
+      if (!v.isValid ())
       {
-        valueType = v.getValueType ();
-        break;
+        valueResult = v.getValueResult ();
+        return;
       }
 
-      value += v.getValue ();
+      value += v.getDouble ();
     }
   }
 }

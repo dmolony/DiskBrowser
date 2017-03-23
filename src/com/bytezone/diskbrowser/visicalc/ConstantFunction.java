@@ -6,4 +6,10 @@ public abstract class ConstantFunction extends Function
   {
     super (cell, text);
   }
+
+  @Override
+  public String getType ()
+  {
+    return "ConstantFunction";
+  }
 }

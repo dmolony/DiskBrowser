@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class Cell extends AbstractValue implements Comparable<Cell>
+class Cell implements Value, Comparable<Cell>
 {
   private static final String line = "+----------------------------------------"
       + "--------------------------------------------+";
@@ -8,15 +8,15 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
   private final Address address;
   private final Sheet parent;
-  private CellType cellType;
-  private String expressionText;
+  private String fullText;
   private char cellFormat = ' ';
-
-  private String repeatingText;
   private String repeat = "";
-  private String label;
-  private Value value;
   private boolean calculated;
+
+  private CellType cellType;
+  private String repeatingText;       // REPEATING_CHARACTER
+  private String label;               // LABEL
+  private Value value;                // VALUE
 
   enum CellType
   {
@@ -25,8 +25,6 @@ class Cell extends AbstractValue implements Comparable<Cell>
 
   public Cell (Sheet parent, Address address)
   {
-    super ("Cell " + address.getText ());
-
     this.parent = parent;
     this.address = address;
 
@@ -125,60 +123,66 @@ class Cell extends AbstractValue implements Comparable<Cell>
     }
     else
     {
+      fullText = command;
+      cellType = CellType.VALUE;
       try
       {
-        expressionText = command;
-        value = new Expression (this, expressionText).reduce ();
-        cellType = CellType.VALUE;
+        value = new Expression (this, fullText).reduce ();
       }
       catch (IllegalArgumentException e)
       {
-        System.out.println ("ignoring error: " + command);
+        value = new Error (this, "@ERROR");
       }
     }
 
-    // FUTURE.VC
     if (false)
+      setTestData (0);
+  }
+
+  private void setTestData (int choice)
+  {
+    // FUTURE.VC
+    if (choice == 1)
     {
       System.out.println ("****** Hardcoded values ******");
       if (address.getRowKey () == 67)
-        expressionText = "1000";
+        fullText = "1000";
       else if (address.getRowKey () == 131)
-        expressionText = "10.5";
+        fullText = "10.5";
       else if (address.getRowKey () == 195)
-        expressionText = "12";
+        fullText = "12";
       else if (address.getRowKey () == 259)
-        expressionText = "8";
+        fullText = "8";
     }
 
     // IRA.VC
-    if (false)
+    if (choice == 2)
     {
       System.out.println ("****** Hardcoded values ******");
       if (address.getRowKey () == 66)
-        expressionText = "10";
+        fullText = "10";
       else if (address.getRowKey () == 130)
-        expressionText = "30";
+        fullText = "30";
       else if (address.getRowKey () == 194)
-        expressionText = "65";
+        fullText = "65";
       else if (address.getRowKey () == 258)
-        expressionText = "1000";
+        fullText = "1000";
       else if (address.getRowKey () == 386)
-        expressionText = "15";
+        fullText = "15";
     }
 
     // CARLOAN.VC
-    if (false)
+    if (choice == 3)
     {
       System.out.println ("****** Hardcoded values ******");
       if (address.getRowKey () == 67)
-        expressionText = "9375";
+        fullText = "9375";
       else if (address.getRowKey () == 131)
-        expressionText = "4500";
+        fullText = "4500";
       else if (address.getRowKey () == 195)
-        expressionText = "24";
+        fullText = "24";
       else if (address.getRowKey () == 259)
-        expressionText = "11.9";
+        fullText = "11.9";
     }
   }
 
@@ -201,56 +205,40 @@ class Cell extends AbstractValue implements Comparable<Cell>
         return Format.justify (empty, colWidth, ' ');
 
       case VALUE:
-        if (!isValueType (ValueType.VALUE))
+        switch (getValueResult ())
         {
-          if (fmtChar == ' ')
-            fmtChar = 'R';
-          return " " + Format.justify (value.getText (), colWidth - 1, fmtChar);
+          case ERROR:
+          case NA:
+            if (fmtChar == ' ')
+              fmtChar = 'R';
+            return " " + Format.justify (value.getText (), colWidth - 1, fmtChar);
+
+          case VALID:
+            switch (getValueType ())
+            {
+              case BOOLEAN:
+                if (fmtChar != 'L')
+                  fmtChar = 'R';
+                return Format.justify (value.getText (), colWidth, fmtChar);
+
+              case NUMBER:
+                if (colWidth == 1)
+                  return ".";
+                return " " + Format.format (value, fmtChar, colWidth - 1);
+
+              default:
+                assert false;
+                return "Impossible";
+            }
+
+          default:
+            assert false;
+            return "Impossible";
         }
-
-        if (value.isBoolean ())     // consider ValueType of BOOLEAN
-        {
-          if (fmtChar != 'L')
-            fmtChar = 'R';
-          return Format.justify (value.getText (), colWidth, fmtChar);
-        }
-
-        if (colWidth == 1)
-          return ".";
-        return " " + Format.format (value, fmtChar, colWidth - 1);
-
       default:
         assert false;
-        return "Impossible";
+        return "impossible";
     }
-  }
-
-  @Override
-  public double getValue ()
-  {
-    return cellType == CellType.VALUE ? value.getValue () : 0;
-  }
-
-  @Override
-  public ValueType getValueType ()
-  {
-    return cellType == CellType.VALUE ? value.getValueType () : ValueType.VALUE;
-  }
-
-  @Override
-  public String getText ()
-  {
-    // cell points to another cell which is ERROR or NA
-    assert cellType == CellType.VALUE;
-    assert !value.isValueType (ValueType.VALUE);
-
-    return value.getText ();
-  }
-
-  @Override
-  public boolean isValueType (ValueType type)
-  {
-    return type == getValueType ();
   }
 
   @Override
@@ -263,45 +251,114 @@ class Cell extends AbstractValue implements Comparable<Cell>
     }
   }
 
-  public String getDebugText ()
+  @Override
+  public boolean isValid ()
   {
-    StringBuilder text = new StringBuilder ();
-    text.append (line);
-    text.append ("\n");
-    text.append (String.format ("| %-11s         %s            Format: %s  |%n",
-        address.getText (), address.getDetails (), cellFormat));
-    text.append (line);
-    text.append ("\n");
+    return cellType == CellType.VALUE ? value.isValid () : true;
+  }
 
+  @Override
+  public ValueResult getValueResult ()
+  {
+    return cellType == CellType.VALUE ? value.getValueResult () : ValueResult.VALID;
+  }
+
+  @Override
+  public ValueType getValueType ()
+  {
+    return cellType == CellType.VALUE ? value.getValueType () : ValueType.NUMBER;
+  }
+
+  @Override
+  public double getDouble ()
+  {
+    return cellType == CellType.VALUE ? value.getDouble () : 0;
+  }
+
+  @Override
+  public boolean getBoolean ()
+  {
+    return cellType == CellType.VALUE ? value.getBoolean () : false;
+  }
+
+  @Override
+  public String getFullText ()
+  {
     switch (cellType)
     {
       case LABEL:
-        text.append (String.format ("| LABEL      : %-69s |%n", label));
-        break;
-
+        return label;
       case REPEATING_CHARACTER:
-        text.append (String.format ("| REPEAT     : %-69s |%n", repeatingText));
-        break;
-
+        return repeatingText;
       case EMPTY:
-        text.append (String.format ("| EMPTY      : %-69s |%n", ""));
-        break;
-
+        return "Empty Cell";
       case VALUE:
-        text.append (String.format ("| VALUE      : %-69s |%n", expressionText));
-        if (value == null)
-          text.append (String.format ("| Value      : %-69s |%n", "null"));
-        else
-          text.append (((AbstractValue) value).getValueText (0));
-        break;
-
+        return value.getFullText ();
       default:
-        text.append ("Unknown CellType: " + cellType + "\n");
+        return "impossible";
     }
-
-    text.append (line);
-    return text.toString ();
   }
+
+  @Override
+  public String getType ()
+  {
+    return "Cell";
+  }
+
+  @Override
+  public String getText ()
+  {
+    // cell points to another cell which is ERROR or NA
+    assert cellType == CellType.VALUE;
+    //    assert !value.isValid ();
+
+    return value.getText ();
+  }
+
+  Value getValue ()
+  {
+    return value;
+  }
+
+  //  public String getDebugText ()
+  //  {
+  //    StringBuilder text = new StringBuilder ();
+  //    text.append (line);
+  //    text.append ("\n");
+  //    text.append (String.format ("| %-11s         %s            Format: %s  |%n",
+  //        address.getText (), address.getDetails (), cellFormat));
+  //    text.append (line);
+  //    text.append ("\n");
+  //
+  //    switch (cellType)
+  //    {
+  //      case LABEL:
+  //        text.append (String.format ("| LABEL      : %-69s |%n", label));
+  //        break;
+  //
+  //      case REPEATING_CHARACTER:
+  //        text.append (String.format ("| REPEAT     : %-69s |%n", repeatingText));
+  //        break;
+  //
+  //      case EMPTY:
+  //        text.append (String.format ("| EMPTY      : %-69s |%n", ""));
+  //        break;
+  //
+  //      case VALUE:
+  //        text.append (String.format ("| VALUE      : %-69s |%n", expressionText));
+  //        if (value == null)
+  //          text.append (String.format ("| Value      : %-69s |%n", "null"));
+  //        else
+  //          text.append (((AbstractValue) value).getValueText (0));
+  //        break;
+  //
+  //      default:
+  //        text.append ("Unknown CellType: " + cellType + "\n");
+  //    }
+  //
+  //    text.append (line);
+  //    return text.toString ();
+  //  }
 
   @Override
   public String toString ()
@@ -316,14 +373,24 @@ class Cell extends AbstractValue implements Comparable<Cell>
       case REPEATING_CHARACTER:
         contents = "Rept: " + repeatingText;
         break;
-      case VALUE:
-        contents = "Exp : " + expressionText;
-        break;
       case EMPTY:
         contents = "Empty";
+        break;
+      case VALUE:
+        switch (value.getValueType ())
+        {
+          case NUMBER:
+            contents = "Num : " + fullText;
+            break;
+          case BOOLEAN:
+            contents = "Bool: " + fullText;
+            break;
+        }
+        //        contents = "Exp : " + expressionText;
+        break;
     }
 
-    return String.format ("[Cell:%5s %s]", address, contents);
+    return String.format ("Cell:%5s %s", address.getText (), contents);
   }
 
   @Override

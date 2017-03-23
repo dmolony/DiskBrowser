@@ -7,35 +7,38 @@ public class Choose extends ValueListFunction
   Choose (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@CHOOSE(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
   public void calculate ()
   {
     Value source = list.get (0);
+    valueResult = ValueResult.VALID;
 
     source.calculate ();
-    if (!source.isValueType (ValueType.VALUE))
+    if (!source.isValid ())
     {
-      valueType = source.getValueType ();
+      valueResult = source.getValueResult ();
       return;
     }
 
-    int index = (int) source.getValue ();
+    int index = (int) source.getDouble ();
     if (index < 1 || index >= list.size ())
     {
-      valueType = ValueType.NA;
+      valueResult = ValueResult.NA;
       return;
     }
 
     Cell cell = (Cell) list.get (index);
     if (cell.isCellType (CellType.EMPTY))
-      valueType = ValueType.NA;
+      valueResult = ValueResult.NA;
     else
     {
-      valueType = cell.getValueType ();
-      value = cell.getValue ();
+      valueResult = cell.getValueResult ();
+      value = cell.getDouble ();
     }
   }
 }

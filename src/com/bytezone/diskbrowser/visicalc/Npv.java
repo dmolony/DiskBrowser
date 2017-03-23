@@ -7,24 +7,27 @@ public class Npv extends ValueListFunction
   Npv (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@NPV(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
   public void calculate ()
   {
     value = 0;
-    valueType = ValueType.VALUE;
+    valueResult = ValueResult.VALID;
 
     Value source = list.get (0);                    // first Value is the rate
     source.calculate ();
-    if (!source.isValueType (ValueType.VALUE))
+
+    if (!source.isValid ())
     {
-      valueType = source.getValueType ();
+      valueResult = source.getValueResult ();
       return;
     }
 
-    double rate = 1 + source.getValue ();
+    double rate = 1 + source.getDouble ();
     int period = 0;
 
     for (int i = 1; i < list.size (); i++)          // remaining Values are Cells
@@ -35,13 +38,13 @@ public class Npv extends ValueListFunction
       if (cell.isCellType (CellType.EMPTY))
         continue;
 
-      if (!cell.isValueType (ValueType.VALUE))
+      if (!cell.isValid ())
       {
-        valueType = cell.getValueType ();
+        valueResult = source.getValueResult ();
         return;
       }
 
-      value += cell.getValue () / Math.pow (rate, period);
+      value += cell.getDouble () / Math.pow (rate, period);
     }
   }
 }

@@ -9,6 +9,6 @@ class Pi extends ConstantFunction
     assert text.equals ("@PI") : text;
 
     value = Math.PI;
-    valueType = ValueType.VALUE;
+    valueType = ValueType.NUMBER;
   }
 }

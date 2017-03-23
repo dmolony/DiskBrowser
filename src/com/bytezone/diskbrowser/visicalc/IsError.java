@@ -1,30 +1,19 @@
 package com.bytezone.diskbrowser.visicalc;
 
-class IsError extends ValueFunction
+class IsError extends BooleanFunction
 {
   public IsError (Cell cell, String text)
   {
     super (cell, text);
-    assert text.startsWith ("@ISERROR(") : text;
-  }
 
-  @Override
-  public boolean isBoolean ()
-  {
-    return true;
+    assert text.startsWith ("@ISERROR(") : text;
+    valueType = ValueType.BOOLEAN;
   }
 
   @Override
   public void calculate ()
   {
     source.calculate ();
-    value = calculateValue ();
-    valueType = ValueType.VALUE;      // do not use source.getValueType()
-  }
-
-  @Override
-  public double calculateValue ()
-  {
-    return source.isValueType (ValueType.ERROR) ? 1 : 0;
+    bool = source.getValueResult () == ValueResult.ERROR;
   }
 }

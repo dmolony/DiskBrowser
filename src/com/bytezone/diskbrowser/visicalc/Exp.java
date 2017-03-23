@@ -11,6 +11,6 @@ public class Exp extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.exp (source.getValue ());
+    return Math.exp (source.getDouble ());
   }
 }

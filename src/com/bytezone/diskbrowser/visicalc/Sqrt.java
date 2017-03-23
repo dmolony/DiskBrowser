@@ -11,6 +11,6 @@ public class Sqrt extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.sqrt (source.getValue ());
+    return Math.sqrt (source.getDouble ());
   }
 }

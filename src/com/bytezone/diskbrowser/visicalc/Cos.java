@@ -11,6 +11,6 @@ public class Cos extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.cos (source.getValue ());
+    return Math.cos (source.getDouble ());
   }
 }

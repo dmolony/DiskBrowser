@@ -8,19 +8,7 @@ public class False extends ConstantFunction
 
     assert text.equals ("@FALSE") : text;
 
-    value = 0;
-    valueType = ValueType.VALUE;
-  }
-
-  @Override
-  public boolean isBoolean ()
-  {
-    return true;
-  }
-
-  @Override
-  public String getText ()
-  {
-    return value == 0 ? "FALSE" : "TRUE";
+    bool = false;
+    valueType = ValueType.BOOLEAN;
   }
 }

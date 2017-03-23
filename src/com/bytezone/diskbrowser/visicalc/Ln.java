@@ -11,6 +11,6 @@ public class Ln extends ValueFunction
   @Override
   public double calculateValue ()
   {
-    return Math.log (source.getValue ());
+    return Math.log (source.getDouble ());
   }
 }

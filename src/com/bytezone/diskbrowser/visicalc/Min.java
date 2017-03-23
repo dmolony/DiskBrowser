@@ -5,7 +5,9 @@ class Min extends ValueListFunction
   public Min (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@MIN(") : text;
+    valueType = ValueType.NUMBER;
   }
 
   @Override
@@ -13,20 +15,22 @@ class Min extends ValueListFunction
   {
     value = Double.MAX_VALUE;
     int totalChecked = 0;
+    valueResult = ValueResult.VALID;
 
     for (Value v : list)
     {
       v.calculate ();
-      if (!v.isValueType (ValueType.VALUE))
+      if (!v.isValid ())
       {
-        valueType = cell.getValueType ();
+        valueResult = cell.getValueResult ();
         return;
       }
 
-      value = Math.min (value, v.getValue ());
+      value = Math.min (value, v.getDouble ());
       totalChecked++;
     }
 
-    valueType = totalChecked == 0 ? ValueType.NA : ValueType.VALUE;
+    if (totalChecked == 0)
+      valueResult = ValueResult.NA;
   }
 }

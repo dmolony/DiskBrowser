@@ -8,18 +8,12 @@ abstract class Function extends AbstractValue
         "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NPV(", "@OR(",
         "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
 
-  protected final Cell cell;
-  protected final String fullText;
-
   protected final String functionName;
   protected final String functionText;
 
   Function (Cell cell, String text)
   {
-    super ("Function");
-
-    this.cell = cell;
-    fullText = text;
+    super (cell, text);
 
     // get function's parameter string
     int pos = text.indexOf ('(');
@@ -38,6 +32,12 @@ abstract class Function extends AbstractValue
   @Override
   public String toString ()
   {
-    return String.format ("Function: %s %s", functionName, functionText);
+    String line = "+-------------------------------------------------------------+";
+    StringBuilder text = new StringBuilder ();
+    text.append (line + "\n");
+    text.append (String.format ("| %-10.10s: FN  : %-34.34s%-8.8s|%n",
+        cell.getAddressText (), getFullText (), valueType));
+    text.append (line);
+    return text.toString ();
   }
 }

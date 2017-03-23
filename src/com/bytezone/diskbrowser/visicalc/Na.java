@@ -7,7 +7,6 @@ public class Na extends ConstantFunction
     super (cell, text);
 
     assert text.equals ("@NA") : text;
-
-    valueType = ValueType.NA;
+    valueResult = ValueResult.NA;
   }
 }

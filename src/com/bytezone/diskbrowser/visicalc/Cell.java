@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.visicalc;
 
+import java.util.Iterator;
+
 class Cell implements Value, Comparable<Cell>
 {
   private static final String line = "+----------------------------------------"
@@ -20,7 +22,7 @@ class Cell implements Value, Comparable<Cell>
 
   enum CellType
   {
-    LABEL, REPEATING_CHARACTER, VALUE, EMPTY
+    LABEL, FILLER, VALUE, EMPTY
   }
 
   public Cell (Sheet parent, Address address)
@@ -105,7 +107,7 @@ class Cell implements Value, Comparable<Cell>
       repeatingText = formatText.substring (2);
       for (int i = 0; i < 20; i++)
         repeat += repeatingText;
-      cellType = CellType.REPEATING_CHARACTER;
+      cellType = CellType.FILLER;
       return;
     }
 
@@ -198,7 +200,7 @@ class Cell implements Value, Comparable<Cell>
           fmtChar = 'L';
         return Format.justify (label, colWidth, fmtChar);
 
-      case REPEATING_CHARACTER:
+      case FILLER:
         return Format.justify (repeat, colWidth, ' ');
 
       case EMPTY:
@@ -282,13 +284,25 @@ class Cell implements Value, Comparable<Cell>
   }
 
   @Override
+  public int size ()
+  {
+    return cellType == CellType.VALUE ? value.size () : 0;
+  }
+
+  @Override
+  public Iterator<Value> iterator ()
+  {
+    return cellType == CellType.VALUE ? value.iterator () : null;
+  }
+
+  @Override
   public String getFullText ()
   {
     switch (cellType)
     {
       case LABEL:
         return "LBL : " + label;
-      case REPEATING_CHARACTER:
+      case FILLER:
         return "RPT : " + repeatingText;
       case EMPTY:
         return "Empty Cell";
@@ -324,14 +338,16 @@ class Cell implements Value, Comparable<Cell>
   public String toString ()
   {
     String contents = "";
+    String contents2 = "";
     String valueText = "";
+    String line2 = "";
 
     switch (cellType)
     {
       case LABEL:
         contents = label;
         break;
-      case REPEATING_CHARACTER:
+      case FILLER:
         contents = repeatingText;
         break;
       case EMPTY:
@@ -343,8 +359,14 @@ class Cell implements Value, Comparable<Cell>
         break;
     }
 
-    return String.format ("%s%n| %-9.9s : %-49.49s %-18.18s |%n", AbstractValue.LINE,
-        address.getText (), contents, cellType + valueText);
+    if (contents.length () > 49)
+    {
+      contents2 = contents.substring (49);
+      contents = contents.substring (0, 49);
+      line2 = String.format ("|             %-69.69s|%n", contents2);
+    }
+    return String.format ("%s%n| %-9.9s : %-49.49s %-18.18s |%n%s", AbstractValue.LINE,
+        address.getText (), contents, cellType + valueText, line2);
   }
 
   @Override

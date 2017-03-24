@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.visicalc;
 
-interface Value
+interface Value extends Iterable<Value>
 {
   enum ValueType
   {
@@ -29,4 +29,6 @@ interface Value
   public String getFullText ();               // original text
 
   public String getType ();                   // FUNCTION, CONDITION, EXPRESSION
+
+  public int size ();
 }

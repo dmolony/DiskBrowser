@@ -125,11 +125,6 @@ class Expression extends AbstractValue //implements Iterable<Value>
     return values.size () == 1 && signs.get (0).equals ("(+)") ? values.get (0) : this;
   }
 
-  int size ()
-  {
-    return values.size ();
-  }
-
   Value get (int index)
   {
     if (index < 0 || index >= values.size ())

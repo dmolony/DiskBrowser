@@ -36,8 +36,8 @@ class Number extends AbstractValue
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));
-    text.append (String.format (FMT5, cell.getAddressText (), "NUM", getFullText (),
-        valueType, getValueText (this)));
+    text.append (
+        String.format (FMT4, "Constant", getFullText (), valueType, getValueText (this)));
     return text.toString ();
   }
 }

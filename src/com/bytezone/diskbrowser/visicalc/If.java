@@ -80,15 +80,22 @@ class If extends Function
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));
-    text.append (String.format (FMT4, "IF", fullText, valueType, getValueText (this)));
+    text.append (
+        String.format (FMT4, getType (), fullText, valueType, getValueText (this)));
     text.append (String.format (FMT4, "condition", conditionText,
         condition.getValueType (), getValueText (condition)));
     if (condition.getBoolean ())
-      text.append (String.format (FMT4, "true", textTrue, expTrue.getValueType (),
-          getValueText (expTrue)));
+      attach (text, "true", expTrue, textTrue);
     else
-      text.append (String.format (FMT4, "false", textFalse, expFalse.getValueType (),
-          getValueText (expFalse)));
+      attach (text, "false", expFalse, textFalse);
     return text.toString ();
+  }
+
+  private void attach (StringBuilder text, String title, Value exp, String s)
+  {
+    text.append (String.format (FMT4, title, s, exp.getValueType (), getValueText (exp)));
+    if (exp.size () > 1)
+      for (Value value : exp)
+        text.append (value);
   }
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractValue implements Value, Iterable<Value>
+public abstract class AbstractValue implements Value//, Iterable<Value>
 {
-  protected static final String FMT4 = "| %-9.9s : %-50.50s%-8.8s %-10.10s|%n";
+  protected static final String FMT4 = "| %-9.9s : %-49.49s %-8.8s %-10.10s|%n";
   protected static final String FMT2 = "| %-9.9s : %-69.69s|%n";
   protected static final String FMT5 = "| %-9.9s : %-3.3s : %-44.44s%-8.8s %-10.10s|%n";
   protected static final String LINE =
@@ -62,6 +62,12 @@ public abstract class AbstractValue implements Value, Iterable<Value>
   public boolean getBoolean ()
   {
     return bool;
+  }
+
+  @Override
+  public int size ()
+  {
+    return values.size ();
   }
 
   @Override

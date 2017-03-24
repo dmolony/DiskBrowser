@@ -21,15 +21,13 @@ public class ConditionListFunction extends Function
   @Override
   public String toString ()
   {
-    String line = "+-------------------------------------------------------------+";
     StringBuilder text = new StringBuilder ();
-    text.append (line + "\n");
-    text.append (String.format ("| %-10.10s: CFN : %-34.34s%-8.8s|%n",
-        cell.getAddressText (), getFullText (), valueType));
+    text.append (String.format ("%s%n", LINE));
+    text.append (
+        String.format (FMT4, "CFN", getFullText (), valueType, getValueText (this)));
     for (Value value : conditions)
-      text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Value",
-          value.getFullText (), value.getValueType ()));
-    text.append (line);
+      text.append (String.format (FMT4, value.getType (), value.getFullText (),
+          value.getValueType (), getValueText (value)));
     return text.toString ();
   }
 }

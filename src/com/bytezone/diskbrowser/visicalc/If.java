@@ -78,18 +78,17 @@ class If extends Function
   @Override
   public String toString ()
   {
-    String line = "+-------------------------------------------------------------+";
     StringBuilder text = new StringBuilder ();
-    text.append (line + "\n");
-    text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", cell.getAddressText (),
-        fullText, valueType));
-    text.append (String.format ("| condition : %-40.40s%-8.8s|%n", conditionText,
-        condition.getValueType ()));
-    text.append (String.format ("| true      : %-40.40s%-8.8s|%n", textTrue,
-        expTrue.getValueType ()));
-    text.append (String.format ("| false     : %-40.40s%-8.8s|%n", textFalse,
-        expFalse.getValueType ()));
-    text.append (line);
+    text.append (String.format ("%s%n", LINE));
+    text.append (String.format (FMT4, "IF", fullText, valueType, getValueText (this)));
+    text.append (String.format (FMT4, "condition", conditionText,
+        condition.getValueType (), getValueText (condition)));
+    if (condition.getBoolean ())
+      text.append (String.format (FMT4, "true", textTrue, expTrue.getValueType (),
+          getValueText (expTrue)));
+    else
+      text.append (String.format (FMT4, "false", textFalse, expFalse.getValueType (),
+          getValueText (expFalse)));
     return text.toString ();
   }
 }

@@ -473,16 +473,14 @@ public class Sheet
               + " ***\n\n");
           last = cell.getAddress ().getColumn ();
         }
-        //        text.append (cell.getDebugText ());
-        //        text.append (cell);
-        //        text.append ("\n");
-        if (cell.isCellType (CellType.VALUE))
-        {
-          text.append (cell.getValue ());
-          text.append ("\n");
-        }
 
-        text.append ("\n");
+        //        text.append (AbstractValue.LINE + "\n");
+        text.append (cell);
+        if (cell.isCellType (CellType.VALUE))
+          text.append (cell.getValue ());
+        text.append (AbstractValue.LINE);
+
+        text.append ("\n\n");
       }
 
       text.append ("\n");

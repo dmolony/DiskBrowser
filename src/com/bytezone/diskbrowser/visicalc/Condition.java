@@ -161,20 +161,19 @@ class Condition extends AbstractValue implements Iterable<Value>
   @Override
   public String toString ()
   {
-    String line = "+-------------------------------------------------------------+";
     StringBuilder text = new StringBuilder ();
-    text.append (line + "\n");
-    text.append (String.format ("| %-10.10s: CND : %-34.34s%-8.8s|%n",
-        cell.getAddressText (), getFullText (), valueType));
-    text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Condition",
-        conditionText, conditionExpression.getValueType ()));
+    text.append (LINE + "\n");
+    text.append (String.format (FMT4, "Predicate", getFullText (), valueType,
+        getValueText (this)));
+    text.append (String.format (FMT4, "Left", conditionText,
+        conditionExpression.getValueType (), getValueText (conditionExpression)));
     if (comparator != null)
     {
-      text.append (String.format ("| %-10.10s: %-60.60s|%n", "Comparatr", comparator));
-      text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Value", valueText,
-          valueExpression.getValueType ()));
+      text.append (String.format (FMT2, "Comparatr", comparator));
+      text.append (String.format (FMT4, "Right", valueText,
+          valueExpression.getValueType (), getValueText (valueExpression)));
     }
-    text.append (line);
+    //    text.append (LINE);
     return text.toString ();
   }
 }

@@ -6,8 +6,16 @@ import java.util.List;
 
 public abstract class AbstractValue implements Value, Iterable<Value>
 {
+  protected static final String FMT4 = "| %-9.9s : %-50.50s%-8.8s %-10.10s|%n";
+  protected static final String FMT2 = "| %-9.9s : %-69.69s|%n";
+  protected static final String FMT5 = "| %-9.9s : %-3.3s : %-44.44s%-8.8s %-10.10s|%n";
+  protected static final String LINE =
+      "+----------------------------------------------------------"
+          + "------------------------+";
+
   protected final Cell cell;
   protected final String fullText;
+
   protected double value;
   protected boolean bool;
   protected ValueType valueType = ValueType.NUMBER;         // could be BOOLEAN
@@ -43,12 +51,6 @@ public abstract class AbstractValue implements Value, Iterable<Value>
   {
     return valueResult == ValueResult.VALID;
   }
-
-  //  @Override
-  //  public boolean isValueType (ValueType type)
-  //  {
-  //    return valueType == type;
-  //  }
 
   @Override
   public double getDouble ()
@@ -92,64 +94,15 @@ public abstract class AbstractValue implements Value, Iterable<Value>
     //    System.out.println ("calculate not overridden: " + cell);
   }
 
+  protected String getValueText (Value value)
+  {
+    return "" + (value.getValueType () == ValueType.NUMBER ? value.getDouble ()
+        : value.getBoolean ());
+  }
+
   @Override
   public Iterator<Value> iterator ()
   {
     return values.iterator ();
   }
-
-  // for debugging
-  //  String getValueText (int depth)
-  //  {
-  //    StringBuilder text = new StringBuilder ();
-  //
-  //    String typeText = "  " + getTypeText ();
-  //    if (getValueType () == ValueType.NUMBER)
-  //    {
-  //      String valueText = String.format ("%f", getDouble ());
-  //      text.append (String.format ("| %-10s : %-69s |%n", typeText, valueText));
-  //    }
-  //    else if (getValueType () == ValueType.BOOLEAN)
-  //    {
-  //      String valueText = String.format ("%s", getBoolean ());
-  //      text.append (String.format ("| %-10s : %-69s |%n", typeText, valueText));
-  //    }
-  //    else
-  //      text.append (String.format ("| %-10s : %-69s |%n", typeText, getValueType ()));
-  //
-  //    if (this instanceof Expression)
-  //    {
-  //      text.append (
-  //          String.format ("| Expression : %-69s |%n", ((Expression) this).fullText ()));
-  //      for (Value v : (Expression) this)
-  //      {
-  //        if (v instanceof Cell)
-  //        {
-  //          Cell c = (Cell) v;
-  //          ValueType vt = c.getValueType ();
-  //          String tx = vt == ValueType.NUMBER ? c.getDouble () + "" : c.getBoolean () + "";
-  //          text.append (
-  //              String.format ("|   Cell %-3s : %-69s |%n", c.getAddressText (), tx));
-  //        }
-  //        else
-  //          text.append (((AbstractValue) v).getValueText (depth + 1));
-  //      }
-  //    }
-  //    else if (this instanceof Function)
-  //    {
-  //      text.append (
-  //          String.format ("| Function   : %-69s |%n", ((Function) this).fullText));
-  //      for (Value v : (Function) this)
-  //        text.append (((AbstractValue) v).getValueText (depth + 1));
-  //    }
-  //    else if (this instanceof Condition)
-  //    {
-  //      text.append (
-  //          String.format ("| Condition  : %-69s |%n", ((Condition) this).getFullText ()));
-  //      for (Value v : (Condition) this)
-  //        text.append (((AbstractValue) v).getValueText (depth + 1));
-  //    }
-  //
-  //    return text.toString ();
-  //  }
 }

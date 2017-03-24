@@ -34,13 +34,10 @@ class Number extends AbstractValue
   @Override
   public String toString ()
   {
-    //    return String.format ("Number: %f", value);
-    String line = "+-------------------------------------------------------------+";
     StringBuilder text = new StringBuilder ();
-    text.append (line + "\n");
-    text.append (String.format ("| %-10.10s: NUM : %-34.34s%-8.8s|%n",
-        cell.getAddressText (), getFullText (), valueType));
-    text.append (line);
+    text.append (String.format ("%s%n", LINE));
+    text.append (String.format (FMT5, cell.getAddressText (), "NUM", getFullText (),
+        valueType, getValueText (this)));
     return text.toString ();
   }
 }

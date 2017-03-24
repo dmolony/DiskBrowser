@@ -355,25 +355,22 @@ class Expression extends AbstractValue //implements Iterable<Value>
   @Override
   public String toString ()
   {
-    String line = "+-------------------------------------------------------------+";
     StringBuilder text = new StringBuilder ();
-    text.append (line + "\n");
-    text.append (String.format ("| %-10.10s: EXP : %-34.34s%-8.8s|%n",
-        cell.getAddressText (), getFullText (), valueType));
+    text.append (String.format ("%s%n", LINE));
+    text.append (
+        String.format (FMT4, "Exprss", getFullText (), valueType, getValueText (this)));
     int index = 0;
     for (Value value : values)
     {
       String sign = signs.get (index);
       if (!"(+)".equals (sign))
-        text.append (String.format ("| %-10.10s: %-40.40s|%n", "sign", sign));
-      text.append (String.format ("| %-10.10s: %-40.40s%-8.8s|%n", "Value",
-          value.getFullText (), value.getValueType ()));
+        text.append (String.format (FMT2, "sign", sign));
+      text.append (String.format (FMT4, value.getType (), value.getFullText (),
+          value.getValueType (), getValueText (value)));
       if (index < operators.size ())
-        text.append (
-            String.format ("| %-10.10s: %-48.48s|%n", "operator", operators.get (index)));
+        text.append (String.format (FMT2, "operator", operators.get (index)));
       ++index;
     }
-    text.append (line);
     return text.toString ();
   }
 }

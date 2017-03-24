@@ -287,9 +287,9 @@ class Cell implements Value, Comparable<Cell>
     switch (cellType)
     {
       case LABEL:
-        return label;
+        return "LBL : " + label;
       case REPEATING_CHARACTER:
-        return repeatingText;
+        return "RPT : " + repeatingText;
       case EMPTY:
         return "Empty Cell";
       case VALUE:
@@ -302,7 +302,7 @@ class Cell implements Value, Comparable<Cell>
   @Override
   public String getType ()
   {
-    return "Cell";
+    return "Cell " + getAddressText ();
   }
 
   @Override
@@ -320,77 +320,31 @@ class Cell implements Value, Comparable<Cell>
     return value;
   }
 
-  //  public String getDebugText ()
-  //  {
-  //    StringBuilder text = new StringBuilder ();
-  //    text.append (line);
-  //    text.append ("\n");
-  //    text.append (String.format ("| %-11s         %s            Format: %s  |%n",
-  //        address.getText (), address.getDetails (), cellFormat));
-  //    text.append (line);
-  //    text.append ("\n");
-  //
-  //    switch (cellType)
-  //    {
-  //      case LABEL:
-  //        text.append (String.format ("| LABEL      : %-69s |%n", label));
-  //        break;
-  //
-  //      case REPEATING_CHARACTER:
-  //        text.append (String.format ("| REPEAT     : %-69s |%n", repeatingText));
-  //        break;
-  //
-  //      case EMPTY:
-  //        text.append (String.format ("| EMPTY      : %-69s |%n", ""));
-  //        break;
-  //
-  //      case VALUE:
-  //        text.append (String.format ("| VALUE      : %-69s |%n", expressionText));
-  //        if (value == null)
-  //          text.append (String.format ("| Value      : %-69s |%n", "null"));
-  //        else
-  //          text.append (((AbstractValue) value).getValueText (0));
-  //        break;
-  //
-  //      default:
-  //        text.append ("Unknown CellType: " + cellType + "\n");
-  //    }
-  //
-  //    text.append (line);
-  //    return text.toString ();
-  //  }
-
   @Override
   public String toString ()
   {
     String contents = "";
+    String valueText = "";
 
     switch (cellType)
     {
       case LABEL:
-        contents = "Labl: " + label;
+        contents = label;
         break;
       case REPEATING_CHARACTER:
-        contents = "Rept: " + repeatingText;
+        contents = repeatingText;
         break;
       case EMPTY:
-        contents = "Empty";
+        contents = "";
         break;
       case VALUE:
-        switch (value.getValueType ())
-        {
-          case NUMBER:
-            contents = "Num : " + fullText;
-            break;
-          case BOOLEAN:
-            contents = "Bool: " + fullText;
-            break;
-        }
-        //        contents = "Exp : " + expressionText;
+        contents = fullText;
+        valueText = ": " + value.getValueType ();
         break;
     }
 
-    return String.format ("Cell:%5s %s", address.getText (), contents);
+    return String.format ("%s%n| %-9.9s : %-49.49s %-18.18s |%n", AbstractValue.LINE,
+        address.getText (), contents, cellType + valueText);
   }
 
   @Override

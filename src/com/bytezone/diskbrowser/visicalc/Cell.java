@@ -33,66 +33,8 @@ class Cell implements Value, Comparable<Cell>
     cellType = CellType.EMPTY;
   }
 
-  void reset ()
-  {
-    calculated = false;
-  }
-
-  Cell getCell (Address address)
-  {
-    return parent.getCell (address);
-  }
-
-  Cell getCell (String addressText)
-  {
-    return parent.getCell (addressText);
-  }
-
-  boolean cellExists (Address address)
-  {
-    return parent.cellExists (address);
-  }
-
-  Function getFunction (String text)
-  {
-    return parent.getFunction (this, text);
-  }
-
-  Value getExpressionValue (String text)
-  {
-    return new Expression (this, text).reduce ();
-  }
-
-  boolean isCellType (CellType cellType)
-  {
-    return this.cellType == cellType;
-  }
-
-  Sheet getParent ()
-  {
-    return parent;
-  }
-
-  Address getAddress ()
-  {
-    return address;
-  }
-
-  String getAddressText ()
-  {
-    return address.getText ();
-  }
-
   void setFormat (String formatText)
   {
-    //  /FG - general
-    //  /FD - default
-    //  /FI - integer
-    //  /F$ - two decimal places
-    //  /FL - left justified
-    //  /FR - right justified
-    //  /F* - graph (histogram)
-
     if (formatText.startsWith ("/T"))             // lock titles
       return;
 
@@ -141,51 +83,24 @@ class Cell implements Value, Comparable<Cell>
       setTestData (0);
   }
 
-  private void setTestData (int choice)
+  void reset ()
   {
-    // FUTURE.VC
-    if (choice == 1)
-    {
-      System.out.println ("****** Hardcoded values ******");
-      if (address.getRowKey () == 67)
-        fullText = "1000";
-      else if (address.getRowKey () == 131)
-        fullText = "10.5";
-      else if (address.getRowKey () == 195)
-        fullText = "12";
-      else if (address.getRowKey () == 259)
-        fullText = "8";
-    }
+    calculated = false;
+  }
 
-    // IRA.VC
-    if (choice == 2)
-    {
-      System.out.println ("****** Hardcoded values ******");
-      if (address.getRowKey () == 66)
-        fullText = "10";
-      else if (address.getRowKey () == 130)
-        fullText = "30";
-      else if (address.getRowKey () == 194)
-        fullText = "65";
-      else if (address.getRowKey () == 258)
-        fullText = "1000";
-      else if (address.getRowKey () == 386)
-        fullText = "15";
-    }
+  Value getExpressionValue (String text)
+  {
+    return new Expression (this, text).reduce ();
+  }
 
-    // CARLOAN.VC
-    if (choice == 3)
-    {
-      System.out.println ("****** Hardcoded values ******");
-      if (address.getRowKey () == 67)
-        fullText = "9375";
-      else if (address.getRowKey () == 131)
-        fullText = "4500";
-      else if (address.getRowKey () == 195)
-        fullText = "24";
-      else if (address.getRowKey () == 259)
-        fullText = "11.9";
-    }
+  boolean isCellType (CellType cellType)
+  {
+    return this.cellType == cellType;
+  }
+
+  Address getAddress ()
+  {
+    return address;
   }
 
   // format cell value for output
@@ -243,6 +158,34 @@ class Cell implements Value, Comparable<Cell>
     }
   }
 
+  // --------------------------------------------------------------------------------//
+  //                              Sheet convenience methods
+  // --------------------------------------------------------------------------------//
+
+  Cell getCell (Address address)
+  {
+    return parent.getCell (address);
+  }
+
+  Cell getCell (String addressText)
+  {
+    return parent.getCell (addressText);
+  }
+
+  boolean cellExists (Address address)
+  {
+    return parent.cellExists (address);
+  }
+
+  Function getFunction (String text)
+  {
+    return parent.getFunction (this, text);
+  }
+
+  // --------------------------------------------------------------------------------//
+  //                              Value interface methods
+  // --------------------------------------------------------------------------------//
+
   @Override
   public void calculate ()
   {
@@ -260,15 +203,15 @@ class Cell implements Value, Comparable<Cell>
   }
 
   @Override
-  public ValueResult getValueResult ()
-  {
-    return cellType == CellType.VALUE ? value.getValueResult () : ValueResult.VALID;
-  }
-
-  @Override
   public ValueType getValueType ()
   {
     return cellType == CellType.VALUE ? value.getValueType () : ValueType.NUMBER;
+  }
+
+  @Override
+  public ValueResult getValueResult ()
+  {
+    return cellType == CellType.VALUE ? value.getValueResult () : ValueResult.VALID;
   }
 
   @Override
@@ -284,15 +227,9 @@ class Cell implements Value, Comparable<Cell>
   }
 
   @Override
-  public int size ()
+  public String getText ()
   {
-    return cellType == CellType.VALUE ? value.size () : 0;
-  }
-
-  @Override
-  public Iterator<Value> iterator ()
-  {
-    return cellType == CellType.VALUE ? value.iterator () : null;
+    return cellType == CellType.VALUE ? value.getText () : "???";
   }
 
   @Override
@@ -316,22 +253,76 @@ class Cell implements Value, Comparable<Cell>
   @Override
   public String getType ()
   {
-    return "Cell " + getAddressText ();
+    return "Cell " + address.getText ();
   }
 
   @Override
-  public String getText ()
+  public int size ()
   {
-    // cell points to another cell which is ERROR or NA
-    assert cellType == CellType.VALUE;
-    //    assert !value.isValid ();
-
-    return value.getText ();
+    return cellType == CellType.VALUE ? value.size () : 0;
   }
 
-  Value getValue ()
+  @Override
+  public Iterator<Value> iterator ()
   {
-    return value;
+    return cellType == CellType.VALUE ? value.iterator () : null;
+  }
+
+  // --------------------------------------------------------------------------------//
+  //                          end of Value interface methods
+  // --------------------------------------------------------------------------------//
+
+  private void setTestData (int choice)
+  {
+    // FUTURE.VC
+    if (choice == 1)
+    {
+      System.out.println ("****** Hardcoded values ******");
+      if (address.getRowKey () == 67)
+        fullText = "1000";
+      else if (address.getRowKey () == 131)
+        fullText = "10.5";
+      else if (address.getRowKey () == 195)
+        fullText = "12";
+      else if (address.getRowKey () == 259)
+        fullText = "8";
+    }
+
+    // IRA.VC
+    if (choice == 2)
+    {
+      System.out.println ("****** Hardcoded values ******");
+      if (address.getRowKey () == 66)
+        fullText = "10";
+      else if (address.getRowKey () == 130)
+        fullText = "30";
+      else if (address.getRowKey () == 194)
+        fullText = "65";
+      else if (address.getRowKey () == 258)
+        fullText = "1000";
+      else if (address.getRowKey () == 386)
+        fullText = "15";
+    }
+
+    // CARLOAN.VC
+    if (choice == 3)
+    {
+      System.out.println ("****** Hardcoded values ******");
+      if (address.getRowKey () == 67)
+        fullText = "9375";
+      else if (address.getRowKey () == 131)
+        fullText = "4500";
+      else if (address.getRowKey () == 195)
+        fullText = "24";
+      else if (address.getRowKey () == 259)
+        fullText = "11.9";
+    }
+  }
+
+  @Override
+  public int compareTo (Cell o)
+  {
+    return address.compareTo (o.address);
   }
 
   @Override
@@ -341,6 +332,7 @@ class Cell implements Value, Comparable<Cell>
     String contents2 = "";
     String valueText = "";
     String line2 = "";
+    String rest = "";
 
     switch (cellType)
     {
@@ -356,22 +348,18 @@ class Cell implements Value, Comparable<Cell>
       case VALUE:
         contents = fullText;
         valueText = ": " + value.getValueType ();
+        rest = value.toString ();
         break;
     }
 
-    if (contents.length () > 49)
+    if (contents.length () > 50)
     {
-      contents2 = contents.substring (49);
-      contents = contents.substring (0, 49);
-      line2 = String.format ("|             %-69.69s|%n", contents2);
+      contents2 = contents.substring (50);
+      contents = contents.substring (0, 50);
+      line2 = String.format ("|             %-70.70s|%n", contents2);
     }
-    return String.format ("%s%n| %-9.9s : %-49.49s %-18.18s |%n%s", AbstractValue.LINE,
-        address.getText (), contents, cellType + valueText, line2);
-  }
 
-  @Override
-  public int compareTo (Cell o)
-  {
-    return address.compareTo (o.address);
+    return String.format ("%s%n| %-9.9s : %-50.50s %-18.18s |%n%s%s", AbstractValue.LINE,
+        address.getText (), contents, cellType + valueText, line2, rest);
   }
 }

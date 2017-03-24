@@ -6,19 +6,19 @@ import java.util.List;
 
 public abstract class AbstractValue implements Value//, Iterable<Value>
 {
-  protected static final String FMT4 = "| %-9.9s : %-49.49s %-8.8s %-10.10s|%n";
-  protected static final String FMT2 = "| %-9.9s : %-69.69s|%n";
-  protected static final String FMT5 = "| %-9.9s : %-3.3s : %-44.44s%-8.8s %-10.10s|%n";
-  protected static final String LINE =
-      "+----------------------------------------------------------"
-          + "------------------------+";
+  protected static final String FMT2 = "| %-9.9s : %-70.70s|%n";
+  protected static final String FMT4 = "| %-9.9s : %-50.50s %-8.8s %-10.10s|%n";
+  protected static final String FMT5 = "| %-9.9s : %-3.3s : %-45.45s%-8.8s %-10.10s|%n";
+  protected static final String LINE = "+--------------------------------------------"
+      + "---------------------------------------+";
 
   protected final Cell cell;
   protected final String fullText;
 
+  protected ValueType valueType = ValueType.NUMBER;         // could be BOOLEAN
   protected double value;
   protected boolean bool;
-  protected ValueType valueType = ValueType.NUMBER;         // could be BOOLEAN
+
   protected ValueResult valueResult = ValueResult.VALID;
   protected List<Value> values = new ArrayList<Value> ();
 

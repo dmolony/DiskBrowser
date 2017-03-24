@@ -160,7 +160,7 @@ public class Sheet
       assert !line.isEmpty ();
       lines.add (line);
 
-      System.out.println (line);
+      //      System.out.println (line);
 
       if (line.startsWith ("/"))
         doFormat (line);
@@ -474,16 +474,13 @@ public class Sheet
           last = cell.getAddress ().getColumn ();
         }
 
-        //        text.append (AbstractValue.LINE + "\n");
         text.append (cell);
-        if (cell.isCellType (CellType.VALUE))
-          text.append (cell.getValue ());
         text.append (AbstractValue.LINE);
 
         text.append ("\n\n");
       }
 
-      text.append ("\n");
+      text.append ("File contents:\n\n");
       for (String line : lines)
       {
         text.append (line);

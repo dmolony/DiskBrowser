@@ -22,9 +22,9 @@ interface Value extends Iterable<Value>
 
   public double getDouble ();                 // if ValueType == NUMBER
 
-  public String getText ();                   // if ValueType == ERROR / NA / BOOLEAN
-
   public boolean getBoolean ();               // if ValueType == BOOLEAN
+
+  public String getText ();                   // if ValueType == ERROR / NA / BOOLEAN
 
   public String getFullText ();               // original text
 

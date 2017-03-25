@@ -55,12 +55,8 @@ class Lookup extends ValueListFunction
     Address adjacentAddress = isVertical ? target.nextColumn () : target.nextRow ();
 
     if (cell.cellExists (adjacentAddress))
-    {
       value = cell.getCell (adjacentAddress).getDouble ();
-    }
     else
-    {
       value = 0;
-    }
   }
 }

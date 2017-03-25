@@ -4,13 +4,14 @@ public abstract class ValueFunction extends Function
 {
   protected Value source;
 
+  abstract double calculateValue ();
+
   ValueFunction (Cell cell, String text)
   {
     super (cell, text);
 
     source = cell.getExpressionValue (functionText);
     values.add (source);
-    // is valueType NUMBER?
   }
 
   @Override
@@ -31,8 +32,6 @@ public abstract class ValueFunction extends Function
     if (Double.isNaN (value))
       valueResult = ValueResult.ERROR;
   }
-
-  abstract double calculateValue ();
 
   @Override
   public String getType ()

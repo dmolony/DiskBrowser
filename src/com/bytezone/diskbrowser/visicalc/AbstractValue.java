@@ -55,12 +55,14 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
   @Override
   public double getDouble ()
   {
+    assert valueType == ValueType.NUMBER;
     return value;
   }
 
   @Override
   public boolean getBoolean ()
   {
+    assert valueType == ValueType.BOOLEAN;
     return bool;
   }
 
@@ -98,6 +100,14 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
   public void calculate ()
   {
     //    System.out.println ("calculate not overridden: " + cell);
+  }
+
+  protected void attach (StringBuilder text, String title, String textValue, Value value)
+  {
+    text.append (String.format (FMT4, title, textValue, value.getValueType (),
+        getValueText (value)));
+    for (Value v : value)
+      text.append (v);
   }
 
   protected String getValueText (Value value)

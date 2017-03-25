@@ -386,38 +386,41 @@ public class Sheet
       }
     }
 
-    List<String> counts = new ArrayList<String> ();
-    for (int i = 0; i < functionTotals.length; i++)
-      if (functionTotals[i] > 0)
-      {
-        String name = Function.functionList[i];
-        if (name.endsWith ("("))
-          name = name.substring (0, name.length () - 1);
-        counts.add (String.format ("%-10s%d", name, functionTotals[i]));
-      }
+    if (debug)
+    {
+      List<String> counts = new ArrayList<String> ();
+      for (int i = 0; i < functionTotals.length; i++)
+        if (functionTotals[i] > 0)
+        {
+          String name = Function.functionList[i];
+          if (name.endsWith ("("))
+            name = name.substring (0, name.length () - 1);
+          counts.add (String.format ("%-10s%d", name, functionTotals[i]));
+        }
 
-    while (counts.size () < 18)
-      counts.add ("");
+      while (counts.size () < 18)
+        counts.add ("");
 
-    text.append (String.format ("+%-83.83s+%n", underline));
-    text.append (String.format ("|  Global format : %-18s %-14s %-14s %-14s  |%n",
-        globalFormat, counts.get (0), counts.get (6), counts.get (12)));
-    text.append (String.format ("|  Column width  : %-2d %-15s %-14s %-14s %-14s  |%n",
-        columnWidth, "", counts.get (1), counts.get (7), counts.get (13)));
-    text.append (String.format ("|  Recalc  order : %-18s %-14s %-14s %-14s  |%n",
-        recalculationOrder == 'R' ? "Row" : "Column", counts.get (2), counts.get (8),
-        counts.get (14)));
-    text.append (String.format ("|  Recalculation : %-18s %-14s %-14s %-14s  |%n",
-        recalculation == 'A' ? "Automatic" : "Manual", counts.get (3), counts.get (9),
-        counts.get (15)));
-    text.append (String.format ("|  Cells         : %-5d  %-11s %-14s %-14s %-14s  |%n",
-        size (), "", counts.get (4), counts.get (10), counts.get (16)));
+      text.append (String.format ("+%-83.83s+%n", underline));
+      text.append (String.format ("|  Global format : %-18s %-14s %-14s %-14s  |%n",
+          globalFormat, counts.get (0), counts.get (6), counts.get (12)));
+      text.append (String.format ("|  Column width  : %-2d %-15s %-14s %-14s %-14s  |%n",
+          columnWidth, "", counts.get (1), counts.get (7), counts.get (13)));
+      text.append (String.format ("|  Recalc  order : %-18s %-14s %-14s %-14s  |%n",
+          recalculationOrder == 'R' ? "Row" : "Column", counts.get (2), counts.get (8),
+          counts.get (14)));
+      text.append (String.format ("|  Recalculation : %-18s %-14s %-14s %-14s  |%n",
+          recalculation == 'A' ? "Automatic" : "Manual", counts.get (3), counts.get (9),
+          counts.get (15)));
+      text.append (String.format ("|  Cells         : %-5d  %-11s %-14s %-14s %-14s  |%n",
+          size (), "", counts.get (4), counts.get (10), counts.get (16)));
 
-    String rangeText = size () > 0 ? Address.getCellName (minRow + 1, minColumn) + ":"
-        + Address.getCellName (maxRow + 1, maxColumn) : "";
-    text.append (String.format ("|  Range         : %-18s %-14s %-14s %-14s  |%n",
-        rangeText, counts.get (5), counts.get (11), counts.get (17)));
-    text.append (String.format ("+%-83.83s+%n", underline));
+      String rangeText = size () > 0 ? Address.getCellName (minRow + 1, minColumn) + ":"
+          + Address.getCellName (maxRow + 1, maxColumn) : "";
+      text.append (String.format ("|  Range         : %-18s %-14s %-14s %-14s  |%n",
+          rangeText, counts.get (5), counts.get (11), counts.get (17)));
+      text.append (String.format ("+%-83.83s+%n", underline));
+    }
 
     if (debug)
     {

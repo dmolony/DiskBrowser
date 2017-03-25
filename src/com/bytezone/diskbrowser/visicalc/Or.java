@@ -14,6 +14,13 @@ class Or extends ConditionListFunction
     for (Value condition : conditions)
     {
       condition.calculate ();
+
+      if (condition.getValueType () != ValueType.BOOLEAN)
+      {
+        valueResult = ValueResult.ERROR;
+        return;
+      }
+
       if (condition.getBoolean ())
       {
         bool = true;

@@ -20,12 +20,6 @@ class Number extends AbstractValue
   }
 
   @Override
-  public String getText ()
-  {
-    return value + "";
-  }
-
-  @Override
   public String getType ()
   {
     return "Constant";
@@ -36,8 +30,7 @@ class Number extends AbstractValue
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));
-    text.append (
-        String.format (FMT4, "Constant", getFullText (), valueType, getValueText (this)));
+    attach (text, getType (), getFullText (), this);
     return text.toString ();
   }
 }

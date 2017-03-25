@@ -125,8 +125,10 @@ class Expression extends AbstractValue
       Value thisValue = values.get (0);
       thisValue.calculate ();
 
-      value = thisValue.getDouble ();
-      bool = thisValue.getBoolean ();
+      if (valueType == ValueType.NUMBER)
+        value = thisValue.getDouble ();
+      else
+        bool = thisValue.getBoolean ();
 
       if (!thisValue.isValid ())            // ERROR / NA
       {

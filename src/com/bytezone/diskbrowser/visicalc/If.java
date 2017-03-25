@@ -55,8 +55,10 @@ class If extends Function
 
       if (!expTrue.isValid ())
         valueResult = expTrue.getValueResult ();
-      else
+      else if (valueType == ValueType.NUMBER)
         value = expTrue.getDouble ();
+      else
+        bool = expTrue.getBoolean ();
     }
     else                                // false
     {
@@ -64,8 +66,10 @@ class If extends Function
 
       if (!expFalse.isValid ())
         valueResult = expTrue.getValueResult ();
-      else
+      else if (valueType == ValueType.NUMBER)
         value = expFalse.getDouble ();
+      else
+        bool = expFalse.getBoolean ();
     }
   }
 
@@ -80,22 +84,13 @@ class If extends Function
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));
-    text.append (
-        String.format (FMT4, getType (), fullText, valueType, getValueText (this)));
-    text.append (String.format (FMT4, "condition", conditionText,
-        condition.getValueType (), getValueText (condition)));
+    text.append (String.format (FMT4, getType (), getFullText (), getValueType (),
+        getValueText (this)));
+    attach (text, "condition", conditionText, condition);
     if (condition.getBoolean ())
-      attach (text, "true", expTrue, textTrue);
+      attach (text, "true", textTrue, expTrue);
     else
-      attach (text, "false", expFalse, textFalse);
+      attach (text, "false", textFalse, expFalse);
     return text.toString ();
-  }
-
-  private void attach (StringBuilder text, String title, Value exp, String s)
-  {
-    text.append (String.format (FMT4, title, s, exp.getValueType (), getValueText (exp)));
-    if (exp.size () > 1)
-      for (Value value : exp)
-        text.append (value);
   }
 }

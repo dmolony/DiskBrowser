@@ -14,12 +14,6 @@ public class BooleanFunction extends Function
   }
 
   @Override
-  public boolean getBoolean ()
-  {
-    return bool;
-  }
-
-  @Override
   public String getType ()
   {
     return "BooleanFunction";

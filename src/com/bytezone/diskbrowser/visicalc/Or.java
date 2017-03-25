@@ -11,6 +11,8 @@ class Or extends ConditionListFunction
   @Override
   public void calculate ()
   {
+    valueResult = ValueResult.VALID;
+
     for (Value condition : conditions)
     {
       condition.calculate ();
@@ -27,6 +29,7 @@ class Or extends ConditionListFunction
         return;
       }
     }
+
     bool = false;
   }
 }

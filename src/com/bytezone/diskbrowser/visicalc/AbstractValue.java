@@ -8,7 +8,7 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
 {
   protected static final String FMT2 = "| %-9.9s : %-70.70s|%n";
   protected static final String FMT4 = "| %-9.9s : %-50.50s %-8.8s %-10.10s|%n";
-  protected static final String FMT5 = "| %-9.9s : %-3.3s : %-45.45s%-8.8s %-10.10s|%n";
+  protected static final String FMT5 = "| %-9.9s : %-39.39s %-10.10s %-8.8s %-10.10s|%n";
   protected static final String LINE = "+--------------------------------------------"
       + "---------------------------------------+";
 
@@ -75,25 +75,7 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
   @Override
   public String getText ()
   {
-    switch (valueResult)
-    {
-      case NA:
-        return "NA";
-      case ERROR:
-        return "ERROR";
-      case VALID:
-        switch (valueType)
-        {
-          case BOOLEAN:
-            return bool ? "TRUE" : "FALSE";
-          case NUMBER:
-            return value + "";
-          default:
-            return "impossible";
-        }
-      default:
-        return "impossible";
-    }
+    return valueResult == ValueResult.VALID ? getValueText (this) : valueResult + "";
   }
 
   @Override
@@ -112,8 +94,8 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
 
   protected String getValueText (Value value)
   {
-    return "" + (value.getValueType () == ValueType.NUMBER ? value.getDouble ()
-        : value.getBoolean ());
+    return value.getValueType () == ValueType.NUMBER ? value.getDouble () + ""
+        : value.getBoolean () ? "TRUE" : "FALSE";
   }
 
   @Override

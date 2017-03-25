@@ -11,6 +11,8 @@ class And extends ConditionListFunction
   @Override
   public void calculate ()
   {
+    valueResult = ValueResult.VALID;
+
     for (Value condition : conditions)
     {
       condition.calculate ();
@@ -27,6 +29,7 @@ class And extends ConditionListFunction
         return;
       }
     }
+
     bool = true;
   }
 }

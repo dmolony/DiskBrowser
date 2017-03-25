@@ -5,8 +5,8 @@ abstract class Function extends AbstractValue
   static final String[] functionList =
       { "@ABS(", "@ACOS(", "@AND(", "@ASIN(", "@ATAN(", "@AVERAGE(", "@COUNT(",
         "@CHOOSE(", "@COS(", "@ERROR", "@EXP(", "@FALSE", "@IF(", "@INT(", "@ISERROR(",
-        "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NPV(", "@OR(",
-        "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
+        "@ISNA(", "@LOG10(", "@LOOKUP(", "@LN(", "@MIN(", "@MAX(", "@NA", "@NOT(",
+        "@NPV(", "@OR(", "@PI", "@SIN(", "@SUM(", "@SQRT(", "@TAN(", "@TRUE" };
 
   protected final String functionName;
   protected final String functionText;

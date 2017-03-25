@@ -331,8 +331,8 @@ class Expression extends AbstractValue
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));
-    text.append (
-        String.format (FMT4, "Exprss", getFullText (), valueType, getValueText (this)));
+    text.append (String.format (FMT4, "Exprssion", getFullText (), valueType,
+        getValueText (this)));
     int index = 0;
     for (Value value : values)
     {

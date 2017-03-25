@@ -16,9 +16,9 @@ class Cell implements Value, Comparable<Cell>
   private boolean calculated;
 
   private CellType cellType;
-  private String repeatingText;       // REPEATING_CHARACTER
-  private String label;               // LABEL
-  private Value value;                // VALUE
+  private String repeatingText;       // CellType.FILLER
+  private String label;               // CellType.LABEL
+  private Value value;                // CellType.VALUE
 
   enum CellType
   {
@@ -46,28 +46,31 @@ class Cell implements Value, Comparable<Cell>
 
     if (formatText.startsWith ("/-"))
     {
+      assert cellType == CellType.EMPTY;
       repeatingText = formatText.substring (2);
+
       for (int i = 0; i < 20; i++)
         repeat += repeatingText;
       cellType = CellType.FILLER;
+
       return;
     }
 
     System.out.printf ("Unexpected format [%s]%n", formatText);
   }
 
-  void setValue (String command)
+  void setValue (String valueText)
   {
     assert cellType == CellType.EMPTY;
 
-    if (!command.isEmpty () && command.charAt (0) == '"')
+    if (!valueText.isEmpty () && valueText.charAt (0) == '"')
     {
-      label = command.substring (1);
+      label = valueText.substring (1);
       cellType = CellType.LABEL;
     }
     else
     {
-      fullText = command;
+      fullText = valueText;
       cellType = CellType.VALUE;
       try
       {
@@ -330,6 +333,7 @@ class Cell implements Value, Comparable<Cell>
   {
     String contents = "";
     String contents2 = "";
+    String valueTypeText = "";
     String valueText = "";
     String line2 = "";
     String rest = "";
@@ -347,19 +351,21 @@ class Cell implements Value, Comparable<Cell>
         break;
       case VALUE:
         contents = fullText;
-        valueText = ": " + value.getValueType ();
+        valueTypeText = value.getValueType () + "";
         rest = value.toString ();
+        valueText = value.getText ();
         break;
     }
 
-    if (contents.length () > 50)
+    if (contents.length () > 39)
     {
-      contents2 = contents.substring (50);
-      contents = contents.substring (0, 50);
+      contents2 = contents.substring (39);
+      contents = contents.substring (0, 39);
       line2 = String.format ("|             %-70.70s|%n", contents2);
     }
 
-    return String.format ("%s%n| %-9.9s : %-50.50s %-18.18s |%n%s%s", AbstractValue.LINE,
-        address.getText (), contents, cellType + valueText, line2, rest);
+    String single = String.format (AbstractValue.FMT5, address.getText (), contents,
+        cellType, valueTypeText, valueText);
+    return String.format ("%s%n%s%s%s", AbstractValue.LINE, single, line2, rest);
   }
 }

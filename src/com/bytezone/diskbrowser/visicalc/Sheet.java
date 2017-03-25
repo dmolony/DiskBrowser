@@ -402,22 +402,22 @@ public class Sheet
         counts.add ("");
 
       text.append (String.format ("+%-83.83s+%n", underline));
-      text.append (String.format ("|  Global format : %-18s %-14s %-14s %-14s  |%n",
+      text.append (String.format ("| Global format : %-18s %-14s %-14s %-14s   |%n",
           globalFormat, counts.get (0), counts.get (6), counts.get (12)));
-      text.append (String.format ("|  Column width  : %-2d %-15s %-14s %-14s %-14s  |%n",
+      text.append (String.format ("| Column width  : %-2d %-15s %-14s %-14s %-14s   |%n",
           columnWidth, "", counts.get (1), counts.get (7), counts.get (13)));
-      text.append (String.format ("|  Recalc  order : %-18s %-14s %-14s %-14s  |%n",
+      text.append (String.format ("| Recalc  order : %-18s %-14s %-14s %-14s   |%n",
           recalculationOrder == 'R' ? "Row" : "Column", counts.get (2), counts.get (8),
           counts.get (14)));
-      text.append (String.format ("|  Recalculation : %-18s %-14s %-14s %-14s  |%n",
+      text.append (String.format ("| Recalculation : %-18s %-14s %-14s %-14s   |%n",
           recalculation == 'A' ? "Automatic" : "Manual", counts.get (3), counts.get (9),
           counts.get (15)));
-      text.append (String.format ("|  Cells         : %-5d  %-11s %-14s %-14s %-14s  |%n",
+      text.append (String.format ("| Cells         : %-5d  %-11s %-14s %-14s %-14s   |%n",
           size (), "", counts.get (4), counts.get (10), counts.get (16)));
 
       String rangeText = size () > 0 ? Address.getCellName (minRow + 1, minColumn) + ":"
           + Address.getCellName (maxRow + 1, maxColumn) : "";
-      text.append (String.format ("|  Range         : %-18s %-14s %-14s %-14s  |%n",
+      text.append (String.format ("| Range         : %-18s %-14s %-14s %-14s   |%n",
           rangeText, counts.get (5), counts.get (11), counts.get (17)));
       text.append (String.format ("+%-83.83s+%n", underline));
     }
@@ -583,27 +583,30 @@ public class Sheet
         return new Na (cell, text);
 
       case 22:
-        return new Npv (cell, text);
+        return new Not (cell, text);
 
       case 23:
-        return new Or (cell, text);
+        return new Npv (cell, text);
 
       case 24:
-        return new Pi (cell, text);
+        return new Or (cell, text);
 
       case 25:
-        return new Sin (cell, text);
+        return new Pi (cell, text);
 
       case 26:
-        return new Sum (cell, text);
+        return new Sin (cell, text);
 
       case 27:
-        return new Sqrt (cell, text);
+        return new Sum (cell, text);
 
       case 28:
-        return new Tan (cell, text);
+        return new Sqrt (cell, text);
 
       case 29:
+        return new Tan (cell, text);
+
+      case 30:
         return new True (cell, text);
 
       default:

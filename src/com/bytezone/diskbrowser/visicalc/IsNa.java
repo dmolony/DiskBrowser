@@ -7,7 +7,6 @@ public class IsNa extends BooleanFunction
     super (cell, text);
 
     assert text.startsWith ("@ISNA(") : text;
-    valueType = ValueType.BOOLEAN;
   }
 
   @Override

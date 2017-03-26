@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractValue implements Value//, Iterable<Value>
+public abstract class AbstractValue implements Value
 {
   protected static final String FMT2 = "| %-9.9s : %-70.70s|%n";
   protected static final String FMT4 = "| %-9.9s : %-50.50s %-8.8s %-10.10s|%n";
@@ -15,7 +15,7 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
   protected final Cell cell;
   protected final String fullText;
 
-  protected ValueType valueType = ValueType.NUMBER;         // could be BOOLEAN
+  protected ValueType valueType;    // = ValueType.NUMBER;         // could be BOOLEAN
   protected double value;
   protected boolean bool;
 
@@ -94,8 +94,11 @@ public abstract class AbstractValue implements Value//, Iterable<Value>
 
   protected String getValueText (Value value)
   {
-    return value.getValueType () == ValueType.NUMBER ? value.getDouble () + ""
-        : value.getBoolean () ? "TRUE" : "FALSE";
+    if (value.getValueType () == ValueType.NUMBER)
+      return value.getDouble () + "";
+    if (value.getValueType () == ValueType.BOOLEAN)
+      return value.getBoolean () ? "TRUE" : "FALSE";
+    return "??*??";
   }
 
   @Override

@@ -83,6 +83,7 @@ class If extends Function
   public String toString ()
   {
     StringBuilder text = new StringBuilder ();
+
     text.append (String.format ("%s%n", LINE));
     text.append (String.format (FMT4, getType (), getFullText (), getValueType (),
         getValueText (this)));
@@ -91,6 +92,7 @@ class If extends Function
       attach (text, "true", textTrue, expTrue);
     else
       attach (text, "false", textFalse, expFalse);
+
     return text.toString ();
   }
 }

@@ -9,7 +9,6 @@ public class Npv extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@NPV(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override

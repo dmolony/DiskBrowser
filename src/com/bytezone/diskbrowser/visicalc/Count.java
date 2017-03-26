@@ -7,6 +7,7 @@ class Count extends ValueListFunction
   public Count (Cell cell, String text)
   {
     super (cell, text);
+
     assert text.startsWith ("@COUNT(") : text;
   }
 
@@ -14,7 +15,6 @@ class Count extends ValueListFunction
   public void calculate ()
   {
     value = 0;
-    valueType = ValueType.NUMBER;
 
     if (!isRange)
       value = list.size ();

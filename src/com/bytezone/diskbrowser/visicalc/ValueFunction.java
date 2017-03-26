@@ -12,6 +12,7 @@ public abstract class ValueFunction extends Function
 
     source = cell.getExpressionValue (functionText);
     values.add (source);
+    valueType = ValueType.NUMBER;
   }
 
   @Override

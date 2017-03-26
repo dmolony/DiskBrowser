@@ -7,7 +7,7 @@ import java.util.List;
 public class ValueList implements Iterable<Value>
 {
   private final List<Value> values = new ArrayList<Value> ();
-  private boolean rangeFound;
+  private boolean hasRange;
 
   public ValueList (Cell cell, String text)
   {
@@ -19,7 +19,7 @@ public class ValueList implements Iterable<Value>
 
       if (Range.isRange (parameter))
       {
-        rangeFound = true;
+        hasRange = true;
         for (Address address : new Range (cell, parameter))
           values.add (cell.getCell (address));
       }
@@ -35,7 +35,7 @@ public class ValueList implements Iterable<Value>
 
   public boolean hasRange ()
   {
-    return rangeFound;
+    return hasRange;
   }
 
   public Value get (int index)

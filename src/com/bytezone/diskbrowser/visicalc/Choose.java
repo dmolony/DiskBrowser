@@ -9,7 +9,6 @@ public class Choose extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@CHOOSE(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override

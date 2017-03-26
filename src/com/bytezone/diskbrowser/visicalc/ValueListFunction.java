@@ -11,6 +11,7 @@ public abstract class ValueListFunction extends Function
 
     list = new ValueList (cell, functionText);
     isRange = functionText.indexOf ("...") > 0;
+    valueType = ValueType.NUMBER;
 
     for (Value v : list)
       values.add (v);

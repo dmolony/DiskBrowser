@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.visicalc;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,10 +8,10 @@ import java.util.regex.Pattern;
 
 class Range implements Iterable<Address>
 {
-  private static final Pattern cellAddress = Pattern.compile ("[A-B]?[A-Z][0-9]{1,3}");
+  //  private static final Pattern cellAddress = Pattern.compile ("[A-B]?[A-Z][0-9]{1,3}");
   private static final Pattern rangePattern =
       Pattern.compile ("([A-B]?[A-Z])([0-9]{1,3})\\.\\.\\.([A-B]?[A-Z])([0-9]{1,3})");
-  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
+  //  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private Address from, to;
   private final List<Address> range = new ArrayList<Address> ();
@@ -57,7 +56,8 @@ class Range implements Iterable<Address>
         cell.getCell (from);
       }
     else
-      throw new InvalidParameterException ();
+      throw new IllegalArgumentException (
+          "Cannot create range " + from.getText () + ", " + to.getText ());
 
     from = tempFrom;
   }

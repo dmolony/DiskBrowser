@@ -4,8 +4,6 @@ import java.util.Iterator;
 
 class Cell implements Value, Comparable<Cell>
 {
-  private static final String line = "+----------------------------------------"
-      + "--------------------------------------------+";
   private static final String empty = "                                        ";
 
   private final Address address;

@@ -12,18 +12,15 @@ class Condition extends AbstractValue implements Iterable<Value>
   private String comparator;
   private String conditionText;
   private String valueText;
-  private final String fullText;
-  //  private Address address; 
 
-  private Expression conditionExpression;
-  private Expression valueExpression;
+  private Value conditionExpression;
+  private Value valueExpression;
 
   public Condition (Cell cell, String text)
   {
     super (cell, text);
 
     valueType = ValueType.BOOLEAN;
-    fullText = text;
 
     for (String comp : comparators)
     {
@@ -44,38 +41,20 @@ class Condition extends AbstractValue implements Iterable<Value>
     }
 
     if (comparator == null)
-    {
-      if (text.startsWith ("@"))
+      if (text.startsWith ("@") || cellAddress.matcher (text).matches ())
       {
         conditionText = text;
-        conditionExpression = new Expression (cell, text);
-        values.add (conditionExpression);
-
-        //        comparator = "=";
-        //
-        //        valueText = "1";
-        //        valueExpression = new Expression (cell, valueText);
-        //        values.add (valueExpression);
-      }
-      else if (cellAddress.matcher (text).matches ())
-      {
-        conditionText = text;
-        conditionExpression = new Expression (cell, text);
-        conditionExpression.valueType = ValueType.BOOLEAN;
+        conditionExpression = new Expression (cell, text).reduce ();
         values.add (conditionExpression);
       }
       else
-      {
-        System.out.println ("No comparator and not a function: " + text);
-        throw new IllegalArgumentException ("No comparator and not a function: " + text);
-      }
-    }
+        throw new IllegalArgumentException (
+            "No comparator and not a function or address: " + text);
   }
 
   @Override
   public void calculate ()
   {
-    //    System.out.printf ("********Calc: %s%n", fullText);
     valueResult = ValueResult.VALID;
 
     conditionExpression.calculate ();
@@ -89,7 +68,6 @@ class Condition extends AbstractValue implements Iterable<Value>
     if (conditionExpression.getValueType () == ValueType.BOOLEAN)
     {
       bool = conditionExpression.getBoolean ();
-      //      System.out.printf ("********Bool: %s%n", bool);
       return;
     }
 
@@ -117,7 +95,6 @@ class Condition extends AbstractValue implements Iterable<Value>
       bool = conditionResult >= expressionResult;
     else
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
-    //    System.out.printf ("********Bool: %s%n", bool);
   }
 
   @Override
@@ -162,6 +139,7 @@ class Condition extends AbstractValue implements Iterable<Value>
   public String toString ()
   {
     StringBuilder text = new StringBuilder ();
+
     text.append (LINE + "\n");
     text.append (String.format (FMT4, "Predicate", getFullText (), valueType,
         getValueText (this)));
@@ -173,7 +151,7 @@ class Condition extends AbstractValue implements Iterable<Value>
       text.append (String.format (FMT4, "Right", valueText,
           valueExpression.getValueType (), getValueText (valueExpression)));
     }
-    //    text.append (LINE);
+
     return text.toString ();
   }
 }

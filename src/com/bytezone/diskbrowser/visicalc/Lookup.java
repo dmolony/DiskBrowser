@@ -7,7 +7,6 @@ class Lookup extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@LOOKUP(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override
@@ -33,11 +32,6 @@ class Lookup extends ValueListFunction
     double sourceValue = source.getDouble ();
     Address target = null;
 
-    // is the range horizontal or vertical?
-    Cell firstCell = (Cell) list.get (1);
-    Cell lastCell = (Cell) list.get (list.size () - 1);
-    boolean isVertical = firstCell.getAddress ().columnMatches (lastCell.getAddress ());
-
     for (int i = 1; i < list.size (); i++)        // skip first entry
     {
       Cell cell = (Cell) list.get (i);
@@ -52,11 +46,19 @@ class Lookup extends ValueListFunction
       return;
     }
 
-    Address adjacentAddress = isVertical ? target.nextColumn () : target.nextRow ();
+    Address adjacentAddress = isVertical () ? target.nextColumn () : target.nextRow ();
 
     if (cell.cellExists (adjacentAddress))
       value = cell.getCell (adjacentAddress).getDouble ();
     else
       value = 0;
+  }
+
+  // is the range horizontal or vertical?
+  private boolean isVertical ()
+  {
+    Cell firstCell = (Cell) list.get (1);
+    Cell lastCell = (Cell) list.get (list.size () - 1);
+    return firstCell.getAddress ().columnMatches (lastCell.getAddress ());
   }
 }

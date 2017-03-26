@@ -9,7 +9,6 @@ public class Average extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@AVERAGE(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override

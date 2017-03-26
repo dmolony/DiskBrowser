@@ -7,7 +7,6 @@ class Max extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@MAX(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override

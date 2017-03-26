@@ -7,6 +7,8 @@ class Error extends ConstantFunction
     super (cell, text);
 
     assert text.startsWith ("@ERROR") : text;
+
     valueResult = ValueResult.ERROR;
+    valueType = ValueType.NUMBER;
   }
 }

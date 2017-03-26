@@ -7,7 +7,6 @@ class Sum extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@SUM(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override

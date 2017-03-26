@@ -65,8 +65,6 @@ public class Format
           val = String.format (rightFormat, val);
         }
 
-        //        System.out.printf ("[%s]%n", val);
-
         if (val.length () > colWidth)
           return OVERFLOW.substring (0, colWidth);
 

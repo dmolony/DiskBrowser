@@ -7,7 +7,6 @@ class Min extends ValueListFunction
     super (cell, text);
 
     assert text.startsWith ("@MIN(") : text;
-    valueType = ValueType.NUMBER;
   }
 
   @Override

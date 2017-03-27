@@ -48,7 +48,7 @@ public class TreeBuilder
     return tree;
   }
 
-  private void addFiles (DefaultMutableTreeNode node, File directory)
+  private void addFiles (DefaultMutableTreeNode parentNode, File directory)
   {
     File[] files = directory.listFiles ();
     if (files == null || files.length == 0)
@@ -60,24 +60,19 @@ public class TreeBuilder
     Arrays.sort (files, fileComparator);
 
     for (File file : files)
-    {
       if (file.isDirectory ())
-      {
-        FileNode fileNode = new FileNode (file);
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);
-        fileNode.setTreeNode (newNode);
-        newNode.setAllowsChildren (true);
-        node.add (newNode);
-      }
+        parentNode.add (createNode (file, true));
       else if (Utility.validFileType (file.getName ()) && file.length () > 0)
-      {
-        FileNode fileNode = new FileNode (file);
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);
-        fileNode.setTreeNode (newNode);
-        newNode.setAllowsChildren (false);
-        node.add (newNode);
-      }
-    }
+        parentNode.add (createNode (file, false));
+  }
+
+  private DefaultMutableTreeNode createNode (File file, boolean allowsChildren)
+  {
+    FileNode fileNode = new FileNode (file);
+    DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);
+    fileNode.setTreeNode (newNode);
+    newNode.setAllowsChildren (allowsChildren);
+    return newNode;
   }
 
   private void setDiskIcon (String iconName)

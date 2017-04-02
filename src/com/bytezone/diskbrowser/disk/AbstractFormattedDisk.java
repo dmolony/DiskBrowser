@@ -294,7 +294,9 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   {
     if (block >= sectorTypes.length)
       System.out.println ("Invalid block number: " + block);
-    else if (sectorTypes[block] != emptySector)
+    else if (sectorTypes[block] == emptySector)
+      System.out.printf ("Tried to assign %s to empty block %d%n", type.name, block);
+    else
       sectorTypes[block] = type;
   }
 

@@ -55,15 +55,16 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 53, 1, "Maximum sectors");
     addTextAndDecimal (text, buffer, 54, 2, "Bytes per sector");
 
-    for (int i = 56; i <= 0xc3; i += 4)
+    boolean bootSectorEmpty = parentDisk.getDisk ().isSectorEmpty (0);
+    for (int i = 56; i <= 0xC3; i += 4)
     {
-      String extra;
-      if (i <= 64)
-        extra = "(DOS)";
+      String extra = "";
+      if (i == 56 && bootSectorEmpty)
+        extra = "(unusable)";
+      else if (i <= 64 && !bootSectorEmpty)
+        extra = "(reserved for DOS)";
       else if (i == 124)
         extra = "(VTOC and Catalog)";
-      else
-        extra = "";
       addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s", (i - 56) / 4,
           getBitmap (buffer[i], buffer[i + 1]), extra));
     }

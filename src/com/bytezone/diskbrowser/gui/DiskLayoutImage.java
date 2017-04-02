@@ -135,6 +135,11 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
       boolean selected)
   {
     SectorType type = disk.getSectorType (blockNo);
+    if (type == null)
+    {
+      System.out.println ("Sector type is null " + blockNo);
+      return;
+    }
     int offset = (bw - 4) / 2 + 1;
 
     Rectangle rect = new Rectangle (x, y, bw, bh);

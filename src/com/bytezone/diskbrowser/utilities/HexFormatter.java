@@ -44,7 +44,7 @@ public class HexFormatter
   public static String format (byte[] buffer, int offset, int length, boolean header,
       int startingAddress)
   {
-    StringBuffer line = new StringBuffer ();
+    StringBuilder line = new StringBuilder ();
     int[] freq = new int[256];
     boolean startedOnBoundary = offset % 0x100 == 0;
 
@@ -143,7 +143,7 @@ public class HexFormatter
 
   public static String getString (byte[] buffer, int offset, int length)
   {
-    StringBuffer text = new StringBuffer ();
+    StringBuilder text = new StringBuilder ();
 
     for (int i = offset; i < offset + length; i++)
     {
@@ -167,16 +167,15 @@ public class HexFormatter
 
   public static String getString2 (byte[] buffer, int offset, int length)
   {
-    StringBuffer text = new StringBuffer ();
+    StringBuilder text = new StringBuilder ();
 
     for (int i = offset; i < offset + length; i++)
     {
       int c = buffer[i] & 0xFF;
-      if (c == 136 && text.length () > 0)
+      if (c == 136)
       {
-        System.out.println (text.toString ());
-        text.deleteCharAt (text.length () - 1);
-        System.out.println ("deleted");
+        if (text.length () > 0)
+          text.deleteCharAt (text.length () - 1);
         continue;
       }
       if (c > 127)

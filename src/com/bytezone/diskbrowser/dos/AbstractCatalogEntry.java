@@ -73,7 +73,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     for (int i = 3; i < max; i++)
     {
       int c = buffer[i] & 0xFF;
-      if (c == 136 && !base.isEmpty ()) // allow backspaces
+      if (c == 136 && !base.isEmpty ())             // allow backspaces
       {
         if (text.length () > 0)
           text.deleteCharAt (text.length () - 1);
@@ -103,13 +103,13 @@ abstract class AbstractCatalogEntry implements AppleFileSource
         return "A";
       case Binary:
         return "B";
-      case SS: // what is this?
+      case SS:                    // what is this?
         return "S";
       case Relocatable:
         return "R";
-      case AA: // what is this?
+      case AA:                    // what is this?
         return "A";
-      case BB: // what is this?
+      case BB:                    // what is this?
         return "B";
       default:
         System.out.println ("Unknown file type : " + fileType);

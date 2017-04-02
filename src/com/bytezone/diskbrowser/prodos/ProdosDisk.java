@@ -83,7 +83,8 @@ public class ProdosDisk extends AbstractFormattedDisk
     do
     {
       byte[] sectorBuffer = disk.readSector (block);
-      sectorTypes[block] = currentSectorType;
+      if (!disk.isSectorEmpty (block))
+        sectorTypes[block] = currentSectorType;
 
       int max = disk.getBlockSize () - ProdosConstants.ENTRY_SIZE;
       for (int ptr = 4; ptr < max; ptr += ProdosConstants.ENTRY_SIZE)
@@ -104,7 +105,8 @@ public class ProdosDisk extends AbstractFormattedDisk
             assert localHeader.entryLength == ProdosConstants.ENTRY_SIZE;
             headerEntries.add (localHeader);
             currentSectorType = catalogSector;
-            sectorTypes[block] = currentSectorType;
+            if (!disk.isSectorEmpty (block))
+              sectorTypes[block] = currentSectorType;
             for (int i = 0; i < vdh.totalBitMapBlocks; i++)
               sectorTypes[vdh.bitMapBlock + i] = volumeMapSector;
             parentNode.setUserObject (vdh);         // populate the empty volume node
@@ -114,7 +116,8 @@ public class ProdosDisk extends AbstractFormattedDisk
             localHeader = new SubDirectoryHeader (this, entry, parent);
             headerEntries.add (localHeader);
             currentSectorType = subcatalogSector;
-            sectorTypes[block] = currentSectorType;
+            if (!disk.isSectorEmpty (block))
+              sectorTypes[block] = currentSectorType;
             break;
 
           case ProdosConstants.TYPE_SUBDIRECTORY:
@@ -158,7 +161,6 @@ public class ProdosDisk extends AbstractFormattedDisk
           if (fe2.getUniqueName ().equals (partner1)
               || fe2.getUniqueName ().equals (partner2))
           {
-            //            System.out.printf ("%s   %s%n", name, partner1);
             ((FileEntry) fe2).link ((FileEntry) fe);
             ((FileEntry) fe).link ((FileEntry) fe2);
           }

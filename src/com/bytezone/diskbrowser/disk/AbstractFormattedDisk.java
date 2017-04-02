@@ -292,10 +292,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   @Override
   public void setSectorType (int block, SectorType type)
   {
-    if (block < sectorTypes.length)
-      sectorTypes[block] = type;
-    else
+    if (block >= sectorTypes.length)
       System.out.println ("Invalid block number: " + block);
+    else if (sectorTypes[block] != emptySector)
+      sectorTypes[block] = type;
   }
 
   // Override this so that the correct sector type can be displayed

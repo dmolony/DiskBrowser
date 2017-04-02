@@ -154,6 +154,8 @@ public class AppleworksWPFile extends AbstractFile
 
     public Header ()
     {
+      // see Asimov disks/images 2/pd_collections/apple_linc/
+      //      1988-02 side A (no boot).dsk
       assert buffer[4] == 0x4F;
 
       int ptr = 5;

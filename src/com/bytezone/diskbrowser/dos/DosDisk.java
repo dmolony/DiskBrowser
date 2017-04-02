@@ -16,6 +16,7 @@ public class DosDisk extends AbstractFormattedDisk
 {
   private static final int ENTRY_SIZE = 35;
   private static final int CATALOG_TRACK = 17;
+  private static final int VTOC_SECTOR = 0;
 
   private final DosVTOCSector dosVTOCSector;
   private final Color green = new Color (0, 200, 0);
@@ -51,7 +52,7 @@ public class DosDisk extends AbstractFormattedDisk
     byte[] sectorBuffer = disk.readSector (da);               // Boot sector
     bootSector = new BootSector (disk, sectorBuffer, "DOS", da);
 
-    da = disk.getDiskAddress (CATALOG_TRACK, 0);
+    da = disk.getDiskAddress (CATALOG_TRACK, VTOC_SECTOR);
     sectorBuffer = disk.readSector (da);          // VTOC
     dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer, da);
 

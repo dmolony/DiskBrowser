@@ -41,6 +41,7 @@ public class CPMDisk extends AbstractFormattedDisk
 
     setEmptyByte ((byte) 0xE5);
 
+    // search for the version string
     for (int i = 8; i >= 4; i -= 2)
     {
       byte[] buffer = disk.readSector (0, i);

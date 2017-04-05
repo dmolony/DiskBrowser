@@ -49,7 +49,7 @@ public class DiskFactory
     Boolean compressed = false;
     Path originalPath = Paths.get (path);
 
-    if (suffix.equals ("gz"))
+    if ("gz".equals (suffix))
     {
       if (debug)
         System.out.println (" ** gzip **");
@@ -78,7 +78,7 @@ public class DiskFactory
         return null;
       }
     }
-    else if (suffix.equals ("zip"))
+    else if ("zip".equals (suffix))
     {
       if (debug)
         System.out.println (" ** zip **");

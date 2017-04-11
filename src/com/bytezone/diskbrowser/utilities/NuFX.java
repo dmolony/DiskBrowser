@@ -12,10 +12,9 @@ import com.bytezone.common.Utility;
 public class NuFX
 {
   private static String[] fileSystems =
-      {//
-       "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
-       "Macintosh MFS", "Lisa File System", "Apple CP/M", "", "MS-DOS", "High Sierra",
-       "ISO 9660", "AppleShare" };
+      { "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
+        "Macintosh MFS", "Lisa File System", "Apple CP/M", "", "MS-DOS", "High Sierra",
+        "ISO 9660", "AppleShare" };
   private Header header;
   private final byte[] buffer;
   private final boolean debug = false;

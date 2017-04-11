@@ -58,16 +58,25 @@ public class CPMDisk extends AbstractFormattedDisk
     for (int sector = 0; sector < 8; sector++)
     {
       DiskAddress da = disk.getDiskAddress (3, sector);
-      if (disk.isSectorEmpty (da))
-        break;
 
       sectorTypes[da.getBlock ()] = catalogSector;
       byte[] buffer = disk.readSector (da);
+      int b1 = buffer[0] & 0xFF;
+      int b2 = buffer[1] & 0xFF;
+      if (b1 == 0xE5)
+        continue;
+      if (b1 > 31)
+        break;
+      if (b2 < 32 || (b2 > 126 && b2 != 0xE5))
+        break;
 
       for (int i = 0; i < buffer.length; i += 32)
       {
-        int val = buffer[i] & 0xFF;
-        if (val == 0xE5)
+        b1 = buffer[i] & 0xFF;
+        b2 = buffer[i + 1] & 0xFF;
+        if (b1 == 0xE5)
+          break;
+        if (b2 < 32 || (b2 > 126 && b2 != 0xE5))
           break;
 
         DirectoryEntry entry = new DirectoryEntry (this, buffer, i);

@@ -79,19 +79,22 @@ class ProdosDirectory extends AbstractFile
 
           switch (fileType)
           {
-            case 4: // Text file
+            case 4:                                           // Text file
               int aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("R=%5d", aux);
               break;
-            case 6: // BIN file
+
+            case 6:                                           // BIN file
               aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("A=$%4X", aux);
               break;
-            case 0x1A: // AWP file
+
+            case 0x1A:                                        // AWP file
               aux = HexFormatter.intValue (buffer[i + 32], buffer[i + 31]); // backwards!
               if (aux != 0)
                 filename = convert (filename, aux);
               break;
+
             default:
               subType = "";
           }

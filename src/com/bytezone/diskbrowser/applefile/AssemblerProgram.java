@@ -58,8 +58,8 @@ public class AssemblerProgram extends AbstractFile
     if (extraBuffer.length == 0)
       return text;
 
-    return text + "\n\n" + HexFormatter.format (extraBuffer, 0, extraBuffer.length,
-        loadAddress + buffer.length);
+    return text + "\n\nData outside actual buffer:\n\n" + HexFormatter
+        .format (extraBuffer, 0, extraBuffer.length, loadAddress + buffer.length);
   }
 
   @Override

@@ -107,9 +107,7 @@ class CatalogEntry extends AbstractCatalogEntry
           break;
       }
     }
-
-    // get the file length
-    if (dataSectors.size () > 0 && fileType != FileType.Text)
+    else if (dataSectors.size () > 0)       // get the file length
     {
       byte[] buffer = disk.readSector (dataSectors.get (0));
       switch (fileType)

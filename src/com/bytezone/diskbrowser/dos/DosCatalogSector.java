@@ -50,7 +50,12 @@ class DosCatalogSector extends AbstractSector
           if (buffer[i + 3] == 0)
             addText (text, buffer, i + 3, 4, "");
           else
+          {
             addText (text, buffer, i + 3, 4, getName (buffer, i));
+            for (int j = 0; j < 24; j += 4)
+              addText (text, buffer, i + j + 7, 4, "");
+            addText (text, buffer, i + 31, 2, "");
+          }
           addTextAndDecimal (text, buffer, i + 33, 2, "Sector count");
         }
         else

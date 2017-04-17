@@ -48,7 +48,7 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 39, 1, "Maximum TS pairs");
     addText (text, buffer, 40, 4, "Not used");
     addText (text, buffer, 44, 4, "Not used");
-    addText (text, buffer, 48, 1, "Last allocated track");
+    addTextAndDecimal (text, buffer, 48, 1, "Last allocated track");
     addText (text, buffer, 49, 1, "Direction to look when allocating the next file");
     addText (text, buffer, 50, 2, "Not used");
     addTextAndDecimal (text, buffer, 52, 1, "Maximum tracks");

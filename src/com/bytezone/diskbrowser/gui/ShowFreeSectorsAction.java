@@ -16,14 +16,14 @@ class ShowFreeSectorsAction extends AbstractAction
   {
     super ("Show free sectors");
     putValue (Action.SHORT_DESCRIPTION,
-          "Display which sectors are marked free in the disk layout panel");
+        "Display which sectors are marked free in the disk layout panel");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt F"));
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_F);
     this.panel = panel;
     this.mh = mh;
-    panel.setFree (mh.showFreeSectorsItem.isSelected ()); // set initial state
   }
 
+  @Override
   public void actionPerformed (ActionEvent e)
   {
     panel.setFree (mh.showFreeSectorsItem.isSelected ());

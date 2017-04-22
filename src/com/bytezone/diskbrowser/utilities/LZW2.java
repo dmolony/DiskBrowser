@@ -2,8 +2,6 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.util.Objects;
 
-import com.bytezone.common.Utility;
-
 class LZW2 extends LZW
 {
   private int nextEntry = 0x100;
@@ -24,7 +22,7 @@ class LZW2 extends LZW
 
     while (ptr < buffer.length - 1)         // what is in the last byte?
     {
-      int rleLength = Utility.getWord (buffer, ptr);
+      int rleLength = LZW.getWord (buffer, ptr);
       boolean lzwPerformed = (rleLength & 0x8000) != 0;
       ptr += 2;
 
@@ -34,7 +32,7 @@ class LZW2 extends LZW
         if (rleLength == 0)
           rleLength = TRACK_LENGTH;
 
-        int chunkLength = Utility.getWord (buffer, ptr);
+        int chunkLength = LZW.getWord (buffer, ptr);
         ptr += 2;
 
         setBuffer (buffer, ptr);            // prepare to read n-bit integers

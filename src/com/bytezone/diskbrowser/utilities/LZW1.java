@@ -2,15 +2,13 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.util.Objects;
 
-import com.bytezone.common.Utility;
-
 class LZW1 extends LZW
 {
   public LZW1 (byte[] buffer)
   {
     bytes = Objects.requireNonNull (buffer);
 
-    crc = Utility.getWord (buffer, 0);
+    crc = LZW.getWord (buffer, 0);
     crcBase = 0;
 
     volume = buffer[2] & 0xFF;
@@ -19,7 +17,7 @@ class LZW1 extends LZW
 
     while (ptr < buffer.length - 1)          // what is in the last byte?
     {
-      int rleLength = Utility.getWord (buffer, ptr);
+      int rleLength = LZW.getWord (buffer, ptr);
       int lzwPerformed = buffer[ptr + 2] & 0xFF;
       ptr += 3;
 

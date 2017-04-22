@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.common.Utility;
-
 public class NuFX
 {
   private static String[] fileSystems =
@@ -131,12 +129,12 @@ public class NuFX
         throw new FileFormatException ("NuFile not found");
       }
 
-      crc = Utility.getWord (buffer, ptr + 6);
-      totalRecords = Utility.getLong (buffer, ptr + 8);
+      crc = LZW.getWord (buffer, ptr + 6);
+      totalRecords = LZW.getLong (buffer, ptr + 8);
       created = new DateTime (buffer, ptr + 12);
       modified = new DateTime (buffer, ptr + 20);
-      version = Utility.getWord (buffer, ptr + 28);
-      eof = Utility.getLong (buffer, ptr + 38);
+      version = LZW.getWord (buffer, ptr + 28);
+      eof = LZW.getLong (buffer, ptr + 38);
 
       byte[] crcBuffer = new byte[40];
       System.arraycopy (buffer, ptr + 8, crcBuffer, 0, crcBuffer.length);
@@ -205,21 +203,21 @@ public class NuFX
       if (!isNuFX (buffer, dataPtr))
         throw new FileFormatException ("NuFX not found");
 
-      crc = Utility.getWord (buffer, dataPtr + 4);
-      attributes = Utility.getWord (buffer, dataPtr + 6);
-      version = Utility.getWord (buffer, dataPtr + 8);
-      totThreads = Utility.getLong (buffer, dataPtr + 10);
-      fileSystemID = Utility.getWord (buffer, dataPtr + 14);
+      crc = LZW.getWord (buffer, dataPtr + 4);
+      attributes = LZW.getWord (buffer, dataPtr + 6);
+      version = LZW.getWord (buffer, dataPtr + 8);
+      totThreads = LZW.getLong (buffer, dataPtr + 10);
+      fileSystemID = LZW.getWord (buffer, dataPtr + 14);
       separator = (char) (buffer[dataPtr + 16] & 0x00FF);
-      access = Utility.getLong (buffer, dataPtr + 18);
-      fileType = Utility.getLong (buffer, dataPtr + 22);
-      auxType = Utility.getLong (buffer, dataPtr + 26);
-      storType = Utility.getWord (buffer, dataPtr + 30);
+      access = LZW.getLong (buffer, dataPtr + 18);
+      fileType = LZW.getLong (buffer, dataPtr + 22);
+      auxType = LZW.getLong (buffer, dataPtr + 26);
+      storType = LZW.getWord (buffer, dataPtr + 30);
       created = new DateTime (buffer, dataPtr + 32);
       modified = new DateTime (buffer, dataPtr + 40);
       archived = new DateTime (buffer, dataPtr + 48);
-      optionSize = Utility.getWord (buffer, dataPtr + 56);
-      fileNameLength = Utility.getWord (buffer, dataPtr + attributes - 2);
+      optionSize = LZW.getWord (buffer, dataPtr + 56);
+      fileNameLength = LZW.getWord (buffer, dataPtr + attributes - 2);
 
       int len = attributes + fileNameLength - 6;
       byte[] crcBuffer = new byte[len + totThreads * 16];

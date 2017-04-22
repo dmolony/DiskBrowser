@@ -329,13 +329,14 @@ public class HexFormatter
 
   public static int unsignedShort (byte[] buffer, int ptr)
   {
-    int val = 0;
-    for (int i = 1; i >= 0; i--)
-    {
-      val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
-    }
-    return val;
+    //    int val = 0;
+    //    for (int i = 1; i >= 0; i--)
+    //    {
+    //      val <<= 8;
+    //      val += buffer[ptr + i] & 0xFF;
+    //    }
+    //    return val;
+    return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
   }
 
   //  public static int signedShort (byte[] buffer, int ptr)

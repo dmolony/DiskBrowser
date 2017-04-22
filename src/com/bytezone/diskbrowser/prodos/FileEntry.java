@@ -41,13 +41,19 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     this.catalogBlock = this.disk.getDiskAddress (parentBlock);
 
     fileType = entryBuffer[16] & 0xFF;
-    keyPtr = HexFormatter.intValue (entryBuffer[17], entryBuffer[18]);
-    blocksUsed = HexFormatter.intValue (entryBuffer[19], entryBuffer[20]);
+    //    keyPtr = HexFormatter.intValue (entryBuffer[17], entryBuffer[18]);
+    keyPtr = HexFormatter.unsignedShort (entryBuffer, 17);
+    //    System.out.printf ("%5d  %5d%n",
+    //        HexFormatter.intValue (entryBuffer[17], entryBuffer[18]), keyPtr);
+    //    blocksUsed = HexFormatter.intValue (entryBuffer[19], entryBuffer[20]);
+    blocksUsed = HexFormatter.unsignedShort (entryBuffer, 19);
     endOfFile = HexFormatter.intValue (entryBuffer[21], entryBuffer[22], entryBuffer[23]);
 
-    auxType = HexFormatter.intValue (entryBuffer[31], entryBuffer[32]);
+    //    auxType = HexFormatter.intValue (entryBuffer[31], entryBuffer[32]);
+    auxType = HexFormatter.unsignedShort (entryBuffer, 31);
     modified = HexFormatter.getAppleDate (entryBuffer, 33);
-    headerPointer = HexFormatter.intValue (entryBuffer[37], entryBuffer[38]);
+    //    headerPointer = HexFormatter.intValue (entryBuffer[37], entryBuffer[38]);
+    headerPointer = HexFormatter.unsignedShort (entryBuffer, 37);
 
     switch (storageType)
     {
@@ -70,6 +76,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       case TYPE_TREE:
         parentDisk.setSectorType (keyPtr, fDisk.masterIndexSector);
         masterIndexBlock = disk.getDiskAddress (keyPtr);
+        indexBlocks.add (masterIndexBlock);
         if (isGEOSFile ())
           traverseGEOSMasterIndex (keyPtr);
         else
@@ -111,6 +118,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           byte[] buffer = disk.readSector (block);
           block = HexFormatter.intValue (buffer[2], buffer[3]);
         } while (block > 0);
+        break;
+
+      case TYPE_PASCAL_ON_PROFILE:
+        indexBlocks.add (disk.getDiskAddress (keyPtr));
         break;
 
       default:
@@ -365,8 +376,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_GSOS_FILE_SYSTEM_TRANSLATOR:
           file = new FileSystemTranslator (name, exactBuffer);
           break;
+        case FILE_TYPE_PASCAL_VOLUME:
+          file = new DefaultAppleFile (name, exactBuffer);
+          break;
         default:
-          System.out.format ("%s - Unknown file type : %02X%n", name, fileType);
+          System.out.format ("%s - Unknown Prodos file type : %02X%n", name, fileType);
           file = new DefaultAppleFile (name, exactBuffer);
       }
     }
@@ -501,6 +515,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
       case TYPE_GSOS_EXTENDED_FILE:
         return disk.readSectors (dataBlocks);   // data and resource forks concatenated
+
+      case TYPE_PASCAL_ON_PROFILE:
+        return disk.readSectors (dataBlocks);
 
       default:
         System.out.println ("Unknown storage type in getBuffer : " + storageType);

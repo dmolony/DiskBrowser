@@ -33,7 +33,7 @@ class ProdosBitMapSector extends AbstractSector
 
     int width = (grid.width - 1) / 8 + 1;   // must be 1-4
 
-    StringBuilder text = getHeader ("Prodos Bit Map Sector");
+    StringBuilder text = getHeader ("Volume Bit Map Block");
 
     if (false)
     {

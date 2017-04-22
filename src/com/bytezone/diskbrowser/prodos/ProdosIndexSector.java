@@ -18,21 +18,22 @@ class ProdosIndexSector extends AbstractSector
   @Override
   public String createText ()
   {
-    StringBuilder text = getHeader ("Prodos Index Sector : " + name);
+    StringBuilder text = getHeader ("Prodos Index Block : " + name);
 
     for (int i = 0; i < 256; i++)
     {
-      text.append (String.format ("%02X        %02X %02X", i, buffer[i],
-                                  buffer[i + 256]));
+      text.append (
+          String.format ("%02X        %02X %02X", i, buffer[i], buffer[i + 256]));
       if (buffer[i] != 0 || buffer[i + 256] != 0)
-        text.append (String
-            .format ("         %s%n",
-                     "block " + HexFormatter.intValue (buffer[i], buffer[i + 256])));
+        text.append (String.format ("         %s%n",
+            "block " + HexFormatter.intValue (buffer[i], buffer[i + 256])));
       else
         text.append ("\n");
     }
+
     if (text.length () > 0)
       text.deleteCharAt (text.length () - 1);
+
     return text.toString ();
   }
 }

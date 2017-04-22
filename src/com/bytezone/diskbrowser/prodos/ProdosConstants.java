@@ -22,6 +22,7 @@ public interface ProdosConstants
   int FILE_TYPE_FONT = 0xC8;
   int FILE_TYPE_ICN = 0xCA;
   int FILE_TYPE_APPLETALK = 0xE2;
+  int FILE_TYPE_PASCAL_VOLUME = 0xEF;
   int FILE_TYPE_USER_DEFINED_1 = 0xF1;
   int FILE_TYPE_INTEGER_BASIC = 0xFA;
   int FILE_TYPE_INTEGER_BASIC_VARS = 0xFB;
@@ -70,7 +71,7 @@ public interface ProdosConstants
                         "$D0", "$D1", "$D2", "$D3", "$D4", "MUS", "INS", "MDI", //
                         "SND", "$D9", "$DA", "DBM", "$DC", "DDD", "$DE", "$DF", //
                         "LBR", "$E1", "ATK", "$E3", "$E4", "$E5", "$E6", "$E7", //
-                        "$E8", "$E9", "$EA", "$EB", "$EC", "$ED", "R16", "PAS", //
+                        "$E8", "$E9", "$EA", "$EB", "$EC", "$ED", "R16", "PAR", //
                         "CMD", "OVL", "UD2", "UD3", "UD4", "BAT", "UD6", "UD7", //
                         "PRG", "P16", "INT", "IVR", "BAS", "VAR", "REL", "SYS" };
 
@@ -207,3 +208,36 @@ public interface ProdosConstants
  */
 
 // See also http://www.kreativekorp.com/miscpages/a2info/filetypes.shtml
+
+/*
+ * https://groups.google.com/forum/#!topic/comp.sys.apple2/waoYCIbkJKs
+ * 
+ * There are a number of disk utilities available that store images of disks that 
+ * utilize file systems that are not ProDOS, at the end of a ProDOS volume.  
+ * There's DOS Master, by Glen Bredon, that stores images of DOS 3.3 disks at the 
+ * end of a ProDOS volume.  Similarly, Pro/Part, by Steven Hirsch, stores images 
+ * of CP/M volumes.  Also, there's Pascal Partition Manager (PPM) that stores 
+ * images of UCSD Pascal volumes.  I've decided to refer to the area used to store 
+ * volume images, by all three of these systems, as a Foreign Volume Area or FVA.  
+ * All three of these systems modify the Block Allocation Map of a ProDOS volume 
+ * to keep ProDOS from assigning blocks used by FVAs for use by files being 
+ * written by ProDOS.  Pascal Partition Manager is different from the other two 
+ * in that it has a file type ($EF) and file kind (4) assigned to it by Apple.  
+ * A directory listing of a ProODS volume containing an FVA managed by PPM will 
+ * show a file name of "PASCAL.AREA".  A directory listing of a ProDOS volume 
+ * containing an FVA managed by DOS Master or Pro/Part will show absolutely nothing.  
+ * Running a popular utility named "MR.FIXIT", also by Glen Bredon, against a 
+ * ProDOS volume containing an FVA will report an error.  Specifically, "MR.FIXIT" 
+ * will complain that all the blocks used by an FVA as allocated but not in use.  
+ * To solve this problem for Pro/Part I wrote a Foreign Volume Area utility 
+ * program that generates a directory entry for the Pro/Part area.  That entry has 
+ * file kind 4, file type $EF, file name "PROPART.AREA" and an auxiliary file 
+ * type $4853 (Steven Hirsch's initials).  Today I realized that it's likely that 
+ * the same thing could be done for DOS Master.  Study of the source code for 
+ * DOS Master will reveal it that's true.  If it is, I propose that "DOS33.AREA" 
+ * be used as the file name and $4247 as the auxiliary type (Glen Bredon's initials).  
+ * As I compose the text of this message I realize that another solution is to 
+ * modify "MR.FIXIT" to be aware of FVAs.  But doing that would not allow someone 
+ * doing a directory listing of a ProDOS volume containing an FVA to be aware 
+ * that the FVA exists.
+ */

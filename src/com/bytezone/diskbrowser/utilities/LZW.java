@@ -110,4 +110,16 @@ class LZW
   {
     return 32 - Integer.numberOfLeadingZeros (maximumValue);
   }
+
+  static int getLong (byte[] buffer, int ptr)
+  {
+    return getWord (buffer, ptr) + getWord (buffer, ptr + 2) * 0x10000;
+  }
+
+  static int getWord (byte[] buffer, int ptr)
+  {
+    int a = (buffer[ptr + 1] & 0xFF) << 8;
+    int b = buffer[ptr] & 0xFF;
+    return a + b;
+  }
 }

@@ -133,6 +133,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // restore the menuHandler items before they are referenced
     quitAction.restore ();
+    diskLayoutPanel.setFree (menuHandler.showFreeSectorsItem.isSelected ());
 
     // Remove the two optional panels if they were previously hidden
     if (!menuHandler.showLayoutItem.isSelected ())

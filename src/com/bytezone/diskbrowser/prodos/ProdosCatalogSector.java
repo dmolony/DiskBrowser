@@ -23,7 +23,7 @@ class ProdosCatalogSector extends AbstractSector
   @Override
   public String createText ()
   {
-    StringBuilder text = getHeader ("Prodos Catalog Sector");
+    StringBuilder text = getHeader ("Volume Directory Block");
 
     addTextAndDecimal (text, buffer, 0, 2, "Previous block");
     addTextAndDecimal (text, buffer, 2, 2, "Next block");

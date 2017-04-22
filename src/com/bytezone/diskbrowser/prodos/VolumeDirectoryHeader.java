@@ -23,9 +23,9 @@ class VolumeDirectoryHeader extends DirectoryHeader
   {
     super (parentDisk, entryBuffer);
 
-    bitMapBlock = HexFormatter.intValue (entryBuffer[35], entryBuffer[36]);
-    totalBlocks = HexFormatter.intValue (entryBuffer[37], entryBuffer[38]);
-    if (totalBlocks == 0xFFFF | totalBlocks == 0x7FFF)
+    bitMapBlock = HexFormatter.unsignedShort (entryBuffer, 35);
+    totalBlocks = HexFormatter.unsignedShort (entryBuffer, 37);
+    if (totalBlocks == 0xFFFF || totalBlocks == 0x7FFF)
       totalBlocks = (int) disk.getFile ().length () / 4096 * 8;   // ignore extra bytes
     //    totalBitMapBlocks = (totalBlocks * 8 - 1) / 4096 + 1;
     totalBitMapBlocks = (totalBlocks - 1) / 512 + 1;
@@ -35,7 +35,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     {
       dataBlocks.add (disk.getDiskAddress (block));
       byte[] buffer = disk.readSector (block);
-      block = HexFormatter.intValue (buffer[2], buffer[3]);
+      block = HexFormatter.unsignedShort (buffer, 2);
     } while (block > 0);
 
     // convert the Free Sector Table

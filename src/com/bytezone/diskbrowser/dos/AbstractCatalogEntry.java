@@ -166,7 +166,6 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           if (reportedLength > buffer.length)
             reportedLength = buffer.length - 2;
           System.arraycopy (buffer, 2, exactBuffer, 0, reportedLength);
-          //          appleFile = new ApplesoftBasicProgram (name, exactBuffer);
           appleFile = new BasicProgram (name, exactBuffer);
           break;
 

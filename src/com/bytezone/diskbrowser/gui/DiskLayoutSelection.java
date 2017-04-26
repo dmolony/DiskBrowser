@@ -148,11 +148,11 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
 
   public void setSelection (List<DiskAddress> list)
   {
-    // for some reason list sometimes contains nulls
+    // sparse files contain empty blocks
     highlights.clear ();
     if (list != null)
       for (DiskAddress da : list)
-        if (da != null)
+        if (da != null && da.getBlock () > 0)
           highlights.add (da);
   }
 

@@ -22,7 +22,7 @@ class LZW2 extends LZW
 
     while (ptr < buffer.length - 1)         // what is in the last byte?
     {
-      int rleLength = LZW.getWord (buffer, ptr);
+      int rleLength = Utility.getWord (buffer, ptr);
       boolean lzwPerformed = (rleLength & 0x8000) != 0;
       ptr += 2;
 
@@ -32,7 +32,7 @@ class LZW2 extends LZW
         if (rleLength == 0)
           rleLength = TRACK_LENGTH;
 
-        int chunkLength = LZW.getWord (buffer, ptr);
+        int chunkLength = Utility.getWord (buffer, ptr);
         ptr += 2;
 
         setBuffer (buffer, ptr);            // prepare to read n-bit integers

@@ -25,7 +25,7 @@ public class PascalDisk extends AbstractFormattedDisk
   protected Relocator relocator;
 
   final String[] fileTypes =
-      { "Volume", "Xdsk", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
+      { "Volume", "Bad ", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
   SectorType diskBootSector = new SectorType ("Boot", Color.lightGray);
   SectorType catalogSector = new SectorType ("Catalog", Color.magenta);
@@ -35,6 +35,10 @@ public class PascalDisk extends AbstractFormattedDisk
   SectorType infoSector = new SectorType ("Info", Color.orange);
   SectorType grafSector = new SectorType ("Graf", Color.cyan);
   SectorType fotoSector = new SectorType ("Foto", Color.gray);
+  SectorType badSector = new SectorType ("Bad", Color.darkGray);
+
+  SectorType[] sectors = { catalogSector, badSector, codeSector, textSector, infoSector,
+                           dataSector, grafSector, fotoSector };
 
   public PascalDisk (Disk disk)
   {
@@ -48,6 +52,7 @@ public class PascalDisk extends AbstractFormattedDisk
     sectorTypesList.add (infoSector);
     sectorTypesList.add (grafSector);
     sectorTypesList.add (fotoSector);
+    sectorTypesList.add (badSector);
 
     List<DiskAddress> blocks = disk.getDiskAddressList (0, 1);    // B0, B1
     this.bootSector = new BootSector (disk, disk.readSectors (blocks), "Pascal");

@@ -20,36 +20,12 @@ public class FileEntry extends CatalogEntry
     int max = Math.min (lastBlock, parent.getDisk ().getTotalBlocks ());
     for (int i = firstBlock; i < max; i++)
     {
-      switch (fileType)
+      if (fileType < parent.sectors.length)
+        parent.sectorTypes[i] = parent.sectors[fileType];
+      else
       {
-        case 2:
-          parent.sectorTypes[i] = parent.codeSector;
-          break;
-
-        case 3:
-          parent.sectorTypes[i] = parent.textSector;
-          break;
-
-        case 4:
-          parent.sectorTypes[i] = parent.infoSector;
-          break;
-
-        case 5:
-          parent.sectorTypes[i] = parent.dataSector;
-          break;
-
-        case 6:
-          parent.sectorTypes[i] = parent.grafSector;
-          break;
-
-        case 7:
-          parent.sectorTypes[i] = parent.fotoSector;
-          break;
-
-        default:
-          System.out.println ("Unknown pascal file type : " + fileType);
-          parent.sectorTypes[i] = parent.dataSector;
-          break;
+        System.out.println ("Unknown pascal file type : " + fileType);
+        parent.sectorTypes[i] = parent.dataSector;
       }
     }
   }
@@ -109,10 +85,6 @@ public class FileEntry extends CatalogEntry
       case 5:                                           // data
         if (name.equals ("SYSTEM.CHARSET"))
           file = new Charset (name, buffer);
-        //        else if (name.equals ("WT"))               // only testing
-        //          file = new WizardryTitle (name, buffer);
-        //        else if (name.equals ("SYSTEM.RELOC"))
-        //          file = new Relocator (name, buffer);
         else
           file = new DefaultAppleFile (name, buffer);
         break;

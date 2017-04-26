@@ -8,7 +8,7 @@ class LZW1 extends LZW
   {
     bytes = Objects.requireNonNull (buffer);
 
-    crc = LZW.getWord (buffer, 0);
+    crc = Utility.getWord (buffer, 0);
     crcBase = 0;
 
     volume = buffer[2] & 0xFF;
@@ -17,7 +17,7 @@ class LZW1 extends LZW
 
     while (ptr < buffer.length - 1)          // what is in the last byte?
     {
-      int rleLength = LZW.getWord (buffer, ptr);
+      int rleLength = Utility.getWord (buffer, ptr);
       int lzwPerformed = buffer[ptr + 2] & 0xFF;
       ptr += 3;
 

@@ -67,7 +67,6 @@ public abstract class AbstractFile implements DataSource
   @Override
   public JComponent getComponent ()
   {
-    //    System.out.println ("In AbstractFile.getComponent()");
     JPanel panel = new JPanel ();
     return panel;
   }

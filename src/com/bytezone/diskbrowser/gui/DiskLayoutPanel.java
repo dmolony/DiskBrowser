@@ -82,7 +82,8 @@ class DiskLayoutPanel extends JPanel
     verticalRuler.setLayout (layout);
     horizontalRuler.setLayout (layout);
     legendPanel.setDisk (disk, layout);
-    sp.setViewportView (diskLayoutImage);     // this is the only way I know of to force a refresh
+    sp.setViewportView (diskLayoutImage);     // this is the only way I know of to 
+    // force a refresh
 
     setLayout (new BorderLayout ());
     if (disk.getGridLayout ().height == 35)
@@ -154,7 +155,6 @@ class DiskLayoutPanel extends JPanel
     // This can happen if a file is selected from a dual-dos disk
     checkCorrectDisk (event.file.getFormattedDisk ());
 
-    // This may need to allow for sparse text files with null DiskAddresses
     diskLayoutImage.setSelection (event.file.getSectors ());
   }
 

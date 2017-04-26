@@ -104,12 +104,12 @@ class Thread
 
     public ThreadHeader (byte[] buffer, int offset)
     {
-      threadClass = LZW.getWord (buffer, offset);
-      format = LZW.getWord (buffer, offset + 2);
-      threadKind = LZW.getWord (buffer, offset + 4);
-      crc = LZW.getWord (buffer, offset + 6);
-      uncompressedEOF = LZW.getLong (buffer, offset + 8);
-      compressedEOF = LZW.getLong (buffer, offset + 12);
+      threadClass = Utility.getWord (buffer, offset);
+      format = Utility.getWord (buffer, offset + 2);
+      threadKind = Utility.getWord (buffer, offset + 4);
+      crc = Utility.getWord (buffer, offset + 6);
+      uncompressedEOF = Utility.getLong (buffer, offset + 8);
+      compressedEOF = Utility.getLong (buffer, offset + 12);
     }
 
     @Override

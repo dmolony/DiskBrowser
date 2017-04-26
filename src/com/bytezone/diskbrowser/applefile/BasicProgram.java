@@ -378,14 +378,16 @@ public class BasicProgram extends AbstractFile
       int length = getLineLength (ptr);
       if (length == 0)
       {
-        pgm.append (HexFormatter.formatNoHeader (buffer, ptr, 2, programLoadAddress));
+        pgm.append (
+            HexFormatter.formatNoHeader (buffer, ptr, 2, programLoadAddress + ptr));
         ptr += 2;
         break;
       }
 
       if (ptr + length < buffer.length)
-        pgm.append (HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress)
-            + "\n\n");
+        pgm.append (
+            HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress + ptr)
+                + "\n\n");
       ptr += length;
     }
 
@@ -393,7 +395,8 @@ public class BasicProgram extends AbstractFile
     {
       int length = buffer.length - ptr;
       pgm.append ("\n\n");
-      pgm.append (HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress));
+      pgm.append (
+          HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress + ptr));
     }
 
     return pgm.toString ();

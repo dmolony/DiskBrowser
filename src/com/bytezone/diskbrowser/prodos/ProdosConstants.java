@@ -34,8 +34,8 @@ public interface ProdosConstants
   int TYPE_DIRECTORY_HEADER = 15;
   int TYPE_SUBDIRECTORY_HEADER = 14;
   int TYPE_SUBDIRECTORY = 13;
-  int TYPE_GSOS_EXTENDED_FILE = 5;
-  int TYPE_PASCAL_ON_PROFILE = 4;
+  int TYPE_GSOS_EXTENDED_FILE = 5;      // tech note #25
+  int TYPE_PASCAL_ON_PROFILE = 4;       // tech note #25
   int TYPE_TREE = 3;
   int TYPE_SAPLING = 2;
   int TYPE_SEEDLING = 1;

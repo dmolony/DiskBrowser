@@ -68,13 +68,13 @@ public class TextFile extends AbstractFile
 
     // check whether file is spread over multiple buffers
     if (buffers != null)
-      return treeFileText (text);
+      return treeFileText (text);       // calls knownLength()
 
     // check whether the record length is known
     if (recordLength == 0)
       return unknownLength (text);
 
-    text.append ("Offset   Record  Text values\n");
+    text.append ("Offset  Record#  Text values\n");
     text.append (
         "------  -------  -------------------------------------------------------\n");
     return knownLength (text, 0).toString ();
@@ -82,9 +82,12 @@ public class TextFile extends AbstractFile
 
   private String treeFileText (StringBuilder text)
   {
+    text.append ("  Offset    Record#  Text values\n");
+    text.append (
+        "----------  -------  -------------------------------------------------------\n");
     for (TextBuffer tb : buffers)
     {
-      this.buffer = tb.buffer;
+      buffer = tb.buffer;
       knownLength (text, tb.firstRecNo);
     }
     return text.toString ();
@@ -105,7 +108,10 @@ public class TextFile extends AbstractFile
       while (buffer[ptr + bytes - 1] == 0)
         bytes--;
 
-      text.append (String.format ("%,6d %,8d  %s%n", ptr, recNo++,
+      if ((buffer[ptr + bytes - 1] & 0x7F) == 0x0D)     // ignore CR
+        bytes--;
+
+      text.append (String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo++,
           HexFormatter.getString (buffer, ptr, bytes)));
     }
     return text;
@@ -118,19 +124,21 @@ public class TextFile extends AbstractFile
     int size = buffer.length;
     int lastVal = 0;
     boolean newFormat = true;
-    boolean showAllOffsets = false;
+    boolean showAllOffsets = true;
 
     if (newFormat)
     {
-      text.append ("Offset   Text values\n");
-      text.append ("------  -------------------------------------------------------"
+      text.append ("  Offset    Text values\n");
+      text.append ("----------  -------------------------------------------------------"
           + "-------------------\n");
-      if (size == 0)
+      if (buffer.length == 0)
         return text.toString ();
 
-      if (buffer[ptr] != 0)
-        text.append (String.format ("%6d  ", ptr));
+      if (buffer[0] != 0)
+        text.append (String.format ("%,10d  ", ptr));
     }
+
+    int gcd = 0;
 
     while (ptr < size)
     {
@@ -144,24 +152,34 @@ public class TextFile extends AbstractFile
         if (nulls > 0)
         {
           if (newFormat)
-            text.append (String.format ("%6d  ", ptr - 1));
+            text.append (String.format ("%,10d  ", ptr - 1));
           else
             text.append ("\nNew record at : " + (ptr - 1) + "\n");
           nulls = 0;
+
+          gcd = gcd == 0 ? ptr - 1 : gcd (gcd, ptr - 1);
         }
         else if (lastVal == 0x0D && newFormat)
           if (showAllOffsets)
-            text.append (String.format ("%6d  ", ptr - 1));
+            text.append (String.format ("%,10d  ", ptr - 1));
           else
-            text.append ("        ");
+            text.append ("              ");
 
         text.append ((char) val);
       }
       lastVal = val;
     }
-    if (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
+
+    if (gcd > 0)
+      text.append ("\nGCD: " + gcd);
+    else if (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
       text.deleteCharAt (text.length () - 1);
 
     return text.toString ();
+  }
+
+  private int gcd (int a, int b)
+  {
+    return a == 0 ? b : gcd (b % a, a);
   }
 }

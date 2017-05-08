@@ -34,11 +34,13 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   {
     this.dosDisk = dosDisk;
     this.disk = dosDisk.getDisk ();
+    this.disk = dosDisk.getDisk ();
     this.catalogSectorDA = catalogSector;
-    reportedSize = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
+
+    //    reportedSize = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
+    reportedSize = HexFormatter.unsignedShort (entryBuffer, 33);
     int type = entryBuffer[2] & 0xFF;
     locked = (type & 0x80) > 0;
-    this.disk = dosDisk.getDisk ();
 
     if ((type & 0x7F) == 0)
       fileType = FileType.Text;
@@ -154,14 +156,14 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           break;
 
         case IntegerBasic:
-          reportedLength = HexFormatter.intValue (buffer[0], buffer[1]);
+          reportedLength = HexFormatter.unsignedShort (buffer, 0);
           exactBuffer = new byte[reportedLength];
           System.arraycopy (buffer, 2, exactBuffer, 0, reportedLength);
           appleFile = new IntegerBasicProgram (name, exactBuffer);
           break;
 
         case ApplesoftBasic:
-          reportedLength = HexFormatter.intValue (buffer[0], buffer[1]);
+          reportedLength = HexFormatter.unsignedShort (buffer, 0);
           exactBuffer = new byte[reportedLength];
           if (reportedLength > buffer.length)
             reportedLength = buffer.length - 2;
@@ -171,12 +173,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
         case Binary:                        // binary file
         case Relocatable:                   // relocatable binary file
-          //          if (buffer.length == 0)
-          //            appleFile = new AssemblerProgram (name, buffer, 0);
-          //          else
-          //          {
-          int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
-          reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
+          int loadAddress = HexFormatter.unsignedShort (buffer, 0);
+          reportedLength = HexFormatter.unsignedShort (buffer, 2);
           if (reportedLength == 0)
           {
             System.out.println (name.trim () + " reported length : 0 - reverting to "
@@ -275,8 +273,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   {
     byte[] exactBuffer;
 
-    int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
-    int reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
+    //    int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
+    int loadAddress = HexFormatter.unsignedShort (buffer, 0);
+    //    int reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
+    int reportedLength = HexFormatter.unsignedShort (buffer, 2);
     if (reportedLength == 0)
     {
       System.out.println (

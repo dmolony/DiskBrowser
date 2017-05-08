@@ -20,6 +20,7 @@ public interface ProdosConstants
   int FILE_TYPE_PNT = 0xC0;
   int FILE_TYPE_PIC = 0xC1;
   int FILE_TYPE_FONT = 0xC8;
+  int FILE_TYPE_FINDER = 0xC9;
   int FILE_TYPE_ICN = 0xCA;
   int FILE_TYPE_APPLETALK = 0xE2;
   int FILE_TYPE_PASCAL_VOLUME = 0xEF;

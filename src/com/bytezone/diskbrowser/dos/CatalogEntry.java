@@ -6,13 +6,14 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class CatalogEntry extends AbstractCatalogEntry
 {
-  int textFileGaps;
-  int length;
-  int address;
+  private int textFileGaps;
+  private int length;
+  private int address;
 
   public CatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
   {
     super (dosDisk, catalogSector, entryBuffer); // build lists of ts and data sectors
+
     if (reportedSize > 0 && disk.isValidAddress (entryBuffer[0], entryBuffer[1]))
     {
       // Get address of first TS-list sector

@@ -40,73 +40,53 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     this.parentDirectory = parent;
     this.catalogBlock = this.disk.getDiskAddress (parentBlock);
 
-    fileType = entryBuffer[16] & 0xFF;
-    //    keyPtr = HexFormatter.intValue (entryBuffer[17], entryBuffer[18]);
-    keyPtr = HexFormatter.unsignedShort (entryBuffer, 17);
-    //    System.out.printf ("%5d  %5d%n",
-    //        HexFormatter.intValue (entryBuffer[17], entryBuffer[18]), keyPtr);
-    //    blocksUsed = HexFormatter.intValue (entryBuffer[19], entryBuffer[20]);
-    blocksUsed = HexFormatter.unsignedShort (entryBuffer, 19);
+    fileType = entryBuffer[0x10] & 0xFF;
+    keyPtr = HexFormatter.unsignedShort (entryBuffer, 0x11);
+    blocksUsed = HexFormatter.unsignedShort (entryBuffer, 0x13);
     endOfFile = HexFormatter.intValue (entryBuffer[21], entryBuffer[22], entryBuffer[23]);
 
-    //    auxType = HexFormatter.intValue (entryBuffer[31], entryBuffer[32]);
-    auxType = HexFormatter.unsignedShort (entryBuffer, 31);
-    modified = HexFormatter.getAppleDate (entryBuffer, 33);
-    //    headerPointer = HexFormatter.intValue (entryBuffer[37], entryBuffer[38]);
-    headerPointer = HexFormatter.unsignedShort (entryBuffer, 37);
+    auxType = HexFormatter.unsignedShort (entryBuffer, 0x1F);
+    modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
+    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
+
+    if (isGSOSFile ())      // I think this is wrong
+      System.out.printf ("************************************ %s is GS/OS%n", name);
 
     switch (storageType)
     {
       case TYPE_SEEDLING:
-        parentDisk.setSectorType (keyPtr, fDisk.dataSector);
-        DiskAddress da = disk.getDiskAddress (keyPtr);
-        if (da != null)
-          dataBlocks.add (da);
-        else
-          invalid = true;
+        addDataBlocks (storageType, keyPtr);
         break;
 
       case TYPE_SAPLING:
-        if (isGEOSFile ())
+        if (isGSOSFile ())                  // not sure why this exists
           traverseGEOSIndex (keyPtr);
         else
-          traverseIndex (keyPtr);
+          addDataBlocks (storageType, keyPtr);
         break;
 
       case TYPE_TREE:
-        parentDisk.setSectorType (keyPtr, fDisk.masterIndexSector);
         masterIndexBlock = disk.getDiskAddress (keyPtr);
-        indexBlocks.add (masterIndexBlock);
-        if (isGEOSFile ())
+        if (isGSOSFile ())                  // not sure why this exists
           traverseGEOSMasterIndex (keyPtr);
         else
-          traverseMasterIndex (keyPtr);
+          addDataBlocks (storageType, keyPtr);
         break;
 
       case TYPE_GSOS_EXTENDED_FILE:
-        parentDisk.setSectorType (keyPtr, fDisk.extendedKeySector);
+        parentDisk.setSectorType (keyPtr, parentDisk.extendedKeySector);
         indexBlocks.add (disk.getDiskAddress (keyPtr));
+
         byte[] buffer2 = disk.readSector (keyPtr);        // data fork and resource fork
 
+        // read 2 mini entries (data fork / resource fork)
         for (int i = 0; i < 512; i += 256)
         {
           int storageType = buffer2[i] & 0x0F;
-          int keyBlock = HexFormatter.intValue (buffer2[i + 1], buffer2[i + 2]);
-          switch (storageType)
-          {
-            case ProdosConstants.TYPE_SEEDLING:
-              parentDisk.setSectorType (keyBlock, fDisk.dataSector);
-              dataBlocks.add (disk.getDiskAddress (keyBlock));
-              break;
-            case ProdosConstants.TYPE_SAPLING:
-              traverseIndex (keyBlock);
-              break;
-            case ProdosConstants.TYPE_TREE:
-              traverseMasterIndex (keyBlock);
-              break;
-            default:
-              System.out.println ("fork not a tree, sapling or seedling!!!");
-          }
+          int keyBlock = HexFormatter.unsignedShort (buffer2, i + 1);
+          int eof =
+              HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
+          addDataBlocks (storageType, keyBlock);
         }
         break;
 
@@ -129,90 +109,87 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
-  private boolean isGEOSFile ()
+  private void addDataBlocks (int storageType, int keyPtr)
+  {
+    DiskAddress emptyDiskAddress = disk.getDiskAddress (0);
+    List<Integer> blocks = new ArrayList<Integer> ();
+
+    switch (storageType)
+    {
+      case TYPE_SEEDLING:
+        blocks.add (keyPtr);
+        break;
+
+      case TYPE_SAPLING:
+        blocks.addAll (readIndex (keyPtr));
+        break;
+
+      case TYPE_TREE:
+        for (Integer indexBlock : readMasterIndex (keyPtr))
+          blocks.addAll (readIndex (indexBlock));
+        break;
+    }
+
+    // remove trailing empty blocks
+    while (blocks.size () > 0 && blocks.get (blocks.size () - 1) == 0)
+      blocks.remove (blocks.size () - 1);
+
+    for (Integer block : blocks)
+    {
+      if (block == 0)
+        dataBlocks.add (emptyDiskAddress);
+      else
+      {
+        dataBlocks.add (disk.getDiskAddress (block));
+        parentDisk.setSectorType (block, parentDisk.dataSector);
+      }
+    }
+  }
+
+  private List<Integer> readIndex (int blockPtr)
+  {
+    List<Integer> blocks = new ArrayList<Integer> (256);
+
+    if (blockPtr == 0)                    // master index contains a zero
+      for (int i = 0; i < 256; i++)
+        blocks.add (0);
+    else
+    {
+      byte[] buffer = disk.readSector (blockPtr);
+      for (int i = 0; i < 256; i++)
+        blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8));
+      parentDisk.setSectorType (blockPtr, parentDisk.indexSector);
+      indexBlocks.add (disk.getDiskAddress (blockPtr));
+    }
+
+    return blocks;
+  }
+
+  private List<Integer> readMasterIndex (int blockPtr)
+  {
+    List<Integer> blocks = new ArrayList<Integer> (128);
+
+    byte[] buffer = disk.readSector (blockPtr);               // master index
+    parentDisk.setSectorType (blockPtr, parentDisk.masterIndexSector);
+    indexBlocks.add (disk.getDiskAddress (blockPtr));
+
+    int max = 128;
+    while (max-- > 0)
+      if (buffer[max] != 0 || buffer[max + 256] != 0)
+        break;
+
+    for (int i = 0; i <= max; i++)
+      blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8));
+
+    return blocks;
+  }
+
+  private boolean isGSOSFile ()
   {
     return ((fileType & 0xF0) == 0x80);
   }
 
-  private void traverseMasterIndex (int keyPtr)
-  {
-    byte[] buffer = disk.readSector (keyPtr);               // master index
-
-    // find the last used index block
-    // get the file size from the catalog and only check those blocks
-    int highestBlock = 0;
-    // A master index block can never be more than half full
-    for (int i = 127; i >= 0; i--)
-    {
-      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-      if (block > 0)
-      {
-        highestBlock = i;
-        break;
-      }
-    }
-
-    for (int i = 0; i <= highestBlock; i++)
-    {
-      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);       // index
-      if (block != 0)
-        traverseIndex (block);
-      else
-      // add 256 empty data blocks
-      {
-        DiskAddress da = disk.getDiskAddress (0);
-        for (int j = 0; j < 256; j++)
-          dataBlocks.add (da);
-      }
-    }
-
-    removeEmptyBlocks ();
-  }
-
-  private void removeEmptyBlocks ()
-  {
-    while (dataBlocks.size () > 0)
-    {
-      DiskAddress da = dataBlocks.get (dataBlocks.size () - 1);
-
-      if (da == null || da.getBlock () != 0)
-        break;
-
-      dataBlocks.remove (dataBlocks.size () - 1);
-    }
-  }
-
-  private void traverseIndex (int keyBlock)
-  {
-    parentDisk.setSectorType (keyBlock, parentDisk.indexSector);
-    indexBlocks.add (disk.getDiskAddress (keyBlock));
-    byte[] buffer = disk.readSector (keyBlock);
-
-    int maxBlocks = (endOfFile - 1) / 512 + 1;
-
-    for (int i = 0; i < 256; i++)
-    {
-      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-      if (!disk.isValidAddress (block))
-      {
-        System.out.println ("Invalid block in " + name + " : " + block);
-        invalid = true;
-        break;
-      }
-
-      if (dataBlocks.size () == maxBlocks)
-        break;
-
-      if (block == 0)
-        dataBlocks.add (null);                    // allow for sparse image files
-      else
-      {
-        parentDisk.setSectorType (block, parentDisk.dataSector);
-        dataBlocks.add (disk.getDiskAddress (block));
-      }
-    }
-  }
-
+  // should be removed
   private void traverseGEOSMasterIndex (int keyPtr)
   {
     byte[] buffer = disk.readSector (keyPtr);               // master index
@@ -227,6 +204,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // should be removed
   private void traverseGEOSIndex (int keyPtr)
   {
     parentDisk.setSectorType (keyPtr, parentDisk.indexSector);
@@ -260,7 +238,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     if (fileType == FILE_TYPE_TEXT && auxType > 0)      // random access file
       return getRandomAccessTextFile ();
 
-    byte[] buffer = isGEOSFile () ? getGEOSBuffer () : getBuffer ();
+    byte[] buffer = isGSOSFile () ? getGEOSBuffer () : getBuffer ();
     byte[] exactBuffer = getExactBuffer (buffer);
 
     try
@@ -377,6 +355,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new FileSystemTranslator (name, exactBuffer);
           break;
         case FILE_TYPE_PASCAL_VOLUME:
+          file = new DefaultAppleFile (name, exactBuffer);
+          break;
+        case FILE_TYPE_FINDER:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
         default:

@@ -25,9 +25,10 @@ class VolumeDirectoryHeader extends DirectoryHeader
 
     bitMapBlock = HexFormatter.unsignedShort (entryBuffer, 35);
     totalBlocks = HexFormatter.unsignedShort (entryBuffer, 37);
-    if (totalBlocks == 0xFFFF || totalBlocks == 0x7FFF)
-      totalBlocks = (int) disk.getFile ().length () / 4096 * 8;   // ignore extra bytes
-    //    totalBitMapBlocks = (totalBlocks * 8 - 1) / 4096 + 1;
+
+    //    if (totalBlocks == 0xFFFF || totalBlocks == 0x7FFF)
+    //      totalBlocks = (int) disk.getFile ().length () / 4096 * 8;// ignore extra bytes
+
     totalBitMapBlocks = (totalBlocks - 1) / 512 + 1;
 
     int block = 2;
@@ -39,7 +40,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     } while (block > 0);
 
     // convert the Free Sector Table
-    int bitMapBytes = totalBlocks / 8; // one bit per block
+    int bitMapBytes = totalBlocks / 8;                  // one bit per block
     byte[] buffer = new byte[bitMapBytes];
     int bitMapBlocks = (bitMapBytes - 1) / disk.getSectorsPerTrack () + 1;
     int lastBitMapBlock = bitMapBlock + bitMapBlocks - 1;
@@ -63,6 +64,8 @@ class VolumeDirectoryHeader extends DirectoryHeader
     // int max2 = (disk.getTotalBlocks () - 1) / 8 + 1;  // bytes required for sector map
 
     int max = (Math.min (totalBlocks, disk.getTotalBlocks ()) - 1) / 8 + 1;
+    //    System.out.printf ("total blocks %,d%n", totalBlocks);
+    //    System.out.printf ("disk blocks  %,d%n", disk.getTotalBlocks ());
 
     for (int i = 0; i < max; i++)
     {

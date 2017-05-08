@@ -246,4 +246,29 @@ public class IntegerBasicProgram extends AbstractFile
 
     return pgm.toString ();
   }
+
+/*
+ * https://groups.google.com/forum/#!topic/comp.sys.apple2/Baf36jyqwAM
+ * To convert Integer Basic to Applesoft
+
+INPUT comands - change comma to semi-colon
+remove all DIM of a string variable (not needed)
+change string variables to use MID$ - i.e.  A$(1,1)(in INT) is MID$(A$,1,1)(in AS basic)
+change GOTO or GOSUB with a variable to ON GOTO
+change IF statements to ON GOTO where possible and convert to multiple lines.  
+All statements that follow an IF on the same line are executed whether the statement 
+is true or not.
+change MOD function to  X=Y-(INT(Y/Z)*Z)
+change "#" to "<>"
+change TAB to HTAB
+change RND(X) to INT(RND(1)*X)
+relocate ML programs and change CALL'S  and POKE'S.  Since INT programs go from 
+HIMEM down, binary code is usually in low memory.
+
+These few are not necessary but make for compact code.
+
+change CALL -384 to INVERSE
+change CALL -380 to NORMAL
+change CALL -936 to HOME 
+ */
 }

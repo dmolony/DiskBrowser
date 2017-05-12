@@ -98,7 +98,7 @@ public class ProdosDisk extends AbstractFormattedDisk
 
         switch (storageType)
         {
-          case ProdosConstants.TYPE_DIRECTORY_HEADER:
+          case ProdosConstants.VOLUME_HEADER:
             assert headerEntries.size () == 0;
             vdh = new VolumeDirectoryHeader (this, entry);
             localHeader = vdh;
@@ -112,7 +112,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             parentNode.setUserObject (vdh);         // populate the empty volume node
             break;
 
-          case ProdosConstants.TYPE_SUBDIRECTORY_HEADER:
+          case ProdosConstants.SUBDIRECTORY_HEADER:
             localHeader = new SubDirectoryHeader (this, entry, parent);
             headerEntries.add (localHeader);
             currentSectorType = subcatalogSector;
@@ -120,7 +120,7 @@ public class ProdosDisk extends AbstractFormattedDisk
               sectorTypes[block] = currentSectorType;
             break;
 
-          case ProdosConstants.TYPE_SUBDIRECTORY:
+          case ProdosConstants.SUBDIRECTORY:
             FileEntry ce = new FileEntry (this, entry, localHeader, block);
             fileEntries.add (ce);
             DefaultMutableTreeNode directoryNode = new DefaultMutableTreeNode (ce);
@@ -129,11 +129,11 @@ public class ProdosDisk extends AbstractFormattedDisk
             processDirectoryBlock (ce.keyPtr, ce, directoryNode);       // Recursion !!
             break;
 
-          case ProdosConstants.TYPE_SEEDLING:
-          case ProdosConstants.TYPE_SAPLING:
-          case ProdosConstants.TYPE_TREE:
-          case ProdosConstants.TYPE_PASCAL_ON_PROFILE:
-          case ProdosConstants.TYPE_GSOS_EXTENDED_FILE:
+          case ProdosConstants.SEEDLING:
+          case ProdosConstants.SAPLING:
+          case ProdosConstants.TREE:
+          case ProdosConstants.PASCAL_ON_PROFILE:
+          case ProdosConstants.GSOS_EXTENDED_FILE:
             FileEntry fe = new FileEntry (this, entry, localHeader, block);
             fileEntries.add (fe);
             DefaultMutableTreeNode node = new DefaultMutableTreeNode (fe);

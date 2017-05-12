@@ -53,19 +53,19 @@ class ProdosCatalogSector extends AbstractSector
 
       switch (fileType)
       {
-        case TYPE_FREE:
-        case TYPE_SEEDLING:
-        case TYPE_SAPLING:
-        case TYPE_TREE:
-        case TYPE_PASCAL_ON_PROFILE:
-        case TYPE_GSOS_EXTENDED_FILE:
-        case TYPE_SUBDIRECTORY:
+        case FREE:
+        case SEEDLING:
+        case SAPLING:
+        case TREE:
+        case PASCAL_ON_PROFILE:
+        case GSOS_EXTENDED_FILE:
+        case SUBDIRECTORY:
           text.append (doFileDescription (i));
           break;
-        case TYPE_SUBDIRECTORY_HEADER:
+        case SUBDIRECTORY_HEADER:
           text.append (doSubdirectoryHeader (i));
           break;
-        case TYPE_DIRECTORY_HEADER:
+        case VOLUME_HEADER:
           text.append (doVolumeDirectoryHeader (i));
           break;
         default:
@@ -169,23 +169,23 @@ class ProdosCatalogSector extends AbstractSector
   {
     switch ((flag & 0xF0) >> 4)
     {
-      case TYPE_FREE:
+      case FREE:
         return "Deleted";
-      case TYPE_SEEDLING:
+      case SEEDLING:
         return "Seedling";
-      case TYPE_SAPLING:
+      case SAPLING:
         return "Sapling";
-      case TYPE_TREE:
+      case TREE:
         return "Tree";
-      case TYPE_PASCAL_ON_PROFILE:
+      case PASCAL_ON_PROFILE:
         return "Pascal area on a Profile HD";
-      case TYPE_GSOS_EXTENDED_FILE:
+      case GSOS_EXTENDED_FILE:
         return "GS/OS extended file";
-      case TYPE_SUBDIRECTORY:
+      case SUBDIRECTORY:
         return "Subdirectory";
-      case TYPE_SUBDIRECTORY_HEADER:
+      case SUBDIRECTORY_HEADER:
         return "Subdirectory Header";
-      case TYPE_DIRECTORY_HEADER:
+      case VOLUME_HEADER:
         return "Volume Directory Header";
       default:
         return "???";

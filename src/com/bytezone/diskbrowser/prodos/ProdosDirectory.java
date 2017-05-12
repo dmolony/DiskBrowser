@@ -46,20 +46,20 @@ class ProdosDirectory extends AbstractFile
 
       switch (storageType)
       {
-        case ProdosConstants.TYPE_DIRECTORY_HEADER:
-        case ProdosConstants.TYPE_SUBDIRECTORY_HEADER:
+        case ProdosConstants.VOLUME_HEADER:
+        case ProdosConstants.SUBDIRECTORY_HEADER:
           text.append ("/" + filename + newLine2);
           text.append (" NAME           TYPE  BLOCKS  "
               + "MODIFIED         CREATED          ENDFILE SUBTYPE" + newLine2);
           break;
 
-        case ProdosConstants.TYPE_FREE:
-        case ProdosConstants.TYPE_SEEDLING:
-        case ProdosConstants.TYPE_SAPLING:
-        case ProdosConstants.TYPE_TREE:
-        case ProdosConstants.TYPE_PASCAL_ON_PROFILE:
-        case ProdosConstants.TYPE_GSOS_EXTENDED_FILE:
-        case ProdosConstants.TYPE_SUBDIRECTORY:
+        case ProdosConstants.FREE:
+        case ProdosConstants.SEEDLING:
+        case ProdosConstants.SAPLING:
+        case ProdosConstants.TREE:
+        case ProdosConstants.PASCAL_ON_PROFILE:
+        case ProdosConstants.GSOS_EXTENDED_FILE:
+        case ProdosConstants.SUBDIRECTORY:
           int type = buffer[i + 16] & 0xFF;
           int blocks = HexFormatter.intValue (buffer[i + 19], buffer[i + 20]);
 

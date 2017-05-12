@@ -13,21 +13,24 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// File Control Block (FCB)
 public class DirectoryEntry implements AppleFileSource
 {
   private final Disk disk;
   private final CPMDisk parent;
+  private DataSource appleFile;
+
   private final int userNumber;
   private final String name;
   private final String type;
-  private final int ex;
-  private final int s1;
-  private final int s2;
-  private final int rc;
-  private final byte[] blockList = new byte[16];
+  private final int extent;
+  private final int s1;                               // reserved
+  private final int s2;                               // reserved
+  private final int recordsUsed;                      // records used in this extent
+  private final byte[] blockList = new byte[16];      // allocation blocks used
+
   private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
   private final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
-  private DataSource appleFile;
   private final boolean readOnly;
   private final boolean systemFile;
 
@@ -36,26 +39,22 @@ public class DirectoryEntry implements AppleFileSource
     this.parent = parent;
     disk = parent.getDisk ();
 
+    // hi-bits of type are used for flags
     readOnly = (buffer[offset + 9] & 0x80) != 0;
     systemFile = (buffer[offset + 10] & 0x80) != 0;
 
-    if (readOnly || systemFile)
-    {
-      byte[] typeBuffer = new byte[3];
-      typeBuffer[0] = (byte) (buffer[offset + 9] & 0x7F);
-      typeBuffer[1] = (byte) (buffer[offset + 10] & 0x7F);
-      typeBuffer[2] = buffer[offset + 11];
-      type = new String (typeBuffer).trim ();
-    }
-    else
-      type = new String (buffer, offset + 9, 3).trim ();
+    byte[] typeBuffer = new byte[3];
+    typeBuffer[0] = (byte) (buffer[offset + 9] & 0x7F);
+    typeBuffer[1] = (byte) (buffer[offset + 10] & 0x7F);
+    typeBuffer[2] = (byte) (buffer[offset + 11] & 0x7F);
+    type = new String (typeBuffer).trim ();
 
     userNumber = buffer[offset] & 0xFF;
     name = new String (buffer, offset + 1, 8).trim ();
-    ex = buffer[offset + 12] & 0xFF;
+    extent = buffer[offset + 12] & 0xFF;
     s2 = buffer[offset + 13] & 0xFF;
     s1 = buffer[offset + 14] & 0xFF;
-    rc = buffer[offset + 15] & 0xFF;
+    recordsUsed = buffer[offset + 15] & 0xFF;
     System.arraycopy (buffer, offset + 16, blockList, 0, 16);
 
     Disk disk = parent.getDisk ();
@@ -123,11 +122,11 @@ public class DirectoryEntry implements AppleFileSource
 
     String text =
         String.format ("%3d   %-8s   %-3s %s %s  %02X   %02X   %02X   %02X   %s",
-                       userNumber, name, type, ro, sf, ex, s2, s1, rc, bytes);
+            userNumber, name, type, ro, sf, extent, s2, s1, recordsUsed, bytes);
     for (DirectoryEntry entry : entries)
       text = text + "\n" + entry.line ();
 
-    if (ex != 0)
+    if (extent != 0)
       text = "                    " + text.substring (20);
 
     return text;
@@ -139,12 +138,12 @@ public class DirectoryEntry implements AppleFileSource
 
     text.append (String.format ("User number .... %d%n", userNumber));
     text.append (String.format ("File name ...... %s%n", name + "." + type));
-    text.append (String.format ("Extents lo ..... %d%n", ex));
+    text.append (String.format ("Extents lo ..... %d%n", extent));
     text.append (String.format ("Extents hi ..... %d%n", s2));
     text.append (String.format ("Reserved ....... %d%n", s1));
 
-    int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);
-    text.append (String.format ("Records ........ %02X  (%d)%n", rc, blocks));
+    int blocks = ((recordsUsed & 0xF0) >> 3) + (((recordsUsed & 0x0F) + 7) / 8);
+    text.append (String.format ("Records ........ %02X  (%d)%n", recordsUsed, blocks));
 
     String bytes = HexFormatter.getHexString (blockList, 0, 16);
     text.append (String.format ("Allocation ..... %s%n", bytes));
@@ -178,8 +177,8 @@ public class DirectoryEntry implements AppleFileSource
       return appleFile;
     }
 
-    DirectoryEntry entry = rc == 0x80 ? entries.get (entries.size () - 1) : this;
-    int len = (entry.ex * 128 + entry.rc) * 128;
+    DirectoryEntry entry = recordsUsed == 0x80 ? entries.get (entries.size () - 1) : this;
+    int len = (entry.extent * 128 + entry.recordsUsed) * 128;
 
     byte[] exactBuffer = new byte[len];
     System.arraycopy (buffer, 0, exactBuffer, 0, len);

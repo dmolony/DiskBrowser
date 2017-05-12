@@ -46,11 +46,11 @@ class ProdosExtendedKeySector extends AbstractSector
   {
     switch ((flag & 0x0F))
     {
-      case ProdosConstants.TYPE_SEEDLING:
+      case ProdosConstants.SEEDLING:
         return "Seedling";
-      case ProdosConstants.TYPE_SAPLING:
+      case ProdosConstants.SAPLING:
         return "Sapling";
-      case ProdosConstants.TYPE_TREE:
+      case ProdosConstants.TREE:
         return "Tree";
       default:
         return "???";

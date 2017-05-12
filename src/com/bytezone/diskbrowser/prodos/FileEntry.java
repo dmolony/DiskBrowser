@@ -54,18 +54,18 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     switch (storageType)
     {
-      case TYPE_SEEDLING:
+      case SEEDLING:
         addDataBlocks (storageType, keyPtr);
         break;
 
-      case TYPE_SAPLING:
+      case SAPLING:
         if (isGSOSFile ())                  // not sure why this exists
           traverseGEOSIndex (keyPtr);
         else
           addDataBlocks (storageType, keyPtr);
         break;
 
-      case TYPE_TREE:
+      case TREE:
         masterIndexBlock = disk.getDiskAddress (keyPtr);
         if (isGSOSFile ())                  // not sure why this exists
           traverseGEOSMasterIndex (keyPtr);
@@ -73,7 +73,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           addDataBlocks (storageType, keyPtr);
         break;
 
-      case TYPE_GSOS_EXTENDED_FILE:
+      case GSOS_EXTENDED_FILE:
         parentDisk.setSectorType (keyPtr, parentDisk.extendedKeySector);
         indexBlocks.add (disk.getDiskAddress (keyPtr));
 
@@ -90,17 +90,17 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         }
         break;
 
-      case TYPE_SUBDIRECTORY:
+      case SUBDIRECTORY:
         int block = keyPtr;
         do
         {
           dataBlocks.add (disk.getDiskAddress (block));
           byte[] buffer = disk.readSector (block);
-          block = HexFormatter.intValue (buffer[2], buffer[3]);
+          block = HexFormatter.unsignedShort (buffer, 2);
         } while (block > 0);
         break;
 
-      case TYPE_PASCAL_ON_PROFILE:
+      case PASCAL_ON_PROFILE:
         indexBlocks.add (disk.getDiskAddress (keyPtr));
         break;
 
@@ -116,15 +116,15 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     switch (storageType)
     {
-      case TYPE_SEEDLING:
+      case SEEDLING:
         blocks.add (keyPtr);
         break;
 
-      case TYPE_SAPLING:
+      case SAPLING:
         blocks.addAll (readIndex (keyPtr));
         break;
 
-      case TYPE_TREE:
+      case TREE:
         for (Integer indexBlock : readMasterIndex (keyPtr))
           blocks.addAll (readIndex (indexBlock));
         break;
@@ -140,8 +140,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         dataBlocks.add (emptyDiskAddress);
       else
       {
-        dataBlocks.add (disk.getDiskAddress (block));
         parentDisk.setSectorType (block, parentDisk.dataSector);
+        dataBlocks.add (disk.getDiskAddress (block));
       }
     }
   }
@@ -155,11 +155,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         blocks.add (0);
     else
     {
-      byte[] buffer = disk.readSector (blockPtr);
-      for (int i = 0; i < 256; i++)
-        blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8));
       parentDisk.setSectorType (blockPtr, parentDisk.indexSector);
       indexBlocks.add (disk.getDiskAddress (blockPtr));
+
+      byte[] buffer = disk.readSector (blockPtr);
+      for (int i = 0; i < 256; i++)
+        blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 0x100] & 0xFF) << 8));
     }
 
     return blocks;
@@ -167,23 +168,24 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private List<Integer> readMasterIndex (int blockPtr)
   {
-    List<Integer> blocks = new ArrayList<Integer> (128);
-
-    byte[] buffer = disk.readSector (blockPtr);               // master index
     parentDisk.setSectorType (blockPtr, parentDisk.masterIndexSector);
     indexBlocks.add (disk.getDiskAddress (blockPtr));
 
-    int max = 128;
-    while (max-- > 0)
-      if (buffer[max] != 0 || buffer[max + 256] != 0)
+    byte[] buffer = disk.readSector (blockPtr);               // master index
+
+    int highest = 0x80;
+    while (highest-- > 0)                                     // decrement after test
+      if (buffer[highest] != 0 || buffer[highest + 0x100] != 0)
         break;
 
-    for (int i = 0; i <= max; i++)
+    List<Integer> blocks = new ArrayList<Integer> (highest + 1);
+    for (int i = 0; i <= highest; i++)
       blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8));
 
     return blocks;
   }
 
+  // should be removed
   private boolean isGSOSFile ()
   {
     return ((fileType & 0xF0) == 0x80);
@@ -403,11 +405,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     switch (storageType)
     {
-      case TYPE_TREE:
+      case TREE:
         return getTreeTextFile ();
-      case TYPE_SAPLING:
+      case SAPLING:
         return getSaplingTextFile ();
-      case TYPE_SEEDLING:
+      case SEEDLING:
         return getSeedlingTextFile ();
       default:
         System.out.println ("Impossible: text file: " + storageType);
@@ -478,12 +480,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     switch (storageType)
     {
-      case TYPE_SEEDLING:
-      case TYPE_SAPLING:
-      case TYPE_TREE:
+      case SEEDLING:
+      case SAPLING:
+      case TREE:
         return disk.readSectors (dataBlocks);
 
-      case TYPE_SUBDIRECTORY:
+      case SUBDIRECTORY:
         byte[] fullBuffer = new byte[dataBlocks.size () * BLOCK_ENTRY_SIZE];
         int offset = 0;
         for (DiskAddress da : dataBlocks)
@@ -494,10 +496,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         }
         return fullBuffer;
 
-      case TYPE_GSOS_EXTENDED_FILE:
+      case GSOS_EXTENDED_FILE:
         return disk.readSectors (dataBlocks);   // data and resource forks concatenated
 
-      case TYPE_PASCAL_ON_PROFILE:
+      case PASCAL_ON_PROFILE:
         return disk.readSectors (dataBlocks);
 
       default:
@@ -510,12 +512,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     switch (storageType)
     {
-      case TYPE_SEEDLING:
+      case SEEDLING:
         System.out.println ("Seedling GEOS file : " + name); // not sure if possible
         return disk.readSectors (dataBlocks);
-      case TYPE_SAPLING:
+      case SAPLING:
         return getIndexFile (keyPtr);
-      case TYPE_TREE:
+      case TREE:
         return getMasterIndexFile (keyPtr);
       default:
         System.out.println ("Unknown storage type for GEOS file : " + storageType);

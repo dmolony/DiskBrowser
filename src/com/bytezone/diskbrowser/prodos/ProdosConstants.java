@@ -32,15 +32,15 @@ public interface ProdosConstants
   int FILE_TYPE_RELOCATABLE = 0xFE;
   int FILE_TYPE_SYS = 0xFF;
 
-  int TYPE_DIRECTORY_HEADER = 15;
-  int TYPE_SUBDIRECTORY_HEADER = 14;
-  int TYPE_SUBDIRECTORY = 13;
-  int TYPE_GSOS_EXTENDED_FILE = 5;      // tech note #25
-  int TYPE_PASCAL_ON_PROFILE = 4;       // tech note #25
-  int TYPE_TREE = 3;
-  int TYPE_SAPLING = 2;
-  int TYPE_SEEDLING = 1;
-  int TYPE_FREE = 0;
+  int VOLUME_HEADER = 15;
+  int SUBDIRECTORY_HEADER = 14;
+  int SUBDIRECTORY = 13;
+  int GSOS_EXTENDED_FILE = 5;      // tech note #25
+  int PASCAL_ON_PROFILE = 4;       // tech note #25
+  int TREE = 3;
+  int SAPLING = 2;
+  int SEEDLING = 1;
+  int FREE = 0;
 
   String[] fileTypes = { //
                         "NON", "BAD", "PCD", "PTX", "TXT", "PDA", "BIN", "FNT", //

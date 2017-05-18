@@ -50,7 +50,7 @@ public class BasicProgram extends AbstractFile
     int max = buffer.length - 4;    // need at least 4 bytes to make a SourceLine
     while (ptr < max)
     {
-      int offset = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
+      int offset = HexFormatter.unsignedShort (buffer, ptr);
       if (offset <= prevOffset)
         break;
 
@@ -86,7 +86,8 @@ public class BasicProgram extends AbstractFile
         if (subline.isEmpty ())
           continue;
 
-        // A REM statement might conceal an assembler routine - see P.CREATE on Diags2E.DSK
+        // A REM statement might conceal an assembler routine
+        // - see P.CREATE on Diags2E.DSK
         if (subline.is (TOKEN_REM) && subline.containsToken ())
         {
           int address = subline.getAddress () + 1;              // skip the REM token
@@ -370,7 +371,7 @@ public class BasicProgram extends AbstractFile
       addHeader (pgm);
 
     int ptr = 0;
-    int offset = HexFormatter.intValue (buffer[0], buffer[1]);
+    int offset = HexFormatter.unsignedShort (buffer, 0);
     int programLoadAddress = offset - getLineLength (0);
 
     while (ptr <= endPtr)             // stop at the same place as the source listing
@@ -426,10 +427,10 @@ public class BasicProgram extends AbstractFile
 
   private int getLineLength (int ptr)
   {
-    int offset = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
+    int offset = HexFormatter.unsignedShort (buffer, ptr);
     if (offset == 0)
       return 0;
-    ptr += 4;
+    ptr += 4;               // skip offset and line number
     int length = 5;
 
     while (ptr < buffer.length && buffer[ptr++] != 0)
@@ -729,18 +730,15 @@ public class BasicProgram extends AbstractFile
       for (int p = startPtr; p <= max; p++)
       {
         byte b = buffer[p];
-        if ((b & 0x80) > 0)               // token
+        if ((b & 0x80) > 0)                         // token
         {
           if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
             line.append (' ');
           int val = b & 0x7F;
           if (val < ApplesoftConstants.tokens.length)
             line.append (ApplesoftConstants.tokens[b & 0x7F]);
-          // else
-          // System.out.println ("Bad value : " + val + " " + line.toString () + " "
-          // + parent.lineNumber);
         }
-        else if (b < 32) // CTRL character
+        else if (b < 32)                            // CTRL character
           line.append ("^" + (char) (b + 64));      // would be better in inverse text
         else
           line.append ((char) b);

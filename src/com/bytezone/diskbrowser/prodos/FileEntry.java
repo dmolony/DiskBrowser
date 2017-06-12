@@ -49,7 +49,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
     headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
 
-    if (isGSOSFile ())      // I think this is wrong
+    if (isGSOSFile ())                      // I think this is wrong
       System.out.printf ("************************************ %s is GS/OS%n", name);
 
     switch (storageType)
@@ -74,20 +74,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
 
       case GSOS_EXTENDED_FILE:
-        parentDisk.setSectorType (keyPtr, parentDisk.extendedKeySector);
-        indexBlocks.add (disk.getDiskAddress (keyPtr));
-
-        byte[] buffer2 = disk.readSector (keyPtr);        // data fork and resource fork
-
-        // read 2 mini entries (data fork / resource fork)
-        for (int i = 0; i < 512; i += 256)
-        {
-          int storageType = buffer2[i] & 0x0F;
-          int keyBlock = HexFormatter.unsignedShort (buffer2, i + 1);
-          int eof =
-              HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
-          addDataBlocks (storageType, keyBlock);
-        }
+        readForks ();
         break;
 
       case SUBDIRECTORY:
@@ -102,10 +89,29 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
       case PASCAL_ON_PROFILE:
         indexBlocks.add (disk.getDiskAddress (keyPtr));
+        System.out.println ("PASCAL on PROFILE: " + name);
+        // are these blocks guaranteed to be contiguous?
         break;
 
       default:
         System.out.println ("Unknown storage type: " + storageType);
+    }
+  }
+
+  private void readForks ()
+  {
+    parentDisk.setSectorType (keyPtr, parentDisk.extendedKeySector);
+    indexBlocks.add (disk.getDiskAddress (keyPtr));
+
+    byte[] buffer2 = disk.readSector (keyPtr);        // data fork and resource fork
+
+    // read 2 mini entries (data fork / resource fork)
+    for (int i = 0; i < 512; i += 256)
+    {
+      int storageType = buffer2[i] & 0x0F;
+      int keyBlock = HexFormatter.unsignedShort (buffer2, i + 1);
+      int eof = HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
+      addDataBlocks (storageType, keyBlock);
     }
   }
 
@@ -188,7 +194,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   // should be removed
   private boolean isGSOSFile ()
   {
-    return ((fileType & 0xF0) == 0x80);
+    //    return ((fileType & 0xF0) == 0x80);
+    if ((fileType & 0xF0) == 0x80)
+      System.out.println ("GS/OS file: " + name);
+    return false;
   }
 
   // should be removed
@@ -508,6 +517,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // should be removed
   private byte[] getGEOSBuffer ()
   {
     switch (storageType)
@@ -525,6 +535,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // should be removed
   private byte[] getMasterIndexFile (int keyPtr)
   {
     byte[] buffer = disk.readSector (keyPtr);
@@ -545,6 +556,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return fileBuffer;
   }
 
+  // should be removed
   private byte[] getIndexFile (int keyPtr)
   {
     byte[] buffer = disk.readSector (keyPtr);

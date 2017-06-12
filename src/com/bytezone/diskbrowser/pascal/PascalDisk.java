@@ -130,6 +130,9 @@ public class PascalDisk extends AbstractFormattedDisk
     disk.setInterleave (1);                 // should only ever be Prodos
     if (checkFormat (disk, debug))
       return true;
+    disk.setInterleave (0);                 // SANE Disk 2.po
+    if (checkFormat (disk, debug))
+      return true;
     return false;
   }
 

@@ -18,7 +18,7 @@ import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 
 class DiskLegendPanel extends JPanel
 {
-  private static final int LEFT = 10;
+  private static final int LEFT = 3;
   private static final int TOP = 10;
 
   private FormattedDisk disk;
@@ -69,7 +69,7 @@ class DiskLegendPanel extends JPanel
 
     for (SectorType type : disk.getSectorTypeList ())
     {
-      int x = LEFT + (count % 2 == 0 ? 0 : 145);
+      int x = LEFT + (count % 2 == 0 ? 0 : 155);
       int y = TOP + count++ / 2 * lineHeight;
 
       // draw border

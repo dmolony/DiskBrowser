@@ -7,11 +7,6 @@ public class OriginalHiResImage extends HiResImage
 {
   private static final int WHITE = 0xFFFFFF;
   private static final int BLACK = 0x000000;
-  //  private static final int RED = 0xFF0000;
-  //  private static final int GREEN = 0x00CC00;
-  //  private static final int BLUE = 0x0000FF;
-  //  private static final int VIOLET = 0xBB66FF;
-  //  private static final int[][] palette = { { VIOLET, GREEN }, { BLUE, RED } };
   private static final int[][] paletteTable = { { 9, 6 }, { 12, 3 } };
 
   private static boolean matchColourBits = false;
@@ -41,6 +36,9 @@ public class OriginalHiResImage extends HiResImage
 
     //    createImage ();
   }
+
+  // https://github.com/Michaelangel007/apple2_hgr_font_tutorial
+  // hgr[ y ] = 0x2000 + (y/64)*0x28 + (y%8)*0x400 + ((y/8)&7)*0x80;
 
   @Override
   protected void createMonochromeImage ()

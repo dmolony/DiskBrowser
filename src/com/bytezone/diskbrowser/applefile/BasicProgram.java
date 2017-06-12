@@ -139,12 +139,22 @@ public class BasicProgram extends AbstractFile
         // (see SEA BATTLE on DISK283.DSK)
         if (subline.is (TOKEN_REM) && lineText.length () > wrapRemAt + 4)
         {
+          //          System.out.println (lineText.length ());
           String copy = lineText.substring (4);
           text.append ("REM ");
-          int inset = text.length ();
+          int inset = text.length () + 1;
           List<String> remarks = splitRemark (copy, wrapRemAt);
+          boolean first = true;
           for (String remark : remarks)
-            text.append ("                        ".substring (0, inset) + remark);
+          {
+            if (first)
+            {
+              first = false;
+              text.append (remark);
+            }
+            else
+              text.append ("\n                        ".substring (0, inset) + remark);
+          }
         }
         else
           text.append (lineText);
@@ -268,14 +278,12 @@ public class BasicProgram extends AbstractFile
       int max = Math.min (wrapLength, remark.length () - 1);
       while (max > 0 && remark.charAt (max) != ' ')
         --max;
-      //      System.out.println (remark.substring (0, max));
-      remarks.add (remark.substring (0, max) + "\n");
       if (max == 0)
         break;
-      remark = remark.substring (max + 1);
+      remarks.add (remark.substring (0, max));
+      remark = remark.substring (max);
     }
     remarks.add (remark);
-    //    System.out.println (remark);
     return remarks;
   }
 

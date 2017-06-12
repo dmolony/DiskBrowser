@@ -533,13 +533,14 @@ public class DiskFactory
   private static FormattedDisk check2mgDisk (File file)
   {
     if (debug)
-      System.out.println ("Checking Prodos 2mg disk");
+      System.out.println ("Checking 2mg disk");
 
     try
     {
       AppleDisk disk = new AppleDisk (file, 0, 0);
       if (disk.getTotalBlocks () > 0 && ProdosDisk.isCorrectFormat (disk))
         return new ProdosDisk (disk);
+      // should check for DOS, but AppleDisk assumes 2mg has 512 byte blocks
     }
     catch (Exception e)
     {

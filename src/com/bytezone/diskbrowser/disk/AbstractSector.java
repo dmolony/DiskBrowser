@@ -83,31 +83,30 @@ public abstract class AbstractSector implements DataSource
     return panel;
   }
 
-  protected void addText (StringBuilder text, byte[] b, int offset, int size, String desc)
+  protected void addText (StringBuilder text, byte[] buffer, int offset, int size,
+      String desc)
   {
-    if ((offset + size - 1) > b.length)
-    {
-      //      System.out.printf ("Offset : %d, Size : %d, Buffer : %d%n", offset, size, buffer.length);
+    if ((offset + size - 1) > buffer.length)
       return;
-    }
 
     switch (size)
     {
       case 1:
-        text.append (
-            String.format ("%03X       %02X            %s%n", offset, b[offset], desc));
+        text.append (String.format ("%03X       %02X            %s%n", offset,
+            buffer[offset], desc));
         break;
       case 2:
         text.append (String.format ("%03X-%03X   %02X %02X         %s%n", offset,
-            offset + 1, b[offset], b[offset + 1], desc));
+            offset + 1, buffer[offset], buffer[offset + 1], desc));
         break;
       case 3:
         text.append (String.format ("%03X-%03X   %02X %02X %02X      %s%n", offset,
-            offset + 2, b[offset], b[offset + 1], b[offset + 2], desc));
+            offset + 2, buffer[offset], buffer[offset + 1], buffer[offset + 2], desc));
         break;
       case 4:
         text.append (String.format ("%03X-%03X   %02X %02X %02X %02X   %s%n", offset,
-            offset + 3, b[offset], b[offset + 1], b[offset + 2], b[offset + 3], desc));
+            offset + 3, buffer[offset], buffer[offset + 1], buffer[offset + 2],
+            buffer[offset + 3], desc));
         break;
       default:
         System.out.println ("Invalid length : " + size);

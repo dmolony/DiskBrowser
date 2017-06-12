@@ -45,6 +45,14 @@ class DosVTOCSector extends AbstractSector
     addText (text, buffer, 3, 1, "DOS release number");
     addText (text, buffer, 4, 2, "Not used");
     addTextAndDecimal (text, buffer, 6, 1, "Diskette volume");
+    addText (text, buffer, 7, 4, "Not used");
+    addText (text, buffer, 11, 4, "Not used");
+    addText (text, buffer, 15, 4, "Not used");
+    addText (text, buffer, 19, 4, "Not used");
+    addText (text, buffer, 23, 4, "Not used");
+    addText (text, buffer, 27, 4, "Not used");
+    addText (text, buffer, 31, 4, "Not used");
+    addText (text, buffer, 35, 4, "Not used");
     addTextAndDecimal (text, buffer, 39, 1, "Maximum TS pairs");
     addText (text, buffer, 40, 4, "Not used");
     addText (text, buffer, 44, 4, "Not used");

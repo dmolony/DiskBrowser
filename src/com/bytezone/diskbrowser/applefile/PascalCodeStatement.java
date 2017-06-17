@@ -264,9 +264,8 @@ public class PascalCodeStatement implements PascalConstants
   {
     String hex = getHex (buffer, ptr, length > 4 ? 4 : length);
     StringBuilder text = new StringBuilder ();
-    text.append (String.format ("%2s%05X: %-11s  %-6s %-8s   %s%n",
-                                jumpTarget ? "->" : "", ptr, hex, mnemonic, extras,
-                                description));
+    text.append (String.format ("%2s%05X: %-11s  %-6s %-10s  %s%n",
+        jumpTarget ? "->" : "", ptr, hex, mnemonic, extras, description));
     if (length > 4)
     {
       int bytesLeft = length - 4;

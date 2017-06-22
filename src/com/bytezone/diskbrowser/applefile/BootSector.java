@@ -9,6 +9,8 @@ public class BootSector extends AbstractSector
 {
   private static final byte[] skew = { 0x00, 0x0D, 0x0B, 0x09, 0x07, 0x05, 0x03, 0x01,
                                        0x0E, 0x0C, 0x0A, 0x08, 0x06, 0x04, 0x02, 0x0F };
+  private static final int SKEW_OFFSET = 0x4D;
+
   AssemblerProgram assembler1;
   AssemblerProgram assembler2;
   String name;                                        // DOS or Prodos
@@ -19,10 +21,9 @@ public class BootSector extends AbstractSector
     this.name = name;
   }
 
-  public BootSector (Disk disk, byte[] buffer, String name)//,
-  //      List<DiskAddress> diskAddressList)
+  public BootSector (Disk disk, byte[] buffer, String name)
   {
-    super (disk, buffer);//, diskAddressList);
+    super (disk, buffer);
     this.name = name;
   }
 
@@ -36,16 +37,16 @@ public class BootSector extends AbstractSector
       int flag = buffer[0] & 0xFF;
       if (flag == 1)                                // apple II
       {
-        if (matches (buffer, 0x4D, skew))
+        if (matches (buffer, SKEW_OFFSET, skew))
         {
-          int newLen = 0x100 - (0x4D + skew.length);
+          int newLen = 0x100 - (SKEW_OFFSET + skew.length);
           byte[] buf1 = new byte[0x4D];
           byte[] buf2 = new byte[newLen];
-          System.arraycopy (buffer, 0, buf1, 0, 0x4D);
-          System.arraycopy (buffer, 0x4D + skew.length, buf2, 0, newLen);
+          System.arraycopy (buffer, 0, buf1, 0, SKEW_OFFSET);
+          System.arraycopy (buffer, SKEW_OFFSET + skew.length, buf2, 0, newLen);
           assembler1 = new AssemblerProgram (name + " (first)", buf1, 0x800, 1);
-          assembler2 =
-              new AssemblerProgram (name + " (second)", buf2, 0x84D + skew.length, 0);
+          assembler2 = new AssemblerProgram (name + " (second)", buf2,
+              SKEW_OFFSET + skew.length, 0);
         }
         else
           assembler1 = new AssemblerProgram (name + " Boot Loader", buffer, 0x00, 1);
@@ -68,7 +69,8 @@ public class BootSector extends AbstractSector
     if (assembler2 != null)
     {
       text.append ("\n\n");
-      text.append (HexFormatter.formatNoHeader (buffer, 0x4D, skew.length, 0x800));
+      text.append (HexFormatter.formatNoHeader (buffer, SKEW_OFFSET, skew.length,
+          0x800 + SKEW_OFFSET));
       text.append ("\n\n");
       text.append (assembler2.getText ());
     }

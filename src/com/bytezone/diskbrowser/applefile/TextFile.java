@@ -171,7 +171,7 @@ public class TextFile extends AbstractFile
     }
 
     if (gcd > 0)
-      text.append ("\nGCD: " + gcd);
+      text.append (String.format ("%nGCD: %,d", gcd));
     else if (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
       text.deleteCharAt (text.length () - 1);
 

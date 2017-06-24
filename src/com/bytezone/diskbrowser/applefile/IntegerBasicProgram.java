@@ -62,7 +62,7 @@ public class IntegerBasicProgram extends AbstractFile
       ptr += lineLength;
     }
 
-    if (ptr < buffer.length)
+    if ((ptr + 4) < buffer.length)
     {
       int address = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
       int remainingBytes = buffer.length - ptr - 5;

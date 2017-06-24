@@ -246,6 +246,11 @@ public class IntegerBasicProgram extends AbstractFile
 
     return pgm.toString ();
   }
+/*
+ * To find integer basic in memory:
+ * $CA $CB contain the starting address
+ * http://www.easy68k.com/paulrsm/6502/INTLST.TXT
+ */
 
 /*
  * https://groups.google.com/forum/#!topic/comp.sys.apple2/Baf36jyqwAM

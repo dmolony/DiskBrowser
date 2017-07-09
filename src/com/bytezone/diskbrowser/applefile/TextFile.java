@@ -88,7 +88,7 @@ public class TextFile extends AbstractFile
     for (TextBuffer tb : buffers)
     {
       buffer = tb.buffer;
-      knownLength (text, tb.firstRecNo);
+      text = knownLength (text, tb.firstRecNo);
     }
     return text.toString ();
   }
@@ -102,6 +102,7 @@ public class TextFile extends AbstractFile
         recNo++;
         continue;
       }
+
       int len = buffer.length - ptr;
       int bytes = len < recordLength ? len : recordLength;
 
@@ -111,9 +112,12 @@ public class TextFile extends AbstractFile
       if ((buffer[ptr + bytes - 1] & 0x7F) == 0x0D)     // ignore CR
         bytes--;
 
-      text.append (String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo++,
-          HexFormatter.getString (buffer, ptr, bytes)));
+      String line = HexFormatter.getString (buffer, ptr, bytes);
+      line = line.replaceAll ("\\n", "\n                     ");
+      text.append (
+          String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo++, line));
     }
+
     return text;
   }
 

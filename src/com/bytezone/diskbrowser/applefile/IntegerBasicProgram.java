@@ -248,7 +248,7 @@ public class IntegerBasicProgram extends AbstractFile
   }
 /*
  * To find integer basic in memory:
- * $CA $CB contain the starting address
+ * $CA $CB contain the starting address ($9464)
  * http://www.easy68k.com/paulrsm/6502/INTLST.TXT
  */
 

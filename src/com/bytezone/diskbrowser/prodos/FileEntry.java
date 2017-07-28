@@ -270,6 +270,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (name.endsWith (".BMP") && HiResImage.isBmp (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
+          else if (name.endsWith (".FNT") && FontFile.isFont (exactBuffer))
+            file = new FontFile (name, exactBuffer);
           else if (link != null)
           {
             if (name.endsWith (".AUX"))
@@ -293,6 +295,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
                   buffer.length - exactBuffer.length);
           }
           break;
+
         case FILE_TYPE_TEXT:
           assert auxType == 0;                        // auxType > 0 handled above
           if (name.endsWith (".S"))
@@ -300,17 +303,21 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else
             file = new TextFile (name, exactBuffer, auxType, endOfFile);
           break;
+
         case FILE_TYPE_APPLESOFT_BASIC:
           file = new BasicProgram (name, exactBuffer);
           break;
+
         case FILE_TYPE_INTEGER_BASIC:
           file = new IntegerBasicProgram (name, exactBuffer);
           break;
+
         case FILE_TYPE_DIRECTORY:
           VolumeDirectoryHeader vdh = parentDisk.vdh;
           file = new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks,
               vdh.freeBlocks, vdh.usedBlocks);
           break;
+
         case FILE_TYPE_APPLESOFT_BASIC_VARS:
           if (endOfFile == 0)
           {
@@ -320,57 +327,74 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else
             file = new StoredVariables (name, exactBuffer);
           break;
+
         case FILE_TYPE_APPLETALK:
           file = new DefaultAppleFile (name + " (Appletalk file)", buffer);
           break;
+
         case FILE_TYPE_GWP:
           file = new SimpleText (name, exactBuffer);
           break;
+
         case FILE_TYPE_AWP:
           file = new AppleworksWPFile (name + " (Appleworks Word Processor)", buffer);
           break;
+
         case FILE_TYPE_ADB:
           file = new AppleworksADBFile (name + " (Appleworks Database File)", buffer);
           break;
+
         case FILE_TYPE_ASP:
           file = new AppleworksSSFile (name + " (Appleworks Spreadsheet File)", buffer);
           break;
+
         case FILE_TYPE_IIGS_SOURCE:       // I think this has a resource fork
           file = new SimpleText (name, exactBuffer);
           break;
+
         case FILE_TYPE_IIGS_APPLICATION:
           file = new AssemblerProgram (name, buffer, auxType);
           break;
+
         case FILE_TYPE_IIGS_DEVICE_DRIVER:
           file = new DeviceDriver (name, exactBuffer, auxType);
           break;
+
         case FILE_TYPE_ICN:
           file = new IconFile (name, exactBuffer);
           break;
+
         case FILE_TYPE_PNT:
           if (auxType == 2)
             file = new SHRPictureFile (name, exactBuffer, fileType, auxType, endOfFile);
           else
             file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           break;
+
         case FILE_TYPE_PIC:
           file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           break;
+
         case FILE_TYPE_FONT:
           file = new QuickDrawFont (name, exactBuffer, fileType, auxType);
           break;
+
         case FILE_TYPE_DESCRIPTOR_TABLE:
           file = new FileTypeDescriptorTable (name, exactBuffer);
           break;
+
         case FILE_TYPE_GSOS_FILE_SYSTEM_TRANSLATOR:
           file = new FileSystemTranslator (name, exactBuffer);
           break;
+
         case FILE_TYPE_PASCAL_VOLUME:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
+
         case FILE_TYPE_FINDER:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
+
         default:
           System.out.format ("%s - Unknown Prodos file type : %02X%n", name, fileType);
           file = new DefaultAppleFile (name, exactBuffer);

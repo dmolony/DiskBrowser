@@ -22,7 +22,7 @@ public interface ApplesoftConstants
                       "THEN ", "AT ", "NOT ", "STEP ",           // 0xC4
                       "+ ", "- ", "* ", "/ ",                    // 0xC8
                       "^ ", "AND ", "OR ", "> ",                 // 0xCC
-                      "= ", "< ", "SGN", "INT",                  // 0xD0
+                      "= ", "< ", "SGN", "INT ",                 // 0xD0
                       "ABS", "USR", "FRE", "SCRN(",              // 0xD4 
                       "PDL", "POS ", "SQR", "RND",               // 0xD8
                       "LOG", "EXP", "COS", "SIN",                // 0xDC

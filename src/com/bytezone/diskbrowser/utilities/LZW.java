@@ -55,7 +55,7 @@ class LZW
     return bit;
   }
 
-  protected int readInt (int width)
+  int readInt (int width)
   {
     if (width < 8 || width > 12)
       throw new RuntimeException ("Illegal value of r = " + width);
@@ -68,7 +68,7 @@ class LZW
     return x;
   }
 
-  protected byte[] undoRLE (byte[] inBuffer, int inPtr, int length)
+  byte[] undoRLE (byte[] inBuffer, int inPtr, int length)
   {
     byte[] outBuffer = new byte[TRACK_LENGTH];
     int outPtr = 0;

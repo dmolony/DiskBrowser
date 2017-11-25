@@ -18,6 +18,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bytezone.diskbrowser.disk.DiskFactory;
@@ -161,10 +162,10 @@ class FileSystemTab extends AbstractTab
 
     // find the old disk and replace it
     DefaultMutableTreeNode rootNode = getRootNode ();
-    Enumeration<DefaultMutableTreeNode> children = rootNode.breadthFirstEnumeration ();
+    Enumeration<TreeNode> children = rootNode.breadthFirstEnumeration ();
     while (children.hasMoreElements ())
     {
-      DefaultMutableTreeNode node = children.nextElement ();
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement ();
       fn = (FileNode) node.getUserObject ();
       if (fn.replaceDisk (disk))
         break;

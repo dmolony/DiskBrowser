@@ -104,22 +104,22 @@ abstract class AbstractTab extends JPanel implements Tab
   protected DefaultMutableTreeNode findNode (int nodeNo)
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
-    Enumeration<DefaultMutableTreeNode> children = rootNode.breadthFirstEnumeration ();
+    Enumeration<TreeNode> children = rootNode.breadthFirstEnumeration ();
     int count = 0;
     DefaultMutableTreeNode selectNode = null;
     while (children.hasMoreElements () && ++count <= nodeNo)
-      selectNode = children.nextElement ();
+      selectNode = (DefaultMutableTreeNode) children.nextElement ();
     return selectNode;
   }
 
   protected DefaultMutableTreeNode findFirstLeafNode ()
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
-    Enumeration<DefaultMutableTreeNode> children = rootNode.depthFirstEnumeration ();
+    Enumeration<TreeNode> children = rootNode.depthFirstEnumeration ();
     DefaultMutableTreeNode selectNode = null;
     while (children.hasMoreElements ())
     {
-      selectNode = children.nextElement ();
+      selectNode = (DefaultMutableTreeNode) children.nextElement ();
       if (selectNode.isLeaf ())
       {
         FileNode node = (FileNode) selectNode.getUserObject ();

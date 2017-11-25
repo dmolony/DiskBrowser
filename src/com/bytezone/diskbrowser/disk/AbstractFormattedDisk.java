@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
@@ -247,17 +248,17 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
   protected DefaultMutableTreeNode findNode (DefaultMutableTreeNode node, String name)
   {
-    Enumeration<DefaultMutableTreeNode> children = node.breadthFirstEnumeration ();
+    Enumeration<TreeNode> children = node.breadthFirstEnumeration ();
     if (children != null)
     {
       while (children.hasMoreElements ())
       {
-        DefaultMutableTreeNode childNode = children.nextElement ();
+        DefaultMutableTreeNode childNode =
+            (DefaultMutableTreeNode) children.nextElement ();
         if (childNode.getUserObject ().toString ().indexOf (name) > 0)
           return childNode;
       }
     }
-    //    System.out.println ("Node not found : " + name);
     return null;
   }
 

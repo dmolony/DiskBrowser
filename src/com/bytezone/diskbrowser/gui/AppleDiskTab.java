@@ -13,6 +13,7 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DiskFactory;
@@ -120,10 +121,10 @@ class AppleDiskTab extends AbstractTab
   private DefaultMutableTreeNode findNode (String nodeName)
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
-    Enumeration<DefaultMutableTreeNode> children = rootNode.breadthFirstEnumeration ();
+    Enumeration<TreeNode> children = rootNode.breadthFirstEnumeration ();
     while (children.hasMoreElements ())
     {
-      DefaultMutableTreeNode node = children.nextElement ();
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement ();
       Object o = node.getUserObject ();
       if (o instanceof AppleFileSource)
       {

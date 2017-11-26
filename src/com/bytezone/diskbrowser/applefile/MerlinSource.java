@@ -19,11 +19,12 @@ public class MerlinSource extends AbstractFile
   }
 
   // Source : Dos binary file
-  public MerlinSource (String name, byte[] buffer)
+  public MerlinSource (String name, byte[] buffer, int loadAddress)
   {
     super (name, buffer);
     this.eof = 0;
     this.recordLength = 0;
+    this.loadAddress = loadAddress;
   }
 
   @Override
@@ -38,7 +39,10 @@ public class MerlinSource extends AbstractFile
       text.append (String.format ("EOF (aux)     : %,8d%n", eof));
     }
     else
-      text.append (String.format ("Buffer size   : %,8d%n", buffer.length));
+    {
+      text.append (String.format ("Buffer size   : %04X   %<,8d%n", buffer.length));
+      text.append (String.format ("Load address  : %04X   %<,8d%n", loadAddress));
+    }
     text.append ("\n");
 
     ptr = 0;

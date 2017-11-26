@@ -201,7 +201,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           else if (ShapeTable.isShapeTable (exactBuffer))
             appleFile = new ShapeTable (name, exactBuffer);
           else if (name.endsWith (".S"))
-            appleFile = new MerlinSource (name, exactBuffer);
+            appleFile = new MerlinSource (name, exactBuffer, loadAddress);
           else if (HiResImage.isGif (exactBuffer))    // buffer?
             appleFile = new OriginalHiResImage (name, exactBuffer, loadAddress);
           else if (HiResImage.isPng (exactBuffer))    // buffer?

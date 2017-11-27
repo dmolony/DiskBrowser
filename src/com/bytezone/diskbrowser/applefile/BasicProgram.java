@@ -78,7 +78,7 @@ public class BasicProgram extends AbstractFile
       text = new StringBuilder (getBase (line) + "  ");
 
       int indent = loopVariables.size ();   // each full line starts at the loop indent
-      int ifIndent = 0;                 // IF statement(s) limit back indentation by NEXT
+      int ifIndent = 0;                     // IF statement(s) limit back indentation by NEXT
 
       for (SubLine subline : line.sublines)
       {

@@ -2,9 +2,6 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -32,29 +29,29 @@ public class AboutAction extends DefaultAction
 
   public void about ()
   {
-    int build = 0;
-    String buildDate = "<no date>";
-    Properties props = new Properties ();
-    InputStream in = this.getClass ().getResourceAsStream ("build.properties");
-    if (in != null)
-    {
-      try
-      {
-        props.load (in);
-        in.close ();
-        build = Integer.parseInt (props.getProperty ("build.number"));
-        buildDate = props.getProperty ("build.date");
-      }
-      catch (IOException e1)
-      {
-        System.out.println ("Properties file not found");
-      }
-    }
+    //    int build = 0;
+    //    String buildDate = "<no date>";
+    //    Properties props = new Properties ();
+    //    InputStream in = this.getClass ().getResourceAsStream ("build.properties");
+    //    if (in != null)
+    //    {
+    //      try
+    //      {
+    //        props.load (in);
+    //        in.close ();
+    //        build = Integer.parseInt (props.getProperty ("build.number"));
+    //        buildDate = props.getProperty ("build.date");
+    //      }
+    //      catch (IOException e1)
+    //      {
+    //        System.out.println ("Properties file not found");
+    //      }
+    //    }
 
-    JOptionPane.showMessageDialog (null,
-                                   "Author - Denis Molony\nBuild #"
-                                         + String.format ("%d", build) + " - " + buildDate
-                                         + "\n" + "\nContact - dmolony@iinet.net.au",
-                                   "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog (null, "Author - Denis Molony"       //
+        //        + "\nBuild #" + String.format ("%d", build) + " - " + buildDate + "\n"      //
+        + "\nGitHub - https://github.com/dmolony/DiskBrowser",         //
+        //        + "\nContact - dmolony@iinet.net.au",         //
+        "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE);
   }
 }

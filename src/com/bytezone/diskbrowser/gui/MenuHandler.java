@@ -11,8 +11,6 @@ import javax.swing.*;
 
 import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
-import com.bytezone.common.OSXAdapter;
-import com.bytezone.common.Platform;
 import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
@@ -152,26 +150,26 @@ public class MenuHandler
 
   void addHelpMenuAction (Action action, String functionName)
   {
-    if (Platform.MAC)
-    {
-      try
-      {
-        if (functionName.equals ("about"))
-          OSXAdapter.setAboutHandler (action,
-              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
-        else if (functionName.equals ("prefs"))
-          OSXAdapter.setPreferencesHandler (action,
-              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
-      }
-      catch (Exception e)
-      {
-        e.printStackTrace ();
-      }
-    }
-    else
-    {
-      helpMenu.add (new JMenuItem (action));
-    }
+    //    if (Platform.MAC)
+    //    {
+    //      try
+    //      {
+    //        if (functionName.equals ("about"))
+    //          OSXAdapter.setAboutHandler (action,
+    //              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
+    //        else if (functionName.equals ("prefs"))
+    //          OSXAdapter.setPreferencesHandler (action,
+    //              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
+    //      }
+    //      catch (Exception e)
+    //      {
+    //        e.printStackTrace ();
+    //      }
+    //    }
+    //    else
+    //    {
+    helpMenu.add (new JMenuItem (action));
+    //    }
   }
 
   private void addLauncherMenu ()

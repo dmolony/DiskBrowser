@@ -33,8 +33,8 @@ class DiskLayoutPanel extends JPanel
   private static final int SIZE = 15;             // basic unit of a display block
   //  private static final String PREFS_RETINA = "retina";
 
-  private final Preferences prefs;
-  private final MenuHandler mh;
+  //  private final Preferences prefs;
+  //  private final MenuHandler mh;
 
   private final DiskLayoutImage diskLayoutImage;
   private final ScrollRuler verticalRuler;
@@ -47,8 +47,8 @@ class DiskLayoutPanel extends JPanel
   {
     super (new BorderLayout ());
 
-    this.prefs = prefs;
-    this.mh = mh;
+    //    this.prefs = prefs;
+    //    this.mh = mh;
 
     diskLayoutImage = new DiskLayoutImage ();
     verticalRuler = new ScrollRuler (diskLayoutImage, ScrollRuler.VERTICAL);

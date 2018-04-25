@@ -20,14 +20,9 @@ class SubDirectoryHeader extends DirectoryHeader
     parentPointer = HexFormatter.intValue (entryBuffer[35], entryBuffer[36]);
     parentSequence = entryBuffer[37] & 0xFF;
     parentSize = entryBuffer[38] & 0xFF;
-  }
 
-  @Override
-  public String toString ()
-  {
-    String locked = (access == 0x01) ? "*" : " ";
-    return String.format ("   %s%-40s %15s", locked, "/" + name,
-        parentDisk.df.format (created.getTime ()));
+    if (false)
+      System.out.printf ("", parentPointer, parentSequence, parentSize);
   }
 
   @Override
@@ -41,5 +36,13 @@ class SubDirectoryHeader extends DirectoryHeader
   public List<DiskAddress> getSectors ()
   {
     return null;
+  }
+
+  @Override
+  public String toString ()
+  {
+    String locked = (access == 0x01) ? "*" : " ";
+    return String.format ("   %s%-40s %15s", locked, "/" + name,
+        parentDisk.df.format (created.getTime ()));
   }
 }

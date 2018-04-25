@@ -27,15 +27,15 @@ public class WizardryTitle extends AbstractFile
     return text.toString ();
   }
 
-  private StringBuilder decode (int value, StringBuilder text)
-  {
-    for (int bit = 0; bit < 8; bit++)
-    {
-      text.append ((value & 0x01) == 1 ? "X" : " ");
-      value >>= 1;
-    }
-    return text;
-  }
+  //  private StringBuilder decode (int value, StringBuilder text)
+  //  {
+  //    for (int bit = 0; bit < 8; bit++)
+  //    {
+  //      text.append ((value & 0x01) == 1 ? "X" : " ");
+  //      value >>= 1;
+  //    }
+  //    return text;
+  //  }
 
   private StringBuilder decode2 (int value, StringBuilder text)
   {

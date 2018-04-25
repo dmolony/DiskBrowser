@@ -189,9 +189,9 @@ public class QuickDrawFont extends AbstractFile
 
       // how the character image to be drawn should be positioned with 
       // respect to the current pen location
-      int offset = buffer[offsetWidthTableOffset + i * 2 + 1];
+      //      int offset = buffer[offsetWidthTableOffset + i * 2 + 1];
       // how far the pen should be advanced after the character is drawn
-      int width = buffer[offsetWidthTableOffset + i * 2] & 0xFF;
+      //      int width = buffer[offsetWidthTableOffset + i * 2] & 0xFF;
 
       if (character != null)
         g2d.drawImage (character.image, x, y, null);

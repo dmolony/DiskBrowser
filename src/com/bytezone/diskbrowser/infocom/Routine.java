@@ -10,7 +10,7 @@ class Routine extends InfocomAbstractFile
   private static final String padding = "                             ";
 
   int startPtr, length, strings, locals;
-  private final Header header;
+  //  private final Header header;
 
   List<Parameter> parameters = new ArrayList<Parameter> ();
   List<Instruction> instructions = new ArrayList<Instruction> ();
@@ -21,7 +21,7 @@ class Routine extends InfocomAbstractFile
   public Routine (int ptr, Header header, int caller)
   {
     super (String.format ("Routine %05X", ptr), header.buffer);
-    this.header = header;
+    //    this.header = header;
 
     locals = buffer[ptr] & 0xFF;
     if (locals > 15)
@@ -134,7 +134,7 @@ class Routine extends InfocomAbstractFile
     public String toString ()
     {
       return String.format ("%05X : L%02d : %d", (startPtr + (sequence - 1) * 2 + 1),
-                            sequence, value);
+          sequence, value);
     }
   }
 

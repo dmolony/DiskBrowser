@@ -83,7 +83,7 @@ public class SHRPictureFile extends HiResImage
     for (int row = 0; row < mainBlock.numScanLines; row++)
     {
       DirEntry dirEntry = mainBlock.scanLineDirectory[row];
-      int hi = dirEntry.mode & 0xFF00;
+      //      int hi = dirEntry.mode & 0xFF00;
       int lo = dirEntry.mode & 0x00FF;
 
       ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[row]

@@ -274,7 +274,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     byte[] exactBuffer;
 
     //    int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
-    int loadAddress = HexFormatter.unsignedShort (buffer, 0);
+    //    int loadAddress = HexFormatter.unsignedShort (buffer, 0);
     //    int reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
     int reportedLength = HexFormatter.unsignedShort (buffer, 2);
     if (reportedLength == 0)

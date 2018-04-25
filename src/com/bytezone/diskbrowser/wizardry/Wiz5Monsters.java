@@ -173,16 +173,16 @@ public class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.
       return s1 + " : " + s2;
     }
 
-    private void split (int offset, int length)
-    {
-      for (int p = offset; length > 0; p += 16, length -= 16)
-      {
-        int len = length > 15 ? 16 : length;
-        String s = HexFormatter.getHexString (buffer, p, len);
-        System.out.println (s);
-      }
-      System.out.println ();
-    }
+    //    private void split (int offset, int length)
+    //    {
+    //      for (int p = offset; length > 0; p += 16, length -= 16)
+    //      {
+    //        int len = length > 15 ? 16 : length;
+    //        String s = HexFormatter.getHexString (buffer, p, len);
+    //        System.out.println (s);
+    //      }
+    //      System.out.println ();
+    //    }
 
     @Override
     public String toString ()

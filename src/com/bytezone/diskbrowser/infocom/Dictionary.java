@@ -15,7 +15,7 @@ class Dictionary extends AbstractFile
   private final int totalSeparators;
   private final int dictionaryPtr, dictionarySize;
   private final int entryLength;
-  private final Header header;
+  //  private final Header header;
 
   // this could be a Google Multimap
   Map<Integer, List<WordEntry>> synonymList = new TreeMap<Integer, List<WordEntry>> ();
@@ -23,7 +23,7 @@ class Dictionary extends AbstractFile
   public Dictionary (Header header)
   {
     super ("Dictionary", header.buffer);
-    this.header = header;
+    //    this.header = header;
 
     dictionaryPtr = header.dictionaryOffset;
     dictionary = new TreeMap<Integer, ZString> ();
@@ -142,9 +142,8 @@ class Dictionary extends AbstractFile
 
     for (ZString word : dictionary.values ())
     {
-      text.append (String
-          .format ("%04X   %3d   %-6s   %s", ptr, count++, word.value,
-                   HexFormatter.getHexString (buffer, ptr + 4, entryLength - 4)));
+      text.append (String.format ("%04X   %3d   %-6s   %s", ptr, count++, word.value,
+          HexFormatter.getHexString (buffer, ptr + 4, entryLength - 4)));
       int b1 = buffer[ptr + 4] & 0xFF;
       int b2 = buffer[ptr + 5] & 0xFF;
       int b3 = buffer[ptr + 6] & 0xFF;
@@ -235,10 +234,9 @@ class Dictionary extends AbstractFile
 
       StringBuilder text = new StringBuilder ();
       text.append (String.format ("%04X   %3d   %-6s   %s  %s   %s", word.startPtr, seq,
-                                  word.value, bits,
-                                  HexFormatter.getHexString (buffer, word.startPtr + 4,
-                                                             entryLength - 4),
-                                  list.toString ()));
+          word.value, bits,
+          HexFormatter.getHexString (buffer, word.startPtr + 4, entryLength - 4),
+          list.toString ()));
       return text.toString ();
     }
   }

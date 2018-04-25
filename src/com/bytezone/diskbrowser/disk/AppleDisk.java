@@ -190,9 +190,7 @@ public class AppleDisk implements Disk
     {
       BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
       if (skip > 0)
-      {
-        long result = in.skip (skip);
-      }
+        in.skip (skip);
       in.read (diskBuffer);
       in.close ();
     }

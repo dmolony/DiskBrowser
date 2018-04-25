@@ -32,12 +32,12 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class V2dDisk
 {
-  private static int[][] interleave =
-      { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
-        { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
+  //  private static int[][] interleave =
+  //      { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
+  //        { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
 
-  private static final int DOS = 0;
-  private static final int PRODOS = 1;
+  //  private static final int DOS = 0;
+  //  private static final int PRODOS = 1;
 
   private static final int TRACK_LENGTH = 6304;
 

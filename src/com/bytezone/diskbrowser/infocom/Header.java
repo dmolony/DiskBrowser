@@ -9,7 +9,7 @@ class Header extends InfocomAbstractFile
   final String[] propertyNames = new String[32];
 
   private final File file;
-  private final Disk disk;
+  //  private final Disk disk;
   int version;
   int highMemory;
   int programCounter;
@@ -33,7 +33,7 @@ class Header extends InfocomAbstractFile
   public Header (String name, byte[] buffer, Disk disk)
   {
     super (name, buffer);
-    this.disk = disk;
+    //    this.disk = disk;
     this.file = disk.getFile ();
 
     version = getByte (0);

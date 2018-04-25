@@ -12,10 +12,10 @@ public class Nibblizer
       { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
         { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
 
-  private static final int DOS = 0;
-  private static final int PRODOS = 1;
-  private static final int BLOCK_SIZE = 256;
-  private static final int TRACK_SIZE = 4096;
+  static final int DOS = 0;
+  static final int PRODOS = 1;
+  static final int BLOCK_SIZE = 256;
+  static final int TRACK_SIZE = 4096;
   private static final int RAW_BUFFER_SIZE = 342;
   private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
 

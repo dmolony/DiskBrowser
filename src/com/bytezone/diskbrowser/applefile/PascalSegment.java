@@ -197,7 +197,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private String getMultiDiskAddresses ()
   {
     String multiDiskAddressText = "";
-    int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
+    //    int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
 
     //    if (segmentNoHeader == 1)           // main segment
     //    {

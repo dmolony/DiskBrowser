@@ -350,13 +350,13 @@ public class Sheet
           + "                                                                      ";
     String underline = "---------------------------------------------------------"
         + "-----------------------------------------------------------------";
-    String left = "";
-    String right = "";
-    if (columnWidth > 2)
-    {
-      left = underline.substring (0, (columnWidth - 2) / 2);
-      right = underline.substring (0, columnWidth - 3 - left.length ()) + "+";
-    }
+    //    String left = "";
+    //    String right = "";
+    //    if (columnWidth > 2)
+    //    {
+    //      left = underline.substring (0, (columnWidth - 2) / 2);
+    //      right = underline.substring (0, columnWidth - 3 - left.length ()) + "+";
+    //    }
 
     int lastRow = 0;
     int lastColumn = 0;

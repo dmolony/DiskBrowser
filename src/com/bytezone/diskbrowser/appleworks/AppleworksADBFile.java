@@ -141,6 +141,7 @@ public class AppleworksADBFile extends AbstractFile
     text.append (String.format ("Categories ......... %d%n", categories));
     text.append (String.format ("Reports ............ %d%n", totalReports));
     text.append (String.format ("Records ............ %d%n", totalRecords));
+    text.append (String.format ("Standard Record .... %s%n", standardRecord != null));
     text.append (String.format ("Min version ........ %d%n", dbMinVersion));
     text.append (String.format ("1st Frozen col ..... %d%n", firstFrozenColumn));
     text.append (String.format ("Last Frozen col .... %d%n", lastFrozenColumn));

@@ -428,7 +428,7 @@ public class WizardryScenarioDisk extends PascalDisk
       offset += max;
     }
 
-    int id = 0;
+    //    int id = 0;
     int totalLines = 0;
 
     for (int ptr = 0; ptr < buffer.length; ptr += recordLength)
@@ -463,7 +463,7 @@ public class WizardryScenarioDisk extends PascalDisk
           }
         }
         addToNode (m, node, messageBlocks, messageSector);
-        id += totalLines;
+        //        id += totalLines;
         totalLines = 0;
       }
     }

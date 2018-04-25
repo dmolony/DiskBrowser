@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.utilities;
 
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.List;
@@ -12,18 +11,18 @@ public class Utility
       Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk");
 
   // not used - it doesn't work with Oracle's JDK
-  private static boolean hasRetinaDisplay ()
-  {
-    Object obj =
-        Toolkit.getDefaultToolkit ().getDesktopProperty ("apple.awt.contentScaleFactor");
-    if (obj instanceof Float)
-    {
-      Float f = (Float) obj;
-      int scale = f.intValue ();
-      return (scale == 2);            // 1 indicates a regular mac display.
-    }
-    return false;
-  }
+  //  private static boolean hasRetinaDisplay ()
+  //  {
+  //    Object obj =
+  //        Toolkit.getDefaultToolkit ().getDesktopProperty ("apple.awt.contentScaleFactor");
+  //    if (obj instanceof Float)
+  //    {
+  //      Float f = (Float) obj;
+  //      int scale = f.intValue ();
+  //      return (scale == 2);            // 1 indicates a regular mac display.
+  //    }
+  //    return false;
+  //  }
 
   public static boolean test (Graphics2D g)
   {

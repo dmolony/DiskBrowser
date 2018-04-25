@@ -25,7 +25,7 @@ public class DoubleScrunch extends CPU
   final byte[][] memory = new byte[2][0x2000];
   private byte[] packedBuffer;
 
-  private final boolean debug = false;
+  //  private final boolean debug = false;
   private int count;
   private final int[] rows = new int[192];
   private int ptr;

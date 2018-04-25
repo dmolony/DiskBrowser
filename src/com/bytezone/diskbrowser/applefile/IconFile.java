@@ -12,24 +12,23 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class IconFile extends AbstractFile
 {
-  private static Palette palette = new Palette ("Virtual II",
-      new int[] { 0x000000, // 0 black
-                  0xDD0033, // 1 magenta
-                  0x885500, // 2 brown         (8)
-                  0xFF6600, // 3 orange        (9)
-                  0x007722, // 4 dark green
-                  0x555555, // 5 grey1
-                  0x11DD00, // 6 light green   (C)
-                  0xFFFF00, // 7 yellow        (D)
-                  0x000099, // 8 dark blue     (2)
-                  0xDD22DD, // 9 purple        (3)
-                  0xAAAAAA, // A grey2
-                  0xFF9988, // B pink
-                  0x2222FF, // C med blue      (6)
-                  0x66AAFF, // D light blue    (7)
-                  0x44FF99, // E aqua
-                  0xFFFFFF  // F white
-      });
+  private static Palette palette = new Palette ("Virtual II", new int[] { 0x000000, // 0 black
+                                                                          0xDD0033, // 1 magenta
+                                                                          0x885500, // 2 brown         (8)
+                                                                          0xFF6600, // 3 orange        (9)
+                                                                          0x007722, // 4 dark green
+                                                                          0x555555, // 5 grey1
+                                                                          0x11DD00, // 6 light green   (C)
+                                                                          0xFFFF00, // 7 yellow        (D)
+                                                                          0x000099, // 8 dark blue     (2)
+                                                                          0xDD22DD, // 9 purple        (3)
+                                                                          0xAAAAAA, // A grey2
+                                                                          0xFF9988, // B pink
+                                                                          0x2222FF, // C med blue      (6)
+                                                                          0x66AAFF, // D light blue    (7)
+                                                                          0x44FF99, // E aqua
+                                                                          0xFFFFFF  // F white
+  });
   //  private static Palette palette = new Palette ("Icon palette",
   //      new int[] { 0x000000, // 0 black
   //                  0x2222FF, // C med blue      (6)
@@ -213,7 +212,7 @@ public class IconFile extends AbstractFile
       System.arraycopy (buffer, ptr + 8 + iconSize, iconMask, 0, iconSize);
 
       int[] colours = palette.getColours ();
-      int gap = 5;
+      //      int gap = 5;
 
       image = new BufferedImage (iconWidth, iconHeight, BufferedImage.TYPE_INT_RGB);
 

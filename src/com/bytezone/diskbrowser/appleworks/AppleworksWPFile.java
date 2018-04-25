@@ -48,8 +48,9 @@ public class AppleworksWPFile extends AbstractFile
           int textLen = b4 & 0x7F;
           boolean cr = (b4 & 0x80) != 0;
 
-          //          System.out.printf ("%02X %02X %d  %d  %s %s%n", b3, b4, margin, textLen,
-          //                             containsTabs, cr);
+          if (false)
+            System.out.printf ("%02X %02X %d  %d  %s %s%n", b3, b4, lineMargin, textLen,
+                containsTabs, cr);
           if (b3 == 0xFF)
             text.append ("--------- Ruler ----------\n");
           else
@@ -137,6 +138,9 @@ public class AppleworksWPFile extends AbstractFile
       }
       ptr += 2;
     }
+    if (false)
+      System.out.printf ("", leftMargin, rightMargin, topMargin, bottomMargin,
+          paperLength, indent);
     return text.toString ();
   }
 
@@ -182,6 +186,8 @@ public class AppleworksWPFile extends AbstractFile
       text.append (String.format ("Mail merge ... %s %n", mailMerge));
       text.append (String.format ("Left margin .. %d %n", leftMargin));
       text.append (String.format ("Min version .. %d %n", sfMinVers));
+      text.append (String.format ("Mult rulers .. %s %n", multipleRulers));
+      text.append (String.format ("Paginated .... %s %n", paginated));
 
       return text.toString ();
     }

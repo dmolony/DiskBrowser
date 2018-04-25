@@ -12,7 +12,7 @@ public class BasicProgram extends AbstractFile
 {
   private static final byte ASCII_QUOTE = 0x22;
   private static final byte ASCII_COLON = 0x3A;
-  private static final byte ASCII_SEMI_COLON = 0x3B;
+  //  private static final byte ASCII_SEMI_COLON = 0x3B;
   private static final byte ASCII_CARET = 0x5E;
 
   private static final byte TOKEN_FOR = (byte) 0x81;

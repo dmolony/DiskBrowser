@@ -580,7 +580,7 @@ public class DiskFactory
       String fileName = file.getAbsolutePath ().toLowerCase ();
       int pos = file.getAbsolutePath ().indexOf ('.');
       char c = fileName.charAt (pos - 1);
-      String suffix = fileName.substring (pos + 1);
+      //      String suffix = fileName.substring (pos + 1);
       int requiredDisks = c == '1' ? 6 : c == 'a' ? 10 : 0;
 
       if (requiredDisks > 0)

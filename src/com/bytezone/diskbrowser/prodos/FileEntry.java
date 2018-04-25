@@ -24,7 +24,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final int endOfFile;
   private final int auxType;
   private final GregorianCalendar modified;
-  private final int headerPointer;
+  //  private final int headerPointer;
   private DataSource file;
   private final DiskAddress catalogBlock;
   private DiskAddress masterIndexBlock;
@@ -47,7 +47,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     auxType = HexFormatter.unsignedShort (entryBuffer, 0x1F);
     modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
-    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
+    //    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
 
     if (isGSOSFile ())                      // I think this is wrong
       System.out.printf ("************************************ %s is GS/OS%n", name);
@@ -110,7 +110,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     {
       int storageType = buffer2[i] & 0x0F;
       int keyBlock = HexFormatter.unsignedShort (buffer2, i + 1);
-      int eof = HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
+      //      int eof = HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
       addDataBlocks (storageType, keyBlock);
     }
   }

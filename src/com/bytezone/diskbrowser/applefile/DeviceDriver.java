@@ -26,6 +26,7 @@ public class DeviceDriver extends AbstractFile
 
     text.append (String.format ("Classifications ... %02X%n", classifications));
     text.append (String.format ("Driver Class ...... %02X%n", driverClass));
+    text.append (String.format ("Aux type .......... %d%n", auxType));
     text.append (String.format ("Inactive .......... %s%n", inactive ? "True" : "False"));
 
     text.deleteCharAt (text.length () - 1);

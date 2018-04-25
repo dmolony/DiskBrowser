@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.Event;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,13 +25,15 @@ class RedoHandler implements FileSelectionListener, DiskSelectionListener,
   public RedoHandler (JRootPane jRootPane, JToolBar toolBar)
   {
     // This code works as long as the toolBar arrows have focus first
-    InputMap im = jRootPane.getInputMap (JComponent.WHEN_IN_FOCUSED_WINDOW);
-    ActionMap am = jRootPane.getActionMap ();
+    InputMap inputMap = jRootPane.getInputMap (JComponent.WHEN_IN_FOCUSED_WINDOW);
+    ActionMap actionMap = jRootPane.getActionMap ();
 
-    im.put (KeyStroke.getKeyStroke (KeyEvent.VK_LEFT, Event.ALT_MASK), "LeftAction");
-    am.put ("LeftAction", leftAction);
-    im.put (KeyStroke.getKeyStroke (KeyEvent.VK_RIGHT, Event.ALT_MASK), "RightAction");
-    am.put ("RightAction", rightAction);
+    inputMap.put (KeyStroke.getKeyStroke (KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK),
+        "LeftAction");
+    actionMap.put ("LeftAction", leftAction);
+    inputMap.put (KeyStroke.getKeyStroke (KeyEvent.VK_RIGHT, InputEvent.ALT_DOWN_MASK),
+        "RightAction");
+    actionMap.put ("RightAction", rightAction);
 
     toolBar.add (leftAction);
     toolBar.add (rightAction);

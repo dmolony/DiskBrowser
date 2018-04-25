@@ -27,7 +27,7 @@ class ProdosBitMapSector extends AbstractSector
     // more than a single block
     int relativeBlock = diskAddress.getBlock () - parent.vdh.bitMapBlock;
     int startBit = relativeBlock * 4096;
-    int endBit = startBit + 4096;
+    //    int endBit = startBit + 4096;
     if (startBit >= grid.width * grid.height)
       return "This sector is not used - the physical file size makes it unnecessary";
 

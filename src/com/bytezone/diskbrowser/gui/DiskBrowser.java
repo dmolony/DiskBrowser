@@ -3,10 +3,14 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.desktop.QuitEvent;
+import java.awt.desktop.QuitHandler;
+import java.awt.desktop.QuitResponse;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
 
+import com.apple.eawt.Application;
 import com.bytezone.common.Platform;
 import com.bytezone.common.QuitAction;
 import com.bytezone.common.QuitAction.QuitListener;
@@ -126,6 +130,15 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     quitAction.addQuitListener (catalogPanel);
     quitAction.addQuitListener (diskLayoutPanel);
     quitAction.addQuitListener (this);
+
+    Application.getApplication ().setQuitHandler (new QuitHandler ()
+    {
+      @Override
+      public void handleQuitRequestWith (QuitEvent e, QuitResponse response)
+      {
+        quitAction.quit ();
+      }
+    });
 
     catalogPanel.setCloseTabAction (closeTabAction);
 

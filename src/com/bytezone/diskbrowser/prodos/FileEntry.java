@@ -259,6 +259,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_BINARY:
         case FILE_TYPE_RELOCATABLE:
         case FILE_TYPE_SYS:
+        case FILE_TYPE_BAT:
         case FILE_TYPE_USER_DEFINED_1:
           //          if (name.endsWith (".S"))
           //            file = new MerlinSource (name, exactBuffer, auxType, endOfFile);

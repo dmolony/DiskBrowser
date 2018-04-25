@@ -228,8 +228,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             else
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
           }
-          else if ((loadAddress == 0x5800 || loadAddress == 0x7800) && reportedLength == 0x240)
-        	  appleFile = new PrintShopGraphic(name, exactBuffer);
+          else if ((loadAddress == 0x5800       //
+              || loadAddress == 0x6000          //
+              || loadAddress == 0x7800)         //
+              && reportedLength == 0x240)
+            appleFile = new PrintShopGraphic (name, exactBuffer);
           else
           {
             appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);

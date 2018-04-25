@@ -18,14 +18,12 @@ public class PrintShopGraphic extends AbstractFile
     int element = 0;
 
     for (int ptr = 0; ptr < 572; ptr++)
-    {
-        for (int px = 7; px >= 0; px--)
-        {
-          int val = (buffer[ptr] >> px) & 0x01;
-          dataBuffer.setElem (element++, val == 0 ? 255 : 0);
-        }
-    }
-    
+      for (int px = 7; px >= 0; px--)
+      {
+        int val = (buffer[ptr] >> px) & 0x01;
+        dataBuffer.setElem (element++, val == 0 ? 255 : 0);
+      }
+
     g2d.dispose ();
   }
 
@@ -39,5 +37,4 @@ public class PrintShopGraphic extends AbstractFile
 
     return text.toString ();
   }
-
 }

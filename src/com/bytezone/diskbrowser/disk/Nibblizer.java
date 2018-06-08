@@ -93,7 +93,7 @@ public class Nibblizer
   {
     for (int i = 0; i < writeTranslateTable.length; i++)
     {
-      int j = (writeTranslateTable[i] & 0xFF) - 150;      // skip first 150 blanks
+      int j = (writeTranslateTable[i] & 0xFF) - 0x96;     // skip first 150 blanks
       readTranslateTable[j] = (byte) (i + 1);             // offset by 1 to avoid zero
     }
   }
@@ -125,39 +125,72 @@ public class Nibblizer
   public boolean processTrack (int trackNo, byte[] buffer, byte[] diskBuffer)
   {
     int ptr = 0;
-
-    while (buffer[ptr] == (byte) 0xEB)
-    {
-      System.out.printf ("%s overrun 0xEB offset %d in track %02X%n", file.getName (),
-          ptr, trackNo);
-      ++ptr;
-    }
-
-    ptr += skipBytes (buffer, ptr, (byte) 0xFF);          // gap1
+    int totalSectors = 0;
+    boolean[] sectorsFound = new boolean[16];
 
     while (ptr < buffer.length)
     {
+      ptr = findBytes (buffer, ptr, addressPrologue);
+      if (ptr < 0)
+      {
+        System.out.printf ("Track: %02X - Address prologue not found%n", trackNo);
+        //        System.out.println (HexFormatter.format (buffer));
+        return false;
+      }
       AddressField addressField = getAddressField (buffer, ptr);
       if (!addressField.isValid ())
+      {
+        System.out.printf ("Track: %02X - Invalid address field%n", trackNo);
         return false;
+      }
+      if (addressField.track != trackNo)
+      {
+        System.out.printf ("Track: %02X - Wrong track found (%02X)%n", trackNo,
+            addressField.track);
+        return false;
+      }
+      if (sectorsFound[addressField.sector])
+      {
+        System.out.printf ("Track: %02X - Sector already processes (%02X)%n", trackNo,
+            addressField.sector);
+        return false;
+      }
+      sectorsFound[addressField.sector] = true;
 
       assert addressField.track == trackNo;
 
       ptr += addressField.size ();
-      ptr += skipBytes (buffer, ptr, (byte) 0xFF);        // gap2
+      ptr = findBytes (buffer, ptr, dataPrologue);
+      if (ptr < 0)
+      {
+        System.out.printf ("Track: %02X - Data prologue not found%n", trackNo);
+        return false;
+      }
 
       DataField dataField = getDataField (buffer, ptr);
       if (!dataField.isValid ())
+      {
+        System.out.printf ("Track: %02X - Invalid data field%n", trackNo);
         return false;
+      }
 
       int offset = addressField.track * TRACK_SIZE
           + interleave[DOS][addressField.sector] * BLOCK_SIZE;
+
       System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, BLOCK_SIZE);
 
+      if (++totalSectors == 16)
+        break;
+
       ptr += dataField.size ();
-      ptr += skipBytes (buffer, ptr, (byte) 0xFF);        // gap3
+    }
+    if (totalSectors != 16)
+    {
+      System.out.printf ("Track: %02X - Sectors found: %02X%n", trackNo, totalSectors);
+      return false;
     }
 
+    //    System.out.printf ("Track: %02X - OK%n", trackNo);
     return true;
   }
 
@@ -260,13 +293,13 @@ public class Nibblizer
     return bits == 1 ? 2 : bits == 2 ? 1 : bits;
   }
 
-  private int skipBytes (byte[] buffer, int offset, byte skipValue)
-  {
-    int count = 0;
-    while (offset < buffer.length && buffer[offset++] == skipValue)
-      ++count;
-    return count;
-  }
+  //  private int skipBytes (byte[] buffer, int offset, byte skipValue)
+  //  {
+  //    int count = 0;
+  //    while (offset < buffer.length && buffer[offset++] == skipValue)
+  //      ++count;
+  //    return count;
+  //  }
 
   private String listBytes (byte[] buffer, int offset, int length)
   {
@@ -327,6 +360,12 @@ public class Nibblizer
       assert length > 0;
       return length;
     }
+
+    @Override
+    public String toString ()
+    {
+      return String.format ("[Offset: %04X, Length: %04X]", offset, length);
+    }
   }
 
   class AddressField extends Field
@@ -337,8 +376,8 @@ public class Nibblizer
     {
       super (buffer, offset);
 
-      if (matchBytes (buffer, offset, addressPrologue)
-          && matchBytes (buffer, offset + 11, epilogue))
+      if (matchBytes (buffer, offset, addressPrologue))
+      //          && matchBytes (buffer, offset + 11, epilogue))
       {
         volume = decode4and4 (buffer, offset + 3);
         track = decode4and4 (buffer, offset + 5);
@@ -350,6 +389,13 @@ public class Nibblizer
         System.out.println (listBytes (buffer, offset, 14));
 
       length = 14;
+    }
+
+    @Override
+    public String toString ()
+    {
+      return String.format ("[volume: %02X, track: %02X, sector: %02X, checksum: %02X]",
+          volume, track, sector, checksum);
     }
   }
 
@@ -365,12 +411,12 @@ public class Nibblizer
       {
         valid = true;
         dataBuffer = decode6and2 (buffer, offset + 3);
-        if (!matchBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, epilogue))
-        {
-          System.out.print ("   bad data epilogue: ");
-          System.out
-              .println (listBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, 3));
-        }
+        //        if (!matchBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, epilogue))
+        //        {
+        //          System.out.print ("   bad data epilogue: ");
+        //          System.out
+        //              .println (listBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, 3));
+        //        }
       }
       else
       {

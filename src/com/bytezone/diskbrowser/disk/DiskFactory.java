@@ -247,6 +247,16 @@ public class DiskFactory
       return null;
     }
 
+    if (suffix.equals ("woz"))
+    {
+      if (debug)
+        System.out.println (" ** woz **");
+      WozDisk wozDisk = new WozDisk (file);
+      AppleDisk appleDisk16 = new AppleDisk (wozDisk);
+      disk = checkDos (appleDisk16);
+      return disk;
+    }
+
     long length = file.length ();
 
     if (length == 116480)           // 13 sector disk

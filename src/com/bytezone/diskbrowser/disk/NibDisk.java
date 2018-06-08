@@ -18,7 +18,7 @@ public class NibDisk
   // .nib files are 232,960 bytes
   // 6,656 bytes x 35 tracks (0x1A00)
 
-  // add 'nib' to TreeBuilder to allow nib files to be selected
+  // add 'nib' to Utility.suffixes to allow nib files to be selected
 
   public NibDisk (File file)
   {

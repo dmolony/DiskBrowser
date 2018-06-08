@@ -226,6 +226,21 @@ public class AppleDisk implements Disk
     diskBuffer = disk.buffer;
   }
 
+  public AppleDisk (WozDisk disk)       // not used yet
+  {
+    tracks = 35;
+    trackSize = 4096;
+    file = disk.file;
+    diskBuffer = disk.diskBuffer;
+
+    sectorSize = 256;
+    sectors = 16;
+    blocks = tracks * sectors;
+    hasData = new boolean[blocks];
+
+    checkSectorsForData ();
+  }
+
   private byte[] getPrefix (File path)
   {
     byte[] buffer = new byte[64];

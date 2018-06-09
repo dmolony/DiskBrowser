@@ -34,7 +34,6 @@ public class NibDisk
       for (int i = 0; i < 35; i++)
       {
         in.read (trackBuffer);
-        //        System.out.println (HexFormatter.format (trackBuffer));
         int offset = 0;
         while (true)
         {

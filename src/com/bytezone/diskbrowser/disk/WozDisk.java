@@ -8,6 +8,8 @@ import java.io.IOException;
 public class WozDisk
 {
   private static final int TRK_SIZE = 0x1A00;
+  private static final int INFO_SIZE = 0x3C;
+  private static final int TMAP_SIZE = 0xA0;
   private static final int DATA_SIZE = TRK_SIZE - 10;
   private static byte[] header =
       { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0a, 0x0D, 0x0A };
@@ -15,19 +17,22 @@ public class WozDisk
   private final boolean debug = false;
 
   final File file;
-  private final Nibblizer nibbler;
   final byte[] diskBuffer = new byte[4096 * 35];
+
+  // ---------------------------------------------------------------------------------//
+  // constructor
+  // ---------------------------------------------------------------------------------//
 
   public WozDisk (File f)
   {
     this.file = f;
-    nibbler = new Nibblizer (f);
+    Nibblizer nibbler = new Nibblizer (f);
 
     byte[] id = new byte[8];
     byte[] checksum = new byte[4];
     byte[] trackBuffer = new byte[TRK_SIZE];
-    byte[] infoBuffer = new byte[60];
-    byte[] tmapBuffer = new byte[160];
+    byte[] infoBuffer = new byte[INFO_SIZE];
+    byte[] tmapBuffer = new byte[TMAP_SIZE];
 
     try
     {
@@ -116,21 +121,30 @@ public class WozDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
+  // skip
+  // ---------------------------------------------------------------------------------//
+
   private void skip (BufferedInputStream file, int size) throws IOException
   {
     while ((size -= file.skip (size)) > 0)
       ;
   }
 
+  // ---------------------------------------------------------------------------------//
+  // readString
+  // ---------------------------------------------------------------------------------//
+
   private String readString (BufferedInputStream file, int size) throws IOException
   {
     byte[] bytes = new byte[size];
     file.read (bytes);
-    //    for (byte b : bytes)
-    //      System.out.printf ("%02X ", b);
-    //    System.out.println ();
     return new String (bytes);
   }
+
+  // ---------------------------------------------------------------------------------//
+  // readInt
+  // ---------------------------------------------------------------------------------//
 
   private int readInt (byte[] buffer, int offset, int length)
   {
@@ -144,12 +158,20 @@ public class WozDisk
     return value;
   }
 
+  // ---------------------------------------------------------------------------------//
+  // readInt
+  // ---------------------------------------------------------------------------------//
+
   private int readInt (BufferedInputStream file, int size) throws IOException
   {
     byte[] buffer = new byte[size];
     file.read (buffer);
     return readInt (buffer, 0, size);
   }
+
+  // ---------------------------------------------------------------------------------//
+  // matches
+  // ---------------------------------------------------------------------------------//
 
   private boolean matches (byte[] b1, byte[] b2)
   {
@@ -158,6 +180,10 @@ public class WozDisk
         return false;
     return true;
   }
+
+  // ---------------------------------------------------------------------------------//
+  // readTrack
+  // ---------------------------------------------------------------------------------//
 
   private void readTrack (byte[] buffer, byte[] trackData, int bytesUsed)
   {
@@ -171,10 +197,6 @@ public class WozDisk
       for (int mask = 0x80; mask > 0; mask >>>= 1)
       {
         int bit = (b & mask) == 0 ? 0 : 1;
-        //        if (bit == 1)
-        //          consecutiveZeros = 0;
-        //        else if (++consecutiveZeros > 3)
-        //          bit = (random.nextInt () & 0x01);
 
         value <<= 1;
         value |= bit;

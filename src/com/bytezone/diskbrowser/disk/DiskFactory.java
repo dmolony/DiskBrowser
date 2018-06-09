@@ -254,6 +254,8 @@ public class DiskFactory
       WozDisk wozDisk = new WozDisk (file);
       AppleDisk appleDisk16 = new AppleDisk (wozDisk);
       disk = checkDos (appleDisk16);
+      if (disk == null)
+        disk = checkProdos (appleDisk16);
       return disk;
     }
 

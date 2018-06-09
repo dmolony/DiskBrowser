@@ -226,7 +226,7 @@ public class AppleDisk implements Disk
     diskBuffer = disk.buffer;
   }
 
-  public AppleDisk (WozDisk disk)       // not used yet
+  public AppleDisk (WozDisk disk)
   {
     tracks = 35;
     trackSize = 4096;

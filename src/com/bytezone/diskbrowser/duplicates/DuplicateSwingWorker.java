@@ -44,7 +44,7 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
 
     if (files == null || files.length == 0)
     {
-      System.out.println ("Empty folder : " + directory.getAbsolutePath ());
+      //      System.out.println ("Empty folder : " + directory.getAbsolutePath ());
       return;
     }
 
@@ -55,8 +55,13 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
 
       if (file.isDirectory ())
       {
-        rootFolderData.incrementFolders ();
-        traverse (file);
+        if (file.getName ().equalsIgnoreCase ("emulators"))
+          System.out.println ("ignoring: " + file.getAbsolutePath ());
+        else
+        {
+          rootFolderData.incrementFolders ();
+          traverse (file);
+        }
       }
       else
       {

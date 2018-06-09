@@ -226,15 +226,15 @@ public class AppleDisk implements Disk
     diskBuffer = disk.buffer;
   }
 
-  public AppleDisk (WozDisk disk)
+  public AppleDisk (WozDisk disk, int tracks, int sectors)
   {
-    tracks = 35;
+    this.tracks = tracks;
     trackSize = 4096;
     file = disk.file;
     diskBuffer = disk.diskBuffer;
 
-    sectorSize = 256;
-    sectors = 16;
+    sectorSize = trackSize / sectors;
+    this.sectors = sectors;
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
 

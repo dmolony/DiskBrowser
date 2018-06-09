@@ -251,11 +251,11 @@ public class DiskFactory
     {
       if (debug)
         System.out.println (" ** woz **");
+
       WozDisk wozDisk = new WozDisk (file);
-      AppleDisk appleDisk16 = new AppleDisk (wozDisk);
-      disk = checkDos (appleDisk16);
+      disk = checkDos (new AppleDisk (wozDisk, 35, 16));
       if (disk == null)
-        disk = checkProdos (appleDisk16);
+        disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
       return disk;
     }
 

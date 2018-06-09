@@ -229,12 +229,12 @@ public class AppleDisk implements Disk
   public AppleDisk (WozDisk disk, int tracks, int sectors)
   {
     this.tracks = tracks;
-    trackSize = 4096;
+    this.sectors = sectors;
     file = disk.file;
     diskBuffer = disk.diskBuffer;
 
+    trackSize = 4096;
     sectorSize = trackSize / sectors;
-    this.sectors = sectors;
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
 

@@ -231,16 +231,19 @@ public class DiskFactory
     {
       if (debug)
         System.out.println (" ** v2d **");
+
       V2dDisk v2dDisk = new V2dDisk (file);
-      AppleDisk appleDisk16 = new AppleDisk (v2dDisk);
-      disk = checkDos (appleDisk16);
+      disk = checkDos (new AppleDisk (v2dDisk, 35, 16));
+      if (disk == null)
+        disk = checkProdos (new AppleDisk (v2dDisk, 35, 8));
       return disk;
     }
 
-    if (suffix.equals ("nib"))
+    if (suffix.equals ("nib"))          // not implemented yet
     {
       if (debug)
         System.out.println (" ** nib **");
+
       NibDisk nibDisk = new NibDisk (file);
       AppleDisk appleDisk16 = new AppleDisk (nibDisk);
       disk = checkDos (appleDisk16);

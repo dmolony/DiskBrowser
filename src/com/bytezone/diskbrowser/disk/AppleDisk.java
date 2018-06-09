@@ -203,15 +203,15 @@ public class AppleDisk implements Disk
     checkSectorsForData ();
   }
 
-  public AppleDisk (V2dDisk disk)
+  public AppleDisk (V2dDisk disk, int tracks, int sectors)
   {
-    tracks = 35;
-    trackSize = 4096;
+    this.tracks = tracks;
+    this.sectors = sectors;
     file = disk.file;
     diskBuffer = disk.diskBuffer;
 
-    sectorSize = 256;
-    sectors = 16;
+    trackSize = 4096;
+    sectorSize = trackSize / sectors;
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
 

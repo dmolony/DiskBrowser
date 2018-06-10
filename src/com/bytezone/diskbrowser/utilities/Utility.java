@@ -94,15 +94,16 @@ public class Utility
     return suffixes.contains (getSuffix (filename));
   }
 
-  public int crc32 (byte[] buffer, int size)
+  public static int crc32 (byte[] buffer, int offset, int length)
   {
-    int crc = ~0;         // one's complement
+    int crc = 0xFFFFFFFF;         // one's complement
 
-    for (int i = 0; i < size; i++)
+    for (int i = offset; i < offset + length; i++)
       crc = crc32_tab[(crc ^ buffer[i]) & 0xFF] ^ (crc >>> 8);
 
-    return ~crc;          // one's complement
+    return ~crc;                 // one's complement
   }
+
   static int[] crc32_tab =
       { 0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
         0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,

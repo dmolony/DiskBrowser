@@ -134,7 +134,6 @@ public class Nibblizer
       if (ptr < 0)
       {
         System.out.printf ("Track: %02X - Address prologue not found%n", trackNo);
-        //        System.out.println (HexFormatter.format (buffer));
         return false;
       }
       AddressField addressField = getAddressField (buffer, ptr);
@@ -174,10 +173,10 @@ public class Nibblizer
         return false;
       }
 
-      int offset = addressField.track * TRACK_SIZE
+      int o = addressField.track * TRACK_SIZE
           + interleave[DOS][addressField.sector] * BLOCK_SIZE;
 
-      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, BLOCK_SIZE);
+      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, o, BLOCK_SIZE);
 
       if (++totalSectors == 16)
         break;

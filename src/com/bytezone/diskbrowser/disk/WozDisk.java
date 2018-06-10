@@ -15,7 +15,6 @@ public class WozDisk
   private static final int DATA_SIZE = TRK_SIZE - 10;
   private static byte[] header =
       { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0a, 0x0D, 0x0A };
-  private static final String SPACES = "                                                ";
   private final boolean debug = false;
 
   final File file;
@@ -46,7 +45,7 @@ public class WozDisk
     assert matches (header, buffer);
 
     int cs1 = readInt (buffer, 8, 4);
-    int cs2 = Utility.crc32 (buffer, 12, 256 - 12 + 35 * 6656);
+    int cs2 = Utility.crc32 (buffer, 12, 256 - 12 + 35 * TRK_SIZE);
     if (cs1 != cs2)
     {
       System.out.printf ("Checksum: %08X%n", cs1);
@@ -56,7 +55,7 @@ public class WozDisk
     int ptr = 12;
     read: while (ptr < buffer.length)
     {
-      String chunkId = readString (buffer, ptr, 4);
+      String chunkId = new String (buffer, ptr, 4);
       ptr += 4;
       int chunkSize = readInt (buffer, ptr, 4);
       ptr += 4;
@@ -122,27 +121,6 @@ public class WozDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  // skip
-  // ---------------------------------------------------------------------------------//
-
-  private void skip (BufferedInputStream file, int size) throws IOException
-  {
-    while ((size -= file.skip (size)) > 0)
-      ;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  // readString
-  // ---------------------------------------------------------------------------------//
-
-  private String readString (byte[] buffer, int offset, int length)
-  {
-    //    byte[] bytes = new byte[size];
-    //    file.read (bytes);
-    return new String (buffer, offset, length);
-  }
-
-  // ---------------------------------------------------------------------------------//
   // readInt
   // ---------------------------------------------------------------------------------//
 
@@ -157,17 +135,6 @@ public class WozDisk
     }
     return value;
   }
-
-  // ---------------------------------------------------------------------------------//
-  // readInt
-  // ---------------------------------------------------------------------------------//
-
-  //  private int readInt (BufferedInputStream file, int size) throws IOException
-  //  {
-  //    byte[] buffer = new byte[size];
-  //    file.read (buffer);
-  //    return readInt (buffer, 0, size);
-  //  }
 
   // ---------------------------------------------------------------------------------//
   // matches
@@ -187,7 +154,6 @@ public class WozDisk
 
   private void readTrack (byte[] buffer, int offset, byte[] trackData, int bytesUsed)
   {
-    //    int consecutiveZeros = 0;
     int value = 0;
     int ptr = 0;
 
@@ -209,6 +175,8 @@ public class WozDisk
       }
     }
 
-    assert value == 0;
+    if (value != 0)
+      System.out.printf ("Value not used: %01X", value);
+    //    assert value == 0;
   }
 }

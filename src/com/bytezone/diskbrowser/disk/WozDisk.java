@@ -24,23 +24,11 @@ public class WozDisk
   // constructor
   // ---------------------------------------------------------------------------------//
 
-  public WozDisk (File f)
+  public WozDisk (File file)
   {
-    this.file = f;
-    Nibblizer nibbler = new Nibblizer (f);
-    byte[] buffer = null;
-
-    try
-    {
-      BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
-      buffer = in.readAllBytes ();
-      in.close ();
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace ();
-      return;
-    }
+    this.file = file;
+    Nibblizer nibbler = new Nibblizer ();
+    byte[] buffer = readFile ();
 
     assert matches (header, buffer);
 
@@ -137,18 +125,6 @@ public class WozDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  // matches
-  // ---------------------------------------------------------------------------------//
-
-  private boolean matches (byte[] b1, byte[] b2)
-  {
-    for (int i = 0; i < b1.length; i++)
-      if (b1[i] != b2[i])
-        return false;
-    return true;
-  }
-
-  // ---------------------------------------------------------------------------------//
   // readTrack
   // ---------------------------------------------------------------------------------//
 
@@ -178,5 +154,37 @@ public class WozDisk
     if (value != 0)
       System.out.printf ("Value not used: %01X", value);
     //    assert value == 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // readFile
+  // ---------------------------------------------------------------------------------//
+
+  private byte[] readFile ()
+  {
+    try
+    {
+      BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
+      byte[] buffer = in.readAllBytes ();
+      in.close ();
+      return buffer;
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace ();
+      return null;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // matches
+  // ---------------------------------------------------------------------------------//
+
+  private boolean matches (byte[] b1, byte[] b2)
+  {
+    for (int i = 0; i < b1.length; i++)
+      if (b1[i] != b2[i])
+        return false;
+    return true;
   }
 }

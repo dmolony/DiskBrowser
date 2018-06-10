@@ -52,7 +52,7 @@ public class V2dDisk
   {
     this.file = file;
     int tracks = 0;
-    nibbler = new Nibblizer (file);
+    nibbler = new Nibblizer ();
 
     try
     {

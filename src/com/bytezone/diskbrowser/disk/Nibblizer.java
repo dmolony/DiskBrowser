@@ -1,21 +1,16 @@
 package com.bytezone.diskbrowser.disk;
 
-import java.io.File;
-
-public class Nibblizer
+class Nibblizer
 {
-  static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
-  static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
-  static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+  private static byte[] addressPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
+  private static byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
+  private static byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
 
-  private static int[][] interleave =
-      { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
-        { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 } };
+  private static int[] interleave =
+      { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
 
-  static final int DOS = 0;
-  static final int PRODOS = 1;
-  static final int BLOCK_SIZE = 256;
-  static final int TRACK_SIZE = 4096;
+  private static final int BLOCK_SIZE = 256;
+  private static final int TRACK_SIZE = 4096;
   private static final int RAW_BUFFER_SIZE = 342;
   private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
 
@@ -35,60 +30,6 @@ public class Nibblizer
 
   private static byte[] readTranslateTable = new byte[106];   // skip first 150 blanks
 
-  // this array is just here for testing - it matches the example in Beneath Apple Prodos
-  private static byte[] testData =
-      { (byte) 0x00, (byte) 0x00, (byte) 0x03, (byte) 0x00, (byte) 0xFA, (byte) 0x55,
-        (byte) 0x53, (byte) 0x45, (byte) 0x52, (byte) 0x53, (byte) 0x2E, (byte) 0x44,
-        (byte) 0x49, (byte) 0x53, (byte) 0x4B, (byte) 0x00, //
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, //
-        (byte) 0x00, (byte) 0x00, (byte) 0xC3, (byte) 0x27, (byte) 0x0D, (byte) 0x09,
-        (byte) 0x00, (byte) 0x06, (byte) 0x00, (byte) 0x18, (byte) 0x01, (byte) 0x26,
-        (byte) 0x50, (byte) 0x52, (byte) 0x4F, (byte) 0x44, //
-        (byte) 0x4F, (byte) 0x53, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF,
-        (byte) 0x08, (byte) 0x00, (byte) 0x1F, (byte) 0x00, //
-
-        (byte) 0x00, (byte) 0x3C, (byte) 0x00, (byte) 0x21, (byte) 0xA8, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x21, (byte) 0x00, (byte) 0x20,
-        (byte) 0x21, (byte) 0xA8, (byte) 0x00, (byte) 0x00, //
-        (byte) 0x02, (byte) 0x00, (byte) 0x2C, (byte) 0x42, (byte) 0x41, (byte) 0x53,
-        (byte) 0x49, (byte) 0x43, (byte) 0x2E, (byte) 0x53, (byte) 0x59, (byte) 0x53,
-        (byte) 0x54, (byte) 0x45, (byte) 0x4D, (byte) 0x00, //
-        (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x27, (byte) 0x00, (byte) 0x15,
-        (byte) 0x00, (byte) 0x00, (byte) 0x28, (byte) 0x00, (byte) 0x6F, (byte) 0xA7,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, //
-        (byte) 0x21, (byte) 0x00, (byte) 0x20, (byte) 0x6F, (byte) 0xA7, (byte) 0x00,
-        (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x25, (byte) 0x46, (byte) 0x49,
-        (byte) 0x4C, (byte) 0x45, (byte) 0x52, (byte) 0x00, //
-
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x3C, (byte) 0x00,
-        (byte) 0x33, (byte) 0x00, (byte) 0x00, (byte) 0x64, //
-        (byte) 0x00, (byte) 0x21, (byte) 0xA8, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x21, (byte) 0x6E, (byte) 0x01, (byte) 0x21, (byte) 0xA8,
-        (byte) 0x00, (byte) 0x00, (byte) 0x02, (byte) 0x00, //
-        (byte) 0x27, (byte) 0x43, (byte) 0x4F, (byte) 0x4E, (byte) 0x56, (byte) 0x45,
-        (byte) 0x52, (byte) 0x54, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, //
-        (byte) 0xFF, (byte) 0x6F, (byte) 0x00, (byte) 0x2A, (byte) 0x00, (byte) 0x01,
-        (byte) 0x50, (byte) 0x00, (byte) 0x61, (byte) 0xA7, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x21, (byte) 0x00, //
-
-        (byte) 0x20, (byte) 0x61, (byte) 0xA7, (byte) 0x00, (byte) 0x00, (byte) 0x02,
-        (byte) 0x00, (byte) 0x27, (byte) 0x53, (byte) 0x54, (byte) 0x41, (byte) 0x52,
-        (byte) 0x54, (byte) 0x55, (byte) 0x50, (byte) 0x00, //
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0xFC, (byte) 0x99, (byte) 0x00, (byte) 0x18, (byte) 0x00,
-        (byte) 0xC9, (byte) 0x2C, (byte) 0x00, (byte) 0x4F, //
-        (byte) 0xA7, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x21,
-        (byte) 0x01, (byte) 0x08, (byte) 0x4F, (byte) 0xA7, (byte) 0x00, (byte) 0x00,
-        (byte) 0x02, (byte) 0x00, (byte) 0x25, (byte) 0x4D, //
-        (byte) 0x4F, (byte) 0x49, (byte) 0x52, (byte) 0x45, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-        (byte) 0x00, (byte) 0x00, (byte) 0xFC, (byte) 0xB1 };
-
   static
   {
     for (int i = 0; i < writeTranslateTable.length; i++)
@@ -104,25 +45,7 @@ public class Nibblizer
   private final byte[] encode1 = new byte[RAW_BUFFER_SIZE];
   private final byte[] encode2 = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
-  private final File file;
-
-  public Nibblizer (File file)
-  {
-    this.file = file;
-
-    if (false)      // test with the Beneath Apple Prodos example
-    {
-      byte[] testBuffer = decode6and2 (encode6and2 (testData), 0);
-
-      for (int i = 0; i < BLOCK_SIZE; i++)
-        if (testData[i] != testBuffer[i])
-          System.out.println ("bollocks");
-
-      return;
-    }
-  }
-
-  public boolean processTrack (int trackNo, byte[] buffer, byte[] diskBuffer)
+  boolean processTrack (int trackNo, byte[] buffer, byte[] diskBuffer)
   {
     int ptr = 0;
     int totalSectors = 0;
@@ -173,10 +96,10 @@ public class Nibblizer
         return false;
       }
 
-      int o = addressField.track * TRACK_SIZE
-          + interleave[DOS][addressField.sector] * BLOCK_SIZE;
+      int offset =
+          addressField.track * TRACK_SIZE + interleave[addressField.sector] * BLOCK_SIZE;
 
-      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, o, BLOCK_SIZE);
+      System.arraycopy (dataField.dataBuffer, 0, diskBuffer, offset, BLOCK_SIZE);
 
       if (++totalSectors == 16)
         break;
@@ -189,7 +112,6 @@ public class Nibblizer
       return false;
     }
 
-    //    System.out.printf ("Track: %02X - OK%n", trackNo);
     return true;
   }
 
@@ -292,14 +214,6 @@ public class Nibblizer
     return bits == 1 ? 2 : bits == 2 ? 1 : bits;
   }
 
-  //  private int skipBytes (byte[] buffer, int offset, byte skipValue)
-  //  {
-  //    int count = 0;
-  //    while (offset < buffer.length && buffer[offset++] == skipValue)
-  //      ++count;
-  //    return count;
-  //  }
-
   private String listBytes (byte[] buffer, int offset, int length)
   {
     StringBuilder text = new StringBuilder ();
@@ -336,7 +250,7 @@ public class Nibblizer
     return true;
   }
 
-  abstract class Field
+  private abstract class Field
   {
     protected boolean valid;
     protected byte[] buffer;
@@ -367,7 +281,7 @@ public class Nibblizer
     }
   }
 
-  class AddressField extends Field
+  private class AddressField extends Field
   {
     int track, sector, volume, checksum;
 
@@ -398,7 +312,7 @@ public class Nibblizer
     }
   }
 
-  class DataField extends Field
+  private class DataField extends Field
   {
     byte[] dataBuffer;
 
@@ -410,12 +324,6 @@ public class Nibblizer
       {
         valid = true;
         dataBuffer = decode6and2 (buffer, offset + 3);
-        //        if (!matchBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, epilogue))
-        //        {
-        //          System.out.print ("   bad data epilogue: ");
-        //          System.out
-        //              .println (listBytes (buffer, offset + 3 + BUFFER_WITH_CHECKSUM_SIZE, 3));
-        //        }
       }
       else
       {

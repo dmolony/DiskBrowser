@@ -32,7 +32,8 @@ public class SectorList extends AbstractFile
   public String getText ()
   {
     StringBuilder text = new StringBuilder ("Block  Sector Type         Owner\n");
-    text.append ("-----  ------------------  ---------------------------------------------\n");
+    text.append (
+        "-----  ------------------  ---------------------------------------------\n");
 
     for (DiskAddress da : sectors)
     {
@@ -40,8 +41,8 @@ public class SectorList extends AbstractFile
       String owner = formattedDisk.getSectorFilename (da);
       if (owner == null)
         owner = "";
-      text.append (String.format (" %04X  %-18s  %s%n", da.getBlock (), sectorType.name,
-                                  owner));
+      text.append (
+          String.format (" %04X  %-18s  %s%n", da.getBlock (), sectorType.name, owner));
     }
 
     return text.toString ();

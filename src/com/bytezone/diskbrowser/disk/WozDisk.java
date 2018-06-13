@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class WozDisk
+class WozDisk
 {
   private static final int TRK_SIZE = 0x1A00;
   private static final int INFO_SIZE = 0x3C;

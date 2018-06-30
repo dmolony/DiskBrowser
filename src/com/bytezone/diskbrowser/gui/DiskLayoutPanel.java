@@ -82,8 +82,9 @@ class DiskLayoutPanel extends JPanel
     verticalRuler.setLayout (layout);
     horizontalRuler.setLayout (layout);
     legendPanel.setDisk (disk, layout);
-    sp.setViewportView (diskLayoutImage);     // this is the only way I know of to 
-    // force a refresh
+
+    // this is the only way I know of to force a refresh
+    sp.setViewportView (diskLayoutImage);
 
     setLayout (new BorderLayout ());
     if (disk.getGridLayout ().height == 35)

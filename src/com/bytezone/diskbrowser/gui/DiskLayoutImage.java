@@ -44,7 +44,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   {
     setPreferredSize (new Dimension (240 + 1, 525 + 1));
     addMouseListener (new MyMouseListener ());
-    setBackground (Color.WHITE);
+    setBackground (new Color (0xE0, 0xE0, 0xE0));
     setOpaque (true);
 
     addKeyListener (new MyKeyListener ());
@@ -145,24 +145,21 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
 
     Rectangle rect = new Rectangle (x, y, bw, bh);
 
-    int width = rect.width - (isRetina ? 2 : 3);
-    int height = rect.height - (isRetina ? 2 : 3);
+    int width = rect.width - (isRetina ? 2 : 3) + 1;
+    int height = rect.height - (isRetina ? 2 : 3) + 1;
     int offset2 = isRetina ? 1 : 2;
 
     // draw frame
-    if (true)
-    {
-      g.setColor (Color.GRAY);
-      //      g.drawRect (rect.x, rect.y, rect.width, rect.height);
-      g.draw (rect);
-    }
+    //    if (false)
+    //    {
+    //      g.setColor (Color.GRAY);
+    //      //      g.drawRect (rect.x, rect.y, rect.width, rect.height);
+    //      g.draw (rect);
+    //    }
 
-    // draw coloured block
-    if (type.colour != Color.WHITE)
-    {
-      g.setColor (type.colour);
-      g.fillRect (rect.x + offset2, rect.y + offset2, width, height);
-    }
+    // draw blocks
+    g.setColor (type.colour);
+    g.fillRect (rect.x + offset2, rect.y + offset2, width, height);
 
     // draw an indicator in free blocks
     if (flagFree)

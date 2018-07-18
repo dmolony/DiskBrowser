@@ -65,11 +65,11 @@ class ProdosDirectory extends AbstractFile
 
           GregorianCalendar created = HexFormatter.getAppleDate (buffer, i + 24);
           String dateC = created == null ? NO_DATE
-              : parentFD.sdf.format (created.getTime ()).toUpperCase ();
+              : parentFD.sdf.format (created.getTime ()).toUpperCase ().replace (".", "");
           String timeC = created == null ? "" : parentFD.stf.format (created.getTime ());
           GregorianCalendar modified = HexFormatter.getAppleDate (buffer, i + 33);
-          String dateM = modified == null ? NO_DATE
-              : parentFD.sdf.format (modified.getTime ()).toUpperCase ();
+          String dateM = modified == null ? NO_DATE : parentFD.sdf
+              .format (modified.getTime ()).toUpperCase ().replace (".", "");
           String timeM =
               modified == null ? "" : parentFD.stf.format (modified.getTime ());
           int eof =

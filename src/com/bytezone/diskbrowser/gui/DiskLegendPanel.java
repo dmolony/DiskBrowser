@@ -4,10 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-
-import javax.swing.JPanel;
 
 import com.bytezone.common.Platform;
 import com.bytezone.common.Platform.FontSize;
@@ -16,15 +12,12 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 
-class DiskLegendPanel extends JPanel
+class DiskLegendPanel extends DiskPanel
 {
   private static final int LEFT = 3;
   private static final int TOP = 10;
 
-  private FormattedDisk disk;
-  private LayoutDetails layoutDetails;
   private final Font font;
-  private boolean isRetina;
 
   public DiskLegendPanel ()
   {
@@ -32,15 +25,10 @@ class DiskLegendPanel extends JPanel
     setBackground (Color.WHITE);
   }
 
+  @Override
   public void setDisk (FormattedDisk disk, LayoutDetails details)
   {
-    this.disk = disk;
-    layoutDetails = details;
-
-    Graphics2D g = (Graphics2D) this.getGraphics ();
-    if (g != null)      // panel might not be showing
-      isRetina = g.getFontRenderContext ().getTransform ()
-          .equals (AffineTransform.getScaleInstance (2.0, 2.0));
+    super.setDisk (disk, details);
 
     repaint ();
   }
@@ -48,7 +36,7 @@ class DiskLegendPanel extends JPanel
   @Override
   public Dimension getPreferredSize ()
   {
-    return new Dimension (0, 160); // width/height
+    return new Dimension (0, 160);            // width/height
   }
 
   @Override
@@ -56,37 +44,35 @@ class DiskLegendPanel extends JPanel
   {
     super.paintComponent (g);
 
-    if (disk == null)
+    if (formattedDisk == null)
       return;
 
     g.setFont (font);
 
     int count = 0;
     int lineHeight = 20;
-    int width = layoutDetails.block.width - (isRetina ? 2 : 3);
-    int height = layoutDetails.block.height - (isRetina ? 2 : 3);
-    int offset = isRetina ? 1 : 2;
 
-    for (SectorType type : disk.getSectorTypeList ())
+    for (SectorType type : formattedDisk.getSectorTypeList ())
     {
       int x = LEFT + (count % 2 == 0 ? 0 : 155);
-      int y = TOP + count++ / 2 * lineHeight;
+      int y = TOP + count / 2 * lineHeight;
+      ++count;
 
       // draw border
-      g.setColor (Color.GRAY);
-      g.drawRect (x, y, layoutDetails.block.width, layoutDetails.block.height);
+      g.setColor (backgroundColor);
+      g.drawRect (x + 1, y + 1, blockWidth - 1, blockHeight - 1);
 
-      // draw the colour
+      // draw block
       g.setColor (type.colour);
       g.fillRect (x + offset, y + offset, width, height);
 
-      // draw the text
+      // draw text
       g.setColor (Color.BLACK);
-      g.drawString (type.name, x + layoutDetails.block.width + 4, y + 12);
+      g.drawString (type.name, x + blockWidth + 4, y + 12);
     }
 
     int y = ++count / 2 * lineHeight + TOP * 2 + 5;
-    int val = disk.falseNegativeBlocks ();
+    int val = formattedDisk.falseNegativeBlocks ();
     if (val > 0)
     {
       g.drawString (
@@ -94,7 +80,7 @@ class DiskLegendPanel extends JPanel
           y);
       y += lineHeight;
     }
-    val = disk.falsePositiveBlocks ();
+    val = formattedDisk.falsePositiveBlocks ();
     if (val > 0)
       g.drawString (val + " used sector" + (val == 1 ? "" : "s") + " marked as available",
           10, y);

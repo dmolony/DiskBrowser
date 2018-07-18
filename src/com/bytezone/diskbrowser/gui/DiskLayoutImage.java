@@ -6,10 +6,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.util.List;
 
-import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
@@ -21,65 +19,57 @@ import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
-class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
+class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
 {
   private static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
   private static final Color[] lightColors =
       { Color.WHITE, Color.YELLOW, Color.PINK, Color.CYAN, Color.ORANGE, Color.GREEN };
 
-  private FormattedDisk disk;
-  private LayoutDetails layoutDetails;
   private boolean showFreeSectors;
   private final DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
   private boolean redo;
-  private boolean isRetina;
 
   // set defaults (used until a real disk is set)
-  private int bw = 30;
-  private int bh = 15;
-  private int gw = 8;
-  private int gh = 35;
+  private int gridWidth = 8;
+  private int gridHeight = 35;
 
   public DiskLayoutImage ()
   {
     setPreferredSize (new Dimension (240 + 1, 525 + 1));
     addMouseListener (new MyMouseListener ());
-    setBackground (new Color (0xE0, 0xE0, 0xE0));
+    setBackground (backgroundColor);
     setOpaque (true);
 
     addKeyListener (new MyKeyListener ());
   }
 
+  @Override
   public void setDisk (FormattedDisk disk, LayoutDetails details)
   {
-    this.disk = disk;
-    layoutDetails = details;
+    super.setDisk (disk, details);
 
-    bw = layoutDetails.block.width;
-    bh = layoutDetails.block.height;
-    gw = layoutDetails.grid.width;
-    gh = layoutDetails.grid.height;
+    gridWidth = layoutDetails.grid.width;           // width in blocks
+    gridHeight = layoutDetails.grid.height;         // height in blocks
 
-    setPreferredSize (new Dimension (gw * bw + 1, gh * bh + 1));
+    setPreferredSize (
+        new Dimension (gridWidth * blockWidth + 1, gridHeight * blockHeight + 1));
     selectionHandler.setSelection (null);
-
-    Graphics2D g = (Graphics2D) this.getGraphics ();
-    if (g != null)        // panel might not be showing
-      isRetina = g.getFontRenderContext ().getTransform ()
-          .equals (AffineTransform.getScaleInstance (2.0, 2.0));
 
     repaint ();
   }
 
   public FormattedDisk getDisk ()
   {
-    return disk;
+    return formattedDisk;
   }
 
   public void setShowFreeSectors (boolean showFree)
   {
-    showFreeSectors = showFree;
-    repaint ();
+    if (showFree != showFreeSectors)
+    {
+      showFreeSectors = showFree;
+      repaint ();
+    }
   }
 
   void setSelection (List<DiskAddress> sectors)
@@ -99,80 +89,61 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   {
     super.paintComponent (g);
 
-    if (disk == null)
+    if (formattedDisk == null)
       return;
 
     Rectangle clipRect = g.getClipBounds ();
 
-    Point p1 = new Point (clipRect.x / bw * bw, clipRect.y / bh * bh);
-    Point p2 = new Point ((clipRect.x + clipRect.width - 1) / bw * bw,
-        (clipRect.y + clipRect.height - 1) / bh * bh);
+    Point topLeft = new Point (clipRect.x / blockWidth * blockWidth,
+        clipRect.y / blockHeight * blockHeight);
+    Point bottomRight =
+        new Point ((clipRect.x + clipRect.width - 1) / blockWidth * blockWidth,
+            (clipRect.y + clipRect.height - 1) / blockHeight * blockHeight);
 
-    int maxBlock = gw * gh;
-    Disk d = disk.getDisk ();
+    int maxBlock = gridWidth * gridHeight;
+    Disk d = formattedDisk.getDisk ();
 
     // this stops an index error when using alt-5 to switch to 512-byte blocks
     //    if (maxBlock > d.getTotalBlocks ())
     //      maxBlock = d.getTotalBlocks ();
     // the index error is caused by not recalculating the grid layout
 
-    Graphics2D g2d = (Graphics2D) g;
-
-    for (int y = p1.y; y <= p2.y; y += bh)
-      for (int x = p1.x; x <= p2.x; x += bw)
+    for (int y = topLeft.y; y <= bottomRight.y; y += blockHeight)
+      for (int x = topLeft.x; x <= bottomRight.x; x += blockWidth)
       {
-        int blockNo = y / bh * gw + x / bw;
+        int blockNo = y / blockHeight * gridWidth + x / blockWidth;
         if (blockNo < maxBlock)
         {
-          DiskAddress da = d.getDiskAddress (blockNo);
-          boolean free = showFreeSectors && disk.isSectorFree (da);
-          boolean selected = selectionHandler.isSelected (da);
-          drawBlock (g2d, blockNo, x, y, free, selected);
+          SectorType type = formattedDisk.getSectorType (blockNo);
+          if (type == null)
+            System.out.println ("Sector type is null " + blockNo);
+          else
+          {
+            DiskAddress da = d.getDiskAddress (blockNo);
+            boolean free = showFreeSectors && formattedDisk.isSectorFree (da);
+            boolean selected = selectionHandler.isSelected (da);
+            drawBlock ((Graphics2D) g, type, x, y, free, selected);
+          }
         }
       }
   }
 
-  private void drawBlock (Graphics2D g, int blockNo, int x, int y, boolean flagFree,
+  private void drawBlock (Graphics2D g, SectorType type, int x, int y, boolean flagFree,
       boolean selected)
   {
-    SectorType type = disk.getSectorType (blockNo);
-    if (type == null)
-    {
-      System.out.println ("Sector type is null " + blockNo);
-      return;
-    }
-    int offset = (bw - 4) / 2 + 1;
-
-    Rectangle rect = new Rectangle (x, y, bw, bh);
-
-    int width = rect.width - (isRetina ? 2 : 3) + 1;
-    int height = rect.height - (isRetina ? 2 : 3) + 1;
-    int offset2 = isRetina ? 1 : 2;
-
-    // draw frame
-    //    if (false)
-    //    {
-    //      g.setColor (Color.GRAY);
-    //      //      g.drawRect (rect.x, rect.y, rect.width, rect.height);
-    //      g.draw (rect);
-    //    }
-
-    // draw blocks
+    // draw block
     g.setColor (type.colour);
-    g.fillRect (rect.x + offset2, rect.y + offset2, width, height);
+    g.fillRect (x + offset, y + offset, width, height);
 
-    // draw an indicator in free blocks
-    if (flagFree)
+    if (flagFree || selected)
     {
       g.setColor (getContrastColor (type));
-      g.drawOval (rect.x + offset - 2, rect.y + 4, 7, 7);
-    }
 
-    // draw an indicator in selected blocks
-    if (selected)
-    {
-      g.setColor (getContrastColor (type));
-      g.fillOval (rect.x + offset, rect.y + 6, 3, 3);
+      if (flagFree)
+        g.drawOval (x + centerOffset - 2, y + 4, 7, 7);
+
+      if (selected)
+        g.fillOval (x + centerOffset, y + 6, 3, 3);
     }
   }
 
@@ -194,14 +165,14 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   public int getScrollableUnitIncrement (Rectangle visibleRect, int orientation,
       int direction)
   {
-    return orientation == SwingConstants.HORIZONTAL ? bw : bh;
+    return orientation == SwingConstants.HORIZONTAL ? blockWidth : blockHeight;
   }
 
   @Override
   public int getScrollableBlockIncrement (Rectangle visibleRect, int orientation,
       int direction)
   {
-    return orientation == SwingConstants.HORIZONTAL ? bw * 4 : bh * 10;
+    return orientation == SwingConstants.HORIZONTAL ? blockWidth * 4 : blockHeight * 10;
   }
 
   @Override
@@ -231,7 +202,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
   private void fireSectorSelectionEvent ()
   {
     SectorSelectedEvent event =
-        new SectorSelectedEvent (this, selectionHandler.getHighlights (), disk);
+        new SectorSelectedEvent (this, selectionHandler.getHighlights (), formattedDisk);
     fireSectorSelectionEvent (event);
   }
 
@@ -265,7 +236,7 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
         case KeyEvent.VK_RIGHT:
         case KeyEvent.VK_UP:
         case KeyEvent.VK_DOWN:
-          selectionHandler.cursorMove (disk, e);
+          selectionHandler.cursorMove (formattedDisk, e);
           fireSectorSelectionEvent ();
           repaint ();
       }
@@ -279,15 +250,15 @@ class DiskLayoutImage extends JPanel implements Scrollable, RedoListener
     @Override
     public void mouseClicked (MouseEvent e)
     {
-      int x = e.getX () / bw;
-      int y = e.getY () / bh;
-      int blockNo = y * gw + x;
-      DiskAddress da = disk.getDisk ().getDiskAddress (blockNo);
+      int x = e.getX () / blockWidth;
+      int y = e.getY () / blockHeight;
+      int blockNo = y * gridWidth + x;
+      DiskAddress da = formattedDisk.getDisk ().getDiskAddress (blockNo);
 
       boolean extend = ((e.getModifiersEx () & InputEvent.SHIFT_DOWN_MASK) > 0);
       boolean append = ((e.getModifiersEx () & InputEvent.CTRL_DOWN_MASK) > 0);
 
-      selectionHandler.doClick (disk.getDisk (), da, extend, append);
+      selectionHandler.doClick (formattedDisk.getDisk (), da, extend, append);
       fireSectorSelectionEvent ();
       repaint ();
       requestFocusInWindow ();

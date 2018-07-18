@@ -14,6 +14,7 @@
 - Dual DOS disks
 - CPM disks
 - Comprehensive disk listing
+- .woz format disks
 
 ### Documentation
 * [Usage](resources/usage.md)

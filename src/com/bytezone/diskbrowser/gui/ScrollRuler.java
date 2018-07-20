@@ -1,6 +1,10 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 
@@ -43,9 +47,11 @@ class ScrollRuler extends JComponent
 
     // Must match the preferred size of DiskLayoutImage
     if (orientation == HORIZONTAL)
-      setPreferredSize (new Dimension (layout.block.width * layout.grid.width + 1, HEIGHT));
+      setPreferredSize (
+          new Dimension (layout.block.width * layout.grid.width + 1, HEIGHT));
     else
-      setPreferredSize (new Dimension (WIDTH, layout.block.height * layout.grid.height + 1));
+      setPreferredSize (
+          new Dimension (WIDTH, layout.block.height * layout.grid.height + 1));
 
     setTrackMode (layout.grid.width == 16 || layout.grid.width == 13);
   }
@@ -55,13 +61,6 @@ class ScrollRuler extends JComponent
     isTrackMode = trackMode;
     repaint ();
   }
-
-  //  public void changeFont (Font font)
-  //  {
-  //    System.out.println (font);
-  //    this.font = font;
-  //    repaint ();
-  //  }
 
   public void setHex (boolean hex)
   {
@@ -73,7 +72,6 @@ class ScrollRuler extends JComponent
   protected void paintComponent (Graphics g)
   {
     Rectangle clipRect = g.getClipBounds ();
-    //		g.setColor (new Color (240, 240, 240));
     g.setColor (Color.WHITE);
     g.fillRect (clipRect.x, clipRect.y, clipRect.width, clipRect.height);
 

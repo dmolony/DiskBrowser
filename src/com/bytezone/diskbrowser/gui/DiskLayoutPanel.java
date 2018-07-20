@@ -18,7 +18,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
@@ -27,14 +26,9 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
 class DiskLayoutPanel extends JPanel
-    implements DiskSelectionListener, FileSelectionListener, RedoListener, QuitListener
-//, FontChangeListener
+    implements DiskSelectionListener, FileSelectionListener, RedoListener
 {
   private static final int SIZE = 15;             // basic unit of a display block
-  //  private static final String PREFS_RETINA = "retina";
-
-  //  private final Preferences prefs;
-  //  private final MenuHandler mh;
 
   private final DiskLayoutImage diskLayoutImage;
   private final ScrollRuler verticalRuler;
@@ -46,9 +40,6 @@ class DiskLayoutPanel extends JPanel
   public DiskLayoutPanel (MenuHandler mh, Preferences prefs)
   {
     super (new BorderLayout ());
-
-    //    this.prefs = prefs;
-    //    this.mh = mh;
 
     diskLayoutImage = new DiskLayoutImage ();
     verticalRuler = new ScrollRuler (diskLayoutImage, ScrollRuler.VERTICAL);
@@ -241,25 +232,4 @@ class DiskLayoutPanel extends JPanel
       legendPanel.setDisk (newDisk, layout);
     }
   }
-
-  @Override
-  public void quit (Preferences arg0)
-  {
-    //    prefs.putBoolean (PREFS_RETINA, mh.retinaItem.isSelected ());
-  }
-
-  @Override
-  public void restore (Preferences arg0)
-  {
-    //    mh.retinaItem.setSelected (prefs.getBoolean (PREFS_RETINA, false));
-    //    setRetina (mh.retinaItem.isSelected ());
-  }
-
-  //  @Override
-  //  public void changeFont (FontChangeEvent e)
-  //  {
-  //    //    verticalRuler.changeFont (e.font);
-  //    //    horizontalRuler.changeFont (e.font);
-  //    //    legendPanel.changeFont (e.font);
-  //  }
 }

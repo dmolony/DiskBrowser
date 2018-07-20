@@ -14,8 +14,8 @@ public class DiskPanel extends JPanel
   FormattedDisk formattedDisk;
   LayoutDetails layoutDetails;
   boolean isRetina;
-  int blockWidth = 30;            // default
-  int blockHeight = 15;            // default
+  int blockWidth = 30;              // default
+  int blockHeight = 15;             // default
   int width;
   int height;
   int offset;

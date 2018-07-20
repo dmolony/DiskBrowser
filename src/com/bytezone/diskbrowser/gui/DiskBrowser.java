@@ -128,7 +128,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     quitAction.addQuitListener (menuHandler);
     quitAction.addQuitListener (menuHandler.fontAction);
     quitAction.addQuitListener (catalogPanel);
-    quitAction.addQuitListener (diskLayoutPanel);
     quitAction.addQuitListener (this);
 
     if (Platform.MAC)

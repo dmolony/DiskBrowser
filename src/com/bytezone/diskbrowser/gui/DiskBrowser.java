@@ -131,14 +131,15 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     quitAction.addQuitListener (diskLayoutPanel);
     quitAction.addQuitListener (this);
 
-    Application.getApplication ().setQuitHandler (new QuitHandler ()
-    {
-      @Override
-      public void handleQuitRequestWith (QuitEvent e, QuitResponse response)
+    if (Platform.MAC)
+      Application.getApplication ().setQuitHandler (new QuitHandler ()
       {
-        quitAction.quit ();
-      }
-    });
+        @Override
+        public void handleQuitRequestWith (QuitEvent e, QuitResponse response)
+        {
+          quitAction.quit ();
+        }
+      });
 
     catalogPanel.setCloseTabAction (closeTabAction);
 

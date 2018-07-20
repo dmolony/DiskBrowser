@@ -183,7 +183,8 @@ public class TreeBuilder
           String type = pos > 0 && !f.isDirectory () ? name.substring (pos) : "";
           String size = f.isDirectory () ? "" : String.format ("%,14d", f.length ());
           text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n",
-              f.isDirectory () ? "D" : " ", name, sdf.format (d), size, type));
+              f.isDirectory () ? "D" : " ", name, sdf.format (d).replace (".", ""), size,
+              type));
         }
 
       if (text.length () > 0)

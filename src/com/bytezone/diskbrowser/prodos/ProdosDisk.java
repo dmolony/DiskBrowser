@@ -58,6 +58,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
     DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode ("empty volume node");
     root.add (volumeNode);
+
     processDirectoryBlock (2, null, volumeNode);
     makeNodeVisible (volumeNode.getFirstLeaf ());
 
@@ -92,6 +93,8 @@ public class ProdosDisk extends AbstractFormattedDisk
         int storageType = (sectorBuffer[ptr] & 0xF0) >> 4;
         if (storageType == 0)                                   // deleted or unused
           continue;
+
+        System.out.println ("here");
 
         byte[] entry = new byte[ProdosConstants.ENTRY_SIZE];
         System.arraycopy (sectorBuffer, ptr, entry, 0, ProdosConstants.ENTRY_SIZE);
@@ -191,6 +194,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     // check entry length and entries per block
     if (buffer[0x23] != 0x27 || buffer[0x24] != 0x0D)
       return false;
+
     int bitMapBlock = HexFormatter.intValue (buffer[0x27], buffer[0x28]);
     if (bitMapBlock != 6)
       return false;

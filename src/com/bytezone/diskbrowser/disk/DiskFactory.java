@@ -227,15 +227,27 @@ public class DiskFactory
       }
     }
 
+    if (suffix.equals ("woz"))
+    {
+      WozDisk wozDisk = new WozDisk (file);
+      AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
+      disk = checkDos (appleDisk256);
+      if (disk == null)
+        disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
+      if (disk == null)
+        disk = new DataDisk (appleDisk256);
+      return disk;
+    }
+
     if (suffix.equals ("v2d"))
     {
-      if (debug)
-        System.out.println (" ** v2d **");
-
       V2dDisk v2dDisk = new V2dDisk (file);
-      disk = checkDos (new AppleDisk (v2dDisk, 35, 16));
+      AppleDisk appleDisk256 = new AppleDisk (v2dDisk, 35, 16);
+      disk = checkDos (appleDisk256);
       if (disk == null)
         disk = checkProdos (new AppleDisk (v2dDisk, 35, 8));
+      if (disk == null)
+        disk = new DataDisk (appleDisk256);
       return disk;
     }
 
@@ -248,18 +260,6 @@ public class DiskFactory
       AppleDisk appleDisk16 = new AppleDisk (nibDisk);
       disk = checkDos (appleDisk16);
       return null;
-    }
-
-    if (suffix.equals ("woz"))
-    {
-      WozDisk wozDisk = new WozDisk (file);
-      AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
-      disk = checkDos (appleDisk256);
-      if (disk == null)
-        disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
-      if (disk == null)
-        disk = new DataDisk (appleDisk256);
-      return disk;
     }
 
     long length = file.length ();

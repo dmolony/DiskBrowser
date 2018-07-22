@@ -11,6 +11,7 @@ public interface ProdosConstants
   int FILE_TYPE_ASP = 0x1B;
   int FILE_TYPE_DESCRIPTOR_TABLE = 0x42;
   int FILE_TYPE_GWP = 0x50;
+  int FILE_TYPE_GEO = 0x82;
   int FILE_TYPE_IIGS_SOURCE = 0xB0;
   int FILE_TYPE_IIGS_OBJECT = 0xB1;
   //  int FILE_TYPE_FORKED_FILE = 0xB3;         // S16

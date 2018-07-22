@@ -394,8 +394,8 @@ class DataPanel extends JTabbedPane
     if (sectors.size () == 1)
     {
       DiskAddress da = sectors.get (0);
-      //      if (da != null)
-      setDataSource (event.getFormattedDisk ().getFormattedSector (da));
+      if (da != null)
+        setDataSource (event.getFormattedDisk ().getFormattedSector (da));
     }
     else
       setDataSource (new SectorList (event.getFormattedDisk (), sectors));

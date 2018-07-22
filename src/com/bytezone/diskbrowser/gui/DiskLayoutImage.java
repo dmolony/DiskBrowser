@@ -78,8 +78,8 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     if (sectors != null && sectors.size () > 0)
     {
       DiskAddress da = sectors.size () == 1 ? sectors.get (0) : sectors.get (1);
-      //      if (da != null)
-      scrollRectToVisible (layoutDetails.getLocation (da));
+      if (da != null)
+        scrollRectToVisible (layoutDetails.getLocation (da));
     }
     repaint ();
   }

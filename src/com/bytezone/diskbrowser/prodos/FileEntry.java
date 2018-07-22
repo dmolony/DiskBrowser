@@ -8,6 +8,7 @@ import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
+import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -31,11 +32,18 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final List<DiskAddress> indexBlocks = new ArrayList<DiskAddress> ();
   private boolean invalid;
   private FileEntry link;
+  //  private final int maxBlocks;
+
+  private final Disk appleDisk;
 
   public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
       int parentBlock)
   {
     super (fDisk, entryBuffer);
+
+    //    maxBlocks = fDisk.getDisk ().getTotalBlocks ();
+    appleDisk = fDisk.getDisk ();
+
     assert parent != null;
     this.parentDirectory = parent;
     this.catalogBlock = this.disk.getDiskAddress (parentBlock);
@@ -49,9 +57,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
     //    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
 
-    if (isGSOSFile ())                      // I think this is wrong
-      System.out.printf ("************************************ %s is GS/OS%n", name);
-
     switch (storageType)
     {
       case SEEDLING:
@@ -59,18 +64,18 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
 
       case SAPLING:
-        if (isGSOSFile ())                  // not sure why this exists
-          traverseGEOSIndex (keyPtr);
-        else
-          addDataBlocks (storageType, keyPtr);
+        //        if (isGSOSFile ())                  // not sure why this exists
+        //          traverseGEOSIndex (keyPtr);
+        //        else
+        addDataBlocks (storageType, keyPtr);
         break;
 
       case TREE:
         masterIndexBlock = disk.getDiskAddress (keyPtr);
-        if (isGSOSFile ())                  // not sure why this exists
-          traverseGEOSMasterIndex (keyPtr);
-        else
-          addDataBlocks (storageType, keyPtr);
+        //        if (isGSOSFile ())                  // not sure why this exists
+        //          traverseGEOSMasterIndex (keyPtr);
+        //        else
+        addDataBlocks (storageType, keyPtr);
         break;
 
       case GSOS_EXTENDED_FILE:
@@ -166,7 +171,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
       byte[] buffer = disk.readSector (blockPtr);
       for (int i = 0; i < 256; i++)
-        blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 0x100] & 0xFF) << 8));
+      {
+        int blockNo = (buffer[i] & 0xFF) | ((buffer[i + 0x100] & 0xFF) << 8);
+        blocks.add (disk.isValidAddress (blockNo) ? blockNo : 0);
+      }
     }
 
     return blocks;
@@ -186,53 +194,56 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     List<Integer> blocks = new ArrayList<Integer> (highest + 1);
     for (int i = 0; i <= highest; i++)
-      blocks.add ((buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8));
+    {
+      int blockNo = (buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8);
+      blocks.add (disk.isValidAddress (blockNo) ? blockNo : 0);
+    }
 
     return blocks;
   }
 
   // should be removed
-  private boolean isGSOSFile ()
-  {
-    //    return ((fileType & 0xF0) == 0x80);
-    if ((fileType & 0xF0) == 0x80)
-      System.out.println ("GS/OS file: " + name);
-    return false;
-  }
+  //  private boolean isGSOSFile ()
+  //  {
+  //    //    return ((fileType & 0xF0) == 0x80);
+  //    if ((fileType & 0xF0) == 0x80)
+  //      System.out.println ("GS/OS file: " + name);
+  //    return false;
+  //  }
 
   // should be removed
-  private void traverseGEOSMasterIndex (int keyPtr)
-  {
-    byte[] buffer = disk.readSector (keyPtr);               // master index
-    for (int i = 0; i < 0x80; i++)
-    {
-      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-      if (block == 0)
-        break;
-      if (block == 0xFFFF)
-        continue;
-      traverseGEOSIndex (block);
-    }
-  }
+  //  private void traverseGEOSMasterIndex (int keyPtr)
+  //  {
+  //    byte[] buffer = disk.readSector (keyPtr);               // master index
+  //    for (int i = 0; i < 0x80; i++)
+  //    {
+  //      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
+  //      if (block == 0)
+  //        break;
+  //      if (block == 0xFFFF)
+  //        continue;
+  //      traverseGEOSIndex (block);
+  //    }
+  //  }
 
   // should be removed
-  private void traverseGEOSIndex (int keyPtr)
-  {
-    parentDisk.setSectorType (keyPtr, parentDisk.indexSector);
-    indexBlocks.add (disk.getDiskAddress (keyPtr));
-    byte[] buffer = disk.readSector (keyPtr);
-
-    for (int i = 0; i < 0x80; i++)
-    {
-      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-      if (block == 0)
-        break;
-      if (block == 0xFFFF)
-        continue;
-      parentDisk.setSectorType (block, parentDisk.dataSector);
-      dataBlocks.add (disk.getDiskAddress (block));
-    }
-  }
+  //  private void traverseGEOSIndex (int keyPtr)
+  //  {
+  //    parentDisk.setSectorType (keyPtr, parentDisk.indexSector);
+  //    indexBlocks.add (disk.getDiskAddress (keyPtr));
+  //    byte[] buffer = disk.readSector (keyPtr);
+  //
+  //    for (int i = 0; i < 0x80; i++)
+  //    {
+  //      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
+  //      if (block == 0)
+  //        break;
+  //      if (block == 0xFFFF)
+  //        continue;
+  //      parentDisk.setSectorType (block, parentDisk.dataSector);
+  //      dataBlocks.add (disk.getDiskAddress (block));
+  //    }
+  //  }
 
   @Override
   public DataSource getDataSource ()
@@ -249,7 +260,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     if (fileType == FILE_TYPE_TEXT && auxType > 0)      // random access file
       return getRandomAccessTextFile ();
 
-    byte[] buffer = isGSOSFile () ? getGEOSBuffer () : getBuffer ();
+    //    byte[] buffer = isGSOSFile () ? getGEOSBuffer () : getBuffer ();
+    byte[] buffer = getBuffer ();
     byte[] exactBuffer = getExactBuffer (buffer);
 
     try
@@ -388,11 +400,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new FileSystemTranslator (name, exactBuffer);
           break;
 
-        case FILE_TYPE_PASCAL_VOLUME:
-          file = new DefaultAppleFile (name, exactBuffer);
-          break;
-
         case FILE_TYPE_FINDER:
+        case FILE_TYPE_PASCAL_VOLUME:
+        case FILE_TYPE_GEO:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
 

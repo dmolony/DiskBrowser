@@ -25,8 +25,11 @@ class ProdosIndexSector extends AbstractSector
       text.append (
           String.format ("%02X        %02X %02X", i, buffer[i], buffer[i + 256]));
       if (buffer[i] != 0 || buffer[i + 256] != 0)
-        text.append (String.format ("         %s%n",
-            "block " + HexFormatter.intValue (buffer[i], buffer[i + 256])));
+      {
+        int blockNo = HexFormatter.intValue (buffer[i], buffer[i + 256]);
+        String valid = disk.isValidAddress (blockNo) ? "" : " *** invalid ***";
+        text.append (String.format ("         %s%s%n", "block " + blockNo, valid));
+      }
       else
         text.append ("\n");
     }

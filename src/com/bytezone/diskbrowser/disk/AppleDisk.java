@@ -29,7 +29,7 @@ public class AppleDisk implements Disk
 
   private final int tracks;               // usually 35 for floppy disks
   private int sectors;                    // 8 or 16
-  private int blocks;                     // 280 or 560
+  private int blocks;                     // 280 or 560 for floppy disks, higher for HD
 
   private final int trackSize;            // 4096
   public int sectorSize;                  // 256 or 512
@@ -460,9 +460,10 @@ public class AppleDisk implements Disk
   {
     if (!isValidAddress (block))
     {
-      System.out.printf ("Invalid block : %d of %d%n", block, this.blocks);
+      System.out.printf ("getDiskAddress: Invalid block : %d of %d%n", block,
+          this.blocks);
       return null;
-      //      return new AppleDiskAddress (this, 0);    this was looping 26/07/2016
+      //      return new AppleDiskAddress (this, 0);    // this was looping 26/07/2016
     }
     return new AppleDiskAddress (this, block);
   }
@@ -483,9 +484,10 @@ public class AppleDisk implements Disk
   @Override
   public boolean isValidAddress (int block)
   {
-    if (block < 0 || block >= this.blocks)
-      return false;
-    return true;
+    //    if (block < 0 || block >= this.blocks)
+    //      return false;
+    //    return true;
+    return block >= 0 && block < this.blocks;
   }
 
   @Override

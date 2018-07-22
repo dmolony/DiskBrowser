@@ -94,8 +94,6 @@ public class ProdosDisk extends AbstractFormattedDisk
         if (storageType == 0)                                   // deleted or unused
           continue;
 
-        System.out.println ("here");
-
         byte[] entry = new byte[ProdosConstants.ENTRY_SIZE];
         System.arraycopy (sectorBuffer, ptr, entry, 0, ProdosConstants.ENTRY_SIZE);
 

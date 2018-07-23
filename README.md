@@ -36,6 +36,8 @@
 ![Pascal](resources/pascal.png?raw=true "Pascal")
 #### Zork
 ![Zork](resources/zork.png?raw=true "Zork")
+#### Infocom 
+![Infocom](resources/planetfall.png?raw=true "Zork")
 #### Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
 #### Visicalc

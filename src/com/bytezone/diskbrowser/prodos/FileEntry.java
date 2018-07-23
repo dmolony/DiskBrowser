@@ -8,7 +8,6 @@ import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
-import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -32,17 +31,15 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final List<DiskAddress> indexBlocks = new ArrayList<DiskAddress> ();
   private boolean invalid;
   private FileEntry link;
-  //  private final int maxBlocks;
 
-  private final Disk appleDisk;
+  //  private final Disk appleDisk;
 
   public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
       int parentBlock)
   {
     super (fDisk, entryBuffer);
 
-    //    maxBlocks = fDisk.getDisk ().getTotalBlocks ();
-    appleDisk = fDisk.getDisk ();
+    //    appleDisk = fDisk.getDisk ();
 
     assert parent != null;
     this.parentDirectory = parent;
@@ -128,16 +125,20 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     switch (storageType)
     {
       case SEEDLING:
-        blocks.add (keyPtr);
+        if (disk.isValidAddress (keyPtr))
+          blocks.add (keyPtr);
         break;
 
       case SAPLING:
-        blocks.addAll (readIndex (keyPtr));
+        if (disk.isValidAddress (keyPtr))
+          blocks.addAll (readIndex (keyPtr));
         break;
 
       case TREE:
-        for (Integer indexBlock : readMasterIndex (keyPtr))
-          blocks.addAll (readIndex (indexBlock));
+        if (disk.isValidAddress (keyPtr))
+          for (Integer indexBlock : readMasterIndex (keyPtr))
+            if (disk.isValidAddress (indexBlock))
+              blocks.addAll (readIndex (indexBlock));
         break;
     }
 

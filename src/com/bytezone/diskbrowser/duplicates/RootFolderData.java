@@ -132,6 +132,15 @@ public class RootFolderData
     disksWindow = null;           // force a recount
   }
 
+  String getRootFolderPathText ()
+  {
+    String text = rootFolder.getAbsolutePath ();
+    String homeDir = System.getProperty ("user.home");
+    if (text.startsWith (homeDir))
+      text = text.replace (homeDir, "~");
+    return text;
+  }
+
   private void clear ()
   {
     typeTotals = new int[4][Utility.suffixes.size ()];

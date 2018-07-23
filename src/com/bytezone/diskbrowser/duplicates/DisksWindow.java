@@ -44,7 +44,7 @@ public class DisksWindow extends JFrame
 
   public DisksWindow (RootFolderData rootFolderData)
   {
-    super ("Disk List - " + rootFolderData.getRootFolder ().getAbsolutePath ());
+    super (rootFolderData.getRootFolderPathText ());
     this.rootFolderData = rootFolderData;
 
     table = new JTable ();

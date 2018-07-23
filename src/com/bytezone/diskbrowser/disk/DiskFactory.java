@@ -567,7 +567,8 @@ public class DiskFactory
     }
     catch (Exception e)
     {
-      System.out.println (e);
+      e.printStackTrace ();
+      //      System.out.println (e);
     }
     if (debug)
       System.out.println ("Not a Prodos 2mg disk");

@@ -32,14 +32,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private boolean invalid;
   private FileEntry link;
 
-  //  private final Disk appleDisk;
-
   public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
       int parentBlock)
   {
     super (fDisk, entryBuffer);
-
-    //    appleDisk = fDisk.getDisk ();
 
     assert parent != null;
     this.parentDirectory = parent;
@@ -61,17 +57,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
 
       case SAPLING:
-        //        if (isGSOSFile ())                  // not sure why this exists
-        //          traverseGEOSIndex (keyPtr);
-        //        else
         addDataBlocks (storageType, keyPtr);
         break;
 
       case TREE:
         masterIndexBlock = disk.getDiskAddress (keyPtr);
-        //        if (isGSOSFile ())                  // not sure why this exists
-        //          traverseGEOSMasterIndex (keyPtr);
-        //        else
         addDataBlocks (storageType, keyPtr);
         break;
 
@@ -202,49 +192,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     return blocks;
   }
-
-  // should be removed
-  //  private boolean isGSOSFile ()
-  //  {
-  //    //    return ((fileType & 0xF0) == 0x80);
-  //    if ((fileType & 0xF0) == 0x80)
-  //      System.out.println ("GS/OS file: " + name);
-  //    return false;
-  //  }
-
-  // should be removed
-  //  private void traverseGEOSMasterIndex (int keyPtr)
-  //  {
-  //    byte[] buffer = disk.readSector (keyPtr);               // master index
-  //    for (int i = 0; i < 0x80; i++)
-  //    {
-  //      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-  //      if (block == 0)
-  //        break;
-  //      if (block == 0xFFFF)
-  //        continue;
-  //      traverseGEOSIndex (block);
-  //    }
-  //  }
-
-  // should be removed
-  //  private void traverseGEOSIndex (int keyPtr)
-  //  {
-  //    parentDisk.setSectorType (keyPtr, parentDisk.indexSector);
-  //    indexBlocks.add (disk.getDiskAddress (keyPtr));
-  //    byte[] buffer = disk.readSector (keyPtr);
-  //
-  //    for (int i = 0; i < 0x80; i++)
-  //    {
-  //      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-  //      if (block == 0)
-  //        break;
-  //      if (block == 0xFFFF)
-  //        continue;
-  //      parentDisk.setSectorType (block, parentDisk.dataSector);
-  //      dataBlocks.add (disk.getDiskAddress (block));
-  //    }
-  //  }
 
   @Override
   public DataSource getDataSource ()

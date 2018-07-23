@@ -40,7 +40,8 @@ class VolumeDirectoryHeader extends DirectoryHeader
     } while (block > 0);
 
     // convert the Free Sector Table
-    int bitMapBytes = totalBlocks / 8;                  // one bit per block
+    //    int bitMapBytes = totalBlocks / 8;                  // one bit per block
+    int bitMapBytes = (totalBlocks - 1) / 8 + 1;                  // one bit per block
     byte[] buffer = new byte[bitMapBytes];
     int bitMapBlocks = (bitMapBytes - 1) / disk.getSectorsPerTrack () + 1;
     int lastBitMapBlock = bitMapBlock + bitMapBlocks - 1;

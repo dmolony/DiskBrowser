@@ -91,6 +91,8 @@ public class Utility
 
   public static boolean validFileType (String filename)
   {
+    if (filename.startsWith ("."))          // ignore invisible files
+      return false;
     return suffixes.contains (getSuffix (filename));
   }
 

@@ -25,7 +25,7 @@ public class DoubleHiResImage extends HiResImage
   {
     super (name, buffer);
 
-    assert name.endsWith (".PAC") || name.endsWith ("A2FC");
+    //    assert name.endsWith (".PAC") || name.endsWith ("A2FC");
 
     if (name.endsWith (".PAC"))
     {
@@ -35,17 +35,17 @@ public class DoubleHiResImage extends HiResImage
       auxBuffer = doubleScrunch.memory[0];
       this.buffer = doubleScrunch.memory[1];
     }
-    else if (name.endsWith (".A2FC"))
+    else          //if (name.endsWith (".A2FC") || auxType == 0x2000)
     {
       auxBuffer = new byte[0x2000];
       this.buffer = new byte[0x2000];
       System.arraycopy (buffer, 0, auxBuffer, 0, 0x2000);
       System.arraycopy (buffer, 0x2000, this.buffer, 0, 0x2000);
     }
-    else
-    {
-      auxBuffer = null;
-    }
+    //    else
+    //    {
+    //      auxBuffer = null;
+    //    }
 
     createImage ();
   }

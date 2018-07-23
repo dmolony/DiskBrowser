@@ -229,14 +229,22 @@ public class DiskFactory
 
     if (suffix.equals ("woz"))
     {
-      WozDisk wozDisk = new WozDisk (file);
-      AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
-      disk = checkDos (appleDisk256);
-      if (disk == null)
-        disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
-      if (disk == null)
-        disk = new DataDisk (appleDisk256);
-      return disk;
+      try
+      {
+        WozDisk wozDisk = new WozDisk (file);
+        AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
+        disk = checkDos (appleDisk256);
+        if (disk == null)
+          disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
+        if (disk == null)
+          disk = new DataDisk (appleDisk256);
+        return disk;
+      }
+      catch (Exception e)
+      {
+        System.out.println (e);
+        return null;
+      }
     }
 
     if (suffix.equals ("v2d"))

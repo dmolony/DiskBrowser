@@ -107,7 +107,6 @@ public class OriginalHiResImage extends HiResImage
         int val = (value >> px) & 0x01;         // get the next pixel to draw
         int column = (ptr + px) % 2;            // is it in an odd or even column?
         line[linePtr++] = val == 0 ? 0 :        // black pixel
-        //  palette[colourBit][column];         // coloured pixel - use lookup table
             colours[paletteTable[colourBit][column]]; // coloured pixel - use lookup table
       }
     }

@@ -503,7 +503,7 @@ public class AppleDisk implements Disk
   @Override
   public boolean isValidAddress (DiskAddress da)
   {
-    return isValidAddress (da.getTrack (), da.getSector ());
+    return da != null && isValidAddress (da.getTrack (), da.getSector ());
   }
 
   /*

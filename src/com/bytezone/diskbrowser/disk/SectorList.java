@@ -22,6 +22,8 @@ public class SectorList extends AbstractFile
 
     for (DiskAddress da : sectors)
     {
+      if (!disk.isValidAddress (da))
+        break;
       byte[] tempBuffer = disk.readSector (da);
       System.arraycopy (tempBuffer, 0, buffer, ptr, disk.getBlockSize ());
       ptr += disk.getBlockSize ();

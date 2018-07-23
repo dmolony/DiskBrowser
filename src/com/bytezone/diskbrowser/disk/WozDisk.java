@@ -24,20 +24,22 @@ class WozDisk
   // constructor
   // ---------------------------------------------------------------------------------//
 
-  public WozDisk (File file)
+  public WozDisk (File file) throws Exception
   {
     this.file = file;
     Nibblizer nibbler = new Nibblizer ();
     byte[] buffer = readFile ();
 
-    assert matches (header, buffer);
+    if (!matches (header, buffer))
+      throw new Exception ("Header error");
 
     int cs1 = readInt (buffer, 8, 4);
     int cs2 = Utility.crc32 (buffer, 12, 256 - 12 + 35 * TRK_SIZE);
     if (cs1 != cs2)
     {
-      System.out.printf ("Checksum: %08X%n", cs1);
-      System.out.printf ("Calculat: %08X%n", cs2);
+      System.out.printf ("Checksum  : %08X%n", cs1);
+      System.out.printf ("Calculated: %08X%n", cs2);
+      throw new Exception ("Checksum error");
     }
 
     int ptr = 12;

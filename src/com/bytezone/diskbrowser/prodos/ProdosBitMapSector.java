@@ -8,13 +8,11 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 
 class ProdosBitMapSector extends AbstractSector
 {
-  //  private final DiskAddress da;
   private final ProdosDisk parent;
 
   ProdosBitMapSector (ProdosDisk parent, Disk disk, byte[] buffer, DiskAddress da)
   {
     super (disk, buffer, da);
-    //    this.da = da;
     this.parent = parent;
   }
 

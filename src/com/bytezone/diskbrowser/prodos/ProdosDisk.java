@@ -169,6 +169,11 @@ public class ProdosDisk extends AbstractFormattedDisk
     }
   }
 
+  public boolean isReservedAddress (int blockNo)
+  {
+    return false;
+  }
+
   public static boolean isCorrectFormat (AppleDisk disk)
   {
     disk.setInterleave (1);

@@ -484,9 +484,6 @@ public class AppleDisk implements Disk
   @Override
   public boolean isValidAddress (int block)
   {
-    //    if (block < 0 || block >= this.blocks)
-    //      return false;
-    //    return true;
     return block >= 0 && block < this.blocks;
   }
 

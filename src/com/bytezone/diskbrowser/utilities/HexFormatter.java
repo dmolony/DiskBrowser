@@ -329,23 +329,21 @@ public class HexFormatter
 
   public static int unsignedShort (byte[] buffer, int ptr)
   {
-    //    int val = 0;
-    //    for (int i = 1; i >= 0; i--)
-    //    {
-    //      val <<= 8;
-    //      val += buffer[ptr + i] & 0xFF;
-    //    }
-    //    return val;
+    if (ptr >= buffer.length)
+    {
+      System.out.println ("index out of range: " + ptr);
+      return 0;
+    }
     return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
   }
 
-  //  public static int signedShort (byte[] buffer, int ptr)
-  //  {
-  //    return (short) (((buffer[ptr] & 0xFF) << 8) | (buffer[ptr + 1] & 0xFF));
-  //  }
-
   public static int signedShort (byte[] buffer, int ptr)
   {
+    if (ptr >= buffer.length)
+    {
+      System.out.println ("index out of range: " + ptr);
+      return 0;
+    }
     return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));
   }
 

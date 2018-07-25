@@ -53,6 +53,9 @@ public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
       if (rootFolderData.progressPanel.cancelled)
         return;
 
+      if (file.isHidden ())
+        continue;
+
       if (file.isDirectory ())
       {
         if (file.getName ().equalsIgnoreCase ("emulators"))

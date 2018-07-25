@@ -60,10 +60,14 @@ public class TreeBuilder
     Arrays.sort (files, fileComparator);
 
     for (File file : files)
+    {
+      if (file.isHidden ())
+        continue;
       if (file.isDirectory ())
         parentNode.add (createNode (file, true));
       else if (Utility.validFileType (file.getName ()) && file.length () > 0)
         parentNode.add (createNode (file, false));
+    }
   }
 
   private DefaultMutableTreeNode createNode (File file, boolean allowsChildren)

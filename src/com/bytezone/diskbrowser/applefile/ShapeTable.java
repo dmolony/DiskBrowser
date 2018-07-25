@@ -41,6 +41,8 @@ public class ShapeTable extends AbstractFile
     for (int i = 0; i < totalShapes; i++)
     {
       Shape shape = new Shape (buffer, i);
+      if (!shape.valid)
+        return;
       shapes.add (shape);
 
       minRow = Math.min (minRow, shape.minRow);
@@ -87,8 +89,6 @@ public class ShapeTable extends AbstractFile
     text.append (String.format ("File Name      : %s%n", name));
     text.append (String.format ("File size      : %,d%n", buffer.length));
     text.append (String.format ("Total shapes   : %d%n", shapes.size ()));
-    //    text.append (String.format ("Smallest       : %d%n", minSize));
-    //    text.append (String.format ("Largest        : %d%n", maxSize));
     text.append (String.format ("Max dimensions : %d x %d%n%n", maxWidth, maxHeight));
 
     for (Shape shape : shapes)
@@ -139,12 +139,11 @@ public class ShapeTable extends AbstractFile
     int actualLength;
     int minRow, maxRow;
     int minCol, maxCol;
-    //    int endRow, endCol;
     int startRow = SIZE / 2;
     int startCol = SIZE / 2;
     int[][] grid = new int[SIZE][SIZE];
     int[][] displayGrid;
-    //    int height, width;
+    boolean valid;
 
     private BufferedImage image;
 
@@ -174,7 +173,8 @@ public class ShapeTable extends AbstractFile
 
         // rightmost 3 bits
         if (v3 >= 4)
-          plot (grid, row, col);
+          if (!plot (grid, row, col))
+            return;
 
         if (v3 == 0 || v3 == 4)
           row--;
@@ -187,7 +187,8 @@ public class ShapeTable extends AbstractFile
 
         // middle 3 bits
         if (v2 >= 4)
-          plot (grid, row, col);
+          if (!plot (grid, row, col))
+            return;
 
         // cannot move up without plotting if v1 is zero
         if ((v2 == 0 && v1 != 0) || v2 == 4)
@@ -240,12 +241,7 @@ public class ShapeTable extends AbstractFile
           maxCol = Math.max (maxCol, col);
         }
       }
-
-      //      height = maxRow - minRow + 1;
-      //      width = maxCol - minCol + 1;
-      //      System.out.printf ("%4d  %4d  %4d  %4d  %4d%n",
-      // index, minRow, maxRow, minCol,
-      //          maxCol);
+      valid = true;
     }
 
     void convertGrid (int offsetRows, int offsetColumns, int rows, int columns)
@@ -275,11 +271,18 @@ public class ShapeTable extends AbstractFile
       //      endCol -= offsetColumns;
     }
 
-    private void plot (int[][] grid, int row, int col)
+    private boolean plot (int[][] grid, int row, int col)
     {
+      if (row < 0 || row >= SIZE || col < 0 || col >= SIZE)
+      {
+        System.out.printf ("Shape table out of range: %d, %d%n", row, col);
+        return false;
+      }
       grid[row][col] = 1;       // plot
       grid[0][col]++;           // increment total column dots
       grid[row][0]++;           // increment total row dots
+
+      return true;
     }
 
     public void drawText (StringBuilder text)

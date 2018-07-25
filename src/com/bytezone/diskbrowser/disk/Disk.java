@@ -42,11 +42,11 @@ public interface Disk extends Iterable<DiskAddress>
 
   public void writeSector (DiskAddress da, byte[] buffer);
 
-  public boolean isSectorEmpty (DiskAddress da);
-
   public boolean isSectorEmpty (int block);
 
   public boolean isSectorEmpty (int track, int sector);
+
+  public boolean isSectorEmpty (DiskAddress da);
 
   public boolean isValidAddress (int block);
 

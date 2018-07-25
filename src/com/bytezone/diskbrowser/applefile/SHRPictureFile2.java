@@ -11,59 +11,88 @@ public class SHRPictureFile2 extends HiResImage
   ColorTable[] colorTables;
   byte[] scb;                     // 0xC1 aux=0
 
+  // see Graphics & Animation.2mg
+
   public SHRPictureFile2 (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
     super (name, buffer, fileType, auxType, eof);
 
-    if (fileType == ProdosConstants.FILE_TYPE_PNT)                // 0xC0
+    switch (fileType)
     {
-      if (auxType == 0)
-      {
-        System.out.println ("0xC0 aux 0 not written");
-      }
-      else if (auxType == 1)          // Eagle/PackBytes
-      {
-        // this unpacks directly to the screen locations
-        System.out.println ("0xC0 aux 1 not written");
-      }
-      else
-        System.out.println ("C0 unknown aux " + auxType);
-    }
-    else if (fileType == ProdosConstants.FILE_TYPE_PIC)           // 0xC1
-    {
-      if (auxType > 2)
-      {
-        System.out.printf ("Changing aux from %04X to 0 in %s%n", auxType, name);
-        auxType = 0;
-      }
-
-      if (auxType == 0)               // 32,768
-      {
-        scb = new byte[200];
-        System.arraycopy (buffer, 32000, scb, 0, scb.length);
-
-        colorTables = new ColorTable[16];
-        for (int i = 0; i < colorTables.length; i++)
-          colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
-      }
-      else if (auxType == 1)
-      {
-        System.out.println ("0xC1 aux 1 not written");
-      }
-      else if (auxType == 2)          // Brooks 38,400
-      {
-        colorTables = new ColorTable[200];
-        for (int i = 0; i < colorTables.length; i++)
+      case ProdosConstants.FILE_TYPE_PNT:
+        switch (auxType)
         {
-          colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
-          colorTables[i].reverse ();
+          case 0:
+            System.out.printf (
+                "%s: PNT aux 0 (Paintworks Packed SHR Image) not written yet%n", name);
+            break;
+
+          case 1:          // Eagle/PackBytes - unpacks to PIC/$00
+            this.buffer = unpackBytes (buffer);
+            scb = new byte[200];
+            System.arraycopy (this.buffer, 32000, scb, 0, scb.length);
+
+            colorTables = new ColorTable[16];
+            for (int i = 0; i < colorTables.length; i++)
+              colorTables[i] = new ColorTable (i, this.buffer, 32256 + i * 32);
+            break;
+
+          case 2:         // handled in SHRPictureFile1
+            break;
+
+          case 3:
+            System.out.printf ("%s: PNT aux 3 (Packed IIGS SHR Image) not written yet%n",
+                name);
+            break;
+
+          case 4:
+            System.out.printf (
+                "%s: PNT aux 4 (Packed SHR Brooks Image) not written yet%n", name);
+            break;
+
+          default:
+            System.out.printf ("%s: PNT unknown aux: %04X%n", name, auxType);
         }
-      }
-      else
-        System.out.println ("C1 unknown aux " + auxType);
+        break;
+
+      case ProdosConstants.FILE_TYPE_PIC:
+        if (auxType > 2)
+        {
+          System.out.printf ("%s: PIC changing aux from %04X to 0%n", name, auxType);
+          auxType = 0;
+        }
+
+        switch (auxType)
+        {
+          case 0:               // 32,768
+            scb = new byte[200];
+            System.arraycopy (buffer, 32000, scb, 0, scb.length);
+
+            colorTables = new ColorTable[16];
+            for (int i = 0; i < colorTables.length; i++)
+              colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
+            break;
+
+          case 1:
+            System.out.printf ("%s: PIC aux 1 not written yet%n", name);
+            break;
+
+          case 2:          // Brooks 38,400
+            colorTables = new ColorTable[200];
+            for (int i = 0; i < colorTables.length; i++)
+            {
+              colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
+              colorTables[i].reverse ();
+            }
+            break;
+
+          default:
+            System.out.println ("PIC unknown aux " + auxType);
+        }
+        break;
+      default:
+        System.out.println ("unknown filetype " + fileType);
     }
-    else
-      System.out.println ("unknown filetype " + fileType);
 
     if (colorTables != null)
       createImage ();

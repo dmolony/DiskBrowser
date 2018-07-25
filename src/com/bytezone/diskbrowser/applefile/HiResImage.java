@@ -12,6 +12,40 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public abstract class HiResImage extends AbstractFile
 {
+  //  File Type   Aux     Name
+  //   $06 BIN                 isGif()               - OriginalHiResImage
+  //   $06 BIN                 isPng()               - OriginalHiResImage
+  //   $06 BIN          .BMP   isBmp()               - OriginalHiResImage
+  //   $06 BIN          .AUX                         - DoubleHiResImage
+  //   $06 BIN          .PAC                         - DoubleHiResImage
+  //   $06 BIN          .A2FC                        - DoubleHiResImage
+  //   $06 BIN   $2000  eof $4000                    - DoubleHiResImage
+  //   $06 BIN   $1FFF  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
+  //   $06 BIN   $2000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
+  //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
+  //   $06 BIN          .3200                        -       ???
+  //   $06 BIN          .3201                        -       ???
+
+  //   $08 PICT <$4000  Apple II Graphics File       -       ???
+  //   $08 PICT  $4000  Packed Hi-Res file           -       ???
+  //   $08 PICT  $4001  Packed Double Hi-Res file    -       ???
+
+  //   $C0 PNT   $0000  Paintworks Packed Super Hi-Res              - SHRPictureFile2 *
+  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image  (xx)        - SHRPictureFile2 
+  // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)        - SHRPictureFile
+  //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File          - SHRPictureFile2 *
+  //   $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) (yy)      - SHRPictureFile2 *
+  //   $C0 PNT   $8001
+  //   $C0 PNT   $8005
+  //   $C0 PNT   $8006
+
+  // * $C1 PIC   $0000  IIGS Super Hi-Res Image (xx)                - SHRPictureFile2
+  //   $C1 PIC   $0001  IIGS QuickDraw II PICT File                 - SHRPictureFile2 *
+  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) (yy)             - SHRPictureFile2
+  //   $C1 PIC   $8001
+  //   $C1 PIC   $8002
+  //   $C1 PIC   $8003
+
   protected static PaletteFactory paletteFactory = new PaletteFactory ();
 
   private static final byte[] pngHeader =
@@ -215,18 +249,18 @@ public abstract class HiResImage extends AbstractFile
 
       switch (type)
       {
-        case 0:
+        case 0:                           // copy next 1-64 bytes as is
           while (count-- != 0)
             newBuf[newPtr++] = buffer[ptr++];
           break;
 
-        case 1:
+        case 1:                          // repeat next byte 3/5/6/7 times
           byte b = buffer[ptr++];
           while (count-- != 0)
             newBuf[newPtr++] = b;
           break;
 
-        case 2:
+        case 2:                          // repeat next 4 bytes (count) times
           for (int i = 0; i < 4; i++)
             fourBuf[i] = buffer[ptr++];
           while (count-- != 0)
@@ -234,7 +268,7 @@ public abstract class HiResImage extends AbstractFile
               newBuf[newPtr++] = fourBuf[i];
           break;
 
-        case 3:
+        case 3:                          // repeat next byte (4*count) times
           b = buffer[ptr++];
           count *= 4;
           while (count-- != 0)

@@ -7,14 +7,14 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class SHRPictureFile extends HiResImage
+public class SHRPictureFile1 extends HiResImage
 {
   private final List<Block> blocks = new ArrayList<Block> ();
   private Main mainBlock;
   private Multipal multipalBlock;
 
-  // 0xC0 aux = 2
-  public SHRPictureFile (String name, byte[] buffer, int fileType, int auxType, int eof)
+  // 0xC0 aux = 2 - Apple IIGS Super Hi-Res Picture File
+  public SHRPictureFile1 (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
     super (name, buffer, fileType, auxType, eof);
 
@@ -176,9 +176,9 @@ public class SHRPictureFile extends HiResImage
 
   private class Main extends Block
   {
-    int masterMode;
-    int pixelsPerScanLine;
-    int numColorTables;
+    int masterMode;                     // 0 = Brooks, 0 = PNT 320 80 = PNT 640
+    int pixelsPerScanLine;              // 320 or 640
+    int numColorTables;                 // 1 = Brooks, 16 = Other
     ColorTable[] colorTables;
     int numScanLines;
     DirEntry[] scanLineDirectory;

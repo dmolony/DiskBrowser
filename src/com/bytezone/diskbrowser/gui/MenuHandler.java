@@ -11,7 +11,6 @@ import javax.swing.*;
 
 import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
-import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory;
@@ -204,6 +203,7 @@ public class MenuHandler
     //    prefs.putBoolean (PREFS_DEBUGGING, debuggingItem.isSelected ());
     prefs.putInt (PREFS_PALETTE,
         HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
+    fontAction.quit (prefs);
   }
 
   @Override
@@ -235,6 +235,8 @@ public class MenuHandler
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
     HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
     VisicalcFile.setDefaultDebug (debuggingItem.isSelected ());
+
+    fontAction.restore (prefs);
   }
 
   @Override

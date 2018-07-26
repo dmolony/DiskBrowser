@@ -24,25 +24,34 @@ public class SHRPictureFile1 extends HiResImage
       int len = HexFormatter.unsignedLong (buffer, ptr);
       if (len == 0)
         break;
-      //      int nameLen = buffer[ptr + 4] & 0xFF;
+
       String kind = HexFormatter.getPascalString (buffer, ptr + 4);
       byte[] data = new byte[Math.min (len, buffer.length - ptr)];
       System.arraycopy (buffer, ptr, data, 0, data.length);
 
-      if ("MAIN".equals (kind))
+      switch (kind)
       {
-        mainBlock = new Main (kind, data);
-        blocks.add (mainBlock);
-      }
-      else if ("MULTIPAL".equals (kind))
-      {
-        multipalBlock = new Multipal (kind, data);
-        blocks.add (multipalBlock);
-      }
-      else
-      {
-        blocks.add (new Block (kind, data));
-        System.out.println ("Unknown block type: " + kind + " in " + name);
+        case "MAIN":
+          mainBlock = new Main (kind, data);
+          blocks.add (mainBlock);
+          break;
+
+        case "MULTIPAL":
+          multipalBlock = new Multipal (kind, data);
+          blocks.add (multipalBlock);
+          break;
+
+        //        case "SuperConvert":
+        //        case "EOA ":                                  // DeluxePaint
+        //        case "PATS":
+        //        case "Platinum Paint":
+        //          blocks.add (new Block (kind, data));
+        //          break;
+
+        default:
+          blocks.add (new Block (kind, data));
+          System.out.println ("Unknown block type: " + kind + " in " + name);
+          break;
       }
 
       ptr += len;

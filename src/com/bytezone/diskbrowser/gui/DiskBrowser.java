@@ -2,18 +2,15 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.EventQueue;
-import java.awt.desktop.QuitEvent;
-import java.awt.desktop.QuitHandler;
-import java.awt.desktop.QuitResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
 
-import com.apple.eawt.Application;
 import com.bytezone.common.Platform;
-import com.bytezone.common.QuitAction;
-import com.bytezone.common.QuitAction.QuitListener;
 import com.bytezone.common.State;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
@@ -67,7 +64,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
     AbstractAction print = new PrintAction (dataPanel);
-    AboutAction aboutAction = new AboutAction ();
+    //    AboutAction aboutAction = new AboutAction ();
     HideCatalogAction hideCatalogAction =
         new HideCatalogAction (this, catalogBorderPanel);
     HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
@@ -81,7 +78,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     //    toolBar.add (preferencesAction);
     toolBar.add (duplicateAction);
     toolBar.add (print);
-    toolBar.add (aboutAction);
+    //    toolBar.add (aboutAction);
 
     // set the listeners
     catalogPanel.addDiskSelectionListener (this);
@@ -114,7 +111,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     // set the MenuItem Actions
     menuHandler.printItem.setAction (print);
     //    menuHandler.addHelpMenuAction (preferencesAction, "prefs");
-    menuHandler.addHelpMenuAction (aboutAction, "about");
+    //    menuHandler.addHelpMenuAction (aboutAction, "about");
     menuHandler.refreshTreeItem.setAction (refreshTreeAction);
     menuHandler.rootItem.setAction (rootDirectoryAction);
     menuHandler.showCatalogItem.setAction (hideCatalogAction);
@@ -123,29 +120,26 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.duplicateItem.setAction (duplicateAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
-    final QuitAction quitAction = Platform.setQuit (this, prefs, menuHandler.fileMenu);
+    //    final QuitAction quitAction = Platform.setQuit (this, prefs, menuHandler.fileMenu);
 
-    quitAction.addQuitListener (menuHandler);
-    quitAction.addQuitListener (menuHandler.fontAction);
-    quitAction.addQuitListener (catalogPanel);
-    quitAction.addQuitListener (this);
+    addQuitListener (menuHandler);
+    addQuitListener (catalogPanel);
+    addQuitListener (this);
 
-    if (Platform.MAC)
-      Application.getApplication ().setQuitHandler (new QuitHandler ()
-      {
-        @Override
-        public void handleQuitRequestWith (QuitEvent e, QuitResponse response)
-        {
-          quitAction.quit ();
-        }
-      });
+    Desktop desktop = Desktop.getDesktop ();
+    desktop.setAboutHandler (e -> JOptionPane.showMessageDialog (null,
+        "Author - Denis Molony\nGitHub - https://github.com/dmolony/DiskBrowser",
+        "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE));
+    //    desktop.setPreferencesHandler (
+    //        e -> JOptionPane.showMessageDialog (null, "Preferences dialog"));
+    desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
 
     catalogPanel.setCloseTabAction (closeTabAction);
 
     pack ();
 
     // restore the menuHandler items before they are referenced
-    quitAction.restore ();
+    fireRestoreEvent ();
     diskLayoutPanel.setFree (menuHandler.showFreeSectorsItem.isSelected ());
 
     // Remove the two optional panels if they were previously hidden
@@ -201,5 +195,31 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         new DiskBrowser ().setVisible (true);
       }
     });
+  }
+
+  List<QuitListener> quitListeners = new ArrayList<> ();
+
+  public void addQuitListener (QuitListener listener)
+  {
+    quitListeners.add (listener);
+  }
+
+  public void removeQuitListener (QuitListener listener)
+  {
+    quitListeners.remove (listener);
+  }
+
+  private void fireQuitEvent ()
+  {
+    for (QuitListener listener : quitListeners)
+      listener.quit (prefs);
+
+    System.exit (0);
+  }
+
+  private void fireRestoreEvent ()
+  {
+    for (QuitListener listener : quitListeners)
+      listener.restore (prefs);
   }
 }

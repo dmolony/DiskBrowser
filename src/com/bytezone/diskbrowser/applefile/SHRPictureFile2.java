@@ -9,7 +9,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class SHRPictureFile2 extends HiResImage
 {
   ColorTable[] colorTables;
-  byte[] scb;                     // 0xC1 aux=0
+  byte[] scb;
 
   // see Graphics & Animation.2mg
 
@@ -27,7 +27,7 @@ public class SHRPictureFile2 extends HiResImage
                 "%s: PNT aux 0 (Paintworks Packed SHR Image) not written yet%n", name);
             break;
 
-          case 1:          // Eagle/PackBytes - unpacks to PIC/$00
+          case 1:                             // packed version of PIC/$00
             this.buffer = unpackBytes (buffer);
             scb = new byte[200];
             System.arraycopy (this.buffer, 32000, scb, 0, scb.length);
@@ -37,17 +37,24 @@ public class SHRPictureFile2 extends HiResImage
               colorTables[i] = new ColorTable (i, this.buffer, 32256 + i * 32);
             break;
 
-          case 2:         // handled in SHRPictureFile1
+          case 2:                             // handled in SHRPictureFile1
             break;
 
-          case 3:
+          case 3:                             // packed version of PIC/$01
             System.out.printf ("%s: PNT aux 3 (Packed IIGS SHR Image) not written yet%n",
                 name);
             break;
 
-          case 4:
-            System.out.printf (
-                "%s: PNT aux 4 (Packed SHR Brooks Image) not written yet%n", name);
+          case 4:                             // packed version of PIC/$02
+            System.out.printf ("%s: PNT aux 4 (Packed SHR Brooks Image) not tested yet%n",
+                name);
+            this.buffer = unpackBytes (buffer);
+            colorTables = new ColorTable[200];
+            for (int i = 0; i < colorTables.length; i++)
+            {
+              colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
+              colorTables[i].reverse ();
+            }
             break;
 
           default:
@@ -64,7 +71,7 @@ public class SHRPictureFile2 extends HiResImage
 
         switch (auxType)
         {
-          case 0:               // 32,768
+          case 0:                             // unpacked version of PNT/$01
             scb = new byte[200];
             System.arraycopy (buffer, 32000, scb, 0, scb.length);
 
@@ -73,11 +80,11 @@ public class SHRPictureFile2 extends HiResImage
               colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
             break;
 
-          case 1:
+          case 1:                             // unpacked version of PNT/$03
             System.out.printf ("%s: PIC aux 1 not written yet%n", name);
             break;
 
-          case 2:          // Brooks 38,400
+          case 2:                             // unpacked version of PNT/$04
             colorTables = new ColorTable[200];
             for (int i = 0; i < colorTables.length; i++)
             {

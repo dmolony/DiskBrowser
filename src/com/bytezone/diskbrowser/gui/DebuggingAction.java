@@ -15,8 +15,7 @@ public class DebuggingAction extends AbstractAction
   {
     super ("Debugging");
     putValue (Action.SHORT_DESCRIPTION, "Show debugging information");
-    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("ctrl D"));
-    //    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_D);
+    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("meta D"));
     this.owner = owner;
   }
 

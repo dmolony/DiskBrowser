@@ -41,9 +41,28 @@ public class SHRPictureFile1 extends HiResImage
           blocks.add (multipalBlock);
           break;
 
+        case "PALETTES":
+          System.out.println ("PALETTES not written");
+          blocks.add (new Block (kind, data));
+          break;
+
+        case "MASK":
+          System.out.println ("MASK not written");
+          blocks.add (new Block (kind, data));
+          break;
+
+        case "PATS":
+          System.out.println ("PATS not written");
+          blocks.add (new Block (kind, data));
+          break;
+
+        case "SCIB":
+          System.out.println ("SCIB not written");
+          blocks.add (new Block (kind, data));
+          break;
+
         //        case "SuperConvert":
         //        case "EOA ":                                  // DeluxePaint
-        //        case "PATS":
         //        case "Platinum Paint":
         //          blocks.add (new Block (kind, data));
         //          break;

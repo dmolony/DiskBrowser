@@ -34,17 +34,20 @@ public abstract class HiResImage extends AbstractFile
   // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image  (xx)        - SHRPictureFile2 
   // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)        - SHRPictureFile
   //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File          - SHRPictureFile2 *
-  //   $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) (yy)      - SHRPictureFile2 *
-  //   $C0 PNT   $8001
-  //   $C0 PNT   $8005
-  //   $C0 PNT   $8006
+  //   $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) (yy) .3201?  - SHRPictureFile2 *
+  //   $C0 PNT   $8001  GTv background picture
+  //   $C0 PNT   $8005  DreamGraphix document
+  //   $C0 PNT   $8006  GIF
 
   // * $C1 PIC   $0000  IIGS Super Hi-Res Image (xx)                - SHRPictureFile2
   //   $C1 PIC   $0001  IIGS QuickDraw II PICT File                 - SHRPictureFile2 *
-  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) (yy)             - SHRPictureFile2
-  //   $C1 PIC   $8001
-  //   $C1 PIC   $8002
-  //   $C1 PIC   $8003
+  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) (yy) .3200?      - SHRPictureFile2
+  //   $C1 PIC   $8001  Allison raw image
+  //   $C1 PIC   $8002  Thunderscan
+  //   $C1 PIC   $8003  DreamGraphix
+
+  //   $C2 ANI          Paintworks animation
+  //   $C3 PAL          Paintworks palette
 
   protected static PaletteFactory paletteFactory = new PaletteFactory ();
 
@@ -190,6 +193,8 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Super Hi-Res Image (Apple Preferred)";
         else if (auxType == 3)
           auxText = "Packed QuickDraw II PICT File";
+        else if (auxType == 4)
+          auxText = "Packed Super Hi-Res 3200 color image";
         else
           auxText = "Unknown aux: " + auxType;
         break;
@@ -236,9 +241,25 @@ public abstract class HiResImage extends AbstractFile
   // Super Hi-res IIGS
   protected byte[] unpackBytes (byte[] buffer)
   {
+    for (int i = 1; i <= 4; i++)
+      try
+      {
+        byte[] newBuf = new byte[32768 * i];        // keep guessing
+        unpack (buffer, newBuf);
+        return newBuf;
+      }
+      catch (ArrayIndexOutOfBoundsException e)
+      {
+
+      }
+
+    return new byte[0];
+  }
+
+  private void unpack (byte[] buffer, byte[] newBuf) throws ArrayIndexOutOfBoundsException
+  {
     // routine found here - http://kpreid.livejournal.com/4319.html
 
-    byte[] newBuf = new byte[32768];        // this might be wrong
     byte[] fourBuf = new byte[4];
 
     int ptr = 0, newPtr = 0;
@@ -276,8 +297,6 @@ public abstract class HiResImage extends AbstractFile
           break;
       }
     }
-
-    return newBuf;
   }
 
   // Super Hi-res IIGS

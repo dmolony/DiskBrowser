@@ -220,29 +220,6 @@ public class ProdosDisk extends AbstractFormattedDisk
   }
 
   @Override
-  public String toString ()
-  {
-    StringBuffer text = new StringBuffer ();
-    String newLine = String.format ("%n");
-
-    VolumeDirectoryHeader volumeDirectory = (VolumeDirectoryHeader) headerEntries.get (0);
-    String timeC = volumeDirectory.created == null ? ""
-        : df.format (volumeDirectory.created.getTime ());
-    text.append ("Volume name        : " + volumeDirectory.name + newLine);
-    text.append ("Creation date      : " + timeC + newLine);
-    text.append ("ProDOS version     : " + volumeDirectory.version + newLine);
-    text.append ("Min ProDOS version : " + volumeDirectory.minVersion + newLine);
-    text.append ("Access rights      : " + volumeDirectory.access + newLine);
-    text.append ("Entry length       : " + volumeDirectory.entryLength + newLine);
-    text.append ("Entries per block  : " + volumeDirectory.entriesPerBlock + newLine);
-    text.append ("File count         : " + volumeDirectory.fileCount + newLine);
-    text.append ("Bitmap block       : " + volumeDirectory.bitMapBlock + newLine);
-    text.append ("Total blocks       : " + volumeDirectory.totalBlocks + newLine);
-
-    return text.toString ();
-  }
-
-  @Override
   public DataSource getFormattedSector (DiskAddress da)
   {
     if (da.getBlock () == 0)
@@ -274,5 +251,28 @@ public class ProdosDisk extends AbstractFormattedDisk
     if (fileNo == 0)
       return ((VolumeDirectoryHeader) headerEntries.get (0)).getSectors ();
     return fileEntries.get (fileNo - 1).getSectors ();
+  }
+
+  @Override
+  public String toString ()
+  {
+    StringBuffer text = new StringBuffer ();
+    String newLine = String.format ("%n");
+
+    VolumeDirectoryHeader volumeDirectory = (VolumeDirectoryHeader) headerEntries.get (0);
+    String timeC = volumeDirectory.created == null ? ""
+        : df.format (volumeDirectory.created.getTime ());
+    text.append ("Volume name        : " + volumeDirectory.name + newLine);
+    text.append ("Creation date      : " + timeC + newLine);
+    text.append ("ProDOS version     : " + volumeDirectory.version + newLine);
+    text.append ("Min ProDOS version : " + volumeDirectory.minVersion + newLine);
+    text.append ("Access rights      : " + volumeDirectory.access + newLine);
+    text.append ("Entry length       : " + volumeDirectory.entryLength + newLine);
+    text.append ("Entries per block  : " + volumeDirectory.entriesPerBlock + newLine);
+    text.append ("File count         : " + volumeDirectory.fileCount + newLine);
+    text.append ("Bitmap block       : " + volumeDirectory.bitMapBlock + newLine);
+    text.append ("Total blocks       : " + volumeDirectory.totalBlocks + newLine);
+
+    return text.toString ();
   }
 }

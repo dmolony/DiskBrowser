@@ -25,6 +25,17 @@ public class SHRPictureFile2 extends HiResImage
           case 0:
             System.out.printf (
                 "%s: PNT aux 0 (Paintworks Packed SHR Image) not written yet%n", name);
+            int background = HexFormatter.intValue (buffer[0x20], buffer[0x21]);
+
+            byte[] palette = new byte[32];
+            byte[] patterns = new byte[512];
+            byte[] data = new byte[buffer.length - 0x222];
+
+            System.arraycopy (buffer, 0x00, palette, 0, palette.length);
+            System.arraycopy (buffer, 0x22, patterns, 0, patterns.length);
+            System.arraycopy (buffer, 0x0222, data, 0, data.length);
+
+            this.buffer = unpackBytes (data);
             break;
 
           case 1:                             // packed version of PIC/$00
@@ -52,7 +63,7 @@ public class SHRPictureFile2 extends HiResImage
             colorTables = new ColorTable[200];
             for (int i = 0; i < colorTables.length; i++)
             {
-              colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
+              colorTables[i] = new ColorTable (i, this.buffer, 32000 + i * 32);
               colorTables[i].reverse ();
             }
             break;
@@ -173,6 +184,7 @@ public class SHRPictureFile2 extends HiResImage
     text.append ("\nScreen lines\n\n");
     for (int i = 0; i < 200; i++)
     {
+      text.append (String.format ("Line: %02X  %<3d%n", i));
       text.append (HexFormatter.format (buffer, i * 160, 160));
       text.append ("\n\n");
     }

@@ -240,8 +240,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (name.endsWith (".BMP") && HiResImage.isBmp (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
-          else if (name.endsWith (".3200") || name.endsWith (".3201"))   // unknown image file
-            file = new AssemblerProgram (name, exactBuffer, auxType);
+          else if (name.endsWith (".3200"))           // $C1/02
+            //            file = new AssemblerProgram (name, exactBuffer, auxType);
+            file = new SHRPictureFile2 (name, exactBuffer, 0xC1, 0x02, endOfFile);
+          else if (name.endsWith (".3201"))           // $C0/04
+            file = new DefaultAppleFile (name, exactBuffer);
+          //            file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 0x04, endOfFile);
           else if (name.endsWith (".FNT") && FontFile.isFont (exactBuffer))
             file = new FontFile (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))
@@ -370,6 +374,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_PASCAL_VOLUME:
         case FILE_TYPE_GEO:
         case FILE_TYPE_LDF:
+        case FILE_TYPE_ANI:
+        case FILE_TYPE_PAL:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
 

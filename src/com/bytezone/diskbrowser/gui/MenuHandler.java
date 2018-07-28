@@ -39,32 +39,32 @@ public class MenuHandler
   JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
-  JMenuItem rootItem = new JMenuItem ("Set root folder...");
-  JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
+  final JMenuItem rootItem = new JMenuItem ("Set root folder...");
+  final JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
   JMenuItem executeDiskItem;
-  JMenuItem printItem = new JMenuItem ("Print output panel...");
-  JMenuItem closeTabItem = new JMenuItem ();
-  JMenuItem duplicateItem = new JMenuItem ();
-  FontAction fontAction;
+  final JMenuItem printItem = new JMenuItem ("Print output panel...");
+  final JMenuItem closeTabItem = new JMenuItem ();
+  final JMenuItem duplicateItem = new JMenuItem ();
+  final FontAction fontAction;
 
   // Format menu items
   final JMenuItem lineWrapItem = new JCheckBoxMenuItem ("Line wrap");
   final JMenuItem showLayoutItem = new JCheckBoxMenuItem ("Show layout panel");
-  JMenuItem showCatalogItem = new JCheckBoxMenuItem ("Show catalog panel");
-  JMenuItem showFreeSectorsItem = new JCheckBoxMenuItem ("Show free sectors");
+  final JMenuItem showCatalogItem = new JCheckBoxMenuItem ("Show catalog panel");
+  final JMenuItem showFreeSectorsItem = new JCheckBoxMenuItem ("Show free sectors");
 
-  JMenuItem sector256Item = new JRadioButtonMenuItem ("256 byte sectors");
-  JMenuItem sector512Item = new JRadioButtonMenuItem ("512 byte blocks");
-  JMenuItem interleave0Item = new JRadioButtonMenuItem (new InterleaveAction (0));
-  JMenuItem interleave1Item = new JRadioButtonMenuItem (new InterleaveAction (1));
-  JMenuItem interleave2Item = new JRadioButtonMenuItem (new InterleaveAction (2));
-  JMenuItem interleave3Item = new JRadioButtonMenuItem (new InterleaveAction (3));
+  final JMenuItem sector256Item = new JRadioButtonMenuItem ("256 byte sectors");
+  final JMenuItem sector512Item = new JRadioButtonMenuItem ("512 byte blocks");
+  final JMenuItem interleave0Item = new JRadioButtonMenuItem (new InterleaveAction (0));
+  final JMenuItem interleave1Item = new JRadioButtonMenuItem (new InterleaveAction (1));
+  final JMenuItem interleave2Item = new JRadioButtonMenuItem (new InterleaveAction (2));
+  final JMenuItem interleave3Item = new JRadioButtonMenuItem (new InterleaveAction (3));
 
-  JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
-  JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
-  JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
-  JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
-  JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
+  final JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
+  final JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
+  final JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
+  final JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
+  final JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
 
   ButtonGroup paletteGroup = new ButtonGroup ();
 

@@ -36,7 +36,7 @@ class DataPanel extends JTabbedPane
 
   JTextArea formattedText;
   ImagePanel imagePanel;                        // internal class
-  boolean debug;
+  boolean debugMode;
 
   boolean imageVisible = false;
 
@@ -182,7 +182,7 @@ class DataPanel extends JTabbedPane
 
   public void setDebug (boolean value)
   {
-    debug = value;
+    debugMode = value;
 
     if (currentDataSource instanceof VisicalcFile)
     {
@@ -271,7 +271,7 @@ class DataPanel extends JTabbedPane
     }
 
     BufferedImage image = dataSource.getImage ();
-    if (image == null || debug)
+    if (image == null || debugMode)
       removeImage ();
     else
     {

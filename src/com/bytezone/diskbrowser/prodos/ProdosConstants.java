@@ -21,6 +21,8 @@ public interface ProdosConstants
   int FILE_TYPE_GSOS_FILE_SYSTEM_TRANSLATOR = 0xBD;
   int FILE_TYPE_PNT = 0xC0;
   int FILE_TYPE_PIC = 0xC1;
+  int FILE_TYPE_ANI = 0xC2;
+  int FILE_TYPE_PAL = 0xC3;
   int FILE_TYPE_FONT = 0xC8;
   int FILE_TYPE_FINDER = 0xC9;
   int FILE_TYPE_ICN = 0xCA;

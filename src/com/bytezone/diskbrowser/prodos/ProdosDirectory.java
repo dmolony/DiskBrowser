@@ -6,7 +6,7 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-class ProdosDirectory extends AbstractFile
+class ProdosDirectory extends AbstractFile implements ProdosConstants
 {
   private static final String NO_DATE = "<NO DATE>";
   private static final String newLine = String.format ("%n");
@@ -79,14 +79,24 @@ class ProdosDirectory extends AbstractFile
 
           switch (fileType)
           {
-            case 4:                                           // Text file
+            case FILE_TYPE_TEXT:
               int aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("R=%5d", aux);
               break;
 
-            case 6:                                           // BIN file
+            case FILE_TYPE_BINARY:
+            case FILE_TYPE_PNT:
+            case FILE_TYPE_PIC:
               aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("A=$%4X", aux);
+              if (fileType == FILE_TYPE_PNT && aux == 0)
+                System.out.printf ("found $C0/00 %s%n", name);
+              if (fileType == FILE_TYPE_PNT && aux == 3)
+                System.out.printf ("found $C0/03 %s%n", name);
+              if (fileType == FILE_TYPE_PNT && aux == 4)
+                System.out.printf ("found $C0/04 %s%n", name);
+              if (fileType == FILE_TYPE_PIC && aux == 1)
+                System.out.printf ("found $C1/01 %s%n", name);
               break;
 
             case 0x1A:                                        // AWP file

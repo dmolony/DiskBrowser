@@ -103,9 +103,9 @@ public abstract class HiResImage extends AbstractFile
       createColourImage ();
   }
 
-  protected abstract void createMonochromeImage ();
+  abstract void createMonochromeImage ();
 
-  protected abstract void createColourImage ();
+  abstract void createColourImage ();
 
   public void checkPalette ()
   {
@@ -185,29 +185,43 @@ public abstract class HiResImage extends AbstractFile
         break;
 
       case ProdosConstants.FILE_TYPE_PNT:           // 0xC0
-        if (auxType == 0)  // see Asimov disks/images/gs/programming/fta_code/GIFT5.SDK
-          auxText = "Paintworks Packed SHR Image";
-        else if (auxType == 1)
-          auxText = "Packed Super Hi-Res Image";
-        else if (auxType == 2)
-          auxText = "Super Hi-Res Image (Apple Preferred)";
-        else if (auxType == 3)
-          auxText = "Packed QuickDraw II PICT File";
-        else if (auxType == 4)
-          auxText = "Packed Super Hi-Res 3200 color image";
-        else
-          auxText = "Unknown aux: " + auxType;
+        switch (auxType)
+        {
+          case 0:
+            auxText = "Paintworks Packed SHR Image";
+            break;
+          case 1:
+            auxText = "Packed Super Hi-Res Image";
+            break;
+          case 2:
+            auxText = "Super Hi-Res Image (Apple Preferred)";
+            break;
+          case 3:
+            auxText = "Packed QuickDraw II PICT File";
+            break;
+          case 4:
+            auxText = "Packed Super Hi-Res 3200 color image";
+            break;
+          default:
+            auxText = "Unknown aux: " + auxType;
+        }
         break;
 
       case ProdosConstants.FILE_TYPE_PIC:           // 0xC1
-        if (auxType == 0)
-          auxText = "Super Hi-res Screen Image";
-        else if (auxType == 1)
-          auxText = "QuickDraw PICT File";
-        else if (auxType == 2)
-          auxText = "Super Hi-Res 3200 color image";
-        else
-          auxText = "Unknown aux: " + auxType;
+        switch (auxType)
+        {
+          case 0:
+            auxText = "Super Hi-res Screen Image";
+            break;
+          case 1:
+            auxText = "QuickDraw PICT File";
+            break;
+          case 2:
+            auxText = "Super Hi-Res 3200 color image";
+            break;
+          default:
+            auxText = "Unknown aux: " + auxType;
+        }
     }
 
     if (!auxText.isEmpty ())
@@ -256,6 +270,7 @@ public abstract class HiResImage extends AbstractFile
     return new byte[0];
   }
 
+  // this should call unpackLine()
   private void unpack (byte[] buffer, byte[] newBuf) throws ArrayIndexOutOfBoundsException
   {
     // routine found here - http://kpreid.livejournal.com/4319.html
@@ -461,9 +476,7 @@ public abstract class HiResImage extends AbstractFile
       // default empty table
       id = -1;
       for (int i = 0; i < 16; i++)
-      {
         entries[i] = new ColorEntry ();
-      }
     }
 
     public ColorTable (int id, byte[] data, int offset)

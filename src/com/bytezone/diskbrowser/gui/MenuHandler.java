@@ -45,7 +45,7 @@ public class MenuHandler
   final JMenuItem printItem = new JMenuItem ("Print output panel...");
   final JMenuItem closeTabItem = new JMenuItem ();
   final JMenuItem duplicateItem = new JMenuItem ();
-  final FontAction fontAction;
+  final FontAction fontAction = new FontAction ();
 
   // Format menu items
   final JMenuItem lineWrapItem = new JCheckBoxMenuItem ("Line wrap");
@@ -85,13 +85,12 @@ public class MenuHandler
     fileMenu.addSeparator ();
     fileMenu.add (closeTabItem);
 
-    fontAction = new FontAction ();
     JMenuItem fontItem = new JMenuItem (fontAction);
     fileMenu.add (fontItem);
-    fontAction.setSampleText ("120  FOR Z = 14 TO 24:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
-        + "  PRINT AB$:\n" + "  FOR TI = 1 TO 50:\n" + "  NEXT :\n" + "  POKE 0,Z + 40:\n"
-        + "  POKE 1,9:\n" + "  CALL MU:\n" + "  VTAB 5:\n" + "  HTAB Z:\n"
-        + "  PRINT SPC(12):\n" + "NEXT :\n" + "VTAB 5:\n" + "HTAB 24:\n" + "PRINT AB$\n");
+    fontAction.setSampleText ("120  FOR Z = 14 TO 24:\n  VTAB 5:\n  HTAB Z:\n"
+        + "  PRINT AB$:\n  FOR TI = 1 TO 50:\n  NEXT :\n  POKE 0,Z + 40:\n"
+        + "  POKE 1,9:\n  CALL MU:\n  VTAB 5:\n  HTAB Z:\n"
+        + "  PRINT SPC(12):\nNEXT :\nVTAB 5:\nHTAB 24:\nPRINT AB$\n");
 
     fileMenu.add (duplicateItem);
     fileMenu.add (debuggingItem);
@@ -149,26 +148,7 @@ public class MenuHandler
 
   void addHelpMenuAction (Action action, String functionName)
   {
-    //    if (Platform.MAC)
-    //    {
-    //      try
-    //      {
-    //        if (functionName.equals ("about"))
-    //          OSXAdapter.setAboutHandler (action,
-    //              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
-    //        else if (functionName.equals ("prefs"))
-    //          OSXAdapter.setPreferencesHandler (action,
-    //              action.getClass ().getDeclaredMethod (functionName, (Class[]) null));
-    //      }
-    //      catch (Exception e)
-    //      {
-    //        e.printStackTrace ();
-    //      }
-    //    }
-    //    else
-    //    {
     helpMenu.add (new JMenuItem (action));
-    //    }
   }
 
   private void addLauncherMenu ()

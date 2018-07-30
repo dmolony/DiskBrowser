@@ -62,6 +62,7 @@ public class SHRPictureFile1 extends HiResImage
           break;
 
         //        case "SuperConvert":
+        //        case "NOTE":
         //        case "EOA ":                                  // DeluxePaint
         //        case "Platinum Paint":
         //          blocks.add (new Block (kind, data));
@@ -79,7 +80,7 @@ public class SHRPictureFile1 extends HiResImage
   }
 
   @Override
-  protected void createMonochromeImage ()
+  void createMonochromeImage ()
   {
     image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
     DataBuffer db = image.getRaster ().getDataBuffer ();
@@ -101,18 +102,25 @@ public class SHRPictureFile1 extends HiResImage
   }
 
   @Override
-  protected void createColourImage ()
+  void createColourImage ()
   {
-    image = new BufferedImage (320, mainBlock.numScanLines, BufferedImage.TYPE_INT_RGB);
+    image = new BufferedImage (mainBlock.pixelsPerScanLine, mainBlock.numScanLines,
+        BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
+
+    if (mainBlock.pixelsPerScanLine != 320)
+      System.out.println ("Pixels per scanline: " + mainBlock.pixelsPerScanLine);
 
     int element = 0;
     int ptr = 0;
     for (int row = 0; row < mainBlock.numScanLines; row++)
     {
       DirEntry dirEntry = mainBlock.scanLineDirectory[row];
-      //      int hi = dirEntry.mode & 0xFF00;
-      int lo = dirEntry.mode & 0x00FF;
+      int hi = dirEntry.mode & 0xFF00;      // always 0
+      int lo = dirEntry.mode & 0x00FF;      // mode bit if hi == 0
+
+      if (hi != 0)
+        System.out.println ("hi not zero");
 
       ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[row]
           : mainBlock.colorTables[lo & 0x0F];
@@ -121,6 +129,7 @@ public class SHRPictureFile1 extends HiResImage
       if (fillMode)
         System.out.println ("fillmode " + fillMode);
 
+      // 320 mode
       for (int col = 0; col < 160; col++)
       {
         int left = (unpackedBuffer[ptr] & 0xF0) >> 4;
@@ -206,10 +215,10 @@ public class SHRPictureFile1 extends HiResImage
   {
     int masterMode;                     // 0 = Brooks, 0 = PNT 320 80 = PNT 640
     int pixelsPerScanLine;              // 320 or 640
-    int numColorTables;                 // 1 = Brooks, 16 = Other
-    ColorTable[] colorTables;
-    int numScanLines;
-    DirEntry[] scanLineDirectory;
+    int numColorTables;                 // 1 = Brooks, 16 = Other (may be zero)
+    ColorTable[] colorTables;           // [numColorTables]
+    int numScanLines;                   // >0
+    DirEntry[] scanLineDirectory;       // [numScanLines]
     byte[][] packedScanLines;
 
     public Main (String kind, byte[] data)

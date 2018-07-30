@@ -10,7 +10,8 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 
-// not currently used
+// ********** not currently used ***********
+
 public class PreferencesAction extends DefaultAction
 {
   JFrame owner;

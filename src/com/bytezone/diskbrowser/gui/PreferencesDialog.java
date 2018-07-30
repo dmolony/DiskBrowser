@@ -43,6 +43,7 @@ class PreferencesDialog extends JDialog
     super (owner, "Set Preferences", false);
 
     this.prefs = prefs;
+    System.out.println ("********* not used ***********");
 
     catalogFontName = prefs.get (prefsCatalogFont, defaultFontName);
     dataFontName = prefs.get (prefsDataFont, defaultFontName);
@@ -82,8 +83,8 @@ class PreferencesDialog extends JDialog
     layoutPanel.add (dataFontSizes);
 
     SpringUtilities.makeCompactGrid (layoutPanel, 2, 3, //rows, cols
-                                     10, 5, //initX, initY
-                                     10, 5); //xPad, yPad
+        10, 5, //initX, initY
+        10, 5); //xPad, yPad
 
     JPanel panel = new JPanel (new BorderLayout ());
     panel.add (layoutPanel, BorderLayout.CENTER);

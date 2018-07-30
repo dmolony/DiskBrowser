@@ -9,7 +9,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class SHRPictureFile2 extends HiResImage
 {
   ColorTable[] colorTables;
-  byte[] scb;
+  byte[] controlBytes;
 
   // see Graphics & Animation.2mg
 
@@ -40,8 +40,8 @@ public class SHRPictureFile2 extends HiResImage
 
           case 1:                             // packed version of PIC/$00
             this.buffer = unpackBytes (buffer);
-            scb = new byte[200];
-            System.arraycopy (this.buffer, 32000, scb, 0, scb.length);
+            controlBytes = new byte[200];
+            System.arraycopy (this.buffer, 32000, controlBytes, 0, controlBytes.length);
 
             colorTables = new ColorTable[16];
             for (int i = 0; i < colorTables.length; i++)
@@ -83,8 +83,8 @@ public class SHRPictureFile2 extends HiResImage
         switch (auxType)
         {
           case 0:                             // unpacked version of PNT/$01
-            scb = new byte[200];
-            System.arraycopy (buffer, 32000, scb, 0, scb.length);
+            controlBytes = new byte[200];
+            System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 
             colorTables = new ColorTable[16];
             for (int i = 0; i < colorTables.length; i++)
@@ -117,12 +117,12 @@ public class SHRPictureFile2 extends HiResImage
   }
 
   @Override
-  protected void createMonochromeImage ()
+  void createMonochromeImage ()
   {
   }
 
   @Override
-  protected void createColourImage ()
+  void createColourImage ()
   {
     image = new BufferedImage (320, 200, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
@@ -132,7 +132,7 @@ public class SHRPictureFile2 extends HiResImage
     for (int row = 0; row < 200; row++)
     {
       ColorTable colorTable =
-          scb != null ? colorTables[scb[row] & 0x0F] : colorTables[row];
+          controlBytes != null ? colorTables[controlBytes[row] & 0x0F] : colorTables[row];
 
       for (int col = 0; col < 160; col++)
       {
@@ -153,13 +153,13 @@ public class SHRPictureFile2 extends HiResImage
     StringBuilder text = new StringBuilder (super.getText ());
     text.append ("\n\n");
 
-    if (scb != null)
+    if (controlBytes != null)
     {
       text.append ("SCB\n---\n");
-      for (int i = 0; i < scb.length; i += 8)
+      for (int i = 0; i < controlBytes.length; i += 8)
       {
         for (int j = 0; j < 8; j++)
-          text.append (String.format ("  %3d:  %02X  ", i + j, scb[i + j]));
+          text.append (String.format ("  %3d:  %02X  ", i + j, controlBytes[i + j]));
         text.append ("\n");
       }
       text.append ("\n");

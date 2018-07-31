@@ -49,20 +49,21 @@ public abstract class HiResImage extends AbstractFile
   //   $C2 ANI          Paintworks animation
   //   $C3 PAL          Paintworks palette
 
-  protected static PaletteFactory paletteFactory = new PaletteFactory ();
+  static PaletteFactory paletteFactory = new PaletteFactory ();
 
-  private static final byte[] pngHeader =
+  static final byte[] pngHeader =
       { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
-  protected static boolean colourQuirks;
-  protected static boolean monochrome;
+  static boolean colourQuirks;
+  static boolean monochrome;
 
-  protected int fileType;
-  protected int auxType;
-  protected int eof;
+  int fileType;
+  int auxType;
+  int eof;
 
-  protected byte[] unpackedBuffer;
-  protected int paletteIndex;
+  byte[] unpackedBuffer;
+  int paletteIndex;
+  String failureReason = "";
 
   public HiResImage (String name, byte[] buffer)
   {
@@ -194,7 +195,7 @@ public abstract class HiResImage extends AbstractFile
             auxText = "Packed Super Hi-Res Image";
             break;
           case 2:
-            auxText = "Super Hi-Res Image (Apple Preferred)";
+            auxText = "Super Hi-Res Image (Apple Preferred Format)";
             break;
           case 3:
             auxText = "Packed QuickDraw II PICT File";
@@ -234,6 +235,8 @@ public abstract class HiResImage extends AbstractFile
       text.append (String.format ("%nUnpacked   : %,d%n%n", unpackedBuffer.length));
       //          text.append (HexFormatter.format (unpackedBuffer));
     }
+    if (!failureReason.isEmpty ())
+      text.append (String.format ("%nFailure    : %s", failureReason));
 
     return text.toString ();
   }
@@ -264,9 +267,10 @@ public abstract class HiResImage extends AbstractFile
       }
       catch (ArrayIndexOutOfBoundsException e)
       {
-
       }
 
+    System.out.println ("unpackBytes()");
+    failureReason = "buffer too small";
     return new byte[0];
   }
 
@@ -314,8 +318,8 @@ public abstract class HiResImage extends AbstractFile
     }
   }
 
-  // Super Hi-res IIGS
-  protected int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
+  // Super Hi-res IIGS (MAIN in $C0/02)
+  int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
   {
     byte[] fourBuf = new byte[4];
 
@@ -332,14 +336,14 @@ public abstract class HiResImage extends AbstractFile
       {
         case 0:
           while (count-- != 0)
-            if (newPtr < unpackedBuffer.length && ptr < buffer.length)
+            if (newPtr < newBuf.length && ptr < buffer.length)
               newBuf[newPtr++] = buffer[ptr++];
           break;
 
         case 1:
           byte b = buffer[ptr++];
           while (count-- != 0)
-            if (newPtr < unpackedBuffer.length)
+            if (newPtr < newBuf.length)
               newBuf[newPtr++] = b;
           break;
 
@@ -349,7 +353,7 @@ public abstract class HiResImage extends AbstractFile
               fourBuf[i] = buffer[ptr++];
           while (count-- != 0)
             for (int i = 0; i < 4; i++)
-              if (newPtr < unpackedBuffer.length)
+              if (newPtr < newBuf.length)
                 newBuf[newPtr++] = fourBuf[i];
           break;
 
@@ -357,7 +361,7 @@ public abstract class HiResImage extends AbstractFile
           b = buffer[ptr++];
           count *= 4;
           while (count-- != 0)
-            if (newPtr < unpackedBuffer.length)
+            if (newPtr < newBuf.length)
               newBuf[newPtr++] = b;
           break;
       }
@@ -484,6 +488,11 @@ public abstract class HiResImage extends AbstractFile
       this.id = id;
       for (int i = 0; i < 16; i++)
       {
+        //        if (offset >= data.length)
+        //        {
+        //          System.out.println ("oops");
+        //          return;
+        //        }
         entries[i] = new ColorEntry (data, offset);
         offset += 2;
       }

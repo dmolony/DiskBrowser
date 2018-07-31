@@ -13,7 +13,7 @@ public class SHRPictureFile1 extends HiResImage
   private Main mainBlock;
   private Multipal multipalBlock;
 
-  // 0xC0 aux = 2 - Apple IIGS Super Hi-Res Picture File
+  // 0xC0/02 - Apple IIGS Super Hi-Res Picture File (APF)
   public SHRPictureFile1 (String name, byte[] buffer, int fileType, int auxType, int eof)
   {
     super (name, buffer, fileType, auxType, eof);
@@ -42,31 +42,19 @@ public class SHRPictureFile1 extends HiResImage
           break;
 
         case "PALETTES":
-          System.out.println ("PALETTES not written");
-          blocks.add (new Block (kind, data));
-          break;
-
         case "MASK":
-          System.out.println ("MASK not written");
-          blocks.add (new Block (kind, data));
-          break;
-
         case "PATS":
-          System.out.println ("PATS not written");
-          blocks.add (new Block (kind, data));
-          break;
-
         case "SCIB":
-          System.out.println ("SCIB not written");
+          System.out.println (kind + " not written");
           blocks.add (new Block (kind, data));
           break;
 
-        //        case "SuperConvert":
-        //        case "NOTE":
-        //        case "EOA ":                                  // DeluxePaint
-        //        case "Platinum Paint":
-        //          blocks.add (new Block (kind, data));
-        //          break;
+        case "NOTE":                                  // Convert 3200
+        case "SuperConvert":
+        case "EOA ":                                  // DeluxePaint
+        case "Platinum Paint":
+          blocks.add (new Block (kind, data));
+          break;
 
         default:
           blocks.add (new Block (kind, data));
@@ -109,20 +97,22 @@ public class SHRPictureFile1 extends HiResImage
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
     if (mainBlock.pixelsPerScanLine != 320)
-      System.out.println ("Pixels per scanline: " + mainBlock.pixelsPerScanLine);
+      System.out.printf ("%s: Pixels per scanline: %d%n", name,
+          mainBlock.pixelsPerScanLine);
 
-    int element = 0;
-    int ptr = 0;
-    for (int row = 0; row < mainBlock.numScanLines; row++)
+    int element = 0;          // index into dataBuffer
+    int ptr = 0;              // index into unpackedBuffer
+
+    for (int line = 0; line < mainBlock.numScanLines; line++)
     {
-      DirEntry dirEntry = mainBlock.scanLineDirectory[row];
+      DirEntry dirEntry = mainBlock.scanLineDirectory[line];
       int hi = dirEntry.mode & 0xFF00;      // always 0
       int lo = dirEntry.mode & 0x00FF;      // mode bit if hi == 0
 
       if (hi != 0)
         System.out.println ("hi not zero");
 
-      ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[row]
+      ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[line]
           : mainBlock.colorTables[lo & 0x0F];
 
       boolean fillMode = (lo & 0x20) != 0;
@@ -130,7 +120,7 @@ public class SHRPictureFile1 extends HiResImage
         System.out.println ("fillmode " + fillMode);
 
       // 320 mode
-      for (int col = 0; col < 160; col++)
+      for (int i = 0; i < 160; i++)
       {
         int left = (unpackedBuffer[ptr] & 0xF0) >> 4;
         int right = unpackedBuffer[ptr] & 0x0F;
@@ -229,6 +219,8 @@ public class SHRPictureFile1 extends HiResImage
       masterMode = HexFormatter.unsignedShort (data, ptr);
       pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
       numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
+
+      System.out.printf ("mm %d, pix %d%n", masterMode, pixelsPerScanLine);
 
       ptr += 6;
       colorTables = new ColorTable[numColorTables];

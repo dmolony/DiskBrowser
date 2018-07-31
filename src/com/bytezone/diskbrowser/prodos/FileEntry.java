@@ -278,6 +278,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           assert auxType == 0;                        // auxType > 0 handled above
           if (name.endsWith (".S"))
             file = new MerlinSource (name, exactBuffer, auxType, endOfFile);
+          else if (name.endsWith (".GIF") && HiResImage.isGif (exactBuffer))
+            file = new OriginalHiResImage (name, exactBuffer, auxType);
           else
             file = new TextFile (name, exactBuffer, auxType, endOfFile);
           break;

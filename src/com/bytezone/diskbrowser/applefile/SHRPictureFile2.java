@@ -39,22 +39,15 @@ public class SHRPictureFile2 extends HiResImage
   {
     switch (auxType)
     {
-      case 0:
-        System.out.printf (
-            "%s: PNT aux 0 (Paintworks Packed SHR Image) not written yet%n", name);
-        int background = HexFormatter.intValue (buffer[0x20], buffer[0x21]);
+      case 0:                               // packed Paintworks SHR
+        controlBytes = new byte[200];       // all pointing to 0th color table
+        colorTables = new ColorTable[1];
+        colorTables[0] = new ColorTable (0, this.buffer, 0);
 
-        byte[] palette = new byte[32];
-        byte[] patterns = new byte[512];
         byte[] data = new byte[buffer.length - 0x222];
-
-        System.arraycopy (buffer, 0x00, palette, 0, palette.length);
-        System.arraycopy (buffer, 0x22, patterns, 0, patterns.length);
         System.arraycopy (buffer, 0x0222, data, 0, data.length);
-
-        failureReason = "not written yet";
-
         this.buffer = unpackBytes (data);
+
         break;
 
       case 1:                             // packed version of PIC/$00
@@ -71,8 +64,9 @@ public class SHRPictureFile2 extends HiResImage
         break;
 
       case 3:                             // packed version of PIC/$01
-        System.out.printf ("%s: PNT aux 3 (Packed IIGS SHR Image) not written yet%n",
-            name);
+        System.out.printf ("%s: PNT aux 3 (QuickDraw PICT) not written yet%n", name);
+        failureReason = "not written yet";
+
         // Apple IIGS Tech Note #46
         // https://www.prepressure.com/library/file-formats/pict
         this.buffer = unpackBytes (buffer);
@@ -80,22 +74,33 @@ public class SHRPictureFile2 extends HiResImage
         int rect1 = HexFormatter.unsignedLong (this.buffer, 2);
         int rect2 = HexFormatter.unsignedLong (this.buffer, 6);
         int version = HexFormatter.unsignedShort (this.buffer, 10);    // $8211
+
         break;
 
       case 4:                             // packed version of PIC/$02
         System.out.printf ("%s: PNT aux 4 (Packed SHR Brooks Image) not tested yet%n",
             name);
-        this.buffer = unpackBytes (buffer);
+
+      case 99:            // testing .3201 binary files
+        // 00000 - 00003  'APP' 0x00
+        // 00004 - 06403  200 color tables of 32 bytes each (one color table per scan line)
+        // 06404 - eof    packed pixel data --> 32,000 bytes
+
         colorTables = new ColorTable[200];
         for (int i = 0; i < colorTables.length; i++)
         {
-          colorTables[i] = new ColorTable (i, this.buffer, 32000 + i * 32);
+          colorTables[i] = new ColorTable (i, this.buffer, 4 + i * 32);
           colorTables[i].reverse ();
         }
+
+        data = new byte[buffer.length - 6404];      // skip APP. and color tables
+        System.arraycopy (buffer, 6404, data, 0, data.length);
+        this.buffer = unpackBytes (data);
         break;
 
       default:
         System.out.printf ("%s: PNT unknown aux: %04X%n", name, auxType);
+        failureReason = "unknown PNT aux";
     }
   }
 
@@ -104,7 +109,7 @@ public class SHRPictureFile2 extends HiResImage
     switch (auxType)
     {
       case 0:                             // unpacked version of PNT/$01
-      case 0x4100:
+      case 0x4100:                        // no idea what this is
         // 00000 - 31999  pixel data 32,000 bytes
         // 32000 - 32199  200 control bytes (one per scan line)
         // 32200 - 32255  empty
@@ -119,7 +124,8 @@ public class SHRPictureFile2 extends HiResImage
         break;
 
       case 1:                             // unpacked version of PNT/$03
-        System.out.printf ("%s: PIC aux 1 not written yet%n", name);
+        System.out.printf ("%s: PIC aux 1 (QuickDraw PICT) not written yet%n", name);
+        failureReason = "not written yet";
         break;
 
       case 2:                             // unpacked version of PNT/$04, .3200
@@ -142,6 +148,7 @@ public class SHRPictureFile2 extends HiResImage
 
       default:
         System.out.println ("PIC unknown aux " + auxType);
+        failureReason = "unknown PIC aux";
     }
   }
 
@@ -158,10 +165,22 @@ public class SHRPictureFile2 extends HiResImage
 
     int element = 0;
     int ptr = 0;
+    ColorTable colorTable = null;
+
     for (int row = 0; row < 200; row++)
     {
-      ColorTable colorTable =
-          controlBytes != null ? colorTables[controlBytes[row] & 0x0F] : colorTables[row];
+      if (controlBytes != null)
+      {
+        int controlByte = controlBytes[row];
+        int mode = controlByte & 0x80;
+        int index = controlByte & 0x0F;
+        int fillMode = controlByte & 0x20;
+        colorTable = colorTables[index];
+        if (mode != 0)
+          System.out.println ("640!!!");
+      }
+      else
+        colorTable = colorTables[row];
 
       for (int col = 0; col < 160; col++)
       {
@@ -180,7 +199,7 @@ public class SHRPictureFile2 extends HiResImage
   public String getText ()
   {
     StringBuilder text = new StringBuilder (super.getText ());
-    text.append ("\n\n");
+    text.append ("\n");
 
     if (controlBytes != null)
     {

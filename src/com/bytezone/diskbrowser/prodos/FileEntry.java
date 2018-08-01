@@ -241,11 +241,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (name.endsWith (".BMP") && HiResImage.isBmp (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (name.endsWith (".3200"))           // $C1/02
-            //            file = new AssemblerProgram (name, exactBuffer, auxType);
             file = new SHRPictureFile2 (name, exactBuffer, 0xC1, 0x02, endOfFile);
           else if (name.endsWith (".3201"))           // $C0/04
-            file = new DefaultAppleFile (name, exactBuffer);
-          //            file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 0x04, endOfFile);
+            //            file = new DefaultAppleFile (name, exactBuffer);
+            file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 99, endOfFile);
           else if (name.endsWith (".FNT") && FontFile.isFont (exactBuffer))
             file = new FontFile (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))

@@ -23,25 +23,25 @@ public abstract class HiResImage extends AbstractFile
   //   $06 BIN   $1FFF  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
   //   $06 BIN   $2000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
   //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
-  //   $06 BIN          .3200                        -       ???
-  //   $06 BIN          .3201                        -       ???
+  //   $06 BIN          .3200                        - SHRPictureFile2
+  //   $06 BIN          .3201                        - SHRPictureFile2
 
   //   $08 PICT <$4000  Apple II Graphics File       -       ???
   //   $08 PICT  $4000  Packed Hi-Res file           -       ???
   //   $08 PICT  $4001  Packed Double Hi-Res file    -       ???
 
-  //   $C0 PNT   $0000  Paintworks Packed Super Hi-Res              - SHRPictureFile2 *
-  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image  (xx)        - SHRPictureFile2 
-  // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)        - SHRPictureFile
-  //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File          - SHRPictureFile2 *
-  //   $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) (yy) .3201?  - SHRPictureFile2 *
+  // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2 
+  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image  (xx)     - SHRPictureFile2 
+  // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)     - SHRPictureFile
+  //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File       - SHRPictureFile2 *
+  // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2 
   //   $C0 PNT   $8001  GTv background picture
   //   $C0 PNT   $8005  DreamGraphix document
   //   $C0 PNT   $8006  GIF
 
-  // * $C1 PIC   $0000  IIGS Super Hi-Res Image (xx)                - SHRPictureFile2
-  //   $C1 PIC   $0001  IIGS QuickDraw II PICT File                 - SHRPictureFile2 *
-  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) (yy) .3200?      - SHRPictureFile2
+  // * $C1 PIC   $0000  IIGS Super Hi-Res Image (xx)             - SHRPictureFile2
+  //   $C1 PIC   $0001  IIGS QuickDraw II PICT File              - SHRPictureFile2 *
+  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) .3200         - SHRPictureFile2
   //   $C1 PIC   $8001  Allison raw image
   //   $C1 PIC   $8002  Thunderscan
   //   $C1 PIC   $8003  DreamGraphix
@@ -164,9 +164,9 @@ public abstract class HiResImage extends AbstractFile
   public String getText ()
   {
     String auxText = "";
-    StringBuilder text = new StringBuilder ("Image File : " + name);
-    text.append (String.format ("%nFile type  : $%02X    %s", fileType,
-        ProdosConstants.fileTypes[fileType]));
+    StringBuilder text = new StringBuilder ();
+    text.append (String.format ("Image File : %s%nFile type  : $%02X    %s%n", name,
+        fileType, ProdosConstants.fileTypes[fileType]));
 
     switch (fileType)
     {
@@ -226,18 +226,16 @@ public abstract class HiResImage extends AbstractFile
     }
 
     if (!auxText.isEmpty ())
-      text.append (String.format ("%nAux type   : $%04X  %s", auxType, auxText));
+      text.append (String.format ("Aux type   : $%04X  %s%n", auxType, auxText));
 
-    text.append (String.format ("%nFile size  : %,d", buffer.length));
-    text.append (String.format ("%nEOF        : %,d", eof));
+    text.append (String.format ("File size  : %,d%n", buffer.length));
+    text.append (String.format ("EOF        : %,d%n", eof));
     if (unpackedBuffer != null)
-    {
-      text.append (String.format ("%nUnpacked   : %,d%n%n", unpackedBuffer.length));
-      //          text.append (HexFormatter.format (unpackedBuffer));
-    }
+      text.append (String.format ("Unpacked   : %,d%n", unpackedBuffer.length));
     if (!failureReason.isEmpty ())
-      text.append (String.format ("%nFailure    : %s", failureReason));
+      text.append (String.format ("Failure    : %s%n", failureReason));
 
+    text.deleteCharAt (text.length () - 1);
     return text.toString ();
   }
 
@@ -488,11 +486,6 @@ public abstract class HiResImage extends AbstractFile
       this.id = id;
       for (int i = 0; i < 16; i++)
       {
-        //        if (offset >= data.length)
-        //        {
-        //          System.out.println ("oops");
-        //          return;
-        //        }
         entries[i] = new ColorEntry (data, offset);
         offset += 2;
       }

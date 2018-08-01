@@ -115,9 +115,9 @@ public class SHRPictureFile1 extends HiResImage
       ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[line]
           : mainBlock.colorTables[lo & 0x0F];
 
-      boolean fillMode = (lo & 0x20) != 0;
-      if (fillMode)
-        System.out.println ("fillmode " + fillMode);
+      //      boolean fillMode = (lo & 0x20) != 0;
+      //      if (fillMode)
+      //        System.out.println ("fillmode " + fillMode);
 
       // 320 mode
       for (int i = 0; i < 160; i++)

@@ -31,15 +31,16 @@ public abstract class HiResImage extends AbstractFile
   //   $08 PICT  $4001  Packed Double Hi-Res file    -       ???
 
   // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2 
-  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image  (xx)     - SHRPictureFile2 
+  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image           - SHRPictureFile2 
   // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)     - SHRPictureFile
   //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File       - SHRPictureFile2 *
   // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2 
+  //   $C0 PNT   $1000
   //   $C0 PNT   $8001  GTv background picture
   //   $C0 PNT   $8005  DreamGraphix document
   //   $C0 PNT   $8006  GIF
 
-  // * $C1 PIC   $0000  IIGS Super Hi-Res Image (xx)             - SHRPictureFile2
+  // * $C1 PIC   $0000  IIGS Super Hi-Res Image                  - SHRPictureFile2
   //   $C1 PIC   $0001  IIGS QuickDraw II PICT File              - SHRPictureFile2 *
   // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) .3200         - SHRPictureFile2
   //   $C1 PIC   $8001  Allison raw image
@@ -61,7 +62,7 @@ public abstract class HiResImage extends AbstractFile
   int auxType;
   int eof;
 
-  byte[] unpackedBuffer;
+  //  byte[] unpackedBuffer;
   int paletteIndex;
   String failureReason = "";
 
@@ -230,8 +231,8 @@ public abstract class HiResImage extends AbstractFile
 
     text.append (String.format ("File size  : %,d%n", buffer.length));
     text.append (String.format ("EOF        : %,d%n", eof));
-    if (unpackedBuffer != null)
-      text.append (String.format ("Unpacked   : %,d%n", unpackedBuffer.length));
+    //    if (unpackedBuffer != null)
+    //      text.append (String.format ("Unpacked   : %,d%n", unpackedBuffer.length));
     if (!failureReason.isEmpty ())
       text.append (String.format ("Failure    : %s%n", failureReason));
 

@@ -160,37 +160,95 @@ public class SHRPictureFile2 extends HiResImage
   @Override
   void createColourImage ()
   {
-    image = new BufferedImage (320, 200, BufferedImage.TYPE_INT_RGB);
+    image = new BufferedImage (640, 400, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
-    int element = 0;
+    int element1 = 0;         // first line
+    int element2 = 640;       // second line
     int ptr = 0;
-    ColorTable colorTable = null;
 
-    for (int row = 0; row < 200; row++)
+    boolean mode320 = true;
+    boolean fillMode = false;
+    ColorTable colorTable = null;
+    boolean flag = false;
+
+    for (int line = 0; line < 200; line++)
     {
       if (controlBytes != null)
       {
-        int controlByte = controlBytes[row];
-        int mode = controlByte & 0x80;
-        int index = controlByte & 0x0F;
-        int fillMode = controlByte & 0x20;
-        colorTable = colorTables[index];
-        if (mode != 0)
-          System.out.println ("640!!!");
+        int controlByte = controlBytes[line] & 0xFF;
+        colorTable = colorTables[controlByte & 0x0F];
+
+        mode320 = (controlByte & 0x80) == 0;
+        fillMode = (controlByte & 0x20) != 0;
+
+        //        System.out.printf ("Line: %3d, cb: %02X, Mode: %-5s, Fill: %-5s%n", line,
+        //            controlByte, mode320, fillMode);
       }
       else
-        colorTable = colorTables[row];
+        colorTable = colorTables[line];
 
-      for (int col = 0; col < 160; col++)
+      if (mode320)       // mode320
       {
-        int left = (buffer[ptr] & 0xF0) >> 4;
-        int right = buffer[ptr] & 0x0F;
+        System.out.println (buffer.length);
+        for (int col = 0; col < 160; col++)       // two pixels per col
+        {
+          int left = (buffer[ptr] & 0xF0) >> 4;
+          int right = buffer[ptr++] & 0x0F;
 
-        dataBuffer.setElem (element++, colorTable.entries[left].color.getRGB ());
-        dataBuffer.setElem (element++, colorTable.entries[right].color.getRGB ());
+          // get left/right colors
+          int rgbLeft = colorTable.entries[left].color.getRGB ();
+          int rgbRight = colorTable.entries[right].color.getRGB ();
 
-        ptr++;
+          // draw left/right pixels on current line
+          dataBuffer.setElem (element1++, rgbLeft);
+          dataBuffer.setElem (element1++, rgbLeft);
+          dataBuffer.setElem (element1++, rgbRight);
+          dataBuffer.setElem (element1++, rgbRight);
+
+          // draw same left/right pixels on next line
+          dataBuffer.setElem (element2++, rgbLeft);
+          dataBuffer.setElem (element2++, rgbLeft);
+          dataBuffer.setElem (element2++, rgbRight);
+          dataBuffer.setElem (element2++, rgbRight);
+        }
+        element1 += 640;        // skip line already drawn
+        element2 += 640;        // one line ahead
+      }
+      else          // mode640
+      {
+        if (!flag)
+        {
+          flag = true;
+          System.out.printf ("640 mode: %s%n", name);
+        }
+        for (int col = 0; col < 160; col++)       // four pixels per col
+        {
+          int p1 = (buffer[ptr] & 0xC0) >> 6;
+          int p2 = (buffer[ptr] & 0x30) >> 4;
+          int p3 = (buffer[ptr] & 0x0C) >> 2;
+          int p4 = (buffer[ptr++] & 0x03);
+
+          // get pixel colors
+          int rgb1 = colorTable.entries[p1 + 8].color.getRGB ();
+          int rgb2 = colorTable.entries[p2 + 12].color.getRGB ();
+          int rgb3 = colorTable.entries[p3].color.getRGB ();
+          int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
+
+          // draw pixels on current line
+          dataBuffer.setElem (element1++, rgb1);
+          dataBuffer.setElem (element1++, rgb2);
+          dataBuffer.setElem (element1++, rgb3);
+          dataBuffer.setElem (element1++, rgb4);
+
+          // draw same pixels on next line
+          dataBuffer.setElem (element2++, rgb1);
+          dataBuffer.setElem (element2++, rgb2);
+          dataBuffer.setElem (element2++, rgb3);
+          dataBuffer.setElem (element2++, rgb4);
+        }
+        element1 += 640;        // skip line already drawn
+        element2 += 640;        // one line ahead
       }
     }
   }

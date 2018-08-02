@@ -384,7 +384,7 @@ public class AppleDisk implements Disk
     int bufferOffset = 0;
     for (DiskAddress da : daList)
     {
-      if (da != null)                               // sparse text files may have gaps
+      if (da != null && da.getBlock () > 0)          // sparse text files may have gaps
         readBuffer (da, buffer, bufferOffset);
       bufferOffset += sectorSize;
     }

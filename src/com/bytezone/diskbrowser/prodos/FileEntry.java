@@ -195,10 +195,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private boolean isValid (int blockNo)
   {
-    if (true)
+    if (false)
     {
       if (!disk.isValidAddress (blockNo))
-        System.out.println ("--Invalid Address: " + blockNo);
+        System.out.println ("--Invalid Block Address: " + blockNo);
       if (parentDisk.isSectorFree (blockNo))
         System.out.println ("--Free block: " + blockNo);
     }
@@ -242,8 +242,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (name.endsWith (".3200"))           // $C1/02
             file = new SHRPictureFile2 (name, exactBuffer, 0xC1, 0x02, endOfFile);
-          else if (name.endsWith (".3201"))           // $C0/04
-            //            file = new DefaultAppleFile (name, exactBuffer);
+          else if (name.endsWith (".3201") || HiResImage.isAPP (exactBuffer)) // $C0/04
+            // I made up aux=99 to test it without stepping on aux==04
             file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 99, endOfFile);
           else if (name.endsWith (".FNT") && FontFile.isFont (exactBuffer))
             file = new FontFile (name, exactBuffer);

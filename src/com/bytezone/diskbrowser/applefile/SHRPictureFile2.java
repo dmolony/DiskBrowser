@@ -80,6 +80,7 @@ public class SHRPictureFile2 extends HiResImage
       case 4:                             // packed version of PIC/$02
         System.out.printf ("%s: PNT aux 4 (Packed SHR Brooks Image) not tested yet%n",
             name);
+        // haven't seen one to test yet, for now drop through to .3201
 
       case 99:            // testing .3201 binary files
         // 00000 - 00003  'APP' 0x00
@@ -96,6 +97,15 @@ public class SHRPictureFile2 extends HiResImage
         data = new byte[buffer.length - 6404];      // skip APP. and color tables
         System.arraycopy (buffer, 6404, data, 0, data.length);
         this.buffer = unpackBytes (data);
+        break;
+
+      case 4096:                          // seems to be a PIC/$00
+        controlBytes = new byte[200];
+        System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
+
+        colorTables = new ColorTable[16];
+        for (int i = 0; i < colorTables.length; i++)
+          colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
         break;
 
       default:
@@ -170,7 +180,7 @@ public class SHRPictureFile2 extends HiResImage
     boolean mode320 = true;
     boolean fillMode = false;
     ColorTable colorTable = null;
-    boolean flag = false;
+    //    boolean flag = false;
 
     for (int line = 0; line < 200; line++)
     {
@@ -181,16 +191,12 @@ public class SHRPictureFile2 extends HiResImage
 
         mode320 = (controlByte & 0x80) == 0;
         fillMode = (controlByte & 0x20) != 0;
-
-        //        System.out.printf ("Line: %3d, cb: %02X, Mode: %-5s, Fill: %-5s%n", line,
-        //            controlByte, mode320, fillMode);
       }
       else
         colorTable = colorTables[line];
 
       if (mode320)       // mode320
       {
-        System.out.println (buffer.length);
         for (int col = 0; col < 160; col++)       // two pixels per col
         {
           int left = (buffer[ptr] & 0xF0) >> 4;
@@ -217,11 +223,6 @@ public class SHRPictureFile2 extends HiResImage
       }
       else          // mode640
       {
-        if (!flag)
-        {
-          flag = true;
-          System.out.printf ("640 mode: %s%n", name);
-        }
         for (int col = 0; col < 160; col++)       // four pixels per col
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;

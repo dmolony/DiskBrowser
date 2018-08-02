@@ -12,6 +12,7 @@ public class SHRPictureFile1 extends HiResImage
   private final List<Block> blocks = new ArrayList<Block> ();
   private Main mainBlock;
   private Multipal multipalBlock;
+  private final boolean debug = false;
 
   // 0xC0/02 - Apple IIGS Super Hi-Res Picture File (APF)
   public SHRPictureFile1 (String name, byte[] buffer, int fileType, int auxType, int eof)
@@ -45,7 +46,8 @@ public class SHRPictureFile1 extends HiResImage
         case "MASK":
         case "PATS":
         case "SCIB":
-          System.out.println (kind + " not written");
+          if (debug)
+            System.out.println (kind + " not written");
           blocks.add (new Block (kind, data));
           break;
 
@@ -92,16 +94,13 @@ public class SHRPictureFile1 extends HiResImage
   @Override
   void createColourImage ()
   {
+    int width = mainBlock.pixelsPerScanLine == 320 ? 640 : mainBlock.pixelsPerScanLine;
     image =
-        new BufferedImage (640, mainBlock.numScanLines * 2, BufferedImage.TYPE_INT_RGB);
+        new BufferedImage (width, mainBlock.numScanLines * 2, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
-    if (mainBlock.pixelsPerScanLine != 320)
-      System.out.printf ("%s: Pixels per scanline: %d%n", name,
-          mainBlock.pixelsPerScanLine);
-
     int element1 = 0;         // first line
-    int element2 = 640;       // second line
+    int element2 = width;     // second line
     int ptr = 0;              // index into buffer
 
     for (int line = 0; line < mainBlock.numScanLines; line++)
@@ -121,29 +120,63 @@ public class SHRPictureFile1 extends HiResImage
       //        System.out.println ("fillmode " + fillMode);
 
       // 320 mode
-      for (int i = 0; i < 160; i++)
+      if (mainBlock.pixelsPerScanLine == 320)
       {
-        int left = (buffer[ptr] & 0xF0) >> 4;
-        int right = buffer[ptr++] & 0x0F;
+        for (int i = 0; i < 160; i++)       // two pixels per col
+        {
+          int left = (buffer[ptr] & 0xF0) >> 4;
+          int right = buffer[ptr++] & 0x0F;
 
-        // get left/right colors
-        int rgbLeft = colorTable.entries[left].color.getRGB ();
-        int rgbRight = colorTable.entries[right].color.getRGB ();
+          // get left/right colors
+          int rgbLeft = colorTable.entries[left].color.getRGB ();
+          int rgbRight = colorTable.entries[right].color.getRGB ();
 
-        // draw left/right pixels on current line
-        dataBuffer.setElem (element1++, rgbLeft);
-        dataBuffer.setElem (element1++, rgbLeft);
-        dataBuffer.setElem (element1++, rgbRight);
-        dataBuffer.setElem (element1++, rgbRight);
+          // draw left/right pixels on current line
+          dataBuffer.setElem (element1++, rgbLeft);
+          dataBuffer.setElem (element1++, rgbLeft);
+          dataBuffer.setElem (element1++, rgbRight);
+          dataBuffer.setElem (element1++, rgbRight);
 
-        // draw same left/right pixels on next line
-        dataBuffer.setElem (element2++, rgbLeft);
-        dataBuffer.setElem (element2++, rgbLeft);
-        dataBuffer.setElem (element2++, rgbRight);
-        dataBuffer.setElem (element2++, rgbRight);
+          // draw same left/right pixels on next line
+          dataBuffer.setElem (element2++, rgbLeft);
+          dataBuffer.setElem (element2++, rgbLeft);
+          dataBuffer.setElem (element2++, rgbRight);
+          dataBuffer.setElem (element2++, rgbRight);
+        }
+        element1 += width;        // skip line already drawn
+        element2 += width;        // one line ahead
       }
-      element1 += 640;        // skip line already drawn
-      element2 += 640;        // one line ahead
+      else
+      {
+        int max = mainBlock.pixelsPerScanLine / 4;
+        for (int col = 0; col < max; col++)       // four pixels per col
+        {
+          int p1 = (buffer[ptr] & 0xC0) >> 6;
+          int p2 = (buffer[ptr] & 0x30) >> 4;
+          int p3 = (buffer[ptr] & 0x0C) >> 2;
+          int p4 = (buffer[ptr++] & 0x03);
+
+          // get pixel colors
+          int rgb1 = colorTable.entries[p1 + 8].color.getRGB ();
+          int rgb2 = colorTable.entries[p2 + 12].color.getRGB ();
+          int rgb3 = colorTable.entries[p3].color.getRGB ();
+          int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
+
+          // draw pixels on current line
+          dataBuffer.setElem (element1++, rgb1);
+          dataBuffer.setElem (element1++, rgb2);
+          dataBuffer.setElem (element1++, rgb3);
+          dataBuffer.setElem (element1++, rgb4);
+
+          // draw same pixels on next line
+          dataBuffer.setElem (element2++, rgb1);
+          dataBuffer.setElem (element2++, rgb2);
+          dataBuffer.setElem (element2++, rgb3);
+          dataBuffer.setElem (element2++, rgb4);
+        }
+        element1 += width;        // skip line already drawn
+        element2 += width;        // one line ahead
+      }
     }
   }
 
@@ -234,7 +267,8 @@ public class SHRPictureFile1 extends HiResImage
       pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
       numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
 
-      System.out.printf ("mm %d, pix %d%n", masterMode, pixelsPerScanLine);
+      //      System.out.printf ("mm %02X, pix %d%n", masterMode, pixelsPerScanLine);
+      //      System.out.printf ("color tables: %d%n", numColorTables);
 
       ptr += 6;
       colorTables = new ColorTable[numColorTables];
@@ -245,10 +279,11 @@ public class SHRPictureFile1 extends HiResImage
       }
 
       numScanLines = HexFormatter.unsignedShort (data, ptr);
+      ptr += 2;
+
       scanLineDirectory = new DirEntry[numScanLines];
       packedScanLines = new byte[numScanLines][];
 
-      ptr += 2;
       for (int i = 0; i < numScanLines; i++)
       {
         DirEntry dirEntry = new DirEntry (data, ptr);
@@ -267,23 +302,33 @@ public class SHRPictureFile1 extends HiResImage
         ptr += len;
       }
 
-      byte[] unpackedBuffer = new byte[numScanLines * 160];
+      int width = pixelsPerScanLine == 320 ? 160 : pixelsPerScanLine / 4;
+      byte[] unpackedBuffer = new byte[numScanLines * width];
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
       {
-        byte[] lineBuffer = packedScanLines[line];
-        if (lineBuffer.length % 2 == 1 && isEmpty (lineBuffer))
+        //        byte[] lineBuffer = packedScanLines[line];
+        if (isOddAndEmpty (packedScanLines[line]))
         {
           System.out.println ("Odd number of bytes in empty buffer in " + name);
           break;
         }
-        ptr = unpackLine (lineBuffer, unpackedBuffer, ptr);
+        //        System.out.printf ("Line: %3d%n", line);
+        //        System.out.println (scanLineDirectory[line]);
+        ptr = unpackLine (packedScanLines[line], unpackedBuffer, ptr);
+
+        // something strange happening here
+        if (line == 102 && name.equals ("DRAGON.SHR"))
+          ptr -= 132;
       }
+
       SHRPictureFile1.this.buffer = unpackedBuffer;
     }
 
-    private boolean isEmpty (byte[] buffer)
+    private boolean isOddAndEmpty (byte[] buffer)
     {
+      if (buffer.length % 2 == 0)
+        return false;
       for (byte b : buffer)
         if (b != 0)
           return false;

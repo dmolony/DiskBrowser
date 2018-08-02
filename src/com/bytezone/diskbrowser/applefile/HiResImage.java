@@ -36,6 +36,7 @@ public abstract class HiResImage extends AbstractFile
   //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File       - SHRPictureFile2 *
   // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2 
   //   $C0 PNT   $1000
+  //   $C0 PNT   $8000  Drawplus ?
   //   $C0 PNT   $8001  GTv background picture
   //   $C0 PNT   $8005  DreamGraphix document
   //   $C0 PNT   $8006  GIF
@@ -62,7 +63,6 @@ public abstract class HiResImage extends AbstractFile
   int auxType;
   int eof;
 
-  //  byte[] unpackedBuffer;
   int paletteIndex;
   String failureReason = "";
 
@@ -231,8 +231,6 @@ public abstract class HiResImage extends AbstractFile
 
     text.append (String.format ("File size  : %,d%n", buffer.length));
     text.append (String.format ("EOF        : %,d%n", eof));
-    //    if (unpackedBuffer != null)
-    //      text.append (String.format ("Unpacked   : %,d%n", unpackedBuffer.length));
     if (!failureReason.isEmpty ())
       text.append (String.format ("Failure    : %s%n", failureReason));
 
@@ -266,9 +264,10 @@ public abstract class HiResImage extends AbstractFile
       }
       catch (ArrayIndexOutOfBoundsException e)
       {
+        // try again with a bigger buffer
       }
 
-    System.out.println ("unpackBytes()");
+    System.out.println ("unpackBytes() failed");
     failureReason = "buffer too small";
     return new byte[0];
   }
@@ -322,13 +321,14 @@ public abstract class HiResImage extends AbstractFile
   {
     byte[] fourBuf = new byte[4];
 
+    int oldPtr = newPtr;
     int ptr = 0;
     while (ptr < buffer.length)
     {
       int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
-      if (ptr >= buffer.length)
+      if (ptr >= buffer.length)       // needed for NAGELxx
         break;
 
       switch (type)
@@ -365,6 +365,7 @@ public abstract class HiResImage extends AbstractFile
           break;
       }
     }
+    //    System.out.println (HexFormatter.format (newBuf, oldPtr, newPtr - oldPtr));
 
     return newPtr;
   }
@@ -457,6 +458,12 @@ public abstract class HiResImage extends AbstractFile
     }
 
     return text.equals ("BM") && size <= buffer.length;
+  }
+
+  public static boolean isAPP (byte[] buffer)
+  {
+    return buffer[0] == (byte) 0xC1 && buffer[1] == (byte) 0xD0
+        && buffer[2] == (byte) 0xD0 && buffer[3] == 0;
   }
 
   public static PaletteFactory getPaletteFactory ()

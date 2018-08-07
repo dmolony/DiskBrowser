@@ -225,8 +225,9 @@ class Nibblizer
 
   private byte[] decode5and3 (byte[] buffer, int offset)
   {
-    for (int i = 0; i <= 410; i++)
-      decodeDos32a[i] = getByte (buffer[offset++]);
+    // convert legal disk values to actual 5 bit values
+    for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_32; i++)        // 411 bytes
+      decodeDos32a[i] = getByte5and3 (buffer[offset++]);
 
     // reconstruct 410 bytes each with 5 bits
     byte chk = 0;
@@ -238,11 +239,13 @@ class Nibblizer
     assert (chk ^ decodeDos32a[ptr]) == 0;
 
     // rearrange 410 bytes into 256
-    byte[] decodedBuffer = new byte[BLOCK_SIZE];
+    byte[] decodedBuffer = new byte[BLOCK_SIZE];                      // 256 bytes
     byte[] k = new byte[8];
     ptr = 0;
-    int[] lines = { 0, 51, 102, 153, 204, 256, 307, 358 };
+    int[] lines = { 0, 51, 102, 153, 204, 256, 307, 358 };      // NB 255 is skipped
 
+    // process 8 disk bytes at a time, giving 5 valid bytes
+    // do this 51 times, giving 255 bytes
     for (int i = 50; i >= 0; i--)
     {
       for (int j = 0; j < 8; j++)
@@ -264,19 +267,36 @@ class Nibblizer
         decodedBuffer[ptr++] = k[j];
     }
 
-    // last byte not yet tested
+    // add last byte
     decodedBuffer[255] = (byte) (decodeDos32b[255] | (decodeDos32b[409] >>> 3));
 
     return decodedBuffer;
   }
 
-  private byte getByte (byte b)
+  // ---------------------------------------------------------------------------------//
+  // getByte5and3
+  // ---------------------------------------------------------------------------------//
+
+  private byte getByte5and3 (byte b)
   {
-    int val = (b & 0xFF) - 0xAB;                   // 0 - 84
+    int val = (b & 0xFF) - 0xAB;                              // 0 - 84
     assert val >= 0 && val <= 84;
-    byte trans = (byte) (readTranslateTable5and3[val] - 1);     // 0 - 31  (5 bits)
+    byte trans = (byte) (readTranslateTable5and3[val] - 1);   // 0 - 31  (5 bits)
     assert trans >= 0 && trans <= 31;
-    return (byte) (trans << 3);                                 // left justify 5 bits
+    return (byte) (trans << 3);                               // left justify 5 bits
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // getByte6and2
+  // ---------------------------------------------------------------------------------//
+
+  private byte getByte6and2 (byte b)
+  {
+    int val = (b & 0xFF) - 0x96;                              // 0 - 105
+    assert val >= 0 && val <= 105;
+    byte trans = (byte) (readTranslateTable6and2[val] - 1);   // 0 - 63  (6 bits)
+    assert trans >= 0 && trans <= 63;
+    return (byte) (trans << 2);                               // left justify 6 bits
   }
 
   // ---------------------------------------------------------------------------------//
@@ -286,14 +306,8 @@ class Nibblizer
   private byte[] decode6and2 (byte[] buffer, int offset)
   {
     // convert legal disk values to actual 6 bit values
-    for (int i = 0; i < decodeDos33a.length; i++)                 // 343 bytes
-    {
-      int val = (buffer[offset++] & 0xFF) - 0x96;                 // 0 - 105
-      assert val >= 0 && val <= 105;
-      byte trans = (byte) (readTranslateTable6and2[val] - 1);     // 0 - 63  (6 bits)
-      assert trans >= 0 && trans <= 63;
-      decodeDos33a[i] = (byte) (trans << 2);                      // left-justify 6 bits
-    }
+    for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_33; i++)      // 343 bytes
+      decodeDos33a[i] = getByte6and2 (buffer[offset++]);
 
     // reconstruct 342 bytes each with 6 bits
     byte chk = 0;

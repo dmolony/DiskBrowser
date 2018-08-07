@@ -46,12 +46,12 @@ public class SHRPictureFile2 extends HiResImage
 
         byte[] data = new byte[buffer.length - 0x222];
         System.arraycopy (buffer, 0x0222, data, 0, data.length);
-        this.buffer = unpackBytes (data);
+        this.buffer = unpack (data);
 
         break;
 
       case 1:                             // packed version of PIC/$00
-        this.buffer = unpackBytes (buffer);
+        this.buffer = unpack (buffer);
         controlBytes = new byte[200];
         System.arraycopy (this.buffer, 32000, controlBytes, 0, controlBytes.length);
 
@@ -69,7 +69,7 @@ public class SHRPictureFile2 extends HiResImage
 
         // Apple IIGS Tech Note #46
         // https://www.prepressure.com/library/file-formats/pict
-        this.buffer = unpackBytes (buffer);
+        this.buffer = unpack (buffer);
         int mode = HexFormatter.unsignedShort (this.buffer, 0);
         int rect1 = HexFormatter.unsignedLong (this.buffer, 2);
         int rect2 = HexFormatter.unsignedLong (this.buffer, 6);
@@ -96,7 +96,7 @@ public class SHRPictureFile2 extends HiResImage
 
         data = new byte[buffer.length - 6404];      // skip APP. and color tables
         System.arraycopy (buffer, 6404, data, 0, data.length);
-        this.buffer = unpackBytes (data);
+        this.buffer = unpack (data);
         break;
 
       case 4096:                          // seems to be a PIC/$00
@@ -180,7 +180,6 @@ public class SHRPictureFile2 extends HiResImage
     boolean mode320 = true;
     boolean fillMode = false;
     ColorTable colorTable = null;
-    //    boolean flag = false;
 
     for (int line = 0; line < 200; line++)
     {

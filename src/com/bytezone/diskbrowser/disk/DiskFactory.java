@@ -232,6 +232,12 @@ public class DiskFactory
       try
       {
         WozDisk wozDisk = new WozDisk (file);
+        if (wozDisk.sectorsPerTrack == 13)
+        {
+          AppleDisk appleDisk = new AppleDisk (wozDisk, 35, 13);
+          disk = checkDos (appleDisk);
+          return disk == null ? new DataDisk (appleDisk) : disk;
+        }
         AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
         disk = checkDos (appleDisk256);
         if (disk == null)

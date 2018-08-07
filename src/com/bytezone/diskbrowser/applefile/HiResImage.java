@@ -97,12 +97,13 @@ public abstract class HiResImage extends AbstractFile
 
   protected void createImage ()
   {
-    if (isGif (buffer) || isPng (buffer) || isBmp (buffer))
-      makeImage ();
-    else if (monochrome)
-      createMonochromeImage ();
-    else
-      createColourImage ();
+    if (failureReason.isEmpty ())
+      if (isGif (buffer) || isPng (buffer) || isBmp (buffer))
+        makeImage ();
+      else if (monochrome)
+        createMonochromeImage ();
+      else
+        createColourImage ();
   }
 
   abstract void createMonochromeImage ();
@@ -252,31 +253,12 @@ public abstract class HiResImage extends AbstractFile
   *              (as in 10xxxxxx case)
   */
 
-  // Super Hi-res IIGS
-  protected byte[] unpackBytes (byte[] buffer)
-  {
-    for (int i = 1; i <= 4; i++)
-      try
-      {
-        byte[] newBuf = new byte[32768 * i];        // keep guessing
-        unpack (buffer, newBuf);
-        return newBuf;
-      }
-      catch (ArrayIndexOutOfBoundsException e)
-      {
-        // try again with a bigger buffer
-      }
-
-    System.out.println ("unpackBytes() failed");
-    failureReason = "buffer too small";
-    return new byte[0];
-  }
-
   // this should call unpackLine()
-  private void unpack (byte[] buffer, byte[] newBuf) throws ArrayIndexOutOfBoundsException
+  byte[] unpack (byte[] buffer) throws ArrayIndexOutOfBoundsException
   {
     // routine found here - http://kpreid.livejournal.com/4319.html
 
+    byte[] newBuf = new byte[calculateBufferSize (buffer)];
     byte[] fourBuf = new byte[4];
 
     int ptr = 0, newPtr = 0;
@@ -314,6 +296,40 @@ public abstract class HiResImage extends AbstractFile
           break;
       }
     }
+    return newBuf;
+  }
+
+  private int calculateBufferSize (byte[] buffer)
+  {
+    int ptr = 0;
+    int size = 0;
+    while (ptr < buffer.length)
+    {
+      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
+
+      if (type == 0)
+      {
+        ptr += count;
+        size += count;
+      }
+      else if (type == 1)
+      {
+        ptr++;
+        size += count;
+      }
+      else if (type == 2)
+      {
+        ptr += 4;
+        size += count * 4;
+      }
+      else
+      {
+        ptr++;
+        size += count * 4;
+      }
+    }
+    return size;
   }
 
   // Super Hi-res IIGS (MAIN in $C0/02)

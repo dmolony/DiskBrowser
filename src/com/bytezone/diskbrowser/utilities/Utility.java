@@ -98,9 +98,10 @@ public class Utility
 
   public static int crc32 (byte[] buffer, int offset, int length)
   {
-    int crc = 0xFFFFFFFF;         // one's complement
+    int crc = 0xFFFFFFFF;        // one's complement of zero
+    int eof = offset + length;
 
-    for (int i = offset; i < offset + length; i++)
+    for (int i = offset; i < eof; i++)
       crc = crc32_tab[(crc ^ buffer[i]) & 0xFF] ^ (crc >>> 8);
 
     return ~crc;                 // one's complement

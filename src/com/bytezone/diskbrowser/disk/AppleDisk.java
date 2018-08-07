@@ -231,10 +231,33 @@ public class AppleDisk implements Disk
     this.tracks = tracks;
     this.sectors = sectors;
     file = disk.file;
-    diskBuffer = disk.diskBuffer;
 
-    trackSize = 4096;
-    sectorSize = trackSize / sectors;
+    if (sectors == 13)
+    {
+      trackSize = 0xD00;
+      sectorSize = 256;
+      diskBuffer = new byte[116480];
+
+      int ptr = 0;
+      for (int track = 0; track < 35; track++)
+      {
+        for (int sector = 0; sector < 13; sector++)
+        {
+          int ptr2 = track * 0xD00 + sector * 0x100;
+          System.arraycopy (disk.diskBuffer, ptr, diskBuffer, ptr2, 0x100);
+          //          System.out.printf ("Copying %04X -> %04X%n", ptr, ptr2);
+          ptr += 0x100;
+        }
+        ptr += 0x300;       // skip 3 sectors
+      }
+    }
+    else
+    {
+      trackSize = 4096;
+      diskBuffer = disk.diskBuffer;
+      sectorSize = trackSize / sectors;
+    }
+
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
 
@@ -381,12 +404,12 @@ public class AppleDisk implements Disk
   public byte[] readSectors (List<DiskAddress> daList)
   {
     byte[] buffer = new byte[daList.size () * sectorSize];
-    int bufferOffset = 0;
+    int ptr = 0;
     for (DiskAddress da : daList)
     {
-      if (da != null && da.getBlock () > 0)          // sparse text files may have gaps
-        readBuffer (da, buffer, bufferOffset);
-      bufferOffset += sectorSize;
+      if (da != null && da.getBlock () > 0)    // sparse text/PNT/PIC files may have gaps
+        readBuffer (da, buffer, ptr);
+      ptr += sectorSize;
     }
     return buffer;
   }

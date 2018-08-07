@@ -55,6 +55,8 @@ public class SHRPictureFile1 extends HiResImage
         case "SuperConvert":
         case "EOA ":                                  // DeluxePaint
         case "Platinum Paint":
+        case "VSDV":
+        case "VSMK":
           blocks.add (new Block (kind, data));
           break;
 
@@ -184,6 +186,7 @@ public class SHRPictureFile1 extends HiResImage
   public String getText ()
   {
     StringBuilder text = new StringBuilder (super.getText ());
+    text.append ("\n\n");
 
     for (Block block : blocks)
     {

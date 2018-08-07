@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 class WozDisk
@@ -16,6 +17,8 @@ class WozDisk
   private static byte[] header =
       { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0a, 0x0D, 0x0A };
   private final boolean debug = false;
+  private int diskType;                       // 5.25 or 3.5
+  int sectorsPerTrack;
 
   final File file;
   final byte[] diskBuffer = new byte[4096 * 35];
@@ -34,7 +37,7 @@ class WozDisk
       throw new Exception ("Header error");
 
     int cs1 = readInt (buffer, 8, 4);
-    int cs2 = Utility.crc32 (buffer, 12, 256 - 12 + 35 * TRK_SIZE);
+    int cs2 = Utility.crc32 (buffer, 12, buffer.length - 12);
     if (cs1 != cs2)
     {
       System.out.printf ("Checksum  : %08X%n", cs1);
@@ -62,6 +65,7 @@ class WozDisk
           System.out.printf ("Creator ........... %s%n%n",
               new String (buffer, ptr + 5, 32));
         }
+        diskType = buffer[ptr + 1] & 0xFF;
         ptr += INFO_SIZE;
       }
       else if ("TMAP".equals (chunkId))
@@ -81,20 +85,31 @@ class WozDisk
       }
       else if ("TRKS".equals (chunkId))
       {
+        if (debug)
+          System.out.println ("Reading TRKS");
         int tracks = chunkSize / TRK_SIZE;
         for (int track = 0; track < tracks; track++)
         {
           int bytesUsed = readInt (buffer, ptr + DATA_SIZE, 2);
           int bitCount = readInt (buffer, ptr + DATA_SIZE + 2, 2);
 
-          byte[] trackData = new byte[bytesUsed];
-          readTrack (buffer, ptr, trackData, bytesUsed);
+          if (debug)
+          {
+            System.out.printf ("Bytes used .... %,6d%n", bytesUsed);
+            System.out.printf ("Bit count  .... %,6d%n", bitCount);
+          }
+
+          byte[] trackData = readTrack (buffer, ptr, bytesUsed, bitCount);
           if (!nibbler.processTrack (track, trackData, diskBuffer))
           {
             System.out.println ("Nibblizer failure");
+            if (debug)
+              System.out.println (HexFormatter.format (trackData));
             break read;
           }
           ptr += TRK_SIZE;
+          if (track == 0)
+            sectorsPerTrack = nibbler.sectorsPerTrack;
         }
       }
       else if ("META".equals (chunkId))
@@ -130,32 +145,42 @@ class WozDisk
   // readTrack
   // ---------------------------------------------------------------------------------//
 
-  private void readTrack (byte[] buffer, int offset, byte[] trackData, int bytesUsed)
+  private byte[] readTrack (byte[] buffer, int offset, int bytesUsed, int bitCount)
   {
+    byte[] trackData = new byte[bytesUsed];
     int value = 0;
     int ptr = 0;
+    final int max = offset + bytesUsed;
+    int count = 0;
 
-    for (int i = offset; i < offset + bytesUsed; i++)
+    for (int i = offset; i < max; i++)
     {
       int b = buffer[i] & 0xFF;
       for (int mask = 0x80; mask > 0; mask >>>= 1)
       {
-        int bit = (b & mask) == 0 ? 0 : 1;
-
         value <<= 1;
-        value |= bit;
+        if ((b & mask) != 0)
+          value |= 1;
+
+        ++count;
 
         if ((value & 0x80) != 0)            // is hi-bit set?
         {
-          trackData[ptr++] = (byte) (value & 0xFF);
+          trackData[ptr++] = (byte) value;
           value = 0;
         }
       }
     }
 
     if (value != 0)
-      System.out.printf ("Value not used: %01X", value);
-    //    assert value == 0;
+      System.out.printf ("********** Value not used: %01X%n", value);
+    if (debug && bitCount != count)
+    {
+      System.out.printf ("BitCount: %,4d%n", bitCount);
+      System.out.printf ("Actual  : %,4d%n", count);
+    }
+
+    return trackData;
   }
 
   // ---------------------------------------------------------------------------------//

@@ -232,7 +232,7 @@ public class DiskFactory
       try
       {
         WozDisk wozDisk = new WozDisk (file);
-        if (wozDisk.sectorsPerTrack == 13)
+        if (wozDisk.getSectorsPerTrack () == 13)
         {
           AppleDisk appleDisk = new AppleDisk (wozDisk, 35, 13);
           disk = checkDos (appleDisk);
@@ -248,7 +248,8 @@ public class DiskFactory
       }
       catch (Exception e)
       {
-        System.out.println (e);
+        //        System.out.println (e);
+        e.printStackTrace ();
         return null;
       }
     }

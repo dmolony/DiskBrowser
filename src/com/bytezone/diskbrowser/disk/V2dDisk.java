@@ -85,7 +85,7 @@ class V2dDisk
         int halfTrackNo = trackNumber % 4;
 
         if (halfTrackNo == 0)                               // only process full tracks
-          nibbler.processTrack (fullTrackNo, trackData, diskBuffer);
+          nibbler.processTrack (fullTrackNo, 16, trackData, diskBuffer);
         else
           System.out.printf ("%s skipping half track %02X / %02X%n", file.getName (),
               fullTrackNo, halfTrackNo);

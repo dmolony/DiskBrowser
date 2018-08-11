@@ -24,6 +24,7 @@ public class CPMDisk extends AbstractFormattedDisk
   public final SectorType macSector = new SectorType ("MAC", Color.green);
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
+  //                        // http://www.seasip.info/Cpm/format31.html
 
   public CPMDisk (Disk disk)
   {

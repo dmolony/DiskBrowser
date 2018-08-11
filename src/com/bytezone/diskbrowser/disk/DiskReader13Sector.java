@@ -4,11 +4,11 @@ import com.bytezone.diskbrowser.disk.MC3470.DiskSector;
 
 public class DiskReader13Sector extends DiskReader
 {
-  private static final int RAW_BUFFER_SIZE_DOS_32 = 410;
-  private static final int BUFFER_WITH_CHECKSUM_SIZE_DOS_32 = RAW_BUFFER_SIZE_DOS_32 + 1;
+  private static final int RAW_BUFFER_SIZE = 410;
+  private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
 
-  private final byte[] decodeDos32a = new byte[BUFFER_WITH_CHECKSUM_SIZE_DOS_32];
-  private final byte[] decodeDos32b = new byte[RAW_BUFFER_SIZE_DOS_32];
+  private final byte[] decodeA = new byte[BUFFER_WITH_CHECKSUM_SIZE];
+  private final byte[] decodeB = new byte[RAW_BUFFER_SIZE];
 
   private final ByteTranslator byteTranslator53 = new ByteTranslator5and3 ();
 
@@ -33,17 +33,17 @@ public class DiskReader13Sector extends DiskReader
     try
     {
       // convert legal disk values to actual 5 bit values
-      for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_32; i++)        // 411 bytes
-        decodeDos32a[i] = byteTranslator53.decode (buffer[offset++]);
+      for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)        // 411 bytes
+        decodeA[i] = (byte) (byteTranslator53.decode (buffer[offset++]) << 3);
 
       // reconstruct 410 bytes each with 5 bits
       byte chk = 0;
       int ptr = 0;
       for (int i = 409; i >= 256; i--)                                  // 154 bytes
-        chk = decodeDos32b[i] = (byte) (decodeDos32a[ptr++] ^ chk);
+        chk = decodeB[i] = (byte) (decodeA[ptr++] ^ chk);
       for (int i = 0; i < 256; i++)                                     // 256 bytes
-        chk = decodeDos32b[i] = (byte) (decodeDos32a[ptr++] ^ chk);
-      if ((chk ^ decodeDos32a[ptr]) != 0)
+        chk = decodeB[i] = (byte) (decodeA[ptr++] ^ chk);
+      if ((chk ^ decodeA[ptr]) != 0)
         throw new DiskNibbleException ("Checksum failed");
 
       // rearrange 410 bytes into 256
@@ -56,7 +56,7 @@ public class DiskReader13Sector extends DiskReader
       for (int i = 50; i >= 0; i--)
       {
         for (int j = 0; j < 8; j++)
-          k[j] = decodeDos32b[i + lines[j]];
+          k[j] = decodeB[i + lines[j]];
 
         k[0] |= (k[5] & 0xE0) >>> 5;
         k[1] |= (k[6] & 0xE0) >>> 5;
@@ -76,7 +76,7 @@ public class DiskReader13Sector extends DiskReader
 
       // add last byte
       decodedBuffer[ptr] =
-          (byte) (decodeDos32b[255] | ((decodeDos32b[409] & 0x3F) >>> 3));
+          (byte) (decodeB[255] | ((decodeB[409] & 0x3F) >>> 3));
     }
     catch (Exception e)
     {
@@ -117,6 +117,6 @@ public class DiskReader13Sector extends DiskReader
   @Override
   int expectedDataSize ()
   {
-    return 411;
+    return BUFFER_WITH_CHECKSUM_SIZE;
   }
 }

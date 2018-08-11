@@ -4,14 +4,14 @@ import com.bytezone.diskbrowser.disk.MC3470.DiskSector;
 
 public class DiskReader16Sector extends DiskReader
 {
-  private static final int RAW_BUFFER_SIZE_DOS_33 = 342;
-  private static final int BUFFER_WITH_CHECKSUM_SIZE_DOS_33 = RAW_BUFFER_SIZE_DOS_33 + 1;
+  private static final int RAW_BUFFER_SIZE = 342;
+  private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
 
-  private final byte[] decodeDos33a = new byte[BUFFER_WITH_CHECKSUM_SIZE_DOS_33];
-  private final byte[] decodeDos33b = new byte[RAW_BUFFER_SIZE_DOS_33];
+  private final byte[] decodeA = new byte[BUFFER_WITH_CHECKSUM_SIZE];
+  private final byte[] decodeB = new byte[RAW_BUFFER_SIZE];
 
-  private final byte[] encodeDos33a = new byte[RAW_BUFFER_SIZE_DOS_33];
-  private final byte[] encodeDos33b = new byte[BUFFER_WITH_CHECKSUM_SIZE_DOS_33];
+  private final byte[] encodeA = new byte[RAW_BUFFER_SIZE];
+  private final byte[] encodeB = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
   private final ByteTranslator byteTranslator62 = new ByteTranslator6and2 ();
 
@@ -39,34 +39,34 @@ public class DiskReader16Sector extends DiskReader
 
     try
     {
-      if (offset + BUFFER_WITH_CHECKSUM_SIZE_DOS_33 >= buffer.length)
+      if (offset + BUFFER_WITH_CHECKSUM_SIZE >= buffer.length)
         throw new DiskNibbleException (
             String.format ("Buffer not long enough (need %d, found %d)",
-                BUFFER_WITH_CHECKSUM_SIZE_DOS_33, buffer.length - offset));
+                BUFFER_WITH_CHECKSUM_SIZE, buffer.length - offset));
 
       // convert legal disk values to actual 6 bit values
-      for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_33; i++)      // 343 bytes
+      for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)      // 343 bytes
       {
         if (offset == buffer.length)
           offset = 0;
-        decodeDos33a[i] = byteTranslator62.decode (buffer[offset++]);
+        decodeA[i] = (byte) (byteTranslator62.decode (buffer[offset++]) << 2);
       }
 
       // reconstruct 342 bytes each with 6 bits
       byte chk = 0;
-      for (int i = decodeDos33b.length - 1; i >= 0; i--)              // 342 bytes
-        chk = decodeDos33b[i] = (byte) (decodeDos33a[i + 1] ^ chk);
-      if ((chk ^ decodeDos33a[0]) != 0)
+      for (int i = decodeB.length - 1; i >= 0; i--)              // 342 bytes
+        chk = decodeB[i] = (byte) (decodeA[i + 1] ^ chk);
+      if ((chk ^ decodeA[0]) != 0)
         throw new DiskNibbleException ("Checksum failed");
 
       // move 6 bits into place
       for (int i = 0; i < BLOCK_SIZE; i++)
-        decodedBuffer[i] = decodeDos33b[i + 86];
+        decodedBuffer[i] = decodeB[i + 86];
 
       // reattach each byte's last 2 bits
       for (int i = 0, j = 86, k = 172; i < 86; i++, j++, k++)
       {
-        byte val = decodeDos33b[i];
+        byte val = decodeB[i];
 
         decodedBuffer[i] |= reverse ((val & 0x0C) >> 2);
         decodedBuffer[j] |= reverse ((val & 0x30) >> 4);
@@ -91,11 +91,11 @@ public class DiskReader16Sector extends DiskReader
   @Override
   byte[] encodeSector (byte[] buffer)
   {
-    byte[] encodedBuffer = new byte[BUFFER_WITH_CHECKSUM_SIZE_DOS_33];
+    byte[] encodedBuffer = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
     // move data buffer down to make room for the 86 extra bytes
     for (int i = 0; i < BLOCK_SIZE; i++)
-      encodeDos33a[i + 86] = buffer[i];
+      encodeA[i + 86] = buffer[i];
 
     // build extra 86 bytes from the bits stripped from the data bytes
     for (int i = 0; i < 86; i++)
@@ -106,24 +106,25 @@ public class DiskReader16Sector extends DiskReader
       if (i < 84)
       {
         int b3 = reverse (buffer[i + 172] & 0x03) << 6;
-        encodeDos33a[i] = (byte) (b1 | b2 | b3);
+        encodeA[i] = (byte) (b1 | b2 | b3);
       }
       else
-        encodeDos33a[i] = (byte) (b1 | b2);
+        encodeA[i] = (byte) (b1 | b2);
     }
 
     // convert into checksum bytes
     byte checksum = 0;
-    for (int i = 0; i < RAW_BUFFER_SIZE_DOS_33; i++)
+    for (int i = 0; i < RAW_BUFFER_SIZE; i++)
     {
-      encodeDos33b[i] = (byte) (checksum ^ encodeDos33a[i]);
-      checksum = encodeDos33a[i];
+      encodeB[i] = (byte) (checksum ^ encodeA[i]);
+      checksum = encodeA[i];
     }
-    encodeDos33b[RAW_BUFFER_SIZE_DOS_33] = checksum;        // add checksum to the end
+
+    encodeB[RAW_BUFFER_SIZE] = checksum;        // add checksum to the end
 
     // remove two bits and convert to translated bytes
-    for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_33; i++)
-      encodedBuffer[i] = byteTranslator62.encode (encodeDos33b[i]);
+    for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)
+      encodedBuffer[i] = byteTranslator62.encode (encodeB[i]);
 
     return encodedBuffer;
   }
@@ -158,6 +159,6 @@ public class DiskReader16Sector extends DiskReader
   @Override
   int expectedDataSize ()
   {
-    return 343;
+    return BUFFER_WITH_CHECKSUM_SIZE;
   }
 }

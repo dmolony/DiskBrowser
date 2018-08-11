@@ -28,23 +28,29 @@ public class ByteTranslator6and2 extends ByteTranslator
     }
   }
 
+  // ---------------------------------------------------------------------------------//
+  // encode
+  // ---------------------------------------------------------------------------------//
+
   @Override
   byte encode (byte b)
   {
-    return writeTranslateTable6and2[(b & 0xFC) / 4];
+    return writeTranslateTable6and2[(b & 0xFC)];
   }
+
+  // ---------------------------------------------------------------------------------//
+  // decode
+  // ---------------------------------------------------------------------------------//
 
   @Override
   byte decode (byte b) throws DiskNibbleException
   {
     int val = (b & 0xFF) - 0x96;                              // 0 - 105
-    //    assert val >= 0 && val <= 105 : "Val: " + val;
     if (val < 0 || val > 105)
       throw new DiskNibbleException ("Val: " + val);
     byte trans = (byte) (readTranslateTable6and2[val] - 1);   // 0 - 63  (6 bits)
-    //    assert trans >= 0 && trans <= 63 : "Trans: " + trans;
     if (trans < 0 || trans > 63)
       throw new DiskNibbleException ("Trans: " + trans);
-    return (byte) (trans << 2);                               // left justify 6 bits
+    return trans;
   }
 }

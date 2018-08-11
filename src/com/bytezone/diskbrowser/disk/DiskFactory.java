@@ -238,12 +238,15 @@ public class DiskFactory
           disk = checkDos (appleDisk);
           return disk == null ? new DataDisk (appleDisk) : disk;
         }
-        AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
-        disk = checkDos (appleDisk256);
-        if (disk == null)
-          disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
-        if (disk == null)
-          disk = new DataDisk (appleDisk256);
+        if (wozDisk.getSectorsPerTrack () == 16)
+        {
+          AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
+          disk = checkDos (appleDisk256);
+          if (disk == null)
+            disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
+          if (disk == null)
+            disk = new DataDisk (appleDisk256);
+        }
         return disk;
       }
       catch (Exception e)

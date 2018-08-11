@@ -7,20 +7,20 @@ class MC3470
 {
   private final boolean debug = false;
 
-  private final byte[] dataBuffer = new byte[411];
-  int dataPtr = 0;
-
   private final List<DiskSector> diskSectors = new ArrayList<> ();
-  DiskReader diskReader;
 
-  State currentState;
-  DiskSector currentDiskSector;
-  int expectedDataSize;
+  private State currentState;
+  private DiskSector currentDiskSector;
+  private int expectedDataSize;
 
-  DiskReader diskReader16 = new DiskReader16Sector ();
-  DiskReader diskReader13 = new DiskReader13Sector ();
+  private DiskReader diskReader;
+  private final DiskReader diskReader16 = new DiskReader16Sector ();
+  private final DiskReader diskReader13 = new DiskReader13Sector ();
 
-  enum State
+  private final byte[] dataBuffer = new byte[500];
+  private int dataPtr = 0;
+
+  private enum State
   {
     ADDRESS, DATA, OTHER
   }
@@ -30,15 +30,16 @@ class MC3470
   // ---------------------------------------------------------------------------------//
 
   void readTrack (byte[] buffer, int offset, int bytesUsed, int bitCount)
+      throws DiskNibbleException
   {
-    int value = 0;
-
     final int max = offset + bytesUsed;
     int totalBits = 0;
 
     diskSectors.clear ();
     currentDiskSector = null;
     currentState = State.OTHER;
+    expectedDataSize = 200;
+    int value = 0;
 
     if (debug)
     {
@@ -92,31 +93,64 @@ class MC3470
   }
 
   // ---------------------------------------------------------------------------------//
+  // is13Sector
+  // ---------------------------------------------------------------------------------//
+
+  boolean is13Sector ()
+  {
+    return diskSectors.size () == 13 && diskReader.sectorsPerTrack == 13;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // is16Sector
+  // ---------------------------------------------------------------------------------//
+
+  boolean is16Sector ()
+  {
+    return diskSectors.size () == 16 && diskReader.sectorsPerTrack == 16;
+  }
+
+  // ---------------------------------------------------------------------------------//
   // checkState
   // ---------------------------------------------------------------------------------//
 
-  private void checkState (int value)
+  private void checkState (int value) throws DiskNibbleException
   {
-    if (value == 0xB5 && isPrologue ())
+    switch (value)
     {
-      diskReader = diskReader13;
-      setState (State.ADDRESS);
+      case 0xB5:
+        if (isPrologue ())
+        {
+          diskReader = diskReader13;
+          setState (State.ADDRESS);
+        }
+        break;
+
+      case 0x96:
+        if (isPrologue ())
+        {
+          diskReader = diskReader16;
+          setState (State.ADDRESS);
+        }
+        break;
+
+      case 0xAD:
+        if (isPrologue ())
+          setState (State.DATA);
+        break;
+
+      case 0xEB:
+        if (isEpilogue ())
+          setState (State.OTHER);
+        break;
     }
-
-    if (value == 0x96 && isPrologue ())
-    {
-      diskReader = diskReader16;
-      setState (State.ADDRESS);
-    }
-
-    if (value == 0xAD && isPrologue ())
-      setState (State.DATA);
-
-    if (value == 0xEB && isEpilogue ())
-      setState (State.OTHER);
 
     if (dataPtr == expectedDataSize)
+    {
+      if (currentState == State.OTHER)
+        throw new DiskNibbleException ("No address or data prologues found");
       setState (State.OTHER);
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -158,27 +192,9 @@ class MC3470
         break;
 
       case OTHER:
-        expectedDataSize = -1;      // unspecified length
+        expectedDataSize = 200;      // what is the maximum filler?
         break;
     }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  // is13Sector
-  // ---------------------------------------------------------------------------------//
-
-  boolean is13Sector ()
-  {
-    return diskSectors.size () == 13 && diskReader.sectorsPerTrack == 13;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  // is16Sector
-  // ---------------------------------------------------------------------------------//
-
-  boolean is16Sector ()
-  {
-    return diskSectors.size () == 16 && diskReader.sectorsPerTrack == 16;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -207,7 +223,7 @@ class MC3470
 
   class DiskSector
   {
-    DiskAddressField addressField;
+    final DiskAddressField addressField;
     byte[] buffer;
 
     DiskSector (DiskAddressField addressField)

@@ -44,6 +44,7 @@ public class ByteTranslator5and3 extends ByteTranslator
   @Override
   byte encode (byte b)
   {
+    System.out.println ("encode() not written");
     return 0;
   }
 
@@ -55,14 +56,12 @@ public class ByteTranslator5and3 extends ByteTranslator
   byte decode (byte b) throws DiskNibbleException
   {
     int val = (b & 0xFF) - 0xAB;                              // 0 - 84
-    //    assert val >= 0 && val <= 84 : "Val: " + val;
     if (val < 0 || val > 84)
       throw new DiskNibbleException ("Val: " + val);
     byte trans = (byte) (readTranslateTable5and3[val] - 1);   // 0 - 31  (5 bits)
-    //    assert trans >= 0 && trans <= 31 : "Trans: " + trans;
     if (trans < 0 || trans > 31)
       throw new DiskNibbleException ("Trans: " + trans);
-    return (byte) (trans << 3);                               // left justify 5 bits
+    return trans;
   }
 
 }

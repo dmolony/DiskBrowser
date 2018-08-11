@@ -7,7 +7,7 @@ public abstract class DiskReader
   static final int BLOCK_SIZE = 256;
   static final byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
 
-  int sectorsPerTrack;
+  final int sectorsPerTrack;
   boolean debug = false;
 
   // ---------------------------------------------------------------------------------//

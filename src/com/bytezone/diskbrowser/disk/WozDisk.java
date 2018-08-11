@@ -105,7 +105,7 @@ class WozDisk
           {
             mc3470.readTrack (buffer, ptr, bytesUsed, bitCount);
 
-            if (trackNo == 0)
+            if (trackNo == 0)         // create disk buffer
             {
               if (mc3470.is13Sector ())
                 diskBuffer = new byte[35 * 13 * 256];
@@ -122,7 +122,9 @@ class WozDisk
           }
           catch (Exception e)
           {
-            e.printStackTrace ();
+            //            e.printStackTrace ();
+            System.out.println (e);
+            break read;
           }
 
           ptr += TRK_SIZE;
@@ -148,7 +150,7 @@ class WozDisk
 
   int getSectorsPerTrack ()
   {
-    return mc3470.is13Sector () ? 13 : 16;
+    return mc3470.is13Sector () ? 13 : mc3470.is16Sector () ? 16 : 0;
   }
 
   // ---------------------------------------------------------------------------------//

@@ -152,7 +152,7 @@ class Nibblizer
       for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_32; i++)        // 411 bytes
       {
         //      System.out.printf ("%,5d  %02X%n", i, buffer[offset]);
-        decodeDos32a[i] = byteTranslator53.decode (buffer[offset++]);
+        decodeDos32a[i] = (byte) (byteTranslator53.decode (buffer[offset++]) << 3);
       }
 
       // reconstruct 410 bytes each with 5 bits
@@ -215,7 +215,7 @@ class Nibblizer
     {
       // convert legal disk values to actual 6 bit values
       for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE_DOS_33; i++)      // 343 bytes
-        decodeDos33a[i] = byteTranslator62.decode (buffer[offset++]);
+        decodeDos33a[i] = (byte) (byteTranslator62.decode (buffer[offset++]) << 2);
 
       // reconstruct 342 bytes each with 6 bits
       byte chk = 0;

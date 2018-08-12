@@ -57,11 +57,10 @@ public class ByteTranslator5and3 extends ByteTranslator
   {
     int val = (b & 0xFF) - 0xAB;                              // 0 - 84
     if (val < 0 || val > 84)
-      throw new DiskNibbleException ("Val: " + val);
+      throw new DiskNibbleException ("5&3 val: " + val);
     byte trans = (byte) (readTranslateTable5and3[val] - 1);   // 0 - 31  (5 bits)
     if (trans < 0 || trans > 31)
-      throw new DiskNibbleException ("Trans: " + trans);
+      throw new DiskNibbleException ("5&3 trans: " + trans);
     return trans;
   }
-
 }

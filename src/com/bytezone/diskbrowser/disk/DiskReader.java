@@ -23,7 +23,7 @@ public abstract class DiskReader
   // abstract functions
   // ---------------------------------------------------------------------------------//
 
-  abstract byte[] decodeSector (byte[] buffer, int ptr);
+  abstract byte[] decodeSector (byte[] buffer);
 
   abstract byte[] encodeSector (byte[] buffer);
 

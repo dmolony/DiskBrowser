@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 class WozDisk
@@ -87,7 +86,11 @@ class WozDisk
       else if ("TRKS".equals (chunkId))
       {
         if (debug)
-          System.out.println ("Reading TRKS");
+        {
+          System.out.println ("***************************************");
+          System.out.printf ("*  Disk ......... %s%n", file.getName ());
+          System.out.println ("***************************************");
+        }
         int tracks = chunkSize / TRK_SIZE;
 
         for (int trackNo = 0; trackNo < tracks; trackNo++)
@@ -97,8 +100,11 @@ class WozDisk
 
           if (debug)
           {
-            System.out.printf ("Bytes used .... %,6d%n", bytesUsed);
-            System.out.printf ("Bit count  .... %,6d%n", bitCount);
+            System.out.println ("******************************");
+            System.out.printf ("*   Track ......... %,6d   *%n", trackNo);
+            System.out.printf ("*   Bytes used .... %,6d   *%n", bytesUsed);
+            System.out.printf ("*   Bit count  .... %,6d   *%n", bitCount);
+            System.out.println ("******************************");
           }
 
           try
@@ -115,6 +121,7 @@ class WozDisk
               {
                 System.out.println ("unknown disk format");
                 break read;
+                //                continue;
               }
             }
 
@@ -124,7 +131,7 @@ class WozDisk
           {
             //            e.printStackTrace ();
             System.out.println (e);
-            break read;
+            //            break read;
           }
 
           ptr += TRK_SIZE;
@@ -132,8 +139,8 @@ class WozDisk
       }
       else if ("META".equals (chunkId))
       {
-        System.out.printf ("[%s]  %08X%n", chunkId, chunkSize);
-        System.out.println (HexFormatter.format (buffer, ptr, chunkSize));
+        //        System.out.printf ("[%s]  %08X%n", chunkId, chunkSize);
+        //        System.out.println (HexFormatter.format (buffer, ptr, chunkSize));
         ptr += chunkSize;
       }
       else

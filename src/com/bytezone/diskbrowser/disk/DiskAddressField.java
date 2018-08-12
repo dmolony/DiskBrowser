@@ -8,21 +8,21 @@ class DiskAddressField
   // constructor
   // ---------------------------------------------------------------------------------//
 
-  DiskAddressField (byte[] buffer, int offset)
+  DiskAddressField (byte[] buffer)
   {
-    volume = decode4and4 (buffer, offset);
-    track = decode4and4 (buffer, offset + 2);
-    sector = decode4and4 (buffer, offset + 4);
-    checksum = decode4and4 (buffer, offset + 6);
+    volume = decode4and4 (buffer, 0);
+    track = decode4and4 (buffer, 2);
+    sector = decode4and4 (buffer, 4);
+    checksum = decode4and4 (buffer, 6);
   }
 
   // ---------------------------------------------------------------------------------//
   // decode4and4
   // ---------------------------------------------------------------------------------//
 
-  int decode4and4 (byte[] buffer, int offset)
+  private int decode4and4 (byte[] buffer, int offset)
   {
-    int odds = ((buffer[offset] & 0xFF) << 1) + 1;
+    int odds = ((buffer[offset] & 0xFF) << 1) | 0x01;
     int evens = buffer[offset + 1] & 0xFF;
     return odds & evens;
   }

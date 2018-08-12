@@ -10,7 +10,7 @@ public class DiskReader13Sector extends DiskReader
   private final byte[] decodeA = new byte[BUFFER_WITH_CHECKSUM_SIZE];
   private final byte[] decodeB = new byte[RAW_BUFFER_SIZE];
 
-  private final ByteTranslator byteTranslator53 = new ByteTranslator5and3 ();
+  private final ByteTranslator byteTranslator = new ByteTranslator5and3 ();
 
   // ---------------------------------------------------------------------------------//
   // constructor
@@ -26,15 +26,16 @@ public class DiskReader13Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
 
   @Override
-  byte[] decodeSector (byte[] buffer, int offset)
+  byte[] decodeSector (byte[] buffer)
   {
     byte[] decodedBuffer = new byte[BLOCK_SIZE];
+    int offset = 0;
 
     try
     {
       // convert legal disk values to actual 5 bit values
       for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)        // 411 bytes
-        decodeA[i] = (byte) (byteTranslator53.decode (buffer[offset++]) << 3);
+        decodeA[i] = (byte) (byteTranslator.decode (buffer[offset++]) << 3);
 
       // reconstruct 410 bytes each with 5 bits
       byte chk = 0;
@@ -75,11 +76,11 @@ public class DiskReader13Sector extends DiskReader
       }
 
       // add last byte
-      decodedBuffer[ptr] =
-          (byte) (decodeB[255] | ((decodeB[409] & 0x3F) >>> 3));
+      decodedBuffer[ptr] = (byte) (decodeB[255] | ((decodeB[409] & 0x3F) >>> 3));
     }
     catch (Exception e)
     {
+      //      e.printStackTrace ();
       System.out.println (e);
     }
 

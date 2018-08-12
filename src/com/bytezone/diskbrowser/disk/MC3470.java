@@ -3,21 +3,27 @@ package com.bytezone.diskbrowser.disk;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
+
 class MC3470
 {
+  private static final int EMPTY = 999;
   private final boolean debug = false;
+  private final boolean dump = false;
 
   private final List<DiskSector> diskSectors = new ArrayList<> ();
 
   private State currentState;
   private DiskSector currentDiskSector;
   private int expectedDataSize;
+  private boolean finished;
+  private boolean restarted;
 
   private DiskReader diskReader;
   private final DiskReader diskReader16 = new DiskReader16Sector ();
   private final DiskReader diskReader13 = new DiskReader13Sector ();
 
-  private final byte[] dataBuffer = new byte[500];
+  private final byte[] dataBuffer = new byte[EMPTY];
   private int dataPtr = 0;
 
   private enum State
@@ -38,17 +44,22 @@ class MC3470
     diskSectors.clear ();
     currentDiskSector = null;
     currentState = State.OTHER;
-    expectedDataSize = 200;
+    expectedDataSize = EMPTY;
+    finished = false;
+    restarted = false;
     int value = 0;
+    dataPtr = 0;
 
     if (debug)
     {
       System.out.printf ("%nOffset    : %06X%n", offset);
       System.out.printf ("Bytes used: %06X%n", bytesUsed);
+      System.out.printf ("Bit count : %06X%n", bitCount);
+      System.out.printf ("remaining : %06X%n", bitCount % 8);
     }
 
-    int inPtr = offset;
-    while (inPtr < max)
+    int inPtr = offset;         // keep offset in case we have to loop around
+    while (!finished && inPtr < max)
     {
       int b = buffer[inPtr++] & 0xFF;
       for (int mask = 0x80; mask != 0; mask >>>= 1)
@@ -57,29 +68,36 @@ class MC3470
         if ((b & mask) != 0)
           value |= 1;
 
-        ++totalBits;
-
         if ((value & 0x80) != 0)                        // is hi-bit set?
         {
+          if (dump)
+          {
+            if (dataPtr % 16 == 0)
+              System.out.printf ("%n%04X: ", dataPtr);
+            System.out.printf ("%02X ", value);
+          }
+
           dataBuffer[dataPtr++] = (byte) value;
           checkState (value);
           value = 0;
         }
+
+        if (++totalBits == bitCount)
+          break;
       }
-      if (inPtr == max && currentState == State.DATA)
+
+      if (inPtr == max && currentState == State.DATA && !restarted)
       {
-        System.out.println ("Unfinished business");
+        inPtr = offset;
+        restarted = true;
       }
     }
 
-    //    if (bytesUsed > outputBuffer.length)
-    //    {
-    //      System.out.printf ("Bytes used  %,5d%n", bytesUsed);
-    //      System.out.printf ("Buffer size %,5d%n", outPtr);
-    //    }
-
-    if (value != 0)
-      System.out.printf ("********** Value not used: %01X%n", value);
+    if (debug)
+    {
+      System.out.printf ("total bits : %d%n", bitCount);
+      System.out.printf ("bits used  : %d%n", totalBits);
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -148,7 +166,7 @@ class MC3470
     if (dataPtr == expectedDataSize)
     {
       if (currentState == State.OTHER)
-        throw new DiskNibbleException ("No address or data prologues found");
+        throw new DiskNibbleException ("No address or data blocks found");
       setState (State.OTHER);
     }
   }
@@ -161,40 +179,67 @@ class MC3470
   {
     if (currentState == newState && currentState == State.OTHER)
       return;
-    assert currentState != newState;
+    assert currentState != newState : currentState + " -> " + newState;
 
     switch (currentState)           // this state is now finished
     {
       case ADDRESS:
-        currentDiskSector = new DiskSector (new DiskAddressField (dataBuffer, 0));
+        currentDiskSector = new DiskSector (new DiskAddressField (dataBuffer));
+        if (dump)
+          System.out.println (currentDiskSector);
         break;
 
       case DATA:
-        currentDiskSector.setBuffer (diskReader.decodeSector (dataBuffer, 0));
-        diskSectors.add (currentDiskSector);
+        if (currentDiskSector != null)
+        {
+          currentDiskSector.setBuffer (diskReader.decodeSector (dataBuffer));
+          diskSectors.add (currentDiskSector);
+          currentDiskSector = null;
+          if (diskSectors.size () == diskReader.sectorsPerTrack)
+            finished = true;
+        }
+        else
+        {
+          if (debug)
+          {
+            System.out.printf ("cannot store %d DATA no ADDRESS", dataPtr);
+            System.out.println (HexFormatter.format (dataBuffer, 0, dataPtr));
+          }
+        }
         break;
 
       case OTHER:
+        break;
+    }
+
+    switch (newState)               // this state is now starting
+    {
+      case ADDRESS:
+        if (dump)
+          System.out.print ("ADDRESS  ");
+        expectedDataSize = 8;
+        break;
+
+      case DATA:
+        if (dump)
+          System.out.println ("DATA");
+        if (debug && currentDiskSector == null)
+        {
+          System.out.println ("starting DATA with no ADDRESS");
+          System.out.println (HexFormatter.format (dataBuffer, 0, dataPtr));
+        }
+        expectedDataSize = diskReader.expectedDataSize ();
+        break;
+
+      case OTHER:
+        if (dump)
+          System.out.println ("OTHER");
+        expectedDataSize = EMPTY;      // what is the maximum filler?
         break;
     }
 
     currentState = newState;
     dataPtr = 0;                    // start collecting new buffer
-
-    switch (currentState)           // this state is now starting
-    {
-      case ADDRESS:
-        expectedDataSize = 8;
-        break;
-
-      case DATA:
-        expectedDataSize = diskReader.expectedDataSize ();
-        break;
-
-      case OTHER:
-        expectedDataSize = 200;      // what is the maximum filler?
-        break;
-    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -203,7 +248,9 @@ class MC3470
 
   private boolean isPrologue ()
   {
-    return dataPtr >= 3 && dataBuffer[dataPtr - 3] == (byte) 0xD5
+    return dataPtr >= 3
+        && (dataBuffer[dataPtr - 3] == (byte) 0xD5
+            || dataBuffer[dataPtr - 3] == (byte) 0xD4)      // non-standard
         && dataBuffer[dataPtr - 2] == (byte) 0xAA;
   }
 
@@ -213,7 +260,9 @@ class MC3470
 
   private boolean isEpilogue ()
   {
-    return dataPtr >= 3 && dataBuffer[dataPtr - 3] == (byte) 0xDE
+    return dataPtr >= 3
+        && (dataBuffer[dataPtr - 3] == (byte) 0xDE
+            || dataBuffer[dataPtr - 3] == (byte) 0xDA)      // non-standard
         && dataBuffer[dataPtr - 2] == (byte) 0xAA;
   }
 

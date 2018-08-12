@@ -47,10 +47,10 @@ public class ByteTranslator6and2 extends ByteTranslator
   {
     int val = (b & 0xFF) - 0x96;                              // 0 - 105
     if (val < 0 || val > 105)
-      throw new DiskNibbleException ("Val: " + val);
+      throw new DiskNibbleException ("6&2 val: " + val);
     byte trans = (byte) (readTranslateTable6and2[val] - 1);   // 0 - 63  (6 bits)
     if (trans < 0 || trans > 63)
-      throw new DiskNibbleException ("Trans: " + trans);
+      throw new DiskNibbleException ("6&2 trans: " + trans);
     return trans;
   }
 }

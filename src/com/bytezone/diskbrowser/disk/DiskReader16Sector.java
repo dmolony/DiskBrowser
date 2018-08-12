@@ -13,7 +13,7 @@ public class DiskReader16Sector extends DiskReader
   private final byte[] encodeA = new byte[RAW_BUFFER_SIZE];
   private final byte[] encodeB = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
-  private final ByteTranslator byteTranslator62 = new ByteTranslator6and2 ();
+  private final ByteTranslator byteTranslator = new ByteTranslator6and2 ();
 
   private static int[] interleave =
       { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
@@ -32,29 +32,21 @@ public class DiskReader16Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
 
   @Override
-  byte[] decodeSector (byte[] buffer, int offset)
+  byte[] decodeSector (byte[] buffer)
   {
     // rearrange 342 bytes into 256
-    byte[] decodedBuffer = new byte[BLOCK_SIZE];                      // 256 bytes
+    byte[] decodedBuffer = new byte[BLOCK_SIZE];                // 256 bytes
+    int offset = 0;
 
     try
     {
-      if (offset + BUFFER_WITH_CHECKSUM_SIZE >= buffer.length)
-        throw new DiskNibbleException (
-            String.format ("Buffer not long enough (need %d, found %d)",
-                BUFFER_WITH_CHECKSUM_SIZE, buffer.length - offset));
-
       // convert legal disk values to actual 6 bit values
       for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)      // 343 bytes
-      {
-        if (offset == buffer.length)
-          offset = 0;
-        decodeA[i] = (byte) (byteTranslator62.decode (buffer[offset++]) << 2);
-      }
+        decodeA[i] = (byte) (byteTranslator.decode (buffer[offset++]) << 2);
 
       // reconstruct 342 bytes each with 6 bits
       byte chk = 0;
-      for (int i = decodeB.length - 1; i >= 0; i--)              // 342 bytes
+      for (int i = decodeB.length - 1; i >= 0; i--)            // 342 bytes
         chk = decodeB[i] = (byte) (decodeA[i + 1] ^ chk);
       if ((chk ^ decodeA[0]) != 0)
         throw new DiskNibbleException ("Checksum failed");
@@ -78,6 +70,7 @@ public class DiskReader16Sector extends DiskReader
     catch (Exception e)
     {
       System.out.println (e);
+      //      e.printStackTrace ();
     }
 
     return decodedBuffer;
@@ -124,7 +117,7 @@ public class DiskReader16Sector extends DiskReader
 
     // remove two bits and convert to translated bytes
     for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)
-      encodedBuffer[i] = byteTranslator62.encode (encodeB[i]);
+      encodedBuffer[i] = byteTranslator.encode (encodeB[i]);
 
     return encodedBuffer;
   }

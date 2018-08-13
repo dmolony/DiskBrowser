@@ -7,14 +7,15 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class MC3470
 {
-  private static final int EMPTY = 999;
+  private static final int MAX_DATA = 999;
   private final boolean debug = false;
   private final boolean dump = false;
 
-  private final List<DiskSector> diskSectors = new ArrayList<> ();
+  private List<RawDiskSector> diskSectors;
 
   private State currentState;
-  private DiskSector currentDiskSector;
+  private RawDiskSector currentDiskSector;
+
   private int expectedDataSize;
   private boolean finished;
   private boolean restarted;
@@ -23,7 +24,7 @@ class MC3470
   private final DiskReader diskReader16 = new DiskReader16Sector ();
   private final DiskReader diskReader13 = new DiskReader13Sector ();
 
-  private final byte[] dataBuffer = new byte[EMPTY];
+  private final byte[] dataBuffer = new byte[MAX_DATA];
   private int dataPtr = 0;
 
   private enum State
@@ -35,40 +36,46 @@ class MC3470
   // readTrack
   // ---------------------------------------------------------------------------------//
 
-  void readTrack (byte[] buffer, int offset, int bytesUsed, int bitCount)
+  List<RawDiskSector> readTrack (byte[] buffer, int offset, int bytesUsed, int bitCount)
       throws DiskNibbleException
   {
     final int max = offset + bytesUsed;
     int totalBits = 0;
+    int totalBytes = 0;
 
-    diskSectors.clear ();
+    diskSectors = new ArrayList<> ();
+    diskReader = null;
     currentDiskSector = null;
     currentState = State.OTHER;
-    expectedDataSize = EMPTY;
     finished = false;
     restarted = false;
-    int value = 0;
+
+    byte value = 0;                     // value to be stored
     dataPtr = 0;
+    expectedDataSize = MAX_DATA;
 
     if (debug)
     {
       System.out.printf ("%nOffset    : %06X%n", offset);
       System.out.printf ("Bytes used: %06X%n", bytesUsed);
       System.out.printf ("Bit count : %06X%n", bitCount);
-      System.out.printf ("remaining : %06X%n", bitCount % 8);
     }
 
-    int inPtr = offset;         // keep offset in case we have to loop around
-    while (!finished && inPtr < max)
+    int inPtr = offset;               // keep offset in case we have to loop around
+    while (inPtr < max && !finished)
     {
-      int b = buffer[inPtr++] & 0xFF;
+      byte b = buffer[inPtr++];
+
+      if (!restarted)
+        totalBytes++;
+
       for (int mask = 0x80; mask != 0; mask >>>= 1)
       {
         value <<= 1;
         if ((b & mask) != 0)
-          value |= 1;
+          value |= 0x01;
 
-        if ((value & 0x80) != 0)                        // is hi-bit set?
+        if ((value & 0x80) != 0)     // value is not valid until the hi-bit is set
         {
           if (dump)
           {
@@ -77,7 +84,7 @@ class MC3470
             System.out.printf ("%02X ", value);
           }
 
-          dataBuffer[dataPtr++] = (byte) value;
+          dataBuffer[dataPtr++] = value;
           checkState (value);
           value = 0;
         }
@@ -86,6 +93,7 @@ class MC3470
           break;
       }
 
+      // check for unfinished data block, we may need to restart the track
       if (inPtr == max && currentState == State.DATA && !restarted)
       {
         inPtr = offset;
@@ -95,18 +103,28 @@ class MC3470
 
     if (debug)
     {
-      System.out.printf ("total bits : %d%n", bitCount);
-      System.out.printf ("bits used  : %d%n", totalBits);
+      System.out.println ("**************************************");
+      System.out.printf ("*  total bits  : %,5d  *%n", bitCount);
+      System.out.printf ("*  bits used   : %,5d  *%n", totalBits);
+      System.out.printf ("*  total bytes : %,5d  *%n", bytesUsed);
+      System.out.printf ("*  bytes used  : %,5d  *%n", totalBytes);
+      System.out.println ("**************************************");
     }
+
+    return diskSectors;
   }
 
   // ---------------------------------------------------------------------------------//
   // storeSectors
   // ---------------------------------------------------------------------------------//
 
-  void storeSectors (byte[] diskBuffer)
+  void storeSectors (List<RawDiskSector> diskSectors, byte[] diskBuffer)
+      throws DiskNibbleException
   {
-    for (DiskSector diskSector : diskSectors)
+    if (diskReader == null)
+      throw new DiskNibbleException ("No DiskReader");
+
+    for (RawDiskSector diskSector : diskSectors)
       diskReader.storeBuffer (diskSector, diskBuffer);
   }
 
@@ -132,11 +150,11 @@ class MC3470
   // checkState
   // ---------------------------------------------------------------------------------//
 
-  private void checkState (int value) throws DiskNibbleException
+  private void checkState (byte value) throws DiskNibbleException
   {
     switch (value)
     {
-      case 0xB5:
+      case (byte) 0xB5:
         if (isPrologue ())
         {
           diskReader = diskReader13;
@@ -144,7 +162,7 @@ class MC3470
         }
         break;
 
-      case 0x96:
+      case (byte) 0x96:
         if (isPrologue ())
         {
           diskReader = diskReader16;
@@ -152,12 +170,12 @@ class MC3470
         }
         break;
 
-      case 0xAD:
+      case (byte) 0xAD:
         if (isPrologue ())
           setState (State.DATA);
         break;
 
-      case 0xEB:
+      case (byte) 0xEB:
         if (isEpilogue ())
           setState (State.OTHER);
         break;
@@ -175,7 +193,7 @@ class MC3470
   // setState
   // ---------------------------------------------------------------------------------//
 
-  private void setState (State newState)
+  private void setState (State newState) throws DiskNibbleException
   {
     if (currentState == newState && currentState == State.OTHER)
       return;
@@ -184,13 +202,22 @@ class MC3470
     switch (currentState)           // this state is now finished
     {
       case ADDRESS:
-        currentDiskSector = new DiskSector (new DiskAddressField (dataBuffer));
+        if (currentDiskSector != null)
+          System.out.printf ("unused ADDRESS: %s%n", currentDiskSector);
+
+        currentDiskSector = new RawDiskSector (new DiskAddressField (dataBuffer));
         if (dump)
           System.out.println (currentDiskSector);
         break;
 
       case DATA:
-        if (currentDiskSector != null)
+        if (currentDiskSector == null)
+        {
+          System.out.printf ("cannot store %d DATA no ADDRESS", dataPtr);
+          if (debug)
+            System.out.println (HexFormatter.format (dataBuffer, 0, dataPtr));
+        }
+        else
         {
           currentDiskSector.setBuffer (diskReader.decodeSector (dataBuffer));
           diskSectors.add (currentDiskSector);
@@ -198,17 +225,9 @@ class MC3470
           if (diskSectors.size () == diskReader.sectorsPerTrack)
             finished = true;
         }
-        else
-        {
-          if (debug)
-          {
-            System.out.printf ("cannot store %d DATA no ADDRESS", dataPtr);
-            System.out.println (HexFormatter.format (dataBuffer, 0, dataPtr));
-          }
-        }
         break;
 
-      case OTHER:
+      case OTHER:       // triggered by an epilogue or full address/data buffer
         break;
     }
 
@@ -234,12 +253,12 @@ class MC3470
       case OTHER:
         if (dump)
           System.out.println ("OTHER");
-        expectedDataSize = EMPTY;      // what is the maximum filler?
+        expectedDataSize = MAX_DATA;      // what is the maximum filler?
         break;
     }
 
     currentState = newState;
-    dataPtr = 0;                    // start collecting new buffer
+    dataPtr = 0;                          // start collecting new buffer
   }
 
   // ---------------------------------------------------------------------------------//
@@ -264,31 +283,5 @@ class MC3470
         && (dataBuffer[dataPtr - 3] == (byte) 0xDE
             || dataBuffer[dataPtr - 3] == (byte) 0xDA)      // non-standard
         && dataBuffer[dataPtr - 2] == (byte) 0xAA;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  // DiskSector
-  // ---------------------------------------------------------------------------------//
-
-  class DiskSector
-  {
-    final DiskAddressField addressField;
-    byte[] buffer;
-
-    DiskSector (DiskAddressField addressField)
-    {
-      this.addressField = addressField;
-    }
-
-    void setBuffer (byte[] buffer)
-    {
-      this.buffer = buffer;
-    }
-
-    @Override
-    public String toString ()
-    {
-      return addressField.toString ();
-    }
   }
 }

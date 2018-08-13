@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.disk;
 
-import com.bytezone.diskbrowser.disk.MC3470.DiskSector;
-
 public class DiskReader16Sector extends DiskReader
 {
   private static final int RAW_BUFFER_SIZE = 342;
@@ -32,45 +30,37 @@ public class DiskReader16Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
 
   @Override
-  byte[] decodeSector (byte[] buffer)
+  byte[] decodeSector (byte[] buffer) throws DiskNibbleException
   {
     // rearrange 342 bytes into 256
-    byte[] decodedBuffer = new byte[BLOCK_SIZE];                // 256 bytes
+    byte[] decodedBuffer = new byte[BLOCK_SIZE];             // 256 bytes
     int offset = 0;
 
-    try
+    // convert legal disk values to actual 6 bit values
+    for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)      // 343 bytes
+      decodeA[i] = (byte) (byteTranslator.decode (buffer[offset++]) << 2);
+
+    // reconstruct 342 bytes each with 6 bits
+    byte chk = 0;
+    for (int i = decodeB.length - 1; i >= 0; i--)            // 342 bytes
+      chk = decodeB[i] = (byte) (decodeA[i + 1] ^ chk);
+    if ((chk ^ decodeA[0]) != 0)
+      throw new DiskNibbleException ("Checksum failed");
+
+    // move 6 bits into place
+    for (int i = 0; i < BLOCK_SIZE; i++)
+      decodedBuffer[i] = decodeB[i + 86];
+
+    // reattach each byte's last 2 bits
+    for (int i = 0, j = 86, k = 172; i < 86; i++, j++, k++)
     {
-      // convert legal disk values to actual 6 bit values
-      for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)      // 343 bytes
-        decodeA[i] = (byte) (byteTranslator.decode (buffer[offset++]) << 2);
+      byte val = decodeB[i];
 
-      // reconstruct 342 bytes each with 6 bits
-      byte chk = 0;
-      for (int i = decodeB.length - 1; i >= 0; i--)            // 342 bytes
-        chk = decodeB[i] = (byte) (decodeA[i + 1] ^ chk);
-      if ((chk ^ decodeA[0]) != 0)
-        throw new DiskNibbleException ("Checksum failed");
+      decodedBuffer[i] |= reverse ((val & 0x0C) >> 2);
+      decodedBuffer[j] |= reverse ((val & 0x30) >> 4);
 
-      // move 6 bits into place
-      for (int i = 0; i < BLOCK_SIZE; i++)
-        decodedBuffer[i] = decodeB[i + 86];
-
-      // reattach each byte's last 2 bits
-      for (int i = 0, j = 86, k = 172; i < 86; i++, j++, k++)
-      {
-        byte val = decodeB[i];
-
-        decodedBuffer[i] |= reverse ((val & 0x0C) >> 2);
-        decodedBuffer[j] |= reverse ((val & 0x30) >> 4);
-
-        if (k < BLOCK_SIZE)
-          decodedBuffer[k] |= reverse ((val & 0xC0) >> 6);
-      }
-    }
-    catch (Exception e)
-    {
-      System.out.println (e);
-      //      e.printStackTrace ();
+      if (k < BLOCK_SIZE)
+        decodedBuffer[k] |= reverse ((val & 0xC0) >> 6);
     }
 
     return decodedBuffer;
@@ -137,7 +127,7 @@ public class DiskReader16Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
 
   @Override
-  void storeBuffer (DiskSector diskSector, byte[] diskBuffer)
+  void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer)
   {
     DiskAddressField addressField = diskSector.addressField;
     byte[] sectorBuffer = diskSector.buffer;

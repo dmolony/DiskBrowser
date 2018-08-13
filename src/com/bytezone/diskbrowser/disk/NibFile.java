@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-class NibDisk
+class NibFile
 {
   //  private final Nibblizer nibbler;
 
@@ -20,7 +20,7 @@ class NibDisk
 
   // add 'nib' to Utility.suffixes to allow nib files to be selected
 
-  public NibDisk (File file)
+  public NibFile (File file)
   {
     this.file = file;
     byte[] trackBuffer = new byte[6656];

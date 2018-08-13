@@ -203,7 +203,7 @@ public class AppleDisk implements Disk
     checkSectorsForData ();
   }
 
-  public AppleDisk (V2dDisk disk, int tracks, int sectors)
+  public AppleDisk (V2dFile disk, int tracks, int sectors)
   {
     this.tracks = tracks;
     this.sectors = sectors;
@@ -218,7 +218,7 @@ public class AppleDisk implements Disk
     checkSectorsForData ();
   }
 
-  public AppleDisk (NibDisk disk)       // not used yet
+  public AppleDisk (NibFile disk)       // not used yet
   {
     tracks = 35;
     trackSize = 4096;
@@ -226,12 +226,12 @@ public class AppleDisk implements Disk
     diskBuffer = disk.buffer;
   }
 
-  public AppleDisk (WozDisk disk, int tracks, int sectors)
+  public AppleDisk (WozFile wozFile, int tracks, int sectors)
   {
     this.tracks = tracks;
     this.sectors = sectors;
-    file = disk.file;
-    diskBuffer = disk.diskBuffer;
+    file = wozFile.file;
+    diskBuffer = wozFile.diskBuffer;
 
     if (sectors == 13)
     {

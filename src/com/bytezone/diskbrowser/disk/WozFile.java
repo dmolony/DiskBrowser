@@ -4,12 +4,13 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
-class WozDisk
+class WozFile
 {
-  private static final byte[] WOZ_DISK_HEADER =
+  private static final byte[] WOZ_FILE_HEADER =
       { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0a, 0x0D, 0x0A };
   private static final int TRK_SIZE = 0x1A00;
   private static final int INFO_SIZE = 0x3C;
@@ -28,20 +29,20 @@ class WozDisk
   // constructor
   // ---------------------------------------------------------------------------------//
 
-  public WozDisk (File file) throws Exception
+  public WozFile (File file) throws Exception
   {
     this.file = file;
     byte[] buffer = readFile ();
 
-    if (!matches (WOZ_DISK_HEADER, buffer))
+    if (!matches (WOZ_FILE_HEADER, buffer))
       throw new Exception ("Header error");
 
-    int cs1 = readInt (buffer, 8, 4);
-    int cs2 = Utility.crc32 (buffer, 12, buffer.length - 12);
-    if (cs1 != cs2)
+    int checksum1 = readInt (buffer, 8, 4);
+    int checksum2 = Utility.crc32 (buffer, 12, buffer.length - 12);
+    if (checksum1 != checksum2)
     {
-      System.out.printf ("Checksum  : %08X%n", cs1);
-      System.out.printf ("Calculated: %08X%n", cs2);
+      System.out.printf ("Stored checksum     : %08X%n", checksum1);
+      System.out.printf ("Calculated checksum : %08X%n", checksum2);
       throw new Exception ("Checksum error");
     }
 
@@ -109,7 +110,8 @@ class WozDisk
 
           try
           {
-            mc3470.readTrack (buffer, ptr, bytesUsed, bitCount);
+            List<RawDiskSector> diskSectors =
+                mc3470.readTrack (buffer, ptr, bytesUsed, bitCount);
 
             if (trackNo == 0)         // create disk buffer
             {
@@ -121,17 +123,16 @@ class WozDisk
               {
                 System.out.println ("unknown disk format");
                 break read;
-                //                continue;
               }
             }
 
-            mc3470.storeSectors (diskBuffer);
+            mc3470.storeSectors (diskSectors, diskBuffer);
           }
           catch (Exception e)
           {
             //            e.printStackTrace ();
             System.out.println (e);
-            //            break read;
+            break read;
           }
 
           ptr += TRK_SIZE;

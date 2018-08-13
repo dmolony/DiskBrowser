@@ -231,7 +231,7 @@ public class DiskFactory
     {
       try
       {
-        WozDisk wozDisk = new WozDisk (file);
+        WozFile wozDisk = new WozFile (file);
         if (wozDisk.getSectorsPerTrack () == 13)
         {
           AppleDisk appleDisk = new AppleDisk (wozDisk, 35, 13);
@@ -259,7 +259,7 @@ public class DiskFactory
 
     if (suffix.equals ("v2d"))
     {
-      V2dDisk v2dDisk = new V2dDisk (file);
+      V2dFile v2dDisk = new V2dFile (file);
       AppleDisk appleDisk256 = new AppleDisk (v2dDisk, 35, 16);
       disk = checkDos (appleDisk256);
       if (disk == null)
@@ -274,7 +274,7 @@ public class DiskFactory
       if (debug)
         System.out.println (" ** nib **");
 
-      NibDisk nibDisk = new NibDisk (file);
+      NibFile nibDisk = new NibFile (file);
       AppleDisk appleDisk16 = new AppleDisk (nibDisk);
       disk = checkDos (appleDisk16);
       return null;

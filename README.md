@@ -14,7 +14,7 @@
 - Dual DOS disks
 - CPM disks
 - Comprehensive disk listing
-- .woz format disks
+- woz format disks
 
 ### Documentation
 * [Usage](resources/usage.md)
@@ -30,14 +30,16 @@
 ![Disk listing](resources/disk1.png?raw=true "Disk listing")
 #### Disk contents
 ![Disk catalog](resources/disk2.png?raw=true "Disk catalog")
+#### Detailed sector display
+![Sector details](resources/sector.png?raw=true "Sector details")
 #### Hard disk
 ![Hard disk](resources/disk3.png?raw=true "Hard disk")
 #### Pascal code
 ![Pascal](resources/pascal.png?raw=true "Pascal")
-#### Zork
-![Zork](resources/zork.png?raw=true "Zork")
-#### Infocom 
-![Infocom](resources/planetfall.png?raw=true "Zork")
+#### Infocom
+![Infocom](resources/zork.png?raw=true "Infocom")
+#### Graphics 
+![Graphics](resources/planetfall.png?raw=true "Graphics")
 #### Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
 #### Visicalc

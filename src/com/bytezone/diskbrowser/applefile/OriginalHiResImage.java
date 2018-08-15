@@ -34,7 +34,7 @@ public class OriginalHiResImage extends HiResImage
   {
     super (name, buffer, fileType, auxType, eof);
 
-    //    createImage ();
+    //    will call createImage () itself
   }
 
   // https://github.com/Michaelangel007/apple2_hgr_font_tutorial

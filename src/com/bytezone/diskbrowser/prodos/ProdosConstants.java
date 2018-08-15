@@ -4,7 +4,7 @@ public interface ProdosConstants
 {
   int FILE_TYPE_TEXT = 0x04;
   int FILE_TYPE_BINARY = 0x06;
-  int FILE_TYPE_PICT = 0x08;                // was Apple /// FotoFile
+  int FILE_TYPE_FOT = 0x08;                // was Apple /// FotoFile
   int FILE_TYPE_DIRECTORY = 0x0F;
   int FILE_TYPE_ADB = 0x19;
   int FILE_TYPE_AWP = 0x1A;

@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -126,13 +128,37 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     addQuitListener (catalogPanel);
     addQuitListener (this);
 
-    Desktop desktop = Desktop.getDesktop ();
-    desktop.setAboutHandler (e -> JOptionPane.showMessageDialog (null,
-        "Author - Denis Molony\nGitHub - https://github.com/dmolony/DiskBrowser",
-        "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE));
-    //    desktop.setPreferencesHandler (
-    //        e -> JOptionPane.showMessageDialog (null, "Preferences dialog"));
-    desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
+    if (Desktop.isDesktopSupported ())
+    {
+      Desktop desktop = Desktop.getDesktop ();
+      if (false)
+      {
+        System.out.println ("Enums:");
+        for (Desktop.Action a : Desktop.Action.values ())
+          System.out.printf ("%s is%s supported%n", a.toString (),
+              (desktop.isSupported (a) ? "" : " not"));
+      }
+
+      if (desktop.isSupported (Desktop.Action.APP_ABOUT))
+        desktop.setAboutHandler (e -> JOptionPane.showMessageDialog (null,
+            "Author - Denis Molony\nGitHub - https://github.com/dmolony/DiskBrowser",
+            "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE));
+      if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
+        desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
+      else
+      {
+        addWindowListener (new WindowAdapter ()
+        {
+          @Override
+          public void windowClosing (WindowEvent e)
+          {
+            fireQuitEvent ();
+          }
+        });
+      }
+    }
+    else
+      System.out.println ("Desktop not supported");
 
     catalogPanel.setCloseTabAction (closeTabAction);
 

@@ -26,9 +26,10 @@ public abstract class HiResImage extends AbstractFile
   //   $06 BIN          .3200                        - SHRPictureFile2
   //   $06 BIN          .3201                        - SHRPictureFile2
 
-  //   $08 PICT <$4000  Apple II Graphics File       -       ???
-  //   $08 PICT  $4000  Packed Hi-Res file           -       ???
-  //   $08 PICT  $4001  Packed Double Hi-Res file    -       ???
+  //   $08 FOT  <$4000  Apple II Graphics File       -       ???
+  //   $08 FOT   $4000  Packed Hi-Res file           -       ???
+  //   $08 FOT   $4001  Packed Double Hi-Res file    -       ???
+  //   $08 FOT   $8066  Fadden Hi-res
 
   // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2 
   // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image           - SHRPictureFile2 
@@ -153,6 +154,13 @@ public abstract class HiResImage extends AbstractFile
   }
 
   /*-
+   * Files of type $08 and any auxiliary type less than or equal to $3FFF contain a 
+   * standard Apple II graphics file in one of several modes. After determining that 
+   * the auxiliary type is not $4000 or $4001 (which have been defined for high-resolution 
+   * and double high-resolution pictures packed with the Apple IIGS PackBytes routine), 
+   * you can determine the mode of the file by examining byte +120 (+$78). The value of 
+   * this byte, which ranges from zero to seven, is interpreted as follows:
+   * 
      Mode                        Page 1    Page 2
      280 x 192 Black & White       0         4
      280 x 192 Limited Color       1         5
@@ -172,7 +180,7 @@ public abstract class HiResImage extends AbstractFile
 
     switch (fileType)
     {
-      case ProdosConstants.FILE_TYPE_PICT:          // 0x08
+      case ProdosConstants.FILE_TYPE_FOT:          // 0x08
         if (auxType < 0x4000)
         {
           auxText = "Apple II Graphics File";
@@ -183,6 +191,8 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Packed Hi-Res File";
         else if (auxType == 0x4001)
           auxText = "Packed Double Hi-Res File";
+        else if (auxType == 0x8066)
+          auxText = "Fadden Hi-Res File";
         else
           auxText = "Unknown aux: " + auxType;
         break;

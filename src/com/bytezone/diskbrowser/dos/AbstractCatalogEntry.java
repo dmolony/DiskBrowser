@@ -37,7 +37,6 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     this.disk = dosDisk.getDisk ();
     this.catalogSectorDA = catalogSector;
 
-    //    reportedSize = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
     reportedSize = HexFormatter.unsignedShort (entryBuffer, 33);
     int type = entryBuffer[2] & 0xFF;
     locked = (type & 0x80) > 0;
@@ -184,16 +183,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
           // buffer is a multiple of the block size, so it usually needs to be reduced
           if ((reportedLength + 4) <= buffer.length)
-          {
             exactBuffer = new byte[reportedLength];
-            //              extraBuffer = new byte[buffer.length - reportedLength - 4];
-            //              System.arraycopy (buffer, reportedLength + 4, extraBuffer, 0,
-            //                                extraBuffer.length);
-          }
           else
             exactBuffer = new byte[buffer.length - 4];  // reported length is too long
-
           System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
+
           if ((name.endsWith (".FONT") || name.endsWith (" FONT")
               || name.endsWith (".SET") || name.startsWith ("ASCII."))
               && FontFile.isFont (exactBuffer))
@@ -278,9 +272,6 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   {
     byte[] exactBuffer;
 
-    //    int loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
-    //    int loadAddress = HexFormatter.unsignedShort (buffer, 0);
-    //    int reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
     int reportedLength = HexFormatter.unsignedShort (buffer, 2);
     if (reportedLength == 0)
     {
@@ -291,15 +282,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
     // buffer is a multiple of the block size, so it usually needs to be reduced
     if ((reportedLength + 4) <= buffer.length)
-    {
       exactBuffer = new byte[reportedLength];
-      //              extraBuffer = new byte[buffer.length - reportedLength - 4];
-      //              System.arraycopy (buffer, reportedLength + 4, extraBuffer, 0,
-      //                                extraBuffer.length);
-    }
     else
       exactBuffer = new byte[buffer.length - 4];  // reported length is too long
     System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
+
     return exactBuffer;
   }
 
@@ -308,9 +295,6 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     if ((name.equals ("FLY LOGO") || name.equals ("FLY LOGO SCRUNCHED"))
         && reportedLength == 0x14FA)
       return true;
-
-    //    if (name.endsWith (".PAC"))
-    //      return true;
 
     if (name.equals ("BBROS LOGO SCRUNCHED") && reportedLength == 0x0FED)
       return true;
@@ -324,10 +308,13 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     for (DiskAddress sector : tsSectors)
       if (sector.matches (da))
         return true;
+
     for (DiskAddress sector : dataSectors)
       // random access files may have gaps, and thus null sectors
+      //      is this still true? I thought I was using sector zero objects??
       if (sector != null && sector.matches (da))
         return true;
+
     return false;
   }
 

@@ -87,19 +87,12 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
             case FILE_TYPE_BINARY:
             case FILE_TYPE_PNT:
             case FILE_TYPE_PIC:
+            case FILE_TYPE_FOT:
               aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("A=$%4X", aux);
-              //              if (fileType == FILE_TYPE_PNT && aux == 0)
-              //                System.out.printf ("found $C0/00 %s%n", name);
-              //              if (fileType == FILE_TYPE_PNT && aux == 3)
-              //                System.out.printf ("found $C0/03 %s%n", name);
-              //              if (fileType == FILE_TYPE_PNT && aux == 4)
-              //                System.out.printf ("found $C0/04 %s%n", name);
-              //              if (fileType == FILE_TYPE_PIC && aux == 1)
-              //                System.out.printf ("found $C1/01 %s%n", name);
               break;
 
-            case 0x1A:                                        // AWP file
+            case FILE_TYPE_AWP:
               aux = HexFormatter.intValue (buffer[i + 32], buffer[i + 31]); // backwards!
               if (aux != 0)
                 filename = convert (filename, aux);

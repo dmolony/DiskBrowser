@@ -354,9 +354,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           break;
 
-        case FILE_TYPE_PICT:
-          System.out.println ("*** PICT : " + name);
-          file = new DefaultAppleFile (name, exactBuffer);
+        case FILE_TYPE_FOT:
+          if (auxType == 0x8066)        // Fadden
+            //            file = new DefaultAppleFile (name, exactBuffer);
+            file = new FaddenHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
+          else
+            file = new DefaultAppleFile (name, exactBuffer);
           break;
 
         case FILE_TYPE_FONT:
@@ -423,6 +426,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     // Text files with aux (reclen) > 0 are random access, possibly with 
     // non-contiguous records, so they need to be handled differently
+
+    // Graphics files can also have gaps
 
     switch (storageType)
     {
@@ -529,65 +534,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
-  // should be removed
-  //  private byte[] getGEOSBuffer ()
-  //  {
-  //    switch (storageType)
-  //    {
-  //      case SEEDLING:
-  //        System.out.println ("Seedling GEOS file : " + name); // not sure if possible
-  //        return disk.readSectors (dataBlocks);
-  //      case SAPLING:
-  //        return getIndexFile (keyPtr);
-  //      case TREE:
-  //        return getMasterIndexFile (keyPtr);
-  //      default:
-  //        System.out.println ("Unknown storage type for GEOS file : " + storageType);
-  //        return new byte[512];
-  //    }
-  //  }
-
-  // should be removed
-  //  private byte[] getMasterIndexFile (int keyPtr)
-  //  {
-  //    byte[] buffer = disk.readSector (keyPtr);
-  //    int length = HexFormatter.intValue (buffer[0xFF], buffer[0x1FF]);
-  //    byte[] fileBuffer = new byte[length];
-  //    int ptr = 0;
-  //    for (int i = 0; i < 0x80; i++)
-  //    {
-  //      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-  //      if (block == 0)
-  //        break;
-  //      if (block == 0xFFFF) // should this insert 131,072 zeroes?
-  //        continue;
-  //      byte[] temp = getIndexFile (block);
-  //      System.arraycopy (temp, 0, fileBuffer, ptr, temp.length);
-  //      ptr += temp.length;
-  //    }
-  //    return fileBuffer;
-  //  }
-
-  // should be removed
-  //  private byte[] getIndexFile (int keyPtr)
-  //  {
-  //    byte[] buffer = disk.readSector (keyPtr);
-  //    int length = HexFormatter.intValue (buffer[0xFF], buffer[0x1FF]);
-  //    byte[] fileBuffer = new byte[length];
-  //    for (int i = 0; i < 0x80; i++)
-  //    {
-  //      int block = HexFormatter.intValue (buffer[i], buffer[i + 256]);
-  //      if (block == 0)
-  //        break;
-  //      if (block == 0xFFFF) // should this insert 512 zeroes?
-  //        continue;
-  //      byte[] temp = disk.readSector (block);
-  //      System.arraycopy (temp, 0, fileBuffer, i * 512, length > 512 ? 512 : length);
-  //      length -= 512;
-  //    }
-  //    return fileBuffer;
-  //  }
-
   private int readIndexBlock (int indexBlock, List<DiskAddress> addresses,
       List<TextBuffer> buffers, int logicalBlock)
   {
@@ -648,11 +594,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     if (ProdosConstants.fileTypes[fileType].equals ("DIR"))
       return name;
-    // String locked = (access == 0x01) ? "*" : " ";
     String locked = (access == 0x00) ? "*" : " ";
+
     if (true)
       return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType],
           blocksUsed, locked) + name;
+
     String timeC = created == null ? "" : parentDisk.df.format (created.getTime ());
     String timeF = modified == null ? "" : parentDisk.df.format (modified.getTime ());
     return String.format ("%s %s%-30s %3d %,10d %15s %15s",

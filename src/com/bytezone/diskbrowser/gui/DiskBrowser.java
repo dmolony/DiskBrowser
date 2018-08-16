@@ -122,8 +122,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.duplicateItem.setAction (duplicateAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
-    //    final QuitAction quitAction = Platform.setQuit (this, prefs, menuHandler.fileMenu);
-
     addQuitListener (menuHandler);
     addQuitListener (catalogPanel);
     addQuitListener (this);
@@ -131,18 +129,12 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     if (Desktop.isDesktopSupported ())
     {
       Desktop desktop = Desktop.getDesktop ();
-      if (false)
-      {
-        System.out.println ("Enums:");
-        for (Desktop.Action a : Desktop.Action.values ())
-          System.out.printf ("%s is%s supported%n", a.toString (),
-              (desktop.isSupported (a) ? "" : " not"));
-      }
 
       if (desktop.isSupported (Desktop.Action.APP_ABOUT))
         desktop.setAboutHandler (e -> JOptionPane.showMessageDialog (null,
             "Author - Denis Molony\nGitHub - https://github.com/dmolony/DiskBrowser",
             "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE));
+
       if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
         desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
       else
@@ -182,7 +174,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   {
     JPanel panel = new JPanel (new BorderLayout ());
     panel.setBackground (Color.WHITE);
-    // panel.setOpaque (true);
     panel.setBorder (BorderFactory.createTitledBorder (title));
     panel.add (pane);
     add (panel, location);
@@ -199,7 +190,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   @Override
   public void quit (Preferences preferences)
   {
-    //    windowSaver = new WindowSaver (prefs, this, "DiskBrowser");
     windowSaver.saveWindow ();
   }
 

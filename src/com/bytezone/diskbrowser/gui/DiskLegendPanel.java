@@ -64,7 +64,7 @@ class DiskLegendPanel extends DiskPanel
 
       // draw block
       g.setColor (type.colour);
-      g.fillRect (x + offset, y + offset, width, height);
+      g.fillRect (x + 1, y + 1, blockWidth - 1, blockHeight - 1);
 
       // draw text
       g.setColor (Color.BLACK);

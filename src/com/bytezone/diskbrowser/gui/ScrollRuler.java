@@ -36,7 +36,7 @@ class ScrollRuler extends JComponent
 
     // set defaults until setLayout is called
     if (orientation == HORIZONTAL)
-      setPreferredSize (new Dimension (0, HEIGHT)); // width/height
+      setPreferredSize (new Dimension (0, HEIGHT));       // width/height
     else
       setPreferredSize (new Dimension (WIDTH, 0));
   }
@@ -96,7 +96,7 @@ class ScrollRuler extends JComponent
     String format;
     int offset;
 
-    if (layoutDetails.block.width <= 15)
+    if (layoutDetails.block.width <= 16)
     {
       format = isHex ? "%1X" : "%1d";
       offset = isHex ? 4 : 0;

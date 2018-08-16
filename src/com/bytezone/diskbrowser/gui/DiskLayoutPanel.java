@@ -47,12 +47,10 @@ class DiskLayoutPanel extends JPanel
     legendPanel = new DiskLegendPanel ();
 
     setBackground (Color.WHITE);
-    setOpaque (true);
 
     sp = new JScrollPane (diskLayoutImage, VERTICAL_SCROLLBAR_ALWAYS,
         HORIZONTAL_SCROLLBAR_ALWAYS);
     sp.setBackground (Color.WHITE);
-    sp.setOpaque (true);
     sp.setColumnHeaderView (horizontalRuler);
     sp.setRowHeaderView (verticalRuler);
     sp.setBorder (null);

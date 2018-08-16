@@ -38,7 +38,9 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     setPreferredSize (new Dimension (240 + 1, 525 + 1));
     addMouseListener (new MyMouseListener ());
     setBackground (backgroundColor);
-    setOpaque (true);
+
+    //    setOpaque (true);
+    //    https://stackoverflow.com/questions/2451990/setopaquetrue-false-java
 
     addKeyListener (new MyKeyListener ());
   }
@@ -131,9 +133,8 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
   private void drawBlock (Graphics2D g, SectorType type, int x, int y, boolean flagFree,
       boolean selected)
   {
-    // draw block
     g.setColor (type.colour);
-    g.fillRect (x + offset, y + offset, width, height);
+    g.fillRect (x + 1, y + 1, blockWidth - 1, blockHeight - 1);
 
     if (flagFree || selected)
     {

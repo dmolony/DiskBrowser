@@ -29,7 +29,7 @@ public abstract class HiResImage extends AbstractFile
   //   $08 FOT  <$4000  Apple II Graphics File       -       ???
   //   $08 FOT   $4000  Packed Hi-Res file           -       ???
   //   $08 FOT   $4001  Packed Double Hi-Res file    -       ???
-  //   $08 FOT   $8066  Fadden Hi-res
+  //   $08 FOT   $8066  Fadden Hi-res                - FaddenHiResImage
 
   // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2 
   // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image           - SHRPictureFile2 
@@ -488,6 +488,8 @@ public abstract class HiResImage extends AbstractFile
 
   public static boolean isAPP (byte[] buffer)
   {
+    if (buffer.length < 4)
+      return false;
     return buffer[0] == (byte) 0xC1 && buffer[1] == (byte) 0xD0
         && buffer[2] == (byte) 0xD0 && buffer[3] == 0;
   }

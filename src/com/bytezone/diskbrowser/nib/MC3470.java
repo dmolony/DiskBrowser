@@ -3,8 +3,6 @@ package com.bytezone.diskbrowser.nib;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.disk.*;
-
 class MC3470
 {
   private static final int MAX_DATA = 999;
@@ -147,6 +145,9 @@ class MC3470
 
     if (dataPtr < 3)            // not enough bytes to test
       return;
+
+    //    System.out.printf ("checking %02X %02X %02X%n", dataBuffer[dataPtr - 3],
+    //        dataBuffer[dataPtr - 2], dataBuffer[dataPtr - 1]);
 
     if (match (address16prologue) || match (address16prologueX))
     {

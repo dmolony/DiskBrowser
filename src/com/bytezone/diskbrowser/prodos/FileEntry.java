@@ -356,10 +356,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
         case FILE_TYPE_FOT:
           if (auxType == 0x8066)        // Fadden
-            //            file = new DefaultAppleFile (name, exactBuffer);
             file = new FaddenHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           else
+          {
+            System.out.println ("Unwritten FOT: " + name);
             file = new DefaultAppleFile (name, exactBuffer);
+          }
           break;
 
         case FILE_TYPE_FONT:

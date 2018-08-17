@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.disk;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.gui.DataSource;
@@ -35,7 +36,7 @@ public class DataDisk extends AbstractFormattedDisk
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
   {
-    return null;
+    return new ArrayList<> ();
   }
 
   // no files on data disks

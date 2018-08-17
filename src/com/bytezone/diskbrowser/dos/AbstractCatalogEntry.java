@@ -231,6 +231,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             byte[] buf = new byte[exactBuffer.length - 4];
             System.arraycopy (exactBuffer, 4, buf, 0, buf.length);
             appleFile = new BasicProgram (name, buf);
+            System.out.printf ("Possible basic binary: %s%n", name);
           }
           else
           {

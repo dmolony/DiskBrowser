@@ -14,6 +14,10 @@ class DiskAddressField
     track = decode4and4 (buffer, 2);
     sector = decode4and4 (buffer, 4);
     checksum = decode4and4 (buffer, 6);
+
+    //    if (track == 0)
+    //      for (int i = 0; i < 8; i++)
+    //        System.out.printf ("%02X ", buffer[i]);
   }
 
   // ---------------------------------------------------------------------------------//

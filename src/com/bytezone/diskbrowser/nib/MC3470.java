@@ -1,9 +1,9 @@
-package com.bytezone.diskbrowser.disk;
+package com.bytezone.diskbrowser.nib;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.disk.*;
 
 class MC3470
 {
@@ -25,7 +25,29 @@ class MC3470
   private final DiskReader diskReader13Sector = new DiskReader13Sector ();
 
   private final byte[] dataBuffer = new byte[MAX_DATA];
-  private int dataPtr = 0;
+  private int dataPtr;
+
+  // D5 AA 96   16 sector address prologue
+  // D5 AA B5   13 sector address prologue
+  // D5 AA AD   data prologue
+  // DE AA EB   epilogue
+
+  // non-standard:
+  // D4 AA 96   address prologue - Bouncing Kamungas
+  // D5 BB CF   data prologue    - Hard Hat Mac
+  // DA AA EB   address epilogue - Bouncing Kamungas
+
+  private static final byte[] address16prologue =
+      { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
+  private static final byte[] address13prologue =
+      { (byte) 0xD5, (byte) 0xAA, (byte) 0xB5 };
+  private static final byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
+  private static final byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+
+  private static final byte[] address16prologueX =
+      { (byte) 0xD4, (byte) 0xAA, (byte) 0x96 };
+  private static final byte[] dataPrologueX = { (byte) 0xD5, (byte) 0xBB, (byte) 0xCF };
+  private static final byte[] epilogueX = { (byte) 0xDA, (byte) 0xAA, (byte) 0xEB };
 
   private enum State
   {
@@ -46,11 +68,11 @@ class MC3470
     diskReader = null;
     currentDiskSector = null;
     currentState = State.OTHER;
+    expectedDataSize = MAX_DATA;
     restarted = false;
 
     byte value = 0;                     // value to be stored
     dataPtr = 0;
-    expectedDataSize = MAX_DATA;
 
     int inPtr = offset;                 // keep offset in case we have to loop around
     final int max = offset + bytesUsed;
@@ -123,34 +145,36 @@ class MC3470
   {
     assert currentState == State.OTHER;
 
-    switch (dataBuffer[dataPtr - 1])      // last byte added
+    if (dataPtr < 3)            // not enough bytes to test
+      return;
+
+    if (match (address16prologue) || match (address16prologueX))
     {
-      case (byte) 0xB5:
-        if (isPrologue ())
-        {
-          diskReader = diskReader13Sector;
-          setState (State.ADDRESS);
-        }
-        break;
-
-      case (byte) 0x96:
-        if (isPrologue ())
-        {
-          diskReader = diskReader16Sector;
-          setState (State.ADDRESS);
-        }
-        break;
-
-      case (byte) 0xAD:
-        if (isPrologue ())
-          setState (State.DATA);
-        break;
-
-      case (byte) 0xEB:
-        if (isEpilogue ())
-          setState (State.OTHER);
-        break;
+      diskReader = diskReader16Sector;
+      setState (State.ADDRESS);
     }
+    else if (match (address13prologue))
+    {
+      diskReader = diskReader13Sector;
+      setState (State.ADDRESS);
+    }
+    else if (match (dataPrologue) || match (dataPrologueX))
+      setState (State.DATA);
+    else if (match (epilogue) || match (epilogueX))
+      setState (State.OTHER);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // match
+  // ---------------------------------------------------------------------------------//
+
+  private boolean match (byte[] pattern)
+  {
+    for (int i = 0, j = dataPtr - 3; i < 3; i++, j++)
+      if (pattern[i] != dataBuffer[j])
+        return false;
+
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -164,7 +188,7 @@ class MC3470
 
     assert currentState != newState : currentState + " -> " + newState;
 
-    switch (currentState)           // this state is now finished
+    switch (currentState)                     // this state is now finished
     {
       case ADDRESS:
         if (currentDiskSector != null)
@@ -191,68 +215,33 @@ class MC3470
         break;
     }
 
-    switch (newState)               // this state is now starting
+    switch (newState)                       // this state is now starting
     {
       case ADDRESS:
+        if (currentDiskSector != null)
+          throw new DiskNibbleException ("cannot start ADDRESS: " + currentDiskSector);
         expectedDataSize = 8;
         if (dump)
           System.out.print ("ADDRESS  ");
         break;
 
       case DATA:
+        if (currentDiskSector == null)
+          throw new DiskNibbleException ("cannot start DATA without ADDRESS");
         expectedDataSize = diskReader.expectedDataSize ();
         if (dump)
           System.out.println ("DATA");
-        if (debug && currentDiskSector == null)
-        {
-          System.out.println ("starting DATA with no ADDRESS");
-          System.out.println (HexFormatter.format (dataBuffer, 0, dataPtr));
-        }
         break;
 
       case OTHER:
-        expectedDataSize = MAX_DATA;      // what is the maximum filler?
+        expectedDataSize = MAX_DATA;        // what is the maximum filler?
         if (dump)
           System.out.println ("OTHER");
         break;
     }
 
     currentState = newState;
-    dataPtr = 0;                          // start collecting new buffer
-  }
-
-  // D5 AA 96   16 sector address prologue
-  // D5 AA B5   13 sector address prologue
-  // D5 AA AD   data prologue
-  // DE AA EB   epilogue
-
-  // non-standard:
-  // D4 AA 96   xx sector address prologue - Bouncing Kamungas
-  // D5 BB CF   data prologue - Hard Hat Mac
-  // DA AA EB   address epilogue - Bouncing Kamungas
-
-  // ---------------------------------------------------------------------------------//
-  // isPrologue
-  // ---------------------------------------------------------------------------------//
-
-  private boolean isPrologue ()
-  {
-    return dataPtr >= 3
-        && (dataBuffer[dataPtr - 3] == (byte) 0xD5
-            || dataBuffer[dataPtr - 3] == (byte) 0xD4)      // non-standard
-        && dataBuffer[dataPtr - 2] == (byte) 0xAA;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  // isEpilogue
-  // ---------------------------------------------------------------------------------//
-
-  private boolean isEpilogue ()
-  {
-    return dataPtr >= 3
-        && (dataBuffer[dataPtr - 3] == (byte) 0xDE
-            || dataBuffer[dataPtr - 3] == (byte) 0xDA)      // non-standard
-        && dataBuffer[dataPtr - 2] == (byte) 0xAA;
+    dataPtr = 0;                            // start collecting new buffer
   }
 
   // ---------------------------------------------------------------------------------//

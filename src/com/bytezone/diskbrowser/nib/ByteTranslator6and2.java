@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.disk;
+package com.bytezone.diskbrowser.nib;
 
 public class ByteTranslator6and2 extends ByteTranslator
 {

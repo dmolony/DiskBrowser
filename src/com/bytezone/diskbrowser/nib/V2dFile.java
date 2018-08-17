@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.disk;
+package com.bytezone.diskbrowser.nib;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -30,7 +30,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 // Position: 0 8 1 9 2 A 3 B 4 C 5 D 6 E 7 F - Prodos (.PO disks)
 // Position: 0 7 E 6 D 5 C 4 B 3 A 2 9 1 8 F - Dos (.DO disks)
 
-class V2dFile
+public class V2dFile
 {
   // private static int[][] interleave =
   //      { { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 },
@@ -43,7 +43,7 @@ class V2dFile
 
   private final Nibblizer nibbler;
 
-  final File file;
+  public final File file;
   final int tracks;
 
   final byte[] diskBuffer = new byte[4096 * 35];
@@ -99,5 +99,14 @@ class V2dFile
     }
 
     this.tracks = tracks;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // getDiskBuffer
+  // ---------------------------------------------------------------------------------//
+
+  public byte[] getDiskBuffer ()
+  {
+    return diskBuffer;
   }
 }

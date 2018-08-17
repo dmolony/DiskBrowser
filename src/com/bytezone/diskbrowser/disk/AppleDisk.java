@@ -15,6 +15,9 @@ import java.util.zip.Checksum;
 
 import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.nib.NibFile;
+import com.bytezone.diskbrowser.nib.V2dFile;
+import com.bytezone.diskbrowser.nib.WozFile;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -208,7 +211,7 @@ public class AppleDisk implements Disk
     this.tracks = tracks;
     this.sectors = sectors;
     file = disk.file;
-    diskBuffer = disk.diskBuffer;
+    diskBuffer = disk.getDiskBuffer ();
 
     trackSize = 4096;
     sectorSize = trackSize / sectors;
@@ -223,7 +226,7 @@ public class AppleDisk implements Disk
     tracks = 35;
     trackSize = 4096;
     file = disk.file;
-    diskBuffer = disk.buffer;
+    diskBuffer = disk.getDiskBuffer ();
   }
 
   public AppleDisk (WozFile wozFile, int tracks, int sectors)
@@ -231,7 +234,7 @@ public class AppleDisk implements Disk
     this.tracks = tracks;
     this.sectors = sectors;
     file = wozFile.file;
-    diskBuffer = wozFile.diskBuffer;
+    diskBuffer = wozFile.getDiskBuffer ();
 
     if (sectors == 13)
     {

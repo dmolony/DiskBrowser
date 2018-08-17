@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.disk;
+package com.bytezone.diskbrowser.nib;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
-class WozFile
+public class WozFile
 {
   private static final byte[] WOZ_FILE_HEADER =
       { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0a, 0x0D, 0x0A };
@@ -20,7 +20,7 @@ class WozFile
   private final boolean debug = false;
   private int diskType;                       // 5.25 or 3.5
 
-  final File file;
+  public final File file;
   byte[] diskBuffer;
 
   private final MC3470 mc3470 = new MC3470 ();
@@ -156,7 +156,7 @@ class WozFile
   // getSectorsPerTrack
   // ---------------------------------------------------------------------------------//
 
-  int getSectorsPerTrack ()
+  public int getSectorsPerTrack ()
   {
     return mc3470.is13Sector () ? 13 : mc3470.is16Sector () ? 16 : 0;
   }
@@ -175,6 +175,15 @@ class WozFile
       shift += 8;
     }
     return value;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // getDiskBuffer
+  // ---------------------------------------------------------------------------------//
+
+  public byte[] getDiskBuffer ()
+  {
+    return diskBuffer;
   }
 
   // ---------------------------------------------------------------------------------//

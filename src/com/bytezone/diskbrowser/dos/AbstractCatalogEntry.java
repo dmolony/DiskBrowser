@@ -222,11 +222,16 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             else
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
           }
-          else if ((loadAddress == 0x5800       //
-              || loadAddress == 0x6000          //
-              || loadAddress == 0x7800)         //
-              && reportedLength == 0x240)
+          else if (reportedLength == 0x240          //
+              && (loadAddress == 0x5800 || loadAddress == 0x6000
+                  || loadAddress == 0x7800))
             appleFile = new PrintShopGraphic (name, exactBuffer);
+          else if (isRunCommand (exactBuffer))
+          {
+            byte[] buf = new byte[exactBuffer.length - 4];
+            System.arraycopy (exactBuffer, 4, buf, 0, buf.length);
+            appleFile = new BasicProgram (name, buf);
+          }
           else
           {
             appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
@@ -288,6 +293,13 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
 
     return exactBuffer;
+  }
+
+  private boolean isRunCommand (byte[] buffer)
+  {
+    // see Stargate - Disk 1, Side A.woz
+    return buffer[0] == 0x4C && buffer[1] == (byte) 0xFC && buffer[2] == (byte) 0xA4
+        && buffer[3] == 0x00;
   }
 
   private boolean isScrunched (int reportedLength)

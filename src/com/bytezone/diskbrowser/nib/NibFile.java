@@ -1,19 +1,19 @@
-package com.bytezone.diskbrowser.disk;
+package com.bytezone.diskbrowser.nib;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-class NibFile
+public class NibFile
 {
   //  private final Nibblizer nibbler;
 
-  final File file;
+  public final File file;
   int tracks;
   int actualTracks;
 
-  final byte[] buffer = new byte[4096 * 35];
+  final byte[] diskBuffer = new byte[4096 * 35];
 
   // .nib files are 232,960 bytes
   // 6,656 bytes x 35 tracks (0x1A00)
@@ -52,5 +52,14 @@ class NibFile
     {
       e.printStackTrace ();
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // getDiskBuffer
+  // ---------------------------------------------------------------------------------//
+
+  public byte[] getDiskBuffer ()
+  {
+    return diskBuffer;
   }
 }

@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.disk;
+package com.bytezone.diskbrowser.nib;
 
 class DiskAddressField
 {

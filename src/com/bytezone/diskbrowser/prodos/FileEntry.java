@@ -27,8 +27,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   //  private final int headerPointer;
   private DataSource file;
   private final DiskAddress catalogBlock;
+
   private DiskAddress masterIndexBlock;
   private final List<DiskAddress> indexBlocks = new ArrayList<DiskAddress> ();
+
   private boolean invalid;
   private FileEntry link;
 
@@ -53,15 +55,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     switch (storageType)
     {
       case SEEDLING:
-        addDataBlocks (storageType, keyPtr);
-        break;
-
       case SAPLING:
-        addDataBlocks (storageType, keyPtr);
-        break;
-
       case TREE:
-        masterIndexBlock = disk.getDiskAddress (keyPtr);
         addDataBlocks (storageType, keyPtr);
         break;
 
@@ -171,15 +166,16 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return blocks;
   }
 
-  private List<Integer> readMasterIndex (int blockPtr)
+  private List<Integer> readMasterIndex (int keyPtr)
   {
-    parentDisk.setSectorType (blockPtr, parentDisk.masterIndexSector);
-    indexBlocks.add (disk.getDiskAddress (blockPtr));
+    masterIndexBlock = disk.getDiskAddress (keyPtr);
+    parentDisk.setSectorType (keyPtr, parentDisk.masterIndexSector);
+    indexBlocks.add (disk.getDiskAddress (keyPtr));
 
-    byte[] buffer = disk.readSector (blockPtr);               // master index
+    byte[] buffer = disk.readSector (keyPtr);                   // master index
 
     int highest = 0x80;
-    while (highest-- > 0)                                     // decrement after test
+    while (highest-- > 0)                                       // decrement after test
       if (buffer[highest] != 0 || buffer[highest + 0x100] != 0)
         break;
 
@@ -232,8 +228,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_SYS:
         case FILE_TYPE_BAT:
         case FILE_TYPE_USER_DEFINED_1:
-          //          if (name.endsWith (".S"))
-          //            file = new MerlinSource (name, exactBuffer, auxType, endOfFile);
           if (SimpleText.isHTML (exactBuffer))
             file = new SimpleText (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer) || HiResImage.isPng (exactBuffer))
@@ -431,8 +425,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     // Text files with aux (reclen) > 0 are random access, possibly with 
     // non-contiguous records, so they need to be handled differently
-
-    // Graphics files can also have gaps
 
     switch (storageType)
     {

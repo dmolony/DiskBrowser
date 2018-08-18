@@ -1,12 +1,17 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.AlphaComposite;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.common.Platform;
+import com.bytezone.common.Platform.FontType;
+
+// see graffidisk.v1.0.2mg
 public class CharacterRom extends AbstractFile
 {
   String description;
@@ -18,14 +23,16 @@ public class CharacterRom extends AbstractFile
 
     description = new String (buffer, 16, 16);
 
+    int sizeX = buffer[5] & 0xFF;
+    int sizeY = buffer[6] & 0xFF;
+
     int gapX = 4;
     int gapY = 4;
-    int sizeX = 7;
-    int sizeY = 8;
     int marginX = 2;
     int marginY = 2;
+    int heading = 20;
 
-    image = new BufferedImage (8 * (sizeX + gapX), 12 * (sizeY + gapY),
+    image = new BufferedImage (8 * (sizeX + gapX), 12 * (sizeY + gapY) + heading,
         BufferedImage.TYPE_BYTE_GRAY);
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
@@ -34,6 +41,11 @@ public class CharacterRom extends AbstractFile
     int y = marginY;
     int count = 0;
     int ptr = 256;
+
+    Font font = Platform.getFont (FontType.SANS_SERIF, 10);
+    g2d.setFont (font);
+    g2d.drawString (description, x, y + 10);
+    y += heading;
 
     while (ptr < buffer.length)
     {

@@ -264,6 +264,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (endOfFile == 38400 && name.startsWith ("LVL."))
             file = new LodeRunner (name, exactBuffer);
+          else if (auxType == 0x1000 && endOfFile == 0x400
+              && CharacterRom.isRom (exactBuffer))
+            file = new CharacterRom (name, exactBuffer);
           else
           {
             file = new AssemblerProgram (name, exactBuffer, auxType);

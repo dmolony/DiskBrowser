@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
+// Found on Pascal disks
 public class Charset extends AbstractFile
 {
   public Charset (String name, byte[] buffer)

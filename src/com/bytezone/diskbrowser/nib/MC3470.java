@@ -25,6 +25,8 @@ class MC3470
   private final byte[] dataBuffer = new byte[MAX_DATA];
   private int dataPtr;
 
+  private final byte[] rawBytes = new byte[8000];
+
   // D5 AA 96   16 sector address prologue
   // D5 AA B5   13 sector address prologue
   // D5 AA AD   data prologue
@@ -133,6 +135,54 @@ class MC3470
     }
 
     return diskSectors;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // getNibbleTrack
+  // ---------------------------------------------------------------------------------//
+
+  public NibbleTrack getNibbleTrack (byte[] buffer, int offset, int length, int bitsUsed)
+  {
+    int rawPtr = 0;
+
+    byte value = 0;                     // value to be stored
+    final int max = offset + length;
+    int totalBits = 0;
+    int zeroBits = 0;
+
+    while (offset < max)
+    {
+      byte b = buffer[offset++];
+      for (int mask = 0x80; mask != 0; mask >>>= 1)
+      {
+        value <<= 1;
+        if ((b & mask) != 0)
+        {
+          value |= 0x01;
+          zeroBits = 0;
+        }
+        else
+        {
+          ++zeroBits;
+          if (zeroBits > 2)
+            System.out.println (zeroBits + " consecutive zeroes");
+        }
+
+        if ((value & 0x80) != 0)     // value is not valid until the hi-bit is set
+        {
+          rawBytes[rawPtr++] = value;
+          value = 0;
+        }
+        if (++totalBits == bitsUsed)      // only use this many bits
+          break;
+      }
+    }
+
+    if (value != 0)
+      rawBytes[rawPtr++] = value;
+
+    NibbleTrack track = new NibbleTrack (rawBytes, rawPtr, bitsUsed);
+    return track;
   }
 
   // ---------------------------------------------------------------------------------//

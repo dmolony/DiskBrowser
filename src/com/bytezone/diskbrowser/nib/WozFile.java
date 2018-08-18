@@ -4,8 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class WozFile
@@ -24,18 +26,20 @@ public class WozFile
   byte[] diskBuffer;
 
   private final MC3470 mc3470 = new MC3470 ();
+  private final List<NibbleTrack> nibbleTracks = new ArrayList<> (40);
 
   // ---------------------------------------------------------------------------------//
   // constructor
   // ---------------------------------------------------------------------------------//
 
-  public WozFile (File file) throws Exception
+  public WozFile (File file) throws DiskNibbleException
   {
     this.file = file;
     byte[] buffer = readFile ();
+    boolean valid = false;
 
     if (!matches (WOZ_FILE_HEADER, buffer))
-      throw new Exception ("Header error");
+      throw new DiskNibbleException ("Header error");
 
     int checksum1 = readInt (buffer, 8, 4);
     int checksum2 = Utility.crc32 (buffer, 12, buffer.length - 12);
@@ -43,7 +47,7 @@ public class WozFile
     {
       System.out.printf ("Stored checksum     : %08X%n", checksum1);
       System.out.printf ("Calculated checksum : %08X%n", checksum2);
-      throw new Exception ("Checksum error");
+      throw new DiskNibbleException ("Checksum error");
     }
 
     int ptr = 12;
@@ -110,6 +114,7 @@ public class WozFile
 
           try
           {
+            //            nibbleTracks.add (mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount));
             List<RawDiskSector> diskSectors =
                 mc3470.readTrack (buffer, ptr, bytesUsed, bitCount);
 
@@ -150,6 +155,28 @@ public class WozFile
         ptr += chunkSize;
       }
     }
+
+    if (!valid)
+      readNibbleTracks (buffer);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // readNibbleTracks
+  // ---------------------------------------------------------------------------------//
+
+  private void readNibbleTracks (byte[] buffer)
+  {
+    for (int track = 0; track < 35; track++)
+    {
+      int ptr = track * 6656 + 256;
+
+      int bytesUsed = readInt (buffer, ptr + DATA_SIZE, 2);
+      int bitCount = readInt (buffer, ptr + DATA_SIZE + 2, 2);
+
+      NibbleTrack nibbleTrack = mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount);
+      nibbleTracks.add (nibbleTrack);
+    }
+    System.out.println (HexFormatter.format (nibbleTracks.get (0).buffer));
   }
 
   // ---------------------------------------------------------------------------------//

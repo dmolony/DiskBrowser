@@ -26,26 +26,21 @@ public class CharacterRom extends AbstractFile
     int sizeX = buffer[5] & 0xFF;
     int sizeY = buffer[6] & 0xFF;
 
-    int gapX = 4;
-    int gapY = 4;
+    int gapX = 2;
+    int gapY = 2;
     int marginX = 2;
     int marginY = 2;
-    int heading = 20;
+    int heading = 15;
 
-    image = new BufferedImage (8 * (sizeX + gapX), 12 * (sizeY + gapY) + heading,
-        BufferedImage.TYPE_BYTE_GRAY);
+    image = new BufferedImage (16 * (sizeX + gapX) + 2 * marginX - gapX,
+        6 * (sizeY + gapY) + 2 * marginY - gapY + heading, BufferedImage.TYPE_BYTE_GRAY);
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
 
     int x = marginX;
-    int y = marginY;
+    int y = marginY + heading;
     int count = 0;
     int ptr = 256;
-
-    Font font = Platform.getFont (FontType.SANS_SERIF, 10);
-    g2d.setFont (font);
-    g2d.drawString (description, x, y + 10);
-    y += heading;
 
     while (ptr < buffer.length)
     {
@@ -55,12 +50,28 @@ public class CharacterRom extends AbstractFile
 
       g2d.drawImage (character.image, x, y, null);
       x += sizeX + gapX;
-      if (++count % 8 == 0)
+      if (++count % 16 == 0)
       {
         x = marginX;
         y += sizeY + gapY;
       }
     }
+
+    y = marginY;
+    x = marginX;
+    Font font = Platform.getFont (FontType.SANS_SERIF, 10);
+    g2d.setFont (font);
+
+    for (int i = 0; i < description.length (); i++)
+    {
+      int pos = description.charAt (i);
+      if (pos == 0)
+        break;
+      Character character = characters.get (pos - 32);
+      g2d.drawImage (character.image, x, y, null);
+      x += sizeX;
+    }
+
     g2d.dispose ();
   }
 
@@ -87,7 +98,7 @@ public class CharacterRom extends AbstractFile
 
   public static boolean isRom (byte[] buffer)
   {
-    if (buffer.length < 4)
+    if (buffer.length != 0x400)
       return false;
 
     // no idea what these mean

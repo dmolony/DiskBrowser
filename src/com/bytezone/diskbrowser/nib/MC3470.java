@@ -77,6 +77,7 @@ class MC3470
     int inPtr = offset;                 // keep offset in case we have to loop around
     final int max = offset + bytesUsed;
     finished = false;
+    int zeroBits = 0;
 
     while (inPtr < max && !finished)
     {
@@ -89,7 +90,17 @@ class MC3470
       {
         value <<= 1;
         if ((b & mask) != 0)
+        {
           value |= 0x01;
+          zeroBits = 0;
+        }
+        else
+        {
+          ++zeroBits;
+          if (zeroBits > 2)
+            System.out.printf (zeroBits + " consecutive zeroes @ %d/%d %s%n",
+                diskSectors.size (), dataPtr, currentState);
+        }
 
         if ((value & 0x80) != 0)     // value is not valid until the hi-bit is set
         {
@@ -121,6 +132,7 @@ class MC3470
       {
         inPtr = offset;
         restarted = true;
+        System.out.println ("wrapping around");
       }
     }
 

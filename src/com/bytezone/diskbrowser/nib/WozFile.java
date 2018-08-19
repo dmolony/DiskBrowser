@@ -176,7 +176,7 @@ public class WozFile
       NibbleTrack nibbleTrack = mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount);
       nibbleTracks.add (nibbleTrack);
     }
-    System.out.println (HexFormatter.format (nibbleTracks.get (0).buffer));
+    System.out.println (HexFormatter.format (nibbleTracks.get (2).buffer));
   }
 
   // ---------------------------------------------------------------------------------//

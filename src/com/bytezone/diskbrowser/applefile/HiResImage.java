@@ -436,6 +436,8 @@ public abstract class HiResImage extends AbstractFile
     }
   }
 
+  // http://commandlinefanatic.com/cgi-bin/showarticle.cgi?article=art011
+  // https://www.w3.org/Graphics/GIF/spec-gif89a.txt
   public static boolean isGif (byte[] buffer)
   {
     if (buffer.length < 6)

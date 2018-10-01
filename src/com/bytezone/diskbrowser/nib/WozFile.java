@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class WozFile
@@ -176,7 +175,7 @@ public class WozFile
       NibbleTrack nibbleTrack = mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount);
       nibbleTracks.add (nibbleTrack);
     }
-    System.out.println (HexFormatter.format (nibbleTracks.get (2).buffer));
+    //    System.out.println (HexFormatter.format (nibbleTracks.get (2).buffer));
   }
 
   // ---------------------------------------------------------------------------------//

@@ -197,7 +197,7 @@ class ProdosCatalogSector extends AbstractSector
   {
     StringBuilder text = new StringBuilder ();
     for (int i = offset, max = offset + 15; i < max && buffer[i] != 0; i++)
-      text.append ((char) buffer[i] & 0xFF);
+      text.append ((char) (buffer[i] & 0xFF));
     return text.toString ();
   }
 }

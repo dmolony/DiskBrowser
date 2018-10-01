@@ -15,6 +15,9 @@ import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// https://mud.co.uk/richard/htflpism.htm
+// https://inform-fiction.org/zmachine/standards/
+
 public class InfocomDisk extends AbstractFormattedDisk
 {
   private static final int BLOCK_SIZE = 256;

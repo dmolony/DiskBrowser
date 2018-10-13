@@ -27,10 +27,13 @@
 
 ### Example Screens
 #### Disk listing
+Select a disk from the Disk Tree tab to display the catalog and disk layout.
 ![Disk listing](resources/disk1.png?raw=true "Disk listing")
 #### Disk contents
+Double-click a disk from the Disk Tree tab and a new tab appears. This tab contains a list of all the files on the disk. Click on a file and the Output panel will display the contents of that file. The disk sectors containing the file will also be highlighted in the Disk Layout panel.
 ![Disk catalog](resources/disk2.png?raw=true "Disk catalog")
 #### Detailed sector display
+Click on any sector in the Disk Layout panel and the Output panel will display the contents of that sector. If it is a recognised sector type, it will be formatted for easier reading.
 ![Sector details](resources/sector.png?raw=true "Sector details")
 #### Hard disk
 ![Hard disk](resources/disk3.png?raw=true "Hard disk")

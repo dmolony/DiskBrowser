@@ -365,6 +365,9 @@ public class DiskFactory
         if (debug)
           System.out.println ("  known PASCAL checksum : " + checksum);
         disk = checkPascalDisk (appleDisk512);
+        disk2 = checkDos (appleDisk256);
+        if (disk2 != null)
+          disk = new DualDosDisk (disk, disk2);
       }
       else if (checksum == 3028642627L    // 
           || checksum == 2070151659L)     // Enchanter
@@ -412,6 +415,10 @@ public class DiskFactory
         disk2 = checkProdos (appleDisk512);
         if (disk2 != null)
           disk = new DualDosDisk (disk, disk2);
+
+        //        disk2 = checkCPMDisk (appleDisk256);
+        //        if (disk2 != null)
+        //          disk = new DualDosDisk (disk, disk2);
       }
     }
     else if (suffix.equals ("po"))
@@ -536,33 +543,33 @@ public class DiskFactory
   /*
   offset | size | description
   ------ | ---- | -----------
-  +$000  | Long |  The integer constant '2IMG'. This integer should be little-endian, 
-                   so on the Apple IIgs, this is equivalent to the four characters 
+  +$000  | Long |  The integer constant '2IMG'. This integer should be little-endian,
+                   so on the Apple IIgs, this is equivalent to the four characters
                    'GMI2'; in ORCA/C 2.1, you can use the integer constant '2IMG'.
-  +$004  | Long |  A four-character tag identifying the application that created the 
+  +$004  | Long |  A four-character tag identifying the application that created the
                    file.
   +$008  | Word |  The length of this header, in bytes. Should be 52.
   +$00A  | Word |  The version number of the image file format. Should be 1.
   +$00C  | Long |  The image format. See table below.
   +$010  | Long |  Flags. See table below.
-  +$014  | Long |  The number of 512-byte blocks in the disk image. This value should 
+  +$014  | Long |  The number of 512-byte blocks in the disk image. This value should
                    be zero unless the image format is 1 (ProDOS order).
-  +$018  | Long |  Offset to the first byte of the first block of the disk in the image 
-                   file, from the beginning of the file. The disk data must come before 
+  +$018  | Long |  Offset to the first byte of the first block of the disk in the image
+                   file, from the beginning of the file. The disk data must come before
                    the comment and creator-specific chunks.
-  +$01C  | Long |  Length of the disk data in bytes. This should be the number of 
+  +$01C  | Long |  Length of the disk data in bytes. This should be the number of
                    blocks * 512.
-  +$020  | Long |  Offset to the first byte of the image comment. Can be zero if 
-                   there's no comment. The comment must come after the data chunk, but 
-                   before the creator-specific chunk. The comment, if it exists, should 
-                   be raw text; no length byte or C-style null terminator byte is 
+  +$020  | Long |  Offset to the first byte of the image comment. Can be zero if
+                   there's no comment. The comment must come after the data chunk, but
+                   before the creator-specific chunk. The comment, if it exists, should
+                   be raw text; no length byte or C-style null terminator byte is
                    required (that's what the next field is for).
   +$024  | Long |  Length of the comment chunk. Zero if there's no comment.
-  +$028  | Long |  Offset to the first byte of the creator-specific data chunk, or zero 
+  +$028  | Long |  Offset to the first byte of the creator-specific data chunk, or zero
                    if there is none.
-  +$02C  | Long |  Length of the creator-specific chunk; zero if there is no 
+  +$02C  | Long |  Length of the creator-specific chunk; zero if there is no
                    creator-specific data.
-  +$030  | 16 bytes |  Reserved space; this pads the header to 64 bytes. These values 
+  +$030  | 16 bytes |  Reserved space; this pads the header to 64 bytes. These values
                    must all be zero.
   */
 

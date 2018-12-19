@@ -108,7 +108,7 @@ public class AssemblerProgram extends AbstractFile
   //    int ptr = executeOffset;
   //    int address = loadAddress + executeOffset;
   //
-  //    // if the assembly doesn't start at the beginning, just dump the bytes that 
+  //    // if the assembly doesn't start at the beginning, just dump the bytes that
   //    // are skipped
   //    for (int i = 0; i < executeOffset; i++)
   //      pgm.append (String.format ("%04X: %02X%n", (loadAddress + i), buffer[i]));
@@ -171,7 +171,7 @@ public class AssemblerProgram extends AbstractFile
     StringBuilder pgm = new StringBuilder ();
     List<AssemblerStatement> lines = getLines ();
 
-    // if the assembly doesn't start at the beginning, just dump the bytes that 
+    // if the assembly doesn't start at the beginning, just dump the bytes that
     // are skipped
     for (int i = 0; i < executeOffset; i++)
       pgm.append (String.format ("    %04X: %02X%n", (loadAddress + i), buffer[i]));

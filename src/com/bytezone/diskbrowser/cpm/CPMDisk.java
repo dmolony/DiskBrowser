@@ -25,6 +25,7 @@ public class CPMDisk extends AbstractFormattedDisk
 
   private int version;      // http://www.seasip.info/Cpm/format22.html
   //                        // http://www.seasip.info/Cpm/format31.html
+  private final DefaultMutableTreeNode volumeNode;
 
   public CPMDisk (Disk disk)
   {
@@ -54,7 +55,9 @@ public class CPMDisk extends AbstractFormattedDisk
       }
     }
 
-    DefaultMutableTreeNode root = getCatalogTreeRoot ();
+    DefaultMutableTreeNode rootNode = getCatalogTreeRoot ();
+    volumeNode = new DefaultMutableTreeNode ();
+    rootNode.add (volumeNode);
 
     for (int sector = 0; sector < 8; sector++)
     {
@@ -91,7 +94,7 @@ public class CPMDisk extends AbstractFormattedDisk
         {
           fileEntries.add (entry);
           DefaultMutableTreeNode node = new DefaultMutableTreeNode (entry);
-          root.add (node);
+          volumeNode.add (node);
           node.setAllowsChildren (false);
         }
         else
@@ -99,8 +102,11 @@ public class CPMDisk extends AbstractFormattedDisk
       }
     }
 
-    root.setUserObject (getCatalog ());         // override the disk's default display
-    makeNodeVisible (root.getFirstLeaf ());
+    //    root.setUserObject (getCatalog ());         // override the disk's default display
+    //    makeNodeVisible (rootNode.getFirstLeaf ());
+
+    volumeNode.setUserObject (getCatalog ());
+    makeNodeVisible (volumeNode.getFirstLeaf ());
   }
 
   private SectorType getSectorType (String type)
@@ -227,5 +233,12 @@ public class CPMDisk extends AbstractFormattedDisk
       if (b != value)
         return false;
     return true;
+  }
+
+  @Override
+  public String toString ()
+  {
+    StringBuffer text = new StringBuffer ("CPM disk");
+    return text.toString ();
   }
 }

@@ -416,9 +416,10 @@ public class DiskFactory
         if (disk2 != null)
           disk = new DualDosDisk (disk, disk2);
 
-        //        disk2 = checkCPMDisk (appleDisk256);
-        //        if (disk2 != null)
-        //          disk = new DualDosDisk (disk, disk2);
+        AppleDisk appleDisk = new AppleDisk (file, 35, 16);
+        disk2 = checkCPMDisk (appleDisk);
+        if (disk2 != null)
+          disk = new DualDosDisk (disk, disk2);
       }
     }
     else if (suffix.equals ("po"))

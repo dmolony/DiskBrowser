@@ -226,9 +226,6 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return null;
   }
 
-  /*
-   * Catalog Tree routines
-   */
   @Override
   public JTree getCatalogTree ()
   {

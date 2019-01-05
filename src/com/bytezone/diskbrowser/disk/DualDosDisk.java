@@ -23,8 +23,8 @@ public class DualDosDisk implements FormattedDisk
   public DualDosDisk (FormattedDisk disk0, FormattedDisk disk1)
   {
     String diskName = disk0.getDisk ().getFile ().getName ();
-    String text = "This disk contains both DOS and another OS\n\n" + disk0.getDisk ()
-        + "\n\n" + disk1.getDisk ();
+    String text = "This disk contains files from DOS and another OS\n\n"
+        + disk0.getDisk () + "\n\n" + disk1.getDisk ();
 
     DefaultAppleFileSource dafs = new DefaultAppleFileSource (diskName, text, this);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (dafs);

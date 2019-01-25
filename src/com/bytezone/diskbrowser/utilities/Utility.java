@@ -72,7 +72,7 @@ public class Utility
           LocalDateTime.of (val[3] + 2000, val[5], val[4], val[2], val[1], val[0]);
       return date;
     }
-    catch (DateTimeException e)
+    catch (DateTimeException | NumberFormatException e)
     {
       return null;
     }

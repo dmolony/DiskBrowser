@@ -40,7 +40,11 @@ public class AppleDiskAddress implements DiskAddress
   @Override
   public boolean matches (DiskAddress that)
   {
-    return that != null && this.block == that.getBlock ();
+    if (that == null)
+      return false;
+    //    if (zeroFlag != ((AppleDiskAddress) that).zeroFlag)
+    //      return false;
+    return this.block == that.getBlock ();
   }
 
   @Override

@@ -86,7 +86,8 @@ class CatalogEntry extends AbstractCatalogEntry
           break;
         }
 
-        if (thisDA.matches (da))
+        if (thisDA.matches (da) && ((AppleDiskAddress) thisDA)
+            .zeroFlag () == ((AppleDiskAddress) da).zeroFlag ())
         {
           System.out.printf ("Next T/S list in sector %s points to itself%n", thisDA);
           break;
@@ -133,10 +134,10 @@ class CatalogEntry extends AbstractCatalogEntry
     String lengthText = length == 0 ? "" : String.format ("$%4X  %,6d", length, length);
     String message = "";
     String lockedFlag = (locked) ? "*" : " ";
+
     if (dosDisk.dosVTOCSector.dosVersion >= 0x41)
-    {
       message = lastModified.toString ().replace ('T', ' ');
-    }
+
     if (reportedSize != actualSize)
       message += "Bad size (" + reportedSize + ") ";
     if (dataSectors.size () == 0)
@@ -148,6 +149,7 @@ class CatalogEntry extends AbstractCatalogEntry
             tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
     if (actualSize == 0)
       text = text.substring (0, 50);
+
     return text;
   }
 }

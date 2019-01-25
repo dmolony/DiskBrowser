@@ -471,6 +471,7 @@ public class DiskFactory
     }
     catch (Exception e)
     {
+      e.printStackTrace ();
     }
     if (debug)
       System.out.println ("  not a DOS disk");

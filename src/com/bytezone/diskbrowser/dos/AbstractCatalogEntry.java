@@ -64,7 +64,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       System.out.println ("Unknown file type : " + type);
 
     name = getName ("", entryBuffer);
-    lastModified = Utility.getDateTime (entryBuffer, 0x1B);
+    if (dosDisk.getVersion () >= 0x41)
+      lastModified = Utility.getDateTime (entryBuffer, 0x1B);
+
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
     String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
         (entryBuffer[33] & 0xFF));

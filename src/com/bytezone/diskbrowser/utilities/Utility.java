@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,6 +58,24 @@ public class Utility
       }
     }
     return false;
+  }
+
+  public static LocalDateTime getDateTime (byte[] buffer, int ptr)
+  {
+    try
+    {
+      int[] val = new int[6];
+      for (int i = 0; i < 6; i++)
+        val[i] = Integer.parseInt (String.format ("%02X", buffer[ptr + i] & 0xFF));
+
+      LocalDateTime date =
+          LocalDateTime.of (val[3] + 2000, val[5], val[4], val[2], val[1], val[0]);
+      return date;
+    }
+    catch (DateTimeException e)
+    {
+      return null;
+    }
   }
 
   public static boolean matches (byte[] buffer, int offset, byte[] key)

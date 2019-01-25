@@ -396,7 +396,8 @@ public class AppleDisk implements Disk
     int ptr = 0;
     for (DiskAddress da : daList)
     {
-      if (da != null && da.getBlock () > 0)    // sparse text/PNT/PIC files may have gaps
+      // sparse text/PNT/PIC files may have gaps
+      if (da != null && (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ()))
         readBuffer (da, buffer, ptr);
       ptr += sectorSize;
     }
@@ -458,6 +459,9 @@ public class AppleDisk implements Disk
   @Override
   public DiskAddress getDiskAddress (int track, int sector)
   {
+    //    track &= 0x3F;
+    //    sector &= 0x1F;
+
     if (!isValidAddress (track, sector))
     {
       System.out.println ("Invalid block : " + track + "/" + sector);
@@ -502,10 +506,14 @@ public class AppleDisk implements Disk
   @Override
   public boolean isValidAddress (int track, int sector)
   {
+    track &= 0x3F;
+    sector &= 0x1F;
+
     if (track < 0 || track >= this.tracks)
       return false;
     if (sector < 0 || sector >= this.sectors)
       return false;
+
     return true;
   }
 

@@ -18,7 +18,7 @@ public class SimpleText2 extends AbstractFile
 
     // store a pointer to each new line
     int ptr = 0;
-    while (buffer[ptr] != -1)
+    while (ptr < buffer.length && buffer[ptr] != -1)
     {
       int length = buffer[ptr] & 0xFF;
       lineStarts.add (ptr);
@@ -37,6 +37,8 @@ public class SimpleText2 extends AbstractFile
 
     for (Integer i : lineStarts)
       text.append (String.format ("%05X  %s%n", i, getLine (i)));
+    if (text.charAt (text.length () - 1) == '\n')
+      text.deleteCharAt (text.length () - 1);
     return text.toString ();
   }
 
@@ -46,8 +48,8 @@ public class SimpleText2 extends AbstractFile
     StringBuilder text = new StringBuilder ();
 
     for (Integer i : lineStarts)
-      text.append (HexFormatter.formatNoHeader (buffer, i, (buffer[i] & 0xFF) + 1)
-          + "\n");
+      text.append (
+          HexFormatter.formatNoHeader (buffer, i, (buffer[i] & 0xFF) + 1) + "\n");
     text.append (HexFormatter.formatNoHeader (buffer, buffer.length - 2, 2) + "\n");
 
     return text.toString ();

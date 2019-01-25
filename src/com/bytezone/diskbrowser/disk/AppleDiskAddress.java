@@ -6,6 +6,7 @@ public class AppleDiskAddress implements DiskAddress
   private final int track;
   private final int sector;
   public final Disk owner;
+  private boolean zeroFlag;
 
   public AppleDiskAddress (Disk owner, int block)
   {
@@ -19,15 +20,15 @@ public class AppleDiskAddress implements DiskAddress
   public AppleDiskAddress (Disk owner, int track, int sector)
   {
     this.owner = owner;
-    this.track = track;
-    this.sector = sector;
-    this.block = track * owner.getSectorsPerTrack () + sector;
+    zeroFlag = (track & 0x40) != 0;
+    this.track = track & 0x3F;
+    this.sector = sector & 0x1F;
+    this.block = this.track * owner.getSectorsPerTrack () + this.sector;
   }
 
-  @Override
-  public String toString ()
+  public boolean zeroFlag ()
   {
-    return String.format ("[Block=%3d, Track=%2d, Sector=%2d]", block, track, sector);
+    return zeroFlag;
   }
 
   @Override
@@ -64,5 +65,12 @@ public class AppleDiskAddress implements DiskAddress
   public Disk getDisk ()
   {
     return owner;
+  }
+
+  @Override
+  public String toString ()
+  {
+    return String.format ("[Block=%3d, Track=%2d, Sector=%2d, Zero=%s]", block, track,
+        sector, zeroFlag);
   }
 }

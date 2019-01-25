@@ -4,12 +4,13 @@ import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 class DosVTOCSector extends AbstractSector
 {
   DosDisk parentDisk;
   int volume;
-  int DOSVersion;
+  int dosVersion;       // 1, 2, 3 or 0x41...
   int maxTSPairs;
   int lastAllocTrack;
   int direction;
@@ -25,7 +26,7 @@ class DosVTOCSector extends AbstractSector
     super (disk, buffer, diskAddress);
 
     this.parentDisk = parentDisk;
-    DOSVersion = buffer[3];
+    dosVersion = buffer[3];
     volume = buffer[6] & 0xFF;
     maxTSPairs = buffer[39];
     lastAllocTrack = buffer[48];
@@ -38,6 +39,63 @@ class DosVTOCSector extends AbstractSector
 
   @Override
   public String createText ()
+  {
+    return dosVersion <= 3 ? createDosText () : createOtherText ();
+  }
+
+  private String createOtherText ()
+  {
+    StringBuilder text = getHeader ("DOS 4.1 VTOC Sector");
+    addText (text, buffer, 0, 1, "Not used");
+    addText (text, buffer, 1, 2, "First directory track/sector");
+    addText (text, buffer, 3, 1, "DOS release number");
+    addText (text, buffer, 4, 1, "Build number");
+    addText (text, buffer, 5, 1, "Ram DOS " + (char) (buffer[5] & 0x7F));
+
+    addTextAndDecimal (text, buffer, 6, 1, "Diskette volume");
+    addText (text, buffer, 7, 1, "Volume type " + (char) (buffer[7] & 0x7F));
+
+    int ptr = 8;
+    addText (text, buffer, ptr, 4, "Volume name: " + getName (buffer, ptr));
+    for (int j = 4; j < 24; j += 4)
+      addText (text, buffer, ptr + j, 4, "");
+
+    addText (text, buffer, 0x20, 3,
+        "Date/time initialised: " + Utility.getDateTime (buffer, 0x20));
+    addText (text, buffer, 0x23, 3, "");
+    addText (text, buffer, 0x26, 1, "Not used");
+
+    addTextAndDecimal (text, buffer, 0x27, 1, "Maximum TS pairs");
+    addText (text, buffer, 0x28, 2, "Volume library");
+    addText (text, buffer, 0x2A, 3,
+        "Date/time modified: " + Utility.getDateTime (buffer, 0x2A));
+    addText (text, buffer, 0x2D, 3, "");
+
+    addTextAndDecimal (text, buffer, 0x30, 1, "Last allocated track");
+    addText (text, buffer, 0x31, 1, "Direction to look when allocating the next file");
+    addText (text, buffer, 0x32, 2, "Not used");
+    addTextAndDecimal (text, buffer, 0x34, 1, "Maximum tracks");
+    addTextAndDecimal (text, buffer, 0x35, 1, "Maximum sectors");
+    addTextAndDecimal (text, buffer, 0x36, 2, "Bytes per sector");
+
+    boolean bootSectorEmpty = parentDisk.getDisk ().isSectorEmpty (0);
+    for (int i = 0x38; i <= 0xC3; i += 4)
+    {
+      String extra = "";
+      if (i == 0x38 && bootSectorEmpty)
+        extra = "(unusable)";
+      else if (i == 124)
+        extra = "(VTOC and Catalog)";
+      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s", (i - 56) / 4,
+          getBitmap (buffer[i], buffer[i + 1]), extra));
+    }
+
+    text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
+  }
+
+  private String createDosText ()
   {
     StringBuilder text = getHeader ("VTOC Sector");
     addText (text, buffer, 0, 1, "Not used");
@@ -138,11 +196,35 @@ class DosVTOCSector extends AbstractSector
     return block;
   }
 
+  // duplicate of DosCatalogSector.getName()
+  private String getName (byte[] buffer, int offset)
+  {
+    StringBuilder text = new StringBuilder ();
+    int max = 24;
+    for (int i = 0; i < max; i++)
+    {
+      int c = buffer[i + offset] & 0xFF;
+      if (c == 136)
+      {
+        if (text.length () > 0)
+          text.deleteCharAt (text.length () - 1);
+        continue;
+      }
+      if (c > 127)
+        c -= c < 160 ? 64 : 128;
+      if (c < 32)                                 // non-printable
+        text.append ("^" + (char) (c + 64));
+      else
+        text.append ((char) c);                   // standard ascii
+    }
+    return text.toString ();
+  }
+
   @Override
   public String toString ()
   {
     StringBuffer text = new StringBuffer ();
-    text.append ("DOS version      : 3." + DOSVersion);
+    text.append ("DOS version      : 3." + dosVersion);
     text.append ("\nVolume           : " + volume);
     text.append ("\nMax TS pairs     : " + maxTSPairs);
     text.append ("\nLast allocated T : " + lastAllocTrack);

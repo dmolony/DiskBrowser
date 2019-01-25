@@ -18,7 +18,7 @@ public class DosDisk extends AbstractFormattedDisk
   private static final int CATALOG_TRACK = 17;
   private static final int VTOC_SECTOR = 0;
 
-  private final DosVTOCSector dosVTOCSector;
+  final DosVTOCSector dosVTOCSector;
   private final Color green = new Color (0, 200, 0);
   private final DefaultMutableTreeNode volumeNode;
 
@@ -152,6 +152,12 @@ public class DosDisk extends AbstractFormattedDisk
 
       int track = sectorBuffer[1] & 0xFF;
       int sector = sectorBuffer[2] & 0xFF;
+      if (dosVTOCSector.dosVersion >= 0x41)
+      {
+        track = track & 0x3F;
+        sector = sector & 0x1F;
+      }
+
       if (!disk.isValidAddress (track, sector))
         break;
 
@@ -254,6 +260,28 @@ public class DosDisk extends AbstractFormattedDisk
     return false;
   }
 
+  public String getVersionText ()
+  {
+    switch (getVersion ())
+    {
+      case 0x01:
+        return "3.1";
+      case 0x02:
+        return "3.2";
+      case 0x03:
+        return "3.3";
+      case 0x41:
+        return "4.1";
+      default:
+        return "??";
+    }
+  }
+
+  public int getVersion ()
+  {
+    return dosVTOCSector.dosVersion;
+  }
+
   private static int checkFormat (AppleDisk disk)
   {
     byte[] buffer = disk.readSector (0x11, 0x00);
@@ -272,10 +300,10 @@ public class DosDisk extends AbstractFormattedDisk
     //      //      return 0;
     //    }
 
-    int version = buffer[3];
-    if (version < -1 || version > 4)
+    int version = buffer[3] & 0xFF;
+    if (version > 0x42 && version != 0xFF)
     {
-      System.out.println ("Bad version : " + buffer[3]);
+      System.out.printf ("Bad version : %02X%n", version);
       return 0;
     }
 
@@ -347,7 +375,7 @@ public class DosDisk extends AbstractFormattedDisk
     if (type == tsListSector)
       return new DosTSListSector (getSectorFilename (da), disk, buffer, da);
     if (type == catalogSector)
-      return new DosCatalogSector (disk, buffer, da);
+      return new DosCatalogSector (this, disk, buffer, da);
     if (type == dataSector)
       return new DefaultSector (
           "Data Sector at " + address + " : " + getSectorFilename (da), disk, buffer, da);
@@ -369,7 +397,7 @@ public class DosDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String line = "- --- ---  ------------------------------  -----  -------------"
-        + "  -- ----  ----------------" + newLine;
+        + "  -- ----  -------------------" + newLine;
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("Disk : %s%n%n", getAbsolutePath ()));
     text.append ("L Typ Len  Name                            Addr"
@@ -405,33 +433,33 @@ public class DosDisk extends AbstractFormattedDisk
   }
 
   /* From http://apple2history.org/history/ah15/
-   * 
-    There were actually three versions of DOS 3.3 that Apple released without 
+   *
+    There were actually three versions of DOS 3.3 that Apple released without
     bumping the version number:
   
     The first version that was released had FPBASIC and INTBASIC files that were 50
     sectors in size.
-    
-    The second version of DOS 3.3, often referred to as “DOS 3.3e”, appeared at the 
-    time the Apple IIe was released. In this version, the FPBASIC and INTBASIC files 
-    were 42 sectors in size. The changes introduced at that time included code to turn 
-    off the IIe 80-column card at boot time, and an attempt to fix a bug in the APPEND 
-    command. This fix reportedly introduced an even worse bug, but as the command was 
-    not heavily used it did not make much of an impact on most programmers. The APPEND 
+  
+    The second version of DOS 3.3, often referred to as “DOS 3.3e”, appeared at the
+    time the Apple IIe was released. In this version, the FPBASIC and INTBASIC files
+    were 42 sectors in size. The changes introduced at that time included code to turn
+    off the IIe 80-column card at boot time, and an attempt to fix a bug in the APPEND
+    command. This fix reportedly introduced an even worse bug, but as the command was
+    not heavily used it did not make much of an impact on most programmers. The APPEND
     fix was applied by utilizing some formerly unused space in the DOS 3.3 code.
-    
-    The third version of DOS 3.3 appeared just before the first release of ProDOS. 
-    The only mention of this in the press was in the DOSTalk column of Softalk magazine. 
-    This final version of DOS 3.3 included a different fix for the APPEND bug, using 
+  
+    The third version of DOS 3.3 appeared just before the first release of ProDOS.
+    The only mention of this in the press was in the DOSTalk column of Softalk magazine.
+    This final version of DOS 3.3 included a different fix for the APPEND bug, using
     another bit of unused space in DOS 3.3.
   
-    With regard to the FPBASIC and INTBASIC files: There were three differences between 
-    the 50 sector and the 42 sector versions of the INTBASIC file. Firstly, the 
-    $F800-$FFFF section was removed. This area was the code for the Monitor, and with 
-    the changes introduced in the Apple IIe, it could cause some things to “break” if 
-    the older Monitor code was executed. Secondly, a FOR/NEXT bug in Integer BASIC was 
-    fixed. Finally, there was a three-byte bug in the Programmer’s Aid ROM #1 chip. 
-    The code for this chip was included in the INTBASIC file, and could therefore be 
+    With regard to the FPBASIC and INTBASIC files: There were three differences between
+    the 50 sector and the 42 sector versions of the INTBASIC file. Firstly, the
+    $F800-$FFFF section was removed. This area was the code for the Monitor, and with
+    the changes introduced in the Apple IIe, it could cause some things to “break” if
+    the older Monitor code was executed. Secondly, a FOR/NEXT bug in Integer BASIC was
+    fixed. Finally, there was a three-byte bug in the Programmer’s Aid ROM #1 chip.
+    The code for this chip was included in the INTBASIC file, and could therefore be
     patched.
    */
 }

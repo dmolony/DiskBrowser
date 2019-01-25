@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -152,7 +153,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     highlights.clear ();
     if (list != null)
       for (DiskAddress da : list)
-        if (da != null && da.getBlock () > 0)
+        if (da != null && (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ()))
           highlights.add (da);
   }
 

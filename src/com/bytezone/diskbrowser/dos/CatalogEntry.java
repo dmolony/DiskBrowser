@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.dos;
 
+import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.dos.DosDisk.FileType;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -20,7 +21,7 @@ class CatalogEntry extends AbstractCatalogEntry
       DiskAddress da = disk.getDiskAddress (entryBuffer[0], entryBuffer[1]);
 
       // Loop through all TS-list sectors
-      loop: while (da.getBlock () > 0)
+      loop: while (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
       {
         if (dosDisk.stillAvailable (da))
           dosDisk.sectorTypes[da.getBlock ()] = dosDisk.tsListSector;
@@ -55,7 +56,7 @@ class CatalogEntry extends AbstractCatalogEntry
                 sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
             break loop;
           }
-          if (da.getBlock () == 0)
+          if (da.getBlock () == 0 && !((AppleDiskAddress) da).zeroFlag ())
           {
             if (fileType != FileType.Text)
               break;
@@ -132,6 +133,10 @@ class CatalogEntry extends AbstractCatalogEntry
     String lengthText = length == 0 ? "" : String.format ("$%4X  %,6d", length, length);
     String message = "";
     String lockedFlag = (locked) ? "*" : " ";
+    if (dosDisk.dosVTOCSector.dosVersion >= 0x41)
+    {
+      message = lastModified.toString ().replace ('T', ' ');
+    }
     if (reportedSize != actualSize)
       message += "Bad size (" + reportedSize + ") ";
     if (dataSectors.size () == 0)

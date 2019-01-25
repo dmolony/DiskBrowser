@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.dos;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.dos.DosDisk.FileType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 abstract class AbstractCatalogEntry implements AppleFileSource
 {
@@ -22,6 +24,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   protected int reportedSize;
   protected boolean locked;
   protected DataSource appleFile;
+  protected LocalDateTime lastModified;
 
   protected DiskAddress catalogSectorDA;
   protected final List<DiskAddress> dataSectors = new ArrayList<DiskAddress> ();
@@ -34,33 +37,34 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   {
     this.dosDisk = dosDisk;
     this.disk = dosDisk.getDisk ();
-    this.disk = dosDisk.getDisk ();
     this.catalogSectorDA = catalogSector;
 
     reportedSize = HexFormatter.unsignedShort (entryBuffer, 33);
-    int type = entryBuffer[2] & 0xFF;
-    locked = (type & 0x80) > 0;
 
-    if ((type & 0x7F) == 0)
+    int type = entryBuffer[2] & 0x7F;
+    locked = (entryBuffer[2] & 0x80) != 0;
+
+    if (type == 0)
       fileType = FileType.Text;
-    else if ((type & 0x01) > 0)
+    else if ((type == 0x01))
       fileType = FileType.IntegerBasic;
-    else if ((type & 0x02) > 0)
+    else if ((type == 0x02))
       fileType = FileType.ApplesoftBasic;
-    else if ((type & 0x04) > 0)
+    else if ((type == 0x04))
       fileType = FileType.Binary;
-    else if ((type & 0x08) > 0)
+    else if ((type == 0x08))
       fileType = FileType.SS;
-    else if ((type & 0x10) > 0)
+    else if ((type == 0x10))
       fileType = FileType.Relocatable;
-    else if ((type & 0x20) > 0)
+    else if ((type == 0x20))
       fileType = FileType.AA;
-    else if ((type & 0x40) > 0)
+    else if ((type == 0x40))
       fileType = FileType.BB;
     else
-      System.out.println ("Unknown file type : " + (type & 0x7F));
+      System.out.println ("Unknown file type : " + type);
 
     name = getName ("", entryBuffer);
+    lastModified = Utility.getDateTime (entryBuffer, 0x1B);
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
     String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
         (entryBuffer[33] & 0xFF));
@@ -71,6 +75,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   {
     StringBuilder text = new StringBuilder (base);
     int max = buffer[0] == (byte) 0xFF ? 32 : 33;
+    if (dosDisk.getVersion () >= 0x41)
+      max = 27;
     for (int i = 3; i < max; i++)
     {
       int c = buffer[i] & 0xFF;

@@ -58,7 +58,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       fileType = FileType.Relocatable;
     else if ((type == 0x20))
       fileType = FileType.AA;
-    else if ((type == 0x40))
+    else if ((type == 0x40))          // Lisa
       fileType = FileType.BB;
     else
       System.out.println ("Unknown file type : " + type);
@@ -260,7 +260,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           appleFile = new DefaultAppleFile (name, buffer);
           break;
 
-        case BB:                                          // what is this?
+        case BB:                                          // Lisa
           loadAddress = HexFormatter.intValue (buffer[0], buffer[1]);
           reportedLength = HexFormatter.intValue (buffer[2], buffer[3]);
           exactBuffer = new byte[reportedLength];

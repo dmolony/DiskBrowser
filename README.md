@@ -12,6 +12,7 @@
 - Compressed disks - shrinkIt, gzip, zip
 - Track and sector display
 - Dual DOS disks
+- DOS 4.1 disks
 - CPM disks
 - Comprehensive disk listing
 - woz format disks

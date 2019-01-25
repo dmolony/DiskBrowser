@@ -118,8 +118,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
         return "R";
       case AA:                    // what is this?
         return "A";
-      case BB:                    // what is this?
-        return "B";
+      case BB:                    // Lisa file
+        return "L";
       default:
         System.out.println ("Unknown file type : " + fileType);
         return "?";

@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.dos;
 
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
+import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 
@@ -9,17 +10,35 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
   boolean allSectorsAvailable = true;
   boolean debug = false;
 
-  public DeletedCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
+  public DeletedCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector,
+      byte[] entryBuffer, int dosVersion)
   {
     super (dosDisk, catalogSector, entryBuffer);
-    //    reportedSize = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
+
     if (debug)
     {
       System.out.println ("Deleted file  : " + name);
       System.out.printf ("Reported size : %d%n", reportedSize);
     }
 
-    if (reportedSize <= 1 || !disk.isValidAddress (entryBuffer[32], entryBuffer[1]))
+    DiskAddress da = null;
+
+    // Get address of first TS-list sector
+    if (dosVersion >= 0x41)
+    {
+      int track = entryBuffer[0] & 0x3F;
+      int sector = entryBuffer[1] & 0x1F;
+      da = disk.getDiskAddress (track, sector);
+    }
+    else
+    {
+      int track = entryBuffer[32] & 0xFF;
+      int sector = entryBuffer[1] & 0xFF;
+      da = disk.getDiskAddress (track, sector);
+    }
+    int totalBlocks = 0;
+
+    if (reportedSize <= 1 || !disk.isValidAddress (da.getTrack (), da.getSector ()))
     {
       if (debug)
         System.out.println ("invalid catalog entry");
@@ -27,12 +46,8 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
       return;
     }
 
-    // Get address of first TS-list sector
-    DiskAddress da = disk.getDiskAddress (entryBuffer[32], entryBuffer[1]);
-    int totalBlocks = 0;
-
     // Loop through all TS-list sectors
-    loop: while (da.getBlock () > 0)
+    loop: while (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
     {
       if (!dosDisk.stillAvailable (da))
       {
@@ -51,7 +66,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
         if (da.getBlock () > 0 && debug)
           System.out.println (da);
 
-        if (da.getBlock () > 0)
+        if (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
         {
           if (!dosDisk.stillAvailable (da))
           {
@@ -68,7 +83,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
       if (da == null)
       {
         System.out.printf ("Next T/S list in sector %s is invalid : %02X, %02X%n", da,
-              sectorBuffer[1], sectorBuffer[2]);
+            sectorBuffer[1], sectorBuffer[2]);
         break;
       }
     }
@@ -99,7 +114,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
 
   public String getDetails ()
   {
-    return String.format ("%-30s  %s", name, allSectorsAvailable ? "Recoverable"
-          : "Not recoverable");
+    return String.format ("%-30s  %s", name,
+        allSectorsAvailable ? "Recoverable" : "Not recoverable");
   }
 }

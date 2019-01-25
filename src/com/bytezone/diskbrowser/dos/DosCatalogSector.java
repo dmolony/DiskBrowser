@@ -10,7 +10,7 @@ class DosCatalogSector extends AbstractSector
 {
   private static final String[] fileTypes =
       { "Text file", "Integer Basic program", "Applesoft Basic program", "Binary file",
-        "SS file", "Relocatable file", "AA file", "BB file" };
+        "SS file", "Relocatable file", "AA file", "Lisa file" };
   private static int CATALOG_ENTRY_SIZE = 35;
 
   private final DosDisk dosDisk;

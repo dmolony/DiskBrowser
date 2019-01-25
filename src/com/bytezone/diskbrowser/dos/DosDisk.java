@@ -55,6 +55,7 @@ public class DosDisk extends AbstractFormattedDisk
     da = disk.getDiskAddress (CATALOG_TRACK, VTOC_SECTOR);
     sectorBuffer = disk.readSector (da);          // VTOC
     dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer, da);
+    sectorTypes[da.getBlock ()] = vtocSector;
 
     DiskAddress catalogStart = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
@@ -63,7 +64,7 @@ public class DosDisk extends AbstractFormattedDisk
     if (dosVTOCSector.maxSectors != disk.getSectorsPerTrack ())
       System.out.println ("Invalid sectors per track : " + dosVTOCSector.maxSectors);
 
-    sectorTypes[CATALOG_TRACK * dosVTOCSector.maxSectors] = vtocSector;
+    //    sectorTypes[CATALOG_TRACK * dosVTOCSector.maxSectors] = vtocSector;
 
     // assert (maxTracks == disk.getTotalTracks ());
     //    assert (dosVTOCSector.maxSectors == disk.getSectorsPerTrack ());
@@ -91,12 +92,12 @@ public class DosDisk extends AbstractFormattedDisk
 
       // The first byte is officially unused, but it always seems to contain 0x00 or 0xFF
       // See beautifulboot.dsk.
-      if (sectorBuffer[0] != 0 && (sectorBuffer[0] & 0xFF) != 0xFF && false)
-      {
-        System.out
-            .println ("Dos catalog sector buffer byte #0 invalid : " + sectorBuffer[0]);
-        break;
-      }
+      //      if (sectorBuffer[0] != 0 && (sectorBuffer[0] & 0xFF) != 0xFF && false)
+      //      {
+      //        System.out
+      //            .println ("Dos catalog sector buffer byte #0 invalid : " + sectorBuffer[0]);
+      //        break;
+      //      }
 
       sectorTypes[da.getBlock ()] = catalogSector;
 
@@ -130,11 +131,14 @@ public class DosDisk extends AbstractFormattedDisk
 
         byte[] entry = new byte[ENTRY_SIZE];
         System.arraycopy (sectorBuffer, ptr, entry, 0, ENTRY_SIZE);
+        int track = entry[0] & 0xFF;
+        boolean deletedFlag = (entry[0] & 0x80) != 0;
 
-        if (entry[0] == (byte) 0xFF) // deleted file
+        //        if (entry[0] == (byte) 0xFF)              // deleted file
+        if (deletedFlag)              // deleted file
         {
           DeletedCatalogEntry deletedCatalogEntry =
-              new DeletedCatalogEntry (this, da, entry);
+              new DeletedCatalogEntry (this, da, entry, dosVTOCSector.dosVersion);
           deletedFileEntries.add (deletedCatalogEntry);
           DefaultMutableTreeNode node = new DefaultMutableTreeNode (deletedCatalogEntry);
           node.setAllowsChildren (false);
@@ -164,6 +168,7 @@ public class DosDisk extends AbstractFormattedDisk
       da = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
     } while (da.getBlock () != 0);
+
     // link double hi-res files
     for (AppleFileSource fe : fileEntries)
     {

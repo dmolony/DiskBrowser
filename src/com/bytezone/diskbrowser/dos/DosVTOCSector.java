@@ -53,7 +53,9 @@ class DosVTOCSector extends AbstractSector
     addText (text, buffer, 5, 1, "Ram DOS " + (char) (buffer[5] & 0x7F));
 
     addTextAndDecimal (text, buffer, 6, 1, "Diskette volume");
-    addText (text, buffer, 7, 1, "Volume type " + (char) (buffer[7] & 0x7F));
+    String diskType =
+        buffer[7] == (byte) 0xC4 ? " = Data" : buffer[7] == (byte) 0xC2 ? " = Boot" : "";
+    addText (text, buffer, 7, 1, "Volume type: " + (char) (buffer[7] & 0x7F) + diskType);
 
     int ptr = 8;
     addText (text, buffer, ptr, 4, "Volume name: " + getName (buffer, ptr));

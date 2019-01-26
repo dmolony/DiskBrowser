@@ -64,6 +64,8 @@ public interface FormattedDisk
 
   public String getAbsolutePath ();
 
+  public String getDisplayPath ();
+
   public void setOriginalPath (Path path);
 
   // VTOC flags sector as free, but it is in use by a file

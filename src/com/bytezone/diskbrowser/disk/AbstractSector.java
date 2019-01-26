@@ -119,7 +119,8 @@ public abstract class AbstractSector implements DataSource
     if (size == 1)
       desc += " (" + (b[offset] & 0xFF) + ")";
     else if (size == 2)
-      desc += " (" + ((b[offset + 1] & 0xFF) * 256 + (b[offset] & 0xFF)) + ")";
+      desc +=
+          String.format (" (%,d)", ((b[offset + 1] & 0xFF) * 256 + (b[offset] & 0xFF)));
     else if (size == 3)
       desc += String.format (" (%,d)", ((b[offset + 2] & 0xFF) * 65536)
           + ((b[offset + 1] & 0xFF) * 256) + (b[offset] & 0xFF));

@@ -194,6 +194,18 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   }
 
   @Override
+  public String getDisplayPath ()
+  {
+    if (originalPath != null)
+      return originalPath.toString ();
+    String home = System.getProperty ("user.home");
+    String path = disk.getFile ().getAbsolutePath ();
+    if (path.startsWith (home))
+      return "~" + path.substring (home.length ());
+    return disk.getFile ().getAbsolutePath ();
+  }
+
+  @Override
   public String getName ()
   {
     if (originalPath != null)

@@ -11,8 +11,11 @@ import com.bytezone.diskbrowser.utilities.Utility;
 
 public class WozFile
 {
-  private static final byte[] WOZ_FILE_HEADER =
-      { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0a, 0x0D, 0x0A };
+  private static final byte[] WOZ1_FILE_HEADER =
+      { 0x57, 0x4F, 0x5A, 0x31, (byte) 0xFF, 0x0A, 0x0D, 0x0A };
+  private static final byte[] WOZ2_FILE_HEADER =
+      { 0x57, 0x4F, 0x5A, 0x32, (byte) 0xFF, 0x0A, 0x0D, 0x0A };
+
   private static final int TRK_SIZE = 0x1A00;
   private static final int INFO_SIZE = 0x3C;
   private static final int TMAP_SIZE = 0xA0;
@@ -37,7 +40,7 @@ public class WozFile
     byte[] buffer = readFile ();
     boolean valid = false;
 
-    if (!matches (WOZ_FILE_HEADER, buffer))
+    if (!matches (WOZ1_FILE_HEADER, buffer))
       throw new DiskNibbleException ("Header error");
 
     int checksum1 = readInt (buffer, 8, 4);

@@ -32,7 +32,7 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
   public String getText ()
   {
     StringBuffer text = new StringBuffer ();
-    text.append ("Disk : " + parentFD.getAbsolutePath () + newLine2);
+    text.append ("Disk : " + parentFD.getDisplayPath () + newLine2);
     for (int i = 0; i < buffer.length; i += 39)
     {
       int storageType = (buffer[i] & 0xF0) >> 4;

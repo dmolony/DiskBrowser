@@ -230,6 +230,12 @@ public class DualDosDisk implements FormattedDisk
   }
 
   @Override
+  public String getDisplayPath ()
+  {
+    return disks[currentDisk].getDisplayPath ();
+  }
+
+  @Override
   public FormattedDisk getParent ()
   {
     return disks[currentDisk].getParent ();

@@ -257,7 +257,7 @@ public class PascalDisk extends AbstractFormattedDisk
     String date =
         volumeEntry.date == null ? "--" : df.format (volumeEntry.date.getTime ());
     StringBuilder text = new StringBuilder ();
-    text.append ("Disk : " + disk.getFile ().getAbsolutePath () + newLine2);
+    text.append ("Disk : " + getDisplayPath () + newLine2);
     text.append ("Volume : " + volumeEntry.name + newLine);
     text.append ("Date   : " + date + newLine2);
     text.append (

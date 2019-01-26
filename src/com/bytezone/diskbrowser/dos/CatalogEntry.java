@@ -143,10 +143,9 @@ class CatalogEntry extends AbstractCatalogEntry
     if (dataSectors.size () == 0)
       message += "No data ";
 
-    String text =
-        String.format ("%1s  %1s  %03d  %-30.30s  %-5s  " + "%-13s  %2d %3d   %s",
-            lockedFlag, getFileType (), actualSize, name, addressText, lengthText,
-            tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
+    String text = String.format ("%1s  %1s  %03d  %-30.30s  %-5s  %-13s %3d %3d   %s",
+        lockedFlag, getFileType (), actualSize, name, addressText, lengthText,
+        tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
     if (actualSize == 0)
       text = text.substring (0, 50);
 

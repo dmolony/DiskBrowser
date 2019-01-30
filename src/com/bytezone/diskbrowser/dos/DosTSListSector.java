@@ -68,8 +68,11 @@ class DosTSListSector extends AbstractSector
       if (buffer[i] == 0 && buffer[i + 1] == 0)
         msg = "";
       else
-        msg = String.format ("Track/sector of file sector %04X  (%<,d)",
-            ((i - 12) / 2 + sectorBase));
+      {
+        String msg2 = buffer[i] == 0x40 ? "  - track zero" : "";
+        msg = String.format ("Track/sector of file sector %04X (%<,d)%s",
+            ((i - 12) / 2 + sectorBase), msg2);
+      }
       addText (text, buffer, i, 2, msg);
     }
 

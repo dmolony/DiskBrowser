@@ -296,7 +296,10 @@ public class DosDisk extends AbstractFormattedDisk
     //      return 0;
 
     if (buffer[53] != 16 && buffer[53] != 13)         // tracks per sector
+    {
+      System.out.printf ("%02X tracks per sector%n", buffer[53]);
       return 0;
+    }
 
     //    if (buffer[49] < -1 || buffer[49] > 1)      // direction of next file save
     //    {

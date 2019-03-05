@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 public class WozFile
@@ -41,7 +42,10 @@ public class WozFile
     boolean valid = false;
 
     if (!matches (WOZ1_FILE_HEADER, buffer))
+    {
+      System.out.println (HexFormatter.format (buffer, 0, 20));
       throw new DiskNibbleException ("Header error");
+    }
 
     int checksum1 = readInt (buffer, 8, 4);
     int checksum2 = Utility.crc32 (buffer, 12, buffer.length - 12);

@@ -168,7 +168,11 @@ public class TreeBuilder
     {
       StringBuilder text = new StringBuilder ();
 
-      text.append ("Directory : " + file.getAbsolutePath () + "\n\n");
+      String home = System.getProperty ("user.home");
+      String path = file.getAbsolutePath ();
+      if (path.startsWith (home))
+        path = "~" + path.substring (home.length ());
+      text.append ("Directory : " + path + "\n\n");
       text.append ("D         File names                       "
           + "      Date               Size  Type\n");
       text.append ("-  ----------------------------------------"
@@ -178,9 +182,11 @@ public class TreeBuilder
       if (files != null)
         for (File f : files)
         {
-          String name = f.getName ();
-          if (name.startsWith ("."))
+          if (f.isHidden ())
             continue;
+          String name = f.getName ();
+          //          if (name.startsWith ("."))
+          //            continue;
 
           Date d = new Date (f.lastModified ());
           int pos = name.lastIndexOf ('.');

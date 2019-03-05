@@ -186,10 +186,17 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   }
 
   @Override
+  public Path getOriginalPath ()
+  {
+    return originalPath;
+  }
+
+  @Override
   public String getAbsolutePath ()
   {
     if (originalPath != null)
       return originalPath.toString ();
+
     return disk.getFile ().getAbsolutePath ();
   }
 
@@ -198,11 +205,19 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   {
     if (originalPath != null)
       return originalPath.toString ();
+
     String home = System.getProperty ("user.home");
     String path = disk.getFile ().getAbsolutePath ();
     if (path.startsWith (home))
       return "~" + path.substring (home.length ());
+
     return disk.getFile ().getAbsolutePath ();
+  }
+
+  @Override
+  public boolean isTempDisk ()
+  {
+    return originalPath != null;
   }
 
   @Override

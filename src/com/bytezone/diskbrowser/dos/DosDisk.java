@@ -257,7 +257,7 @@ public class DosDisk extends AbstractFormattedDisk
     }
     if (catalogBlocks > 0)
     {
-      disk.setInterleave (0);
+      disk.setInterleave (1);
       return true;
     }
     if (cb2 > 0)
@@ -297,7 +297,6 @@ public class DosDisk extends AbstractFormattedDisk
 
     if (buffer[53] != 16 && buffer[53] != 13)         // tracks per sector
     {
-      System.out.printf ("%02X tracks per sector%n", buffer[53]);
       return 0;
     }
 

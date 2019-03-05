@@ -179,6 +179,11 @@ public class DirectoryEntry implements AppleFileSource
 
     DirectoryEntry entry = recordsUsed == 0x80 ? entries.get (entries.size () - 1) : this;
     int len = (entry.extent * 128 + entry.recordsUsed) * 128;
+    if (len > buffer.length)
+    {
+      System.out.println ("too big");       // see tdbt12d1.sdk
+      len = buffer.length;
+    }
 
     byte[] exactBuffer = new byte[len];
     System.arraycopy (buffer, 0, exactBuffer, 0, len);

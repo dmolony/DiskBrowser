@@ -15,10 +15,10 @@ class RefreshTreeAction extends DefaultAction
   public RefreshTreeAction (CatalogPanel owner)
   {
     super ("Refresh current tree", "Makes newly added/modified disks available",
-          "/com/bytezone/diskbrowser/icons/");
-//    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt R"));
+        "/com/bytezone/diskbrowser/icons/");
+    //    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt R"));
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_F5, 0));
-//    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_R);
+    //    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_R);
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_F5);
     this.owner = owner;
 

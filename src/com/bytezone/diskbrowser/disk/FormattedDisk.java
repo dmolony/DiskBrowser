@@ -68,6 +68,10 @@ public interface FormattedDisk
 
   public void setOriginalPath (Path path);
 
+  public Path getOriginalPath ();
+
+  public boolean isTempDisk ();
+
   // VTOC flags sector as free, but it is in use by a file
   public int falsePositiveBlocks ();
 

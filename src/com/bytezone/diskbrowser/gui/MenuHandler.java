@@ -31,6 +31,7 @@ public class MenuHandler
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
+  private final SaveTempFileAction saveTempFileAction = new SaveTempFileAction ();
 
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
@@ -42,6 +43,7 @@ public class MenuHandler
   final JMenuItem rootItem = new JMenuItem ("Set root folder...");
   final JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
   JMenuItem executeDiskItem;
+  final JMenuItem saveDiskItem = new JMenuItem ("Save converted disk as...");
   final JMenuItem printItem = new JMenuItem ("Print output panel...");
   final JMenuItem closeTabItem = new JMenuItem ();
   final JMenuItem duplicateItem = new JMenuItem ();
@@ -78,6 +80,7 @@ public class MenuHandler
     fileMenu.add (rootItem);
     fileMenu.addSeparator ();
     fileMenu.add (refreshTreeItem);
+    fileMenu.add (saveDiskItem);
 
     addLauncherMenu ();
 
@@ -144,6 +147,8 @@ public class MenuHandler
     interleaveGroup.add (interleave1Item);
     interleaveGroup.add (interleave2Item);
     interleaveGroup.add (interleave3Item);
+
+    saveDiskItem.setAction (saveTempFileAction);
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -279,5 +284,8 @@ public class MenuHandler
       ((InterleaveAction) interleave2Item.getAction ()).setDisk (currentDisk);
       ((InterleaveAction) interleave3Item.getAction ()).setDisk (currentDisk);
     }
+
+    saveDiskItem.setEnabled (disk.isTempDisk ());
+    saveTempFileAction.setDisk (disk);
   }
 }

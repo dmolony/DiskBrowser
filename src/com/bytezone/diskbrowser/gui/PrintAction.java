@@ -20,9 +20,10 @@ class PrintAction extends DefaultAction
   {
     super ("Print...", "Print the contents of the output panel",
         "/com/bytezone/diskbrowser/icons/");
-    int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
+    int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMaskEx ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_P, mask));
     //    putValue (Action.MNEMONIC_KEY, KeyEvent.VK_P);
+
     this.owner = owner;
 
     setIcon (Action.SMALL_ICON, "printer_16.png");

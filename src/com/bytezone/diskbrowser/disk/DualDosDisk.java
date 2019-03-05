@@ -258,4 +258,16 @@ public class DualDosDisk implements FormattedDisk
   {
     return disks[currentDisk].getName ();
   }
+
+  @Override
+  public boolean isTempDisk ()
+  {
+    return disks[currentDisk].isTempDisk ();
+  }
+
+  @Override
+  public Path getOriginalPath ()
+  {
+    return disks[currentDisk].getOriginalPath ();
+  }
 }

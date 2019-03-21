@@ -98,8 +98,11 @@ class MC3470
         {
           ++zeroBits;
           if (zeroBits > 2)
-            System.out.printf (zeroBits + " consecutive zeroes @ %d/%d %s%n",
-                diskSectors.size (), dataPtr, currentState);
+          {
+            if (debug)
+              System.out.printf (zeroBits + " consecutive zeroes @ %d/%d %s%n",
+                  diskSectors.size (), dataPtr, currentState);
+          }
         }
 
         if ((value & 0x80) != 0)     // value is not valid until the hi-bit is set
@@ -132,7 +135,8 @@ class MC3470
       {
         inPtr = offset;
         restarted = true;
-        System.out.println ("wrapping around");
+        if (debug)
+          System.out.println ("wrapping around");
       }
     }
 

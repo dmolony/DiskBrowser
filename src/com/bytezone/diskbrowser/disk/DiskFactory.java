@@ -254,8 +254,8 @@ public class DiskFactory
       }
       catch (Exception e)
       {
-        //        System.out.println (e);
-        e.printStackTrace ();
+        System.out.println (e);
+        //        e.printStackTrace ();
         return null;
       }
     }

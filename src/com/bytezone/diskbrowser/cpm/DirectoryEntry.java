@@ -113,7 +113,6 @@ public class DirectoryEntry implements AppleFileSource
 
   public String line ()
   {
-    //    int blocks = ((rc & 0xF0) >> 3) + (((rc & 0x0F) + 7) / 8);
     String bytes = HexFormatter.getHexString (blockList, 0, 16);
     bytes = bytes.replaceAll ("00", "  ");
 

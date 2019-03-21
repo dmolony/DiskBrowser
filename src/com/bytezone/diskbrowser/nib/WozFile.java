@@ -24,6 +24,8 @@ public class WozFile
 
   private final boolean debug = false;
   private int diskType;                       // 5.25 or 3.5
+  private int wozVersion;
+  private int bootSectorFormat;
 
   public final File file;
   byte[] diskBuffer;
@@ -41,7 +43,15 @@ public class WozFile
     byte[] buffer = readFile ();
     boolean valid = false;
 
-    if (!matches (WOZ1_FILE_HEADER, buffer))
+    if (matches (WOZ1_FILE_HEADER, buffer))
+    {
+      wozVersion = 1;
+    }
+    else if (matches (WOZ2_FILE_HEADER, buffer))
+    {
+      wozVersion = 2;
+    }
+    else
     {
       System.out.println (HexFormatter.format (buffer, 0, 20));
       throw new DiskNibbleException ("Header error");
@@ -64,19 +74,45 @@ public class WozFile
       int chunkSize = readInt (buffer, ptr, 4);
       ptr += 4;
 
+      if (debug)
+      {
+        System.out.printf ("Offset    : %06X%n", ptr - 8);
+        System.out.printf ("Chunk ID  : %s%n", chunkId);
+        System.out.printf ("Chunk size: %,d%n", chunkSize);
+      }
+
       if ("INFO".equals (chunkId))
       {
         if (debug)
         {
+          System.out.println ();
           System.out.printf ("Version ........... %02X%n", buffer[ptr]);
           System.out.printf ("Disk type ......... %02X%n", buffer[ptr + 1]);
           System.out.printf ("Write protected ... %02X%n", buffer[ptr + 2]);
           System.out.printf ("Synchronised ...... %02X%n", buffer[ptr + 3]);
           System.out.printf ("Cleaned ........... %02X%n", buffer[ptr + 4]);
-          System.out.printf ("Creator ........... %s%n%n",
-              new String (buffer, ptr + 5, 32));
+          System.out.printf ("Creator ........... %s%n",
+              new String (buffer, ptr + 5, 32).trim ());
+
+          if (wozVersion > 1)
+          {
+            System.out.printf ("Disk sides ........ %02X%n", buffer[ptr + 37]);
+            System.out.printf ("Boot format ....... %02X%n", buffer[ptr + 38]);
+            System.out.printf ("Optimal timing .... %02X%n", buffer[ptr + 39]);
+            System.out.printf ("Compatible flags .. %04X%n",
+                readInt (buffer, ptr + 40, 2));
+            System.out.printf ("Minimum RAM ....... %04X%n",
+                readInt (buffer, ptr + 42, 2));
+            System.out.printf ("Largest track ..... %04X%n",
+                readInt (buffer, ptr + 44, 2));
+          }
+          System.out.println ();
         }
+
         diskType = buffer[ptr + 1] & 0xFF;
+        if (wozVersion > 1)
+          bootSectorFormat = buffer[ptr + 38] & 0xFF;
+
         ptr += INFO_SIZE;
       }
       else if ("TMAP".equals (chunkId))
@@ -98,55 +134,92 @@ public class WozFile
       {
         if (debug)
         {
-          System.out.println ("***************************************");
+          System.out.println ("***********************************************");
           System.out.printf ("*  Disk ......... %s%n", file.getName ());
-          System.out.println ("***************************************");
+          System.out.println ("***********************************************");
         }
-        int tracks = chunkSize / TRK_SIZE;
 
-        for (int trackNo = 0; trackNo < tracks; trackNo++)
+        if (wozVersion == 1)
         {
-          int bytesUsed = readInt (buffer, ptr + DATA_SIZE, 2);
-          int bitCount = readInt (buffer, ptr + DATA_SIZE + 2, 2);
+          int tracks = chunkSize / TRK_SIZE;
 
-          if (debug)
+          for (int trackNo = 0; trackNo < tracks; trackNo++)
           {
-            System.out.println ("******************************");
-            System.out.printf ("*   Track ......... %,6d   *%n", trackNo);
-            System.out.printf ("*   Bytes used .... %,6d   *%n", bytesUsed);
-            System.out.printf ("*   Bit count  .... %,6d   *%n", bitCount);
-            System.out.println ("******************************");
-          }
+            int bytesUsed = readInt (buffer, ptr + DATA_SIZE, 2);
+            int bitCount = readInt (buffer, ptr + DATA_SIZE + 2, 2);
 
-          try
-          {
-            //            nibbleTracks.add (mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount));
-            List<RawDiskSector> diskSectors =
-                mc3470.readTrack (buffer, ptr, bytesUsed, bitCount);
-
-            if (trackNo == 0)         // create disk buffer
+            if (debug)
             {
-              if (mc3470.is13Sector ())
-                diskBuffer = new byte[35 * 13 * 256];
-              else if (mc3470.is16Sector ())
-                diskBuffer = new byte[35 * 16 * 256];
-              else
-              {
-                System.out.println ("unknown disk format");
-                break read;
-              }
+              System.out.println ("***************************************");
+              System.out.printf ("*   Track ......... %,6d of %,6d  *%n", trackNo,
+                  tracks);
+              System.out.printf ("*   Bytes used .... %,6d            *%n", bytesUsed);
+              System.out.printf ("*   Bit count  .... %,6d            *%n", bitCount);
+              System.out.println ("***************************************");
             }
 
-            mc3470.storeSectors (diskSectors, diskBuffer);
-          }
-          catch (Exception e)
-          {
-            //            e.printStackTrace ();
-            System.out.println (e);
-            break read;
-          }
+            try
+            {
+              // nibbleTracks.add (mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount));
+              List<RawDiskSector> diskSectors =
+                  mc3470.readTrack (buffer, ptr, bytesUsed, bitCount);
 
-          ptr += TRK_SIZE;
+              if (trackNo == 0)         // create disk buffer
+              {
+                if (mc3470.is13Sector ())
+                  diskBuffer = new byte[35 * 13 * 256];
+                else if (mc3470.is16Sector ())
+                  diskBuffer = new byte[35 * 16 * 256];
+                else
+                {
+                  System.out.println ("unknown disk format");
+                  break read;
+                }
+              }
+
+              mc3470.storeSectors (diskSectors, diskBuffer);
+            }
+            catch (Exception e)
+            {
+              System.out.println (e);
+              break read;
+            }
+
+            ptr += TRK_SIZE;
+          }
+        }
+        else
+        {
+          diskBuffer = new byte[(bootSectorFormat == 2 ? 13 : 16) * 35 * 256];
+
+          for (int trackNo = 0; trackNo < 160; trackNo++)
+          {
+            int p = 256 + trackNo * 8;
+            int startingBlock = readInt (buffer, p, 2);
+            int blockCount = readInt (buffer, p + 2, 2);
+            int bitCount = readInt (buffer, p + 4, 4);
+
+            if (startingBlock == 0)
+              break;
+
+            if (debug)
+              System.out.printf ("%3d  %3d  %6d%n", startingBlock, blockCount, bitCount);
+
+            try
+            {
+              // nibbleTracks.add (mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount));
+              List<RawDiskSector> diskSectors = mc3470.readTrack (buffer,
+                  startingBlock * 512, blockCount * 512, bitCount);
+
+              mc3470.storeSectors (diskSectors, diskBuffer);
+            }
+            catch (Exception e)
+            {
+              System.out.println (e);
+              break read;
+            }
+          }
+          ptr += chunkSize;
         }
       }
       else if ("META".equals (chunkId))
@@ -162,8 +235,8 @@ public class WozFile
       }
     }
 
-    if (!valid)
-      readNibbleTracks (buffer);
+    //    if (!valid)
+    //      readNibbleTracks (buffer);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -182,7 +255,6 @@ public class WozFile
       NibbleTrack nibbleTrack = mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount);
       nibbleTracks.add (nibbleTrack);
     }
-    //    System.out.println (HexFormatter.format (nibbleTracks.get (2).buffer));
   }
 
   // ---------------------------------------------------------------------------------//

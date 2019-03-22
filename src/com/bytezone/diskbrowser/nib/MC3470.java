@@ -79,7 +79,7 @@ class MC3470
     finished = false;
     int zeroBits = 0;
 
-    while (inPtr < max && !finished)
+    main: while (inPtr < max && !finished)
     {
       byte b = buffer[inPtr++];
 
@@ -88,24 +88,26 @@ class MC3470
 
       for (int mask = 0x80; mask != 0; mask >>>= 1)
       {
-        value <<= 1;
-        if ((b & mask) != 0)
+        value <<= 1;                  // make space for next bit
+        if ((b & mask) != 0)          // is next bit = 1?
         {
-          value |= 0x01;
-          zeroBits = 0;
+          value |= 0x01;              // store 1
+          zeroBits = 0;               // reset zero counter
         }
         else
         {
-          ++zeroBits;
-          if (zeroBits > 2)
+          ++zeroBits;                 // increment zero counter
+          if (zeroBits > 2)           // looks like copy protection
           {
             if (debug)
-              System.out.printf (zeroBits + " consecutive zeroes @ %d/%d %s%n",
-                  diskSectors.size (), dataPtr, currentState);
+              System.out.printf ("%d consecutive zeroes @ %d/%d %s - %,d%n", zeroBits,
+                  diskSectors.size (), dataPtr, currentState, totalBits);
+            value |= 0x01;            // store 1
+            zeroBits = 0;             // reset zero counter
           }
         }
 
-        if ((value & 0x80) != 0)     // value is not valid until the hi-bit is set
+        if ((value & 0x80) != 0)      // value is not valid until the hi-bit is set
         {
           if (dump)
           {
@@ -127,11 +129,15 @@ class MC3470
         }
 
         if (++totalBits == bitCount)      // only use this many bits
+        {
+          if (debug)
+            System.out.println ("bitcount reached");
           break;
+        }
       }
 
       // check for unfinished data block, we may need to restart from the beginning
-      if (inPtr == max && currentState == State.DATA && !restarted)
+      if (totalBits == bitCount && currentState == State.DATA && !restarted)
       {
         inPtr = offset;
         restarted = true;

@@ -44,13 +44,9 @@ public class WozFile
     boolean valid = false;
 
     if (matches (WOZ1_FILE_HEADER, buffer))
-    {
       wozVersion = 1;
-    }
     else if (matches (WOZ2_FILE_HEADER, buffer))
-    {
       wozVersion = 2;
-    }
     else
     {
       System.out.println (HexFormatter.format (buffer, 0, 20));
@@ -199,11 +195,17 @@ public class WozFile
             int blockCount = readInt (buffer, p + 2, 2);
             int bitCount = readInt (buffer, p + 4, 4);
 
+            if (debug)
+            {
+              System.out.println ("******************************");
+              System.out.printf ("*   Track ......... %,6d   *%n", trackNo);
+              System.out.printf ("*   Block count ... %,6d   *%n", blockCount);
+              System.out.printf ("*   Bit count  .... %,6d   *%n", bitCount);
+              System.out.println ("******************************");
+            }
+
             if (startingBlock == 0)
               break;
-
-            if (debug)
-              System.out.printf ("%3d  %3d  %6d%n", startingBlock, blockCount, bitCount);
 
             try
             {

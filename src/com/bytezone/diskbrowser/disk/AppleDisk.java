@@ -147,6 +147,8 @@ public class AppleDisk implements Disk
       {
         System.out.println ("Not a 2mg file");
         this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
+        tracks = blocks / 8;          // change parameter!
+        sectors = 8;                  // change parameter!
         this.sectorSize = 512;
         this.trackSize = sectors * sectorSize;
       }
@@ -180,7 +182,16 @@ public class AppleDisk implements Disk
     this.tracks = tracks;
     this.sectors = sectors;
 
-    diskBuffer = new byte[tracks * sectors * sectorSize];
+    if (debug)
+    {
+      System.out.printf ("Track size  : %d%n", trackSize);
+      System.out.printf ("Sector size : %d%n", sectorSize);
+      System.out.printf ("Tracks      : %d%n", tracks);
+      System.out.printf ("Sectors     : %d%n", sectors);
+      System.out.printf ("Blocks      : %d%n", blocks);
+    }
+
+    diskBuffer = new byte[blocks * sectorSize];
     hasData = new boolean[blocks];
 
     if (debug)

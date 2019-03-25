@@ -129,10 +129,10 @@ class DosVTOCSector extends AbstractSector
       String extra = "";
       if (i == 56 && bootSectorEmpty)
         extra = "(unusable)";
-      else if (i <= 64 && !bootSectorEmpty)
-        extra = "(reserved for DOS)";
-      else if (i == 124)
-        extra = "(VTOC and Catalog)";
+      //      else if (i <= 64 && !bootSectorEmpty)
+      //        extra = "(reserved for DOS)";
+      //      else if (i == 124)
+      //        extra = "(VTOC and Catalog)";
       addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s", (i - 56) / 4,
           getBitmap (buffer[i], buffer[i + 1]), extra));
     }

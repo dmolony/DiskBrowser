@@ -18,6 +18,7 @@ import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
 {
+  private static String[] args;
   private static final String windowTitle = "Apple ][ Disk Browser";
   private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
   private WindowSaver windowSaver;
@@ -26,7 +27,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   {
     super (windowTitle);
 
-    if (false)
+    if (args.length > 0 && "-reset".equals (args[0]))
     {
       State state = new State (prefs);
       state.clear ();
@@ -202,6 +203,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
   public static void main (String[] args)
   {
+    DiskBrowser.args = args;
     EventQueue.invokeLater (new Runnable ()
     {
       @Override

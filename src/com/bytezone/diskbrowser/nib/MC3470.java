@@ -36,6 +36,7 @@ class MC3470
   // D4 AA 96   address prologue - Bouncing Kamungas
   // D5 BB CF   data prologue    - Hard Hat Mac
   // DA AA EB   address epilogue - Bouncing Kamungas
+  // DD AA AD   ?? prologue      - Wings of Fury  (4&4 data)
 
   private static final byte[] address16prologue =
       { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };

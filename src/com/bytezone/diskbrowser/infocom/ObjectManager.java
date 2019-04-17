@@ -62,7 +62,7 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
     parentNode.add (child);
     if (object.sibling > 0)
       buildObjectTree (header.objectManager.list.get (object.sibling - 1), parentNode,
-                       disk);
+          disk);
     if (object.child > 0)
       buildObjectTree (header.objectManager.list.get (object.child - 1), child, disk);
     else
@@ -77,13 +77,22 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
   @Override
   public String getText ()
   {
-    StringBuilder text =
-        new StringBuilder ("  #   Attributes  Pr Sb Ch  Prop   Title\n---   -----------"
-            + " -- -- -- -----   -----------------------------\n");
+    String header1 = "ID   Attributes  Pr Sb Ch  Prop   Title\n--   -----------"
+        + " -- -- -- -----   -----------------------------\n";
+    String underline = " --------------------------";
+    String header2 = "ID  Title                      Parent                     Sibling"
+        + "                    Child                      Attributes   Prop\n" + "-- "
+        + underline + underline + underline + underline + " -----------  -----" + "\n";
+    StringBuilder text = new StringBuilder (header2);
 
     int objectNumber = 0;
     for (ZObject zo : list)
-      text.append (String.format ("%3d   %s%n", ++objectNumber, zo));
+      if (false)
+        text.append (String.format ("%02X   %s%n", ++objectNumber, zo));
+      else
+        text.append (
+            String.format ("%02X %s%n", ++objectNumber, zo.getDescription (list)));
+
     text.deleteCharAt (text.length () - 1);
     return text.toString ();
   }

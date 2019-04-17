@@ -76,7 +76,7 @@ class DiskLegendPanel extends DiskPanel
     if (val > 0)
     {
       g.drawString (
-          val + " empty sector" + (val == 1 ? "" : "s") + " marked as unavailable", 10,
+          val + " unused sector" + (val == 1 ? "" : "s") + " marked as unavailable", 10,
           y);
       y += lineHeight;
     }

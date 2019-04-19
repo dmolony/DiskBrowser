@@ -17,6 +17,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // https://mud.co.uk/richard/htflpism.htm
 // https://inform-fiction.org/zmachine/standards/
+// https://github.com/historicalsource?tab=repositories
 
 public class InfocomDisk extends AbstractFormattedDisk
 {

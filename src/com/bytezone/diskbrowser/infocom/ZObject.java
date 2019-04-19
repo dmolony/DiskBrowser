@@ -35,7 +35,7 @@ class ZObject extends AbstractFile
       byte b = buffer[offset + i];
       for (int j = 0; j < 8; j++)
       {
-        if ((b & 0x80) == 0x80)
+        if ((b & 0x80) != 0)
           attributes.set (bitIndex);
         b <<= 1;
         ++bitIndex;
@@ -69,18 +69,19 @@ class ZObject extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format ("ID       : %3d   %s%n%nAttributes : ", id, name));
-    text.append (HexFormatter.getHexString (buffer, startPtr, 4));
-    text.append ("   " + attributes.toString ());
+    text.append (String.format ("ID       : %02X  (%<3d)  %s%n%n", id, name));
 
     String obj1 = parent == 0 ? "" : header.objectManager.list.get (parent - 1).name;
     String obj2 = sibling == 0 ? "" : header.objectManager.list.get (sibling - 1).name;
     String obj3 = child == 0 ? "" : header.objectManager.list.get (child - 1).name;
 
-    text.append (
-        String.format ("%n%nParent   : %02X  (%3d)  %s%n", parent, parent, obj1));
-    text.append (String.format ("Sibling  : %02X  (%3d)  %s%n", sibling, sibling, obj2));
-    text.append (String.format ("Child    : %02X  (%3d)  %s%n%n", child, child, obj3));
+    text.append (String.format ("Parent   : %02X  (%<3d)  %s%n", parent, obj1));
+    text.append (String.format ("Sibling  : %02X  (%<3d)  %s%n", sibling, obj2));
+    text.append (String.format ("Child    : %02X  (%<3d)  %s%n%n", child, obj3));
+
+    text.append ("Attributes : ");
+    text.append (HexFormatter.getHexString (buffer, startPtr, 4));
+    text.append ("   " + attributes.toString () + "\n\n");
 
     for (Property prop : properties)
       text.append (prop + "\n");
@@ -115,13 +116,13 @@ class ZObject extends AbstractFile
 
   public String getDescription (List<ZObject> list)
   {
-    StringBuilder text = new StringBuilder (String.format (" %-26s", getName ()));
+    StringBuilder text = new StringBuilder (String.format (" %-40s", getName ()));
 
     for (int i = 4; i < 7; i++)
     {
       int index = buffer[startPtr + i] & 0xFF;
       String name = index > 0 ? list.get (index - 1).getName () : "";
-      text.append (String.format (" %-26s", name));
+      text.append (String.format (" %-40s", name));
     }
 
     text.append (" ");
@@ -166,7 +167,7 @@ class ZObject extends AbstractFile
         text.append (
             String.format ("%-20s", HexFormatter.getHexString (buffer, ptr + 1, length)));
 
-      if (propertyType.charAt (0) >= 'a') // directions are in lowercase
+      if (propertyType.charAt (0) >= 'a')           // directions are in lowercase
       {
         switch (length)
         {
@@ -176,9 +177,10 @@ class ZObject extends AbstractFile
           case 2:
             text.append ("\"" + header.stringManager.stringAt (offset) + "\"");
             break;
-          case 3:
+          case 3:           // executable routine
             int address = header.getWord (ptr + 1) * 2;
             text.append (String.format ("R:%05X", address));
+            appendRoutine (text, address);
             break;
           case 4:
             address = header.getWord (ptr + 3) * 2;
@@ -202,13 +204,7 @@ class ZObject extends AbstractFile
       else if (propertyType.startsWith ("CODE"))
       {
         if (offset > 0)          // cretin contains 00 00
-        {
-          Routine r = header.codeManager.getRoutine (offset);
-          if (r != null)
-            text.append ("\n\n" + r.getText ());
-          else                  // this can happen if the property is mislabelled as code
-            text.append ("\n\n****** null routine\n");
-        }
+          appendRoutine (text, offset);
       }
       else if (propertyType.startsWith ("STR"))
       {
@@ -217,6 +213,15 @@ class ZObject extends AbstractFile
       }
 
       return text.toString ();
+    }
+
+    private void appendRoutine (StringBuilder text, int offset)
+    {
+      Routine r = header.codeManager.getRoutine (offset);
+      if (r != null)
+        text.append ("\n\n" + r.getText ());
+      else                  // this can happen if the property is mislabelled as code
+        text.append ("\n\n****** null routine\n");
     }
   }
 }

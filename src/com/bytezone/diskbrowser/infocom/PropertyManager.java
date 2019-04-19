@@ -77,8 +77,8 @@ class PropertyManager extends AbstractFile
       for (ZObject o : list)
       {
         ZObject.Property p = o.getProperty (id);
-        text.append (String.format ("%3d  %-29s%s%n", o.id, o.getName (),
-                                    p.toString ().substring (7)));
+        text.append (String.format ("%02X  %-29s%s%n", o.id, o.getName (),
+            p.toString ().substring (7)));
       }
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);
@@ -89,7 +89,7 @@ class PropertyManager extends AbstractFile
     public String toString ()
     {
       return String.format ("   %2d      %-6s    %3d", id, header.propertyNames[id],
-                            list.size ());
+          list.size ());
     }
   }
 }

@@ -79,10 +79,14 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
   {
     String header1 = "ID   Attributes  Pr Sb Ch  Prop   Title\n--   -----------"
         + " -- -- -- -----   -----------------------------\n";
-    String underline = " --------------------------";
-    String header2 = "ID  Title                      Parent                     Sibling"
-        + "                    Child                      Attributes   Prop\n" + "-- "
-        + underline + underline + underline + underline + " -----------  -----" + "\n";
+    String underline = " ----------------------------------------";
+    String titles[] =
+        { "ID  ", "Title                                    ",
+          "Parent                                   ",
+          "Sibling                                  ",
+          "Child                                    ", "Attributes   Prop\n" };
+    String header2 = titles[0] + titles[1] + titles[2] + titles[3] + titles[4] + titles[5]
+        + "-- " + underline + underline + underline + underline + " -----------  -----\n";
     StringBuilder text = new StringBuilder (header2);
 
     int objectNumber = 0;

@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.bytezone.diskbrowser.infocom.Instruction.Operand;
+import com.bytezone.diskbrowser.infocom.Instruction.OperandType;
+
 class Routine extends InfocomAbstractFile
     implements Iterable<Instruction>, Comparable<Routine>
 {
   private static final String padding = "                             ";
 
   int startPtr, length, strings, locals;
-  //  private final Header header;
 
   List<Parameter> parameters = new ArrayList<Parameter> ();
   List<Instruction> instructions = new ArrayList<Instruction> ();
@@ -21,11 +23,13 @@ class Routine extends InfocomAbstractFile
   public Routine (int ptr, Header header, int caller)
   {
     super (String.format ("Routine %05X", ptr), header.buffer);
-    //    this.header = header;
 
     locals = buffer[ptr] & 0xFF;
     if (locals > 15)
+    {
+      System.out.println ("Too many locals: " + locals);
       return;
+    }
 
     startPtr = ptr++;                             // also used to flag a valid routine
     calledBy.add (caller);
@@ -52,6 +56,10 @@ class Routine extends InfocomAbstractFile
 
       if (instruction.isPrint ())
         strings++;
+
+      for (Operand operand : instruction.opcode.operands)
+        if (operand.operandType == OperandType.VAR_GLOBAL)
+          header.globals.addRoutine (this, operand);
 
       ptr += instruction.length ();
 

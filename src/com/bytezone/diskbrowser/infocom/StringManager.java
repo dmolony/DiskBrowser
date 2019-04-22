@@ -20,9 +20,9 @@ class StringManager extends AbstractFile
     int max = header.fileLength;
     while (ptr < max)
     {
-      ZString zs = new ZString (buffer, ptr, header);
+      ZString zs = new ZString (header, ptr);
       if (zs.value == null)
-        break; // used when eof not known or correct - fix!!
+        break;                        // used when eof not known or correct - fix!!
       strings.put (ptr, zs);
       ptr += zs.length;
     }
@@ -47,7 +47,7 @@ class StringManager extends AbstractFile
     int count = 0;
     text.append ("  #  Start  String\n");
     text.append ("---  -----  --------------------------------------------------------"
-          + "-------------------\n");
+        + "-------------------\n");
 
     for (ZString s : strings.values ())
     {

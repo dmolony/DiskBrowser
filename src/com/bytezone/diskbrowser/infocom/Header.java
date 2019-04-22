@@ -9,12 +9,11 @@ class Header extends InfocomAbstractFile
   final String[] propertyNames = new String[32];
 
   private final File file;
-  //  private final Disk disk;
   int version;
   int highMemory;
   int programCounter;
   int dictionaryOffset;
-  int objectTable;
+  int objectTableOffset;
   int globalsOffset;
   int staticMemory;
   int abbreviationsTable;
@@ -23,29 +22,37 @@ class Header extends InfocomAbstractFile
   int stringPointer;
 
   final Abbreviations abbreviations;
-  final Dictionary dictionary;
   final ObjectManager objectManager;
-  final StringManager stringManager;
-  final CodeManager codeManager;
   final Globals globals;
   final Grammar grammar;
+  final Dictionary dictionary;
+  final CodeManager codeManager;
+  final StringManager stringManager;
 
   public Header (String name, byte[] buffer, Disk disk)
   {
     super (name, buffer);
-    //    this.disk = disk;
     this.file = disk.getFile ();
 
-    version = getByte (0);
-    highMemory = getWord (4);
-    programCounter = getWord (6);
-    dictionaryOffset = getWord (8);
-    objectTable = getWord (10);
-    globalsOffset = getWord (12);
-    staticMemory = getWord (14);
-    abbreviationsTable = getWord (24);
-    checksum = getWord (28);
-    fileLength = getWord (26) * 2;
+    version = getByte (00);
+    highMemory = getWord (0x04);
+    programCounter = getWord (0x06);
+
+    dictionaryOffset = getWord (0x08);
+    objectTableOffset = getWord (0x0A);
+    globalsOffset = getWord (0x0C);
+    staticMemory = getWord (0x0E);
+    abbreviationsTable = getWord (0x18);
+
+    fileLength = getWord (0x1A) * 2;            // 2 for versions 1-3
+    checksum = getWord (0x1C);
+    int interpreterNumber = getByte (0x1E);
+    int interpreterVersion = getByte (0x1F);
+    int revision = getWord (0x30);
+
+    System.out.printf ("Version    : %d%n", version);
+    System.out.printf ("Interpreter: %d.%d%n", interpreterNumber, interpreterVersion);
+    System.out.printf ("Revision   : %d%n", revision);
 
     if (fileLength == 0)
       fileLength = buffer.length;
@@ -75,6 +82,11 @@ class Header extends InfocomAbstractFile
     hexBlocks.add (new HexBlock (0, 64, "Header data:"));
   }
 
+  String getPropertyName (int id)
+  {
+    return propertyNames[id];
+  }
+
   public String getAbbreviation (int index)
   {
     return abbreviations.getAbbreviation (index);
@@ -100,8 +112,8 @@ class Header extends InfocomAbstractFile
     text.append ("\nDynamic memory:\n");
     text.append (String.format ("  Abbreviation table     %04X  %,6d%n",
         abbreviationsTable, abbreviationsTable));
-    text.append (String.format ("  Objects table          %04X  %,6d%n", objectTable,
-        objectTable));
+    text.append (String.format ("  Objects table          %04X  %,6d%n",
+        objectTableOffset, objectTableOffset));
     text.append (String.format ("  Global variables       %04X  %,6d%n", globalsOffset,
         globalsOffset));
 
@@ -125,9 +137,14 @@ class Header extends InfocomAbstractFile
     text.append (String.format ("Total strings                     %d%n",
         stringManager.strings.size ()));
     text.append (String.format ("Total objects                     %d%n",
-        objectManager.list.size ()));
+        objectManager.getObjects ().size ()));
 
     return text.toString ();
+  }
+
+  ZObject getObject (int index)
+  {
+    return objectManager.getObject (index);
   }
 
   int getByte (int offset)

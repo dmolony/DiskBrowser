@@ -69,7 +69,7 @@ class AttributeManager extends AbstractFile
           new StringBuilder ("Objects with attribute " + id + " set:\n\n");
       for (ZObject o : list)
       {
-        text.append (String.format ("%3d  %-28s%n", o.id, o.getName ()));
+        text.append (String.format ("%3d  %-28s%n", o.getId (), o.getName ()));
       }
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);

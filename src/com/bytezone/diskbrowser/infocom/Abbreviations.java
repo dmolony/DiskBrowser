@@ -20,7 +20,7 @@ class Abbreviations extends InfocomAbstractFile
     dataPtr = header.getWord (header.abbreviationsTable) * 2;
     dataSize = header.abbreviationsTable - dataPtr;
     tablePtr = header.abbreviationsTable;
-    tableSize = header.objectTable - header.abbreviationsTable;
+    tableSize = header.objectTableOffset - header.abbreviationsTable;
 
     // prepare hex dump
     hexBlocks.add (new HexBlock (dataPtr, dataSize, "Abbreviations data:"));
@@ -29,21 +29,17 @@ class Abbreviations extends InfocomAbstractFile
 
   private void populate ()
   {
-    System.out.println ("populating abbreviations");
     list = new ArrayList<ZString> ();
 
-    for (int i = header.abbreviationsTable; i < header.objectTable; i += 2)
-    {
-      int j = header.getWord (i) * 2;
-      ZString zs = new ZString (buffer, j, header);
-      list.add (zs);
-    }
+    for (int i = header.abbreviationsTable; i < header.objectTableOffset; i += 2)
+      list.add (new ZString (header, header.getWord (i) * 2));
   }
 
   public String getAbbreviation (int abbreviationNumber)
   {
     if (list == null)
       populate ();
+
     return list.get (abbreviationNumber).value;
   }
 

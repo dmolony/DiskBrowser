@@ -86,16 +86,16 @@ public class InfocomDisk extends AbstractFormattedDisk
     stringsNode = addToTree (root, "Strings", header.stringManager, TYPE_LEAF);
 
     PropertyManager pm = new PropertyManager ("Properties", data, header);
-    pm.addNodes (addToTree (objectNode, "Properties", pm, TYPE_NODE), this);
+    pm.addNodes (addToTree (root, "Properties", pm, TYPE_NODE), this);
 
     AttributeManager am = new AttributeManager ("Attributes", data, header);
-    am.addNodes (addToTree (objectNode, "Attributes", am, TYPE_NODE), this);
+    am.addNodes (addToTree (root, "Attributes", am, TYPE_NODE), this);
 
     sectorTypes[48] = headerSector;
 
-    setSectorTypes (header.abbreviationsTable, header.objectTable, abbreviationsSector,
+    setSectorTypes (header.abbreviationsTable, header.objectTableOffset, abbreviationsSector,
         abbreviationsNode);
-    setSectorTypes (header.objectTable, header.globalsOffset, objectsSector, objectNode);
+    setSectorTypes (header.objectTableOffset, header.globalsOffset, objectsSector, objectNode);
     setSectorTypes (header.globalsOffset, header.staticMemory, globalsSector,
         globalsNode);
     setSectorTypes (header.staticMemory, header.dictionaryOffset, grammarSector,

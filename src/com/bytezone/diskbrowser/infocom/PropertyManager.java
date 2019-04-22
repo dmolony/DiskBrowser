@@ -33,7 +33,7 @@ class PropertyManager extends AbstractFile
     for (Statistic stat : list)
       if (stat.list.size () > 0)
       {
-        String title = "Property " + header.propertyNames[stat.id].trim ();
+        String title = "Property " + header.getPropertyName (stat.id).trim ();
         DefaultMutableTreeNode child = new DefaultMutableTreeNode (
             new DefaultAppleFileSource (title, stat.getText (), disk));
         node.add (child);
@@ -72,13 +72,13 @@ class PropertyManager extends AbstractFile
 
     String getText ()
     {
-      StringBuilder text =
-          new StringBuilder ("Objects with property " + id + " set:\n\n");
+      StringBuilder text = new StringBuilder (String
+          .format ("Objects with property %d %s set:%n%n", id, header.propertyNames[id]));
       for (ZObject o : list)
       {
         ZObject.Property p = o.getProperty (id);
-        text.append (String.format ("%02X  %-29s%s%n", o.id, o.getName (),
-            p.toString ().substring (7)));
+        text.append (String.format ("%02X  %-29s%s%n", o.getId (), o.getName (),
+            p.toString ().substring (11)));
       }
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);
@@ -88,7 +88,7 @@ class PropertyManager extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("   %2d      %-6s    %3d", id, header.propertyNames[id],
+      return String.format ("   %2d      %-6s    %3d", id, header.getPropertyName (id),
           list.size ());
     }
   }

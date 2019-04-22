@@ -36,7 +36,7 @@ class CodeManager extends AbstractFile
     for (Routine routine : routines.values ())
     {
       String name = String.format ("%3d %s (%04X)", ++count, routine.getName (),
-                                   routine.startPtr / 2);
+          routine.startPtr / 2);
       DefaultAppleFileSource dafs = new DefaultAppleFileSource (name, routine, disk);
       dafs.setSectors (getSectors (routine, disk.getDisk ()));
 
@@ -114,10 +114,10 @@ class CodeManager extends AbstractFile
     for (Routine r : routines.values ())
     {
       int gap = r.startPtr - nextAddress;
-      text.append (String
-          .format ("%3d    %05X   %5d     %3d      %2d      %3d     %3d   %4d   %04X%n",
-                   ++count, r.startPtr, r.length, r.instructions.size (), r.strings,
-                   r.calledBy.size (), r.calls.size (), gap, r.startPtr / 2));
+      text.append (String.format (
+          "%3d    %05X   %5d     %3d      %2d      %3d     %3d   %4d   %04X%n", ++count,
+          r.startPtr, r.length, r.instructions.size (), r.strings, r.calledBy.size (),
+          r.calls.size (), gap, r.startPtr / 2));
 
       nextAddress = r.startPtr + r.length;
     }
@@ -148,7 +148,7 @@ class CodeManager extends AbstractFile
 
   Routine addRoutine (int address, int caller)
   {
-    if (address == 0) // stack-based call
+    if (address == 0)                                       // stack-based call
       return null;
     if (address > header.fileLength)
       return null;
@@ -163,7 +163,7 @@ class CodeManager extends AbstractFile
 
     // try to create a new Routine
     Routine r = new Routine (address, header, caller);
-    if (r.length == 0) // invalid routine
+    if (r.length == 0)                                      // invalid routine
       return null;
 
     // recursively add all routines called by this one

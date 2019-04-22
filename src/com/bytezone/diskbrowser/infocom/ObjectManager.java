@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.infocom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,21 +12,22 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 
 class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
 {
-  Header header;
-  List<ZObject> list;
-  int defaultsPtr, defaultsSize;
-  int tablePtr, tableSize;
-  int propertyPtr, propertySize;
-  ObjectAnalyser analyser;
+  private final Header header;
+  private final List<ZObject> list;
+  private List<ZObject> sortedList;
+  private final int defaultsPtr, defaultsSize;
+  private final int tablePtr, tableSize;
+  private final int propertyPtr, propertySize;
+  private final ObjectAnalyser analyser;
 
   public ObjectManager (Header header)
   {
     super ("Objects", header.buffer);
     this.header = header;
 
-    defaultsPtr = header.objectTable;
+    defaultsPtr = header.objectTableOffset;
     defaultsSize = 62;
-    tablePtr = header.objectTable + 62;
+    tablePtr = header.objectTableOffset + 62;
     propertyPtr = header.getWord (tablePtr + 7);
     propertySize = header.globalsOffset - propertyPtr;
     tableSize = (propertyPtr - tablePtr);
@@ -45,6 +47,16 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
     hexBlocks.add (new HexBlock (propertyPtr, propertySize, "Properties:"));
   }
 
+  List<ZObject> getObjects ()
+  {
+    return list;
+  }
+
+  ZObject getObject (int index)
+  {
+    return list.get (index);
+  }
+
   public void addNodes (DefaultMutableTreeNode root, FormattedDisk disk)
   {
     root.setAllowsChildren (true);
@@ -61,10 +73,9 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
         new DefaultAppleFileSource (object.getName (), object, disk));
     parentNode.add (child);
     if (object.sibling > 0)
-      buildObjectTree (header.objectManager.list.get (object.sibling - 1), parentNode,
-          disk);
+      buildObjectTree (list.get (object.sibling - 1), parentNode, disk);
     if (object.child > 0)
-      buildObjectTree (header.objectManager.list.get (object.child - 1), child, disk);
+      buildObjectTree (list.get (object.child - 1), child, disk);
     else
       child.setAllowsChildren (false);
   }
@@ -77,8 +88,8 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
   @Override
   public String getText ()
   {
-    String header1 = "ID   Attributes  Pr Sb Ch  Prop   Title\n--   -----------"
-        + " -- -- -- -----   -----------------------------\n";
+    //    String header1 = "ID   Attributes  Pr Sb Ch  Prop   Title\n--   -----------"
+    //        + " -- -- -- -----   -----------------------------\n";
     String underline = " ----------------------------------------";
     String titles[] =
         { "ID  ", "Title                                    ",
@@ -89,13 +100,21 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
         + "-- " + underline + underline + underline + underline + " -----------  -----\n";
     StringBuilder text = new StringBuilder (header2);
 
-    int objectNumber = 0;
+    if (sortedList == null)
+      sortedList = new ArrayList<> (list);
+    Collections.sort (sortedList);
+
+    //    int objectNumber = 0;
     for (ZObject zo : list)
-      if (false)
-        text.append (String.format ("%02X   %s%n", ++objectNumber, zo));
-      else
-        text.append (
-            String.format ("%02X %s%n", ++objectNumber, zo.getDescription (list)));
+      //      if (false)
+      //        text.append (String.format ("%02X   %s%n", ++objectNumber, zo));
+      //      else
+      text.append (String.format ("%02X %s%n", zo.getId (), zo.getDescription (list)));
+
+    text.append ("\n\n");
+    text.append (header2);
+    for (ZObject zo : sortedList)
+      text.append (String.format ("%02X %s%n", zo.getId (), zo.getDescription (list)));
 
     text.deleteCharAt (text.length () - 1);
     return text.toString ();

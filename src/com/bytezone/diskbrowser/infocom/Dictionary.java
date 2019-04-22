@@ -15,15 +15,12 @@ class Dictionary extends AbstractFile
   private final int totalSeparators;
   private final int dictionaryPtr, dictionarySize;
   private final int entryLength;
-  //  private final Header header;
 
-  // this could be a Google Multimap
   Map<Integer, List<WordEntry>> synonymList = new TreeMap<Integer, List<WordEntry>> ();
 
   public Dictionary (Header header)
   {
     super ("Dictionary", header.buffer);
-    //    this.header = header;
 
     dictionaryPtr = header.dictionaryOffset;
     dictionary = new TreeMap<Integer, ZString> ();
@@ -38,7 +35,7 @@ class Dictionary extends AbstractFile
     int count = 0;
     for (int i = 0; i < totalEntries; i++)
     {
-      ZString string = new ZString (buffer, ptr, header);
+      ZString string = new ZString (header, ptr);
       dictionary.put (ptr, string);
       WordEntry wordEntry = new WordEntry (string, count++);
 
@@ -56,8 +53,8 @@ class Dictionary extends AbstractFile
       {
         int b1 = buffer[ptr + 5] & 0xFF;
         int property = (b1 >= 1 && b1 <= 31) ? b1 : buffer[ptr + 6] & 0xFF;
-        if (header.propertyNames[property] == null
-            || header.propertyNames[property].length () > string.value.length ())
+        if (header.getPropertyName (property) == null
+            || header.getPropertyName (property).length () > string.value.length ())
           header.propertyNames[property] = string.value;
       }
       ptr += entryLength;
@@ -68,6 +65,48 @@ class Dictionary extends AbstractFile
     for (int i = 1; i < header.propertyNames.length; i++)
       if (header.propertyNames[i] == null)
         header.propertyNames[i] = i + "";
+
+    // testing (only works in Zork 1)
+    if (false)
+    {
+      if (header.propertyNames[4].equals ("4"))
+        header.propertyNames[4] = "PSEUDO";
+      if (header.propertyNames[5].equals ("5"))
+        header.propertyNames[5] = "GLOBAL";
+      if (header.propertyNames[6].equals ("6"))
+        header.propertyNames[6] = "VTYPE";
+      if (header.propertyNames[7].equals ("7"))
+        header.propertyNames[7] = "STRENGTH";
+      if (header.propertyNames[10].equals ("10"))
+        header.propertyNames[10] = "CAPACITY";
+      if (header.propertyNames[12].equals ("12"))
+        header.propertyNames[12] = "TVALU";
+      if (header.propertyNames[13].equals ("13"))
+        header.propertyNames[13] = "VALUE";
+      if (header.propertyNames[15].equals ("15"))
+        header.propertyNames[15] = "SIZE";
+      if (header.propertyNames[16].equals ("16"))
+        header.propertyNames[16] = "ADJ";
+    }
+
+    // 4     = PSEUDO    (property 4)
+    // 5     = GLOBAL    (property 5)
+    // 6     = VTYPE     (property 6)
+    // 7     = STRENGTH  (property 7)
+    // STR3  = TEXT      (property 8)
+    // CODE2 = DESCFCN   (property 9)
+    // 10    = CAPACITY  (property 10)
+    // STR1  = LDESC     (property 11)
+    // 12    = TVALUE    (property 12)   value in trophy case
+    // 13    = VALUE     (property 13)
+    // STR2  = FDESC     (property 14)
+    // 15    = SIZE      (property 15)
+    // 16    = ADJ       (property 16)
+    // CODE1 = ACTION    (property 17)
+    // 18    = DICT      (property 18)
+    // 19    = LAND      (property 19)
+    // 20    = OUT       (property 20)
+    // 21    = IN        (property 21)
   }
 
   public boolean containsWordAt (int address)
@@ -168,7 +207,7 @@ class Dictionary extends AbstractFile
           text.append ("\n");
         }
 
-        if (wordEntry.value == 0x80) // nouns are all in one entry
+        if (wordEntry.value == 0x80)            // nouns are all in one entry
         {
           for (WordEntry we : list)
             text.append (we + "\n");

@@ -7,23 +7,24 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 class Grammar extends InfocomAbstractFile
 {
   private static final int SENTENCE_LENGTH = 8;
-  Header header;
-  int indexPtr, indexSize;
-  int tablePtr, tableSize;
-  int actionPtr, actionSize;
-  int preActionPtr, preActionSize;
-  int prepositionPtr, prepositionSize;
-  int indexEntries;
-  int totalPrepositions;
-  int padding;
+  private final Header header;
+  private final int indexPtr, indexSize;
+  private final int tablePtr, tableSize;
+  private final int actionPtr, actionSize;
+  private final int preActionPtr, preActionSize;
+  private final int prepositionPtr, prepositionSize;
+  private final int indexEntries;
+  private final int totalPrepositions;
+  private final int padding;
 
-  List<SentenceGroup> sentenceGroups = new ArrayList<SentenceGroup> ();
-  Map<Integer, List<Sentence>> actionList = new TreeMap<Integer, List<Sentence>> ();
+  private final List<SentenceGroup> sentenceGroups = new ArrayList<SentenceGroup> ();
+  private final Map<Integer, List<Sentence>> actionList =
+      new TreeMap<Integer, List<Sentence>> ();
 
-  List<Integer> actionRoutines = new ArrayList<Integer> ();
-  List<Integer> preActionRoutines = new ArrayList<Integer> ();
+  private final List<Integer> actionRoutines = new ArrayList<Integer> ();
+  private final List<Integer> preActionRoutines = new ArrayList<Integer> ();
 
-  public Grammar (String name, byte[] buffer, Header header)
+  Grammar (String name, byte[] buffer, Header header)
   {
     super (name, buffer);
     this.header = header;
@@ -173,8 +174,8 @@ class Grammar extends InfocomAbstractFile
       text.append (line);
     }
 
-    text.append ("\n" + actionRoutines.size ()
-        + " Action routines\n===================\n\n");
+    text.append (
+        "\n" + actionRoutines.size () + " Action routines\n===================\n\n");
 
     // add sentences in action routine sequence
     for (Integer routine : actionRoutines)

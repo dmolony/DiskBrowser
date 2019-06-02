@@ -93,9 +93,10 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     sectorTypes[48] = headerSector;
 
-    setSectorTypes (header.abbreviationsTable, header.objectTableOffset, abbreviationsSector,
-        abbreviationsNode);
-    setSectorTypes (header.objectTableOffset, header.globalsOffset, objectsSector, objectNode);
+    setSectorTypes (header.abbreviationsTable, header.objectTableOffset,
+        abbreviationsSector, abbreviationsNode);
+    setSectorTypes (header.objectTableOffset, header.globalsOffset, objectsSector,
+        objectNode);
     setSectorTypes (header.globalsOffset, header.staticMemory, globalsSector,
         globalsNode);
     setSectorTypes (header.staticMemory, header.dictionaryOffset, grammarSector,
@@ -232,7 +233,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     int abbreviationsTable = HexFormatter.intValue (buffer[25], buffer[24]);
     int fileLength = HexFormatter.intValue (buffer[27], buffer[26]);
 
-    if (false)
+    if (true)
     {
       System.out.printf ("Version         %,6d%n", version);
       System.out.printf ("Abbreviations   %,6d%n", abbreviationsTable);
@@ -247,8 +248,8 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     if (abbreviationsTable >= objectTable)
       return false;
-    if (objectTable >= globals)
-      return false;
+    //    if (objectTable >= globals)
+    //      return false;
     if (globals >= staticMemory)
       return false;
     if (staticMemory >= dictionary)

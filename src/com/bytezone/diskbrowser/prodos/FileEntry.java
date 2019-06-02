@@ -361,6 +361,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           }
           break;
 
+        case FILE_TYPE_FNT:
+          file = new FontFile (name, exactBuffer);
+          break;
+
         case FILE_TYPE_FONT:
           file = new QuickDrawFont (name, exactBuffer, fileType, auxType);
           break;
@@ -423,7 +427,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private DataSource getRandomAccessTextFile ()
   {
-    // Text files with aux (reclen) > 0 are random access, possibly with 
+    // Text files with aux (reclen) > 0 are random access, possibly with
     // non-contiguous records, so they need to be handled differently
 
     switch (storageType)

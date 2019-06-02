@@ -39,6 +39,8 @@ public class OriginalHiResImage extends HiResImage
 
   // https://github.com/Michaelangel007/apple2_hgr_font_tutorial
   // hgr[ y ] = 0x2000 + (y/64)*0x28 + (y%8)*0x400 + ((y/8)&7)*0x80;
+  // or... Y = aabbbccc
+  //    address = BASE + aa * 0x28 + bb * 0x80 + ccc * 0x0400 + X
 
   @Override
   protected void createMonochromeImage ()

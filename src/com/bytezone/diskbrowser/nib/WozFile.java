@@ -22,7 +22,8 @@ public class WozFile
   private static final int TMAP_SIZE = 0xA0;
   private static final int DATA_SIZE = TRK_SIZE - 10;
 
-  private final boolean debug = false;
+  private final boolean debug = true;
+  private final boolean dump = true;
   private int diskType;                       // 5.25 or 3.5
   private int wozVersion;
   private int bootSectorFormat;
@@ -81,9 +82,12 @@ public class WozFile
       {
         if (debug)
         {
+          int diskType = buffer[ptr + 1] & 0xFF;
+          String diskTypeText = diskType == 1 ? "5.25" : diskType == 2 ? "3.5" : "??";
+
           System.out.println ();
           System.out.printf ("Version ........... %02X%n", buffer[ptr]);
-          System.out.printf ("Disk type ......... %02X%n", buffer[ptr + 1]);
+          System.out.printf ("Disk type ......... %02X  %s%n", diskType, diskTypeText);
           System.out.printf ("Write protected ... %02X%n", buffer[ptr + 2]);
           System.out.printf ("Synchronised ...... %02X%n", buffer[ptr + 3]);
           System.out.printf ("Cleaned ........... %02X%n", buffer[ptr + 4]);
@@ -92,8 +96,12 @@ public class WozFile
 
           if (wozVersion > 1)
           {
+            int bootFormat = buffer[ptr + 38] & 0xFF;
+            String bootFormatText = bootFormat == 1 ? "16 sector"
+                : bootFormat == 2 ? "13 sector" : bootFormat == 3 ? "Both" : "??";
             System.out.printf ("Disk sides ........ %02X%n", buffer[ptr + 37]);
-            System.out.printf ("Boot format ....... %02X%n", buffer[ptr + 38]);
+            System.out.printf ("Boot format ....... %02X  %s%n", bootFormat,
+                bootFormatText);
             System.out.printf ("Optimal timing .... %02X%n", buffer[ptr + 39]);
             System.out.printf ("Compatible flags .. %04X%n",
                 readInt (buffer, ptr + 40, 2));
@@ -199,6 +207,7 @@ public class WozFile
             {
               System.out.println ("******************************");
               System.out.printf ("*   Track ......... %,6d   *%n", trackNo);
+              System.out.printf ("*   Start block ... %,6d   *%n", startingBlock);
               System.out.printf ("*   Block count ... %,6d   *%n", blockCount);
               System.out.printf ("*   Bit count  .... %,6d   *%n", bitCount);
               System.out.println ("******************************");
@@ -212,6 +221,12 @@ public class WozFile
               // nibbleTracks.add (mc3470.getNibbleTrack (buffer, ptr, bytesUsed, bitCount));
               List<RawDiskSector> diskSectors = mc3470.readTrack (buffer,
                   startingBlock * 512, blockCount * 512, bitCount);
+
+              for (RawDiskSector rawDiskSector : diskSectors)
+              {
+                System.out.println (rawDiskSector);
+                rawDiskSector.dump ();
+              }
 
               mc3470.storeSectors (diskSectors, diskBuffer);
             }
@@ -313,6 +328,11 @@ public class WozFile
     }
   }
 
+  void dump (int trackNo)
+  {
+
+  }
+
   // ---------------------------------------------------------------------------------//
   // matches
   // ---------------------------------------------------------------------------------//
@@ -323,5 +343,18 @@ public class WozFile
       if (b1[i] != b2[i])
         return false;
     return true;
+  }
+
+  public static void main (String[] args)
+  {
+    File file = new File ("/Users/denismolony/code/python/wozardry-2.0/bill.woz");
+    try
+    {
+      WozFile wozFile = new WozFile (file);
+    }
+    catch (DiskNibbleException e)
+    {
+      e.printStackTrace ();
+    }
   }
 }

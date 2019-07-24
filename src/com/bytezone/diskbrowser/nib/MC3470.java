@@ -7,7 +7,7 @@ class MC3470
 {
   private static final int MAX_DATA = 999;
   private final boolean debug = false;
-  private final boolean dump = false;
+  private final boolean dump = true;
 
   private List<RawDiskSector> diskSectors;
 
@@ -50,6 +50,13 @@ class MC3470
   private static final byte[] dataPrologueX = { (byte) 0xD5, (byte) 0xBB, (byte) 0xCF };
   private static final byte[] epilogueX = { (byte) 0xDA, (byte) 0xAA, (byte) 0xEB };
 
+  private static final byte[][] master =
+      { address16prologue, address13prologue, dataPrologue, epilogue, address16prologueX,
+        dataPrologueX, epilogueX };
+  private static final String[] masterNames =
+      { "Address Prologue 16", "Address Prologue 13", "Data Prologue", "Epilogue",
+        "Address Prologue 16 X", "Data Prologue X", "Epilogue X" };
+
   private enum State
   {
     ADDRESS, DATA, OTHER
@@ -80,7 +87,7 @@ class MC3470
     finished = false;
     int zeroBits = 0;
 
-    main: while (inPtr < max && !finished)
+    while (inPtr < max && !finished)
     {
       byte b = buffer[inPtr++];
 
@@ -90,7 +97,7 @@ class MC3470
       for (int mask = 0x80; mask != 0; mask >>>= 1)
       {
         value <<= 1;                  // make space for next bit
-        if ((b & mask) != 0)          // is next bit = 1?
+        if ((b & mask) != 0)          // is next bit == 1?
         {
           value |= 0x01;              // store 1
           zeroBits = 0;               // reset zero counter
@@ -126,7 +133,11 @@ class MC3470
           if (currentState == State.OTHER)
             checkState ();
           else if (dataPtr == expectedDataSize)     // DATA or ADDRESS is now complete
+          {
+            if (debug)
+              System.out.printf ("%s full%n", currentState);
             setState (State.OTHER);
+          }
         }
 
         if (++totalBits == bitCount)      // only use this many bits
@@ -138,7 +149,8 @@ class MC3470
       }
 
       // check for unfinished data block, we may need to restart from the beginning
-      if (totalBits == bitCount && currentState == State.DATA && !restarted)
+      //      if (totalBits == bitCount && currentState == State.DATA && !restarted)
+      if (totalBits == bitCount && !restarted)
       {
         inPtr = offset;
         restarted = true;
@@ -149,12 +161,12 @@ class MC3470
 
     if (debug)
     {
-      System.out.println ("**************************************");
-      System.out.printf ("*  total bits  : %,5d  *%n", bitCount);
-      System.out.printf ("*  bits used   : %,5d  *%n", totalBits);
-      System.out.printf ("*  total bytes : %,5d  *%n", bytesUsed);
-      System.out.printf ("*  bytes used  : %,5d  *%n", totalBytes);
-      System.out.println ("**************************************");
+      System.out.println ("***************************");
+      System.out.printf ("*  total bits  : %,6d  *%n", bitCount);
+      System.out.printf ("*  bits used   : %,6d  *%n", totalBits);
+      System.out.printf ("*  total bytes : %,6d  *%n", bytesUsed);
+      System.out.printf ("*  bytes used  : %,6d  *%n", totalBytes);
+      System.out.println ("***************************");
     }
 
     return diskSectors;
@@ -248,6 +260,27 @@ class MC3470
       if (pattern[i] != dataBuffer[j])
         return false;
 
+    if (debug)
+    {
+      for (int i = 0; i < master.length; i++)
+        if (debugMatch (master[i]))
+          System.out.printf ("Matched: %02X %02X %02X  %s%n", pattern[0], pattern[1],
+              pattern[2], masterNames[i]);
+    }
+
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  // debugMatch
+  // ---------------------------------------------------------------------------------//
+
+  private boolean debugMatch (byte[] pattern)
+  {
+    for (int i = 0, j = dataPtr - 3; i < 3; i++, j++)
+      if (pattern[i] != dataBuffer[j])
+        return false;
+
     return true;
   }
 
@@ -293,24 +326,30 @@ class MC3470
     {
       case ADDRESS:
         if (currentDiskSector != null)
-          throw new DiskNibbleException ("cannot start ADDRESS: " + currentDiskSector);
+        {
+          System.out.println ("\nskipped: " + currentDiskSector);
+          currentDiskSector = null;
+        }
+        //          throw new DiskNibbleException (
+        //              "cannot start ADDRESS: " + currentDiskSector + " has no data");
         expectedDataSize = 8;
         if (dump)
-          System.out.print ("ADDRESS  ");
+          System.out.print ("\nADDRESS  ");
         break;
 
       case DATA:
         if (currentDiskSector == null)
-          throw new DiskNibbleException ("cannot start DATA without ADDRESS");
+          //          throw new DiskNibbleException ("cannot start DATA without ADDRESS");
+          return;
         expectedDataSize = diskReader.expectedDataSize ();
         if (dump)
-          System.out.println ("DATA");
+          System.out.println ("\nDATA");
         break;
 
       case OTHER:
         expectedDataSize = MAX_DATA;        // what is the maximum filler?
         if (dump)
-          System.out.println ("OTHER");
+          System.out.println ("\nOTHER");
         break;
     }
 

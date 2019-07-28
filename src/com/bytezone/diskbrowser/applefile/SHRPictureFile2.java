@@ -120,6 +120,7 @@ public class SHRPictureFile2 extends HiResImage
     {
       case 0:                             // unpacked version of PNT/$01
       case 0x4100:                        // no idea what this is
+      case 0x2000:                        // see TotalReplay.2mg
         // 00000 - 31999  pixel data 32,000 bytes
         // 32000 - 32199  200 control bytes (one per scan line)
         // 32200 - 32255  empty

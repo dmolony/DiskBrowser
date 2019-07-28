@@ -30,11 +30,11 @@ public class DiskReader16Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
 
   @Override
-  byte[] decodeSector (byte[] buffer) throws DiskNibbleException
+  byte[] decodeSector (byte[] buffer, int offset) throws DiskNibbleException
   {
     // rearrange 342 bytes into 256
     byte[] decodedBuffer = new byte[BLOCK_SIZE];             // 256 bytes
-    int offset = 0;
+    //    int offset = 0;
 
     // convert legal disk values to actual 6 bit values
     for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)      // 343 bytes

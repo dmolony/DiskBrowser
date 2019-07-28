@@ -16,11 +16,16 @@ public abstract class DiskReader
     this.sectorsPerTrack = sectorsPerTrack;
   }
 
+  byte[] decodeSector (byte[] buffer) throws DiskNibbleException
+  {
+    return decodeSector (buffer, 0);
+  }
+
   // ---------------------------------------------------------------------------------//
   // abstract functions
   // ---------------------------------------------------------------------------------//
 
-  abstract byte[] decodeSector (byte[] buffer) throws DiskNibbleException;
+  abstract byte[] decodeSector (byte[] buffer, int offset) throws DiskNibbleException;
 
   abstract byte[] encodeSector (byte[] buffer);
 

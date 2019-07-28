@@ -31,11 +31,11 @@ public abstract class HiResImage extends AbstractFile
   //   $08 FOT   $4001  Packed Double Hi-Res file    -       ???
   //   $08 FOT   $8066  Fadden Hi-res                - FaddenHiResImage
 
-  // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2 
-  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image           - SHRPictureFile2 
+  // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2
+  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image           - SHRPictureFile2
   // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)     - SHRPictureFile
   //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File       - SHRPictureFile2 *
-  // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2 
+  // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2
   //   $C0 PNT   $1000
   //   $C0 PNT   $8000  Drawplus ?
   //   $C0 PNT   $8001  GTv background picture
@@ -45,6 +45,7 @@ public abstract class HiResImage extends AbstractFile
   // * $C1 PIC   $0000  IIGS Super Hi-Res Image                  - SHRPictureFile2
   //   $C1 PIC   $0001  IIGS QuickDraw II PICT File              - SHRPictureFile2 *
   // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) .3200         - SHRPictureFile2
+  //   $C1 PIC   $2000  ?
   //   $C1 PIC   $8001  Allison raw image
   //   $C1 PIC   $8002  Thunderscan
   //   $C1 PIC   $8003  DreamGraphix
@@ -154,13 +155,13 @@ public abstract class HiResImage extends AbstractFile
   }
 
   /*-
-   * Files of type $08 and any auxiliary type less than or equal to $3FFF contain a 
-   * standard Apple II graphics file in one of several modes. After determining that 
-   * the auxiliary type is not $4000 or $4001 (which have been defined for high-resolution 
-   * and double high-resolution pictures packed with the Apple IIGS PackBytes routine), 
-   * you can determine the mode of the file by examining byte +120 (+$78). The value of 
+   * Files of type $08 and any auxiliary type less than or equal to $3FFF contain a
+   * standard Apple II graphics file in one of several modes. After determining that
+   * the auxiliary type is not $4000 or $4001 (which have been defined for high-resolution
+   * and double high-resolution pictures packed with the Apple IIGS PackBytes routine),
+   * you can determine the mode of the file by examining byte +120 (+$78). The value of
    * this byte, which ranges from zero to seven, is interpreted as follows:
-   * 
+   *
      Mode                        Page 1    Page 2
      280 x 192 Black & White       0         4
      280 x 192 Limited Color       1         5
@@ -169,6 +170,8 @@ public abstract class HiResImage extends AbstractFile
    */
 
   // SHR see - http://noboot.com/charlie/cb2e_p3.htm
+
+  // also: https://groups.google.com/forum/#!topic/comp.sys.apple2/zYhZ5YdNNxQ
 
   @Override
   public String getText ()
@@ -224,6 +227,7 @@ public abstract class HiResImage extends AbstractFile
         switch (auxType)
         {
           case 0:
+          case 0x2000:
             auxText = "Super Hi-res Screen Image";
             break;
           case 1:

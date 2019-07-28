@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bytezone.common.Utility;
@@ -23,31 +24,46 @@ public class Dumper
   private static final byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
   private static final byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
 
-  List<Track> tracks;
+  private final DiskReader13Sector diskReader13Sector = new DiskReader13Sector ();
+  private final DiskReader16Sector diskReader16Sector = new DiskReader16Sector ();
+
+  private int diskSectors;
+  private int wozVersion;
+  private byte[] addressPrologue;
+
+  private final boolean debug = false;
 
   // ---------------------------------------------------------------------------------//
-  public Dumper (File file)
+  public Dumper (File file) throws DiskNibbleException
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = readFile (file);
     String header = new String (buffer, 0, 4);
-    System.out.println (header);
+    if (!"WOZ1".equals (header) && !"WOZ2".equals (header))
+    {
+      System.out.println ("Not a WOZ disk");
+      return;
+    }
+
+    List<Track> tracks = null;
 
     int ptr = 12;
     while (ptr < buffer.length)
     {
       String chunkId = new String (buffer, ptr, 4);
       int size = Utility.getLong (buffer, ptr + 4);
-      System.out.printf ("%n%s  %,9d%n", chunkId, size);
+      if (debug)
+        System.out.printf ("%n%s  %,9d%n", chunkId, size);
+
       switch (chunkId)
       {
-        case "INFO":
+        case "INFO":                            // 60 bytes
           info (buffer, ptr);
           break;
-        case "TMAP":
+        case "TMAP":                            // 160 bytes
           tmap (buffer, ptr);
           break;
-        case "TRKS":
+        case "TRKS":                            // starts at 248
           tracks = trks (buffer, ptr);
           break;
         case "META":
@@ -61,16 +77,26 @@ public class Dumper
       ptr += size + 8;
     }
 
-    Track track = tracks.get (0x22);
-    for (Sector sector : track.sectors)
-      sector.dump ();
+    DiskReader diskReader = diskSectors == 13 ? diskReader13Sector : diskReader16Sector;
+    byte[] diskBuffer = new byte[35 * diskSectors * 256];
+
+    for (Track track : tracks)
+      for (Sector sector : track)
+        if (sector.dataOffset > 0)
+          sector.pack (diskReader, diskBuffer,
+              256 * (sector.trackNo * diskSectors + sector.sector));
+
+    int tr = 0x11;
+    int sc = 15;
+    System.out
+        .println (HexFormatter.format (diskBuffer, 256 * (tr * diskSectors + sc), 256));
   }
 
   // ---------------------------------------------------------------------------------//
   private void info (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    int version = val8 (buffer, ptr + 8);
+    wozVersion = val8 (buffer, ptr + 8);
     int diskType = val8 (buffer, ptr + 9);
     int writeProtected = val8 (buffer, ptr + 10);
     int synchronised = val8 (buffer, ptr + 11);
@@ -83,24 +109,30 @@ public class Dumper
     int requiredRam = val16 (buffer, ptr + 50);
     int largestTrack = val16 (buffer, ptr + 52);
 
-    String bootSectorFormatText =
-        bootSectorFormat == 0 ? "Unknown" : bootSectorFormat == 1 ? "16 sector"
-            : bootSectorFormat == 2 ? "13 sector" : "Hybrid";
-    String diskTypeText = diskType == 1 ? "5.25" : "3.5";
+    diskSectors = bootSectorFormat == 2 ? 13 : 16;
+    addressPrologue = diskSectors == 13 ? address13prologue : address16prologue;
 
-    System.out.printf ("Version ............. %d%n", version);
-    System.out.printf ("Disk type ........... %d  (%s\")%n", diskType, diskTypeText);
-    System.out.printf ("Write protected ..... %d%n", writeProtected);
-    System.out.printf ("Synchronized ........ %d%n", synchronised);
-    System.out.printf ("Cleaned ............. %d%n", cleaned);
-    System.out.printf ("Creator ............. %s%n", creator);
-    System.out.printf ("Sides ............... %d%n", sides);
-    System.out.printf ("Boot sector format .. %d  (%s)%n", bootSectorFormat,
-        bootSectorFormatText);
-    System.out.printf ("Optimal bit timing .. %d%n", optimalBitTiming);
-    System.out.printf ("Compatible hardware . %d%n", compatibleHardware);
-    System.out.printf ("Required RAM ........ %d%n", requiredRam);
-    System.out.printf ("Largest track ....... %d%n", largestTrack);
+    if (debug)
+    {
+      String bootSectorFormatText =
+          bootSectorFormat == 0 ? "Unknown" : bootSectorFormat == 1 ? "16 sector"
+              : bootSectorFormat == 2 ? "13 sector" : "Hybrid";
+      String diskTypeText = diskType == 1 ? "5.25" : "3.5";
+
+      System.out.printf ("Version ............. %d%n", wozVersion);
+      System.out.printf ("Disk type ........... %d  (%s\")%n", diskType, diskTypeText);
+      System.out.printf ("Write protected ..... %d%n", writeProtected);
+      System.out.printf ("Synchronized ........ %d%n", synchronised);
+      System.out.printf ("Cleaned ............. %d%n", cleaned);
+      System.out.printf ("Creator ............. %s%n", creator);
+      System.out.printf ("Sides ............... %d%n", sides);
+      System.out.printf ("Boot sector format .. %d  (%s)%n", bootSectorFormat,
+          bootSectorFormatText);
+      System.out.printf ("Optimal bit timing .. %d%n", optimalBitTiming);
+      System.out.printf ("Compatible hardware . %d%n", compatibleHardware);
+      System.out.printf ("Required RAM ........ %d%n", requiredRam);
+      System.out.printf ("Largest track ....... %d%n", largestTrack);
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -115,16 +147,19 @@ public class Dumper
   // ---------------------------------------------------------------------------------//
   {
     ptr += 8;
-    String metaData = new String (buffer, ptr, length);
-    //    System.out.println (metaData);
-    String[] chunks = metaData.split ("\n");
-    for (String chunk : chunks)
+
+    if (debug)
     {
-      String[] parts = chunk.split ("\t");
-      if (parts.length >= 2)
-        System.out.printf ("%-20s %s%n", parts[0], parts[1]);
-      else
-        System.out.printf ("%-20s%n", parts[0]);
+      String metaData = new String (buffer, ptr, length);
+      String[] chunks = metaData.split ("\n");
+      for (String chunk : chunks)
+      {
+        String[] parts = chunk.split ("\t");
+        if (parts.length >= 2)
+          System.out.printf ("%-20s %s%n", parts[0], parts[1]);
+        else
+          System.out.printf ("%-20s%n", parts[0]);
+      }
     }
   }
 
@@ -141,7 +176,8 @@ public class Dumper
         break;
       tracks.add (trk);
       ptr += 8;
-      System.out.printf ("%n$%02X  %s%n", i, trk);
+      if (debug)
+        System.out.printf ("%n$%02X  %s%n", i, trk);
     }
     return tracks;
   }
@@ -183,12 +219,9 @@ public class Dumper
   private byte[] readFile (File file)
   // ---------------------------------------------------------------------------------//
   {
-    try
+    try (BufferedInputStream in = new BufferedInputStream (new FileInputStream (file)))
     {
-      BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
-      byte[] buffer = in.readAllBytes ();
-      in.close ();
-      return buffer;
+      return in.readAllBytes ();
     }
     catch (IOException e)
     {
@@ -201,7 +234,9 @@ public class Dumper
   public static void main (String[] args)
   // ---------------------------------------------------------------------------------//
   {
-    File file = new File ("/Users/denismolony/code/python/wozardry-2.0/bill.woz");
+    //    File file = new File ("/Users/denismolony/code/python/wozardry-2.0/bill.woz");
+    File file = new File ("/Users/denismolony/Dropbox/Examples/woz test images/WOZ 2.0/"
+        + "DOS 3.3 System Master.woz");
     try
     {
       Dumper dumper = new Dumper (file);
@@ -213,7 +248,7 @@ public class Dumper
   }
 
   // ---------------------------------------------------------------------------------//
-  class Track
+  class Track implements Iterable<Sector>
   // ---------------------------------------------------------------------------------//
   {
     int trackNo;
@@ -249,25 +284,26 @@ public class Dumper
 
       int offset = -1;
 
-      while (sectors.size () < 13)        // hard-coded!!
+      while (sectors.size () < diskSectors)
       {
-        offset = findNext (address13prologue, offset + 1);
+        offset = findNext (addressPrologue, offset + 1);
         if (offset < 0)
           break;
 
         Sector sector = new Sector (this, offset);
         if (sectors.size () > 0)
-          checkDuplicates (sector, sectors.get (sectors.size () - 1));
+          checkDuplicates (sector);
         sectors.add (sector);
       }
     }
 
     // ---------------------------------------------------------------------------------//
-    private void checkDuplicates (Sector sector1, Sector sector2)
+    private void checkDuplicates (Sector sector1)
     // ---------------------------------------------------------------------------------//
     {
-      if (sector1.sector == sector2.sector)
-        System.out.println ("\n*** duplicate ***\n");
+      for (Sector sector : sectors)
+        if (sector1.sector == sector.sector)
+          System.out.println ("\n*** duplicate ***\n");
     }
 
     // ---------------------------------------------------------------------------------//
@@ -296,27 +332,23 @@ public class Dumper
     int nextByte ()
     // ---------------------------------------------------------------------------------//
     {
-      while (!nextBit ())
-        if (revolutions >= 2)
-        {
-          System.out.println ("looping");
-          return 0;
-        }
-
-      int b = 0x80;
-      for (int i = 6; i >= 0; i--)
+      byte b = 0;
+      while ((b & 0x80) == 0)
+      {
+        b <<= 1;
         if (nextBit ())
-          b |= (1 << i);
+          b |= 0x01;
+      }
 
       return b;
     }
 
     // ---------------------------------------------------------------------------------//
-    byte[] readTrack ()
+    void readTrack ()
     // ---------------------------------------------------------------------------------//
     {
       if (newBuffer != null)
-        return newBuffer;
+        return;
 
       int max = (bitCount - 1) / 8 + 1;
       max += 520;
@@ -324,8 +356,6 @@ public class Dumper
 
       for (int i = 0; i < max; i++)
         newBuffer[i] = (byte) nextByte ();
-
-      return newBuffer;
     }
 
     // ---------------------------------------------------------------------------------//
@@ -347,6 +377,20 @@ public class Dumper
     }
 
     // ---------------------------------------------------------------------------------//
+    void packSector (int sector)
+    // ---------------------------------------------------------------------------------//
+    {
+
+    }
+
+    // ---------------------------------------------------------------------------------//
+    void dump ()
+    // ---------------------------------------------------------------------------------//
+    {
+      System.out.println (HexFormatter.format (newBuffer));
+    }
+
+    // ---------------------------------------------------------------------------------//
     @Override
     public String toString ()
     // ---------------------------------------------------------------------------------//
@@ -359,6 +403,14 @@ public class Dumper
         text.append (String.format ("%2d  %s%n", count++, sector));
       text.deleteCharAt (text.length () - 1);
       return text.toString ();
+    }
+
+    // ---------------------------------------------------------------------------------//
+    @Override
+    public Iterator<Sector> iterator ()
+    // ---------------------------------------------------------------------------------//
+    {
+      return sectors.iterator ();
     }
   }
 
@@ -395,6 +447,14 @@ public class Dumper
       System.out.println (this);
       System.out.println (
           HexFormatter.format (track.newBuffer, addressOffset, 512, addressOffset));
+    }
+
+    // ---------------------------------------------------------------------------------//
+    void pack (DiskReader diskReader, byte[] buffer, int ptr) throws DiskNibbleException
+    // ---------------------------------------------------------------------------------//
+    {
+      byte[] decodedBuffer = diskReader.decodeSector (track.newBuffer, dataOffset + 3);
+      System.arraycopy (decodedBuffer, 0, buffer, ptr, decodedBuffer.length);
     }
 
     // ---------------------------------------------------------------------------------//

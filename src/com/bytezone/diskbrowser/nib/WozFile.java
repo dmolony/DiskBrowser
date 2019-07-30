@@ -27,12 +27,9 @@ public class WozFile
   private static final int TRK_SIZE = 0x1A00;
   private static final int DATA_SIZE = TRK_SIZE - 10;
 
-  private final DiskReader13Sector diskReader13Sector = new DiskReader13Sector ();
-  private final DiskReader16Sector diskReader16Sector = new DiskReader16Sector ();
-
   private static int[][] interleave =
-      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-        { 0, 7, 14, 6, 13, 5, 12, 4, 11, 3, 10, 2, 9, 1, 8, 15 } };
+      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // 13 sector
+        { 0, 7, 14, 6, 13, 5, 12, 4, 11, 3, 10, 2, 9, 1, 8, 15 } };     // 16 sector
 
   public final File file;
 
@@ -95,7 +92,7 @@ public class WozFile
       ptr += size + 8;
     }
 
-    DiskReader diskReader = diskSectors == 13 ? diskReader13Sector : diskReader16Sector;
+    DiskReader diskReader = DiskReader.getDiskReader (diskSectors);
     diskBuffer = new byte[35 * diskSectors * 256];
     int ndx = diskSectors == 13 ? 0 : 1;
 
@@ -144,7 +141,7 @@ public class WozFile
       System.out.printf ("Creator ............. %s%n", creator);
     }
 
-    if (wozVersion == 2)
+    if (wozVersion >= 2)
     {
       int sides = val8 (buffer, ptr + 45);
       int bootSectorFormat = val8 (buffer, ptr + 46);
@@ -217,6 +214,7 @@ public class WozFile
 
     int reclen = wozVersion == 1 ? TRK_SIZE : 8;
     int max = wozVersion == 1 ? 35 : 160;
+
     for (int i = 0; i < max; i++)
     {
       try
@@ -248,15 +246,18 @@ public class WozFile
   private int val16 (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    return (buffer[ptr++] & 0xFF) + ((buffer[ptr] & 0xFF) << 8);
+    return (buffer[ptr] & 0xFF)                 //
+        | ((buffer[ptr + 1] & 0xFF) << 8);
   }
 
   // ---------------------------------------------------------------------------------//
   private int val32 (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    return (buffer[ptr++] & 0xFF) + ((buffer[ptr++] & 0xFF) << 8)
-        + ((buffer[ptr++] & 0xFF) << 16) + ((buffer[ptr] & 0xFF) << 24);
+    return (buffer[ptr] & 0xFF)                 //
+        | ((buffer[ptr + 1] & 0xFF) << 8)       //
+        | ((buffer[ptr + 2] & 0xFF) << 16)      //
+        | ((buffer[ptr + 3] & 0xFF) << 24);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -311,6 +312,7 @@ public class WozFile
     int startingBlock;
     int blockCount;
     int bitCount;
+    int bytesUsed;         // WOZ1 - not needed
 
     byte[] rawBuffer;
     byte[] newBuffer;
@@ -319,7 +321,6 @@ public class WozFile
     int byteIndex;
     int trackIndex;
     int revolutions;
-    int bytesUsed;
 
     List<Sector> sectors = new ArrayList<> ();
 
@@ -472,27 +473,23 @@ public class WozFile
     }
 
     // ---------------------------------------------------------------------------------//
-    void dump ()
-    // ---------------------------------------------------------------------------------//
-    {
-      System.out.println (HexFormatter.format (newBuffer));
-    }
-
-    // ---------------------------------------------------------------------------------//
     @Override
     public String toString ()
     // ---------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
       if (wozVersion == 1)
-        text.append (String.format ("Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount));
+        text.append (
+            String.format ("WOZ1: Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount));
       else
-        text.append (String.format ("Start: %4d,  Blocks: %2d,  Bits: %,8d%n%n",
+        text.append (String.format ("WOZ2: Start: %4d,  Blocks: %2d,  Bits: %,8d%n%n",
             startingBlock, blockCount, bitCount));
+
       int count = 0;
       for (Sector sector : sectors)
         text.append (String.format ("%2d  %s%n", count++, sector));
       text.deleteCharAt (text.length () - 1);
+
       return text.toString ();
     }
 
@@ -535,16 +532,6 @@ public class WozFile
     // ---------------------------------------------------------------------------------//
     {
       return this.sectorNo == sector.sectorNo;
-    }
-
-    // ---------------------------------------------------------------------------------//
-    void dump ()
-    // ---------------------------------------------------------------------------------//
-    {
-      System.out.println ();
-      System.out.println (this);
-      System.out.println (HexFormatter.format (track.newBuffer, addressOffset, BLOCK_SIZE,
-          addressOffset));
     }
 
     // ---------------------------------------------------------------------------------//

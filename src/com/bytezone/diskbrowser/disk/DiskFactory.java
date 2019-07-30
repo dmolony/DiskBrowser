@@ -234,6 +234,7 @@ public class DiskFactory
     {
       try
       {
+        //        WozFileOld wozDisk = new WozFileOld (file);
         WozFile wozDisk = new WozFile (file);
         if (wozDisk.getSectorsPerTrack () == 13)
         {
@@ -241,6 +242,7 @@ public class DiskFactory
           disk = checkDos (appleDisk);
           return disk == null ? new DataDisk (appleDisk) : disk;
         }
+
         if (wozDisk.getSectorsPerTrack () == 16)
         {
           AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
@@ -255,7 +257,6 @@ public class DiskFactory
       catch (Exception e)
       {
         System.out.println (e);
-        //        e.printStackTrace ();
         return null;
       }
     }

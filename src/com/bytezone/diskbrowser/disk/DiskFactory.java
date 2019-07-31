@@ -235,20 +235,20 @@ public class DiskFactory
       try
       {
         //        WozFileOld wozDisk = new WozFileOld (file);
-        WozFile wozDisk = new WozFile (file);
-        if (wozDisk.getSectorsPerTrack () == 13)
+        WozFile wozFile = new WozFile (file);
+        if (wozFile.getSectorsPerTrack () == 13)
         {
-          AppleDisk appleDisk = new AppleDisk (wozDisk, 35, 13);
+          AppleDisk appleDisk = new AppleDisk (wozFile, 35, 13);
           disk = checkDos (appleDisk);
           return disk == null ? new DataDisk (appleDisk) : disk;
         }
 
-        if (wozDisk.getSectorsPerTrack () == 16)
+        if (wozFile.getSectorsPerTrack () == 16)
         {
-          AppleDisk appleDisk256 = new AppleDisk (wozDisk, 35, 16);
+          AppleDisk appleDisk256 = new AppleDisk (wozFile, 35, 16);
           disk = checkDos (appleDisk256);
           if (disk == null)
-            disk = checkProdos (new AppleDisk (wozDisk, 35, 8));
+            disk = checkProdos (new AppleDisk (wozFile, 35, 8));
           if (disk == null)
             disk = new DataDisk (appleDisk256);
         }
@@ -707,5 +707,10 @@ public class DiskFactory
       System.out.println ("Not a CPM disk");
 
     return null;
+  }
+
+  private static void checkMissingSectors (AppleDisk disk, WozFile wozFile)
+  {
+
   }
 }

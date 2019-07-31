@@ -6,6 +6,7 @@ public class AppleDiskAddress implements DiskAddress
   private final int track;
   private final int sector;
   public final Disk owner;
+
   private boolean zeroFlag;
 
   public AppleDiskAddress (Disk owner, int block)
@@ -42,8 +43,6 @@ public class AppleDiskAddress implements DiskAddress
   {
     if (that == null)
       return false;
-    //    if (zeroFlag != ((AppleDiskAddress) that).zeroFlag)
-    //      return false;
     return this.block == that.getBlock ();
   }
 

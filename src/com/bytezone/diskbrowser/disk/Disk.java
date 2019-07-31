@@ -48,6 +48,12 @@ public interface Disk extends Iterable<DiskAddress>
 
   public boolean isSectorEmpty (DiskAddress da);
 
+  public boolean isSectorMissing (int block);
+
+  public boolean isSectorMissing (int track, int sector);
+
+  public boolean isSectorMissing (DiskAddress da);
+
   public boolean isValidAddress (int block);
 
   public boolean isValidAddress (int track, int sector);

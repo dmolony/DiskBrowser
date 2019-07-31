@@ -39,6 +39,7 @@ public class WozFile
   private final byte[] diskBuffer;
 
   private final boolean debug = false;
+  List<Sector> badSectors = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public WozFile (File file) throws DiskNibbleException
@@ -115,6 +116,13 @@ public class WozFile
   // ---------------------------------------------------------------------------------//
   {
     return diskSectors;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public List<Sector> getBadSectors ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return badSectors;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -310,7 +318,7 @@ public class WozFile
   {
     int trackNo;
     int startingBlock;
-    int blockCount;
+    int blockCount;        // WOZ2 - not needed
     int bitCount;
     int bytesUsed;         // WOZ1 - not needed
 
@@ -379,6 +387,9 @@ public class WozFile
         if (sectors.size () > 0)
           checkDuplicates (sector);
         sectors.add (sector);
+
+        if (sector.dataOffset < 0)
+          badSectors.add (sector);
       }
     }
 
@@ -503,11 +514,11 @@ public class WozFile
   }
 
   // ---------------------------------------------------------------------------------//
-  class Sector
+  public class Sector
   // ---------------------------------------------------------------------------------//
   {
     Track track;
-    int trackNo, sectorNo, volume, checksum;
+    public final int trackNo, sectorNo, volume, checksum;
     int addressOffset, dataOffset;
 
     // ---------------------------------------------------------------------------------//
@@ -520,6 +531,9 @@ public class WozFile
       trackNo = decode4and4 (track.newBuffer, addressOffset + 5);
       sectorNo = decode4and4 (track.newBuffer, addressOffset + 7);
       checksum = decode4and4 (track.newBuffer, addressOffset + 9);
+
+      //      int epiloguePtr = track.findNext (epilogue, addressOffset + 11);
+      //      assert epiloguePtr == addressOffset + 11;
 
       this.addressOffset = addressOffset;
       dataOffset = track.findNext (dataPrologue, addressOffset + 11);

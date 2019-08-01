@@ -53,7 +53,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     addPanel (dataPanel, "Output", BorderLayout.CENTER);
 
     // create and add the right-hand disk layout panel
-    DiskLayoutPanel diskLayoutPanel = new DiskLayoutPanel (menuHandler, prefs);
+    DiskLayoutPanel diskLayoutPanel = new DiskLayoutPanel ();
     JPanel layoutBorderPanel =
         addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 

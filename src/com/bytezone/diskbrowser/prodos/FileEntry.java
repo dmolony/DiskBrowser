@@ -253,6 +253,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (name.endsWith (".PAC") || name.endsWith (".A2FC")
               || (endOfFile == 0x4000 && auxType == 0x2000))
             file = new DoubleHiResImage (name, exactBuffer);
+          else if (endOfFile == 0x4000 && auxType == 0x4000)
+            file = new DoubleHiResImage (name, exactBuffer);
           else if (oneOf (endOfFile, 0x1FF8, 0x1FFF, 0x2000, 0x4000)
               && oneOf (auxType, 0x1FFF, 0x2000, 0x4000))
             file = new OriginalHiResImage (name, exactBuffer, auxType);

@@ -69,6 +69,7 @@ class MC3470
   List<RawDiskSector> readTrack (byte[] buffer, int offset, int bytesUsed, int bitCount)
       throws DiskNibbleException
   {
+    assert false : "Not used";
     int totalBits = 0;
     int totalBytes = 0;
 

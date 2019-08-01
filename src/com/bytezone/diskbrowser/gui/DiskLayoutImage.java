@@ -126,15 +126,15 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
             DiskAddress da = d.getDiskAddress (blockNo);
             boolean free = showFreeSectors && formattedDisk.isSectorFree (da);
             boolean selected = selectionHandler.isSelected (da);
-            boolean missing = d.isSectorMissing (da);
-            drawBlock ((Graphics2D) g, type, x, y, free, selected, missing);
+            //            boolean missing = d.isSectorMissing (da);
+            drawBlock ((Graphics2D) g, type, x, y, free, selected);
           }
         }
       }
   }
 
   private void drawBlock (Graphics2D g, SectorType type, int x, int y, boolean flagFree,
-      boolean selected, boolean missing)
+      boolean selected)
   {
     g.setColor (type.colour);
     g.fillRect (x + 1, y + 1, blockWidth - 1, blockHeight - 1);
@@ -150,13 +150,13 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
         g.fillOval (x + centerOffset, y + 6, 3, 3);
     }
 
-    if (missing)
-    {
-      g.setColor (Color.black);
-      g.setStroke (missingStroke);
-      g.drawLine (x + 5, y + 5, x + 11, y + 11);
-      g.drawLine (x + 5, y + 11, x + 11, y + 5);
-    }
+    //    if (missing)
+    //    {
+    //      g.setColor (Color.darkGray);
+    //      g.setStroke (missingStroke);
+    //      g.drawLine (x + 5, y + 5, x + 11, y + 11);
+    //      g.drawLine (x + 5, y + 11, x + 11, y + 5);
+    //    }
   }
 
   private Color getContrastColor (SectorType type)

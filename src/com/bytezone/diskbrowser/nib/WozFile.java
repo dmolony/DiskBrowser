@@ -13,6 +13,7 @@ import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class WozFile
+//-----------------------------------------------------------------------------------//
 {
   private static final byte[] address16prologue =
       { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
@@ -20,6 +21,7 @@ public class WozFile
       { (byte) 0xD5, (byte) 0xAA, (byte) 0xB5 };
   private static final byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
   private static final byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
+  // apparently it can be DE AA Ex
 
   private static final int BLOCK_SIZE = 512;
   private static final int SECTOR_SIZE = 256;
@@ -34,11 +36,13 @@ public class WozFile
   public final File file;
 
   private int diskSectors;
+  private int diskType;
   private int wozVersion;
   private byte[] addressPrologue;
   private final byte[] diskBuffer;
 
-  private final boolean debug = false;
+  private final boolean debug1 = false;
+  private final boolean debug2 = false;
   List<Sector> badSectors = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
@@ -68,7 +72,7 @@ public class WozFile
     {
       String chunkId = new String (buffer, ptr, 4);
       int size = val32 (buffer, ptr + 4);
-      if (debug)
+      if (debug1)
         System.out.printf ("%n%s  %,9d%n", chunkId, size);
 
       switch (chunkId)
@@ -97,11 +101,12 @@ public class WozFile
     diskBuffer = new byte[35 * diskSectors * 256];
     int ndx = diskSectors == 13 ? 0 : 1;
 
-    for (Track track : tracks)
-      for (Sector sector : track)
-        if (sector.dataOffset > 0)
-          sector.pack (diskReader, diskBuffer, SECTOR_SIZE
-              * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]));
+    if (diskType == 1)
+      for (Track track : tracks)
+        for (Sector sector : track)
+          if (sector.dataOffset > 0)
+            sector.pack (diskReader, diskBuffer, SECTOR_SIZE
+                * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -131,13 +136,13 @@ public class WozFile
   {
     wozVersion = val8 (buffer, ptr + 8);
 
-    int diskType = val8 (buffer, ptr + 9);
+    diskType = val8 (buffer, ptr + 9);
     int writeProtected = val8 (buffer, ptr + 10);
     int synchronised = val8 (buffer, ptr + 11);
     int cleaned = val8 (buffer, ptr + 12);
     String creator = new String (buffer, ptr + 13, 32);
 
-    if (debug)
+    if (debug1)
     {
       String diskTypeText = diskType == 1 ? "5.25" : "3.5";
 
@@ -160,7 +165,7 @@ public class WozFile
 
       setGlobals (bootSectorFormat == 2 ? 13 : 16);
 
-      if (debug)
+      if (debug1)
       {
         String bootSectorFormatText =
             bootSectorFormat == 0 ? "Unknown" : bootSectorFormat == 1 ? "16 sector"
@@ -198,7 +203,7 @@ public class WozFile
   {
     ptr += 8;
 
-    if (debug)
+    if (debug1)
     {
       String metaData = new String (buffer, ptr, length);
       String[] chunks = metaData.split ("\n");
@@ -231,7 +236,7 @@ public class WozFile
         if (trk.bitCount == 0)
           break;
         tracks.add (trk);
-        if (debug)
+        if (debug2)
           System.out.printf ("%n$%02X  %s%n", i, trk);
       }
       catch (DiskNibbleException e)
@@ -299,12 +304,14 @@ public class WozFile
     String home = "/Users/denismolony/";
     String wozBase1 = home + "Dropbox/Examples/woz test images/WOZ 1.0/";
     String wozBase2 = home + "Dropbox/Examples/woz test images/WOZ 2.0/";
+    String wozBase3 = home + "Dropbox/Examples/woz test images/WOZ 2.0/3.5/";
     File[] files = { new File (home + "code/python/wozardry-2.0/bill.woz"),
                      new File (wozBase2 + "DOS 3.3 System Master.woz"),
-                     new File (wozBase1 + "DOS 3.3 System Master.woz") };
+                     new File (wozBase1 + "DOS 3.3 System Master.woz"),
+                     new File (wozBase3 + "Apple IIgs System Disk 1.1.woz") };
     try
     {
-      new WozFile (files[2]);
+      new WozFile (files[3]);
     }
     catch (Exception e)
     {
@@ -339,15 +346,15 @@ public class WozFile
       this.rawBuffer = rawBuffer;
       this.trackNo = trackNo;
 
-      if (debug)
-        System.out.println (HexFormatter.format (rawBuffer, ptr, 512, ptr));
+      if (debug1)
+        System.out.println (HexFormatter.format (rawBuffer, ptr, 1024, ptr));
 
       if (wozVersion == 1)
       {
         bytesUsed = val16 (rawBuffer, ptr + DATA_SIZE);
         bitCount = val16 (rawBuffer, ptr + DATA_SIZE + 2);
 
-        if (debug)
+        if (debug1)
           System.out.println (
               (String.format ("Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount)));
       }
@@ -357,8 +364,8 @@ public class WozFile
         blockCount = val16 (rawBuffer, ptr + 2);
         bitCount = val32 (rawBuffer, ptr + 4);
 
-        if (debug)
-          System.out.println ((String.format ("Start: %4d,  Blocks: %2d,  Bits: %,8d%n%n",
+        if (debug1)
+          System.out.println ((String.format ("%nStart: %4d,  Blocks: %2d,  Bits: %,8d%n",
               startingBlock, blockCount, bitCount)));
       }
 
@@ -384,7 +391,7 @@ public class WozFile
           break;
 
         Sector sector = new Sector (this, offset);
-        if (sectors.size () > 0)
+        if (debug1 && sectors.size () > 0)
           checkDuplicates (sector);
         sectors.add (sector);
 
@@ -399,7 +406,7 @@ public class WozFile
     {
       for (Sector sector : sectors)
         if (sector.isDuplicate (newSector))
-          System.out.println ("\n*** duplicate ***\n");
+          System.out.printf ("Duplicate: %s%n", newSector);
     }
 
     // ---------------------------------------------------------------------------------//

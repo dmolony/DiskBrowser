@@ -159,7 +159,7 @@ public class BasicProgram extends AbstractFile
         else
           text.append (lineText);
 
-        // Check for a wrappable PRINT statement 
+        // Check for a wrappable PRINT statement
         // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
         if (wrapPrintAt > 0 && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
             && countChars (text, ASCII_QUOTE) == 2        // just start and end quotes
@@ -414,12 +414,8 @@ public class BasicProgram extends AbstractFile
   private void addHeader (StringBuilder pgm)
   {
     pgm.append ("Name    : " + name + "\n");
-    pgm.append ("Length  : $" + HexFormatter.format4 (buffer.length));
-    pgm.append (" (" + buffer.length + ")\n");
-
-    int programLoadAddress = getLoadAddress ();
-    pgm.append ("Load at : $" + HexFormatter.format4 (programLoadAddress));
-    pgm.append (" (" + programLoadAddress + ")\n\n");
+    pgm.append (String.format ("Length  : $%04X (%<,d)%n", buffer.length));
+    pgm.append (String.format ("Load at : $%04X (%<,d)%n%n", getLoadAddress ()));
   }
 
   private int getLoadAddress ()

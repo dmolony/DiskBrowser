@@ -9,6 +9,7 @@ public class RawDiskSector
 
   RawDiskSector (DiskAddressField addressField)
   {
+    assert false : "Not used";
     this.addressField = addressField;
   }
 

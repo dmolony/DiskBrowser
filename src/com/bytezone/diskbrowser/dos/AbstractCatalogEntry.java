@@ -70,7 +70,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
     String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
         (entryBuffer[33] & 0xFF));
-    catalogName = getName (base, entryBuffer);
+    catalogName = getName (base, entryBuffer).replace ("^", "");
   }
 
   private String getName (String base, byte[] buffer)

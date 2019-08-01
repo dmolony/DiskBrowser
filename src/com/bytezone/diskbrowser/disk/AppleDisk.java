@@ -18,7 +18,6 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.nib.NibFile;
 import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
-import com.bytezone.diskbrowser.nib.WozFile.Sector;
 import com.bytezone.diskbrowser.nib.WozFileOld;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -78,7 +77,7 @@ public class AppleDisk implements Disk
   //         DFB     06,04,02,15     ;12->06,13->04,14->02,15->15
 
   private boolean[] hasData;
-  private boolean[] isMissing;
+  //  private boolean[] isMissing;
   private byte emptyByte = 0;
 
   private ActionListener actionListenerList;
@@ -196,7 +195,7 @@ public class AppleDisk implements Disk
 
     diskBuffer = new byte[blocks * sectorSize];
     hasData = new boolean[blocks];
-    isMissing = new boolean[blocks];
+    //    isMissing = new boolean[blocks];
 
     if (debug)
     {
@@ -232,7 +231,7 @@ public class AppleDisk implements Disk
     sectorSize = trackSize / sectors;
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
-    isMissing = new boolean[blocks];
+    //    isMissing = new boolean[blocks];
 
     checkSectorsForData ();
   }
@@ -265,7 +264,7 @@ public class AppleDisk implements Disk
 
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
-    isMissing = new boolean[blocks];
+    //    isMissing = new boolean[blocks];
 
     checkSectorsForData ();
   }
@@ -290,12 +289,12 @@ public class AppleDisk implements Disk
 
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
-    isMissing = new boolean[blocks];
+    //    isMissing = new boolean[blocks];
 
     checkSectorsForData ();
 
-    for (Sector sector : wozFile.getBadSectors ())
-      isMissing[sector.trackNo * sectors + sector.sectorNo] = true;
+    //    for (Sector sector : wozFile.getBadSectors ())
+    //      isMissing[sector.trackNo * sectors + sector.sectorNo] = true;
   }
 
   private byte[] getPrefix (File path)
@@ -420,23 +419,23 @@ public class AppleDisk implements Disk
     return !hasData[getDiskAddress (track, sector).getBlock ()];
   }
 
-  @Override
-  public boolean isSectorMissing (DiskAddress da)
-  {
-    return isMissing[da.getBlock ()];
-  }
-
-  @Override
-  public boolean isSectorMissing (int block)
-  {
-    return isMissing[block];
-  }
-
-  @Override
-  public boolean isSectorMissing (int track, int sector)
-  {
-    return isMissing[getDiskAddress (track, sector).getBlock ()];
-  }
+  //  @Override
+  //  public boolean isSectorMissing (DiskAddress da)
+  //  {
+  //    return isMissing[da.getBlock ()];
+  //  }
+  //
+  //  @Override
+  //  public boolean isSectorMissing (int block)
+  //  {
+  //    return isMissing[block];
+  //  }
+  //
+  //  @Override
+  //  public boolean isSectorMissing (int track, int sector)
+  //  {
+  //    return isMissing[getDiskAddress (track, sector).getBlock ()];
+  //  }
 
   @Override
   public File getFile ()

@@ -50,7 +50,7 @@ class DiskLayoutPanel extends JPanel
 
     sp = new JScrollPane (diskLayoutImage, VERTICAL_SCROLLBAR_ALWAYS,
         HORIZONTAL_SCROLLBAR_ALWAYS);
-    sp.setBackground (Color.WHITE);
+    sp.getViewport ().setBackground (Color.WHITE);
     sp.setColumnHeaderView (horizontalRuler);
     sp.setRowHeaderView (verticalRuler);
     sp.setBorder (null);

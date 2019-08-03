@@ -54,7 +54,7 @@ public abstract class DiskReader
 
   abstract byte[] encodeSector (byte[] buffer);
 
-  abstract void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer);
+  //  abstract void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer);
 
   abstract int expectedDataSize ();
 }

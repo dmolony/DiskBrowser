@@ -18,7 +18,6 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.nib.NibFile;
 import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
-import com.bytezone.diskbrowser.nib.WozFileOld;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -242,31 +241,6 @@ public class AppleDisk implements Disk
     trackSize = 4096;
     file = disk.file;
     diskBuffer = disk.getDiskBuffer ();
-  }
-
-  public AppleDisk (WozFileOld wozFile, int tracks, int sectors)
-  {
-    this.tracks = tracks;
-    this.sectors = sectors;
-    file = wozFile.file;
-    diskBuffer = wozFile.getDiskBuffer ();
-
-    if (sectors == 13)
-    {
-      trackSize = 0xD00;
-      sectorSize = 256;
-    }
-    else
-    {
-      trackSize = 0x1000;
-      sectorSize = trackSize / sectors;
-    }
-
-    blocks = tracks * sectors;
-    hasData = new boolean[blocks];
-    //    isMissing = new boolean[blocks];
-
-    checkSectorsForData ();
   }
 
   public AppleDisk (WozFile wozFile, int tracks, int sectors)

@@ -126,14 +126,14 @@ public class DiskReader16Sector extends DiskReader
   // storeBuffer
   // ---------------------------------------------------------------------------------//
 
-  @Override
-  void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer)
-  {
-    DiskAddressField addressField = diskSector.addressField;
-    byte[] sectorBuffer = diskSector.buffer;
-    int offset = addressField.track * 0x1000 + interleave[addressField.sector] * 256;
-    System.arraycopy (sectorBuffer, 0, diskBuffer, offset, 256);
-  }
+  //  @Override
+  //  void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer)
+  //  {
+  //    DiskAddressField addressField = diskSector.addressField;
+  //    byte[] sectorBuffer = diskSector.buffer;
+  //    int offset = addressField.track * 0x1000 + interleave[addressField.sector] * 256;
+  //    System.arraycopy (sectorBuffer, 0, diskBuffer, offset, 256);
+  //  }
 
   // ---------------------------------------------------------------------------------//
   // expectedDataSize

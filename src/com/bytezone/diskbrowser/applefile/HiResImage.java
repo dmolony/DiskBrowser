@@ -22,7 +22,8 @@ public abstract class HiResImage extends AbstractFile
   //   $06 BIN   $2000  eof $4000                    - DoubleHiResImage
   //   $06 BIN   $1FFF  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
   //   $06 BIN   $2000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
-  //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
+  //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage   (?)
+  //   $06 BIN   $4000  eof $4000                    - DoubleHiResImage     (?)
   //   $06 BIN          .3200                        - SHRPictureFile2
   //   $06 BIN          .3201                        - SHRPictureFile2
 

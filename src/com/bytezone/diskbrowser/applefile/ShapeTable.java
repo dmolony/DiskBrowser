@@ -42,7 +42,7 @@ public class ShapeTable extends AbstractFile
     {
       Shape shape = new Shape (buffer, i);
       if (!shape.valid)
-        return;
+        continue;                   // shape table should be abandoned
       shapes.add (shape);
 
       minRow = Math.min (minRow, shape.minRow);
@@ -125,6 +125,10 @@ public class ShapeTable extends AbstractFile
       int offset = HexFormatter.unsignedShort (buffer, ptr);
       if (offset == 0 || offset >= buffer.length)
         return false;
+
+      // check if previous shape ended with zero
+      //      if (i > 0 && buffer[offset - 1] > 0)
+      //        return false;
     }
 
     return true;
@@ -247,7 +251,7 @@ public class ShapeTable extends AbstractFile
     void convertGrid (int offsetRows, int offsetColumns, int rows, int columns)
     {
       //      System.out.printf ("Converting shape # %d%n", index);
-      //      System.out.printf ("offsetRows %d offsetCols %d%n", offsetRows, 
+      //      System.out.printf ("offsetRows %d offsetCols %d%n", offsetRows,
       // offsetColumns);
       //      System.out.printf ("rows %d cols %d%n", rows, columns);
 

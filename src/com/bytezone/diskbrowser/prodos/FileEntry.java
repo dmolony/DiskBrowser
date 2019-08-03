@@ -223,11 +223,17 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     {
       switch (fileType)
       {
+        case FILE_TYPE_USER_DEFINED_1:                  // OVL
+          if (endOfFile == 0x2000 && auxType == 0)
+          {
+            file = new OriginalHiResImage (name, exactBuffer, auxType);
+            break;
+          }
+          // drop through
         case FILE_TYPE_BINARY:
         case FILE_TYPE_RELOCATABLE:
         case FILE_TYPE_SYS:
         case FILE_TYPE_BAT:
-        case FILE_TYPE_USER_DEFINED_1:
           if (SimpleText.isHTML (exactBuffer))
             file = new SimpleText (name, exactBuffer);
           else if (HiResImage.isGif (exactBuffer) || HiResImage.isPng (exactBuffer))
@@ -385,6 +391,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_LDF:
         case FILE_TYPE_ANI:
         case FILE_TYPE_PAL:
+        case FILE_TYPE_NON:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
 

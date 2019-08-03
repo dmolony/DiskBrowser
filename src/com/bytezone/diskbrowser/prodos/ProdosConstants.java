@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.prodos;
 
 public interface ProdosConstants
 {
+  int FILE_TYPE_NON = 0x00;
   int FILE_TYPE_PCD = 0x02;
   int FILE_TYPE_TEXT = 0x04;
   int FILE_TYPE_PDA = 0x05;
@@ -31,7 +32,7 @@ public interface ProdosConstants
   int FILE_TYPE_ICN = 0xCA;
   int FILE_TYPE_APPLETALK = 0xE2;
   int FILE_TYPE_PASCAL_VOLUME = 0xEF;
-  int FILE_TYPE_USER_DEFINED_1 = 0xF1;
+  int FILE_TYPE_USER_DEFINED_1 = 0xF1;          // OVL
   int FILE_TYPE_BAT = 0xF5;
   int FILE_TYPE_INTEGER_BASIC = 0xFA;
   int FILE_TYPE_INTEGER_BASIC_VARS = 0xFB;

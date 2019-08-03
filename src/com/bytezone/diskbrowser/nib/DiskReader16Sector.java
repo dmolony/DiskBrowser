@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.nib;
 
+// -----------------------------------------------------------------------------------//
 public class DiskReader16Sector extends DiskReader
+// -----------------------------------------------------------------------------------//
 {
   private static final int RAW_BUFFER_SIZE = 342;
   private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
@@ -13,24 +15,17 @@ public class DiskReader16Sector extends DiskReader
 
   private final ByteTranslator byteTranslator = new ByteTranslator6and2 ();
 
-  private static int[] interleave =
-      { 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
-
   // ---------------------------------------------------------------------------------//
-  // constructor
-  // ---------------------------------------------------------------------------------//
-
   DiskReader16Sector ()
+  // ---------------------------------------------------------------------------------//
   {
     super (16);
   }
 
   // ---------------------------------------------------------------------------------//
-  // decodeSector
-  // ---------------------------------------------------------------------------------//
-
   @Override
   byte[] decodeSector (byte[] buffer, int offset) throws DiskNibbleException
+  // ---------------------------------------------------------------------------------//
   {
     // rearrange 342 bytes into 256
     byte[] decodedBuffer = new byte[BLOCK_SIZE];             // 256 bytes
@@ -66,13 +61,11 @@ public class DiskReader16Sector extends DiskReader
     return decodedBuffer;
   }
 
-  // ---------------------------------------------------------------------------------//
-  // encodeSector
-  // ---------------------------------------------------------------------------------//
-
   // convert 256 data bytes into 342 translated bytes plus a checksum
+  // ---------------------------------------------------------------------------------//
   @Override
   byte[] encodeSector (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] encodedBuffer = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
@@ -112,35 +105,18 @@ public class DiskReader16Sector extends DiskReader
     return encodedBuffer;
   }
 
-  // ---------------------------------------------------------------------------------//
-  // reverse
-  // ---------------------------------------------------------------------------------//
-
   // reverse 2 bits - 0 <= bits <= 3
+  // ---------------------------------------------------------------------------------//
   private static int reverse (int bits)
+  // ---------------------------------------------------------------------------------//
   {
     return bits == 1 ? 2 : bits == 2 ? 1 : bits;
   }
 
   // ---------------------------------------------------------------------------------//
-  // storeBuffer
-  // ---------------------------------------------------------------------------------//
-
-  //  @Override
-  //  void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer)
-  //  {
-  //    DiskAddressField addressField = diskSector.addressField;
-  //    byte[] sectorBuffer = diskSector.buffer;
-  //    int offset = addressField.track * 0x1000 + interleave[addressField.sector] * 256;
-  //    System.arraycopy (sectorBuffer, 0, diskBuffer, offset, 256);
-  //  }
-
-  // ---------------------------------------------------------------------------------//
-  // expectedDataSize
-  // ---------------------------------------------------------------------------------//
-
   @Override
   int expectedDataSize ()
+  // ---------------------------------------------------------------------------------//
   {
     return BUFFER_WITH_CHECKSUM_SIZE;
   }

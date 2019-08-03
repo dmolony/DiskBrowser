@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.nib;
 
+// -----------------------------------------------------------------------------------//
 public class DiskReader13Sector extends DiskReader
+// -----------------------------------------------------------------------------------//
 {
   private static final int RAW_BUFFER_SIZE = 410;
   private static final int BUFFER_WITH_CHECKSUM_SIZE = RAW_BUFFER_SIZE + 1;
@@ -11,20 +13,16 @@ public class DiskReader13Sector extends DiskReader
   private final ByteTranslator byteTranslator = new ByteTranslator5and3 ();
 
   // ---------------------------------------------------------------------------------//
-  // constructor
-  // ---------------------------------------------------------------------------------//
-
   DiskReader13Sector ()
+  // ---------------------------------------------------------------------------------//
   {
     super (13);
   }
 
   // ---------------------------------------------------------------------------------//
-  // decodeSector
-  // ---------------------------------------------------------------------------------//
-
   @Override
   byte[] decodeSector (byte[] buffer, int offset) throws DiskNibbleException
+  // ---------------------------------------------------------------------------------//
   {
     byte[] decodedBuffer = new byte[BLOCK_SIZE];
     //    int offset = 0;
@@ -78,35 +76,18 @@ public class DiskReader13Sector extends DiskReader
   }
 
   // ---------------------------------------------------------------------------------//
-  // encodeSector
-  // ---------------------------------------------------------------------------------//
-
   @Override
   byte[] encodeSector (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     System.out.println ("encodeSector() not written");
     return null;
   }
 
   // ---------------------------------------------------------------------------------//
-  // storeBuffer
-  // ---------------------------------------------------------------------------------//
-
-  //  @Override
-  //  void storeBuffer (RawDiskSector diskSector, byte[] diskBuffer)
-  //  {
-  //    DiskAddressField addressField = diskSector.addressField;
-  //    byte[] sectorBuffer = diskSector.buffer;
-  //    int offset = addressField.track * 0x0D00 + addressField.sector * 256;
-  //    System.arraycopy (sectorBuffer, 0, diskBuffer, offset, 256);
-  //  }
-
-  // ---------------------------------------------------------------------------------//
-  // expectedDataSize
-  // ---------------------------------------------------------------------------------//
-
   @Override
   int expectedDataSize ()
+  // ---------------------------------------------------------------------------------//
   {
     return BUFFER_WITH_CHECKSUM_SIZE;
   }

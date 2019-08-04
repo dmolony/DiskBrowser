@@ -35,15 +35,14 @@ public class WozFile
 
   public final File file;
 
+  private Info info;
   private int diskSectors;
-  private int diskType;
-  private int wozVersion;
+
   private byte[] addressPrologue;
   private final byte[] diskBuffer;
 
   private final boolean debug1 = false;
   private final boolean debug2 = false;
-  List<Sector> badSectors = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public WozFile (File file) throws DiskNibbleException
@@ -78,12 +77,14 @@ public class WozFile
       switch (chunkId)
       {
         case "INFO":                            // 60 bytes
-          info (buffer, ptr);
+          info = new Info (buffer, ptr);
+          if (info.wozVersion >= 2)
+            setSectors (info.bootSectorFormat == 2 ? 13 : 16);
           break;
         case "TMAP":                            // 160 bytes
           tmap (buffer, ptr);
           break;
-        case "TRKS":                            // starts at 248
+        case "TRKS":                            // starts at 248, data at 256
           tracks = trks (buffer, ptr);
           break;
         case "META":
@@ -101,7 +102,7 @@ public class WozFile
     diskBuffer = new byte[35 * diskSectors * 256];
     int ndx = diskSectors == 13 ? 0 : 1;
 
-    if (diskType == 1)
+    if (info.diskType == 1)
       for (Track track : tracks)
         for (Sector sector : track)
           if (sector.dataOffset > 0)
@@ -124,66 +125,7 @@ public class WozFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public List<Sector> getBadSectors ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return badSectors;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void info (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    wozVersion = val8 (buffer, ptr + 8);
-
-    diskType = val8 (buffer, ptr + 9);
-    int writeProtected = val8 (buffer, ptr + 10);
-    int synchronised = val8 (buffer, ptr + 11);
-    int cleaned = val8 (buffer, ptr + 12);
-    String creator = new String (buffer, ptr + 13, 32);
-
-    if (debug1)
-    {
-      String diskTypeText = diskType == 1 ? "5.25" : "3.5";
-
-      System.out.printf ("Version ............. %d%n", wozVersion);
-      System.out.printf ("Disk type ........... %d  (%s\")%n", diskType, diskTypeText);
-      System.out.printf ("Write protected ..... %d%n", writeProtected);
-      System.out.printf ("Synchronized ........ %d%n", synchronised);
-      System.out.printf ("Cleaned ............. %d%n", cleaned);
-      System.out.printf ("Creator ............. %s%n", creator);
-    }
-
-    if (wozVersion >= 2)
-    {
-      int sides = val8 (buffer, ptr + 45);
-      int bootSectorFormat = val8 (buffer, ptr + 46);
-      int optimalBitTiming = val8 (buffer, ptr + 47);
-      int compatibleHardware = val16 (buffer, ptr + 48);
-      int requiredRam = val16 (buffer, ptr + 50);
-      int largestTrack = val16 (buffer, ptr + 52);
-
-      setGlobals (bootSectorFormat == 2 ? 13 : 16);
-
-      if (debug1)
-      {
-        String bootSectorFormatText =
-            bootSectorFormat == 0 ? "Unknown" : bootSectorFormat == 1 ? "16 sector"
-                : bootSectorFormat == 2 ? "13 sector" : "Hybrid";
-
-        System.out.printf ("Sides ............... %d%n", sides);
-        System.out.printf ("Boot sector format .. %d  (%s)%n", bootSectorFormat,
-            bootSectorFormatText);
-        System.out.printf ("Optimal bit timing .. %d%n", optimalBitTiming);
-        System.out.printf ("Compatible hardware . %d%n", compatibleHardware);
-        System.out.printf ("Required RAM ........ %d%n", requiredRam);
-        System.out.printf ("Largest track ....... %d%n", largestTrack);
-      }
-    }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void setGlobals (int diskSectors)
+  private void setSectors (int diskSectors)
   // ---------------------------------------------------------------------------------//
   {
     this.diskSectors = diskSectors;
@@ -225,8 +167,8 @@ public class WozFile
     List<Track> tracks = new ArrayList<> ();
     ptr += 8;
 
-    int reclen = wozVersion == 1 ? TRK_SIZE : 8;
-    int max = wozVersion == 1 ? 35 : 160;
+    int reclen = info.wozVersion == 1 ? TRK_SIZE : 8;
+    int max = info.wozVersion == 1 ? 35 : 160;
 
     for (int i = 0; i < max; i++)
     {
@@ -320,8 +262,83 @@ public class WozFile
   }
 
   // ---------------------------------------------------------------------------------//
-  class Track implements Iterable<Sector>
+  class Info
   // ---------------------------------------------------------------------------------//
+  {
+    int wozVersion;
+    int diskType;
+    int writeProtected;
+    int synchronised;
+    int cleaned;
+    String creator;
+
+    int sides;
+    int bootSectorFormat;
+    int optimalBitTiming;
+    int compatibleHardware;
+    int requiredRam;
+    int largestTrack;
+
+    Info (byte[] buffer, int ptr)
+    {
+      wozVersion = val8 (buffer, ptr + 8);
+
+      diskType = val8 (buffer, ptr + 9);
+      writeProtected = val8 (buffer, ptr + 10);
+      synchronised = val8 (buffer, ptr + 11);
+      cleaned = val8 (buffer, ptr + 12);
+      creator = new String (buffer, ptr + 13, 32);
+
+      if (wozVersion >= 2)
+      {
+        sides = val8 (buffer, ptr + 45);
+        bootSectorFormat = val8 (buffer, ptr + 46);
+        optimalBitTiming = val8 (buffer, ptr + 47);
+        compatibleHardware = val16 (buffer, ptr + 48);
+        requiredRam = val16 (buffer, ptr + 50);
+        largestTrack = val16 (buffer, ptr + 52);
+      }
+    }
+
+    // ---------------------------------------------------------------------------------//
+    @Override
+    public String toString ()
+    // ---------------------------------------------------------------------------------//
+    {
+      StringBuilder text = new StringBuilder ();
+
+      String diskTypeText = diskType == 1 ? "5.25" : "3.5";
+
+      text.append (String.format ("Version ............. %d%n", wozVersion));
+      text.append (
+          String.format ("Disk type ........... %d  (%s\")%n", diskType, diskTypeText));
+      text.append (String.format ("Write protected ..... %d%n", writeProtected));
+      text.append (String.format ("Synchronized ........ %d%n", synchronised));
+      text.append (String.format ("Cleaned ............. %d%n", cleaned));
+      text.append (String.format ("Creator ............. %s", creator));
+
+      if (wozVersion > 1)
+      {
+        String bootSectorFormatText =
+            bootSectorFormat == 0 ? "Unknown" : bootSectorFormat == 1 ? "16 sector"
+                : bootSectorFormat == 2 ? "13 sector" : "Hybrid";
+
+        text.append (String.format ("%nSides ............... %d%n", sides));
+        text.append (String.format ("Boot sector format .. %d  (%s)%n", bootSectorFormat,
+            bootSectorFormatText));
+        text.append (String.format ("Optimal bit timing .. %d%n", optimalBitTiming));
+        text.append (String.format ("Compatible hardware . %d%n", compatibleHardware));
+        text.append (String.format ("Required RAM ........ %d%n", requiredRam));
+        text.append (String.format ("Largest track ....... %d", largestTrack));
+      }
+
+      return text.toString ();
+    }
+  }
+
+  // -----------------------------------------------------------------------------------//
+  class Track implements Iterable<Sector>
+  // -----------------------------------------------------------------------------------//
   {
     int trackNo;
     int startingBlock;
@@ -349,7 +366,7 @@ public class WozFile
       if (debug1)
         System.out.println (HexFormatter.format (rawBuffer, ptr, 1024, ptr));
 
-      if (wozVersion == 1)
+      if (info.wozVersion == 1)
       {
         bytesUsed = val16 (rawBuffer, ptr + DATA_SIZE);
         bitCount = val16 (rawBuffer, ptr + DATA_SIZE + 2);
@@ -376,9 +393,9 @@ public class WozFile
 
       if (addressPrologue == null)                                 // WOZ1
         if (findNext (address16prologue, ptr) > 0)
-          setGlobals (16);
+          setSectors (16);
         else if (findNext (address13prologue, ptr) > 0)
-          setGlobals (13);
+          setSectors (13);
         else
           throw new DiskNibbleException ("No address prologue found");
 
@@ -394,9 +411,6 @@ public class WozFile
         if (debug1 && sectors.size () > 0)
           checkDuplicates (sector);
         sectors.add (sector);
-
-        if (sector.dataOffset < 0)
-          badSectors.add (sector);
       }
     }
 
@@ -416,7 +430,7 @@ public class WozFile
       trackIndex = 0;
       bitIndex = 0;
 
-      if (wozVersion == 1)
+      if (info.wozVersion == 1)
         byteIndex = 256 + trackNo * TRK_SIZE;
       else
         byteIndex = startingBlock * BLOCK_SIZE;
@@ -496,7 +510,7 @@ public class WozFile
     // ---------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
-      if (wozVersion == 1)
+      if (info.wozVersion == 1)
         text.append (
             String.format ("WOZ1: Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount));
       else

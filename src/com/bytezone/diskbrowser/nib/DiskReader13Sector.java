@@ -25,7 +25,6 @@ public class DiskReader13Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
   {
     byte[] decodedBuffer = new byte[BLOCK_SIZE];
-    //    int offset = 0;
 
     // convert legal disk values to actual 5 bit values
     for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)             // 411 bytes

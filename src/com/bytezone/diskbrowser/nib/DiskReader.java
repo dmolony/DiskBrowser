@@ -20,7 +20,7 @@ public abstract class DiskReader
   }
 
   // ---------------------------------------------------------------------------------//
-  static DiskReader getDiskReader (int sectors)
+  static DiskReader getInstance (int sectors)
   // ---------------------------------------------------------------------------------//
   {
     if (sectors == 13)
@@ -36,6 +36,7 @@ public abstract class DiskReader
         reader16 = new DiskReader16Sector ();
       return reader16;
     }
+
     return null;
   }
 

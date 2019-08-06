@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.nib;
 
-public abstract class ByteTranslator
+public interface ByteTranslator
 {
   abstract byte encode (byte b);
 

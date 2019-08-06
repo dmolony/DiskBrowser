@@ -39,7 +39,7 @@ public class WozFile
   private int diskSectors;
 
   private byte[] addressPrologue;
-  private final byte[] diskBuffer;
+  private byte[] diskBuffer;
 
   private final boolean debug1 = false;
   private final boolean debug2 = false;
@@ -98,16 +98,13 @@ public class WozFile
       ptr += size + 8;
     }
 
-    DiskReader diskReader = DiskReader.getDiskReader (diskSectors);
-    diskBuffer = new byte[35 * diskSectors * 256];
-    int ndx = diskSectors == 13 ? 0 : 1;
+    if (info.diskType == 1)                   // 5.25"
+    {
+      diskBuffer = new byte[35 * diskSectors * SECTOR_SIZE];
 
-    if (info.diskType == 1)
       for (Track track : tracks)
-        for (Sector sector : track)
-          if (sector.dataOffset > 0)
-            sector.pack (diskReader, diskBuffer, SECTOR_SIZE
-                * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]));
+        track.pack (diskBuffer);
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -340,19 +337,19 @@ public class WozFile
   class Track implements Iterable<Sector>
   // -----------------------------------------------------------------------------------//
   {
-    int trackNo;
-    int startingBlock;
-    int blockCount;        // WOZ2 - not needed
-    int bitCount;
-    int bytesUsed;         // WOZ1 - not needed
+    private int trackNo;
+    private int startingBlock;
+    private int blockCount;        // WOZ2 - not needed
+    private int bitCount;
+    private int bytesUsed;         // WOZ1 - not needed
 
-    byte[] rawBuffer;
-    byte[] newBuffer;
+    private byte[] rawBuffer;
+    private byte[] newBuffer;
 
-    int bitIndex;
-    int byteIndex;
-    int trackIndex;
-    int revolutions;
+    private int bitIndex;
+    private int byteIndex;
+    private int trackIndex;
+    private int revolutions;
 
     List<Sector> sectors = new ArrayList<> ();
 
@@ -408,8 +405,7 @@ public class WozFile
           break;
 
         Sector sector = new Sector (this, offset);
-        if (debug1 && sectors.size () > 0)
-          checkDuplicates (sector);
+        checkDuplicates (sector);
         sectors.add (sector);
       }
     }
@@ -505,6 +501,19 @@ public class WozFile
     }
 
     // ---------------------------------------------------------------------------------//
+    void pack (byte[] diskBuffer) throws DiskNibbleException
+    // ---------------------------------------------------------------------------------//
+    {
+      int ndx = diskSectors == 13 ? 0 : 1;
+      DiskReader diskReader = DiskReader.getInstance (diskSectors);
+
+      for (Sector sector : sectors)
+        if (sector.dataOffset > 0)
+          sector.pack (diskReader, diskBuffer, SECTOR_SIZE
+              * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]));
+    }
+
+    // ---------------------------------------------------------------------------------//
     @Override
     public String toString ()
     // ---------------------------------------------------------------------------------//
@@ -538,9 +547,10 @@ public class WozFile
   public class Sector
   // ---------------------------------------------------------------------------------//
   {
-    Track track;
-    public final int trackNo, sectorNo, volume, checksum;
-    int addressOffset, dataOffset;
+    private final Track track;
+    private final int trackNo, sectorNo, volume, checksum;
+    private final int addressOffset;
+    private int dataOffset;
 
     // ---------------------------------------------------------------------------------//
     Sector (Track track, int addressOffset)

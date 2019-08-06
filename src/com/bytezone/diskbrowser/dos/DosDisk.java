@@ -106,11 +106,7 @@ public class DosDisk extends AbstractFormattedDisk
       if (!disk.isValidAddress (track, sector))
         break;
 
-      //      int thisBlock = da.getBlock ();
       da = disk.getDiskAddress (track, sector);
-
-      //      if (CHECK_SELF_POINTER && da.getBlock () == thisBlock)
-      //        break;
 
     } while (da.getBlock () != 0);
 
@@ -134,7 +130,6 @@ public class DosDisk extends AbstractFormattedDisk
         int track = entry[0] & 0xFF;
         boolean deletedFlag = (entry[0] & 0x80) != 0;
 
-        //        if (entry[0] == (byte) 0xFF)              // deleted file
         if (deletedFlag)              // deleted file
         {
           DeletedCatalogEntry deletedCatalogEntry =
@@ -181,7 +176,6 @@ public class DosDisk extends AbstractFormattedDisk
           if (fe2.getUniqueName ().equals (partner1)
               || fe2.getUniqueName ().equals (partner2))
           {
-            //            System.out.printf ("%s   %s%n", name, partner1);
             ((CatalogEntry) fe2).link ((CatalogEntry) fe);
             ((CatalogEntry) fe).link ((CatalogEntry) fe2);
           }
@@ -343,20 +337,11 @@ public class DosDisk extends AbstractFormattedDisk
       }
 
       catalogAddresses.add (da);
-      //      catalogBlocks++;
-      //      if (catalogBlocks > 1000)     // looping
-      //      {
-      //        System.out.println ("Disk appears to be looping in countCatalogBlocks()");
-      //        return 0;
-      //      }
 
-      //      int thisBlock = da.getBlock ();
       da = disk.getDiskAddress (buffer[1], buffer[2]);
 
     } while (da.getBlock () != 0);
 
-    //    if (catalogBlocks != catalogAddresses.size ())
-    //      System.out.printf ("CB: %d, size: %d%n", catalogBlocks, catalogAddresses.size ());
     return catalogAddresses.size ();
   }
 
@@ -411,8 +396,8 @@ public class DosDisk extends AbstractFormattedDisk
         + "   Length         TS Data  Comment" + newLine);
     text.append (line);
 
-    for (AppleFileSource ce : fileEntries)
-      text.append (((CatalogEntry) ce).getDetails () + newLine);
+    for (AppleFileSource fileEntry : fileEntries)
+      text.append (((CatalogEntry) fileEntry).getDetails () + newLine);
 
     text.append (line);
     text.append (String.format (

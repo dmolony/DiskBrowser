@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.nib;
 
-public class ByteTranslator6and2 extends ByteTranslator
+public class ByteTranslator6and2 implements ByteTranslator
 {
   // 64 valid bytes that can be stored on a disk (plus 0xAA and 0xD5)
   private static byte[] writeTranslateTable6and2 =
@@ -33,7 +33,7 @@ public class ByteTranslator6and2 extends ByteTranslator
   // ---------------------------------------------------------------------------------//
 
   @Override
-  byte encode (byte b)
+  public byte encode (byte b)
   {
     return writeTranslateTable6and2[(b & 0xFC)];
   }
@@ -43,7 +43,7 @@ public class ByteTranslator6and2 extends ByteTranslator
   // ---------------------------------------------------------------------------------//
 
   @Override
-  byte decode (byte b) throws DiskNibbleException
+  public byte decode (byte b) throws DiskNibbleException
   {
     int val = (b & 0xFF) - 0x96;                              // 0 - 105
     if (val < 0 || val > 105)

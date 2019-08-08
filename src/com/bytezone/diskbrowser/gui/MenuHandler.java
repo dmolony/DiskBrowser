@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -11,6 +12,7 @@ import javax.swing.*;
 
 import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
+import com.bytezone.diskbrowser.applefile.BasicProgram;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory;
@@ -27,16 +29,27 @@ public class MenuHandler
   private static final String PREFS_SHOW_FREE_SECTORS = "show free sectors";
   private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
   private static final String PREFS_MONOCHROME = "monochrome";
+
+  private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
+  private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
+  private static final String PREFS_SHOW_TARGETS = "showTargets";
+  private static final String PREFS_SHOW_HEADER = "showHeader";
+  private static final String PREFS_SHOW_CARET = "showCaret";
+
   //  private static final String PREFS_DEBUGGING = "debugging";
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
   private final SaveTempFileAction saveTempFileAction = new SaveTempFileAction ();
+  private final BasicPreferences basicPreferences = new BasicPreferences ();
+  private final List<BasicPreferencesListener> basicPreferencesListeners =
+      new ArrayList<> ();
 
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
   JMenu formatMenu = new JMenu ("Format");
   JMenu colourMenu = new JMenu ("Colours");
+  JMenu applesoftMenu = new JMenu ("Applesoft");
   JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
@@ -68,6 +81,12 @@ public class MenuHandler
   final JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
   final JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
 
+  final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
+  final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align assign");
+  final JMenuItem showTargetsItem = new JCheckBoxMenuItem ("Show targets");
+  final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
+  final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
+
   ButtonGroup paletteGroup = new ButtonGroup ();
 
   public MenuHandler (Preferences prefs)
@@ -75,6 +94,7 @@ public class MenuHandler
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
     menuBar.add (colourMenu);
+    menuBar.add (applesoftMenu);
     menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
@@ -131,6 +151,28 @@ public class MenuHandler
     colourMenu.add (nextPaletteItem);
     colourMenu.add (prevPaletteItem);
 
+    applesoftMenu.add (splitRemarkItem);
+    applesoftMenu.add (alignAssignItem);
+    applesoftMenu.add (showTargetsItem);
+    applesoftMenu.add (showHeaderItem);
+    applesoftMenu.add (showCaretItem);
+
+    ActionListener basicPreferencesAction = new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        setBasicPreferences ();
+        notifyBasicPreferencesListeners ();
+      }
+    };
+
+    splitRemarkItem.addActionListener (basicPreferencesAction);
+    alignAssignItem.addActionListener (basicPreferencesAction);
+    showTargetsItem.addActionListener (basicPreferencesAction);
+    showHeaderItem.addActionListener (basicPreferencesAction);
+    showCaretItem.addActionListener (basicPreferencesAction);
+
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
     sector256Item.setActionCommand ("256");
@@ -149,6 +191,31 @@ public class MenuHandler
     interleaveGroup.add (interleave3Item);
 
     saveDiskItem.setAction (saveTempFileAction);
+  }
+
+  private void setBasicPreferences ()
+  {
+    basicPreferences.splitRem = splitRemarkItem.isSelected ();
+    basicPreferences.alignAssign = alignAssignItem.isSelected ();
+    basicPreferences.showCaret = showCaretItem.isSelected ();
+    basicPreferences.showHeader = showHeaderItem.isSelected ();
+    basicPreferences.showTargets = showTargetsItem.isSelected ();
+    BasicProgram.setBasicPreferences (basicPreferences);
+  }
+
+  void addBasicPreferencesListener (BasicPreferencesListener listener)
+  {
+    if (!basicPreferencesListeners.contains (listener))
+    {
+      basicPreferencesListeners.add (listener);
+      listener.setBasicPreferences (basicPreferences);
+    }
+  }
+
+  void notifyBasicPreferencesListeners ()
+  {
+    for (BasicPreferencesListener listener : basicPreferencesListeners)
+      listener.setBasicPreferences (basicPreferences);
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -189,6 +256,12 @@ public class MenuHandler
     prefs.putInt (PREFS_PALETTE,
         HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
     fontAction.quit (prefs);
+
+    prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
+    prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_TARGETS, showTargetsItem.isSelected ());
   }
 
   @Override
@@ -201,6 +274,14 @@ public class MenuHandler
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
     monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
     //    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
+
+    splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
+    alignAssignItem.setSelected (prefs.getBoolean (PREFS_ALIGN_ASSIGN, true));
+    showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
+    showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
+    showTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
+
+    setBasicPreferences ();
 
     int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
     PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();

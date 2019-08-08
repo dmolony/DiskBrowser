@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.bytezone.diskbrowser.gui.BasicPreferences;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class BasicProgram extends AbstractFile
@@ -32,13 +33,7 @@ public class BasicProgram extends AbstractFile
   private final Set<Integer> gotoLines = new HashSet<Integer> ();
   private final Set<Integer> gosubLines = new HashSet<Integer> ();
 
-  private final boolean splitRem = false;                   // should be a user preference
-  private final boolean alignAssign = true;                 // should be a user preference
-  private final boolean showTargets = true;                 // should be a user preference
-  private final boolean showHeader = true;                  // should be a user preference
-  private final boolean onlyShowTargetLineNumbers = false;  // should be a user preference
-  private final int wrapPrintAt = 40;
-  private final int wrapRemAt = 60;
+  private static BasicPreferences basicPreferences;
 
   public BasicProgram (String name, byte[] buffer)
   {
@@ -62,16 +57,21 @@ public class BasicProgram extends AbstractFile
     endPtr = ptr;
   }
 
+  public static void setBasicPreferences (BasicPreferences basicPreferences)
+  {
+    BasicProgram.basicPreferences = basicPreferences;
+  }
+
   @Override
   public String getText ()
   {
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<String> ();
-    if (showHeader)
+    if (basicPreferences.showHeader)
       addHeader (fullText);
     int alignPos = 0;
     StringBuilder text;
-    int baseOffset = showTargets ? 12 : 8;
+    int baseOffset = basicPreferences.showTargets ? 12 : 8;
 
     for (SourceLine line : sourceLines)
     {
@@ -107,7 +107,7 @@ public class BasicProgram extends AbstractFile
         }
 
         // Are we joining REM lines with the previous subline?
-        if (!splitRem && subline.isJoinableRem ())
+        if (!basicPreferences.splitRem && subline.isJoinableRem ())
         {
           // Join this REM statement to the previous line, so no indenting
           fullText.deleteCharAt (fullText.length () - 1);         // remove newline
@@ -116,14 +116,14 @@ public class BasicProgram extends AbstractFile
         else    // ... otherwise do all the indenting and showing of targets etc.
         {
           // Prepare target indicators for subsequent sublines (ie no line number)
-          if (showTargets && !subline.isFirst ())
+          if (basicPreferences.showTargets && !subline.isFirst ())
             if (subline.is (TOKEN_GOSUB))
               text.append ("<<--");
             else if (subline.is (TOKEN_GOTO) || subline.isImpliedGoto ())
               text.append (" <--");
 
           // Align assign statements if required
-          if (alignAssign)
+          if (basicPreferences.alignAssign)
             alignPos = alignEqualsPosition (subline, alignPos);
 
           int column = indent * 2 + baseOffset;
@@ -137,13 +137,13 @@ public class BasicProgram extends AbstractFile
 
         // Check for a wrappable REM statement
         // (see SEA BATTLE on DISK283.DSK)
-        if (subline.is (TOKEN_REM) && lineText.length () > wrapRemAt + 4)
+        if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt + 4)
         {
           //          System.out.println (lineText.length ());
           String copy = lineText.substring (4);
           text.append ("REM ");
           int inset = text.length () + 1;
-          List<String> remarks = splitRemark (copy, wrapRemAt);
+          List<String> remarks = splitRemark (copy, basicPreferences.wrapRemAt);
           boolean first = true;
           for (String remark : remarks)
           {
@@ -161,7 +161,8 @@ public class BasicProgram extends AbstractFile
 
         // Check for a wrappable PRINT statement
         // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
-        if (wrapPrintAt > 0 && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
+        if (basicPreferences.wrapPrintAt > 0           //
+            && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
             && countChars (text, ASCII_QUOTE) == 2        // just start and end quotes
             && countChars (text, ASCII_CARET) == 0)       // no control characters
         //    && countChars (text, ASCII_SEMI_COLON) == 0)
@@ -189,16 +190,16 @@ public class BasicProgram extends AbstractFile
           {
             int first = text.indexOf ("\"") + 1;
             int last = text.indexOf ("\"", first + 1) - 1;
-            if ((last - first) > wrapPrintAt)
+            if ((last - first) > basicPreferences.wrapPrintAt)
             {
-              int ptr = first + wrapPrintAt;
+              int ptr = first + basicPreferences.wrapPrintAt;
               do
               {
                 fullText.append (text.substring (0, ptr)
                     + "\n                                 ".substring (0, first + 1));
                 text.delete (0, ptr);
-                ptr = wrapPrintAt;
-              } while (text.length () > wrapPrintAt);
+                ptr = basicPreferences.wrapPrintAt;
+              } while (text.length () > basicPreferences.wrapPrintAt);
             }
             fullText.append (text + "\n");
           }
@@ -232,7 +233,7 @@ public class BasicProgram extends AbstractFile
     int first = line.indexOf ("\"") + 1;
     int last = line.indexOf ("\"", first + 1) - 1;
 
-    if (first != 7 || (last - first) <= wrapPrintAt)
+    if (first != 7 || (last - first) <= basicPreferences.wrapPrintAt)
       return null;
 
     int charsLeft = last - first + 1;
@@ -243,10 +244,10 @@ public class BasicProgram extends AbstractFile
     String sub;
     while (true)
     {
-      if (line.length () >= wrapPrintAt)
+      if (line.length () >= basicPreferences.wrapPrintAt)
       {
-        sub = line.substring (0, wrapPrintAt);
-        line = line.substring (wrapPrintAt);
+        sub = line.substring (0, basicPreferences.wrapPrintAt);
+        line = line.substring (basicPreferences.wrapPrintAt);
       }
       else
       {
@@ -255,7 +256,7 @@ public class BasicProgram extends AbstractFile
       }
 
       String subline = padding + sub;
-      charsLeft -= wrapPrintAt;
+      charsLeft -= basicPreferences.wrapPrintAt;
 
       if (charsLeft > 0)
         lines.add (subline);
@@ -298,7 +299,7 @@ public class BasicProgram extends AbstractFile
 
   private String getBase (SourceLine line)
   {
-    if (!showTargets)
+    if (!basicPreferences.showTargets)
       return String.format (" %5d", line.lineNumber);
 
     String lineNumberText = String.format ("%5d", line.lineNumber);
@@ -316,7 +317,7 @@ public class BasicProgram extends AbstractFile
       c1 = "--";
     if (!c1.equals ("  ") && c2.equals ("  "))
       c2 = "--";
-    if (onlyShowTargetLineNumbers && !c2.startsWith (">"))
+    if (basicPreferences.onlyShowTargetLineNumbers && !c2.startsWith (">"))
       lineNumberText = "";
     return String.format ("%s%s %s", c1, c2, lineNumberText);
   }
@@ -351,7 +352,7 @@ public class BasicProgram extends AbstractFile
           // Lines that start with a REM always break.
           if (subline.assignEqualPos == 0
               // && (splitRem || !subline.is (TOKEN_REM) || subline.isFirst ()))
-              && (splitRem || !subline.isJoinableRem ()))
+              && (basicPreferences.splitRem || !subline.isJoinableRem ()))
             break fast; // of champions
 
           if (subline.assignEqualPos > highestAssign)
@@ -375,7 +376,7 @@ public class BasicProgram extends AbstractFile
       return super.getHexDump ();
 
     StringBuilder pgm = new StringBuilder ();
-    if (showHeader)
+    if (basicPreferences.showHeader)
       addHeader (pgm);
 
     int ptr = 0;
@@ -566,7 +567,7 @@ public class BasicProgram extends AbstractFile
       this.length = length;
 
       byte b = buffer[startPtr];
-      if ((b & 0x80) > 0)                   // token
+      if (isToken (b))
       {
         switch (b)
         {
@@ -620,7 +621,7 @@ public class BasicProgram extends AbstractFile
       }
       else
       {
-        if (b >= 48 && b <= 57)       // numeric, so must be a line number
+        if (isDigit (b))       // numeric, so must be a line number
         {
           String target = new String (buffer, startPtr, length - 1);
           try
@@ -638,7 +639,8 @@ public class BasicProgram extends AbstractFile
             //            assert false;
           }
         }
-        else if (alignAssign)
+        //        else if (basicPreferences.alignAssign)
+        else
           recordEqualsPosition ();
       }
     }
@@ -646,9 +648,9 @@ public class BasicProgram extends AbstractFile
     private boolean isImpliedGoto ()
     {
       byte b = buffer[startPtr];
-      if ((b & 0x80) > 0)                     // token
+      if (isToken (b))
         return false;
-      return (b >= 48 && b <= 57);
+      return (isDigit (b));
     }
 
     // Record the position of the equals sign so it can be aligned with adjacent lines.
@@ -686,9 +688,24 @@ public class BasicProgram extends AbstractFile
     {
       // ignore first byte, check the rest for tokens
       for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
-        if ((buffer[p] & 0x80) > 0)
+        if (isToken (buffer[p]))
           return true;
       return false;
+    }
+
+    private boolean isToken (byte value)
+    {
+      return (value & 0x80) > 0;
+    }
+
+    private boolean isControlCharacter (byte value)
+    {
+      return value < 32;
+    }
+
+    private boolean isDigit (byte value)
+    {
+      return value >= 48 && value <= 57;
     }
 
     public int getAddress ()
@@ -734,7 +751,7 @@ public class BasicProgram extends AbstractFile
       for (int p = startPtr; p <= max; p++)
       {
         byte b = buffer[p];
-        if ((b & 0x80) > 0)                         // token
+        if (isToken (b))
         {
           if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
             line.append (' ');
@@ -742,8 +759,8 @@ public class BasicProgram extends AbstractFile
           if (val < ApplesoftConstants.tokens.length)
             line.append (ApplesoftConstants.tokens[b & 0x7F]);
         }
-        else if (b < 32)                            // CTRL character
-          line.append ("^" + (char) (b + 64));      // would be better in inverse text
+        else if (isControlCharacter (b))
+          line.append (basicPreferences.showCaret ? "^" + (char) (b + 64) : "");
         else
           line.append ((char) b);
       }

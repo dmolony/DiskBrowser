@@ -13,6 +13,7 @@ import javax.swing.event.ChangeListener;
 
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
+import com.bytezone.diskbrowser.applefile.BasicProgram;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
@@ -23,7 +24,7 @@ import com.bytezone.diskbrowser.disk.SectorList;
 
 class DataPanel extends JTabbedPane
     implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
-    FileNodeSelectionListener, FontChangeListener
+    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener
 {
   private static final int TEXT_WIDTH = 65;
 
@@ -118,7 +119,10 @@ class DataPanel extends JTabbedPane
       }
     });
 
-    menuHandler.lineWrapItem.setAction (new LineWrapAction (formattedText));
+    LineWrapAction lineWrapAction = new LineWrapAction ();
+    menuHandler.lineWrapItem.setAction (lineWrapAction);
+    lineWrapAction.addListener (formattedText);
+
     menuHandler.colourQuirksItem.setAction (new ColourQuirksAction (this));
     menuHandler.monochromeItem.setAction (new MonochromeAction (this));
     menuHandler.debuggingItem.setAction (new DebuggingAction (this));
@@ -229,6 +233,7 @@ class DataPanel extends JTabbedPane
   private void setDataSource (DataSource dataSource)
   {
     currentDataSource = dataSource;
+
     if (dataSource == null)
     {
       formattedText.setText ("");
@@ -381,7 +386,8 @@ class DataPanel extends JTabbedPane
   @Override
   public void fileSelected (FileSelectedEvent event)
   {
-    setDataSource (event.file.getDataSource ());
+    DataSource dataSource = event.file.getDataSource ();
+    setDataSource (dataSource);
   }
 
   @Override
@@ -413,5 +419,12 @@ class DataPanel extends JTabbedPane
   public void changeFont (FontChangeEvent fontChangeEvent)
   {
     setTabsFont (fontChangeEvent.font);
+  }
+
+  @Override
+  public void setBasicPreferences (BasicPreferences basicPreferences)
+  {
+    if (currentDataSource instanceof BasicProgram)
+      setDataSource (currentDataSource);
   }
 }

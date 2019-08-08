@@ -33,6 +33,7 @@ public class MenuHandler
   private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
   private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
   private static final String PREFS_SHOW_TARGETS = "showTargets";
+  private static final String PREFS_ONLY_SHOW_TARGETS = "onlyShowTargets";
   private static final String PREFS_SHOW_HEADER = "showHeader";
   private static final String PREFS_SHOW_CARET = "showCaret";
 
@@ -84,6 +85,8 @@ public class MenuHandler
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align assign");
   final JMenuItem showTargetsItem = new JCheckBoxMenuItem ("Show targets");
+  final JMenuItem onlyShowTargetLinesItem =
+      new JCheckBoxMenuItem ("Only show target lines");
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
 
@@ -154,6 +157,7 @@ public class MenuHandler
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (alignAssignItem);
     applesoftMenu.add (showTargetsItem);
+    applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showHeaderItem);
     applesoftMenu.add (showCaretItem);
 
@@ -170,6 +174,7 @@ public class MenuHandler
     splitRemarkItem.addActionListener (basicPreferencesAction);
     alignAssignItem.addActionListener (basicPreferencesAction);
     showTargetsItem.addActionListener (basicPreferencesAction);
+    onlyShowTargetLinesItem.addActionListener (basicPreferencesAction);
     showHeaderItem.addActionListener (basicPreferencesAction);
     showCaretItem.addActionListener (basicPreferencesAction);
 
@@ -200,6 +205,7 @@ public class MenuHandler
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showHeader = showHeaderItem.isSelected ();
     basicPreferences.showTargets = showTargetsItem.isSelected ();
+    basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
     BasicProgram.setBasicPreferences (basicPreferences);
   }
 
@@ -262,6 +268,7 @@ public class MenuHandler
     prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_TARGETS, showTargetsItem.isSelected ());
+    prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
   }
 
   @Override
@@ -280,6 +287,8 @@ public class MenuHandler
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
     showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
     showTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
+    onlyShowTargetLinesItem
+        .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));
 
     setBasicPreferences ();
 

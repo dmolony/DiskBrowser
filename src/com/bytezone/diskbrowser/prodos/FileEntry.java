@@ -289,7 +289,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_APPLESOFT_BASIC:
-          file = new BasicProgram (name, exactBuffer);
+          file = new ApplesoftBasicProgram (name, exactBuffer);
+          break;
+
+        case FILE_TYPE_GS_BASIC:
+          file = new BasicProgramGS (name, exactBuffer);
           break;
 
         case FILE_TYPE_INTEGER_BASIC:
@@ -391,8 +395,14 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_LDF:
         case FILE_TYPE_ANI:
         case FILE_TYPE_PAL:
-        case FILE_TYPE_NON:
           file = new DefaultAppleFile (name, exactBuffer);
+          break;
+
+        case FILE_TYPE_NON:
+          if (name.endsWith (".TIFF") && HiResImage.isTiff (exactBuffer))
+            file = new OriginalHiResImage (name, exactBuffer, auxType);
+          else
+            file = new DefaultAppleFile (name, exactBuffer);
           break;
 
         default:

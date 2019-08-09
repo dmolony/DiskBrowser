@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.bytezone.diskbrowser.gui.DiskBrowser;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -95,7 +96,9 @@ public class AssemblerProgram extends AbstractFile
       pgm.append (String.format ("Entry   : $%04X%n", (loadAddress + executeOffset)));
     pgm.append (String.format ("%n"));
 
-    return pgm.append (getStringBuilder2 ()).toString ();
+    String stringText = getStringsText ();
+
+    return pgm.append (getStringBuilder2 ()).toString () + stringText;
   }
 
   //  private StringBuilder getStringBuilder ()
@@ -265,6 +268,44 @@ public class AssemblerProgram extends AbstractFile
     }
 
     return lines;
+  }
+
+  private Map<Integer, String> getStrings ()
+  {
+    TreeMap<Integer, String> strings = new TreeMap<> ();
+
+    int start = 0;
+    for (int ptr = 0; ptr < buffer.length; ptr++)
+    {
+      if ((buffer[ptr] & 0x80) != 0)    // high bit set
+        continue;
+
+      if (buffer[ptr] == 0 && ptr - start > 5)             // possible end of string
+        strings.put (start, HexFormatter.getString (buffer, start, ptr - start));
+
+      start = ptr + 1;
+    }
+    return strings;
+  }
+
+  private String getStringsText ()
+  {
+    Map<Integer, String> strings = getStrings ();
+    if (strings.size () == 0)
+      return "";
+
+    StringBuilder text = new StringBuilder ("\n\nPossible strings:\n\n");
+    for (Integer key : strings.keySet ())
+    {
+      String s = strings.get (key);
+      int start = key + loadAddress;
+      text.append (String.format ("%04X - %04X %s %n", start, start + s.length (), s));
+    }
+
+    if (text.length () > 0)
+      text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
   }
 
   private String getArrow (AssemblerStatement cmd)

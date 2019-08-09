@@ -101,7 +101,7 @@ public abstract class HiResImage extends AbstractFile
   protected void createImage ()
   {
     if (failureReason.isEmpty ())
-      if (isGif (buffer) || isPng (buffer) || isBmp (buffer))
+      if (isGif (buffer) || isPng (buffer) || isBmp (buffer) || isTiff (buffer))
         makeImage ();
       else if (monochrome)
         createMonochromeImage ();
@@ -461,6 +461,18 @@ public abstract class HiResImage extends AbstractFile
       if (pngHeader[i] != buffer[i])
         return false;
 
+    return true;
+  }
+
+  public static boolean isTiff (byte[] buffer)
+  {
+    if (buffer.length < 3)
+      return false;
+    String text = new String (buffer, 0, 2);
+    if (!"II".equals (text) && !"MM".equals (text))
+      return false;
+    if (buffer[2] != 0x2A)
+      return false;
     return true;
   }
 

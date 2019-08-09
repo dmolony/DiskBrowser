@@ -13,7 +13,7 @@ import javax.swing.event.ChangeListener;
 
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
-import com.bytezone.diskbrowser.applefile.BasicProgram;
+import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
@@ -424,7 +424,7 @@ class DataPanel extends JTabbedPane
   @Override
   public void setBasicPreferences (BasicPreferences basicPreferences)
   {
-    if (currentDataSource instanceof BasicProgram)
+    if (currentDataSource instanceof ApplesoftBasicProgram)
       setDataSource (currentDataSource);
   }
 }

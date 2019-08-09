@@ -175,7 +175,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           if (reportedLength > buffer.length)
             reportedLength = buffer.length - 2;
           System.arraycopy (buffer, 2, exactBuffer, 0, reportedLength);
-          appleFile = new BasicProgram (name, exactBuffer);
+          appleFile = new ApplesoftBasicProgram (name, exactBuffer);
           break;
 
         case Binary:                        // binary file
@@ -238,7 +238,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           {
             byte[] buf = new byte[exactBuffer.length - 4];
             System.arraycopy (exactBuffer, 4, buf, 0, buf.length);
-            appleFile = new BasicProgram (name, buf);
+            appleFile = new ApplesoftBasicProgram (name, buf);
             System.out.printf ("Possible basic binary: %s%n", name);
           }
           else

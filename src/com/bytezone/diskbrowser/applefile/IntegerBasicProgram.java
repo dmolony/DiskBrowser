@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class IntegerBasicProgram extends AbstractFile
+public class IntegerBasicProgram extends BasicProgram
 {
   private static String[] tokens =
       { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?",
@@ -170,8 +170,8 @@ public class IntegerBasicProgram extends AbstractFile
     {
       int b = buffer[p] & 0xFF;
 
-      if (b == 0x03 // token for colon (:)
-          && !inString && !inRemark && buffer[p + 1] != 1)        // not end of line
+      if (b == 0x03                                             // token for colon (:)
+          && !inString && !inRemark && buffer[p + 1] != 1)      // not end of line
       {
         text.append (":\n" + "         ".substring (0, lineTab));
         continue;

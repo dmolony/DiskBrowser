@@ -92,7 +92,7 @@ public class MenuHandler
 
   ButtonGroup paletteGroup = new ButtonGroup ();
 
-  public MenuHandler (Preferences prefs)
+  public MenuHandler ()
   {
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);

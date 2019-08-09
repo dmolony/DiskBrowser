@@ -34,7 +34,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     }
 
     JToolBar toolBar = new JToolBar ("Toolbar", JToolBar.HORIZONTAL);
-    MenuHandler menuHandler = new MenuHandler (prefs);
+    MenuHandler menuHandler = new MenuHandler ();
 
     setJMenuBar (menuHandler.menuBar);
     setLayout (new BorderLayout ());

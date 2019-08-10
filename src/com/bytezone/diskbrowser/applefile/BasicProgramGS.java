@@ -7,6 +7,76 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class BasicProgramGS extends BasicProgram
 {
+  private static String[] //
+  tokens = { " AUTO ", " DEL ", " EDIT ", " HLIST ",                // 0x80 - 0x83
+             " LIST ", " RENUM ", " BREAK ", " FN ",                // 0x84 - 0x87
+             " PROC ", " GOSUB ", " GOTO ", " FOR ",                // 0x88 - 0x8B
+             " THEN ", " ELSE ", " NEXT ", " OFF ",                 // 0x8C - 0x8F
+             " ON ", " INPUT ", " OUTPUT ", " TEXT ",               // 0x90 - 0x93
+             " TIMER ", " EXCEPTION ", " CAT ", " 97 ",             // 0x94 - 0x97
+             " INIT ", " INVOKE ", " LIBRARY ", " PREFIX ",         // 0x98 - 0x9B
+             " TYPE ", " LOAD ", " SAVE ", " DELETE ",              // 0x9C - 0x9F
+             " RUN ", " RENAME ", " CREATE ", " LOCK ",             // 0xA0 - 0xA3
+             " UNLOCK ", " EXEC ", " CHAIN ", " CATALOG ",          // 0xA4 - 0xA7
+             " OPEN ", " QUIT ", " DIR ", " DIM ",                  // 0xA8 - 0xAB
+             " READ ", " WRITE ", " CLOSE ", " TASKPOLL ",          // 0xAC - 0xAF 
+             " LOCATE ", " EVENTDEF ", " MENUDEF ", " VOLUMES ",    // 0xB0 - 0xB3
+             " CALL% ", " CALL ", " _", " TEXTPORT ",               // 0xB4 - 0xB7
+             " PERFORM ", " GRAF ", " DBUG ", " POP ",              // 0xB8 - 0xBB
+             " HOME ", " SUB$( ", " TRACE ", " NOTRACE ",           // 0xBC - 0xBF
+             " NORMAL ", " INVERSE ", " RESUME ", " LET ",          // 0xC0 - 0xC3
+             " IF ", " RESTORE ", " SWAP ", " RETURN ",             // 0xC4 - 0xC7
+             " REM ", " STOP ", " DATA ", " IMAGE ",                // 0xC8 - 0xCB
+             " LIBFIND ", " DEF ", " PRINT ", " CLEAR ",            // 0xCC - 0xCF
+             " RANDOMIZE ", " NEW ", " POKE ", " ASSIGN ",          // 0xD0 - 0xD3
+             " GET ", " PUT ", " SET ", " ERROR ",                  // 0xD4 - 0xD7
+             " ERASE ", " LOCAL ", " WHILE ", " CONT ",             // 0xD8 - 0xDB
+             " DO ", " UNTIL ", " END ", " DF ",                    // 0xDC - 0xDF
+             " E0 ", " E1 ", " E2 ", " E3 ",                        // 0xE0 - 0xE3
+             " E4 ", " E5 ", " E6 ", " E7 ",                        // 0xE4 - 0xE7
+             " E8 ", " E9 ", " EA ", " EB ",                        // 0xE8 - 0xEB
+             " EC ", " ED ", " EE ", " EF  ",                       // 0xEC - 0xEF
+             " F0 ", " F1 ", " F2 ", " F3 ",                        // 0xF0 - 0xF3
+             " F4 ", " F5 ", " F6 ", " F7 ",                        // 0xF4 - 0xF7
+             " F8 ", " F9 ", " FA ", " FB ",                        // 0xF8 - 0xFB
+             " FC ", " FD ", " FE ", " FF  ",                       // 0xFC - 0xFF
+  };
+
+  private static String[] //
+  tokensDF = { " TAB(", " TO ", " SPC(", " USING ",                   // 0x80 - 0x83
+               " APPEND ", " MOD ", " REMDR ", " STEP ",              // 0x84 - 0x87
+               " AND ", " OR ", " XOR ", " DIV ",                     // 0x88 - 0x8B
+               " SRC ", " NOT ", " 8E ", " UPDATE ",                  // 0x8C - 0x8F 
+               " TXT ", " BDF ", " FILTYPE= ", " AS ",                // 0x90 - 0x93
+               " 94 ", " 95 ", " SGN(", " INT ",                      // 0x94 - 0x97
+               " ABS(", " TYP(", " REC(", " JOYX(",                   // 0x98 - 0x9B
+               " PDL(", " BTN(", " R.STACK% ", " R.STACK@ ",          // 0x9C - 0x9F
+               " R.STACK&(", " SQR(", " RND(", " LOG(",               // 0xA0 - 0xA3
+               " LOG1(", " LOG2(", " LOGB%(", " EXP(",                // 0xA4 - 0xA7
+               " EXP1(", " EXP2(", " COS(", " SIN(",                  // 0xA8 - 0xAB
+               " TAN(", " ATN(", " BASIC@(", " DATE(",                // 0xAC - 0xAF
+               " EOFMARK(", " FILTYP(", " FIX(", " FREMEM(",          // 0XB0 - 0xB3
+               " NEGATE(", " PEEK(", " ROUND(", " TASKREC%(",         // 0xB4 - 0xB7
+               " TASKREC@(", " TIME(", " UIR(", " STR$(",             // 0xB8 - 0xBB
+               " HEX$(", " PFX$(", " SPACE$(", " ERRTXT$(",           // 0xBC - 0xBF
+               " CHR$(", " RELATION(", " ANU(", " COMPI(",            // 0xC0 - 0xC3
+               " SCALB(", " SCALE(", " LEN(", " VAL(",                // 0xC4 - 0xC7
+               " ASC(", " UCASE$(", " TEN(", " CONV#(",               // 0xC8 - 0xCB
+               " CONV@(", " CONV(", " CONV&(", " CONV$",              // 0xCC - 0xCF
+               " CONV%(", " LEFT$(", " RIGHT$(", " REP$(",            // 0xD0 - 0xD3
+               " MID$(", " INSTR(", " VARPTR(", " VARPTR$(",          // 0xD4 - 0xD7
+               " VAR$(", " VAR(", " UBOUND(", " FILE(",               // 0xD8 - 0xDB
+               " EXEVENT@(", " DD ", " DE ", " DF ",                  // 0xDC - 0xDF
+               " HPOS ", " VPOS ", " TIME$ ", " DATE$ ",              // 0xE0 - 0xE3
+               " PREFIX$ ", " E5 ", " OUTREC ", " INDENT ",           // 0xE4 - 0xE7
+               " SHOWDIGITS ", " LISTTAB ", " AUXID@ ", " EXFN ",     // 0xE8 - 0xEB
+               " SECONDS@ ", " FRE ", " ERRLIN ", " ERR ",            // 0xEC - 0xEF
+               " KBD ", " EOF ", " JOYY ", " PDL9 ",                  // 0xF0 - 0xF3
+               " PI ", " ERRTOOL ", " F6 ", " F7 ",                   // 0xF4 - 0xF7
+               " F8 ", " F9 ", " FA ", " FB ",                        // 0xF8 - 0xFB
+               " FC ", " FD ", " FE ", " FF ",                        // 0xFC - 0xFF
+  };
+
   private final List<SourceLine> sourceLines = new ArrayList<> ();
 
   public BasicProgramGS (String name, byte[] buffer)
@@ -65,644 +135,68 @@ public class BasicProgramGS extends BasicProgram
 
       while (ptr < max)
       {
-        byte b = buffer[ptr++];
-        if (isToken (b))
+        byte b1 = buffer[ptr++];
+        if (isToken (b1))
         {
-          switch (b & 0xFF)
+          if (b1 == (byte) 0xDF)
           {
-            case 0x80:
-              text.append (" AUTO ");
-              break;
-            case 0x81:
-              text.append (" DEL ");
-              break;
-            case 0x82:
-              text.append (" EDIT ");
-              break;
-            case 0x83:
-              text.append (" HLIST ");
-              break;
-            case 0x84:
-              text.append (" LIST ");
-              break;
-            case 0x85:
-              text.append (" RENUM ");
-              break;
-            case 0x86:
-              text.append (" BREAK ");
-              break;
-            case 0x87:
-              text.append (" FN ");
-              break;
-            case 0x88:
-              text.append (" PROC ");
-              break;
-            case 0x89:
-              text.append (" GOSUB ");
-              break;
-            case 0x8A:
-              text.append (" GOTO ");
-              break;
-            case 0x8B:
-              text.append (" FOR ");
-              break;
-            case 0x8C:
-              text.append (" THEN ");
-              break;
-            case 0x8D:
-              text.append (" ELSE ");
-              break;
-            case 0x8E:
-              text.append (" NEXT ");
-              break;
-            case 0x8F:
-              text.append (" OFF ");
-              break;
-            case 0x90:
-              text.append (" ON ");
-              break;
-            case 0x91:
-              text.append (" INPUT ");
-              break;
-            case 0x92:
-              text.append (" OUTPUT ");
-              break;
-            case 0x93:
-              text.append (" TEXT ");
-              break;
-            case 0x94:
-              text.append (" TIMER ");
-              break;
-            case 0x95:
-              text.append (" EXCEPTION ");
-              break;
-            case 0x96:
-              text.append (" CAT ");
-              break;
-            case 0x98:
-              text.append (" INIT ");
-              break;
-            case 0x99:
-              text.append (" INVOKE ");
-              break;
-            case 0x9A:
-              text.append (" LIBRARY ");
-              break;
-            case 0x9B:
-              text.append (" PREFIX ");
-              break;
-            case 0x9C:
-              text.append (" TYPE ");
-              break;
-            case 0x9D:
-              text.append (" LOAD ");
-              break;
-            case 0x9E:
-              text.append (" SAVE ");
-              break;
-            case 0x9F:
-              text.append (" DELETE ");
-              break;
-            case 0xA0:
-              text.append (" RUN ");
-              break;
-            case 0xA1:
-              text.append (" RENAME ");
-              break;
-            case 0xA2:
-              text.append (" CREATE ");
-              break;
-            case 0xA3:
-              text.append (" LOCK ");
-              break;
-            case 0xA4:
-              text.append (" UNLOCK ");
-              break;
-            case 0xA5:
-              text.append (" EXEC ");
-              break;
-            case 0xA6:
-              text.append (" CHAIN ");
-              break;
-            case 0xA7:
-              text.append (" CATALOG ");
-              break;
-            case 0xA8:
-              text.append (" OPEN ");
-              break;
-            case 0xA9:
-              text.append (" QUIT ");
-              break;
-            case 0xAA:
-              text.append (" DIR ");
-              break;
-            case 0xAB:
-              text.append (" DIM ");
-              break;
-            case 0xAC:
-              text.append (" READ ");
-              break;
-            case 0xAD:
-              text.append (" WRITE ");
-              break;
-            case 0xAE:
-              text.append (" CLOSE ");
-              break;
-            case 0xAF:
-              text.append (" TASKPOLL ");
-              break;
-            case 0xB0:
-              text.append (" LOCATE ");
-              break;
-            case 0xB1:
-              text.append (" EVENTDEF ");
-              break;
-            case 0xB2:
-              text.append (" MENUDEF ");
-              break;
-            case 0xB3:
-              text.append (" VOLUMES ");
-              break;
-            case 0xB4:
-              text.append (" CALL% ");
-              break;
-            case 0xB5:
-              text.append (" CALL ");
-              break;
-            case 0xB6:
-              text.append (" _ ");
-              break;
-            case 0xB7:
-              text.append (" TEXTPORT ");
-              break;
-            case 0xB8:
-              text.append (" PERFORM ");
-              break;
-            case 0xB9:
-              text.append (" GRAF ");
-              break;
-            case 0xBA:
-              text.append (" DBUG ");
-              break;
-            case 0xBB:
-              text.append (" POP ");
-              break;
-            case 0xBC:
-              text.append (" HOME ");
-              break;
-            case 0xBD:
-              text.append (" SUB$( ");
-              break;
-            case 0xBE:
-              text.append (" TRACE ");
-              break;
-            case 0xBF:
-              text.append (" NOTRACE ");
-              break;
-            case 0xC0:
-              text.append (" NORMAL ");
-              break;
-            case 0xC1:
-              text.append (" INVERSE ");
-              break;
-            case 0xC2:
-              text.append (" RESUME ");
-              break;
-            case 0xC3:
-              text.append (" LET ");
-              break;
-            case 0xC4:
-              text.append (" IF ");
-              break;
-            case 0xC5:
-              text.append (" RESTORE ");
-              break;
-            case 0xC6:
-              text.append (" SWAP ");
-              break;
-            case 0xC7:
-              text.append (" RETURN ");
-              break;
-            case 0xC8:
-              text.append (" REM ");
-              break;
-            case 0xC9:
-              text.append (" STOP ");
-              break;
-            case 0xCA:
-              text.append (" DATA ");
-              break;
-            case 0xCB:
-              text.append (" IMAGE ");
-              break;
-            case 0xCC:
-              text.append (" LIBFIND ");
-              break;
-            case 0xCD:                        // gimme some skin
-              text.append (" DEF ");
-              break;
-            case 0xCE:
-              text.append (" PRINT ");
-              break;
-            case 0xCF:
-              text.append (" CLEAR ");
-              break;
-            case 0xD0:
-              text.append (" RANDOMIZE ");
-              break;
-            case 0xD1:
-              text.append (" NEW ");
-              break;
-            case 0xD2:
-              text.append (" POKE ");
-              break;
-            case 0xD3:
-              text.append (" ASSIGN ");
-              break;
-            case 0xD4:
-              text.append (" GET ");
-              break;
-            case 0xD5:
-              text.append (" PUT ");
-              break;
-            case 0xD6:
-              text.append (" SET ");
-              break;
-            case 0xD7:
-              text.append (" ERROR ");
-              break;
-            case 0xD8:
-              text.append (" ERASE ");
-              break;
-            case 0xD9:
-              text.append (" LOCAL ");
-              break;
-            case 0xDA:
-              text.append (" WHILE ");
-              break;
-            case 0xDB:
-              text.append (" CONT ");
-              break;
-            case 0xDC:
-              text.append (" DO ");
-              break;
-            case 0xDD:
-              text.append (" UNTIL ");
-              break;
-            case 0xDE:
-              text.append (" END ");
-              break;
-            case 0xDF:
-              switch (buffer[ptr] & 0xFF)
-              {
-                case 0x80:
-                  text.append (" TAB( ");
-                  break;
-                case 0x81:
-                  text.append (" TO ");
-                  break;
-                case 0x82:
-                  text.append (" SPC( ");
-                  break;
-                case 0x83:
-                  text.append (" USING ");
-                  break;
-                case 0x84:
-                  text.append (" APPEND ");
-                  break;
-                case 0x85:
-                  text.append (" MOD ");
-                  break;
-                case 0x86:
-                  text.append (" REMDR ");
-                  break;
-                case 0x87:
-                  text.append (" STEP ");
-                  break;
-                case 0x88:
-                  text.append (" AND ");
-                  break;
-                case 0x89:
-                  text.append (" OR ");
-                  break;
-                case 0x8A:
-                  text.append (" XOR ");
-                  break;
-                case 0x8B:
-                  text.append (" DIV ");
-                  break;
-                case 0x8C:
-                  text.append (" SRC ");
-                  break;
-                case 0x8D:
-                  text.append (" NOT ");
-                  break;
-                case 0x8F:
-                  text.append (" UPDATE ");
-                  break;
-                case 0x90:
-                  text.append (" TXT ");
-                  break;
-                case 0x91:
-                  text.append (" BDF ");
-                  break;
-                case 0x92:
-                  text.append (" FILTYPE= ");
-                  break;
-                case 0x93:
-                  text.append (" AS ");
-                  break;
-                case 0x96:
-                  text.append (" SGN( ");
-                  break;
-                case 0x97:
-                  text.append (" INT ");
-                  break;
-                case 0x98:
-                  text.append (" ABS( ");
-                  break;
-                case 0x99:
-                  text.append (" TYP( ");
-                  break;
-                case 0x9A:
-                  text.append (" REC( ");
-                  break;
-                case 0x9B:
-                  text.append (" JOYX( ");
-                  break;
-                case 0x9C:
-                  text.append (" PDL( ");
-                  break;
-                case 0x9D:
-                  text.append (" BTN( ");
-                  break;
-                case 0x9E:
-                  text.append (" R.STACK%( ");
-                  break;
-                case 0x9F:
-                  text.append (" R.STACK@( ");
-                  break;
-                case 0xA0:
-                  text.append (" R.STACK&( ");
-                  break;
-                case 0xA1:
-                  text.append (" SQR( ");
-                  break;
-                case 0xA2:
-                  text.append (" RND( ");
-                  break;
-                case 0xA3:
-                  text.append (" LOG( ");
-                  break;
-                case 0xA4:
-                  text.append (" LOG1( ");
-                  break;
-                case 0xA5:
-                  text.append (" LOG2( ");
-                  break;
-                case 0xA6:
-                  text.append (" LOGB%( ");
-                  break;
-                case 0xA7:
-                  text.append (" EXP( ");
-                  break;
-                case 0xA8:
-                  text.append (" EXP1( ");
-                  break;
-                case 0xA9:
-                  text.append (" EXP2( ");
-                  break;
-                case 0xAA:
-                  text.append (" COS( ");
-                  break;
-                case 0xAB:
-                  text.append (" SIN( ");
-                  break;
-                case 0xAC:
-                  text.append (" TAN( ");
-                  break;
-                case 0xAD:
-                  text.append (" ATN( ");
-                  break;
-                case 0xAE:
-                  text.append (" BASIC@( ");
-                  break;
-                case 0xAF:
-                  text.append (" DATE( ");
-                  break;
-                case 0xB0:
-                  text.append (" EOFMARK( ");
-                  break;
-                case 0xB1:
-                  text.append (" FILTYP( ");
-                  break;
-                case 0xB2:
-                  text.append (" FIX( ");
-                  break;
-                case 0xB3:
-                  text.append (" FREMEM( ");
-                  break;
-                case 0xB4:
-                  text.append (" NEGATE( ");
-                  break;
-                case 0xB5:
-                  text.append (" PEEK( ");
-                  break;
-                case 0xB6:
-                  text.append (" ROUND( ");
-                  break;
-                case 0xB7:
-                  text.append (" TASKREC%( ");
-                  break;
-                case 0xB8:
-                  text.append (" TASKREC@( ");
-                  break;
-                case 0xB9:
-                  text.append (" TIME( ");
-                  break;
-                case 0xBA:
-                  text.append (" UIR( ");
-                  break;
-                case 0xBB:
-                  text.append (" STR$( ");
-                  break;
-                case 0xBC:
-                  text.append (" HEX$( ");
-                  break;
-                case 0xBD:
-                  text.append (" PFX$( ");
-                  break;
-                case 0xBE:
-                  text.append (" SPACE$( ");
-                  break;
-                case 0xBF:
-                  text.append (" ERRTXT$( ");
-                  break;
-                case 0xC0:
-                  text.append (" CHR$( ");
-                  break;
-                case 0xC1:
-                  text.append (" RELATION( ");
-                  break;
-                case 0xC2:
-                  text.append (" ANU( ");
-                  break;
-                case 0xC3:
-                  text.append (" COMPI( ");
-                  break;
-                case 0xC4:
-                  text.append (" SCALB( ");
-                  break;
-                case 0xC5:
-                  text.append (" SCALE( ");
-                  break;
-                case 0xC6:
-                  text.append (" LEN( ");
-                  break;
-                case 0xC7:
-                  text.append (" VAL( ");
-                  break;
-                case 0xC8:
-                  text.append (" ASC( ");
-                  break;
-                case 0xC9:
-                  text.append (" UCASE$( ");
-                  break;
-                case 0xCA:
-                  text.append (" TEN( ");
-                  break;
-                case 0xCB:
-                  text.append (" CONV#( ");
-                  break;
-                case 0xCC:
-                  text.append (" CONV@( ");
-                  break;
-                case 0xCD:
-                  text.append (" CONV( ");
-                  break;
-                case 0xCE:
-                  text.append (" CONV&( ");
-                  break;
-                case 0xCF:
-                  text.append (" CONV$ ");
-                  break;
-                case 0xD0:
-                  text.append (" CONV%( ");
-                  break;
-                case 0xD1:
-                  text.append (" LEFT$( ");
-                  break;
-                case 0xD2:
-                  text.append (" RIGHT$( ");
-                  break;
-                case 0xD3:
-                  text.append (" REP$( ");
-                  break;
-                case 0xD4:
-                  text.append (" MID$( ");
-                  break;
-                case 0xD5:
-                  text.append (" INSTR( ");
-                  break;
-                case 0xD6:
-                  text.append (" VARPTR( ");
-                  break;
-                case 0xD7:
-                  text.append (" VARPTR$( ");
-                  break;
-                case 0xD8:
-                  text.append (" VAR$( ");
-                  break;
-                case 0xD9:
-                  text.append (" VAR( ");
-                  break;
-                case 0xDA:
-                  text.append (" UBOUND( ");
-                  break;
-                case 0xDB:
-                  text.append (" FILE( ");
-                  break;
-                case 0xDC:
-                  text.append (" EXEVENT@( ");
-                  break;
-                case 0xE0:
-                  text.append (" HPOS ");
-                  break;
-                case 0xE1:
-                  text.append (" VPOS ");
-                  break;
-                case 0xE2:
-                  text.append (" TIME$ ");
-                  break;
-                case 0xE3:
-                  text.append (" DATE$ ");
-                  break;
-                case 0xE4:
-                  text.append (" PREFIX$ ");
-                  break;
-                case 0xE6:
-                  text.append (" OUTREC ");
-                  break;
-                case 0xE7:
-                  text.append (" INDENT ");
-                  break;
-                case 0xE8:
-                  text.append (" SHOWDIGITS ");
-                  break;
-                case 0xE9:
-                  text.append (" LISTTAB ");
-                  break;
-                case 0xEA:
-                  text.append (" AUXID@ ");
-                  break;
-                case 0xEB:
-                  text.append (" EXFN ");
-                  break;
-                case 0xEC:
-                  text.append (" SECONDS@ ");
-                  break;
-                case 0xED:
-                  text.append (" FRE ");
-                  break;
-                case 0xEE:
-                  text.append (" ERRLIN ");
-                  break;
-                case 0xEF:
-                  text.append (" ERR ");
-                  break;
-                case 0xF0:
-                  text.append (" KBD ");
-                  break;
-                case 0xF1:
-                  text.append (" EOF ");
-                  break;
-                case 0xF2:
-                  text.append (" JOYY ");
-                  break;
-                case 0xF3:
-                  text.append (" PDL9 ");
-                  break;
-                case 0xF4:
-                  text.append (" PI ");
-                  break;
-                case 0xF5:
-                  text.append (" ERRTOOL ");
-                  break;
-              }
-              break;
-            default:
-              text.append (String.format (" %02X ", b));
+            byte b2 = buffer[ptr++];
+            text.append (tokensDF[(b2 & 0x7F)]);
           }
+          else if (b1 >= (byte) 0xE0)
+          {
+            //            show (ptr - 1, 5);
+            if (b1 == (byte) 0xFC)                      // 3 bytes
+            {
+              text.append (String.format (" %d ", get (ptr, 3)));
+              ptr += 4;                                  // skip trailing zero
+            }
+            else if (b1 == (byte) 0xFA)                 // 2 bytes
+            {
+              text.append (String.format (" %d ", get (ptr, 2)));
+              ptr += 2;
+            }
+            else if (b1 == (byte) 0xFB)
+            {
+              ptr += 3;                         // ignore 3 bytes (why?)
+            }
+            else if ((b1 & 0xF0) == 0xF0)       // F0:F9 = 0:9
+            {
+              text.append (b1 & 0x0F);
+            }
+            else if ((b1 & 0xE0) == 0xE0)       // 3 nybbles
+            {
+              int val = ((b1 & 0x0F) << 8) | (buffer[ptr++] & 0xFF);
+              text.append (String.format (" %d ", val));
+            }
+          }
+          else
+            text.append (tokens[(b1 & 0x7F)]);
         }
         else
         {
-          if ((b & 0xFF) < 32)
+          if ((b1 & 0xFF) < 32)
             text.append ('.');
           else
-            text.append ((char) b);
+            text.append ((char) b1);
         }
       }
       line = text.toString ();
+    }
+
+    private int get (int ptr, int size)
+    {
+      int val = 0;
+      for (int i = 0; i < size; i++)
+        val |= (buffer[ptr++] & 0xFF) << (i * 8);
+      return val;
+    }
+
+    private void show (int ptr, int size)
+    {
+      for (int i = 0; i < size; i++)
+        System.out.printf (" %02X ", buffer[ptr++]);
+      System.out.println ();
     }
 
     @Override

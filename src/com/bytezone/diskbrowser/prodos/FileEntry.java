@@ -269,6 +269,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (auxType == 0x1000 && endOfFile == 0x400
               && CharacterRom.isRom (exactBuffer))
             file = new CharacterRom (name, exactBuffer);
+          else if (auxType == 0 && endOfFile == 0x8000)
+          {
+            // see gs basic disk, one of the four pictures looks ok
+            file = new SHRPictureFile2 (name, exactBuffer, 0xC1, 0, endOfFile);
+          }
           else
           {
             file = new AssemblerProgram (name, exactBuffer, auxType);

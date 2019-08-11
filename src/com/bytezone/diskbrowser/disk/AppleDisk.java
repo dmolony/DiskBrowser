@@ -76,7 +76,6 @@ public class AppleDisk implements Disk
   //         DFB     06,04,02,15     ;12->06,13->04,14->02,15->15
 
   private boolean[] hasData;
-  //  private boolean[] isMissing;
   private byte emptyByte = 0;
 
   private ActionListener actionListenerList;
@@ -230,7 +229,6 @@ public class AppleDisk implements Disk
     sectorSize = trackSize / sectors;
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
-    //    isMissing = new boolean[blocks];
 
     checkSectorsForData ();
   }
@@ -263,12 +261,8 @@ public class AppleDisk implements Disk
 
     blocks = tracks * sectors;
     hasData = new boolean[blocks];
-    //    isMissing = new boolean[blocks];
 
     checkSectorsForData ();
-
-    //    for (Sector sector : wozFile.getBadSectors ())
-    //      isMissing[sector.trackNo * sectors + sector.sectorNo] = true;
   }
 
   private byte[] getPrefix (File path)

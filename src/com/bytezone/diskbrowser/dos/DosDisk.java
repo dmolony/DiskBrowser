@@ -271,6 +271,10 @@ public class DosDisk extends AbstractFormattedDisk
         return "3.3";
       case 0x41:
         return "4.1";
+      case 0x42:
+        return "4.2";
+      case 0x43:
+        return "4.3";
       default:
         return "??";
     }
@@ -302,7 +306,7 @@ public class DosDisk extends AbstractFormattedDisk
     //    }
 
     int version = buffer[3] & 0xFF;
-    if (version > 0x42 && version != 0xFF)
+    if (version > 0x43 && version != 0xFF)
     {
       System.out.printf ("Bad version : %02X%n", version);
       return 0;

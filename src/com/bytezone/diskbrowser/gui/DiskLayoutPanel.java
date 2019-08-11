@@ -75,7 +75,7 @@ class DiskLayoutPanel extends JPanel
     sp.setViewportView (diskLayoutImage);
 
     setLayout (new BorderLayout ());
-    if (disk.getGridLayout ().height == 35)
+    if (disk.getGridLayout ().height == 35)       // what about 48?
     {
       add (sp, BorderLayout.NORTH);
       add (legendPanel, BorderLayout.CENTER);

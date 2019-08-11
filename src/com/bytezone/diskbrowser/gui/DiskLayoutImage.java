@@ -24,8 +24,6 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
   private static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
   private static final Color[] lightColors =
       { Color.WHITE, Color.YELLOW, Color.PINK, Color.CYAN, Color.ORANGE, Color.GREEN };
-  private static Stroke missingStroke =
-      new BasicStroke ((float) 3.0, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 
   private boolean showFreeSectors;
   private final DiskLayoutSelection selectionHandler = new DiskLayoutSelection ();
@@ -126,7 +124,6 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
             DiskAddress da = d.getDiskAddress (blockNo);
             boolean free = showFreeSectors && formattedDisk.isSectorFree (da);
             boolean selected = selectionHandler.isSelected (da);
-            //            boolean missing = d.isSectorMissing (da);
             drawBlock ((Graphics2D) g, type, x, y, free, selected);
           }
         }
@@ -149,14 +146,6 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
       if (selected)
         g.fillOval (x + centerOffset, y + 6, 3, 3);
     }
-
-    //    if (missing)
-    //    {
-    //      g.setColor (Color.darkGray);
-    //      g.setStroke (missingStroke);
-    //      g.drawLine (x + 5, y + 5, x + 11, y + 11);
-    //      g.drawLine (x + 5, y + 11, x + 11, y + 5);
-    //    }
   }
 
   private Color getContrastColor (SectorType type)

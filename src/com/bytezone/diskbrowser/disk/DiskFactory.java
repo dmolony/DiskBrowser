@@ -232,10 +232,14 @@ public class DiskFactory
 
     if (suffix.equals ("woz"))
     {
+      if (debug)
+        System.out.println ("Checking woz");
       try
       {
         //        WozFileOld wozDisk = new WozFileOld (file);
         WozFile wozFile = new WozFile (file);
+        if (debug)
+          System.out.println ("  Woz read");
         if (wozFile.getSectorsPerTrack () == 13)
         {
           AppleDisk appleDisk = new AppleDisk (wozFile, 35, 13);
@@ -245,7 +249,7 @@ public class DiskFactory
 
         if (wozFile.getSectorsPerTrack () == 16)
         {
-          AppleDisk appleDisk256 = new AppleDisk (wozFile, 35, 16);
+          AppleDisk appleDisk256 = new AppleDisk (wozFile, wozFile.getTracks (), 16);
           disk = checkDos (appleDisk256);
           if (disk == null)
             disk = checkProdos (new AppleDisk (wozFile, 35, 8));

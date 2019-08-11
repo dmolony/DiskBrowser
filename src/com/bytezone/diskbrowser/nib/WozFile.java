@@ -40,6 +40,7 @@ public class WozFile
 
   private byte[] addressPrologue;
   private byte[] diskBuffer;
+  private List<Track> tracks;
 
   private final boolean debug1 = false;
   private final boolean debug2 = false;
@@ -63,8 +64,6 @@ public class WozFile
       System.out.printf ("Calculated checksum : %08X%n", checksum2);
       throw new DiskNibbleException ("Checksum error");
     }
-
-    List<Track> tracks = null;
 
     int ptr = 12;
     while (ptr < buffer.length)
@@ -100,7 +99,7 @@ public class WozFile
 
     if (info.diskType == 1)                   // 5.25"
     {
-      diskBuffer = new byte[35 * diskSectors * SECTOR_SIZE];
+      diskBuffer = new byte[tracks.size () * diskSectors * SECTOR_SIZE];
 
       for (Track track : tracks)
         track.pack (diskBuffer);
@@ -112,6 +111,13 @@ public class WozFile
   // ---------------------------------------------------------------------------------//
   {
     return diskBuffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public int getTracks ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return tracks.size ();
   }
 
   // ---------------------------------------------------------------------------------//

@@ -10,7 +10,7 @@ class DosVTOCSector extends AbstractSector
 {
   DosDisk parentDisk;
   int volume;
-  int dosVersion;       // 1, 2, 3 or 0x41...
+  int dosVersion;       // 1, 2, 3 or 0x41, 0x42, 0x43...
   int maxTSPairs;
   int lastAllocTrack;
   int direction;
@@ -65,7 +65,7 @@ class DosVTOCSector extends AbstractSector
     addText (text, buffer, 0x20, 3,
         "Date/time initialised: " + Utility.getDateTime (buffer, 0x20));
     addText (text, buffer, 0x23, 3, "");
-    addText (text, buffer, 0x26, 1, "Not used");
+    addText (text, buffer, 0x26, 1, "VTOC Phase");
 
     addTextAndDecimal (text, buffer, 0x27, 1, "Maximum TS pairs");
     addText (text, buffer, 0x28, 2, "Volume library");
@@ -172,7 +172,9 @@ class DosVTOCSector extends AbstractSector
   {
     int block = 0;
     int base = maxSectors == 13 ? 3 : 0;
-    for (int i = 56; i <= 0xc3; i += 4)
+    int first = 0x38;
+    int max = maxTracks * 4 + first;
+    for (int i = first; i < max; i += 4)
     {
       block = check (buffer[i + 1], block, base);
       block = check (buffer[i], block, 0);

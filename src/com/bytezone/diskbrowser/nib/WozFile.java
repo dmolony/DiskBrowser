@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -43,7 +42,7 @@ public class WozFile
   private List<Track> tracks;
 
   private final boolean debug1 = false;
-  private final boolean debug2 = false;
+  private final boolean showTracks = false;
 
   // ---------------------------------------------------------------------------------//
   public WozFile (File file) throws DiskNibbleException
@@ -181,7 +180,7 @@ public class WozFile
         if (trk.bitCount == 0)
           break;
         tracks.add (trk);
-        if (debug2)
+        if (showTracks)
           System.out.printf ("%n$%02X  %s%n", i, trk);
       }
       catch (DiskNibbleException e)
@@ -301,6 +300,9 @@ public class WozFile
         requiredRam = val16 (buffer, ptr + 50);
         largestTrack = val16 (buffer, ptr + 52);
       }
+
+      if (debug1)
+        System.out.println (this);
     }
 
     // ---------------------------------------------------------------------------------//
@@ -366,8 +368,8 @@ public class WozFile
       this.rawBuffer = rawBuffer;
       this.trackNo = trackNo;
 
-      if (debug1)
-        System.out.println (HexFormatter.format (rawBuffer, ptr, 1024, ptr));
+      //      if (debug1)
+      //        System.out.println (HexFormatter.format (rawBuffer, ptr, 1024, ptr));
 
       if (info.wozVersion == 1)
       {

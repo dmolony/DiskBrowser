@@ -183,13 +183,13 @@ public class DosDisk extends AbstractFormattedDisk
     }
 
     // add up all the free and used sectors, and label DOS sectors while we're here
-    int lastDosSector = dosVTOCSector.maxSectors * 3; // first three tracks
+    int lastDosSector = dosVTOCSector.maxSectors * 3;       // first three tracks
     for (DiskAddress da2 : disk)
     {
       int blockNo = da2.getBlock ();
       if (blockNo < lastDosSector) // in the DOS region
       {
-        if (freeBlocks.get (blockNo)) // according to the VTOC
+        if (freeBlocks.get (blockNo))                       // according to the VTOC
           ++freeSectors;
         else
         {
@@ -200,7 +200,7 @@ public class DosDisk extends AbstractFormattedDisk
       }
       else
       {
-        if (stillAvailable (da2)) // free or used, ie not specifically labelled
+        if (stillAvailable (da2))       // free or used, ie not specifically labelled
           ++freeSectors;
         else
           ++usedSectors;

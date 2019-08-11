@@ -102,7 +102,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
   protected String getFileType ()
   {
-    switch (this.fileType)
+    switch (fileType)
     {
       case Text:
         return "T";

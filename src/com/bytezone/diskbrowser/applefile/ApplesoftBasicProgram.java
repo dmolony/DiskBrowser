@@ -211,7 +211,9 @@ public class ApplesoftBasicProgram extends BasicProgram
         alignPos = 0;
     }
 
-    fullText.deleteCharAt (fullText.length () - 1);               // remove last newline
+    if (fullText.length () > 0)
+      fullText.deleteCharAt (fullText.length () - 1);           // remove last newline
+
     return fullText.toString ();
   }
 

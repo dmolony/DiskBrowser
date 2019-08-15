@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.bytezone.common.Utility;
+import com.bytezone.diskbrowser.gui.AssemblerPreferences;
 import com.bytezone.diskbrowser.gui.DiskBrowser;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -21,6 +23,8 @@ public class AssemblerProgram extends AbstractFile
   private int executeOffset;
 
   private byte[] extraBuffer = new byte[0];
+
+  static AssemblerPreferences assemblerPreferences;
 
   public AssemblerProgram (String name, byte[] buffer, int address)
   {
@@ -35,6 +39,11 @@ public class AssemblerProgram extends AbstractFile
   {
     this (name, buffer, address);
     this.executeOffset = executeOffset;
+  }
+
+  public static void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
+  {
+    AssemblerProgram.assemblerPreferences = assemblerPreferences;
   }
 
   public void setExtraBuffer (byte[] fullBuffer, int offset, int length)
@@ -66,12 +75,10 @@ public class AssemblerProgram extends AbstractFile
   @Override
   public String getAssembler ()
   {
-    //    String text = super.getAssembler ();
     if (buffer == null)
       return "No buffer";
     if (assembler == null)
       this.assembler = new AssemblerProgram (name, buffer, loadAddress);
-    //    return assembler.getText ();
 
     if (extraBuffer.length == 0)
       return assembler.getText ();
@@ -94,82 +101,17 @@ public class AssemblerProgram extends AbstractFile
 
     if (executeOffset > 0)
       pgm.append (String.format ("Entry   : $%04X%n", (loadAddress + executeOffset)));
-    pgm.append (String.format ("%n"));
 
-    String stringText = getStringsText ();
+    pgm.append ("\n");
+    pgm.append (getListing ());
 
-    return pgm.append (getStringBuilder2 ()).toString () + stringText;
+    if (assemblerPreferences.showStrings)
+      pgm.append (getStringsText ());
+
+    return pgm.toString ();
   }
 
-  //  private StringBuilder getStringBuilder ()
-  //  {
-  //    if (true)
-  //      return getStringBuilder2 ();
-  //
-  //    StringBuilder pgm = new StringBuilder ();
-  //
-  //    int ptr = executeOffset;
-  //    int address = loadAddress + executeOffset;
-  //
-  //    // if the assembly doesn't start at the beginning, just dump the bytes that
-  //    // are skipped
-  //    for (int i = 0; i < executeOffset; i++)
-  //      pgm.append (String.format ("%04X: %02X%n", (loadAddress + i), buffer[i]));
-  //
-  //    while (ptr < buffer.length)
-  //    {
-  //      StringBuilder line = new StringBuilder ();
-  //
-  //      AssemblerStatement cmd = new AssemblerStatement (buffer[ptr]);
-  //
-  //      if (cmd.size == 2 && ptr < buffer.length - 1)
-  //        cmd.addData (buffer[ptr + 1]);
-  //      else if (cmd.size == 3 && ptr < buffer.length - 2)
-  //        cmd.addData (buffer[ptr + 1], buffer[ptr + 2]);
-  //      else
-  //        cmd.size = 1;
-  //
-  //      line.append (String.format ("%04X: ", address));
-  //      for (int i = 0; i < cmd.size; i++)
-  //        line.append (String.format ("%02X ", buffer[ptr + i]));
-  //      while (line.length () < 20)
-  //        line.append (" ");
-  //      line.append (cmd.mnemonic + " " + cmd.operand);
-  //      if (cmd.offset != 0)
-  //      {
-  //        int branch = address + cmd.offset + 2;
-  //        line.append (String.format ("$%04X", branch < 0 ? branch += 0xFFFF : branch));
-  //      }
-  //
-  //      if (cmd.target > 0
-  //          && (cmd.target < loadAddress - 1 || cmd.target > (loadAddress + buffer.length)))
-  //      {
-  //        while (line.length () < 40)
-  //          line.append (" ");
-  //
-  //        String text = equates.get (cmd.target);
-  //        if (text != null)
-  //          line.append ("; " + text);
-  //        else
-  //          for (int i = 0, max = ApplesoftConstants.tokenAddresses.length; i < max; i++)
-  //            if (cmd.target == ApplesoftConstants.tokenAddresses[i])
-  //            {
-  //              line.append ("; Applesoft - " + ApplesoftConstants.tokens[i]);
-  //              break;
-  //            }
-  //      }
-  //      pgm.append (line.toString () + "\n");
-  //      address += cmd.size;
-  //      ptr += cmd.size;
-  //    }
-  //
-  //    if (pgm.length () > 0)
-  //      pgm.deleteCharAt (pgm.length () - 1);
-  //
-  //    return pgm;
-  //  }
-
-  private StringBuilder getStringBuilder2 ()
+  private String getListing ()
   {
     StringBuilder pgm = new StringBuilder ();
     List<AssemblerStatement> lines = getLines ();
@@ -183,8 +125,9 @@ public class AssemblerProgram extends AbstractFile
     {
       StringBuilder line = new StringBuilder ();
 
+      String arrowText = assemblerPreferences.showTargets ? getArrow (cmd) : "";
       line.append (
-          String.format ("%3.3s %04X: %02X ", getArrow (cmd), cmd.address, cmd.value));
+          String.format ("%3.3s %04X: %02X ", arrowText, cmd.address, cmd.value));
 
       if (cmd.size > 1)
         line.append (String.format ("%02X ", cmd.operand1));
@@ -223,7 +166,7 @@ public class AssemblerProgram extends AbstractFile
     if (pgm.length () > 0)
       pgm.deleteCharAt (pgm.length () - 1);
 
-    return pgm;
+    return pgm.toString ();
   }
 
   private List<AssemblerStatement> getLines ()
@@ -270,36 +213,20 @@ public class AssemblerProgram extends AbstractFile
     return lines;
   }
 
-  private Map<Integer, String> getStrings ()
-  {
-    TreeMap<Integer, String> strings = new TreeMap<> ();
-
-    int start = 0;
-    for (int ptr = 0; ptr < buffer.length; ptr++)
-    {
-      if ((buffer[ptr] & 0x80) != 0)    // high bit set
-        continue;
-
-      if (buffer[ptr] == 0 && ptr - start > 5)             // possible end of string
-        strings.put (start, HexFormatter.getString (buffer, start, ptr - start));
-
-      start = ptr + 1;
-    }
-    return strings;
-  }
-
   private String getStringsText ()
   {
     Map<Integer, String> strings = getStrings ();
     if (strings.size () == 0)
       return "";
+    List<Integer> entryPoints = getEntryPoints ();
 
     StringBuilder text = new StringBuilder ("\n\nPossible strings:\n\n");
     for (Integer key : strings.keySet ())
     {
       String s = strings.get (key);
       int start = key + loadAddress;
-      text.append (String.format ("%04X - %04X %s %n", start, start + s.length (), s));
+      text.append (String.format ("%s %04X - %04X %s %n",
+          entryPoints.contains (start) ? "*" : " ", start, start + s.length (), s));
     }
 
     if (text.length () > 0)
@@ -308,18 +235,57 @@ public class AssemblerProgram extends AbstractFile
     return text.toString ();
   }
 
+  private Map<Integer, String> getStrings ()
+  {
+    TreeMap<Integer, String> strings = new TreeMap<> ();
+
+    int start = 0;
+    for (int ptr = 0; ptr < buffer.length; ptr++)
+    {
+      if ((buffer[ptr] & 0x80) != 0)              // high bit set
+        continue;
+
+      if (buffer[ptr] == 0                        // possible end of string
+          && ptr - start > 5)
+        strings.put (start, HexFormatter.getString (buffer, start, ptr - start));
+
+      start = ptr + 1;
+    }
+    return strings;
+  }
+
+  private List<Integer> getEntryPoints ()
+  {
+    List<Integer> entryPoints = new ArrayList<> ();
+
+    for (int ptr = 0; ptr < buffer.length; ptr++)
+      if ((buffer[ptr] == (byte) 0xBD || buffer[ptr] == (byte) 0xB9)
+          && (ptr + 2 < buffer.length))
+      {
+        int address = Utility.getWord (buffer, ptr + 1);
+        if (address > loadAddress && address < loadAddress + buffer.length)
+          entryPoints.add (address);
+      }
+
+    return entryPoints;
+  }
+
   private String getArrow (AssemblerStatement cmd)
   {
     String arrow = "";
+
     if (cmd.value == 0x4C || cmd.value == 0x6C || cmd.value == 0x60 || cmd.offset != 0)
       arrow = "<--";
+
     if (cmd.value == 0x20 && isLocal (cmd.target))    // JSR
       arrow = "<--";
+
     if (cmd.isTarget)
       if (arrow.isEmpty ())
         arrow = "-->";
       else
         arrow = "<->";
+
     return arrow;
   }
 

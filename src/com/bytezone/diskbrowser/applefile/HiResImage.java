@@ -285,6 +285,7 @@ public abstract class HiResImage extends AbstractFile
       switch (type)
       {
         case 0:                           // copy next 1-64 bytes as is
+          count = Math.min (count, buffer.length - ptr);
           while (count-- != 0)
             newBuf[newPtr++] = buffer[ptr++];
           break;

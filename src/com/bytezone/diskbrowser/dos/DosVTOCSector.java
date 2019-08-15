@@ -40,12 +40,12 @@ class DosVTOCSector extends AbstractSector
   @Override
   public String createText ()
   {
-    return dosVersion <= 3 ? createDosText () : createOtherText ();
+    return dosVersion <= 3 ? createDosText () : createDos4Text ();
   }
 
-  private String createOtherText ()
+  private String createDos4Text ()
   {
-    StringBuilder text = getHeader ("DOS 4.1 VTOC Sector");
+    StringBuilder text = getHeader ("DOS 4 VTOC Sector");
     addText (text, buffer, 0, 1, "Not used");
     addText (text, buffer, 1, 2, "First directory track/sector");
     addText (text, buffer, 3, 1, "DOS release number");
@@ -81,17 +81,17 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 0x36, 2, "Bytes per sector");
 
     boolean bootSectorEmpty = parentDisk.getDisk ().isSectorEmpty (0);
-    int base = 0x38;
-    int max = maxTracks * 4 + base;
-    for (int i = base; i < max; i += 4)
+    int firstSector = 0x38;
+    int max = maxTracks * 4 + firstSector;
+    for (int i = firstSector; i < max; i += 4)
     {
       String extra = "";
-      if (i == base && bootSectorEmpty)
+      if (i == firstSector && bootSectorEmpty)
         extra = "(unusable)";
       else if (i == 124)
         extra = "(VTOC and Catalog)";
-      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s", (i - base) / 4,
-          getBitmap (buffer[i], buffer[i + 1]), extra));
+      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s",
+          (i - firstSector) / 4, getBitmap (buffer[i], buffer[i + 1]), extra));
     }
 
     text.deleteCharAt (text.length () - 1);
@@ -126,17 +126,19 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 54, 2, "Bytes per sector");
 
     boolean bootSectorEmpty = parentDisk.getDisk ().isSectorEmpty (0);
-    for (int i = 56; i <= 0xC3; i += 4)
+    int firstSector = 0x38;
+    int max = maxTracks * 4 + firstSector;
+    for (int i = firstSector; i < max; i += 4)
     {
       String extra = "";
-      if (i == 56 && bootSectorEmpty)
+      if (i == firstSector && bootSectorEmpty)
         extra = "(unusable)";
       //      else if (i <= 64 && !bootSectorEmpty)
       //        extra = "(reserved for DOS)";
       //      else if (i == 124)
       //        extra = "(VTOC and Catalog)";
-      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s", (i - 56) / 4,
-          getBitmap (buffer[i], buffer[i + 1]), extra));
+      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s",
+          (i - firstSector) / 4, getBitmap (buffer[i], buffer[i + 1]), extra));
     }
 
     text.deleteCharAt (text.length () - 1);
@@ -172,9 +174,9 @@ class DosVTOCSector extends AbstractSector
   {
     int block = 0;
     int base = maxSectors == 13 ? 3 : 0;
-    int first = 0x38;
-    int max = maxTracks * 4 + first;
-    for (int i = first; i < max; i += 4)
+    int firstSector = 0x38;
+    int max = maxTracks * 4 + firstSector;
+    for (int i = firstSector; i < max; i += 4)
     {
       block = check (buffer[i + 1], block, base);
       block = check (buffer[i], block, 0);

@@ -12,11 +12,7 @@ import javax.swing.*;
 
 import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
-import com.bytezone.diskbrowser.applefile.BasicProgram;
-import com.bytezone.diskbrowser.applefile.HiResImage;
-import com.bytezone.diskbrowser.applefile.Palette;
-import com.bytezone.diskbrowser.applefile.PaletteFactory;
-import com.bytezone.diskbrowser.applefile.VisicalcFile;
+import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
@@ -37,13 +33,21 @@ public class MenuHandler
   private static final String PREFS_SHOW_HEADER = "showHeader";
   private static final String PREFS_SHOW_CARET = "showCaret";
 
+  private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
+  private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
+
   //  private static final String PREFS_DEBUGGING = "debugging";
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
   private final SaveTempFileAction saveTempFileAction = new SaveTempFileAction ();
+
   private final BasicPreferences basicPreferences = new BasicPreferences ();
   private final List<BasicPreferencesListener> basicPreferencesListeners =
+      new ArrayList<> ();
+
+  private final AssemblerPreferences assemblerPreferences = new AssemblerPreferences ();
+  private final List<AssemblerPreferencesListener> assemblerPreferencesListeners =
       new ArrayList<> ();
 
   JMenuBar menuBar = new JMenuBar ();
@@ -51,6 +55,7 @@ public class MenuHandler
   JMenu formatMenu = new JMenu ("Format");
   JMenu colourMenu = new JMenu ("Colours");
   JMenu applesoftMenu = new JMenu ("Applesoft");
+  JMenu assemblerMenu = new JMenu ("Assembler");
   JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
@@ -82,13 +87,18 @@ public class MenuHandler
   final JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
   final JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
 
+  // Applesoft menu items
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align assign");
-  final JMenuItem showTargetsItem = new JCheckBoxMenuItem ("Show targets");
+  final JMenuItem showBasicTargetsItem = new JCheckBoxMenuItem ("Show targets");
   final JMenuItem onlyShowTargetLinesItem =
       new JCheckBoxMenuItem ("Only show target lines");
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
+
+  // Assembler menu items
+  final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
+  final JMenuItem showAssemblerStringsItem = new JCheckBoxMenuItem ("Show strings");
 
   ButtonGroup paletteGroup = new ButtonGroup ();
 
@@ -98,6 +108,7 @@ public class MenuHandler
     menuBar.add (formatMenu);
     menuBar.add (colourMenu);
     menuBar.add (applesoftMenu);
+    menuBar.add (assemblerMenu);
     menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
@@ -156,10 +167,13 @@ public class MenuHandler
 
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (alignAssignItem);
-    applesoftMenu.add (showTargetsItem);
+    applesoftMenu.add (showBasicTargetsItem);
     applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showHeaderItem);
     applesoftMenu.add (showCaretItem);
+
+    assemblerMenu.add (showAssemblerTargetsItem);
+    assemblerMenu.add (showAssemblerStringsItem);
 
     ActionListener basicPreferencesAction = new ActionListener ()
     {
@@ -171,12 +185,25 @@ public class MenuHandler
       }
     };
 
+    ActionListener assemblerPreferencesAction = new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        setAssemblerPreferences ();
+        notifyAssemblerPreferencesListeners ();
+      }
+    };
+
     splitRemarkItem.addActionListener (basicPreferencesAction);
     alignAssignItem.addActionListener (basicPreferencesAction);
-    showTargetsItem.addActionListener (basicPreferencesAction);
+    showBasicTargetsItem.addActionListener (basicPreferencesAction);
     onlyShowTargetLinesItem.addActionListener (basicPreferencesAction);
     showHeaderItem.addActionListener (basicPreferencesAction);
     showCaretItem.addActionListener (basicPreferencesAction);
+
+    showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
+    showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -204,7 +231,7 @@ public class MenuHandler
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showHeader = showHeaderItem.isSelected ();
-    basicPreferences.showTargets = showTargetsItem.isSelected ();
+    basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
     BasicProgram.setBasicPreferences (basicPreferences);
   }
@@ -222,6 +249,28 @@ public class MenuHandler
   {
     for (BasicPreferencesListener listener : basicPreferencesListeners)
       listener.setBasicPreferences (basicPreferences);
+  }
+
+  private void setAssemblerPreferences ()
+  {
+    assemblerPreferences.showTargets = showAssemblerTargetsItem.isSelected ();
+    assemblerPreferences.showStrings = showAssemblerStringsItem.isSelected ();
+    AssemblerProgram.setAssemblerPreferences (assemblerPreferences);
+  }
+
+  void addAssemblerPreferencesListener (AssemblerPreferencesListener listener)
+  {
+    if (!assemblerPreferencesListeners.contains (listener))
+    {
+      assemblerPreferencesListeners.add (listener);
+      listener.setAssemblerPreferences (assemblerPreferences);
+    }
+  }
+
+  void notifyAssemblerPreferencesListeners ()
+  {
+    for (AssemblerPreferencesListener listener : assemblerPreferencesListeners)
+      listener.setAssemblerPreferences (assemblerPreferences);
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -267,8 +316,13 @@ public class MenuHandler
     prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_TARGETS, showTargetsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
+
+    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
+        showAssemblerTargetsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_STRINGS,
+        showAssemblerStringsItem.isSelected ());
   }
 
   @Override
@@ -286,11 +340,17 @@ public class MenuHandler
     alignAssignItem.setSelected (prefs.getBoolean (PREFS_ALIGN_ASSIGN, true));
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
     showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
-    showTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
+    showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
     onlyShowTargetLinesItem
         .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));
 
+    showAssemblerTargetsItem
+        .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_TARGETS, true));
+    showAssemblerStringsItem
+        .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_STRINGS, true));
+
     setBasicPreferences ();
+    setAssemblerPreferences ();
 
     int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
     PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();

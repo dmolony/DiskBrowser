@@ -19,6 +19,7 @@ public class AssemblerStatement
   public int address;
   public boolean isTarget;
   public byte operand1, operand2;
+  String ascii = "";
 
   public static void print ()
   {
@@ -73,6 +74,23 @@ public class AssemblerStatement
     this.mnemonic = AssemblerConstants.mnemonics[this.opcode];
     this.size = AssemblerConstants.sizes2[this.opcode];
     this.operand = "";
+    ascii = getChar (opcode);
+  }
+
+  String getChar (byte val)
+  {
+    int c = val & 0xFF;
+    if (c > 127)
+    {
+      if (c < 160)
+        c -= 64;
+      else
+        c -= 128;
+    }
+    if (c < 32 || c == 127)         // non-printable
+      return ".";
+    else                            // standard ascii
+      return (char) c + "";
   }
 
   public void addData ()
@@ -131,6 +149,7 @@ public class AssemblerStatement
     String address = "$" + HexFormatter.format2 (b);
     //    if (this.mnemonic.equals ("JSR"))
     //      this.target = HexFormatter.intValue (b);
+    ascii += getChar (b);
 
     switch (this.opcode)
     {
@@ -271,6 +290,7 @@ public class AssemblerStatement
     //          || this.mnemonic.equals ("BIT") || this.mnemonic.equals ("STA")
     //          || this.mnemonic.equals ("LDA"))
     //      this.target = HexFormatter.intValue (b1, b2);
+    ascii += getChar (b1) + getChar (b2);
 
     switch (this.opcode)
     {

@@ -13,18 +13,15 @@ import javax.swing.event.ChangeListener;
 
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
-import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
-import com.bytezone.diskbrowser.applefile.HiResImage;
-import com.bytezone.diskbrowser.applefile.Palette;
+import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
-import com.bytezone.diskbrowser.applefile.QuickDrawFont;
-import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 
 class DataPanel extends JTabbedPane
     implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
-    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener
+    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
+    AssemblerPreferencesListener
 {
   private static final int TEXT_WIDTH = 65;
 
@@ -425,6 +422,13 @@ class DataPanel extends JTabbedPane
   public void setBasicPreferences (BasicPreferences basicPreferences)
   {
     if (currentDataSource instanceof ApplesoftBasicProgram)
+      setDataSource (currentDataSource);
+  }
+
+  @Override
+  public void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
+  {
+    if (currentDataSource instanceof AssemblerProgram)
       setDataSource (currentDataSource);
   }
 }

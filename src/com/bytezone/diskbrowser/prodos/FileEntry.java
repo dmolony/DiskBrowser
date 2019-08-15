@@ -24,7 +24,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final int endOfFile;
   private final int auxType;
   private final GregorianCalendar modified;
-  //  private final int headerPointer;
+  private final int headerPointer;
   private DataSource file;
   private final DiskAddress catalogBlock;
 
@@ -50,7 +50,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     auxType = HexFormatter.unsignedShort (entryBuffer, 0x1F);
     modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
-    //    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
+    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
 
     switch (storageType)
     {
@@ -287,6 +287,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           assert auxType == 0;                        // auxType > 0 handled above
           if (name.endsWith (".S"))
             file = new MerlinSource (name, exactBuffer, auxType, endOfFile);
+          else if (name.endsWith ("PLA"))
+            file = new SimpleText (name, exactBuffer);
           else if (name.endsWith (".GIF") && HiResImage.isGif (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else
@@ -400,6 +402,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_LDF:
         case FILE_TYPE_ANI:
         case FILE_TYPE_PAL:
+        case FILE_TYPE_IIGS_OBJECT:
           file = new DefaultAppleFile (name, exactBuffer);
           break;
 
@@ -411,7 +414,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         default:
-          System.out.format ("%s - Unknown Prodos file type : %02X%n", name, fileType);
+          // System.out.format ("%02X  %s  %s - Unknown Prodos file type%n",
+          // fileType, fileTypes[fileType], name);
           file = new DefaultAppleFile (name, exactBuffer);
       }
     }

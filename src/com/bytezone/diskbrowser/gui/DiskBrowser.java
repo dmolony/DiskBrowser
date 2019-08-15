@@ -168,6 +168,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
       hideCatalogAction.set (false);
 
     menuHandler.addBasicPreferencesListener (dataPanel);
+    menuHandler.addAssemblerPreferencesListener (dataPanel);
 
     // activate the highest panel now that the listeners are ready
     catalogPanel.activate ();

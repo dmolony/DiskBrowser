@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.applefile;
 
 public class SimpleText extends AbstractFile
 {
+  // LISA text file
 
   public SimpleText (String name, byte[] buffer)
   {

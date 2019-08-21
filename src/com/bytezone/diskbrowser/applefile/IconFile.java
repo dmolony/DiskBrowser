@@ -12,23 +12,24 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class IconFile extends AbstractFile
 {
-  private static Palette palette = new Palette ("Virtual II", new int[] { 0x000000, // 0 black
-                                                                          0xDD0033, // 1 magenta
-                                                                          0x885500, // 2 brown         (8)
-                                                                          0xFF6600, // 3 orange        (9)
-                                                                          0x007722, // 4 dark green
-                                                                          0x555555, // 5 grey1
-                                                                          0x11DD00, // 6 light green   (C)
-                                                                          0xFFFF00, // 7 yellow        (D)
-                                                                          0x000099, // 8 dark blue     (2)
-                                                                          0xDD22DD, // 9 purple        (3)
-                                                                          0xAAAAAA, // A grey2
-                                                                          0xFF9988, // B pink
-                                                                          0x2222FF, // C med blue      (6)
-                                                                          0x66AAFF, // D light blue    (7)
-                                                                          0x44FF99, // E aqua
-                                                                          0xFFFFFF  // F white
-  });
+  private static Palette palette = //
+      new Palette ("Virtual II", new int[] { 0x000000, // 0 black
+                                             0xDD0033, // 1 magenta
+                                             0x885500, // 2 brown         (8)
+                                             0xFF6600, // 3 orange        (9)
+                                             0x007722, // 4 dark green
+                                             0x555555, // 5 grey1
+                                             0x11DD00, // 6 light green   (C)
+                                             0xFFFF00, // 7 yellow        (D)
+                                             0x000099, // 8 dark blue     (2)
+                                             0xDD22DD, // 9 purple        (3)
+                                             0xAAAAAA, // A grey2
+                                             0xFF9988, // B pink
+                                             0x2222FF, // C med blue      (6)
+                                             0x66AAFF, // D light blue    (7)
+                                             0x44FF99, // E aqua
+                                             0xFFFFFF  // F white
+      });
   //  private static Palette palette = new Palette ("Icon palette",
   //      new int[] { 0x000000, // 0 black
   //                  0x2222FF, // C med blue      (6)
@@ -69,7 +70,8 @@ public class IconFile extends AbstractFile
       int dataLen = HexFormatter.unsignedShort (buffer, ptr);
       if (dataLen == 0 || (dataLen + ptr) > buffer.length)
         break;
-      icons.add (new Icon (buffer, ptr));
+      Icon icon = new Icon (buffer, ptr);
+      icons.add (icon);
       ptr += dataLen;
     }
 
@@ -165,8 +167,15 @@ public class IconFile extends AbstractFile
       iDataType = HexFormatter.unsignedShort (buffer, 82);
       iDataAux = HexFormatter.unsignedShort (buffer, 84);
 
-      largeImage = new Image (buffer, 86);
-      smallImage = new Image (buffer, 86 + largeImage.size ());
+      try
+      {
+        largeImage = new Image (buffer, 86);
+        smallImage = new Image (buffer, 86 + largeImage.size ());
+      }
+      catch (InvalidImageException e)
+      {
+        System.out.println (e.getMessage ());
+      }
     }
 
     @Override
@@ -196,17 +205,26 @@ public class IconFile extends AbstractFile
     boolean colour;
     private final BufferedImage image;
 
-    public Image (byte[] buffer, int ptr)
+    public Image (byte[] buffer, int ptr) throws InvalidImageException
     {
       iconType = HexFormatter.unsignedShort (buffer, ptr);
       iconSize = HexFormatter.unsignedShort (buffer, ptr + 2);
       iconHeight = HexFormatter.unsignedShort (buffer, ptr + 4);
       iconWidth = HexFormatter.unsignedShort (buffer, ptr + 6);
 
+      if (iconType != 0 && iconType != 0x8000)
+        throw new InvalidImageException (String.format ("Bad icon type: %04X", iconType));
+
       iconImage = new byte[iconSize];
       iconMask = new byte[iconSize];
 
       colour = (iconType & 0x80) != 0;
+
+      //      System.out.printf ("Icon type %04X %<d%n", iconType);
+      //      System.out.printf ("Icon size %d%n", iconSize);
+      //      System.out.printf ("Icon height %d%n", iconHeight);
+      //      System.out.printf ("Icon width %d%n", iconWidth);
+      //      System.out.println ();
 
       System.arraycopy (buffer, ptr + 8, iconImage, 0, iconSize);
       System.arraycopy (buffer, ptr + 8 + iconSize, iconMask, 0, iconSize);
@@ -277,7 +295,7 @@ public class IconFile extends AbstractFile
         5       Red     D00    1
         6       Green   0E0    2
         7       White   FFF    3
-        
+    
         8       Black   000    0
         9       Blue    00F    1
         10      Yellow  FF0    2
@@ -286,7 +304,7 @@ public class IconFile extends AbstractFile
         13      Red     D00    1
         14      Green   0E0    2
         15      White   FFF    3
-        
+    
     The displayMode word bits are defined as:
     
     Bit 0       selectedIconBit    1 = invert image before copying
@@ -318,6 +336,14 @@ public class IconFile extends AbstractFile
       }
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);
+    }
+  }
+
+  class InvalidImageException extends Exception
+  {
+    public InvalidImageException (String message)
+    {
+      super (message);
     }
   }
 }

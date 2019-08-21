@@ -19,7 +19,6 @@ public class AssemblerStatement
   public int address;
   public boolean isTarget;
   public byte operand1, operand2;
-  String ascii = "";
 
   public static void print ()
   {
@@ -74,7 +73,6 @@ public class AssemblerStatement
     this.mnemonic = AssemblerConstants.mnemonics[this.opcode];
     this.size = AssemblerConstants.sizes2[this.opcode];
     this.operand = "";
-    ascii = getChar (opcode);
   }
 
   String getChar (byte val)
@@ -95,7 +93,7 @@ public class AssemblerStatement
 
   public void addData ()
   {
-    switch (this.opcode)
+    switch (opcode)
     {
       case 0x00:  // BRK
       case 0x08:  // PHP
@@ -147,119 +145,116 @@ public class AssemblerStatement
   {
     operand1 = b;
     String address = "$" + HexFormatter.format2 (b);
-    //    if (this.mnemonic.equals ("JSR"))
-    //      this.target = HexFormatter.intValue (b);
-    ascii += getChar (b);
 
     switch (this.opcode)
     {
-      case 0x09:  // ORA
-      case 0x29:  // AND
-      case 0x49:  // EOR
-      case 0x69:  // ADC
-      case 0x89:  // NOP - 65c02
-      case 0xA0:  // LDY
-      case 0xA2:  // LDX
-      case 0xA9:  // LDA
-      case 0xC0:  // CPY
-      case 0xC9:  // CMP
-      case 0xE0:  // CPX
-      case 0xE9:  // SBC
+      case 0x09:                      // ORA
+      case 0x29:                      // AND
+      case 0x49:                      // EOR
+      case 0x69:                      // ADC
+      case 0x89:                      // NOP - 65c02
+      case 0xA0:                      // LDY
+      case 0xA2:                      // LDX
+      case 0xA9:                      // LDA
+      case 0xC0:                      // CPY
+      case 0xC9:                      // CMP
+      case 0xE0:                      // CPX
+      case 0xE9:                      // SBC
         operand = "#" + address;
-        mode = 2; // Immediate
+        mode = 2;                     // Immediate
         break;
 
-      case 0x04:  // NOP - 65c02
-      case 0x05:  // ORA
-      case 0x06:  // ASL
-      case 0x14:  // NOP - 65c02
-      case 0x24:  // BIT
-      case 0x25:  // AND
-      case 0x26:  // ROL
-      case 0x45:  // EOR
-      case 0x46:  // LSR
-      case 0x64:  // NOP - 65c02
-      case 0x65:  // ADC
-      case 0x66:  // ROR
-      case 0x84:  // STY
-      case 0x85:  // STA
-      case 0x86:  // STX
-      case 0xA4:  // LDY
-      case 0xA5:  // LDA
-      case 0xA6:  // LDX
-      case 0xC4:  // CPY
-      case 0xC5:  // CMP
-      case 0xC6:  // DEC
-      case 0xE4:  // CPX
-      case 0xE5:  // SBC
-      case 0xE6:  // INC
+      case 0x04:                      // NOP - 65c02
+      case 0x05:                      // ORA
+      case 0x06:                      // ASL
+      case 0x14:                      // NOP - 65c02
+      case 0x24:                      // BIT
+      case 0x25:                      // AND
+      case 0x26:                      // ROL
+      case 0x45:                      // EOR
+      case 0x46:                      // LSR
+      case 0x64:                      // NOP - 65c02
+      case 0x65:                      // ADC
+      case 0x66:                      // ROR
+      case 0x84:                      // STY
+      case 0x85:                      // STA
+      case 0x86:                      // STX
+      case 0xA4:                      // LDY
+      case 0xA5:                      // LDA
+      case 0xA6:                      // LDX
+      case 0xC4:                      // CPY
+      case 0xC5:                      // CMP
+      case 0xC6:                      // DEC
+      case 0xE4:                      // CPX
+      case 0xE5:                      // SBC
+      case 0xE6:                      // INC
         target = b & 0xFF;
         operand = address;
-        mode = 8; // Zero page
+        mode = 8;                     // Zero page
         break;
 
-      case 0x15:  // ORA
-      case 0x16:  // ASL
-      case 0x34:  // NOP - 65c02
-      case 0x35:  // AND
-      case 0x36:  // ROL
-      case 0x55:  // EOR
-      case 0x56:  // LSR
-      case 0x74:  // NOP - 65c02
-      case 0x75:  // ADC
-      case 0x76:  // ROR
-      case 0x94:  // STY
-      case 0x95:  // STA
-      case 0xB4:  // LDY
-      case 0xB5:  // LDA
-      case 0xD5:  // CMP
-      case 0xD6:  // DEC
-      case 0xF5:  // SBC
-      case 0xF6:  // INC
+      case 0x15:                      // ORA
+      case 0x16:                      // ASL
+      case 0x34:                      // NOP - 65c02
+      case 0x35:                      // AND
+      case 0x36:                      // ROL
+      case 0x55:                      // EOR
+      case 0x56:                      // LSR
+      case 0x74:                      // NOP - 65c02
+      case 0x75:                      // ADC
+      case 0x76:                      // ROR
+      case 0x94:                      // STY
+      case 0x95:                      // STA
+      case 0xB4:                      // LDY
+      case 0xB5:                      // LDA
+      case 0xD5:                      // CMP
+      case 0xD6:                      // DEC
+      case 0xF5:                      // SBC
+      case 0xF6:                      // INC
         operand = address + ",X";
-        mode = 9; // Zero page, X
+        mode = 9;                     // Zero page, X
         break;
 
-      case 0x96:  // STX
-      case 0xB6:  // LDX
+      case 0x96:                      // STX
+      case 0xB6:                      // LDX
         operand = address + ",Y";
-        mode = 10;  // Zero page, Y
+        mode = 10;                    // Zero page, Y
         break;
 
-      case 0x01:  // ORA
-      case 0x21:  // AND
-      case 0x41:  // EOR
-      case 0x61:  // ADC
-      case 0x81:  // STA
-      case 0xA1:  // LDA
-      case 0xC1:  // CMP
-      case 0xE1:  // SEC
+      case 0x01:                      // ORA
+      case 0x21:                      // AND
+      case 0x41:                      // EOR
+      case 0x61:                      // ADC
+      case 0x81:                      // STA
+      case 0xA1:                      // LDA
+      case 0xC1:                      // CMP
+      case 0xE1:                      // SEC
         operand = "(" + address + ",X)";
-        mode = 11;  // (Indirect, X)
+        mode = 11;                    // (Indirect, X)
         break;
 
-      case 0x11:  // ORA
-      case 0x31:  // AND
-      case 0x51:  // EOR
-      case 0x71:  // ADC
-      case 0x91:  // STA
-      case 0xB1:  // LDA
-      case 0xD1:  // CMP
-      case 0xF1:  // SBC
+      case 0x11:                      // ORA
+      case 0x31:                      // AND
+      case 0x51:                      // EOR
+      case 0x71:                      // ADC
+      case 0x91:                      // STA
+      case 0xB1:                      // LDA
+      case 0xD1:                      // CMP
+      case 0xF1:                      // SBC
         operand = "(" + address + "),Y";
-        mode = 12;  // (Indirect), Y
+        mode = 12;                    // (Indirect), Y
         break;
 
-      case 0x12:  // NOP
-      case 0x32:  // NOP
-      case 0x52:  // NOP
-      case 0x72:  // NOP
-      case 0x92:  // NOP
-      case 0xB2:  // NOP
-      case 0xD2:  // NOP
-      case 0xF2:  // NOP
-        operand = "(" + address + ")"; // all 65c02
-        mode = 13; // (zero page)
+      case 0x12:                      // NOP
+      case 0x32:                      // NOP
+      case 0x52:                      // NOP
+      case 0x72:                      // NOP
+      case 0x92:                      // NOP
+      case 0xB2:                      // NOP
+      case 0xD2:                      // NOP
+      case 0xF2:                      // NOP
+        operand = "(" + address + ")";   // all 65c02
+        mode = 13;                    // (zero page)
         break;
 
       case 0x10:  // BPL
@@ -272,7 +267,7 @@ public class AssemblerStatement
       case 0xD0:  // BNE
       case 0xF0:  // BEQ
         offset = b;
-        mode = 14; // relative
+        mode = 14;                          // relative
         this.target = b & 0xFF;
         break;
 
@@ -286,11 +281,6 @@ public class AssemblerStatement
     operand1 = b1;
     operand2 = b2;
     String address = "$" + HexFormatter.format2 (b2) + HexFormatter.format2 (b1);
-    //    if (this.mnemonic.equals ("JSR") || this.mnemonic.equals ("JMP")
-    //          || this.mnemonic.equals ("BIT") || this.mnemonic.equals ("STA")
-    //          || this.mnemonic.equals ("LDA"))
-    //      this.target = HexFormatter.intValue (b1, b2);
-    ascii += getChar (b1) + getChar (b2);
 
     switch (this.opcode)
     {
@@ -378,8 +368,11 @@ public class AssemblerStatement
   public String toString ()
   {
     if (offset == 0)
-      return String.format ("%d  %3s %-10s %02X", size, mnemonic, operand, value);
-    return String.format ("%d  %3s %-10s %02X", size, mnemonic, operand + "+" + offset,
-        value);
+      return String.format ("%06X  %d  %3s %-10s %02X", address, size, mnemonic, operand,
+          value);
+
+    String offsetText = String.format ("$%04X", address + offset + 2);
+    return String.format ("%06X  %d  %3s %-10s %02X", address, size, mnemonic,
+        operand + offsetText, value);
   }
 }

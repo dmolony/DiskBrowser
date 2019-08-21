@@ -40,6 +40,7 @@ public class SHRPictureFile2 extends HiResImage
     switch (auxType)
     {
       case 0:                               // packed Paintworks SHR
+      case 0x8000:                          // Paintworks Gold
         controlBytes = new byte[200];       // all pointing to 0th color table
         colorTables = new ColorTable[1];
         colorTables[0] = new ColorTable (0, this.buffer, 0);

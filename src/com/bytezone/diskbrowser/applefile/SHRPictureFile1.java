@@ -310,14 +310,12 @@ public class SHRPictureFile1 extends HiResImage
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
       {
-        //        byte[] lineBuffer = packedScanLines[line];
         if (isOddAndEmpty (packedScanLines[line]))
         {
           System.out.println ("Odd number of bytes in empty buffer in " + name);
           break;
         }
-        //        System.out.printf ("Line: %3d%n", line);
-        //        System.out.println (scanLineDirectory[line]);
+
         ptr = unpackLine (packedScanLines[line], unpackedBuffer, ptr);
 
         // something strange happening here

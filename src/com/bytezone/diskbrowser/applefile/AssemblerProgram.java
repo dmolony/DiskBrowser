@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.gui.AssemblerPreferences;
@@ -24,7 +23,16 @@ public class AssemblerProgram extends AbstractFile
 
   private byte[] extraBuffer = new byte[0];
 
+  //  private TreeMap<Integer, String> strings;
+  private List<Integer> entryPoints;
+  private List<StringLocation> stringLocations;
+
   static AssemblerPreferences assemblerPreferences;
+
+  public static void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
+  {
+    AssemblerProgram.assemblerPreferences = assemblerPreferences;
+  }
 
   public AssemblerProgram (String name, byte[] buffer, int address)
   {
@@ -33,17 +41,14 @@ public class AssemblerProgram extends AbstractFile
 
     if (equates == null)
       getEquates ();
+
+    //    AssemblerBlocks assemblerBlocks = new AssemblerBlocks (buffer, address);
   }
 
   public AssemblerProgram (String name, byte[] buffer, int address, int executeOffset)
   {
     this (name, buffer, address);
     this.executeOffset = executeOffset;
-  }
-
-  public static void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
-  {
-    AssemblerProgram.assemblerPreferences = assemblerPreferences;
   }
 
   public void setExtraBuffer (byte[] fullBuffer, int offset, int length)
@@ -114,7 +119,11 @@ public class AssemblerProgram extends AbstractFile
   private String getListing ()
   {
     StringBuilder pgm = new StringBuilder ();
+
     List<AssemblerStatement> lines = getLines ();
+
+    if (stringLocations == null)
+      getStrings ();
 
     // if the assembly doesn't start at the beginning, just dump the bytes that
     // are skipped
@@ -138,6 +147,7 @@ public class AssemblerProgram extends AbstractFile
         line.append (" ");
 
       line.append (cmd.mnemonic + " " + cmd.operand);
+
       if (cmd.offset != 0)
       {
         int branch = cmd.address + cmd.offset + 2;
@@ -160,6 +170,7 @@ public class AssemblerProgram extends AbstractFile
               break;
             }
       }
+
       pgm.append (line.toString () + "\n");
     }
 
@@ -168,6 +179,20 @@ public class AssemblerProgram extends AbstractFile
 
     return pgm.toString ();
   }
+
+  //  private int showString (AssemblerStatement cmd, StringBuilder line)
+  //  {
+  //    int key = cmd.address - loadAddress;
+  //    if (strings.containsKey (key))
+  //    {
+  //      while (line.length () < 40)
+  //        line.append (" ");
+  //      String s = strings.get (key);
+  //      line.append ("# " + s);
+  //      return s.length () - cmd.size;
+  //    }
+  //    return 0;
+  //  }
 
   private List<AssemblerStatement> getLines ()
   {
@@ -193,9 +218,12 @@ public class AssemblerProgram extends AbstractFile
       else
         cmd.size = 1;
 
+      // JMP, JMP, JSR
       if (cmd.target >= loadAddress && cmd.target < (loadAddress + buffer.length)
           && (cmd.value == 0x4C || cmd.value == 0x6C || cmd.value == 0x20))
         targets.add (cmd.target);
+
+      // branch relative
       if (cmd.offset != 0)
         targets.add (cmd.address + cmd.offset + 2);
 
@@ -215,18 +243,19 @@ public class AssemblerProgram extends AbstractFile
 
   private String getStringsText ()
   {
-    Map<Integer, String> strings = getStrings ();
-    if (strings.size () == 0)
+    if (stringLocations.size () == 0)
       return "";
-    List<Integer> entryPoints = getEntryPoints ();
 
     StringBuilder text = new StringBuilder ("\n\nPossible strings:\n\n");
-    for (Integer key : strings.keySet ())
+    for (StringLocation stringLocation : stringLocations)
     {
-      String s = strings.get (key);
-      int start = key + loadAddress;
-      text.append (String.format ("%s %04X - %04X %s %n",
-          entryPoints.contains (start) ? "*" : " ", start, start + s.length (), s));
+      if (stringLocation.zeroTerminated)
+        text.append (String.format ("%s %04X - %04X %s %s %n",
+            entryPoints.contains (stringLocation.offset + loadAddress) ? "*" : " ",
+            stringLocation.offset, stringLocation.offset + stringLocation.length,
+            stringLocation.toStatisticsString (), stringLocation));
+      else
+        System.out.println (stringLocation);
     }
 
     if (text.length () > 0)
@@ -235,31 +264,17 @@ public class AssemblerProgram extends AbstractFile
     return text.toString ();
   }
 
-  private Map<Integer, String> getStrings ()
+  private void getStrings ()
   {
-    TreeMap<Integer, String> strings = new TreeMap<> ();
+    entryPoints = new ArrayList<> ();
+    stringLocations = new ArrayList<> ();
 
     int start = 0;
     for (int ptr = 0; ptr < buffer.length; ptr++)
     {
-      if ((buffer[ptr] & 0x80) != 0)              // high bit set
-        continue;
-
-      if (buffer[ptr] == 0                        // possible end of string
-          && ptr - start > 5)
-        strings.put (start, HexFormatter.getString (buffer, start, ptr - start));
-
-      start = ptr + 1;
-    }
-    return strings;
-  }
-
-  private List<Integer> getEntryPoints ()
-  {
-    List<Integer> entryPoints = new ArrayList<> ();
-
-    for (int ptr = 0; ptr < buffer.length; ptr++)
-      if ((buffer[ptr] == (byte) 0xBD || buffer[ptr] == (byte) 0xB9)
+      if ((buffer[ptr] == (byte) 0xBD       // LDA Absolute,X
+          || buffer[ptr] == (byte) 0xB9     // LDA Absolute,Y
+          || buffer[ptr] == (byte) 0xAD)    // LDA Absolute
           && (ptr + 2 < buffer.length))
       {
         int address = Utility.getWord (buffer, ptr + 1);
@@ -267,7 +282,17 @@ public class AssemblerProgram extends AbstractFile
           entryPoints.add (address);
       }
 
-    return entryPoints;
+      if ((buffer[ptr] & 0x80) != 0)                    // hi bit set
+        continue;
+
+      if (ptr - start > 3)
+        stringLocations.add (new StringLocation (start, ptr - 1));
+
+      start = ptr + 1;
+    }
+
+    if (buffer.length - start > 3)
+      stringLocations.add (new StringLocation (start, buffer.length - 1));
   }
 
   private String getArrow (AssemblerStatement cmd)
@@ -322,6 +347,80 @@ public class AssemblerProgram extends AbstractFile
     catch (IOException e)
     {
       e.printStackTrace ();
+    }
+  }
+
+  class StringLocation
+  {
+    int offset;
+    int length;
+    boolean zeroTerminated;
+    boolean hasLengthByte;
+    int digits;
+    int letters;
+    int punctuation;
+    int controlChars;
+    int spaces;
+
+    public StringLocation (int first, int last)
+    {
+      offset = first;
+      length = last - offset + 1;
+
+      zeroTerminated = ++last < buffer.length && buffer[last] == 0;
+      hasLengthByte = first > 0 && (buffer[first] & 0xFF) == length;
+
+      for (int i = offset; i < offset + length; i++)
+      {
+        int val = buffer[i] & 0x7F;
+        if (val < 32 || val == 127)
+          ++controlChars;
+        else if (val == 32)
+          ++spaces;
+        else if (val >= 48 && val <= 57)
+          ++digits;
+        else if (val >= 65 && val <= 90)
+          ++letters;
+        else if (val >= 97 && val <= 122)
+          ++letters;
+        else
+          ++punctuation;
+      }
+    }
+
+    boolean likelyString ()
+    {
+      return spaces > 0 || letters > punctuation;
+    }
+
+    public String toStatisticsString ()
+    {
+      return String.format ("%2d, %2d, %2d, %2d, %2d", digits, letters, punctuation,
+          controlChars, spaces);
+    }
+
+    @Override
+    public String toString ()
+    {
+      StringBuilder text = new StringBuilder ();
+
+      if (hasLengthByte)
+        text.append ("<length>");
+
+      for (int i = offset; i < offset + length; i++)
+      {
+        int val = buffer[i] & 0x7F;
+        if (val == 4)
+          text.append ("<ctrl-D>");
+        else if (val == 10)
+          text.append ("<LF>");
+        else if (val == 13)
+          text.append ("<CR>");
+        else
+          text.append ((char) val);
+      }
+
+      return text.toString ();
     }
   }
 }

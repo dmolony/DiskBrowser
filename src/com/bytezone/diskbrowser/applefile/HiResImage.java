@@ -38,7 +38,7 @@ public abstract class HiResImage extends AbstractFile
   //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File       - SHRPictureFile2 *
   // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2
   //   $C0 PNT   $1000
-  //   $C0 PNT   $8000  Drawplus ?
+  //   $C0 PNT   $8000  Drawplus? Paintworks Gold?
   //   $C0 PNT   $8001  GTv background picture
   //   $C0 PNT   $8005  DreamGraphix document
   //   $C0 PNT   $8006  GIF
@@ -315,45 +315,11 @@ public abstract class HiResImage extends AbstractFile
     return newBuf;
   }
 
-  private int calculateBufferSize (byte[] buffer)
-  {
-    int ptr = 0;
-    int size = 0;
-    while (ptr < buffer.length)
-    {
-      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
-      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
-
-      if (type == 0)
-      {
-        ptr += count;
-        size += count;
-      }
-      else if (type == 1)
-      {
-        ptr++;
-        size += count;
-      }
-      else if (type == 2)
-      {
-        ptr += 4;
-        size += count * 4;
-      }
-      else
-      {
-        ptr++;
-        size += count * 4;
-      }
-    }
-    return size;
-  }
-
   // Super Hi-res IIGS (MAIN in $C0/02)
   int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
   {
     byte[] fourBuf = new byte[4];
 
-    int oldPtr = newPtr;
     int ptr = 0;
     while (ptr < buffer.length)
     {
@@ -397,9 +363,41 @@ public abstract class HiResImage extends AbstractFile
           break;
       }
     }
-    //    System.out.println (HexFormatter.format (newBuf, oldPtr, newPtr - oldPtr));
 
     return newPtr;
+  }
+
+  private int calculateBufferSize (byte[] buffer)
+  {
+    int ptr = 0;
+    int size = 0;
+    while (ptr < buffer.length)
+    {
+      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
+
+      if (type == 0)
+      {
+        ptr += count;
+        size += count;
+      }
+      else if (type == 1)
+      {
+        ptr++;
+        size += count;
+      }
+      else if (type == 2)
+      {
+        ptr += 4;
+        size += count * 4;
+      }
+      else
+      {
+        ptr++;
+        size += count * 4;
+      }
+    }
+    return size;
   }
 
   // Beagle Bros routine to expand a hi-res screen

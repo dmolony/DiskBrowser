@@ -9,8 +9,8 @@ public class BasicProgramGS extends BasicProgram
 {
   private static String[] //
   tokens = { "AUTO", "DEL", "EDI", "HLIST ",                // 0x80 - 0x83
-             "LIST", "RENUM", "BREAK", "FN",                // 0x84 - 0x87
-             "PROC", "GOSUB", " GOTO ", "FOR ",               // 0x88 - 0x8B
+             "LIST", "RENUM", "BREAK ", "FN ",                // 0x84 - 0x87
+             "PROC ", "GOSUB", " GOTO ", "FOR ",               // 0x88 - 0x8B
              " THEN ", "ELSE ", "NEXT ", "OFF ",                // 0x8C - 0x8F
              "ON ", "INPUT ", "OUTPUT ", "TEXT ",               // 0x90 - 0x93
              "TIMER ", "EXCEPTION ", "CAT ", " 97 ",            // 0x94 - 0x97

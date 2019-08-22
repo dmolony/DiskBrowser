@@ -31,24 +31,6 @@ public class IconFile extends AbstractFile implements ProdosConstants
                                              0x44FF99, // E aqua
                                              0xFFFFFF  // F white
       });
-  //  private static Palette palette = new Palette ("Icon palette",
-  //      new int[] { 0x000000, // 0 black
-  //                  0x2222FF, // C med blue      (6)
-  //                  0xFFFF00, // 7 yellow        (D)
-  //                  0xFFFFFF,  // F white
-  //                  0x000000, //   black
-  //                  0xDD0033, // 1 magenta
-  //                  0x11DD00, // 6 light green   (C)
-  //                  0xFFFFFF,  // F white
-  //                  0x000000, // 0 black
-  //                  0x2222FF, // C med blue      (6)
-  //                  0xFFFF00, // 7 yellow        (D)
-  //                  0xFFFFFF,  // F white
-  //                  0x000000, //   black
-  //                  0xDD0033, // 1 magenta
-  //                  0x11DD00, // 6 light green   (C)
-  //                  0xFFFFFF,  // F white
-  //      });
 
   private final int iBlkNext;
   private final int iBlkID;
@@ -293,7 +275,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
 
     /*
         Offset  Color   RGB  Mini-Palette
-
+    
         0       Black   000    0
         1       Blue    00F    1
         2       Yellow  FF0    2
@@ -302,7 +284,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
         5       Red     D00    1
         6       Green   0E0    2
         7       White   FFF    3
-
+    
         8       Black   000    0
         9       Blue    00F    1
         10      Yellow  FF0    2
@@ -311,18 +293,18 @@ public class IconFile extends AbstractFile implements ProdosConstants
         13      Red     D00    1
         14      Green   0E0    2
         15      White   FFF    3
-
+    
     The displayMode word bits are defined as:
-
+    
     Bit 0       selectedIconBit    1 = invert image before copying
     Bit 1       openIconBit        1 = copy light-gray pattern instead of image
     Bit 2       offLineBit         1 = AND light-gray pattern to image being copied
     Bits 3-7    reserved.
     Bits 8-11   foreground color to apply to black part of black & white icons
     Bits 12-15  background color to apply to white part of black & white icons
-
+    
     Bits 0-2 can occur at once and are tested in the order 1-2-0.
-
+    
     "Color is only applied to the black and white icons if bits 15-8 are not all 0.
     Colored pixels in an icon are inverted by black pixels becoming white and any
     other color of pixel becoming black."

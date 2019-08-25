@@ -54,6 +54,11 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
 
   ZObject getObject (int index)
   {
+    if (index < 0 || index >= list.size ())
+    {
+      System.out.printf ("Invalid index: %d / %d%n", index, list.size ());
+      return null;
+    }
     return list.get (index);
   }
 

@@ -13,25 +13,6 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class IconFile extends AbstractFile implements ProdosConstants
 {
-  private static Palette palette = //
-      new Palette ("Virtual II", new int[] { 0x000000, // 0 black
-                                             0xDD0033, // 1 magenta
-                                             0x885500, // 2 brown         (8)
-                                             0xFF6600, // 3 orange        (9)
-                                             0x007722, // 4 dark green
-                                             0x555555, // 5 grey1
-                                             0x11DD00, // 6 light green   (C)
-                                             0xFFFF00, // 7 yellow        (D)
-                                             0x000099, // 8 dark blue     (2)
-                                             0xDD22DD, // 9 purple        (3)
-                                             0xAAAAAA, // A grey2
-                                             0xFF9988, // B pink
-                                             0x2222FF, // C med blue      (6)
-                                             0x66AAFF, // D light blue    (7)
-                                             0x44FF99, // E aqua
-                                             0xFFFFFF  // F white
-      });
-
   private final int iBlkNext;
   private final int iBlkID;
   private final int iBlkPath;
@@ -53,11 +34,12 @@ public class IconFile extends AbstractFile implements ProdosConstants
     while (true)
     {
       int dataLen = HexFormatter.unsignedShort (buffer, ptr);
-
       if (dataLen == 0 || (dataLen + ptr) > buffer.length)
         break;
+
       Icon icon = new Icon (buffer, ptr);
-      icons.add (icon);
+      if (icon.smallImage != null)            // didn't have an exception
+        icons.add (icon);
       ptr += dataLen;
     }
 
@@ -77,8 +59,10 @@ public class IconFile extends AbstractFile implements ProdosConstants
     int columns = Math.min (icons.size (), 4);
     int rows = (icons.size () - 1) / columns + 1;
 
-    image = new BufferedImage (columns * maxWidth + 2 * base + (columns - 1) * gap,
-        rows * maxHeight + 2 * base + (rows - 1) * gap, BufferedImage.TYPE_INT_RGB);
+    image = new BufferedImage (                               //
+        columns * maxWidth + 2 * base + (columns - 1) * gap,  //
+        rows * maxHeight + 2 * base + (rows - 1) * gap,       //
+        BufferedImage.TYPE_INT_RGB);
 
     Graphics2D graphics = image.createGraphics ();
     graphics.setBackground (Color.WHITE);
@@ -100,6 +84,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
       }
     }
     g2d.dispose ();
+    graphics.dispose ();
   }
 
   @Override
@@ -212,7 +197,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
         System.out.println ();
       }
 
-      if (iconType != 0 && iconType != 0x8000)
+      if (iconType != 0 && iconType != 0x8000 && iconType != 0xFFFF && iconType != 0x00FF)
         throw new InvalidImageException (String.format ("Bad icon type: %04X", iconType));
 
       iconImage = new byte[iconSize];
@@ -223,7 +208,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
       System.arraycopy (buffer, ptr + 8, iconImage, 0, iconSize);
       System.arraycopy (buffer, ptr + 8 + iconSize, iconMask, 0, iconSize);
 
-      int[] colours = palette.getColours ();
+      int[] colours = HiResImage.getPaletteFactory ().get (0).getColours ();
 
       image = new BufferedImage (iconWidth, iconHeight, BufferedImage.TYPE_INT_RGB);
 
@@ -275,7 +260,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
 
     /*
         Offset  Color   RGB  Mini-Palette
-    
+
         0       Black   000    0
         1       Blue    00F    1
         2       Yellow  FF0    2
@@ -284,7 +269,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
         5       Red     D00    1
         6       Green   0E0    2
         7       White   FFF    3
-    
+
         8       Black   000    0
         9       Blue    00F    1
         10      Yellow  FF0    2
@@ -293,18 +278,18 @@ public class IconFile extends AbstractFile implements ProdosConstants
         13      Red     D00    1
         14      Green   0E0    2
         15      White   FFF    3
-    
+
     The displayMode word bits are defined as:
-    
+
     Bit 0       selectedIconBit    1 = invert image before copying
     Bit 1       openIconBit        1 = copy light-gray pattern instead of image
     Bit 2       offLineBit         1 = AND light-gray pattern to image being copied
     Bits 3-7    reserved.
     Bits 8-11   foreground color to apply to black part of black & white icons
     Bits 12-15  background color to apply to white part of black & white icons
-    
+
     Bits 0-2 can occur at once and are tested in the order 1-2-0.
-    
+
     "Color is only applied to the black and white icons if bits 15-8 are not all 0.
     Colored pixels in an icon are inverted by black pixels becoming white and any
     other color of pixel becoming black."

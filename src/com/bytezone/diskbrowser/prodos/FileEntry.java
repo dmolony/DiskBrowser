@@ -68,7 +68,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         int block = keyPtr;
         do
         {
-          dataBlocks.add (disk.getDiskAddress (block));
+          DiskAddress diskAddress = disk.getDiskAddress (block);
+          if (diskAddress == null)
+            break;
+          dataBlocks.add (diskAddress);
           byte[] buffer = disk.readSector (block);
           block = HexFormatter.unsignedShort (buffer, 2);
         } while (block > 0);

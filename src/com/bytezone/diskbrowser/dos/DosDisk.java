@@ -235,6 +235,7 @@ public class DosDisk extends AbstractFormattedDisk
   {
     disk.setInterleave (0);
     int catalogBlocks = checkFormat (disk);
+
     if (catalogBlocks > 3)
       return true;
     disk.setInterleave (1);
@@ -243,19 +244,22 @@ public class DosDisk extends AbstractFormattedDisk
     if (cb2 > 3)
       return true;
     disk.setInterleave (2);
-    if (false)
+    if (true)
     {
       int cb3 = checkFormat (disk);
       if (cb3 > 3)
         return true;
     }
+
     if (catalogBlocks > 0)
     {
       disk.setInterleave (1);
       return true;
     }
+
     if (cb2 > 0)
       return true;
+
     return false;
   }
 
@@ -293,7 +297,7 @@ public class DosDisk extends AbstractFormattedDisk
     //    if (buffer[1] != 0x11) // first catalog track
     //      return 0;
 
-    if (buffer[53] != 16 && buffer[53] != 13)         // tracks per sector
+    if (buffer[53] != 16 && buffer[53] != 13)         // sectors per track
     {
       return 0;
     }
@@ -325,7 +329,7 @@ public class DosDisk extends AbstractFormattedDisk
     do
     {
       if (!disk.isValidAddress (da))
-        break;
+        return 0;
 
       if (catalogAddresses.contains (da))
       {
@@ -336,8 +340,8 @@ public class DosDisk extends AbstractFormattedDisk
       buffer = disk.readSector (da);
       if (!disk.isValidAddress (buffer[1], buffer[2]))
       {
-        System.out.printf ("Invalid address : %02X / %02X%n", buffer[1], buffer[2]);
-        break;
+        //        System.out.printf ("Invalid address : %02X / %02X%n", buffer[1], buffer[2]);
+        return 0;
       }
 
       catalogAddresses.add (da);
@@ -432,10 +436,10 @@ public class DosDisk extends AbstractFormattedDisk
    *
     There were actually three versions of DOS 3.3 that Apple released without
     bumping the version number:
-
+  
     The first version that was released had FPBASIC and INTBASIC files that were 50
     sectors in size.
-
+  
     The second version of DOS 3.3, often referred to as “DOS 3.3e”, appeared at the
     time the Apple IIe was released. In this version, the FPBASIC and INTBASIC files
     were 42 sectors in size. The changes introduced at that time included code to turn
@@ -443,12 +447,12 @@ public class DosDisk extends AbstractFormattedDisk
     command. This fix reportedly introduced an even worse bug, but as the command was
     not heavily used it did not make much of an impact on most programmers. The APPEND
     fix was applied by utilizing some formerly unused space in the DOS 3.3 code.
-
+  
     The third version of DOS 3.3 appeared just before the first release of ProDOS.
     The only mention of this in the press was in the DOSTalk column of Softalk magazine.
     This final version of DOS 3.3 included a different fix for the APPEND bug, using
     another bit of unused space in DOS 3.3.
-
+  
     With regard to the FPBASIC and INTBASIC files: There were three differences between
     the 50 sector and the 42 sector versions of the INTBASIC file. Firstly, the
     $F800-$FFFF section was removed. This area was the code for the Monitor, and with

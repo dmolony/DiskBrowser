@@ -14,8 +14,16 @@ public class AppleDiskAddress implements DiskAddress
     this.owner = owner;
     this.block = block;
     int sectorsPerTrack = owner.getSectorsPerTrack ();
-    this.track = block / sectorsPerTrack;
-    this.sector = block % sectorsPerTrack;
+    if (sectorsPerTrack == 0)
+    {
+      track = 0;
+      sector = 0;
+    }
+    else
+    {
+      track = block / sectorsPerTrack;
+      sector = block % sectorsPerTrack;
+    }
   }
 
   public AppleDiskAddress (Disk owner, int track, int sector)

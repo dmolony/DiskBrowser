@@ -236,10 +236,8 @@ public class DiskFactory
         System.out.println ("Checking woz");
       try
       {
-        //        WozFileOld wozDisk = new WozFileOld (file);
         WozFile wozFile = new WozFile (file);
-        if (debug)
-          System.out.println ("  Woz read");
+
         if (wozFile.getSectorsPerTrack () == 13)
         {
           AppleDisk appleDisk = new AppleDisk (wozFile, 35, 13);
@@ -526,8 +524,14 @@ public class DiskFactory
 
     try
     {
-      // truncate the file if necessary
-      AppleDisk disk = new AppleDisk (file, (int) file.length () / 4096, 8);
+      // extend the file if necessary
+      int tracks = (int) (file.length () - 1) / 4096 + 1;
+      if (tracks * 4096 != file.length ())
+      {
+        System.out.println ("*** extended ***");     // System Addons.hdv
+        //        System.out.println (tracks);
+      }
+      AppleDisk disk = new AppleDisk (file, tracks, 8);
       if (ProdosDisk.isCorrectFormat (disk))
       {
         if (debug)

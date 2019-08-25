@@ -23,7 +23,6 @@ public class AssemblerProgram extends AbstractFile
 
   private byte[] extraBuffer = new byte[0];
 
-  //  private TreeMap<Integer, String> strings;
   private List<Integer> entryPoints;
   private List<StringLocation> stringLocations;
 
@@ -249,13 +248,10 @@ public class AssemblerProgram extends AbstractFile
     StringBuilder text = new StringBuilder ("\n\nPossible strings:\n\n");
     for (StringLocation stringLocation : stringLocations)
     {
-      if (stringLocation.zeroTerminated)
-        text.append (String.format ("%s %04X - %04X %s %s %n",
-            entryPoints.contains (stringLocation.offset + loadAddress) ? "*" : " ",
-            stringLocation.offset, stringLocation.offset + stringLocation.length,
-            stringLocation.toStatisticsString (), stringLocation));
-      else
-        System.out.println (stringLocation);
+      int address = stringLocation.offset + loadAddress;
+      text.append (String.format ("%s %04X - %04X  %s %n",
+          entryPoints.contains (stringLocation.offset + loadAddress) ? "*" : " ", address,
+          address + stringLocation.length, stringLocation));
     }
 
     if (text.length () > 0)
@@ -270,15 +266,16 @@ public class AssemblerProgram extends AbstractFile
     stringLocations = new ArrayList<> ();
 
     int start = 0;
+    int max = buffer.length - 2;
     for (int ptr = 0; ptr < buffer.length; ptr++)
     {
       if ((buffer[ptr] == (byte) 0xBD       // LDA Absolute,X
           || buffer[ptr] == (byte) 0xB9     // LDA Absolute,Y
           || buffer[ptr] == (byte) 0xAD)    // LDA Absolute
-          && (ptr + 2 < buffer.length))
+          && (ptr < max))
       {
         int address = Utility.getWord (buffer, ptr + 1);
-        if (address > loadAddress && address < loadAddress + buffer.length)
+        if (address >= loadAddress && address < loadAddress + buffer.length)
           entryPoints.add (address);
       }
 
@@ -355,6 +352,7 @@ public class AssemblerProgram extends AbstractFile
     int offset;
     int length;
     boolean zeroTerminated;
+    boolean lowTerminated;
     boolean hasLengthByte;
     int digits;
     int letters;
@@ -367,7 +365,10 @@ public class AssemblerProgram extends AbstractFile
       offset = first;
       length = last - offset + 1;
 
-      zeroTerminated = ++last < buffer.length && buffer[last] == 0;
+      int end = last + 1;
+
+      zeroTerminated = end < buffer.length && buffer[end] == 0;
+      lowTerminated = end < buffer.length && buffer[end] >= 32 && buffer[end] < 127;
       hasLengthByte = first > 0 && (buffer[first] & 0xFF) == length;
 
       for (int i = offset; i < offset + length; i++)
@@ -419,6 +420,8 @@ public class AssemblerProgram extends AbstractFile
         else
           text.append ((char) val);
       }
+      if (lowTerminated)
+        text.append ((char) buffer[offset + length]);
 
       return text.toString ();
     }

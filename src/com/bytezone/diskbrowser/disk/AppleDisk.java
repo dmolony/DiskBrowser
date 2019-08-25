@@ -155,7 +155,8 @@ public class AppleDisk implements Disk
     }
     else if (suffix.equalsIgnoreCase ("HDV"))
     {
-      this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
+      //      this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
+      this.blocks = tracks * sectors;
       this.sectorSize = 512;
       this.trackSize = sectors * sectorSize;
     }
@@ -193,7 +194,6 @@ public class AppleDisk implements Disk
 
     diskBuffer = new byte[blocks * sectorSize];
     hasData = new boolean[blocks];
-    //    isMissing = new boolean[blocks];
 
     if (debug)
     {
@@ -415,7 +415,10 @@ public class AppleDisk implements Disk
   public byte[] readSector (DiskAddress da)
   {
     byte[] buffer = new byte[sectorSize];
-    readBuffer (da, buffer, 0);
+    if (da == null)
+      System.out.println ("Disk address is null");
+    else
+      readBuffer (da, buffer, 0);
     return buffer;
   }
 

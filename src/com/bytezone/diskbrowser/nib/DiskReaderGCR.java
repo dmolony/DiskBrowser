@@ -1,13 +1,13 @@
 package com.bytezone.diskbrowser.nib;
 
 // -----------------------------------------------------------------------------------//
-public class DiskReaderGRC extends DiskReader
+public class DiskReaderGCR extends DiskReader
 // -----------------------------------------------------------------------------------//
 {
   private final ByteTranslator byteTranslator = new ByteTranslator6and2 ();
 
   // ---------------------------------------------------------------------------------//
-  DiskReaderGRC ()
+  DiskReaderGCR ()
   // ---------------------------------------------------------------------------------//
   {
     super (0);

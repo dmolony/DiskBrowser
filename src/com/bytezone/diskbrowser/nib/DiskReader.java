@@ -9,7 +9,7 @@ abstract class DiskReader
 
   static DiskReader reader13;
   static DiskReader reader16;
-  static DiskReader readerGRC;
+  static DiskReader readerGCR;
 
   final int sectorsPerTrack;
 
@@ -37,9 +37,9 @@ abstract class DiskReader
         return reader16;
 
       case 0:
-        if (readerGRC == null)
-          readerGRC = new DiskReaderGRC ();
-        return readerGRC;
+        if (readerGCR == null)
+          readerGCR = new DiskReaderGCR ();
+        return readerGCR;
 
       default:
         return null;

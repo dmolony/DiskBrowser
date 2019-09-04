@@ -104,7 +104,7 @@ public class WozFile
       diskBuffer = new byte[tracks.size () * diskSectors * SECTOR_SIZE];
 
       for (Track track : tracks)
-        track.packType1 (diskBuffer);
+        track.pack (diskBuffer);
     }
     else if (info.diskType == 2)              // 3.5"
     {
@@ -535,7 +535,7 @@ public class WozFile
     }
 
     // ---------------------------------------------------------------------------------//
-    void packType1 (byte[] diskBuffer) throws DiskNibbleException
+    void pack (byte[] diskBuffer) throws DiskNibbleException
     // ---------------------------------------------------------------------------------//
     {
       int ndx = diskSectors == 13 ? 0 : 1;
@@ -550,22 +550,6 @@ public class WozFile
               * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]);
           System.arraycopy (decodedBuffer, 0, diskBuffer, ptr, decodedBuffer.length);
         }
-    }
-
-    // ---------------------------------------------------------------------------------//
-    int packType2 (byte[] diskBuffer, int ptr) throws DiskNibbleException
-    // ---------------------------------------------------------------------------------//
-    {
-      DiskReader diskReader = DiskReader.getInstance (0);
-      for (Sector sector : sectors)
-        if (sector.dataOffset > 0)
-        {
-          byte[] decodedBuffer =
-              diskReader.decodeSector (newBuffer, sector.dataOffset + 4);
-          System.arraycopy (decodedBuffer, 12, diskBuffer, ptr, 512);
-          ptr += 512;
-        }
-      return ptr;
     }
 
     // ---------------------------------------------------------------------------------//
@@ -660,7 +644,11 @@ public class WozFile
     {
       DiskReader diskReader = DiskReader.getInstance (0);
 
+      // start decoding from 4 bytes past the data prologue (3 bytes for prologue
+      // itself, and another byte for the sector number)
       byte[] decodedBuffer = diskReader.decodeSector (track.newBuffer, dataOffset + 4);
+
+      // return 512 bytes (ignore the 12 tag bytes)
       System.arraycopy (decodedBuffer, 12, diskBuffer, ptr, 512);
     }
 
@@ -684,7 +672,7 @@ public class WozFile
     {
       if (this.trackNo != o.trackNo)
         return this.trackNo - o.trackNo;
-      if (this.volume != o.volume)
+      if (this.volume != o.volume)              // side
         return this.volume - o.volume;
       return this.sectorNo - o.sectorNo;
     }

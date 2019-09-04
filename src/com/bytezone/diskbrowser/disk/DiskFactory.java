@@ -247,13 +247,30 @@ public class DiskFactory
 
         if (wozFile.getSectorsPerTrack () == 16)
         {
-          AppleDisk appleDisk256 = new AppleDisk (wozFile, wozFile.getTracks (), 16);
-          disk = checkDos (appleDisk256);
-          if (disk == null)
-            disk = checkProdos (new AppleDisk (wozFile, 35, 8));
-          if (disk == null)
-            disk = new DataDisk (appleDisk256);
+          if (wozFile.getDiskType () == 2)
+          {
+            if (debug)
+              System.out.println ("Checking woz 3.5");
+            AppleDisk disk800 = new AppleDisk (wozFile, 200, 8);
+            if (ProdosDisk.isCorrectFormat (disk800))
+            {
+              if (debug)
+                System.out.println ("  --> PRODOS hard disk");
+              return new ProdosDisk (disk800);
+            }
+            disk = new DataDisk (disk800);
+          }
+          else
+          {
+            AppleDisk appleDisk256 = new AppleDisk (wozFile, wozFile.getTracks (), 16);
+            disk = checkDos (appleDisk256);
+            if (disk == null)
+              disk = checkProdos (new AppleDisk (wozFile, 35, 8));
+            if (disk == null)
+              disk = new DataDisk (appleDisk256);
+          }
         }
+
         return disk;
       }
       catch (Exception e)

@@ -556,7 +556,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       this.length = length;
 
       byte b = buffer[startPtr];
-      if (isToken (b))
+      if (isHighBitSet (b))
       {
         switch (b)
         {
@@ -637,7 +637,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     private boolean isImpliedGoto ()
     {
       byte b = buffer[startPtr];
-      if (isToken (b))
+      if (isHighBitSet (b))
         return false;
       return (isDigit (b));
     }
@@ -677,7 +677,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     {
       // ignore first byte, check the rest for tokens
       for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
-        if (isToken (buffer[p]))
+        if (isHighBitSet (buffer[p]))
           return true;
       return false;
     }
@@ -740,7 +740,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       for (int p = startPtr; p <= max; p++)
       {
         byte b = buffer[p];
-        if (isToken (b))
+        if (isHighBitSet (b))
         {
           if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
             line.append (' ');

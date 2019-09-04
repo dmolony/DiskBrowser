@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.nib;
 
 // -----------------------------------------------------------------------------------//
-public class DiskReader16Sector extends DiskReader
+class DiskReader16Sector extends DiskReader
 // -----------------------------------------------------------------------------------//
 {
   private static final int RAW_BUFFER_SIZE = 342;

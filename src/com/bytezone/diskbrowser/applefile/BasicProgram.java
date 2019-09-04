@@ -9,11 +9,11 @@ public abstract class BasicProgram extends AbstractFile
   static final byte ASCII_SEMI_COLON = 0x3B;
   static final byte ASCII_CARET = 0x5E;
 
-  static BasicPreferences basicPreferences;
+  static BasicPreferences basicPreferences;     // set by MenuHandler
 
   public static void setBasicPreferences (BasicPreferences basicPreferences)
   {
-    ApplesoftBasicProgram.basicPreferences = basicPreferences;
+    BasicProgram.basicPreferences = basicPreferences;
   }
 
   public BasicProgram (String name, byte[] buffer)
@@ -21,14 +21,15 @@ public abstract class BasicProgram extends AbstractFile
     super (name, buffer);
   }
 
-  boolean isToken (byte value)
+  boolean isHighBitSet (byte value)
   {
     return (value & 0x80) != 0;
   }
 
   boolean isControlCharacter (byte value)
   {
-    return (value & 0xFF) < 32;
+    int val = value & 0xFF;
+    return val > 0 && val < 32;
   }
 
   boolean isDigit (byte value)

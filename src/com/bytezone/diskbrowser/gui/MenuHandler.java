@@ -35,6 +35,7 @@ public class MenuHandler
 
   private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
+  private static final String PREFS_SHOW_ASSEMBLER_HEADER = "showAssemblerHeader";
 
   //  private static final String PREFS_DEBUGGING = "debugging";
   private static final String PREFS_PALETTE = "palette";
@@ -99,6 +100,7 @@ public class MenuHandler
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
   final JMenuItem showAssemblerStringsItem = new JCheckBoxMenuItem ("Show strings");
+  final JMenuItem showAssemblerHeaderItem = new JCheckBoxMenuItem ("Show header");
 
   ButtonGroup paletteGroup = new ButtonGroup ();
 
@@ -174,6 +176,7 @@ public class MenuHandler
 
     assemblerMenu.add (showAssemblerTargetsItem);
     assemblerMenu.add (showAssemblerStringsItem);
+    assemblerMenu.add (showAssemblerHeaderItem);
 
     ActionListener basicPreferencesAction = new ActionListener ()
     {
@@ -204,6 +207,7 @@ public class MenuHandler
 
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
+    showAssemblerHeaderItem.addActionListener (assemblerPreferencesAction);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -255,6 +259,7 @@ public class MenuHandler
   {
     assemblerPreferences.showTargets = showAssemblerTargetsItem.isSelected ();
     assemblerPreferences.showStrings = showAssemblerStringsItem.isSelected ();
+    assemblerPreferences.showHeader = showAssemblerHeaderItem.isSelected ();
     AssemblerProgram.setAssemblerPreferences (assemblerPreferences);
   }
 
@@ -323,6 +328,7 @@ public class MenuHandler
         showAssemblerTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_STRINGS,
         showAssemblerStringsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_HEADER, showAssemblerHeaderItem.isSelected ());
   }
 
   @Override
@@ -334,6 +340,7 @@ public class MenuHandler
     showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
     monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
+
     //    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
 
     splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
@@ -348,6 +355,8 @@ public class MenuHandler
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_TARGETS, true));
     showAssemblerStringsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_STRINGS, true));
+    showAssemblerHeaderItem
+        .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_HEADER, true));
 
     setBasicPreferences ();
     setAssemblerPreferences ();

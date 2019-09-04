@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.nib;
 
-public class ByteTranslator6and2 implements ByteTranslator
+// -----------------------------------------------------------------------------------//
+class ByteTranslator6and2 implements ByteTranslator
+// -----------------------------------------------------------------------------------//
 {
   // 64 valid bytes that can be stored on a disk (plus 0xAA and 0xD5)
   private static byte[] writeTranslateTable6and2 =
@@ -17,35 +19,36 @@ public class ByteTranslator6and2 implements ByteTranslator
         (byte) 0xF5, (byte) 0xF6, (byte) 0xF7, (byte) 0xF9, (byte) 0xFA, (byte) 0xFB,
         (byte) 0xFC, (byte) 0xFD, (byte) 0xFE, (byte) 0xFF };
 
-  private static byte[] readTranslateTable6and2 = new byte[106];  // skip first 150 blanks
+  private static final int SKIP = 0x96;
+  private static byte[] readTranslateTable6and2 = new byte[256 - SKIP];
 
   static
   {
     for (int i = 0; i < writeTranslateTable6and2.length; i++)
     {
-      int j = (writeTranslateTable6and2[i] & 0xFF) - 0x96;   // skip first 150 blanks
+      int j = (writeTranslateTable6and2[i] & 0xFF) - SKIP;   // skip first 150 blanks
       readTranslateTable6and2[j] = (byte) (i + 1);           // offset by 1 to avoid zero
     }
+
+    if (false)
+      for (int i = 0; i < readTranslateTable6and2.length; i++)
+        System.out.printf ("%02X  %02X%n", i + SKIP, readTranslateTable6and2[i] - 1);
   }
 
   // ---------------------------------------------------------------------------------//
-  // encode
-  // ---------------------------------------------------------------------------------//
-
   @Override
   public byte encode (byte b)
+  // ---------------------------------------------------------------------------------//
   {
     return writeTranslateTable6and2[(b & 0xFC)];
   }
 
   // ---------------------------------------------------------------------------------//
-  // decode
-  // ---------------------------------------------------------------------------------//
-
   @Override
   public byte decode (byte b) throws DiskNibbleException
+  // ---------------------------------------------------------------------------------//
   {
-    int val = (b & 0xFF) - 0x96;                              // 0 - 105
+    int val = (b & 0xFF) - SKIP;                              // 0 - 105
     if (val < 0 || val > 105)
       throw new DiskNibbleException ("6&2 val: " + val);
     byte trans = (byte) (readTranslateTable6and2[val] - 1);   // 0 - 63  (6 bits)

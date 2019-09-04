@@ -10,6 +10,7 @@ public class BootSector extends AbstractSector
   private static final byte[] skew = { 0x00, 0x0D, 0x0B, 0x09, 0x07, 0x05, 0x03, 0x01,
                                        0x0E, 0x0C, 0x0A, 0x08, 0x06, 0x04, 0x02, 0x0F };
   private static final int SKEW_OFFSET = 0x4D;
+  private static final int SKEW_OFFSET_2 = 0x3C;      // DOS 4.x
 
   AssemblerProgram assembler1;
   AssemblerProgram assembler2;
@@ -34,7 +35,7 @@ public class BootSector extends AbstractSector
 
     if (assembler1 == null)
     {
-      int flag = buffer[0] & 0xFF;
+      int flag = buffer[0] & 0xFF;                  // how many blocks to load
       if (flag == 1)                                // apple II
       {
         if (matches (buffer, SKEW_OFFSET, skew))
@@ -53,8 +54,8 @@ public class BootSector extends AbstractSector
       }
       else                                          // apple III (SOS)
       {
-        byte[] newBuffer = new byte[buffer.length * 2];
-        System.arraycopy (buffer, 0, newBuffer, 0, buffer.length);
+        //        byte[] newBuffer = new byte[buffer.length * 2];
+        //        System.arraycopy (buffer, 0, newBuffer, 0, buffer.length);
 
         //        byte[] buf = disk.readSector (1);
         //        System.arraycopy (buf, 0, newBuffer, buf.length, buf.length);
@@ -66,6 +67,7 @@ public class BootSector extends AbstractSector
     }
 
     text.append (assembler1.getText ());
+
     if (assembler2 != null)
     {
       text.append ("\n\n");

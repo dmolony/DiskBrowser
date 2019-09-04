@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +44,8 @@ public class WozFile
 
   private final boolean debug1 = false;
   private final boolean showTracks = false;
+
+  private final ByteTranslator6and2 byteTranslator6and2 = new ByteTranslator6and2 ();
 
   // ---------------------------------------------------------------------------------//
   public WozFile (File file) throws DiskNibbleException
@@ -101,7 +104,23 @@ public class WozFile
       diskBuffer = new byte[tracks.size () * diskSectors * SECTOR_SIZE];
 
       for (Track track : tracks)
-        track.pack (diskBuffer);
+        track.packType1 (diskBuffer);
+    }
+    else if (info.diskType == 2)              // 3.5"
+    {
+      List<Sector> sectors = new ArrayList<> ();
+      for (Track track : tracks)
+        sectors.addAll (track.sectors);
+      Collections.sort (sectors);
+
+      diskBuffer = new byte[800 * info.sides * SECTOR_SIZE * 2];
+      ptr = 0;
+
+      for (Sector sector : sectors)
+      {
+        sector.pack (diskBuffer, ptr);
+        ptr += 512;
+      }
     }
   }
 
@@ -110,6 +129,13 @@ public class WozFile
   // ---------------------------------------------------------------------------------//
   {
     return diskBuffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public int getDiskType ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return info.diskType;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -368,9 +394,6 @@ public class WozFile
       this.rawBuffer = rawBuffer;
       this.trackNo = trackNo;
 
-      //      if (debug1)
-      //        System.out.println (HexFormatter.format (rawBuffer, ptr, 1024, ptr));
-
       if (info.wozVersion == 1)
       {
         bytesUsed = val16 (rawBuffer, ptr + DATA_SIZE);
@@ -413,18 +436,21 @@ public class WozFile
           break;
 
         Sector sector = new Sector (this, offset);
-        checkDuplicates (sector);
+        if (isDuplicate (sector))
+          break;
         sectors.add (sector);
       }
     }
 
     // ---------------------------------------------------------------------------------//
-    private void checkDuplicates (Sector newSector)
+    private boolean isDuplicate (Sector newSector)
     // ---------------------------------------------------------------------------------//
     {
       for (Sector sector : sectors)
-        if (sector.isDuplicate (newSector))
-          System.out.printf ("Duplicate: %s%n", newSector);
+        if (sector.sectorNo == newSector.sectorNo)
+          return true;
+
+      return false;
     }
 
     // ---------------------------------------------------------------------------------//
@@ -483,7 +509,7 @@ public class WozFile
         return;
 
       int max = (bitCount - 1) / 8 + 1;
-      max += 520;
+      max += 600;
       newBuffer = new byte[max];
 
       for (int i = 0; i < max; i++)
@@ -509,7 +535,7 @@ public class WozFile
     }
 
     // ---------------------------------------------------------------------------------//
-    void pack (byte[] diskBuffer) throws DiskNibbleException
+    void packType1 (byte[] diskBuffer) throws DiskNibbleException
     // ---------------------------------------------------------------------------------//
     {
       int ndx = diskSectors == 13 ? 0 : 1;
@@ -517,8 +543,29 @@ public class WozFile
 
       for (Sector sector : sectors)
         if (sector.dataOffset > 0)
-          sector.pack (diskReader, diskBuffer, SECTOR_SIZE
-              * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]));
+        {
+          byte[] decodedBuffer =
+              diskReader.decodeSector (newBuffer, sector.dataOffset + 3);
+          int ptr = SECTOR_SIZE
+              * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]);
+          System.arraycopy (decodedBuffer, 0, diskBuffer, ptr, decodedBuffer.length);
+        }
+    }
+
+    // ---------------------------------------------------------------------------------//
+    int packType2 (byte[] diskBuffer, int ptr) throws DiskNibbleException
+    // ---------------------------------------------------------------------------------//
+    {
+      DiskReader diskReader = DiskReader.getInstance (0);
+      for (Sector sector : sectors)
+        if (sector.dataOffset > 0)
+        {
+          byte[] decodedBuffer =
+              diskReader.decodeSector (newBuffer, sector.dataOffset + 4);
+          System.arraycopy (decodedBuffer, 12, diskBuffer, ptr, 512);
+          ptr += 512;
+        }
+      return ptr;
     }
 
     // ---------------------------------------------------------------------------------//
@@ -552,11 +599,11 @@ public class WozFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public class Sector
+  public class Sector implements Comparable<Sector>
   // ---------------------------------------------------------------------------------//
   {
     private final Track track;
-    private final int trackNo, sectorNo, volume, checksum;
+    private int trackNo, sectorNo, volume, checksum;
     private final int addressOffset;
     private int dataOffset;
 
@@ -566,10 +613,37 @@ public class WozFile
     {
       this.track = track;
 
-      volume = decode4and4 (track.newBuffer, addressOffset + 3);
-      trackNo = decode4and4 (track.newBuffer, addressOffset + 5);
-      sectorNo = decode4and4 (track.newBuffer, addressOffset + 7);
-      checksum = decode4and4 (track.newBuffer, addressOffset + 9);
+      if (info.diskType == 1)
+      {
+        volume = decode4and4 (track.newBuffer, addressOffset + 3);
+        trackNo = decode4and4 (track.newBuffer, addressOffset + 5);
+        sectorNo = decode4and4 (track.newBuffer, addressOffset + 7);
+        checksum = decode4and4 (track.newBuffer, addressOffset + 9);
+      }
+      else
+      {
+        // http://apple2.guidero.us/doku.php/articles/iicplus_smartport_secrets
+        // SWIM Chip User's Ref pp 6
+        // uPD72070.pdf
+        try
+        {
+          int b1 = byteTranslator6and2.decode (track.newBuffer[addressOffset + 3]);
+          sectorNo = byteTranslator6and2.decode (track.newBuffer[addressOffset + 4]);
+          int b3 = byteTranslator6and2.decode (track.newBuffer[addressOffset + 5]);
+          int format = byteTranslator6and2.decode (track.newBuffer[addressOffset + 6]);
+          checksum = byteTranslator6and2.decode (track.newBuffer[addressOffset + 7]);
+
+          trackNo = (b1 & 0x3F) | ((b3 & 0x1F) << 6);
+          volume = (b3 & 0x20) >>> 5;       // side
+
+          int chk = b1 ^ sectorNo ^ b3 ^ format;
+          assert chk == checksum;
+        }
+        catch (DiskNibbleException e)
+        {
+          e.printStackTrace ();
+        }
+      }
 
       //      int epiloguePtr = track.findNext (epilogue, addressOffset + 11);
       //      assert epiloguePtr == addressOffset + 11;
@@ -581,18 +655,13 @@ public class WozFile
     }
 
     // ---------------------------------------------------------------------------------//
-    boolean isDuplicate (Sector sector)
+    void pack (byte[] diskBuffer, int ptr) throws DiskNibbleException
     // ---------------------------------------------------------------------------------//
     {
-      return this.sectorNo == sector.sectorNo;
-    }
+      DiskReader diskReader = DiskReader.getInstance (0);
 
-    // ---------------------------------------------------------------------------------//
-    void pack (DiskReader diskReader, byte[] buffer, int ptr) throws DiskNibbleException
-    // ---------------------------------------------------------------------------------//
-    {
-      byte[] decodedBuffer = diskReader.decodeSector (track.newBuffer, dataOffset + 3);
-      System.arraycopy (decodedBuffer, 0, buffer, ptr, decodedBuffer.length);
+      byte[] decodedBuffer = diskReader.decodeSector (track.newBuffer, dataOffset + 4);
+      System.arraycopy (decodedBuffer, 12, diskBuffer, ptr, 512);
     }
 
     // ---------------------------------------------------------------------------------//
@@ -600,10 +669,24 @@ public class WozFile
     public String toString ()
     // ---------------------------------------------------------------------------------//
     {
+      String fld = info.diskType == 1 ? "Vol" : info.diskType == 2 ? "Sde" : "???";
       String dataOffsetText = dataOffset < 0 ? "" : String.format ("%04X", dataOffset);
+
       return String.format (
-          "Vol: %02X  Trk: %02X  Sct: %02X  Chk: %02X  Add: %04X  Dat: %s", volume,
+          "%s: %02X  Trk: %02X  Sct: %02X  Chk: %02X  Add: %04X  Dat: %s", fld, volume,
           trackNo, sectorNo, checksum, addressOffset, dataOffsetText);
+    }
+
+    // ---------------------------------------------------------------------------------//
+    @Override
+    public int compareTo (Sector o)
+    // ---------------------------------------------------------------------------------//
+    {
+      if (this.trackNo != o.trackNo)
+        return this.trackNo - o.trackNo;
+      if (this.volume != o.volume)
+        return this.volume - o.volume;
+      return this.sectorNo - o.sectorNo;
     }
   }
 }

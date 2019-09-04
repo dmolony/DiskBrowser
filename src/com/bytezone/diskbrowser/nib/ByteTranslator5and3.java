@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.nib;
 
-public class ByteTranslator5and3 implements ByteTranslator
+// -----------------------------------------------------------------------------------//
+class ByteTranslator5and3 implements ByteTranslator
+// -----------------------------------------------------------------------------------//
 {
   // 32 valid bytes that can be stored on a disk (plus 0xAA and 0xD5)
   private static byte[] writeTranslateTable5and3 =
@@ -11,14 +13,16 @@ public class ByteTranslator5and3 implements ByteTranslator
         (byte) 0xEE, (byte) 0xEF, (byte) 0xF5, (byte) 0xF6, (byte) 0xF7, (byte) 0xFA,
         (byte) 0xFB, (byte) 0xFD, (byte) 0xFE, (byte) 0xFF };
 
-  private static byte[] readTranslateTable5and3 = new byte[85];   // skip first 171 blanks
+  private static final int SKIP = 0xAB;
+  private static byte[] readTranslateTable5and3 = new byte[256 - SKIP];
+
   private static boolean debug = false;
 
   static
   {
     for (int i = 0; i < writeTranslateTable5and3.length; i++)
     {
-      int j = (writeTranslateTable5and3[i] & 0xFF) - 0xAB;   // skip first 171 blanks
+      int j = (writeTranslateTable5and3[i] & 0xFF) - SKIP;   // skip first 171 blanks
       readTranslateTable5and3[j] = (byte) (i + 1);           // offset by 1 to avoid zero
       if (debug)
         System.out.printf ("%02X  %02X  %02X%n", i, writeTranslateTable5and3[i], j);
@@ -38,24 +42,20 @@ public class ByteTranslator5and3 implements ByteTranslator
   }
 
   // ---------------------------------------------------------------------------------//
-  // encode
-  // ---------------------------------------------------------------------------------//
-
   @Override
   public byte encode (byte b)
+  // ---------------------------------------------------------------------------------//
   {
     System.out.println ("encode() not written");
     return 0;
   }
 
   // ---------------------------------------------------------------------------------//
-  // decode
-  // ---------------------------------------------------------------------------------//
-
   @Override
   public byte decode (byte b) throws DiskNibbleException
+  // ---------------------------------------------------------------------------------//
   {
-    int val = (b & 0xFF) - 0xAB;                              // 0 - 84
+    int val = (b & 0xFF) - SKIP;                              // 0 - 84
     if (val < 0 || val > 84)
       throw new DiskNibbleException ("5&3 val: " + val);
     byte trans = (byte) (readTranslateTable5and3[val] - 1);   // 0 - 31  (5 bits)

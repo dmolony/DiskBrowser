@@ -9,13 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.gui.AssemblerPreferences;
 import com.bytezone.diskbrowser.gui.DiskBrowser;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class AssemblerProgram extends AbstractFile
 {
+  static AssemblerPreferences assemblerPreferences;     // set by MenuHandler
+
   private static Map<Integer, String> equates;
 
   private final int loadAddress;
@@ -25,8 +26,6 @@ public class AssemblerProgram extends AbstractFile
 
   private List<Integer> entryPoints;
   private List<StringLocation> stringLocations;
-
-  static AssemblerPreferences assemblerPreferences;
 
   public static void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
   {
@@ -81,6 +80,7 @@ public class AssemblerProgram extends AbstractFile
   {
     if (buffer == null)
       return "No buffer";
+
     if (assembler == null)
       this.assembler = new AssemblerProgram (name, buffer, loadAddress);
 
@@ -94,19 +94,25 @@ public class AssemblerProgram extends AbstractFile
     return assembler.getText () + "\n\n" + assemblerProgram.getText ();
   }
 
-  @Override
-  public String getText ()
+  private void addHeader (StringBuilder pgm)
   {
-    StringBuilder pgm = new StringBuilder ();
-
     pgm.append (String.format ("Name    : %s%n", name));
     pgm.append (String.format ("Length  : $%04X (%,d)%n", buffer.length, buffer.length));
     pgm.append (String.format ("Load at : $%04X (%,d)%n", loadAddress, loadAddress));
 
     if (executeOffset > 0)
       pgm.append (String.format ("Entry   : $%04X%n", (loadAddress + executeOffset)));
-
     pgm.append ("\n");
+  }
+
+  @Override
+  public String getText ()
+  {
+    StringBuilder pgm = new StringBuilder ();
+
+    if (assemblerPreferences.showHeader)
+      addHeader (pgm);
+
     pgm.append (getListing ());
 
     if (assemblerPreferences.showStrings)
@@ -250,7 +256,7 @@ public class AssemblerProgram extends AbstractFile
     {
       int address = stringLocation.offset + loadAddress;
       text.append (String.format ("%s %04X - %04X  %s %n",
-          entryPoints.contains (stringLocation.offset + loadAddress) ? "*" : " ", address,
+          entryPoints.contains (stringLocation.offset) ? "*" : " ", address,
           address + stringLocation.length, stringLocation));
     }
 
@@ -266,19 +272,8 @@ public class AssemblerProgram extends AbstractFile
     stringLocations = new ArrayList<> ();
 
     int start = 0;
-    int max = buffer.length - 2;
     for (int ptr = 0; ptr < buffer.length; ptr++)
     {
-      if ((buffer[ptr] == (byte) 0xBD       // LDA Absolute,X
-          || buffer[ptr] == (byte) 0xB9     // LDA Absolute,Y
-          || buffer[ptr] == (byte) 0xAD)    // LDA Absolute
-          && (ptr < max))
-      {
-        int address = Utility.getWord (buffer, ptr + 1);
-        if (address >= loadAddress && address < loadAddress + buffer.length)
-          entryPoints.add (address);
-      }
-
       if ((buffer[ptr] & 0x80) != 0)                    // hi bit set
         continue;
 
@@ -290,6 +285,15 @@ public class AssemblerProgram extends AbstractFile
 
     if (buffer.length - start > 3)
       stringLocations.add (new StringLocation (start, buffer.length - 1));
+
+    int max = buffer.length - 2;
+    for (StringLocation stringLocation : stringLocations)
+      for (int ptr = 0; ptr < max; ptr++)
+        if (stringLocation.matches (buffer, ptr))
+        {
+          entryPoints.add (stringLocation.offset);
+          break;
+        }
   }
 
   private String getArrow (AssemblerStatement cmd)
@@ -350,6 +354,7 @@ public class AssemblerProgram extends AbstractFile
   class StringLocation
   {
     int offset;
+    byte hi, lo;
     int length;
     boolean zeroTerminated;
     boolean lowTerminated;
@@ -364,12 +369,20 @@ public class AssemblerProgram extends AbstractFile
     {
       offset = first;
       length = last - offset + 1;
-
       int end = last + 1;
 
       zeroTerminated = end < buffer.length && buffer[end] == 0;
       lowTerminated = end < buffer.length && buffer[end] >= 32 && buffer[end] < 127;
-      hasLengthByte = first > 0 && (buffer[first] & 0xFF) == length;
+
+      if (first > 0 && (buffer[first] & 0xFF) == length + 1)
+      {
+        hasLengthByte = true;
+        --offset;
+        ++length;
+      }
+
+      hi = (byte) ((offset + loadAddress) >>> 8);
+      lo = (byte) ((offset + loadAddress) & 0x00FF);
 
       for (int i = offset; i < offset + length; i++)
       {
@@ -389,9 +402,19 @@ public class AssemblerProgram extends AbstractFile
       }
     }
 
+    boolean matches (byte[] buffer, int ptr)
+    {
+      return lo == buffer[ptr] && hi == buffer[ptr + 1];
+    }
+
     boolean likelyString ()
     {
       return spaces > 0 || letters > punctuation;
+    }
+
+    public String address ()
+    {
+      return String.format ("%04X  %02X %02X", offset, hi, lo);
     }
 
     public String toStatisticsString ()

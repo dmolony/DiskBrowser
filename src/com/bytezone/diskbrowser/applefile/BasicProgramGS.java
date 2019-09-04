@@ -136,7 +136,7 @@ public class BasicProgramGS extends BasicProgram
       while (ptr < max)
       {
         byte b1 = buffer[ptr++];
-        if (isToken (b1))
+        if (isHighBitSet (b1))
           ptr = tokenOrNumber (b1, text, ptr);
         else
           text.append ((b1 & 0xFF) < 32 ? '.' : (char) b1);

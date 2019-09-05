@@ -41,15 +41,15 @@ public class DiskReaderGCR extends DiskReader
       byte b1 = (byte) (d1 | ((d3 << 4) & 0xC0));
 
       // calculate running checksums
-      outBuffer[outPtr++] = checksum (b0, checksums, 2, 0);
-      outBuffer[outPtr++] = checksum (b1, checksums, 0, 1);
+      outBuffer[outPtr++] = checksum (b0, checksums, 0);
+      outBuffer[outPtr++] = checksum (b1, checksums, 1);
 
       if (outPtr == outBuffer.length)
         break;
 
       byte d2 = byteTranslator.decode (inBuffer[inPtr++]);      // translate
       byte b2 = (byte) (d2 | (d3 << 6));                        // reassemble
-      outBuffer[outPtr++] = checksum (b2, checksums, 1, 2);     // checksum
+      outBuffer[outPtr++] = checksum (b2, checksums, 2);        // checksum
     }
 
     // decode four disk bytes into three checksum bytes
@@ -73,19 +73,20 @@ public class DiskReaderGCR extends DiskReader
   }
 
   // ---------------------------------------------------------------------------------//
-  private byte checksum (byte diskByte, int[] checksums, int current, int next)
+  private byte checksum (byte diskByte, int[] checksums, int a)
   // ---------------------------------------------------------------------------------//
   {
-    int val = (diskByte ^ checksums[current]) & 0xFF;
-    checksums[next] += val;             // prepare next checksum
+    int b = (a + 2) % 3;
+    int val = (diskByte ^ checksums[b]) & 0xFF;
+    checksums[a] += val;              // prepare next checksum
 
-    if (checksums[current] > 0xFF)      // is there a carry?
+    if (checksums[b] > 0xFF)          // is there a carry?
     {
-      ++checksums[next];                // pass it on
-      checksums[current] &= 0xFF;       // back to 8 bits
+      ++checksums[a];                 // pass it on
+      checksums[b] &= 0xFF;           // back to 8 bits
     }
 
-    return (byte) val;                  // converted data byte
+    return (byte) val;                // converted data byte
   }
 
   // ---------------------------------------------------------------------------------//

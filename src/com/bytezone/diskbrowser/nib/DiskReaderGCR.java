@@ -15,24 +15,25 @@ public class DiskReaderGCR extends DiskReader
 
   // ---------------------------------------------------------------------------------//
   @Override
-  byte[] decodeSector (byte[] buffer, int ptr) throws DiskNibbleException
+  byte[] decodeSector (byte[] inBuffer, int inPtr) throws DiskNibbleException
   // ---------------------------------------------------------------------------------//
   {
-    byte[] outBuffer = new byte[BLOCK_SIZE * 2 + 12];       // 524 bytes
+    byte[] outBuffer = new byte[BLOCK_SIZE * 2 + 12];           // 524 bytes
     int outPtr = 0;
     int[] checksums = new int[3];
 
     // decode four disk bytes into three data bytes (175 * 3 - 1 = 524)
     for (int j = 0; j < 175; j++)
     {
-      checksums[0] = (checksums[0] & 0xFF) << 1;            // ROL
-      if ((checksums[0] > 0xFF))
-        ++checksums[0];
+      // ROL first checksum
+      checksums[0] = (checksums[0] & 0xFF) << 1;                // shift left
+      if ((checksums[0] > 0xFF))                                // check for overflow
+        ++checksums[0];                                         // update bit 0
 
       // 6&2 translation
-      byte d3 = byteTranslator.decode (buffer[ptr++]);       // composite byte
-      byte d0 = byteTranslator.decode (buffer[ptr++]);
-      byte d1 = byteTranslator.decode (buffer[ptr++]);
+      byte d3 = byteTranslator.decode (inBuffer[inPtr++]);      // composite byte
+      byte d0 = byteTranslator.decode (inBuffer[inPtr++]);
+      byte d1 = byteTranslator.decode (inBuffer[inPtr++]);
 
       // reassemble bytes
       byte b0 = (byte) ((d0 & 0x3F) | ((d3 & 0x30) << 2));
@@ -42,19 +43,19 @@ public class DiskReaderGCR extends DiskReader
       outBuffer[outPtr++] = checksum (b0, checksums, 0, 2);
       outBuffer[outPtr++] = checksum (b1, checksums, 2, 1);
 
-      if (j < 174)        // get fourth disk byte if we are not at the very end
+      if (j < 174)        // get third byte if we are not at the very end
       {
-        byte d2 = byteTranslator.decode (buffer[ptr++]);        // translate
+        byte d2 = byteTranslator.decode (inBuffer[inPtr++]);    // translate
         byte b2 = (byte) ((d2 & 0x3F) | ((d3 & 0x03) << 6));    // reassemble
         outBuffer[outPtr++] = checksum (b2, checksums, 1, 0);   // checksum
       }
     }
 
     // decode four disk bytes into three data bytes
-    byte d3 = byteTranslator.decode (buffer[ptr++]);         // composite byte
-    byte d0 = byteTranslator.decode (buffer[ptr++]);
-    byte d1 = byteTranslator.decode (buffer[ptr++]);
-    byte d2 = byteTranslator.decode (buffer[ptr++]);
+    byte d3 = byteTranslator.decode (inBuffer[inPtr++]);        // composite byte
+    byte d0 = byteTranslator.decode (inBuffer[inPtr++]);
+    byte d1 = byteTranslator.decode (inBuffer[inPtr++]);
+    byte d2 = byteTranslator.decode (inBuffer[inPtr++]);
 
     // reassemble bytes
     byte b0 = (byte) ((d0 & 0x3F) | ((d3 & 0x30) << 2));
@@ -71,19 +72,19 @@ public class DiskReaderGCR extends DiskReader
   }
 
   // ---------------------------------------------------------------------------------//
-  private byte checksum (byte b, int[] checksums, int c1, int c2)
+  private byte checksum (byte diskByte, int[] checksums, int current, int next)
   // ---------------------------------------------------------------------------------//
   {
-    int val = (b ^ checksums[c1]) & 0xFF;
-    checksums[c2] += val;
+    int val = (diskByte ^ checksums[current]) & 0xFF;
+    checksums[next] += val;             // prepare next checksum
 
-    if (checksums[c1] > 0xFF)
+    if (checksums[current] > 0xFF)      // is there a carry?
     {
-      ++checksums[c2];
-      checksums[c1] &= 0xFF;
+      ++checksums[next];                // pass it on
+      checksums[current] &= 0xFF;       // back to 8 bits
     }
 
-    return (byte) val;
+    return (byte) val;                  // converted data byte
   }
 
   // ---------------------------------------------------------------------------------//

@@ -22,8 +22,8 @@ public class DiskReaderGCR extends DiskReader
     int outPtr = 0;
     int[] checksums = new int[3];
 
-    // decode four disk bytes into three data bytes (175 * 3 - 1 = 524)
-    for (int j = 0; j < 175; j++)
+    // decode four disk bytes into three data bytes (174 * 3 + 2 = 524)
+    while (true)
     {
       // ROL first checksum
       checksums[0] = (checksums[0] & 0xFF) << 1;                // shift left
@@ -43,12 +43,12 @@ public class DiskReaderGCR extends DiskReader
       outBuffer[outPtr++] = checksum (b0, checksums, 0, 2);
       outBuffer[outPtr++] = checksum (b1, checksums, 2, 1);
 
-      if (j < 174)        // get third byte if we are not at the very end
-      {
-        byte d2 = byteTranslator.decode (inBuffer[inPtr++]);    // translate
-        byte b2 = (byte) ((d2 & 0x3F) | ((d3 & 0x03) << 6));    // reassemble
-        outBuffer[outPtr++] = checksum (b2, checksums, 1, 0);   // checksum
-      }
+      if (outPtr == outBuffer.length)
+        break;
+
+      byte d2 = byteTranslator.decode (inBuffer[inPtr++]);      // translate
+      byte b2 = (byte) ((d2 & 0x3F) | ((d3 & 0x03) << 6));      // reassemble
+      outBuffer[outPtr++] = checksum (b2, checksums, 1, 0);     // checksum
     }
 
     // decode four disk bytes into three data bytes

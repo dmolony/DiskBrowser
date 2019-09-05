@@ -4,6 +4,7 @@ package com.bytezone.diskbrowser.nib;
 public class DiskReaderGCR extends DiskReader
 // -----------------------------------------------------------------------------------//
 {
+  static final int TAG_SIZE = 12;
   private final ByteTranslator byteTranslator = new ByteTranslator6and2 ();
 
   // ---------------------------------------------------------------------------------//
@@ -18,7 +19,7 @@ public class DiskReaderGCR extends DiskReader
   byte[] decodeSector (byte[] inBuffer, int inPtr) throws DiskNibbleException
   // ---------------------------------------------------------------------------------//
   {
-    byte[] outBuffer = new byte[BLOCK_SIZE * 2 + 12];           // 524 bytes
+    byte[] outBuffer = new byte[BLOCK_SIZE + TAG_SIZE];         // 524 bytes
     int outPtr = 0;
     int[] checksums = new int[3];
 
@@ -51,7 +52,7 @@ public class DiskReaderGCR extends DiskReader
       outBuffer[outPtr++] = checksum (b2, checksums, 1, 0);     // checksum
     }
 
-    // decode four disk bytes into three data bytes
+    // decode four disk bytes into three checksum bytes
     byte d3 = byteTranslator.decode (inBuffer[inPtr++]);        // composite byte
     byte d0 = byteTranslator.decode (inBuffer[inPtr++]);
     byte d1 = byteTranslator.decode (inBuffer[inPtr++]);
@@ -92,15 +93,7 @@ public class DiskReaderGCR extends DiskReader
   byte[] encodeSector (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
+    System.out.println ("encodeSector() not written");
     return null;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  int expectedDataSize ()
-  // ---------------------------------------------------------------------------------//
-  {
-    assert false;
-    return 0;
   }
 }

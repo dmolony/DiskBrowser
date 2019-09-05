@@ -24,7 +24,7 @@ class DiskReader13Sector extends DiskReader
   byte[] decodeSector (byte[] buffer, int offset) throws DiskNibbleException
   // ---------------------------------------------------------------------------------//
   {
-    byte[] decodedBuffer = new byte[BLOCK_SIZE];
+    byte[] decodedBuffer = new byte[SECTOR_SIZE];
 
     // convert legal disk values to actual 5 bit values
     for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)             // 411 bytes
@@ -81,13 +81,5 @@ class DiskReader13Sector extends DiskReader
   {
     System.out.println ("encodeSector() not written");
     return null;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  int expectedDataSize ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return BUFFER_WITH_CHECKSUM_SIZE;
   }
 }

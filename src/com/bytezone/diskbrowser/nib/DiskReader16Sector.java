@@ -28,7 +28,7 @@ class DiskReader16Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
   {
     // rearrange 342 bytes into 256
-    byte[] decodedBuffer = new byte[BLOCK_SIZE];             // 256 bytes
+    byte[] decodedBuffer = new byte[SECTOR_SIZE];             // 256 bytes
 
     // convert legal disk values to actual 6 bit values
     for (int i = 0; i < BUFFER_WITH_CHECKSUM_SIZE; i++)      // 343 bytes
@@ -42,7 +42,7 @@ class DiskReader16Sector extends DiskReader
       throw new DiskNibbleException ("Checksum failed");
 
     // move 6 bits into place
-    for (int i = 0; i < BLOCK_SIZE; i++)
+    for (int i = 0; i < SECTOR_SIZE; i++)
       decodedBuffer[i] = decodeB[i + 86];
 
     // reattach each byte's last 2 bits
@@ -53,7 +53,7 @@ class DiskReader16Sector extends DiskReader
       decodedBuffer[i] |= reverse ((val & 0x0C) >> 2);
       decodedBuffer[j] |= reverse ((val & 0x30) >> 4);
 
-      if (k < BLOCK_SIZE)
+      if (k < SECTOR_SIZE)
         decodedBuffer[k] |= reverse ((val & 0xC0) >> 6);
     }
 
@@ -69,7 +69,7 @@ class DiskReader16Sector extends DiskReader
     byte[] encodedBuffer = new byte[BUFFER_WITH_CHECKSUM_SIZE];
 
     // move data buffer down to make room for the 86 extra bytes
-    for (int i = 0; i < BLOCK_SIZE; i++)
+    for (int i = 0; i < SECTOR_SIZE; i++)
       encodeA[i + 86] = buffer[i];
 
     // build extra 86 bytes from the bits stripped from the data bytes
@@ -110,13 +110,5 @@ class DiskReader16Sector extends DiskReader
   // ---------------------------------------------------------------------------------//
   {
     return bits == 1 ? 2 : bits == 2 ? 1 : bits;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  int expectedDataSize ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return BUFFER_WITH_CHECKSUM_SIZE;
   }
 }

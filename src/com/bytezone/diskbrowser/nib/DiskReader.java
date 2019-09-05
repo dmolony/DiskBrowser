@@ -4,7 +4,8 @@ package com.bytezone.diskbrowser.nib;
 abstract class DiskReader
 // -----------------------------------------------------------------------------------//
 {
-  static final int BLOCK_SIZE = 256;
+  static final int SECTOR_SIZE = 256;
+  static final int BLOCK_SIZE = 512;
   static final byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
 
   static DiskReader reader13;
@@ -60,6 +61,4 @@ abstract class DiskReader
   abstract byte[] decodeSector (byte[] buffer, int offset) throws DiskNibbleException;
 
   abstract byte[] encodeSector (byte[] buffer);
-
-  abstract int expectedDataSize ();
 }

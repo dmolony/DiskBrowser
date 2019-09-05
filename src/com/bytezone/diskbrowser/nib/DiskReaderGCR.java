@@ -26,10 +26,10 @@ public class DiskReaderGCR extends DiskReader
     // decode four disk bytes into three data bytes (174 * 3 + 2 = 524)
     while (true)
     {
-      // ROL first checksum
-      checksums[0] = (checksums[0] & 0xFF) << 1;                // shift left
-      if ((checksums[0] > 0xFF))                                // check for overflow
-        ++checksums[0];                                         // set bit 0
+      // ROL checksum
+      checksums[2] = (checksums[2] & 0xFF) << 1;                // shift left
+      if ((checksums[2] > 0xFF))                                // check for overflow
+        ++checksums[2];                                         // set bit 0
 
       // 6&2 translation
       byte d3 = byteTranslator.decode (inBuffer[inPtr++]);      // composite byte
@@ -41,15 +41,15 @@ public class DiskReaderGCR extends DiskReader
       byte b1 = (byte) (d1 | ((d3 & 0x0C) << 4));
 
       // calculate running checksums
-      outBuffer[outPtr++] = checksum (b0, checksums, 0, 2);
-      outBuffer[outPtr++] = checksum (b1, checksums, 2, 1);
+      outBuffer[outPtr++] = checksum (b0, checksums, 2, 0);
+      outBuffer[outPtr++] = checksum (b1, checksums, 0, 1);
 
       if (outPtr == outBuffer.length)
         break;
 
       byte d2 = byteTranslator.decode (inBuffer[inPtr++]);      // translate
       byte b2 = (byte) (d2 | (d3 << 6));                        // reassemble
-      outBuffer[outPtr++] = checksum (b2, checksums, 1, 0);     // checksum
+      outBuffer[outPtr++] = checksum (b2, checksums, 1, 2);     // checksum
     }
 
     // decode four disk bytes into three checksum bytes
@@ -64,9 +64,9 @@ public class DiskReaderGCR extends DiskReader
     byte b2 = (byte) ((d2 & 0x3F) | ((d3 & 0x03) << 6));
 
     // compare disk checksums with calculated checksums
-    if ((checksums[0] & 0xFF) != (b2 & 0xFF)        //
+    if ((checksums[0] & 0xFF) != (b0 & 0xFF)        //
         || (checksums[1] & 0xFF) != (b1 & 0xFF)     //
-        || (checksums[2] & 0xFF) != (b0 & 0xFF))
+        || (checksums[2] & 0xFF) != (b2 & 0xFF))
       throw new DiskNibbleException ("Checksum failed");
 
     return outBuffer;

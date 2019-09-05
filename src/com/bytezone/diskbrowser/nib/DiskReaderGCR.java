@@ -37,8 +37,8 @@ public class DiskReaderGCR extends DiskReader
       byte d1 = byteTranslator.decode (inBuffer[inPtr++]);
 
       // reassemble data bytes
-      byte b0 = (byte) (d0 | ((d3 & 0x30) << 2));
-      byte b1 = (byte) (d1 | ((d3 & 0x0C) << 4));
+      byte b0 = (byte) (d0 | ((d3 << 2) & 0xC0));
+      byte b1 = (byte) (d1 | ((d3 << 4) & 0xC0));
 
       // calculate running checksums
       outBuffer[outPtr++] = checksum (b0, checksums, 2, 0);
@@ -59,8 +59,8 @@ public class DiskReaderGCR extends DiskReader
     byte d2 = byteTranslator.decode (inBuffer[inPtr++]);
 
     // reassemble checksums
-    byte b0 = (byte) (d0 | ((d3 & 0x30) << 2));
-    byte b1 = (byte) (d1 | ((d3 & 0x0C) << 4));
+    byte b0 = (byte) (d0 | ((d3 << 2) & 0xC0));
+    byte b1 = (byte) (d1 | ((d3 << 4) & 0xC0));
     byte b2 = (byte) (d2 | (d3 << 6));
 
     // compare disk checksums with calculated checksums

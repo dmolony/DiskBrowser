@@ -36,7 +36,7 @@ public class DiskReaderGCR extends DiskReader
       byte d0 = byteTranslator.decode (inBuffer[inPtr++]);
       byte d1 = byteTranslator.decode (inBuffer[inPtr++]);
 
-      // reassemble bytes
+      // reassemble data bytes
       byte b0 = (byte) (d0 | ((d3 & 0x30) << 2));
       byte b1 = (byte) (d1 | ((d3 & 0x0C) << 4));
 
@@ -58,10 +58,10 @@ public class DiskReaderGCR extends DiskReader
     byte d1 = byteTranslator.decode (inBuffer[inPtr++]);
     byte d2 = byteTranslator.decode (inBuffer[inPtr++]);
 
-    // reassemble bytes
-    byte b0 = (byte) ((d0 & 0x3F) | ((d3 & 0x30) << 2));
-    byte b1 = (byte) ((d1 & 0x3F) | ((d3 & 0x0C) << 4));
-    byte b2 = (byte) ((d2 & 0x3F) | ((d3 & 0x03) << 6));
+    // reassemble checksums
+    byte b0 = (byte) (d0 | ((d3 & 0x30) << 2));
+    byte b1 = (byte) (d1 | ((d3 & 0x0C) << 4));
+    byte b2 = (byte) (d2 | (d3 << 6));
 
     // compare disk checksums with calculated checksums
     if ((checksums[0] & 0xFF) != (b0 & 0xFF)        //

@@ -28,7 +28,7 @@ public class DiskReaderGCR extends DiskReader
       // ROL first checksum
       checksums[0] = (checksums[0] & 0xFF) << 1;                // shift left
       if ((checksums[0] > 0xFF))                                // check for overflow
-        ++checksums[0];                                         // update bit 0
+        ++checksums[0];                                         // set bit 0
 
       // 6&2 translation
       byte d3 = byteTranslator.decode (inBuffer[inPtr++]);      // composite byte

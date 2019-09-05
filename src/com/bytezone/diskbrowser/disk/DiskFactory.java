@@ -251,7 +251,7 @@ public class DiskFactory
           {
             if (debug)
               System.out.println ("Checking woz 3.5");
-            AppleDisk disk800 = new AppleDisk (wozFile, 200, 8);
+            AppleDisk disk800 = new AppleDisk (wozFile, 100 * wozFile.getSides (), 8);
             if (ProdosDisk.isCorrectFormat (disk800))
             {
               if (debug)

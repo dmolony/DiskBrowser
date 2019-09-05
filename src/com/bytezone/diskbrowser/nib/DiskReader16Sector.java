@@ -103,12 +103,4 @@ class DiskReader16Sector extends DiskReader
 
     return encodedBuffer;
   }
-
-  // reverse 2 bits - 0 <= bits <= 3
-  // ---------------------------------------------------------------------------------//
-  private static int reverse (int bits)
-  // ---------------------------------------------------------------------------------//
-  {
-    return bits == 1 ? 2 : bits == 2 ? 1 : bits;
-  }
 }

@@ -113,13 +113,13 @@ public class WozFile
         sectors.addAll (track.sectors);
       Collections.sort (sectors);
 
-      diskBuffer = new byte[800 * info.sides * SECTOR_SIZE * 2];
+      diskBuffer = new byte[800 * info.sides * BLOCK_SIZE];
       ptr = 0;
 
       for (Sector sector : sectors)
       {
-        sector.pack (diskBuffer, ptr);
-        ptr += 512;
+        sector.pack35 (diskBuffer, ptr);
+        ptr += BLOCK_SIZE;
       }
     }
   }
@@ -646,7 +646,7 @@ public class WozFile
     }
 
     // ---------------------------------------------------------------------------------//
-    void pack (byte[] diskBuffer, int ptr) throws DiskNibbleException
+    void pack35 (byte[] diskBuffer, int ptr) throws DiskNibbleException
     // ---------------------------------------------------------------------------------//
     {
       DiskReader diskReader = DiskReader.getInstance (0);
@@ -656,7 +656,7 @@ public class WozFile
       byte[] decodedBuffer = diskReader.decodeSector (track.newBuffer, dataOffset + 4);
 
       // return 512 bytes (ignore the 12 tag bytes)
-      System.arraycopy (decodedBuffer, 12, diskBuffer, ptr, 512);
+      System.arraycopy (decodedBuffer, DiskReaderGCR.TAG_SIZE, diskBuffer, ptr, 512);
     }
 
     // ---------------------------------------------------------------------------------//

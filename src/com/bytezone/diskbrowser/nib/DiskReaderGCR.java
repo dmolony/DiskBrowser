@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.nib;
 
 // -----------------------------------------------------------------------------------//
-public class DiskReaderGCR extends DiskReader
+class DiskReaderGCR extends DiskReader
 // -----------------------------------------------------------------------------------//
 {
   static final int TAG_SIZE = 12;
@@ -26,7 +26,7 @@ public class DiskReaderGCR extends DiskReader
     // decode four disk bytes into three data bytes (174 * 3 + 2 = 524)
     while (true)
     {
-      // ROL checksum
+      // ROL checksum (also keep left-shifted hi bit)
       checksums[2] = (checksums[2] & 0xFF) << 1;                // shift left
       if ((checksums[2] > 0xFF))                                // check for overflow
         ++checksums[2];                                         // set bit 0
@@ -64,29 +64,29 @@ public class DiskReaderGCR extends DiskReader
     byte b2 = (byte) (d2 | (d3 << 6));
 
     // compare disk checksums with calculated checksums
-    if ((checksums[0] & 0xFF) != (b0 & 0xFF)        //
-        || (checksums[1] & 0xFF) != (b1 & 0xFF)     //
-        || (checksums[2] & 0xFF) != (b2 & 0xFF))
+    if ((byte) (checksums[0] & 0xFF) != b0        //
+        || (byte) (checksums[1] & 0xFF) != b1     //
+        || (byte) (checksums[2] & 0xFF) != b2)
       throw new DiskNibbleException ("Checksum failed");
 
     return outBuffer;
   }
 
   // ---------------------------------------------------------------------------------//
-  private byte checksum (byte diskByte, int[] checksums, int a)
+  private byte checksum (byte diskByte, int[] checksums, int current)
   // ---------------------------------------------------------------------------------//
   {
-    int b = (a + 2) % 3;
-    int val = (diskByte ^ checksums[b]) & 0xFF;
-    checksums[a] += val;              // prepare next checksum
+    int prev = (current + 2) % 3;
+    int val = (diskByte ^ checksums[prev]) & 0xFF;
+    checksums[current] += val;           // add to this checksum
 
-    if (checksums[b] > 0xFF)          // is there a carry?
+    if (checksums[prev] > 0xFF)          // was there a carry last time?
     {
-      ++checksums[a];                 // pass it on
-      checksums[b] &= 0xFF;           // back to 8 bits
+      ++checksums[current];              // add it to this checksum
+      checksums[prev] &= 0xFF;           // reset previous carry
     }
 
-    return (byte) val;                // converted data byte
+    return (byte) val;                   // converted data byte
   }
 
   // ---------------------------------------------------------------------------------//

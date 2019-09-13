@@ -159,7 +159,7 @@ public class SHRPictureFile2 extends HiResImage
         break;
 
       default:
-        System.out.println ("PIC unknown aux " + auxType);
+        System.out.printf ("PIC unknown aux: %04X%n ", auxType);
         failureReason = "unknown PIC aux";
     }
   }

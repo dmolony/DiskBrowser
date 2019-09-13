@@ -2,8 +2,8 @@ package com.bytezone.diskbrowser.gui;
 
 /***********************************************************************************************
  * Contains a single instance of FileSystemTab, and any number of AppleDiskTab instances.
- * 
- * 
+ *
+ *
  ***********************************************************************************************/
 
 import java.awt.Dimension;
@@ -50,7 +50,6 @@ class CatalogPanel extends JTabbedPane
   private Font font;
   private FileSystemTab fileTab;
   private final List<AppleDiskTab> diskTabs = new ArrayList<AppleDiskTab> ();
-  //  private final DocumentCreatorFactory lister;
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
   private final RedoHandler redoHandler;
   private CloseTabAction closeTabAction;
@@ -390,7 +389,7 @@ class CatalogPanel extends JTabbedPane
   //    if (evt.getKey ().equals (PreferencesDialog.prefsCatalogFont))
   //      font = new Font (evt.getNewValue (), Font.PLAIN, font.getSize ());
   //    if (evt.getKey ().equals (PreferencesDialog.prefsCatalogFontSize))
-  //      font = new Font (font.getFontName (), 
+  //      font = new Font (font.getFontName (),
   //    Font.PLAIN, Integer.parseInt (evt.getNewValue ()));
   //    if (fileTab != null)
   //      fileTab.setTreeFont (font);

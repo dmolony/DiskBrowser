@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
@@ -31,6 +32,7 @@ public class ProdosDisk extends AbstractFormattedDisk
 
   private final List<DirectoryHeader> headerEntries = new ArrayList<DirectoryHeader> ();
   protected VolumeDirectoryHeader vdh;
+  private final DefaultMutableTreeNode volumeNode;
 
   private static final boolean debug = false;
 
@@ -56,7 +58,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     bootSector = new BootSector (disk, buffer, "Prodos", da);
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
-    DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode ("empty volume node");
+    volumeNode = new DefaultMutableTreeNode ("empty volume node");
     root.add (volumeNode);
 
     processDirectoryBlock (2, null, volumeNode);
@@ -72,6 +74,48 @@ public class ProdosDisk extends AbstractFormattedDisk
       }
       else if (stillAvailable (da2))
         falseNegatives++;
+    }
+
+    sort (volumeNode);
+    ((DefaultTreeModel) catalogTree.getModel ()).reload ();
+  }
+
+  public void sort (DefaultMutableTreeNode node)
+  {
+    for (int base = 0; base < node.getChildCount (); base++)
+    {
+      DefaultMutableTreeNode baseNode = (DefaultMutableTreeNode) node.getChildAt (base);
+      if (!baseNode.isLeaf ())
+      {
+        sort (baseNode);
+        continue;
+      }
+
+      String childName = ((FileEntry) baseNode.getUserObject ()).name;
+      DefaultMutableTreeNode smallestNode = null;
+      String smallestName = childName;
+      int smallestPos = -1;
+
+      for (int j = base + 1; j < node.getChildCount (); j++)
+      {
+        DefaultMutableTreeNode compareNode = (DefaultMutableTreeNode) node.getChildAt (j);
+        if (!compareNode.isLeaf ())
+          continue;
+
+        String compareName = ((FileEntry) compareNode.getUserObject ()).name;
+        if (smallestName.compareToIgnoreCase (compareName) > 0)
+        {
+          smallestNode = compareNode;
+          smallestName = compareName;
+          smallestPos = j;
+        }
+      }
+
+      if (smallestNode != null)
+      {
+        node.insert (baseNode, smallestPos);
+        node.insert (smallestNode, base);
+      }
     }
   }
 

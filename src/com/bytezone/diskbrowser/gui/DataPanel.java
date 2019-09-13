@@ -24,6 +24,7 @@ class DataPanel extends JTabbedPane
     AssemblerPreferencesListener
 {
   private static final int TEXT_WIDTH = 65;
+  private static final int BACKGROUND = 245;
 
   JTextArea hexText;
   JTextArea disassemblyText;
@@ -70,6 +71,9 @@ class DataPanel extends JTabbedPane
     imagePane =
         new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+    imagePane.setBorder (null);
+
     imagePane.getVerticalScrollBar ().setUnitIncrement (50);
     imagePane.getHorizontalScrollBar ().setUnitIncrement (25);
 
@@ -321,7 +325,7 @@ class DataPanel extends JTabbedPane
 
     public ImagePanel ()
     {
-      this.setBackground (Color.gray);
+      this.setBackground (new Color (BACKGROUND, BACKGROUND, BACKGROUND));
     }
 
     private void setImage (BufferedImage image)

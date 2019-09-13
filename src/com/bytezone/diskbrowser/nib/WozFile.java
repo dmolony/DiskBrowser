@@ -36,6 +36,7 @@ public class WozFile
   public final File file;
 
   private Info info;
+  private Meta meta;
   private int diskSectors;
 
   private byte[] addressPrologue;
@@ -70,6 +71,8 @@ public class WozFile
     int ptr = 12;
     while (ptr < buffer.length)
     {
+      validateChunk (buffer, ptr);
+
       String chunkId = new String (buffer, ptr, 4);
       int size = val32 (buffer, ptr + 4);
       if (debug1)
@@ -80,7 +83,7 @@ public class WozFile
         case "INFO":                            // 60 bytes
           info = new Info (buffer, ptr);
           if (info.wozVersion >= 2)
-            setSectors (info.bootSectorFormat == 2 ? 13 : 16);
+            setPrologue (info.bootSectorFormat == 2 ? 13 : 16);
           break;
         case "TMAP":                            // 160 bytes
           tmap (buffer, ptr);
@@ -89,7 +92,7 @@ public class WozFile
           tracks = trks (buffer, ptr);
           break;
         case "META":
-          meta (buffer, ptr, size);
+          meta = new Meta (buffer, ptr, size);
           break;
         case "WRIT":
           break;
@@ -122,6 +125,33 @@ public class WozFile
         ptr += BLOCK_SIZE;
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean validateChunk (byte[] buffer, int ptr) throws DiskNibbleException
+  // ---------------------------------------------------------------------------------//
+  {
+    int size = val32 (buffer, ptr + 4);
+    if (size <= 0 || size + ptr + 8 > buffer.length)
+    {
+      if (info != null)
+        System.out.println (info);
+      throw new DiskNibbleException (String.format ("Invalid chunk size: %08X%n", size));
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+      int val = buffer[ptr + i] & 0xFF;
+      if (val < 'A' || val > 'Z')               // not uppercase ascii
+      {
+        if (info != null)
+          System.out.println (info);
+        throw new DiskNibbleException (
+            String.format ("Invalid chunk name character: %02X%n", val));
+      }
+    }
+
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -160,7 +190,7 @@ public class WozFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private void setSectors (int diskSectors)
+  private void setPrologue (int diskSectors)
   // ---------------------------------------------------------------------------------//
   {
     this.diskSectors = diskSectors;
@@ -172,27 +202,6 @@ public class WozFile
   // ---------------------------------------------------------------------------------//
   {
     ptr += 8;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void meta (byte[] buffer, int ptr, int length)
-  // ---------------------------------------------------------------------------------//
-  {
-    ptr += 8;
-
-    if (debug1)
-    {
-      String metaData = new String (buffer, ptr, length);
-      String[] chunks = metaData.split ("\n");
-      for (String chunk : chunks)
-      {
-        String[] parts = chunk.split ("\t");
-        if (parts.length >= 2)
-          System.out.printf ("%-20s %s%n", parts[0], parts[1]);
-        else
-          System.out.printf ("%-20s%n", parts[0]);
-      }
-    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -275,6 +284,16 @@ public class WozFile
   }
 
   // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    if (meta != null)
+      return info.toString () + "\n\n" + meta.toString ();
+    return info.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
   public static void main (String[] args)
   // ---------------------------------------------------------------------------------//
   {
@@ -314,7 +333,9 @@ public class WozFile
     int requiredRam;
     int largestTrack;
 
+    // ---------------------------------------------------------------------------------//
     Info (byte[] buffer, int ptr)
+    // ---------------------------------------------------------------------------------//
     {
       wozVersion = val8 (buffer, ptr + 8);
 
@@ -343,7 +364,7 @@ public class WozFile
     public String toString ()
     // ---------------------------------------------------------------------------------//
     {
-      StringBuilder text = new StringBuilder ();
+      StringBuilder text = new StringBuilder ("WOZ info:\n\n");
 
       String diskTypeText = diskType == 1 ? "5.25" : "3.5";
 
@@ -369,6 +390,46 @@ public class WozFile
         text.append (String.format ("Required RAM ........ %d%n", requiredRam));
         text.append (String.format ("Largest track ....... %d", largestTrack));
       }
+
+      return text.toString ();
+    }
+  }
+
+  // -----------------------------------------------------------------------------------//
+  class Meta
+  // -----------------------------------------------------------------------------------//
+  {
+    List<String> lines = new ArrayList<> ();
+
+    // ---------------------------------------------------------------------------------//
+    Meta (byte[] buffer, int ptr, int length)
+    // ---------------------------------------------------------------------------------//
+    {
+      String dots = " ......................";
+      String metaData = new String (buffer, ptr + 8, length);
+      String[] chunks = metaData.split ("\n");
+      for (String chunk : chunks)
+      {
+        String[] parts = chunk.split ("\t");
+        if (parts.length >= 2)
+          lines.add (String.format ("%-21.21s %s", parts[0] + dots, parts[1]));
+        else
+          lines.add (String.format ("%-21.21s", parts[0] + dots));
+      }
+    }
+
+    // ---------------------------------------------------------------------------------//
+    @Override
+    public String toString ()
+    // ---------------------------------------------------------------------------------//
+    {
+      StringBuilder text = new StringBuilder ("WOZ meta:\n\n");
+
+      for (String line : lines)
+        text.append (String.format ("%s%n", line));
+
+      if (text.length () > 0)
+        text.deleteCharAt (text.length () - 1);
 
       return text.toString ();
     }
@@ -428,9 +489,9 @@ public class WozFile
 
       if (addressPrologue == null)                                 // WOZ1
         if (findNext (address16prologue, ptr) > 0)
-          setSectors (16);
+          setPrologue (16);
         else if (findNext (address13prologue, ptr) > 0)
-          setSectors (13);
+          setPrologue (13);
         else
           throw new DiskNibbleException ("No address prologue found");
 

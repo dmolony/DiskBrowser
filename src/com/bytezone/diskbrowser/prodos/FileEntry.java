@@ -100,7 +100,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     {
       int storageType = buffer2[i] & 0x0F;
       int keyBlock = HexFormatter.unsignedShort (buffer2, i + 1);
-      //      int eof = HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
+      int eof = HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
       addDataBlocks (storageType, keyBlock);
     }
   }
@@ -265,7 +265,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (endOfFile == 0x4000 && auxType == 0x4000)
             file = new DoubleHiResImage (name, exactBuffer);
           else if (oneOf (endOfFile, 0x1FF8, 0x1FFF, 0x2000, 0x4000)
-              && oneOf (auxType, 0x1FFF, 0x2000, 0x4000))
+              && oneOf (auxType, 0x1FFF, 0x2000, 0x4000, 0x6000))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (endOfFile == 38400 && name.startsWith ("LVL."))
             file = new LodeRunner (name, exactBuffer);

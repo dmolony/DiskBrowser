@@ -30,10 +30,10 @@ class FileSystemTab extends AbstractTab
 {
   File rootFolder;
 
-  public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
+  public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler redoHandler,
       Font font, DiskSelectedEvent diskEvent)
   {
-    super (navMan, selector, font);
+    super (redoHandler, selector, font);
     this.rootFolder = folder;
 
     TreeBuilder tb = new TreeBuilder (folder);
@@ -52,7 +52,7 @@ class FileSystemTab extends AbstractTab
     }
 
     if (diskEvent != null)
-      navMan.diskSelected (diskEvent);
+      redoHandler.diskSelected (diskEvent);
     else
       System.out.println ("No disk event");
   }

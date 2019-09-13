@@ -13,10 +13,13 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.disk.*;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.gui.ProdosPreferences;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class ProdosDisk extends AbstractFormattedDisk
 {
+  static ProdosPreferences prodosPreferences;     // set by MenuHandler
+
   protected final DateFormat df = DateFormat.getInstance ();
   protected final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
   protected final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
@@ -35,6 +38,11 @@ public class ProdosDisk extends AbstractFormattedDisk
   private final DefaultMutableTreeNode volumeNode;
 
   private static final boolean debug = false;
+
+  public static void setProdosPreferences (ProdosPreferences prodosPreferences)
+  {
+    ProdosDisk.prodosPreferences = prodosPreferences;
+  }
 
   public ProdosDisk (Disk disk)
   {
@@ -76,8 +84,11 @@ public class ProdosDisk extends AbstractFormattedDisk
         falseNegatives++;
     }
 
-    sort (volumeNode);
-    ((DefaultTreeModel) catalogTree.getModel ()).reload ();
+    if (ProdosDisk.prodosPreferences.sortDirectories)
+    {
+      sort (volumeNode);
+      ((DefaultTreeModel) catalogTree.getModel ()).reload ();
+    }
   }
 
   public void sort (DefaultMutableTreeNode node)

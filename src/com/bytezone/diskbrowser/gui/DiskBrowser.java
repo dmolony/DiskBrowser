@@ -34,7 +34,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     }
 
     JToolBar toolBar = new JToolBar ("Toolbar", JToolBar.HORIZONTAL);
-    MenuHandler menuHandler = new MenuHandler ();
+    MenuHandler menuHandler = new MenuHandler (prefs);
+    //    menuHandler.restore (prefs);        // early !!
 
     setJMenuBar (menuHandler.menuBar);
     setLayout (new BorderLayout ());
@@ -45,7 +46,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     toolBar.addSeparator ();
 
     // create and add the left-hand catalog panel
-    CatalogPanel catalogPanel = new CatalogPanel (menuHandler, redoHandler, prefs);
+    CatalogPanel catalogPanel = new CatalogPanel (redoHandler, prefs);
     JPanel catalogBorderPanel = addPanel (catalogPanel, "Catalog", BorderLayout.WEST);
 
     // create and add the centre output panel

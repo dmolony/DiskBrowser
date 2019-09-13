@@ -55,7 +55,7 @@ class CatalogPanel extends JTabbedPane
   private CloseTabAction closeTabAction;
   private final RootFolderData rootFolderData = new RootFolderData ();
 
-  public CatalogPanel (MenuHandler mh, RedoHandler redoHandler, Preferences prefs)
+  public CatalogPanel (RedoHandler redoHandler, Preferences prefs)
   {
     this.redoHandler = redoHandler;
 

@@ -15,6 +15,7 @@ import com.bytezone.common.FontAction;
 import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.prodos.ProdosDisk;
 
 public class MenuHandler
     implements DiskSelectionListener, FileSelectionListener, QuitListener
@@ -37,6 +38,8 @@ public class MenuHandler
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
   private static final String PREFS_SHOW_ASSEMBLER_HEADER = "showAssemblerHeader";
 
+  private static final String PREFS_PRODOS_SORT_DIRECTORIES = "prodosSortDirectories";
+
   //  private static final String PREFS_DEBUGGING = "debugging";
   private static final String PREFS_PALETTE = "palette";
 
@@ -51,12 +54,17 @@ public class MenuHandler
   private final List<AssemblerPreferencesListener> assemblerPreferencesListeners =
       new ArrayList<> ();
 
+  private final ProdosPreferences prodosPreferences = new ProdosPreferences ();
+  private final List<ProdosPreferencesListener> prodosPreferencesListeners =
+      new ArrayList<> ();
+
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
   JMenu formatMenu = new JMenu ("Format");
   JMenu colourMenu = new JMenu ("Colours");
   JMenu applesoftMenu = new JMenu ("Applesoft");
   JMenu assemblerMenu = new JMenu ("Assembler");
+  JMenu prodosMenu = new JMenu ("Prodos");
   JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
@@ -102,15 +110,19 @@ public class MenuHandler
   final JMenuItem showAssemblerStringsItem = new JCheckBoxMenuItem ("Show strings");
   final JMenuItem showAssemblerHeaderItem = new JCheckBoxMenuItem ("Show header");
 
+  // Prodos menu items
+  final JMenuItem prodosSortDirectoriesItem = new JCheckBoxMenuItem ("Sort directories");
+
   ButtonGroup paletteGroup = new ButtonGroup ();
 
-  public MenuHandler ()
+  public MenuHandler (Preferences prefs)
   {
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
     menuBar.add (colourMenu);
     menuBar.add (applesoftMenu);
     menuBar.add (assemblerMenu);
+    menuBar.add (prodosMenu);
     menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
@@ -178,6 +190,8 @@ public class MenuHandler
     assemblerMenu.add (showAssemblerStringsItem);
     assemblerMenu.add (showAssemblerHeaderItem);
 
+    prodosMenu.add (prodosSortDirectoriesItem);
+
     ActionListener basicPreferencesAction = new ActionListener ()
     {
       @Override
@@ -198,6 +212,16 @@ public class MenuHandler
       }
     };
 
+    ActionListener prodosPreferencesAction = new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        setProdosPreferences ();
+        notifyProdosPreferencesListeners ();
+      }
+    };
+
     splitRemarkItem.addActionListener (basicPreferencesAction);
     alignAssignItem.addActionListener (basicPreferencesAction);
     showBasicTargetsItem.addActionListener (basicPreferencesAction);
@@ -208,6 +232,8 @@ public class MenuHandler
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerHeaderItem.addActionListener (assemblerPreferencesAction);
+
+    prodosSortDirectoriesItem.addActionListener (prodosPreferencesAction);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -227,6 +253,15 @@ public class MenuHandler
     interleaveGroup.add (interleave3Item);
 
     saveDiskItem.setAction (saveTempFileAction);
+
+    // this is done early because the CatalogPanel creates the previous disk used
+    // before restore() is called
+    prodosSortDirectoriesItem
+        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
+
+    setBasicPreferences ();
+    setAssemblerPreferences ();
+    setProdosPreferences ();
   }
 
   private void setBasicPreferences ()
@@ -276,6 +311,27 @@ public class MenuHandler
   {
     for (AssemblerPreferencesListener listener : assemblerPreferencesListeners)
       listener.setAssemblerPreferences (assemblerPreferences);
+  }
+
+  private void setProdosPreferences ()
+  {
+    prodosPreferences.sortDirectories = prodosSortDirectoriesItem.isSelected ();
+    ProdosDisk.setProdosPreferences (prodosPreferences);
+  }
+
+  void addProdosPreferencesListener (ProdosPreferencesListener listener)
+  {
+    if (!prodosPreferencesListeners.contains (listener))
+    {
+      prodosPreferencesListeners.add (listener);
+      listener.setProdosPreferences (prodosPreferences);
+    }
+  }
+
+  void notifyProdosPreferencesListeners ()
+  {
+    for (ProdosPreferencesListener listener : prodosPreferencesListeners)
+      listener.setProdosPreferences (prodosPreferences);
   }
 
   void addHelpMenuAction (Action action, String functionName)
@@ -329,6 +385,9 @@ public class MenuHandler
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_STRINGS,
         showAssemblerStringsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_HEADER, showAssemblerHeaderItem.isSelected ());
+
+    prefs.putBoolean (PREFS_PRODOS_SORT_DIRECTORIES,
+        prodosSortDirectoriesItem.isSelected ());
   }
 
   @Override
@@ -358,8 +417,12 @@ public class MenuHandler
     showAssemblerHeaderItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_HEADER, true));
 
-    setBasicPreferences ();
-    setAssemblerPreferences ();
+    //    prodosSortDirectoriesItem
+    //        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
+
+    //    setBasicPreferences ();
+    //    setAssemblerPreferences ();
+    //    setProdosPreferences ();
 
     int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
     PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();

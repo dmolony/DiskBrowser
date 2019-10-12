@@ -277,6 +277,9 @@ public class AssemblerProgram extends AbstractFile
       if ((buffer[ptr] & 0x80) != 0)                    // hi bit set
         continue;
 
+      if (buffer[ptr] == 0x0D)                          // CR
+        continue;
+
       if (ptr - start > 3)
         stringLocations.add (new StringLocation (start, ptr - 1));
 

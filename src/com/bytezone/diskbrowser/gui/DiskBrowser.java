@@ -12,8 +12,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.*;
 
-import com.bytezone.common.Platform;
-import com.bytezone.common.State;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
@@ -23,19 +21,21 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
   private WindowSaver windowSaver;
 
+  private static final String OS = System.getProperty ("os.name").toLowerCase ();
+  private static final boolean MAC = OS.startsWith ("mac os");
+
   public DiskBrowser ()
   {
     super (windowTitle);
 
     if (args.length > 0 && "-reset".equals (args[0]))
     {
-      State state = new State (prefs);
-      state.clear ();
+      WindowState windowState = new WindowState (prefs);
+      windowState.clear ();
     }
 
     JToolBar toolBar = new JToolBar ("Toolbar", JToolBar.HORIZONTAL);
-    MenuHandler menuHandler = new MenuHandler (prefs);
-    //    menuHandler.restore (prefs);        // early !!
+    MenuHandler menuHandler = new MenuHandler ();
 
     setJMenuBar (menuHandler.menuBar);
     setLayout (new BorderLayout ());
@@ -46,11 +46,11 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     toolBar.addSeparator ();
 
     // create and add the left-hand catalog panel
-    CatalogPanel catalogPanel = new CatalogPanel (redoHandler, prefs);
+    CatalogPanel catalogPanel = new CatalogPanel (redoHandler);
     JPanel catalogBorderPanel = addPanel (catalogPanel, "Catalog", BorderLayout.WEST);
 
     // create and add the centre output panel
-    DataPanel dataPanel = new DataPanel (menuHandler, prefs);
+    DataPanel dataPanel = new DataPanel (menuHandler);
     addPanel (dataPanel, "Output", BorderLayout.CENTER);
 
     // create and add the right-hand disk layout panel
@@ -161,6 +161,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     // restore the menuHandler items before they are referenced
     fireRestoreEvent ();
     diskLayoutPanel.setFree (menuHandler.showFreeSectorsItem.isSelected ());
+    dataPanel.setLineWrap (menuHandler.lineWrapItem.isSelected ());
 
     // Remove the two optional panels if they were previously hidden
     if (!menuHandler.showLayoutItem.isSelected ())
@@ -213,10 +214,28 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
       @Override
       public void run ()
       {
-        Platform.setLookAndFeel ();
+        setLookAndFeel ();
         new DiskBrowser ().setVisible (true);
       }
     });
+  }
+
+  private static void setLookAndFeel ()
+  {
+    try
+    {
+      if (MAC)
+      {
+        UIManager.setLookAndFeel (UIManager.getSystemLookAndFeelClassName ());
+        System.setProperty ("apple.laf.useScreenMenuBar", "true");
+      }
+      else
+        UIManager.setLookAndFeel ("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace ();
+    }
   }
 
   List<QuitListener> quitListeners = new ArrayList<> ();

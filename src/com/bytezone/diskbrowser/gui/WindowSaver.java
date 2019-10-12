@@ -24,8 +24,6 @@ public class WindowSaver
     prefs.putInt (key + "Y", frame.getY ());
     prefs.putInt (key + "Height", frame.getHeight ());
     prefs.putInt (key + "Width", frame.getWidth ());
-    //    System.out.printf ("Saving x:%d, y:%d, w:%d, h:%d%n", frame.getX (), frame.getY (),
-    //                       frame.getWidth (), frame.getHeight ());
   }
 
   public boolean restoreWindow ()
@@ -37,22 +35,19 @@ public class WindowSaver
 
     Dimension screen = java.awt.Toolkit.getDefaultToolkit ().getScreenSize ();
 
-    if (width < 0)                // nothing to restore
+    if (width < 0)                                    // nothing to restore
     {
       frame.setLocation (100, 100);
       frame.setSize (1000, 600);
       frame.setLocationRelativeTo (null);             // centre
-      //      System.out.printf ("Creating x:%d, y:%d, w:%d, h:%d%n", x, y, width, height);
       return false;
     }
 
-    //    System.out.printf ("w:%d, sw:%f%n", width, screen.getWidth ());
     if (width > screen.getWidth () - 15)
       width = (int) (screen.getWidth () - 15);
 
     frame.setSize (width, height);
     frame.setLocation (x, y);
-    //    System.out.printf ("Restoring x:%d, y:%d, w:%d, h:%d%n", x, y, width, height);
 
     return true;
   }

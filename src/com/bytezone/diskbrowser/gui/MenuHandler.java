@@ -10,7 +10,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.*;
 
-import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
 import com.bytezone.diskbrowser.applefile.*;
 import com.bytezone.diskbrowser.disk.DataDisk;
@@ -65,7 +64,7 @@ public class MenuHandler
   JMenu applesoftMenu = new JMenu ("Applesoft");
   JMenu assemblerMenu = new JMenu ("Assembler");
   JMenu prodosMenu = new JMenu ("Prodos");
-  JMenu helpMenu = new JMenu ("Help");
+  //  JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
   final JMenuItem rootItem = new JMenuItem ("Set root folder...");
@@ -115,7 +114,7 @@ public class MenuHandler
 
   ButtonGroup paletteGroup = new ButtonGroup ();
 
-  public MenuHandler (Preferences prefs)
+  public MenuHandler ()
   {
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
@@ -123,7 +122,7 @@ public class MenuHandler
     menuBar.add (applesoftMenu);
     menuBar.add (assemblerMenu);
     menuBar.add (prodosMenu);
-    menuBar.add (helpMenu);
+    //    menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
     fileMenu.addSeparator ();
@@ -235,7 +234,7 @@ public class MenuHandler
 
     prodosSortDirectoriesItem.addActionListener (prodosPreferencesAction);
 
-    helpMenu.add (new JMenuItem (new EnvironmentAction ()));
+    //    helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
     sector256Item.setActionCommand ("256");
     sector256Item.setAccelerator (KeyStroke.getKeyStroke ("alt 4"));
@@ -256,12 +255,13 @@ public class MenuHandler
 
     // this is done early because the CatalogPanel creates the previous disk used
     // before restore() is called
-    prodosSortDirectoriesItem
-        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
+    // what about all the other preferences???
+    //    prodosSortDirectoriesItem
+    //        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
 
-    setBasicPreferences ();
-    setAssemblerPreferences ();
-    setProdosPreferences ();
+    //    setBasicPreferences ();
+    //    setAssemblerPreferences ();
+    //    setProdosPreferences ();
   }
 
   private void setBasicPreferences ()
@@ -334,10 +334,10 @@ public class MenuHandler
       listener.setProdosPreferences (prodosPreferences);
   }
 
-  void addHelpMenuAction (Action action, String functionName)
-  {
-    helpMenu.add (new JMenuItem (action));
-  }
+  //  void addHelpMenuAction (Action action, String functionName)
+  //  {
+  //    helpMenu.add (new JMenuItem (action));
+  //  }
 
   private void addLauncherMenu ()
   {
@@ -417,12 +417,12 @@ public class MenuHandler
     showAssemblerHeaderItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_HEADER, true));
 
-    //    prodosSortDirectoriesItem
-    //        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
+    prodosSortDirectoriesItem
+        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
 
-    //    setBasicPreferences ();
-    //    setAssemblerPreferences ();
-    //    setProdosPreferences ();
+    setBasicPreferences ();
+    setAssemblerPreferences ();
+    setProdosPreferences ();
 
     int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
     PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();

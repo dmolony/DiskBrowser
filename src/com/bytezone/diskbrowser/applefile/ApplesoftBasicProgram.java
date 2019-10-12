@@ -211,6 +211,16 @@ public class ApplesoftBasicProgram extends BasicProgram
         alignPos = 0;
     }
 
+    int ptr = endPtr + 2;
+    if (ptr < buffer.length)
+    {
+      int offset = HexFormatter.unsignedShort (buffer, 0);
+      int programLoadAddress = offset - getLineLength (0);
+      fullText.append ("\nExtra data:\n\n");
+      fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
+          programLoadAddress + ptr));
+    }
+
     if (fullText.length () > 0)
       fullText.deleteCharAt (fullText.length () - 1);           // remove last newline
 

@@ -55,15 +55,15 @@ class CatalogPanel extends JTabbedPane
   private CloseTabAction closeTabAction;
   private final RootFolderData rootFolderData = new RootFolderData ();
 
-  public CatalogPanel (RedoHandler redoHandler, Preferences prefs)
+  public CatalogPanel (RedoHandler redoHandler)
   {
     this.redoHandler = redoHandler;
 
     setTabPlacement (SwingConstants.BOTTOM);
     setPreferredSize (new Dimension (360, 802));          // width, height
 
-    createTabs (prefs);
-    addChangeListener (new TabChangeListener ());
+    //    createTabs (prefs);
+    //    addChangeListener (new TabChangeListener ());
   }
 
   RootFolderData getRootFolderData ()
@@ -84,6 +84,7 @@ class CatalogPanel extends JTabbedPane
 
     rootFolderData.setRootFolder (rootDirectoryFile);
 
+    // move to restore()
     String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
     int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
     String lastFileUsed = prefs.get (prefsLastFileUsed, "");
@@ -307,8 +308,10 @@ class CatalogPanel extends JTabbedPane
   }
 
   @Override
-  public void restore (Preferences preferences)
+  public void restore (Preferences prefs)
   {
+    createTabs (prefs);
+    addChangeListener (new TabChangeListener ());
   }
 
   // Pass through to DiskSelector

@@ -5,7 +5,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -26,18 +25,18 @@ class DataPanel extends JTabbedPane
   private static final int TEXT_WIDTH = 65;
   private static final int BACKGROUND = 245;
 
-  JTextArea hexText;
-  JTextArea disassemblyText;
+  private final JTextArea formattedText;
+  private final JTextArea hexText;
+  private final JTextArea disassemblyText;
 
   // these two panes are interchangeable
-  JScrollPane formattedPane;
-  JScrollPane imagePane;
+  private final JScrollPane formattedPane;
+  private final JScrollPane imagePane;
 
-  JTextArea formattedText;
-  ImagePanel imagePanel;                        // internal class
-  boolean debugMode;
+  private final ImagePanel imagePanel;                        // internal class
+  private boolean debugMode;
 
-  boolean imageVisible = false;
+  private boolean imageVisible = false;
 
   // used to determine whether the text has been set
   boolean formattedTextValid;
@@ -47,14 +46,14 @@ class DataPanel extends JTabbedPane
 
   final MenuHandler menuHandler;
 
-  public DataPanel (MenuHandler mh, Preferences prefs)
+  public DataPanel (MenuHandler mh)
   {
     this.menuHandler = mh;
     setTabPlacement (SwingConstants.BOTTOM);
 
     formattedText = new JTextArea (10, TEXT_WIDTH);
     formattedPane = setPanel (formattedText, "Formatted");
-    formattedText.setLineWrap (prefs.getBoolean (MenuHandler.PREFS_LINE_WRAP, true));
+    //    formattedText.setLineWrap (prefs.getBoolean (MenuHandler.PREFS_LINE_WRAP, true));
     formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"
@@ -163,6 +162,11 @@ class DataPanel extends JTabbedPane
       imagePanel.setImage (image.getImage ());
     }
     return palette;
+  }
+
+  void setLineWrap (boolean lineWrap)
+  {
+    formattedText.setLineWrap (lineWrap);
   }
 
   public void setColourQuirks (boolean value)

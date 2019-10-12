@@ -24,6 +24,7 @@ class WindowState
     try
     {
       preferences.clear ();
+      System.out.println ("Preferences cleared");
     }
     catch (BackingStoreException e)
     {

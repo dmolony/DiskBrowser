@@ -212,7 +212,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     int ptr = endPtr + 2;
-    if (ptr < buffer.length)
+    if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
     {
       int offset = HexFormatter.unsignedShort (buffer, 0);
       int programLoadAddress = offset - getLineLength (0);

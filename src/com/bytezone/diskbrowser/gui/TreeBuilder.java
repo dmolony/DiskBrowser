@@ -26,16 +26,16 @@ public class TreeBuilder
   private final FileComparator fileComparator = new FileComparator ();
   private final JTree tree;
 
-  public TreeBuilder (File folder)
+  public TreeBuilder (File rootFolder)
   {
-    assert (folder.exists ());
-    assert (folder.isDirectory ());
+    assert (rootFolder.exists ());
+    assert (rootFolder.isDirectory ());
 
-    FileNode fileNode = new FileNode (folder);
+    FileNode fileNode = new FileNode (rootFolder);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (fileNode);
     fileNode.setTreeNode (root);
 
-    addFiles (root, folder);
+    addFiles (root, rootFolder);
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     tree = new JTree (treeModel);
 
@@ -98,7 +98,7 @@ public class TreeBuilder
   /*
    * Class used to control the text displayed by the JTree.
    */
-  public class FileNode implements DataSource
+  public class FileNode implements DataSource   // why does it implement DataSource?
   {
     DefaultMutableTreeNode parentNode;
     public final File file;
@@ -185,8 +185,6 @@ public class TreeBuilder
           if (f.isHidden ())
             continue;
           String name = f.getName ();
-          //          if (name.startsWith ("."))
-          //            continue;
 
           Date d = new Date (f.lastModified ());
           int pos = name.lastIndexOf ('.');

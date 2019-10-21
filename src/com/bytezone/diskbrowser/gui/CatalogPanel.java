@@ -49,7 +49,7 @@ class CatalogPanel extends JTabbedPane
 
   private Font font;
   private FileSystemTab fileTab;
-  private final List<AppleDiskTab> diskTabs = new ArrayList<AppleDiskTab> ();
+  private final List<AppleDiskTab> diskTabs = new ArrayList<> ();
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
   private final RedoHandler redoHandler;
   private CloseTabAction closeTabAction;
@@ -61,9 +61,6 @@ class CatalogPanel extends JTabbedPane
 
     setTabPlacement (SwingConstants.BOTTOM);
     setPreferredSize (new Dimension (360, 802));          // width, height
-
-    //    createTabs (prefs);
-    //    addChangeListener (new TabChangeListener ());
   }
 
   RootFolderData getRootFolderData ()
@@ -84,7 +81,6 @@ class CatalogPanel extends JTabbedPane
 
     rootFolderData.setRootFolder (rootDirectoryFile);
 
-    // move to restore()
     String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
     int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
     String lastFileUsed = prefs.get (prefsLastFileUsed, "");

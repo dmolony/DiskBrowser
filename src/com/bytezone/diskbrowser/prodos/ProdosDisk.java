@@ -86,19 +86,20 @@ public class ProdosDisk extends AbstractFormattedDisk
 
     if (ProdosDisk.prodosPreferences.sortDirectories)
     {
-      sort (volumeNode);
+      sortLeaves (volumeNode);
+      sortFolders (volumeNode);
       ((DefaultTreeModel) catalogTree.getModel ()).reload ();
     }
   }
 
-  public void sort (DefaultMutableTreeNode node)
+  public void sortLeaves (DefaultMutableTreeNode node)
   {
-    for (int base = 0; base < node.getChildCount (); base++)
+    for (int i = 0; i < node.getChildCount (); i++)
     {
-      DefaultMutableTreeNode baseNode = (DefaultMutableTreeNode) node.getChildAt (base);
+      DefaultMutableTreeNode baseNode = (DefaultMutableTreeNode) node.getChildAt (i);
       if (!baseNode.isLeaf ())
       {
-        sort (baseNode);
+        sortLeaves (baseNode);
         continue;
       }
 
@@ -107,7 +108,7 @@ public class ProdosDisk extends AbstractFormattedDisk
       String smallestName = childName;
       int smallestPos = -1;
 
-      for (int j = base + 1; j < node.getChildCount (); j++)
+      for (int j = i + 1; j < node.getChildCount (); j++)
       {
         DefaultMutableTreeNode compareNode = (DefaultMutableTreeNode) node.getChildAt (j);
         if (!compareNode.isLeaf ())
@@ -125,7 +126,45 @@ public class ProdosDisk extends AbstractFormattedDisk
       if (smallestNode != null)
       {
         node.insert (baseNode, smallestPos);
-        node.insert (smallestNode, base);
+        node.insert (smallestNode, i);
+      }
+    }
+  }
+
+  public void sortFolders (DefaultMutableTreeNode node)
+  {
+    for (int i = 0; i < node.getChildCount (); i++)
+    {
+      DefaultMutableTreeNode baseNode = (DefaultMutableTreeNode) node.getChildAt (i);
+      if (baseNode.isLeaf ())
+        continue;
+
+      sortFolders (baseNode);
+
+      String childName = ((FileEntry) baseNode.getUserObject ()).name;
+      DefaultMutableTreeNode smallestNode = null;
+      String smallestName = childName;
+      int smallestPos = -1;
+
+      for (int j = i + 1; j < node.getChildCount (); j++)
+      {
+        DefaultMutableTreeNode compareNode = (DefaultMutableTreeNode) node.getChildAt (j);
+        if (compareNode.isLeaf ())
+          continue;
+
+        String compareName = ((FileEntry) compareNode.getUserObject ()).name;
+        if (smallestName.compareToIgnoreCase (compareName) > 0)
+        {
+          smallestNode = compareNode;
+          smallestName = compareName;
+          smallestPos = j;
+        }
+      }
+
+      if (smallestNode != null)
+      {
+        node.insert (baseNode, smallestPos);
+        node.insert (smallestNode, i);
       }
     }
   }

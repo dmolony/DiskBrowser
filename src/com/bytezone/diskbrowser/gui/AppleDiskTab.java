@@ -24,6 +24,7 @@ class AppleDiskTab extends AbstractTab
 {
   FormattedDisk disk;
 
+  // restoring from a file selection
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, FileSelectedEvent event)
   {
@@ -32,6 +33,7 @@ class AppleDiskTab extends AbstractTab
     redoHandler.fileSelected (event);
   }
 
+  // restoring from a sector selection
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, SectorSelectedEvent event)
   {
@@ -44,9 +46,9 @@ class AppleDiskTab extends AbstractTab
   // couldn't find the file entry. Either the file has been deleted, or it is a disk
   // with redefined files (Wizardry, Infocom etc).
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
-      RedoHandler navMan, Font font, String lastFileUsed)
+      RedoHandler redoHandler, Font font, String lastFileUsed)
   {
-    super (navMan, selector, font);
+    super (redoHandler, selector, font);
     create (disk);
     //    System.out.println ("ooh - couldn't find the previous file");
     DefaultMutableTreeNode node = findNode (lastFileUsed);
@@ -54,21 +56,21 @@ class AppleDiskTab extends AbstractTab
     {
       AppleFileSource afs = (AppleFileSource) node.getUserObject ();
       FileSelectedEvent event = new FileSelectedEvent (this, afs);
-      navMan.fileSelected (event);
+      redoHandler.fileSelected (event);
     }
   }
 
   // User is selecting a new disk from the catalog
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
-      RedoHandler navMan, Font font)
+      RedoHandler redoHandler, Font font)
   {
-    super (navMan, selector, font);
+    super (redoHandler, selector, font);
     create (disk);
 
     AppleFileSource afs = (AppleFileSource) findNode (2).getUserObject (); // select Catalog
     if (afs == null)
       afs = (AppleFileSource) findNode (1).getUserObject (); // select Disk
-    navMan.fileSelected (new FileSelectedEvent (this, afs));
+    redoHandler.fileSelected (new FileSelectedEvent (this, afs));
   }
 
   private void create (FormattedDisk disk)
@@ -125,13 +127,10 @@ class AppleDiskTab extends AbstractTab
     while (children.hasMoreElements ())
     {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement ();
-      Object o = node.getUserObject ();
-      if (o instanceof AppleFileSource)
-      {
-        AppleFileSource afs = (AppleFileSource) node.getUserObject ();
-        if (nodeName.equals (afs.getUniqueName ()))
-          return node;
-      }
+      Object userObject = node.getUserObject ();
+      if (userObject instanceof AppleFileSource
+          && nodeName.equals (((AppleFileSource) userObject).getUniqueName ()))
+        return node;
     }
     return null;
   }

@@ -635,7 +635,6 @@ public class ApplesoftBasicProgram extends BasicProgram
             System.out.println (target);
             System.out.println (HexFormatter.format (buffer, startPtr, length - 1));
             System.out.println (e);
-            //            assert false;
           }
         }
         //        else if (basicPreferences.alignAssign)
@@ -691,21 +690,6 @@ public class ApplesoftBasicProgram extends BasicProgram
           return true;
       return false;
     }
-
-    //    private boolean isToken (byte value)
-    //    {
-    //      return (value & 0x80) > 0;
-    //    }
-
-    //    private boolean isControlCharacter (byte value)
-    //    {
-    //      return value < 32;
-    //    }
-
-    //    private boolean isDigit (byte value)
-    //    {
-    //      return value >= 48 && value <= 57;
-    //    }
 
     public int getAddress ()
     {

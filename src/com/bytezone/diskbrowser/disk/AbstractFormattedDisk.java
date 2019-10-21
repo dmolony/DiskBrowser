@@ -181,12 +181,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   {
     this.originalPath = path;
 
-    DefaultMutableTreeNode root =
-        (DefaultMutableTreeNode) catalogTree.getModel ().getRoot ();
-    DefaultAppleFileSource afs =
-        new DefaultAppleFileSource (getName (), disk.toString (), this);
+    DefaultMutableTreeNode root = getCatalogTreeRoot ();
     if (root.getUserObject () == null)
-      root.setUserObject (afs);
+      root.setUserObject (
+          new DefaultAppleFileSource (getName (), disk.toString (), this));
   }
 
   @Override
@@ -405,8 +403,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   @Override
   public boolean stillAvailable (DiskAddress da)
   {
-    return sectorTypes[da.getBlock ()] == usedSector
-        || sectorTypes[da.getBlock ()] == emptySector;
+    return stillAvailable (da.getBlock ());
   }
 
   @Override

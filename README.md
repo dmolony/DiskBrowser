@@ -1,6 +1,7 @@
 # Apple II Disk Browser
 
 ### Features
+- Cross-platform (Windows, MacOS, Linux)
 - Applesoft and Integer Basic
 - Pascal disassembler
 - 6502 disassembler
@@ -19,7 +20,6 @@
 
 ### Documentation
 * [Usage](resources/usage.md)
-* [Project layout](resources/structure.md)
 
 ### Installation
 * Install the **latest** version of the [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JRE or JDK).

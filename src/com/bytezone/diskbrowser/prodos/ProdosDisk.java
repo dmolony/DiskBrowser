@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -36,6 +38,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   private final List<DirectoryHeader> headerEntries = new ArrayList<DirectoryHeader> ();
   protected VolumeDirectoryHeader vdh;
   private final DefaultMutableTreeNode volumeNode;
+  private final NodeComparator nodeComparator = new NodeComparator ();
 
   private static final boolean debug = false;
 
@@ -86,86 +89,32 @@ public class ProdosDisk extends AbstractFormattedDisk
 
     if (ProdosDisk.prodosPreferences.sortDirectories)
     {
-      sortLeaves (volumeNode);
-      sortFolders (volumeNode);
+      sortNodes (volumeNode);
       ((DefaultTreeModel) catalogTree.getModel ()).reload ();
     }
   }
 
-  public void sortLeaves (DefaultMutableTreeNode node)
+  public void sortNodes (DefaultMutableTreeNode node)
   {
-    for (int i = 0; i < node.getChildCount (); i++)
+    int totalNodes = node.getChildCount ();
+    if (totalNodes == 0)
+      return;
+
+    List<DefaultMutableTreeNode> children = new ArrayList<> (totalNodes);
+    for (int i = 0; i < totalNodes; i++)
     {
-      DefaultMutableTreeNode baseNode = (DefaultMutableTreeNode) node.getChildAt (i);
-      if (!baseNode.isLeaf ())
-      {
-        sortLeaves (baseNode);
-        continue;
-      }
-
-      String childName = ((FileEntry) baseNode.getUserObject ()).name;
-      DefaultMutableTreeNode smallestNode = null;
-      String smallestName = childName;
-      int smallestPos = -1;
-
-      for (int j = i + 1; j < node.getChildCount (); j++)
-      {
-        DefaultMutableTreeNode compareNode = (DefaultMutableTreeNode) node.getChildAt (j);
-        if (!compareNode.isLeaf ())
-          continue;
-
-        String compareName = ((FileEntry) compareNode.getUserObject ()).name;
-        if (smallestName.compareToIgnoreCase (compareName) > 0)
-        {
-          smallestNode = compareNode;
-          smallestName = compareName;
-          smallestPos = j;
-        }
-      }
-
-      if (smallestNode != null)
-      {
-        node.insert (baseNode, smallestPos);
-        node.insert (smallestNode, i);
-      }
+      DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt (i);
+      children.add (child);
+      if (!child.isLeaf ())
+        sortNodes (child);
     }
-  }
 
-  public void sortFolders (DefaultMutableTreeNode node)
-  {
-    for (int i = 0; i < node.getChildCount (); i++)
+    if (totalNodes > 1)
     {
-      DefaultMutableTreeNode baseNode = (DefaultMutableTreeNode) node.getChildAt (i);
-      if (baseNode.isLeaf ())
-        continue;
-
-      sortFolders (baseNode);
-
-      String childName = ((FileEntry) baseNode.getUserObject ()).name;
-      DefaultMutableTreeNode smallestNode = null;
-      String smallestName = childName;
-      int smallestPos = -1;
-
-      for (int j = i + 1; j < node.getChildCount (); j++)
-      {
-        DefaultMutableTreeNode compareNode = (DefaultMutableTreeNode) node.getChildAt (j);
-        if (compareNode.isLeaf ())
-          continue;
-
-        String compareName = ((FileEntry) compareNode.getUserObject ()).name;
-        if (smallestName.compareToIgnoreCase (compareName) > 0)
-        {
-          smallestNode = compareNode;
-          smallestName = compareName;
-          smallestPos = j;
-        }
-      }
-
-      if (smallestNode != null)
-      {
-        node.insert (baseNode, smallestPos);
-        node.insert (smallestNode, i);
-      }
+      node.removeAllChildren ();
+      Collections.sort (children, nodeComparator);
+      for (DefaultMutableTreeNode child : children)
+        node.add (child);
     }
   }
 
@@ -368,5 +317,23 @@ public class ProdosDisk extends AbstractFormattedDisk
     text.append ("Total blocks       : " + volumeDirectory.totalBlocks + newLine);
 
     return text.toString ();
+  }
+
+  class NodeComparator implements Comparator<DefaultMutableTreeNode>
+  {
+    @Override
+    public int compare (DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
+    {
+      String name1 = ((FileEntry) o1.getUserObject ()).name;
+      String name2 = ((FileEntry) o2.getUserObject ()).name;
+
+      if (o1.isLeaf () && !o2.isLeaf ())
+        return -1;
+      if (!o1.isLeaf () && o2.isLeaf ())
+        return 1;
+
+      return name1.compareTo (name2);
+    }
+
   }
 }

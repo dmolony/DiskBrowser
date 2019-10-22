@@ -37,6 +37,8 @@ Double-click a disk from the Disk Tree tab and a new tab appears. This tab conta
 #### Detailed sector display
 Click on any sector in the Disk Layout panel and the Output panel will display the contents of that sector. If it is a recognised sector type, it will be formatted for easier reading.
 ![Sector details](resources/sector.png?raw=true "Sector details")
+#### Windows
+![Windows](resources/windows.png?raw=true "Windows")
 #### Hard disk
 ![Hard disk](resources/disk3.png?raw=true "Hard disk")
 #### Pascal code

@@ -94,30 +94,6 @@ public class ProdosDisk extends AbstractFormattedDisk
     }
   }
 
-  public void sortNodes (DefaultMutableTreeNode node)
-  {
-    int totalNodes = node.getChildCount ();
-    if (totalNodes == 0)
-      return;
-
-    List<DefaultMutableTreeNode> children = new ArrayList<> (totalNodes);
-    for (int i = 0; i < totalNodes; i++)
-    {
-      DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt (i);
-      children.add (child);
-      if (!child.isLeaf ())
-        sortNodes (child);
-    }
-
-    if (totalNodes > 1)
-    {
-      node.removeAllChildren ();
-      Collections.sort (children, nodeComparator);
-      for (DefaultMutableTreeNode child : children)
-        node.add (child);
-    }
-  }
-
   private void processDirectoryBlock (int block, FileEntry parent,
       DefaultMutableTreeNode parentNode)
   {
@@ -296,6 +272,30 @@ public class ProdosDisk extends AbstractFormattedDisk
     return fileEntries.get (fileNo - 1).getSectors ();
   }
 
+  public void sortNodes (DefaultMutableTreeNode node)
+  {
+    int totalChildren = node.getChildCount ();
+    if (totalChildren == 0)
+      return;
+
+    List<DefaultMutableTreeNode> children = new ArrayList<> (totalChildren);
+    for (int i = 0; i < totalChildren; i++)
+    {
+      DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt (i);
+      children.add (child);
+      if (!child.isLeaf ())
+        sortNodes (child);
+    }
+
+    if (totalChildren > 1)
+    {
+      node.removeAllChildren ();
+      Collections.sort (children, nodeComparator);
+      for (DefaultMutableTreeNode child : children)
+        node.add (child);
+    }
+  }
+
   @Override
   public String toString ()
   {
@@ -324,13 +324,14 @@ public class ProdosDisk extends AbstractFormattedDisk
     @Override
     public int compare (DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
     {
-      String name1 = ((FileEntry) o1.getUserObject ()).name;
-      String name2 = ((FileEntry) o2.getUserObject ()).name;
-
       if (o1.isLeaf () && !o2.isLeaf ())
         return -1;
+
       if (!o1.isLeaf () && o2.isLeaf ())
         return 1;
+
+      String name1 = ((FileEntry) o1.getUserObject ()).name;
+      String name2 = ((FileEntry) o2.getUserObject ()).name;
 
       return name1.compareTo (name2);
     }

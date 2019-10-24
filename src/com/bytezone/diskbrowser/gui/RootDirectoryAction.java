@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -12,15 +13,14 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 import com.bytezone.common.Platform;
-import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
-class RootDirectoryAction extends DefaultAction
+public class RootDirectoryAction extends DefaultAction implements QuitListener
 {
-  private final RootFolderData rootFolderData;
-  private final List<RootDirectoryChangeListener> listeners =
-      new ArrayList<RootDirectoryAction.RootDirectoryChangeListener> ();
+  private static final String prefsRootDirectory = "Root directory";
+  private final List<RootDirectoryChangeListener> listeners = new ArrayList<> ();
+  private File rootFolder;
 
-  public RootDirectoryAction (RootFolderData rootFolderData)
+  public RootDirectoryAction ()
   {
     super ("Set HOME folder...", "Defines root folder where the disk images are kept",
         "/com/bytezone/diskbrowser/icons/");
@@ -29,8 +29,6 @@ class RootDirectoryAction extends DefaultAction
 
     setIcon (Action.SMALL_ICON, "folder_explore_16.png");
     setIcon (Action.LARGE_ICON_KEY, "folder_explore_32.png");
-
-    this.rootFolderData = rootFolderData;
   }
 
   @Override
@@ -39,8 +37,8 @@ class RootDirectoryAction extends DefaultAction
     JFileChooser chooser = new JFileChooser (Platform.userHome);
     chooser.setDialogTitle ("Select FOLDER containing disk images");
     chooser.setFileSelectionMode (JFileChooser.DIRECTORIES_ONLY);
-    if (rootFolderData.getRootFolder () != null)
-      chooser.setSelectedFile (rootFolderData.getRootFolder ());
+    if (rootFolder != null)
+      chooser.setSelectedFile (rootFolder);
 
     int result = chooser.showDialog (null, "Accept");
     if (result == JFileChooser.APPROVE_OPTION)
@@ -50,9 +48,8 @@ class RootDirectoryAction extends DefaultAction
         file = file.getParentFile ();
       if (file != null)
       {
-        rootFolderData.setRootFolder (file);
         for (RootDirectoryChangeListener listener : listeners)
-          listener.rootDirectoryChanged (rootFolderData);
+          listener.rootDirectoryChanged (file);
       }
     }
   }
@@ -63,8 +60,28 @@ class RootDirectoryAction extends DefaultAction
       listeners.add (listener);
   }
 
-  interface RootDirectoryChangeListener
+  @Override
+  public void quit (Preferences prefs)
   {
-    public void rootDirectoryChanged (RootFolderData rootFolderData);
+    if (rootFolder == null)
+      prefs.put (prefsRootDirectory, "");
+    else
+      prefs.put (prefsRootDirectory, rootFolder.getAbsolutePath ());
+  }
+
+  @Override
+  public void restore (Preferences prefs)
+  {
+    String rootDirectory = prefs.get (prefsRootDirectory, "");
+
+    File rootDirectoryFile = new File (rootDirectory);
+    if (!rootDirectoryFile.exists () || !rootDirectoryFile.isDirectory ())
+    {
+      System.out.println ("No root directory");
+      return;
+    }
+    this.rootFolder = rootDirectoryFile;
+    for (RootDirectoryChangeListener listener : listeners)
+      listener.rootDirectoryChanged (rootDirectoryFile);
   }
 }

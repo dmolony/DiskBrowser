@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -11,7 +12,6 @@ import javax.swing.KeyStroke;
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
-import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 
 public class DuplicateAction extends DefaultAction implements RootDirectoryChangeListener
 {
@@ -26,15 +26,15 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
 
     setIcon (Action.SMALL_ICON, "save_delete_16.png");
     setIcon (Action.LARGE_ICON_KEY, "save_delete_32.png");
-    int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask ();
+    int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMaskEx ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_L, mask));
     setEnabled (rootFolderData.getRootFolder () != null);
   }
 
   @Override
-  public void rootDirectoryChanged (RootFolderData rootFolderData)
+  public void rootDirectoryChanged (File rootFolder)
   {
-    assert rootFolderData == this.rootFolderData;
+    assert rootFolderData.getRootFolder () == rootFolder;
     setEnabled (rootFolderData.getRootFolder () != null);
   }
 

@@ -24,6 +24,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   private static final String OS = System.getProperty ("os.name").toLowerCase ();
   private static final boolean MAC = OS.startsWith ("mac os");
 
+  private final RootFolderData rootFolderData = new RootFolderData ();
+
   public DiskBrowser ()
   {
     super (windowTitle);
@@ -56,11 +58,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
     // create actions
-    RootFolderData rootFolderData = catalogPanel.getRootFolderData ();
     DuplicateAction duplicateAction = new DuplicateAction (rootFolderData);
-    RootDirectoryAction rootDirectoryAction = new RootDirectoryAction (rootFolderData);
-    rootDirectoryAction.addListener (catalogPanel);
-    rootDirectoryAction.addListener (duplicateAction);
+    RootDirectoryAction rootDirectoryAction = new RootDirectoryAction ();
 
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
@@ -82,6 +81,10 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     //    toolBar.add (aboutAction);
 
     // set the listeners
+    rootDirectoryAction.addListener (rootFolderData);
+    rootDirectoryAction.addListener (catalogPanel);
+    rootDirectoryAction.addListener (duplicateAction);
+
     catalogPanel.addDiskSelectionListener (this);
     catalogPanel.addDiskSelectionListener (dataPanel);
     catalogPanel.addDiskSelectionListener (diskLayoutPanel);
@@ -121,6 +124,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.duplicateItem.setAction (duplicateAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
+    addQuitListener (rootDirectoryAction);
     addQuitListener (menuHandler);
     addQuitListener (catalogPanel);
     addQuitListener (this);

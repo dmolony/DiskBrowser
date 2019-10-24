@@ -15,9 +15,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
+import com.bytezone.diskbrowser.gui.RootDirectoryChangeListener;
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class RootFolderData
+public class RootFolderData implements RootDirectoryChangeListener
 {
   private static final String header =
       "      type        uncmp      .gz     .zip    total";
@@ -63,7 +64,6 @@ public class RootFolderData
     dialogTotals.add (progressPanel, BorderLayout.CENTER);
     southPanel.add (btnCancel);               // needs to be here for the pack()
     dialogTotals.add (southPanel, BorderLayout.SOUTH);
-    //    dialogTotals.setTitle ("Disk Totals");
     dialogTotals.pack ();
     dialogTotals.setLocationRelativeTo (null);
 
@@ -123,13 +123,6 @@ public class RootFolderData
     southPanel.add (button);
     dialogTotals.revalidate ();
     dialogTotals.repaint ();
-  }
-
-  public void setRootFolder (File rootFolder)
-  {
-    this.rootFolder = rootFolder;
-    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
-    disksWindow = null;           // force a recount
   }
 
   String getRootFolderPathText ()
@@ -251,6 +244,18 @@ public class RootFolderData
     }
   }
 
+  @Override
+  public String toString ()
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append (String.format ("Root folder ....... %s%n", rootFolder));
+    text.append (String.format ("Disks ............. %,d%n", totalDisks));
+    text.append (String.format ("Folders ........... %,d", totalFolders));
+
+    return text.toString ();
+  }
+
   class ProgressPanel extends JPanel
   {
     public volatile boolean cancelled;
@@ -293,15 +298,19 @@ public class RootFolderData
 
       if (doChecksums)
       {
-        //        line = String.format ("Unique checksums:                    %,7d%n",
-        //            checksumMap.size ());
-        //        y += lineHeight;
-        //        g.drawString (line, x, y);
         line = String.format ("duplicates ...                             %,7d%n",
             totalDisks - checksumMap.size ());
         y += lineHeight + 10;
         g.drawString (line, x, y);
       }
     }
+  }
+
+  @Override
+  public void rootDirectoryChanged (File rootFolder)
+  {
+    this.rootFolder = rootFolder;
+    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
+    disksWindow = null;           // force a recount
   }
 }

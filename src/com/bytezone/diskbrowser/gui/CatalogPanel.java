@@ -30,11 +30,9 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
-import com.bytezone.diskbrowser.duplicates.RootFolderData;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
-import com.bytezone.diskbrowser.gui.RootDirectoryAction.RootDirectoryChangeListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
 class CatalogPanel extends JTabbedPane
@@ -45,7 +43,6 @@ class CatalogPanel extends JTabbedPane
   private static final String prefsLastDosUsed = "Last dos used";
   private static final String prefsLastFileUsed = "Last file used";
   private static final String prefsLastSectorsUsed = "Last sectors used";
-  private static final String prefsRootDirectory = "Root directory";
 
   private Font font;
   private FileSystemTab fileTab;
@@ -53,7 +50,7 @@ class CatalogPanel extends JTabbedPane
   private final DiskAndFileSelector selector = new DiskAndFileSelector ();
   private final RedoHandler redoHandler;
   private CloseTabAction closeTabAction;
-  private final RootFolderData rootFolderData = new RootFolderData ();
+  private File rootFolder;
 
   public CatalogPanel (RedoHandler redoHandler)
   {
@@ -63,24 +60,8 @@ class CatalogPanel extends JTabbedPane
     setPreferredSize (new Dimension (360, 802));          // width, height
   }
 
-  RootFolderData getRootFolderData ()
-  {
-    return rootFolderData;
-  }
-
   private void createTabs (Preferences prefs)
   {
-    String rootDirectory = prefs.get (prefsRootDirectory, "");
-
-    File rootDirectoryFile = new File (rootDirectory);
-    if (!rootDirectoryFile.exists () || !rootDirectoryFile.isDirectory ())
-    {
-      System.out.println ("No root directory");
-      return;
-    }
-
-    rootFolderData.setRootFolder (rootDirectoryFile);
-
     String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
     int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
     String lastFileUsed = prefs.get (prefsLastFileUsed, "");
@@ -146,22 +127,24 @@ class CatalogPanel extends JTabbedPane
   }
 
   @Override
-  public void rootDirectoryChanged (RootFolderData rootFolderData)
+  public void rootDirectoryChanged (File rootFolder)
   {
-    assert rootFolderData == this.rootFolderData;
+    this.rootFolder = rootFolder;
+    if (fileTab == null)                // still restoring last session
+      return;
 
     // is the user replacing an existing root folder?
     if (fileTab != null)
+    {
       removeTabAt (0);
-
-    insertFileSystemTab (null);
-    setSelectedIndex (0);
+      insertFileSystemTab (null);
+      setSelectedIndex (0);
+    }
   }
 
   private void insertFileSystemTab (DiskSelectedEvent diskEvent)
   {
-    fileTab = new FileSystemTab (rootFolderData.getRootFolder (), selector, redoHandler,
-        font, diskEvent);
+    fileTab = new FileSystemTab (rootFolder, selector, redoHandler, font, diskEvent);
     fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
     insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
   }
@@ -248,7 +231,6 @@ class CatalogPanel extends JTabbedPane
   {
     if (fileTab == null)
     {
-      prefs.put (prefsRootDirectory, "");
       prefs.put (prefsLastDiskUsed, "");
       prefs.putInt (prefsLastDosUsed, -1);
       prefs.put (prefsLastFileUsed, "");
@@ -256,8 +238,6 @@ class CatalogPanel extends JTabbedPane
     }
     else
     {
-      prefs.put (prefsRootDirectory, fileTab.rootFolder.getAbsolutePath ());
-
       if (diskTabs.size () == 0)
       {
         RedoEvent redoEvent = fileTab.redoData.getCurrentEvent ();
@@ -381,20 +361,6 @@ class CatalogPanel extends JTabbedPane
     if (tab instanceof AppleDiskTab)
       ((AppleDiskTab) tab).tree.setSelectionPath (null);
   }
-
-  //  @Override
-  //  public void preferenceChange (PreferenceChangeEvent evt)
-  //  {
-  //    if (evt.getKey ().equals (PreferencesDialog.prefsCatalogFont))
-  //      font = new Font (evt.getNewValue (), Font.PLAIN, font.getSize ());
-  //    if (evt.getKey ().equals (PreferencesDialog.prefsCatalogFontSize))
-  //      font = new Font (font.getFontName (),
-  //    Font.PLAIN, Integer.parseInt (evt.getNewValue ()));
-  //    if (fileTab != null)
-  //      fileTab.setTreeFont (font);
-  //    for (AppleDiskTab tab : diskTabs)
-  //      tab.setTreeFont (font);
-  //  }
 
   @Override
   public void changeFont (FontChangeEvent fontChangeEvent)

@@ -43,14 +43,11 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
     int result = chooser.showDialog (null, "Accept");
     if (result == JFileChooser.APPROVE_OPTION)
     {
-      File file = chooser.getSelectedFile ();
-      if (!file.isDirectory ())
-        file = file.getParentFile ();
-      if (file != null)
-      {
-        for (RootDirectoryChangeListener listener : listeners)
-          listener.rootDirectoryChanged (file);
-      }
+      File rootDirectoryFile = chooser.getSelectedFile ();
+      if (!rootDirectoryFile.isDirectory ())
+        rootDirectoryFile = rootDirectoryFile.getParentFile ();
+      if (rootDirectoryFile != null)
+        notifyListeners (rootDirectoryFile);
     }
   }
 
@@ -63,10 +60,8 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
   @Override
   public void quit (Preferences prefs)
   {
-    if (rootFolder == null)
-      prefs.put (prefsRootDirectory, "");
-    else
-      prefs.put (prefsRootDirectory, rootFolder.getAbsolutePath ());
+    prefs.put (prefsRootDirectory,
+        rootFolder == null ? "" : rootFolder.getAbsolutePath ());
   }
 
   @Override
@@ -80,8 +75,13 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
       System.out.println ("No root directory");
       return;
     }
-    this.rootFolder = rootDirectoryFile;
+    notifyListeners (rootDirectoryFile);
+  }
+
+  private void notifyListeners (File rootDirectoryFile)
+  {
+    rootFolder = rootDirectoryFile;
     for (RootDirectoryChangeListener listener : listeners)
-      listener.rootDirectoryChanged (rootDirectoryFile);
+      listener.rootDirectoryChanged (rootFolder);
   }
 }

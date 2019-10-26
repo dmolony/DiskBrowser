@@ -32,9 +32,9 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
   }
 
   @Override
-  public void rootDirectoryChanged (File rootFolder)
+  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
   {
-    assert rootFolderData.getRootFolder () == rootFolder;
+    assert rootFolderData.getRootFolder () == newRootFolder;
     setEnabled (rootFolderData.getRootFolder () != null);
   }
 

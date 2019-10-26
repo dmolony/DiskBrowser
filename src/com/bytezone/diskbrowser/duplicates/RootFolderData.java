@@ -307,9 +307,9 @@ public class RootFolderData implements RootDirectoryChangeListener
   }
 
   @Override
-  public void rootDirectoryChanged (File rootFolder)
+  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
   {
-    this.rootFolder = rootFolder;
+    rootFolder = newRootFolder;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
     disksWindow = null;           // force a recount
   }

@@ -30,8 +30,8 @@ class FileSystemTab extends AbstractTab
 {
   File rootFolder;
 
-  public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler redoHandler,
-      Font font, DiskSelectedEvent diskEvent)
+  public FileSystemTab (File folder, DiskAndFileSelector selector,
+      RedoHandler redoHandler, Font font, DiskSelectedEvent diskEvent)
   {
     super (redoHandler, selector, font);
     this.rootFolder = folder;

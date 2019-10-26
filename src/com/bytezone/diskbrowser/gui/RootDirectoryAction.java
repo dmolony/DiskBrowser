@@ -70,6 +70,7 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
     String rootDirectory = prefs.get (prefsRootDirectory, "");
 
     File rootDirectoryFile = new File (rootDirectory);
+
     if (!rootDirectoryFile.exists () || !rootDirectoryFile.isDirectory ())
     {
       System.out.println ("No root directory");
@@ -78,10 +79,11 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
     notifyListeners (rootDirectoryFile);
   }
 
-  private void notifyListeners (File rootDirectoryFile)
+  private void notifyListeners (File newRootFolder)
   {
-    rootFolder = rootDirectoryFile;
+    File oldRootFolder = rootFolder;
+    rootFolder = newRootFolder;
     for (RootDirectoryChangeListener listener : listeners)
-      listener.rootDirectoryChanged (rootFolder);
+      listener.rootDirectoryChanged (oldRootFolder, newRootFolder);
   }
 }

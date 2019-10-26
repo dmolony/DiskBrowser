@@ -145,7 +145,7 @@ public class WizardryScenarioDisk extends PascalDisk
   @Override
   public AppleFileSource getFile (String fileName)
   {
-    System.out.println ("Wizardry disk looking for : " + fileName);
+    //    System.out.println ("Wizardry disk looking for : " + fileName);
     return null;
   }
 

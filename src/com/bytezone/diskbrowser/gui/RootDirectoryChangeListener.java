@@ -4,5 +4,5 @@ import java.io.File;
 
 public interface RootDirectoryChangeListener
 {
-  public void rootDirectoryChanged (File rootFolder);
+  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder);
 }

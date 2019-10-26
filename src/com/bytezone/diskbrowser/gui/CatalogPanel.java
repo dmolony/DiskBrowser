@@ -51,6 +51,7 @@ class CatalogPanel extends JTabbedPane
   private final RedoHandler redoHandler;
   private CloseTabAction closeTabAction;
   private File rootFolder;
+  private boolean restored = false;
 
   public CatalogPanel (RedoHandler redoHandler)
   {
@@ -60,86 +61,19 @@ class CatalogPanel extends JTabbedPane
     setPreferredSize (new Dimension (360, 802));          // width, height
   }
 
-  private void createTabs (Preferences prefs)
-  {
-    String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
-    int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
-    String lastFileUsed = prefs.get (prefsLastFileUsed, "");
-    String lastSectorsUsed = prefs.get (prefsLastSectorsUsed, "");
-
-    if (false)
-    {
-      System.out.println ("Last disk    : " + lastDiskUsed);
-      System.out.println ("Last dos     : " + lastDosUsed);
-      System.out.println ("Last file    : " + lastFileUsed);
-      System.out.println ("Last sectors : " + lastSectorsUsed);
-    }
-
-    DiskSelectedEvent diskEvent = null;
-    if (!lastDiskUsed.isEmpty ())
-    {
-      diskEvent = DiskSelectedEvent.create (this, lastDiskUsed);
-      if (diskEvent != null)
-      {
-        FormattedDisk fd = diskEvent.getFormattedDisk ();
-        if (lastDosUsed >= 0 && fd instanceof DualDosDisk)
-          ((DualDosDisk) fd).setCurrentDiskNo (lastDosUsed);
-      }
-    }
-    else
-      System.out.println ("no disk selected");
-
-    insertFileSystemTab (diskEvent);
-
-    if (diskEvent != null)
-    {
-      AppleDiskTab tab = null;
-      FormattedDisk fd = diskEvent.getFormattedDisk ();
-
-      if (!lastFileUsed.isEmpty ())
-      {
-        AppleFileSource afs = fd.getFile (lastFileUsed);
-        if (afs != null)
-        {
-          FileSelectedEvent fileEvent = FileSelectedEvent.create (this, afs);
-          tab = new AppleDiskTab (fd, selector, redoHandler, font, fileEvent);
-        }
-        else
-          tab = new AppleDiskTab (fd, selector, redoHandler, font, lastFileUsed);
-      }
-      else if (!lastSectorsUsed.isEmpty ())
-      {
-        SectorSelectedEvent sectorEvent =
-            SectorSelectedEvent.create (this, fd, lastSectorsUsed);
-        tab = new AppleDiskTab (fd, selector, redoHandler, font, sectorEvent);
-      }
-      else
-        tab = new AppleDiskTab (fd, selector, redoHandler, font);
-
-      if (tab != null)
-      {
-        diskTabs.add (tab);
-        add (tab, "D" + diskTabs.size ());
-      }
-      else
-        System.out.println ("No disk tab created");
-    }
-  }
-
   @Override
-  public void rootDirectoryChanged (File rootFolder)
+  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
   {
-    this.rootFolder = rootFolder;
-    if (fileTab == null)                // still restoring last session
+    rootFolder = newRootFolder;
+    if (!restored)
       return;
 
     // is the user replacing an existing root folder?
     if (fileTab != null)
-    {
       removeTabAt (0);
-      insertFileSystemTab (null);
-      setSelectedIndex (0);
-    }
+
+    insertFileSystemTab (null);
+    setSelectedIndex (0);
   }
 
   private void insertFileSystemTab (DiskSelectedEvent diskEvent)
@@ -286,8 +220,71 @@ class CatalogPanel extends JTabbedPane
   @Override
   public void restore (Preferences prefs)
   {
-    createTabs (prefs);
+    String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
+    int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
+    String lastFileUsed = prefs.get (prefsLastFileUsed, "");
+    String lastSectorsUsed = prefs.get (prefsLastSectorsUsed, "");
+
+    if (false)
+    {
+      System.out.println ("Last disk    : " + lastDiskUsed);
+      System.out.println ("Last dos     : " + lastDosUsed);
+      System.out.println ("Last file    : " + lastFileUsed);
+      System.out.println ("Last sectors : " + lastSectorsUsed);
+    }
+
+    DiskSelectedEvent diskEvent = null;
+    if (!lastDiskUsed.isEmpty ())
+    {
+      diskEvent = DiskSelectedEvent.create (this, lastDiskUsed);
+      if (diskEvent != null)
+      {
+        FormattedDisk fd = diskEvent.getFormattedDisk ();
+        if (lastDosUsed >= 0 && fd instanceof DualDosDisk)
+          ((DualDosDisk) fd).setCurrentDiskNo (lastDosUsed);
+      }
+    }
+    else
+      System.out.println ("no disk selected");
+
+    if (rootFolder != null)
+      insertFileSystemTab (diskEvent);
+
+    if (diskEvent != null)
+    {
+      AppleDiskTab tab = null;
+      FormattedDisk fd = diskEvent.getFormattedDisk ();
+
+      if (!lastFileUsed.isEmpty ())
+      {
+        AppleFileSource afs = fd.getFile (lastFileUsed);
+        if (afs != null)
+        {
+          FileSelectedEvent fileEvent = FileSelectedEvent.create (this, afs);
+          tab = new AppleDiskTab (fd, selector, redoHandler, font, fileEvent);
+        }
+        else
+          tab = new AppleDiskTab (fd, selector, redoHandler, font, lastFileUsed);
+      }
+      else if (!lastSectorsUsed.isEmpty ())
+      {
+        SectorSelectedEvent sectorEvent =
+            SectorSelectedEvent.create (this, fd, lastSectorsUsed);
+        tab = new AppleDiskTab (fd, selector, redoHandler, font, sectorEvent);
+      }
+      else
+        tab = new AppleDiskTab (fd, selector, redoHandler, font);
+
+      if (tab != null)
+      {
+        diskTabs.add (tab);
+        add (tab, "D" + diskTabs.size ());
+      }
+      else
+        System.out.println ("No disk tab created");
+    }
     addChangeListener (new TabChangeListener ());
+    restored = true;
   }
 
   // Pass through to DiskSelector

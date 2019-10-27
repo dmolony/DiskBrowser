@@ -66,7 +66,7 @@ class CatalogPanel extends JTabbedPane
   {
     rootFolder = newRootFolder;
     if (!restored)
-      return;
+      return;           // restore will finish the task
 
     // is the user replacing an existing root folder?
     if (fileTab != null)

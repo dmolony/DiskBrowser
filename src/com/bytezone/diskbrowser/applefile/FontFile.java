@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -33,6 +34,12 @@ public class FontFile extends AbstractFile
 
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
+
+    if (false)        // show gaps around the glyphs
+    {
+      g2d.setColor (new Color (245, 245, 245));
+      g2d.fillRect (0, 0, image.getWidth (), image.getHeight ());
+    }
 
     int ptr = 0;
     int x = borderX;

@@ -1,99 +1,26 @@
 package com.bytezone.diskbrowser.applefile;
 
-import java.awt.AlphaComposite;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.common.Platform;
-import com.bytezone.common.Platform.FontType;
-
 // see graffidisk.v1.0.2mg
-public class CharacterRom extends AbstractFile
+public class CharacterRom extends CharacterList
 {
+  private static final int charsX = 16;
+  private static final int charsY = 6;
+
   String description;
   List<Character> characters = new ArrayList<> ();
 
   public CharacterRom (String name, byte[] buffer)
   {
-    super (name, buffer);
+    super (name, buffer, charsX, charsY, 256);
 
     description = new String (buffer, 16, 16);
 
-    int sizeX = buffer[5] & 0xFF;
-    int sizeY = buffer[6] & 0xFF;
-
-    int gapX = 2;
-    int gapY = 2;
-    int marginX = 2;
-    int marginY = 2;
-    int heading = 15;
-
-    image = new BufferedImage (16 * (sizeX + gapX) + 2 * marginX - gapX,
-        6 * (sizeY + gapY) + 2 * marginY - gapY + heading, BufferedImage.TYPE_BYTE_GRAY);
-    Graphics2D g2d = image.createGraphics ();
-    g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
-
-    int x = marginX;
-    int y = marginY + heading;
-    int count = 0;
-    int ptr = 256;
-
-    while (ptr < buffer.length)
-    {
-      Character character = new Character (buffer, ptr);
-      characters.add (character);
-      ptr += 8;
-
-      g2d.drawImage (character.image, x, y, null);
-      x += sizeX + gapX;
-      if (++count % 16 == 0)
-      {
-        x = marginX;
-        y += sizeY + gapY;
-      }
-    }
-
-    y = marginY;
-    x = marginX;
-    Font font = Platform.getFont (FontType.SANS_SERIF, 10);
-    g2d.setFont (font);
-
-    for (int i = 0; i < description.length (); i++)
-    {
-      int pos = description.charAt (i);
-      if (pos == 0)
-        break;
-      Character character = characters.get (pos - 32);
-      g2d.drawImage (character.image, x, y, null);
-      x += sizeX;
-    }
-
-    g2d.dispose ();
-  }
-
-  @Override
-  public String getText ()
-  {
-    StringBuilder text = new StringBuilder (description + "\n\n");
-    for (int i = 256; i < buffer.length; i += 8)
-    {
-      for (int line = 0; line < 8; line++)
-      {
-        int value = buffer[i + line] & 0xFF;
-        for (int bit = 0; bit < 8; bit++)
-        {
-          text.append ((value & 0x80) != 0 ? "X" : ".");
-          value <<= 1;
-        }
-        text.append ("\n");
-      }
-      text.append ("\n");
-    }
-    return text.toString ();
+    assert sizeX == (buffer[5] & 0xFF);
+    assert sizeY == (buffer[6] & 0xFF);
   }
 
   public static boolean isRom (byte[] buffer)
@@ -107,23 +34,50 @@ public class CharacterRom extends AbstractFile
         && buffer[2] == (byte) 0x53 && buffer[3] == (byte) 0x10;
   }
 
-  class Character
+  @Override
+  public String getText ()
   {
-    private final BufferedImage image;
+    StringBuilder text = new StringBuilder (description + "\n\n");
 
-    public Character (byte[] buffer, int ptr)
+    for (int i = 256; i < buffer.length; i += sizeY)
     {
-      // draw the image
-      image = new BufferedImage (7, 8, BufferedImage.TYPE_BYTE_GRAY);
+      for (int line = 0; line < sizeY; line++)
+      {
+        int value = buffer[i + line] & 0xFF;
+        for (int bit = 0; bit < sizeX; bit++)
+        {
+          text.append ((value & 0x80) == 0 ? "." : "X");
+          value <<= 1;
+        }
+        text.append ("\n");
+      }
+      text.append ("\n");
+    }
+
+    return text.toString ();
+  }
+
+  @Override
+  Character createCharacter (byte[] buffer, int ptr)
+  {
+    return new CharacterRomCharacter (buffer, ptr);
+  }
+
+  class CharacterRomCharacter extends Character
+  {
+    public CharacterRomCharacter (byte[] buffer, int ptr)
+    {
+      super (buffer, ptr);
+
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
 
-      for (int line = 0; line < 8; line++)
+      for (int i = 0; i < sizeY; i++)
       {
         int value = buffer[ptr++] & 0xFF;
-        for (int bit = 0; bit < 7; bit++)
+        for (int j = 0; j < sizeX; j++)
         {
-          dataBuffer.setElem (element++, (value & 0x80) != 0 ? 255 : 0);
+          dataBuffer.setElem (element++, (value & 0x80) == 0 ? 0 : 0xFF);
           value <<= 1;
         }
       }

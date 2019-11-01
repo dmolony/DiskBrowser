@@ -76,7 +76,7 @@ public class PascalDisk extends AbstractFormattedDisk
     DefaultMutableTreeNode volumeNode = new DefaultMutableTreeNode (volumeEntry);
     root.add (volumeNode);
 
-    List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
+    List<DiskAddress> sectors = new ArrayList<> ();
     int max = Math.min (volumeEntry.lastBlock, disk.getTotalBlocks ());
     for (int i = 2; i < max; i++)
     {
@@ -91,7 +91,7 @@ public class PascalDisk extends AbstractFormattedDisk
         new PascalCatalogSector (disk, disk.readSectors (sectors), sectors);
 
     // read the catalog
-    List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
+    List<DiskAddress> addresses = new ArrayList<> ();
     for (int i = 2; i < max; i++)
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readSectors (addresses);
@@ -130,7 +130,7 @@ public class PascalDisk extends AbstractFormattedDisk
     disk.setInterleave (1);                 // should only ever be Prodos
     if (checkFormat (disk, debug))
       return true;
-    disk.setInterleave (0);                 // SANE Disk 2.po
+    disk.setInterleave (0);                 // see SANE Disk 2.po
     if (checkFormat (disk, debug))
       return true;
     return false;
@@ -170,7 +170,7 @@ public class PascalDisk extends AbstractFormattedDisk
       //      return false;
     }
 
-    List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
+    List<DiskAddress> addresses = new ArrayList<> ();
     for (int i = 2; i < to; i++)
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readSectors (addresses);

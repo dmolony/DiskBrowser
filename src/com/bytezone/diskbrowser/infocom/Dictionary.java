@@ -16,14 +16,14 @@ class Dictionary extends AbstractFile
   private final int dictionaryPtr, dictionarySize;
   private final int entryLength;
 
-  Map<Integer, List<WordEntry>> synonymList = new TreeMap<Integer, List<WordEntry>> ();
+  Map<Integer, List<WordEntry>> synonymList = new TreeMap<> ();
 
   public Dictionary (Header header)
   {
     super ("Dictionary", header.buffer);
 
     dictionaryPtr = header.dictionaryOffset;
-    dictionary = new TreeMap<Integer, ZString> ();
+    dictionary = new TreeMap<> ();
 
     totalSeparators = buffer[dictionaryPtr] & 0xFF;
     int ptr = dictionaryPtr + totalSeparators + 1;

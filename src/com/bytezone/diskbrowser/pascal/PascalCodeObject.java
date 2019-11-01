@@ -15,13 +15,12 @@ class PascalCodeObject implements AppleFileSource
 {
   private final PascalDisk parent;
   private final AbstractFile segment;
-  private final List<DiskAddress> blocks;
+  private final List<DiskAddress> blocks = new ArrayList<> ();
 
   public PascalCodeObject (PascalDisk parent, PascalSegment segment, int firstBlock)
   {
     this.parent = parent;
     this.segment = segment;
-    this.blocks = new ArrayList<DiskAddress> ();
 
     int lo = firstBlock + segment.blockNo;
     int hi = lo + (segment.size - 1) / 512;

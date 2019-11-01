@@ -91,7 +91,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
   @Override
   public DataSource getDataSource ()
   {
-    List<byte[]> blockList = new ArrayList<byte[]> ();
+    List<byte[]> blockList = new ArrayList<> ();
     int block = 2;
     do
     {
@@ -114,7 +114,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
   @Override
   public List<DiskAddress> getSectors ()
   {
-    List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
+    List<DiskAddress> sectors = new ArrayList<> ();
     sectors.addAll (dataBlocks);
     return sectors;
   }

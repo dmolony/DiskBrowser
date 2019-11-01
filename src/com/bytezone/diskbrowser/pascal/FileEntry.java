@@ -103,7 +103,6 @@ public class FileEntry extends CatalogEntry
   {
     byte[] buffer = parent.getDisk ().readSectors (blocks);
     byte[] exactBuffer;
-    //    System.out.println (HexFormatter.format (buffer));
 
     if (buffer.length > 0 && bytesUsedInLastBlock < 512)
     {

@@ -20,7 +20,7 @@ abstract class CatalogEntry implements AppleFileSource
   int version;
   int minVersion;
   int access;
-  List<DiskAddress> dataBlocks = new ArrayList<DiskAddress> ();
+  List<DiskAddress> dataBlocks = new ArrayList<> ();
   Disk disk;
 
   public CatalogEntry (ProdosDisk parentDisk, byte[] entryBuffer)

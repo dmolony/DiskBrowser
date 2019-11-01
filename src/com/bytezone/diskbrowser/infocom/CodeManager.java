@@ -17,7 +17,7 @@ class CodeManager extends AbstractFile
 {
   private final Header header;
   private int codeSize;
-  private final Map<Integer, Routine> routines = new TreeMap<Integer, Routine> ();
+  private final Map<Integer, Routine> routines = new TreeMap<> ();
 
   public CodeManager (Header header)
   {
@@ -50,7 +50,7 @@ class CodeManager extends AbstractFile
   {
     int blockNo = routine.startPtr / 256 + 48;
     int size = routine.length;
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> blocks = new ArrayList<> ();
 
     while (size > 0)
     {

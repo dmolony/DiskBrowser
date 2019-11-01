@@ -29,7 +29,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final DiskAddress catalogBlock;
 
   private DiskAddress masterIndexBlock;
-  private final List<DiskAddress> indexBlocks = new ArrayList<DiskAddress> ();
+  private final List<DiskAddress> indexBlocks = new ArrayList<> ();
 
   private boolean invalid;
   private FileEntry link;
@@ -249,6 +249,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             // I made up aux=99 to test it without stepping on aux==04
             file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 99, endOfFile);
           else if (name.endsWith (".FNT") && FontFile.isFont (exactBuffer))
+            file = new FontFile (name, exactBuffer);
+          else if (name.endsWith (".FONT") && FontFile.isFont (exactBuffer))
             file = new FontFile (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))
             file = new ShapeTable (name, exactBuffer);
@@ -477,8 +479,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private DataSource getTreeTextFile ()
   {
-    List<TextBuffer> buffers = new ArrayList<TextBuffer> ();
-    List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
+    List<TextBuffer> buffers = new ArrayList<> ();
+    List<DiskAddress> addresses = new ArrayList<> ();
     int logicalBlock = 0;
 
     byte[] mainIndexBuffer = disk.readSector (keyPtr);
@@ -508,8 +510,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   private DataSource getSaplingTextFile ()
   {
-    List<TextBuffer> buffers = new ArrayList<TextBuffer> ();
-    List<DiskAddress> addresses = new ArrayList<DiskAddress> ();
+    List<TextBuffer> buffers = new ArrayList<> ();
+    List<DiskAddress> addresses = new ArrayList<> ();
     readIndexBlock (keyPtr, addresses, buffers, 0);
 
     if (buffers.size () == 1 && name.endsWith (".S"))
@@ -590,7 +592,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   @Override
   public List<DiskAddress> getSectors ()
   {
-    List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
+    List<DiskAddress> sectors = new ArrayList<> ();
     sectors.add (catalogBlock);
     if (masterIndexBlock != null)
       sectors.add (masterIndexBlock);

@@ -21,7 +21,7 @@ abstract class CatalogEntry implements AppleFileSource
   protected int fileType;
   protected GregorianCalendar date;
   protected int bytesUsedInLastBlock;
-  protected final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+  protected final List<DiskAddress> blocks = new ArrayList<> ();
 
   public CatalogEntry (PascalDisk parent, byte[] buffer)
   {
@@ -29,7 +29,6 @@ abstract class CatalogEntry implements AppleFileSource
 
     firstBlock = HexFormatter.intValue (buffer[0], buffer[1]);
     lastBlock = HexFormatter.intValue (buffer[2], buffer[3]);
-    //    fileType = HexFormatter.intValue (buffer[4], buffer[5]);
     fileType = buffer[4] & 0xFF;
     name = HexFormatter.getPascalString (buffer, 6);
     bytesUsedInLastBlock = HexFormatter.intValue (buffer[16], buffer[17]);
@@ -52,7 +51,7 @@ abstract class CatalogEntry implements AppleFileSource
   @Override
   public List<DiskAddress> getSectors ()
   {
-    List<DiskAddress> sectors = new ArrayList<DiskAddress> (blocks);
+    List<DiskAddress> sectors = new ArrayList<> (blocks);
     return sectors;
   }
 

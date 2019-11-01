@@ -17,12 +17,11 @@ class Grammar extends InfocomAbstractFile
   private final int totalPrepositions;
   private final int padding;
 
-  private final List<SentenceGroup> sentenceGroups = new ArrayList<SentenceGroup> ();
-  private final Map<Integer, List<Sentence>> actionList =
-      new TreeMap<Integer, List<Sentence>> ();
+  private final List<SentenceGroup> sentenceGroups = new ArrayList<> ();
+  private final Map<Integer, List<Sentence>> actionList = new TreeMap<> ();
 
-  private final List<Integer> actionRoutines = new ArrayList<Integer> ();
-  private final List<Integer> preActionRoutines = new ArrayList<Integer> ();
+  private final List<Integer> actionRoutines = new ArrayList<> ();
+  private final List<Integer> preActionRoutines = new ArrayList<> ();
 
   Grammar (String name, byte[] buffer, Header header)
   {
@@ -135,7 +134,7 @@ class Grammar extends InfocomAbstractFile
 
   public List<Integer> getActionRoutines ()
   {
-    List<Integer> routines = new ArrayList<Integer> ();
+    List<Integer> routines = new ArrayList<> ();
     routines.addAll (actionRoutines);
     routines.addAll (preActionRoutines);
     return routines;
@@ -202,7 +201,7 @@ class Grammar extends InfocomAbstractFile
 
   private List<Sentence> getSentences (int routine)
   {
-    List<Sentence> sentences = new ArrayList<Sentence> ();
+    List<Sentence> sentences = new ArrayList<> ();
 
     for (SentenceGroup sg : sentenceGroups)
       for (Sentence s : sg.sentences)
@@ -232,7 +231,7 @@ class Grammar extends InfocomAbstractFile
   {
     int startPtr;
     int id;
-    List<Sentence> sentences = new ArrayList<Sentence> ();
+    List<Sentence> sentences = new ArrayList<> ();
     String verbString; // list of synonyms inside []
 
     public SentenceGroup (int id, int ptr)

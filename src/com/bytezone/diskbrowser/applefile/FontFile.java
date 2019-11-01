@@ -9,36 +9,58 @@ import java.util.List;
 
 public class FontFile extends AbstractFile
 {
+  private static final int borderX = 3;
+  private static final int borderY = 3;
+  private static final int gapX = 3;
+  private static final int gapY = 3;
+  private static final int charsX = 8;
+  private static final int charsY = 12;
+
+  private static final int sizeX = 7;
+  private static final int sizeY = 8;
+  private static final int charBytes = 8;
+
   List<Character> characters = new ArrayList<Character> ();
 
   public FontFile (String name, byte[] buffer)
   {
     super (name, buffer);
 
-    image = new BufferedImage (8 * (7 + 4), 12 * (8 + 4), BufferedImage.TYPE_BYTE_GRAY);
+    image = new BufferedImage (                         //
+        dimension (charsX, borderX, sizeX, gapX),       //
+        dimension (charsY, borderY, sizeY, gapY),       //
+        BufferedImage.TYPE_BYTE_GRAY);
+
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
 
     int ptr = 0;
-    int x = 2;
-    int y = 2;
+    int x = borderX;
+    int y = borderY;
     int count = 0;
 
     while (ptr < buffer.length)
     {
       Character c = new Character (buffer, ptr);
-      ptr += 8;
       characters.add (c);
+      ptr += charBytes;
 
       g2d.drawImage (c.image, x, y, null);
-      x += 7 + 4;
-      if (++count % 8 == 0)
+      if (++count % charBytes == 0)
       {
-        x = 2;
-        y += 8 + 4;
+        x = borderX;
+        y += sizeY + gapY;
       }
+      else
+        x += sizeX + gapX;
     }
+
     g2d.dispose ();
+  }
+
+  private int dimension (int chars, int border, int size, int gap)
+  {
+    return border * 2 + chars * (size + gap) - gap;
   }
 
   @Override
@@ -84,11 +106,11 @@ public class FontFile extends AbstractFile
     public Character (byte[] buffer, int ptr)
     {
       // draw the image
-      image = new BufferedImage (7, 8, BufferedImage.TYPE_BYTE_GRAY);
+      image = new BufferedImage (sizeX, sizeY, BufferedImage.TYPE_BYTE_GRAY);
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
 
-      for (int i = 0; i < 8; i++)
+      for (int i = 0; i < charBytes; i++)
       {
         int b = buffer[ptr + i] & 0xFF;
         String s = "0000000" + Integer.toString (b, 2);

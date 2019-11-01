@@ -249,9 +249,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             // I made up aux=99 to test it without stepping on aux==04
             file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 99, endOfFile);
           else if (name.endsWith (".FNT") && FontFile.isFont (exactBuffer))
-            file = new FontFile (name, exactBuffer);
+            file = new FontFile (name, exactBuffer, auxType);
           else if (name.endsWith (".FONT") && FontFile.isFont (exactBuffer))
-            file = new FontFile (name, exactBuffer);
+            file = new FontFile (name, exactBuffer, auxType);
           else if (ShapeTable.isShapeTable (exactBuffer))
             file = new ShapeTable (name, exactBuffer);
           else if (link != null)
@@ -386,7 +386,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_FNT:
-          file = new FontFile (name, exactBuffer);
+          file = new FontFile (name, exactBuffer, auxType);
           break;
 
         case FILE_TYPE_FONT:

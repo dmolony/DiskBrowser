@@ -23,9 +23,10 @@ public class FontFile extends AbstractFile
 
   List<Character> characters = new ArrayList<Character> ();
 
-  public FontFile (String name, byte[] buffer)
+  public FontFile (String name, byte[] buffer, int address)
   {
     super (name, buffer);
+    loadAddress = address;
 
     image = new BufferedImage (                         //
         dimension (charsX, borderX, sizeX, gapX),       //
@@ -37,7 +38,7 @@ public class FontFile extends AbstractFile
 
     if (false)        // show gaps around the glyphs
     {
-      g2d.setColor (new Color (245, 245, 245));
+      g2d.setColor (new Color (245, 245, 245));   // match background
       g2d.fillRect (0, 0, image.getWidth (), image.getHeight ());
     }
 

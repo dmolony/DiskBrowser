@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 // see graffidisk.v1.0.2mg
+// -----------------------------------------------------------------------------------//
 public class CharacterRom extends CharacterList
+// -----------------------------------------------------------------------------------//
 {
   private static final int charsX = 16;
   private static final int charsY = 6;
@@ -13,7 +15,9 @@ public class CharacterRom extends CharacterList
   String description;
   List<Character> characters = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public CharacterRom (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, charsX, charsY, 256);
 
@@ -23,7 +27,9 @@ public class CharacterRom extends CharacterList
     assert sizeY == (buffer[6] & 0xFF);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isRom (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length != 0x400)
       return false;
@@ -34,15 +40,21 @@ public class CharacterRom extends CharacterList
         && buffer[2] == (byte) 0x53 && buffer[3] == (byte) 0x10;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   Character createCharacter (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     return new CharacterRomCharacter (buffer, ptr);
   }
 
+  // ---------------------------------------------------------------------------------//
   class CharacterRomCharacter extends Character
+  // ---------------------------------------------------------------------------------//
   {
+    // -------------------------------------------------------------------------------//
     public CharacterRomCharacter (byte[] buffer, int ptr)
+    // -------------------------------------------------------------------------------//
     {
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;

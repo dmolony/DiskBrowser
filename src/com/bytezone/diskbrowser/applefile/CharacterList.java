@@ -8,7 +8,9 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 abstract class CharacterList extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   static final int borderX = 3;
   static final int borderY = 3;
@@ -20,12 +22,16 @@ abstract class CharacterList extends AbstractFile
 
   List<Character> characters = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public CharacterList (String name, byte[] buffer, int charsX, int charsY)
+  // ---------------------------------------------------------------------------------//
   {
     this (name, buffer, charsX, charsY, 0);
   }
 
+  // ---------------------------------------------------------------------------------//
   public CharacterList (String name, byte[] buffer, int charsX, int charsY, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -67,15 +73,21 @@ abstract class CharacterList extends AbstractFile
     g2d.dispose ();
   }
 
+  // ---------------------------------------------------------------------------------//
   abstract Character createCharacter (byte[] buffer, int ptr);
+  // ---------------------------------------------------------------------------------//
 
+  // ---------------------------------------------------------------------------------//
   int dimension (int chars, int border, int size, int gap)
+  // ---------------------------------------------------------------------------------//
   {
     return border * 2 + chars * (size + gap) - gap;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
 
@@ -88,12 +100,16 @@ abstract class CharacterList extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class Character
+  // ---------------------------------------------------------------------------------//
   {
     BufferedImage image = new BufferedImage (sizeX, sizeY, BufferedImage.TYPE_BYTE_GRAY);
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();

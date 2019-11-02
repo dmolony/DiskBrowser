@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,13 +74,39 @@ abstract class CharacterList extends AbstractFile
     return border * 2 + chars * (size + gap) - gap;
   }
 
+  @Override
+  public String getText ()
+  {
+    StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
+
+    for (Character character : characters)
+    {
+      text.append (character);
+      text.append ("\n");
+    }
+
+    return text.toString ();
+  }
+
   class Character
   {
-    BufferedImage image;
+    BufferedImage image = new BufferedImage (sizeX, sizeY, BufferedImage.TYPE_BYTE_GRAY);
 
-    public Character (byte[] buffer, int ptr)
+    @Override
+    public String toString ()
     {
-      image = new BufferedImage (sizeX, sizeY, BufferedImage.TYPE_BYTE_GRAY);
+      StringBuilder text = new StringBuilder ();
+      DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
+      int element = 0;
+
+      for (int i = 0; i < sizeY; i++)
+      {
+        for (int j = 0; j < sizeX; j++)
+          text.append (dataBuffer.getElem (element++) == 0 ? "." : "X");
+        text.append ("\n");
+      }
+
+      return text.toString ();
     }
   }
 }

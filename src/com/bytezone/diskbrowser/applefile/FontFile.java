@@ -29,29 +29,6 @@ public class FontFile extends CharacterList
   }
 
   @Override
-  public String getText ()
-  {
-    StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
-
-    for (int i = 0; i < buffer.length; i += sizeY)
-    {
-      for (int line = 0; line < sizeY; line++)
-      {
-        int value = buffer[i + line] & 0xFF;
-        for (int bit = 0; bit < sizeX; bit++)
-        {
-          text.append ((value & 0x01) == 0 ? "." : "X");
-          value >>>= 1;
-        }
-        text.append ("\n");
-      }
-      text.append ("\n");
-    }
-
-    return text.toString ();
-  }
-
-  @Override
   Character createCharacter (byte[] buffer, int ptr)
   {
     return new FontFileCharacter (buffer, ptr);
@@ -61,8 +38,6 @@ public class FontFile extends CharacterList
   {
     public FontFileCharacter (byte[] buffer, int ptr)
     {
-      super (buffer, ptr);
-
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
 

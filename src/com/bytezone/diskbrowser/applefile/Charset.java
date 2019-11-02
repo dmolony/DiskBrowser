@@ -18,29 +18,6 @@ public class Charset extends CharacterList
   }
 
   @Override
-  public String getText ()
-  {
-    StringBuilder text = new StringBuilder ();
-
-    for (int i = 0; i < buffer.length; i += sizeY)
-    {
-      for (int line = sizeY - 1; line >= 0; line--)
-      {
-        int value = buffer[line + i] & 0xFF;
-        for (int bit = 0; bit < sizeX; bit++)
-        {
-          text.append ((value & 0x01) == 0 ? "." : "X");
-          value >>>= 1;
-        }
-        text.append ("\n");
-      }
-      text.append ("\n");
-    }
-
-    return text.toString ();
-  }
-
-  @Override
   Character createCharacter (byte[] buffer, int ptr)
   {
     return new CharsetCharacter (buffer, ptr);
@@ -50,8 +27,6 @@ public class Charset extends CharacterList
   {
     public CharsetCharacter (byte[] buffer, int ptr)
     {
-      super (buffer, ptr);
-
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
 

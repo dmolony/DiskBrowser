@@ -11,6 +11,7 @@ public class CharacterRom extends CharacterList
 {
   private static final int charsX = 16;
   private static final int charsY = 6;
+  private static final int HEADER_LENGTH = 0x100;
 
   String description;
   List<Character> characters = new ArrayList<> ();
@@ -19,7 +20,7 @@ public class CharacterRom extends CharacterList
   public CharacterRom (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    super (name, buffer, charsX, charsY, 256);
+    super (name, buffer, charsX, charsY, HEADER_LENGTH);
 
     description = new String (buffer, 16, 16);
 

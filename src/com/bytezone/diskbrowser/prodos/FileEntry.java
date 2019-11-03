@@ -16,7 +16,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 // - Populate dataBlocks, indexBlocks, catalogBlock and masterIndexBlock
 // - Provide getDataSource ()
 
+// -----------------------------------------------------------------------------------//
 class FileEntry extends CatalogEntry implements ProdosConstants
+// -----------------------------------------------------------------------------------//
 {
   private final int fileType;
   final int keyPtr;
@@ -34,8 +36,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private boolean invalid;
   private FileEntry link;
 
+  // ---------------------------------------------------------------------------------//
   public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
       int parentBlock)
+  // ---------------------------------------------------------------------------------//
   {
     super (fDisk, entryBuffer);
 
@@ -88,14 +92,16 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void readForks ()
+  // ---------------------------------------------------------------------------------//
   {
     parentDisk.setSectorType (keyPtr, parentDisk.extendedKeySector);
     indexBlocks.add (disk.getDiskAddress (keyPtr));
 
     byte[] buffer2 = disk.readSector (keyPtr);        // data fork and resource fork
 
-    // read 2 mini entries (data fork / resource fork)
+    // read 2 mini entries (data fork & resource fork)
     for (int i = 0; i < 512; i += 256)
     {
       int storageType = buffer2[i] & 0x0F;
@@ -105,10 +111,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addDataBlocks (int storageType, int keyPtr)
+  // ---------------------------------------------------------------------------------//
   {
     DiskAddress emptyDiskAddress = disk.getDiskAddress (0);
-    List<Integer> blocks = new ArrayList<Integer> ();
+    List<Integer> blocks = new ArrayList<> ();
 
     switch (storageType)
     {
@@ -146,9 +154,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<Integer> readIndex (int blockPtr)
+  // ---------------------------------------------------------------------------------//
   {
-    List<Integer> blocks = new ArrayList<Integer> (256);
+    List<Integer> blocks = new ArrayList<> (256);
 
     if (blockPtr == 0)                    // master index contains a zero
       for (int i = 0; i < 256; i++)
@@ -169,7 +179,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return blocks;
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<Integer> readMasterIndex (int keyPtr)
+  // ---------------------------------------------------------------------------------//
   {
     masterIndexBlock = disk.getDiskAddress (keyPtr);
     parentDisk.setSectorType (keyPtr, parentDisk.masterIndexSector);
@@ -182,7 +194,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       if (buffer[highest] != 0 || buffer[highest + 0x100] != 0)
         break;
 
-    List<Integer> blocks = new ArrayList<Integer> (highest + 1);
+    List<Integer> blocks = new ArrayList<> (highest + 1);
     for (int i = 0; i <= highest; i++)
     {
       int blockNo = (buffer[i] & 0xFF) | ((buffer[i + 256] & 0xFF) << 8);
@@ -192,7 +204,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return blocks;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean isValid (int blockNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (false)
     {
@@ -204,8 +218,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return disk.isValidAddress (blockNo) && !parentDisk.isSectorFree (blockNo);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     if (file != null)
       return file;
@@ -271,8 +287,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else if (endOfFile == 38400 && name.startsWith ("LVL."))
             file = new LodeRunner (name, exactBuffer);
-          else if (auxType == 0x1000 && endOfFile == 0x400
-              && CharacterRom.isRom (exactBuffer))
+          else if (auxType == 0x1000 && CharacterRom.isRom (exactBuffer))
             file = new CharacterRom (name, exactBuffer);
           else if (auxType == 0 && endOfFile == 0x8000)
           {
@@ -313,7 +328,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_DIRECTORY:
-          VolumeDirectoryHeader vdh = parentDisk.vdh;
+          VolumeDirectoryHeader vdh = parentDisk.getVolumeDirectoryHeader ();
           file = new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks,
               vdh.freeBlocks, vdh.usedBlocks);
           break;
@@ -432,7 +447,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return file;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean oneOf (int val, int... values)
+  // ---------------------------------------------------------------------------------//
   {
     for (int value : values)
       if (val == value)
@@ -440,7 +457,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   private byte[] getExactBuffer (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] exactBuffer;
     if (buffer.length < endOfFile)
@@ -458,7 +477,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return exactBuffer;
   }
 
+  // ---------------------------------------------------------------------------------//
   private DataSource getRandomAccessTextFile ()
+  // ---------------------------------------------------------------------------------//
   {
     // Text files with aux (reclen) > 0 are random access, possibly with
     // non-contiguous records, so they need to be handled differently
@@ -477,7 +498,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private DataSource getTreeTextFile ()
+  // ---------------------------------------------------------------------------------//
   {
     List<TextBuffer> buffers = new ArrayList<> ();
     List<DiskAddress> addresses = new ArrayList<> ();
@@ -508,7 +531,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return new TextFile (name, buffers, auxType, endOfFile);
   }
 
+  // ---------------------------------------------------------------------------------//
   private DataSource getSaplingTextFile ()
+  // ---------------------------------------------------------------------------------//
   {
     List<TextBuffer> buffers = new ArrayList<> ();
     List<DiskAddress> addresses = new ArrayList<> ();
@@ -520,7 +545,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return new TextFile (name, buffers, auxType, endOfFile);
   }
 
+  // ---------------------------------------------------------------------------------//
   private DataSource getSeedlingTextFile ()
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = getBuffer ();
     if (endOfFile < buffer.length)
@@ -536,7 +563,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     return new TextFile (name, buffer, auxType, endOfFile);
   }
 
+  // ---------------------------------------------------------------------------------//
   private byte[] getBuffer ()
+  // ---------------------------------------------------------------------------------//
   {
     switch (storageType)
     {
@@ -568,8 +597,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private int readIndexBlock (int indexBlock, List<DiskAddress> addresses,
       List<TextBuffer> buffers, int logicalBlock)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] indexBuffer = disk.readSector (indexBlock);
     for (int j = 0; j < 256; j++)
@@ -586,11 +617,14 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       }
       logicalBlock++;
     }
+
     return logicalBlock;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> sectors = new ArrayList<> ();
     sectors.add (catalogBlock);
@@ -598,11 +632,14 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       sectors.add (masterIndexBlock);
     sectors.addAll (indexBlocks);
     sectors.addAll (dataBlocks);
+
     return sectors;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean contains (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     if (da == null)
       return false;
@@ -614,20 +651,26 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     for (DiskAddress block : dataBlocks)
       if (da.matches (block))
         return true;
+
     return false;
   }
 
-  // called from ProdosDisk.processDirectoryBlock
+  // called from ProdosDisk.processDirectoryBlock, used to link DoubleHires image files
+  // ---------------------------------------------------------------------------------//
   void link (FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     this.link = fileEntry;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     if (ProdosConstants.fileTypes[fileType].equals ("DIR"))
       return name;
+
     String locked = (access == 0x00) ? "*" : " ";
 
     if (true)

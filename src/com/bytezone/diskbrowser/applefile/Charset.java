@@ -39,10 +39,11 @@ public class Charset extends CharacterList
     {
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
+      ptr += sizeY;         // start at the end and move backwards
 
-      for (int i = sizeY - 1; i >= 0; i--)
+      for (int i = 0; i < sizeY; i++)
       {
-        int value = buffer[ptr + i] & 0xFF;
+        int value = buffer[--ptr] & 0xFF;
         for (int j = 0; j < sizeX; j++)
         {
           dataBuffer.setElem (element++, (value & 0x01) == 0 ? 0 : 0xFF);

@@ -2,7 +2,6 @@ package com.bytezone.diskbrowser.prodos;
 
 import java.awt.Color;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,8 +24,6 @@ public class ProdosDisk extends AbstractFormattedDisk
   static ProdosPreferences prodosPreferences;     // set by MenuHandler
 
   final DateFormat df = DateFormat.getInstance ();
-  final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
-  final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
 
   final SectorType dosSector = new SectorType ("Bootstrap Loader", Color.lightGray);
   final SectorType catalogSector = new SectorType ("Catalog", new Color (0, 200, 0));
@@ -38,9 +35,9 @@ public class ProdosDisk extends AbstractFormattedDisk
   final SectorType extendedKeySector = new SectorType ("Extended key", Color.gray);
 
   private final List<DirectoryHeader> headerEntries = new ArrayList<> ();
-  VolumeDirectoryHeader vdh;
   private final DefaultMutableTreeNode volumeNode;
   private final NodeComparator nodeComparator = new NodeComparator ();
+  private VolumeDirectoryHeader vdh;
 
   private static final boolean debug = false;
 
@@ -129,15 +126,15 @@ public class ProdosDisk extends AbstractFormattedDisk
           case ProdosConstants.VOLUME_HEADER:
             assert headerEntries.size () == 0;
             vdh = new VolumeDirectoryHeader (this, entry);
-            localHeader = vdh;
-            assert localHeader.entryLength == ProdosConstants.ENTRY_SIZE;
-            headerEntries.add (localHeader);
+            assert vdh.entryLength == ProdosConstants.ENTRY_SIZE;
+            headerEntries.add (vdh);
             currentSectorType = catalogSector;
             if (!disk.isSectorEmpty (block))
               sectorTypes[block] = currentSectorType;
             for (int i = 0; i < vdh.totalBitMapBlocks; i++)
               sectorTypes[vdh.bitMapBlock + i] = volumeMapSector;
             parentNode.setUserObject (vdh);         // populate the empty volume node
+            localHeader = vdh;
             break;
 
           case ProdosConstants.SUBDIRECTORY_HEADER:
@@ -197,11 +194,11 @@ public class ProdosDisk extends AbstractFormattedDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  public boolean isReservedAddress (int blockNo)
-  // ---------------------------------------------------------------------------------//
-  {
-    return false;
-  }
+  //  public boolean isReservedAddress (int blockNo)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    return false;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk)
@@ -236,6 +233,13 @@ public class ProdosDisk extends AbstractFormattedDisk
       return false;
 
     return true;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  VolumeDirectoryHeader getVolumeDirectoryHeader ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return vdh;
   }
 
   // ---------------------------------------------------------------------------------//

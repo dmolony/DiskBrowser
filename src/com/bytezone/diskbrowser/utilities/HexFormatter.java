@@ -4,45 +4,61 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.GregorianCalendar;
 
+// -----------------------------------------------------------------------------------//
 public class HexFormatter
+// -----------------------------------------------------------------------------------//
 {
   private static String[] hex =
       { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
   private static MathContext mathContext = new MathContext (9);
 
+  // ---------------------------------------------------------------------------------//
   public static String format (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     return format (buffer, 0, buffer.length);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String formatNoHeader (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     return formatNoHeader (buffer, 0, buffer.length);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     return format (buffer, offset, length, true, 0);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format (byte[] buffer, int offset, int length, int startingAddress)
+  // ---------------------------------------------------------------------------------//
   {
     return format (buffer, offset, length, true, startingAddress);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String formatNoHeader (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     return format (buffer, offset, length, false, 0);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String formatNoHeader (byte[] buffer, int offset, int length,
       int startingAddress)
+  // ---------------------------------------------------------------------------------//
   {
     return format (buffer, offset, length, false, startingAddress);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format (byte[] buffer, int offset, int length, boolean header,
       int startingAddress)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder ();
     int[] freq = new int[256];
@@ -113,7 +129,9 @@ public class HexFormatter
     return line.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String sanitiseString (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder trans = new StringBuilder ();
     for (int j = offset; j < offset + length; j++)
@@ -136,12 +154,16 @@ public class HexFormatter
     return trans.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getString (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     return getString (buffer, 0, buffer.length);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getString (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -165,7 +187,9 @@ public class HexFormatter
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getString2 (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -193,17 +217,23 @@ public class HexFormatter
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getHexString (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     return getHexString (buffer, offset, length, true);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getHexString (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     return getHexString (buffer, 0, buffer.length);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getHexString (byte[] buffer, int offset, int length, boolean space)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder hex = new StringBuilder ();
     int max = Math.min (offset + length, buffer.length);
@@ -218,8 +248,10 @@ public class HexFormatter
     return hex.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getHexStringReversed (byte[] buffer, int offset, int length,
       boolean space)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder hex = new StringBuilder ();
     for (int i = length - 1; i >= 0; i--)
@@ -233,14 +265,18 @@ public class HexFormatter
     return hex.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getBitString (byte b)
+  // ---------------------------------------------------------------------------------//
   {
     String s = "0000000" + Integer.toBinaryString (b & 0xFF);
     s = s.replaceAll ("0", ".");
     return s.substring (s.length () - 8);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static char byteValue (byte b)
+  // ---------------------------------------------------------------------------------//
   {
     int c = b & 0xFF;
     if (c > 127)
@@ -253,7 +289,9 @@ public class HexFormatter
 
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format4 (int value)
+  // ---------------------------------------------------------------------------------//
   {
     if (value < 0)
       return "***err**";
@@ -270,12 +308,16 @@ public class HexFormatter
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format3 (int value)
+  // ---------------------------------------------------------------------------------//
   {
     return format4 (value).substring (1);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format2 (int value)
+  // ---------------------------------------------------------------------------------//
   {
     if (value < 0)
       value += 256;
@@ -283,23 +325,31 @@ public class HexFormatter
     return text;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String format1 (int value)
+  // ---------------------------------------------------------------------------------//
   {
     String text = hex[value];
     return text;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int intValue (byte b1, byte b2)
+  // ---------------------------------------------------------------------------------//
   {
     return (b1 & 0xFF) + (b2 & 0xFF) * 256;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int intValue (byte b1, byte b2, byte b3)
+  // ---------------------------------------------------------------------------------//
   {
     return (b1 & 0xFF) + (b2 & 0xFF) * 256 + (b3 & 0xFF) * 65536;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int unsignedLong (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int val = 0;
     for (int i = 3; i >= 0; i--)
@@ -310,13 +360,17 @@ public class HexFormatter
     return val;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int signedLong (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     return (((buffer[ptr] & 0xFF) << 24) | ((buffer[ptr] & 0xFF) << 16)
         | ((buffer[ptr] & 0xFF) << 8) | (buffer[ptr + 1] & 0xFF));
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int getLongBigEndian (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int val = 0;
     for (int i = 0; i < 4; i++)
@@ -327,7 +381,9 @@ public class HexFormatter
     return val;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int unsignedShort (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     if (ptr >= buffer.length)
     {
@@ -337,7 +393,9 @@ public class HexFormatter
     return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int signedShort (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     if (ptr >= buffer.length)
     {
@@ -347,7 +405,9 @@ public class HexFormatter
     return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int getShortBigEndian (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int val = 0;
     for (int i = 0; i < 2; i++)
@@ -358,7 +418,9 @@ public class HexFormatter
     return val;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static double getSANEDouble (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     long bits = 0;
     for (int i = 7; i >= 0; i--)
@@ -370,7 +432,9 @@ public class HexFormatter
     return Double.longBitsToDouble (bits);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static double floatValueOld (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     double val = 0;
 
@@ -396,7 +460,9 @@ public class HexFormatter
     return val;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static double floatValue (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int exponent = buffer[ptr] & 0x7F;                      // biased 128
     if (exponent == 0)
@@ -415,7 +481,9 @@ public class HexFormatter
     return negative ? rounded * -1 : rounded;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static GregorianCalendar getAppleDate (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     int date = HexFormatter.intValue (buffer[offset], buffer[offset + 1]);
     if (date > 0)
@@ -434,7 +502,9 @@ public class HexFormatter
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static GregorianCalendar getPascalDate (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     int year = (buffer[offset + 1] & 0xFF);
     int day = (buffer[offset] & 0xF0) >> 4;
@@ -451,7 +521,9 @@ public class HexFormatter
     return new GregorianCalendar (year, month - 1, day);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getPascalString (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     int length = buffer[offset] & 0xFF;
     return HexFormatter.getString (buffer, offset + 1, length);

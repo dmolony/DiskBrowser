@@ -19,19 +19,22 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 
 import com.bytezone.diskbrowser.disk.DiskFactory;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
+// -----------------------------------------------------------------------------------//
 class FileSystemTab extends AbstractTab
+// -----------------------------------------------------------------------------------//
 {
   File rootFolder;
 
+  // ---------------------------------------------------------------------------------//
   public FileSystemTab (File folder, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, DiskSelectedEvent diskEvent)
+  // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
     this.rootFolder = folder;
@@ -57,22 +60,28 @@ class FileSystemTab extends AbstractTab
       System.out.println ("No disk event");
   }
 
+  // ---------------------------------------------------------------------------------//
   public FileSystemTab (File folder, DiskAndFileSelector selector, RedoHandler navMan,
       Font font)
+  // ---------------------------------------------------------------------------------//
   {
     this (folder, selector, navMan, font, null);    // default to first available disk
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void activate ()
+  // ---------------------------------------------------------------------------------//
   {
     tree.setSelectionPath (null);     // turn off any current selection to force an event
     redoHandler.setCurrentData (redoData);
   }
 
   // connected to RefreshTreeAction
+  // ---------------------------------------------------------------------------------//
   @Override
   public void refresh ()
+  // ---------------------------------------------------------------------------------//
   {
     String currentDiskName = ((FileNode) getSelectedObject ()).file.getAbsolutePath ();
     TreeBuilder tb = new TreeBuilder (rootFolder);
@@ -82,7 +91,9 @@ class FileSystemTab extends AbstractTab
     setSelectionListener (tree);
   }
 
+  // ---------------------------------------------------------------------------------//
   void redoEvent (RedoEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode node = null;
     if (event.type.equals ("FileNodeEvent"))
@@ -103,7 +114,9 @@ class FileSystemTab extends AbstractTab
       System.out.println ("Disk node not found");
   }
 
+  // ---------------------------------------------------------------------------------//
   void selectDisk (String path)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode node = findNode (rootFolder.getAbsolutePath () + path);
     if (node != null)
@@ -114,12 +127,16 @@ class FileSystemTab extends AbstractTab
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode findNode (String absolutePath)
+  // ---------------------------------------------------------------------------------//
   {
     return search (getRootNode (), absolutePath);
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode search (DefaultMutableTreeNode node, String absolutePath)
+  // ---------------------------------------------------------------------------------//
   {
     FileNode fn = (FileNode) node.getUserObject ();
 
@@ -153,7 +170,9 @@ class FileSystemTab extends AbstractTab
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void replaceDisk (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     // first check currently selected disk
     FileNode fn = (FileNode) getSelectedObject ();
@@ -172,7 +191,9 @@ class FileSystemTab extends AbstractTab
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setSelectionListener (JTree tree)
+  // ---------------------------------------------------------------------------------//
   {
     tree.addTreeSelectionListener (new TreeSelectionListener ()
     {
@@ -195,9 +216,8 @@ class FileSystemTab extends AbstractTab
       @Override
       public void treeWillExpand (TreeExpansionEvent e) throws ExpandVetoException
       {
-        TreePath path = e.getPath ();
         DefaultMutableTreeNode node =
-            (DefaultMutableTreeNode) path.getLastPathComponent ();
+            (DefaultMutableTreeNode) e.getPath ().getLastPathComponent ();
         FileNode fn = (FileNode) node.getUserObject ();
         if (node.getChildCount () == 0)
           fn.readFiles ();

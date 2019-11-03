@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 public class Utility
+// -----------------------------------------------------------------------------------//
 {
   public static final List<String> suffixes =
       Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk", "woz");
@@ -26,25 +28,33 @@ public class Utility
   //    return false;
   //  }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean test (Graphics2D g)
+  // ---------------------------------------------------------------------------------//
   {
     return g.getFontRenderContext ().getTransform ()
         .equals (AffineTransform.getScaleInstance (2.0, 2.0));
   }
 
+  // ---------------------------------------------------------------------------------//
   static int getLong (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     return getWord (buffer, ptr) + getWord (buffer, ptr + 2) * 0x10000;
   }
 
+  // ---------------------------------------------------------------------------------//
   static int getWord (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int a = (buffer[ptr + 1] & 0xFF) << 8;
     int b = buffer[ptr] & 0xFF;
     return a + b;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean find (byte[] buffer, byte[] key)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < buffer.length; i++)
     {
@@ -60,7 +70,9 @@ public class Utility
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static LocalDateTime getDateTime (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     try
     {
@@ -78,7 +90,9 @@ public class Utility
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean matches (byte[] buffer, int offset, byte[] key)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
     while (offset < buffer.length && ptr < key.length)
@@ -88,12 +102,16 @@ public class Utility
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int getSuffixNo (String filename)
+  // ---------------------------------------------------------------------------------//
   {
     return suffixes.indexOf (getSuffix (filename));
   }
 
+  // ---------------------------------------------------------------------------------//
   public static String getSuffix (String filename)
+  // ---------------------------------------------------------------------------------//
   {
     String lcFilename = filename.toLowerCase ();
 
@@ -109,14 +127,18 @@ public class Utility
     return lcFilename.substring (dotPos + 1);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean validFileType (String filename)
+  // ---------------------------------------------------------------------------------//
   {
     if (filename.startsWith ("."))          // ignore invisible files
       return false;
     return suffixes.contains (getSuffix (filename));
   }
 
+  // ---------------------------------------------------------------------------------//
   public static int crc32 (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     int crc = 0xFFFFFFFF;        // one's complement of zero
     int eof = offset + length;

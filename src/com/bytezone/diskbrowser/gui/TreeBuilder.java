@@ -19,14 +19,18 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class TreeBuilder
+// -----------------------------------------------------------------------------------//
 {
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
 
   private final FileComparator fileComparator = new FileComparator ();
   private final JTree tree;
 
+  // ---------------------------------------------------------------------------------//
   public TreeBuilder (File rootFolder)
+  // ---------------------------------------------------------------------------------//
   {
     assert (rootFolder.exists ());
     assert (rootFolder.isDirectory ());
@@ -43,12 +47,16 @@ public class TreeBuilder
     setDiskIcon ("/com/bytezone/diskbrowser/icons/disk.png");
   }
 
+  // ---------------------------------------------------------------------------------//
   public JTree getTree ()
+  // ---------------------------------------------------------------------------------//
   {
     return tree;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addFiles (DefaultMutableTreeNode parentNode, File directory)
+  // ---------------------------------------------------------------------------------//
   {
     File[] files = directory.listFiles ();
     if (files == null || files.length == 0)
@@ -70,7 +78,9 @@ public class TreeBuilder
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode createNode (File file, boolean allowsChildren)
+  // ---------------------------------------------------------------------------------//
   {
     FileNode fileNode = new FileNode (file);
     DefaultMutableTreeNode newNode = new DefaultMutableTreeNode (fileNode);
@@ -79,7 +89,9 @@ public class TreeBuilder
     return newNode;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setDiskIcon (String iconName)
+  // ---------------------------------------------------------------------------------//
   {
     URL url = this.getClass ().getResource (iconName);
     if (url != null)
@@ -98,7 +110,9 @@ public class TreeBuilder
   /*
    * Class used to control the text displayed by the JTree.
    */
+  // ---------------------------------------------------------------------------------//
   public class FileNode implements DataSource   // why does it implement DataSource?
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode parentNode;
     public final File file;
@@ -109,22 +123,30 @@ public class TreeBuilder
     int disks;
     boolean showDisks;
 
+    // -------------------------------------------------------------------------------//
     public FileNode (File file)
+    // -------------------------------------------------------------------------------//
     {
       this.file = file;
     }
 
+    // -------------------------------------------------------------------------------//
     public void setTreeNode (DefaultMutableTreeNode node)
+    // -------------------------------------------------------------------------------//
     {
       this.parentNode = node;
     }
 
+    // -------------------------------------------------------------------------------//
     public void readFiles ()
+    // -------------------------------------------------------------------------------//
     {
       addFiles (parentNode, file);
     }
 
+    // -------------------------------------------------------------------------------//
     public FormattedDisk getFormattedDisk ()
+    // -------------------------------------------------------------------------------//
     {
       if (formattedDisk == null)
         try
@@ -140,7 +162,9 @@ public class TreeBuilder
       return formattedDisk;
     }
 
+    // -------------------------------------------------------------------------------//
     public boolean replaceDisk (FormattedDisk disk)
+    // -------------------------------------------------------------------------------//
     {
       String path = disk.getDisk ().getFile ().getAbsolutePath ();
       if (formattedDisk != null && path.equals (file.getAbsolutePath ()))
@@ -151,8 +175,10 @@ public class TreeBuilder
       return false;
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       String name = file.getName ();
       if (name.length () > MAX_NAME_LENGTH)
@@ -163,8 +189,10 @@ public class TreeBuilder
       return name;
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String getText ()
+    // -------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
 
@@ -200,26 +228,34 @@ public class TreeBuilder
       return text.toString ();
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String getAssembler ()
+    // -------------------------------------------------------------------------------//
     {
       return null;
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String getHexDump ()
+    // -------------------------------------------------------------------------------//
     {
       return null;
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public BufferedImage getImage ()
+    // -------------------------------------------------------------------------------//
     {
       return null;
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public JComponent getComponent ()
+    // -------------------------------------------------------------------------------//
     {
       return null;
     }

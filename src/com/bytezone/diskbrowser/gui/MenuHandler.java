@@ -252,16 +252,6 @@ public class MenuHandler
     interleaveGroup.add (interleave3Item);
 
     saveDiskItem.setAction (saveTempFileAction);
-
-    // this is done early because the CatalogPanel creates the previous disk used
-    // before restore() is called
-    // what about all the other preferences???
-    //    prodosSortDirectoriesItem
-    //        .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
-
-    //    setBasicPreferences ();
-    //    setAssemblerPreferences ();
-    //    setProdosPreferences ();
   }
 
   private void setBasicPreferences ()

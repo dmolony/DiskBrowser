@@ -528,4 +528,15 @@ public class HexFormatter
     int length = buffer[offset] & 0xFF;
     return HexFormatter.getString (buffer, offset + 1, length);
   }
+
+  // ---------------------------------------------------------------------------------//
+  public static String getCString (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
+  {
+    int end = offset;
+    while (buffer[end] != 0)
+      end++;
+
+    return HexFormatter.getString (buffer, offset, end - offset);
+  }
 }

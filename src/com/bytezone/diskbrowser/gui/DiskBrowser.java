@@ -18,11 +18,11 @@ import com.bytezone.diskbrowser.duplicates.RootFolderData;
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
 // -----------------------------------------------------------------------------------//
 {
-  static long start;
-  static
-  {
-    start = System.currentTimeMillis ();
-  }
+  //  static long start;
+  //  static
+  //  {
+  //    start = System.currentTimeMillis ();
+  //  }
   private static String[] args;
   private static final String windowTitle = "Apple ][ Disk Browser";
   private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());
@@ -38,7 +38,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   // ---------------------------------------------------------------------------------//
   {
     super (windowTitle);
-    System.out.printf ("Start Init: %,5d%n", System.currentTimeMillis () - start);
+    //    System.out.printf ("Start Init: %,5d%n", System.currentTimeMillis () - start);
 
     if (args.length > 0 && "-reset".equals (args[0]))
       new WindowState (prefs).clear ();
@@ -185,7 +185,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // activate the highest panel now that the listeners are ready
     catalogPanel.activate ();
-    System.out.printf ("End Init  : %,5d%n", System.currentTimeMillis () - start);
+    //    System.out.printf ("End Init  : %,5d%n", System.currentTimeMillis () - start);
   }
 
   // ---------------------------------------------------------------------------------//

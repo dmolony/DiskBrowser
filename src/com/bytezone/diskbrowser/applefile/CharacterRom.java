@@ -4,6 +4,8 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
+
 // see graffidisk.v1.0.2mg
 // -----------------------------------------------------------------------------------//
 public class CharacterRom extends CharacterList
@@ -22,7 +24,7 @@ public class CharacterRom extends CharacterList
   {
     super (name, buffer, charsX, charsY, HEADER_LENGTH);
 
-    description = new String (buffer, 16, 16);
+    description = HexFormatter.getCString (buffer, 16);
 
     assert sizeX == (buffer[5] & 0xFF);
     assert sizeY == (buffer[6] & 0xFF);
@@ -35,10 +37,11 @@ public class CharacterRom extends CharacterList
     if (buffer.length != 0x400)
       return false;
 
-    // no idea what these mean
+    // see CHARROM.S on graffidisk
     // BD 41 53 10 A0 07 08
     return buffer[0] == (byte) 0xBD && buffer[1] == (byte) 0x41
-        && buffer[2] == (byte) 0x53 && buffer[3] == (byte) 0x10;
+        && buffer[2] == (byte) 0x53 && buffer[4] == (byte) 0xA0
+        && buffer[5] == (byte) 0x07 && buffer[6] == (byte) 0x08;
   }
 
   // ---------------------------------------------------------------------------------//

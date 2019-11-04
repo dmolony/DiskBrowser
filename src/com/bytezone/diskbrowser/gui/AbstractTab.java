@@ -2,8 +2,8 @@ package com.bytezone.diskbrowser.gui;
 
 /***********************************************************************************************
  * Parent class of FileSystemTab and AppleDiskTab.
- * 
- * 
+ *
+ *
  ***********************************************************************************************/
 
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
@@ -30,18 +30,22 @@ import javax.swing.tree.TreeSelectionModel;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoData;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
+// -----------------------------------------------------------------------------------//
 abstract class AbstractTab extends JPanel implements Tab
+// -----------------------------------------------------------------------------------//
 {
   private final static Cursor handCursor = new Cursor (Cursor.HAND_CURSOR);
   private final List<MouseAdapter> adapters = new ArrayList<MouseAdapter> ();
   private Font font;
-  private final JScrollPane scrollpane;
+  private final JScrollPane scrollPane;
   final DiskAndFileSelector eventHandler;
   final RedoHandler redoHandler;
   final RedoData redoData;
   protected JTree tree;
 
+  // ---------------------------------------------------------------------------------//
   public AbstractTab (RedoHandler redoHandler, DiskAndFileSelector selector, Font font)
+  // ---------------------------------------------------------------------------------//
   {
     super (new BorderLayout ());
 
@@ -50,17 +54,20 @@ abstract class AbstractTab extends JPanel implements Tab
     this.redoHandler = redoHandler;
     this.redoData = redoHandler.createData ();
 
-    scrollpane =
+    scrollPane =
         new JScrollPane (null, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER);
-    scrollpane.setBorder (null);
-    add (scrollpane, BorderLayout.CENTER);
+    scrollPane.setBorder (null);
+    //    scrollPane.setBorder (BorderFactory.createEmptyBorder ());
+    add (scrollPane, BorderLayout.CENTER);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void setTree (JTree tree)
+  // ---------------------------------------------------------------------------------//
   {
     this.tree = tree;
     tree.setFont (font);
-    scrollpane.setViewportView (tree);
+    scrollPane.setViewportView (tree);
     TreeSelectionModel tsm = tree.getSelectionModel ();
     tsm.setSelectionMode (TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -70,38 +77,50 @@ abstract class AbstractTab extends JPanel implements Tab
       addTreeMouseListener (new CursorHandler ());
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void setTreeFont (Font font)
+  // ---------------------------------------------------------------------------------//
   {
     tree.setFont (font);
     this.font = font;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addTreeMouseListener (MouseAdapter adapter)
+  // ---------------------------------------------------------------------------------//
   {
     tree.addMouseListener (adapter);
     adapters.add (adapter);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void restoreAdapters ()
+  // ---------------------------------------------------------------------------------//
   {
     for (MouseAdapter ma : adapters)
       tree.addMouseListener (ma);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected Object getSelectedObject ()
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode node =
         (DefaultMutableTreeNode) tree.getLastSelectedPathComponent ();
     return node == null ? null : node.getUserObject ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DefaultMutableTreeNode getRootNode ()
+  // ---------------------------------------------------------------------------------//
   {
     return (DefaultMutableTreeNode) tree.getModel ().getRoot ();
   }
 
+  // ---------------------------------------------------------------------------------//
   protected DefaultMutableTreeNode findNode (int nodeNo)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
     Enumeration<TreeNode> children = rootNode.breadthFirstEnumeration ();
@@ -112,7 +131,9 @@ abstract class AbstractTab extends JPanel implements Tab
     return selectNode;
   }
 
+  // ---------------------------------------------------------------------------------//
   protected DefaultMutableTreeNode findFirstLeafNode ()
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
     Enumeration<TreeNode> children = rootNode.depthFirstEnumeration ();
@@ -131,21 +152,28 @@ abstract class AbstractTab extends JPanel implements Tab
   }
 
   // Trigger the TreeSelectionListener set by the real Tab (if the value is different)
-  protected void showNode (DefaultMutableTreeNode showNode)
+  // ---------------------------------------------------------------------------------//
+  protected void showNode (DefaultMutableTreeNode treeNode)
+  // ---------------------------------------------------------------------------------//
   {
-    assert showNode != null;
-    TreePath tp = getPathToNode (showNode);
+    assert treeNode != null;
+    TreePath tp = getPathToNode (treeNode);
     if (tp == null)
     {
-      System.out.println ("Not found: " + showNode);
+      System.out.println ("Not found: " + treeNode);
       return;
     }
+
+    tree.requestFocusInWindow ();
     tree.setSelectionPath (tp);
     tree.scrollPathToVisible (tp);
-    tree.requestFocusInWindow ();
+    if (!treeNode.isLeaf ())
+      tree.expandPath (tp);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected TreePath getPathToNode (DefaultMutableTreeNode selectNode)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel ();
     TreeNode[] nodes = treeModel.getPathToRoot (selectNode);
@@ -154,7 +182,9 @@ abstract class AbstractTab extends JPanel implements Tab
     return new TreePath (nodes);
   }
 
+  // ---------------------------------------------------------------------------------//
   private class CursorHandler extends MouseAdapter
+  // ---------------------------------------------------------------------------------//
   {
     private Cursor oldCursor;
 

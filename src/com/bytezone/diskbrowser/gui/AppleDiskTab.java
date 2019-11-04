@@ -92,7 +92,7 @@ class AppleDiskTab extends AbstractTab
   }
 
   @Override
-  public void refresh () // called when the user gives ALT-R command
+  public void refresh ()                  // called when the user gives ALT-R command
   {
     Object o = getSelectedObject ();
     String currentFile = (o == null) ? null : ((AppleFileSource) o).getUniqueName ();

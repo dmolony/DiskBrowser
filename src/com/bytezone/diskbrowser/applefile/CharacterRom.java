@@ -25,9 +25,6 @@ public class CharacterRom extends CharacterList
     super (name, buffer, charsX, charsY, HEADER_LENGTH);
 
     description = HexFormatter.getCString (buffer, 16);
-
-    assert sizeX == (buffer[5] & 0xFF);
-    assert sizeY == (buffer[6] & 0xFF);
   }
 
   // ---------------------------------------------------------------------------------//

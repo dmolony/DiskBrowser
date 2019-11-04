@@ -17,7 +17,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
   private final int iBlkID;
   private final int iBlkPath;
   private final String iBlkName;
-  private final List<Icon> icons = new ArrayList<IconFile.Icon> ();
+  private final List<Icon> icons = new ArrayList<> ();
   private final boolean debug = false;
 
   public IconFile (String name, byte[] buffer)
@@ -59,9 +59,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     int columns = Math.min (icons.size (), 4);
     int rows = (icons.size () - 1) / columns + 1;
 
-    image = new BufferedImage (                               //
-        columns * maxWidth + 2 * base + (columns - 1) * gap,  //
-        rows * maxHeight + 2 * base + (rows - 1) * gap,       //
+    image = new BufferedImage (                             //
+        dimension (columns, base, maxWidth, gap),           //
+        dimension (rows, base, maxHeight, gap),             //
         BufferedImage.TYPE_INT_RGB);
 
     Graphics2D graphics = image.createGraphics ();
@@ -85,6 +85,13 @@ public class IconFile extends AbstractFile implements ProdosConstants
     }
     g2d.dispose ();
     graphics.dispose ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int dimension (int chars, int border, int size, int gap)
+  // ---------------------------------------------------------------------------------//
+  {
+    return border * 2 + chars * (size + gap) - gap;
   }
 
   @Override
@@ -197,6 +204,10 @@ public class IconFile extends AbstractFile implements ProdosConstants
         System.out.println ();
       }
 
+      if (iconWidth == 0 || iconHeight == 0)
+        throw new InvalidImageException (
+            String.format ("Invalid icon: Height: %d, Width: %d", iconHeight, iconWidth));
+
       if (iconType != 0 && iconType != 0x8000 && iconType != 0xFFFF && iconType != 0x00FF)
         throw new InvalidImageException (String.format ("Bad icon type: %04X", iconType));
 
@@ -260,7 +271,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
 
     /*
         Offset  Color   RGB  Mini-Palette
-
+    
         0       Black   000    0
         1       Blue    00F    1
         2       Yellow  FF0    2
@@ -269,7 +280,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
         5       Red     D00    1
         6       Green   0E0    2
         7       White   FFF    3
-
+    
         8       Black   000    0
         9       Blue    00F    1
         10      Yellow  FF0    2
@@ -278,18 +289,18 @@ public class IconFile extends AbstractFile implements ProdosConstants
         13      Red     D00    1
         14      Green   0E0    2
         15      White   FFF    3
-
+    
     The displayMode word bits are defined as:
-
+    
     Bit 0       selectedIconBit    1 = invert image before copying
     Bit 1       openIconBit        1 = copy light-gray pattern instead of image
     Bit 2       offLineBit         1 = AND light-gray pattern to image being copied
     Bits 3-7    reserved.
     Bits 8-11   foreground color to apply to black part of black & white icons
     Bits 12-15  background color to apply to white part of black & white icons
-
+    
     Bits 0-2 can occur at once and are tested in the order 1-2-0.
-
+    
     "Color is only applied to the black and white icons if bits 15-8 are not all 0.
     Colored pixels in an icon are inverted by black pixels becoming white and any
     other color of pixel becoming black."

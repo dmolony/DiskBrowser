@@ -10,8 +10,11 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class IconFile extends AbstractFile implements ProdosConstants
+// -----------------------------------------------------------------------------------//
 {
   private final int iBlkNext;
   private final int iBlkID;
@@ -20,7 +23,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
   private final List<Icon> icons = new ArrayList<> ();
   private final boolean debug = false;
 
+  // ---------------------------------------------------------------------------------//
   public IconFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -59,9 +64,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     int columns = Math.min (icons.size (), 4);
     int rows = (icons.size () - 1) / columns + 1;
 
-    image = new BufferedImage (                             //
-        dimension (columns, base, maxWidth, gap),           //
-        dimension (rows, base, maxHeight, gap),             //
+    image = new BufferedImage (                                     //
+        Utility.dimension (columns, base, maxWidth, gap),           //
+        Utility.dimension (rows, base, maxHeight, gap),             //
         BufferedImage.TYPE_INT_RGB);
 
     Graphics2D graphics = image.createGraphics ();
@@ -88,14 +93,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  private int dimension (int chars, int border, int size, int gap)
-  // ---------------------------------------------------------------------------------//
-  {
-    return border * 2 + chars * (size + gap) - gap;
-  }
-
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
 
@@ -114,7 +114,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class Icon
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer;
     int iDataLen;
@@ -125,7 +127,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     Image largeImage;
     Image smallImage;
 
+    // -------------------------------------------------------------------------------//
     public Icon (byte[] fullBuffer, int ptr)
+    // -------------------------------------------------------------------------------//
     {
       iDataLen = HexFormatter.unsignedShort (fullBuffer, ptr);
 
@@ -161,8 +165,10 @@ public class IconFile extends AbstractFile implements ProdosConstants
       }
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
       text.append (String.format ("Data length .. %04X%n", iDataLen));
@@ -177,7 +183,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class Image
+  // ---------------------------------------------------------------------------------//
   {
     int iconType;
     int iconSize;
@@ -188,7 +196,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     boolean colour;
     private final BufferedImage image;
 
+    // -------------------------------------------------------------------------------//
     public Image (byte[] buffer, int ptr) throws InvalidImageException
+    // -------------------------------------------------------------------------------//
     {
       iconType = HexFormatter.unsignedShort (buffer, ptr);
       iconSize = HexFormatter.unsignedShort (buffer, ptr + 2);
@@ -210,6 +220,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
 
       if (iconType != 0 && iconType != 0x8000 && iconType != 0xFFFF && iconType != 0x00FF)
         throw new InvalidImageException (String.format ("Bad icon type: %04X", iconType));
+      // have also seen 0x7FFF and 0x8001
 
       iconImage = new byte[iconSize];
       iconMask = new byte[iconSize];
@@ -248,13 +259,17 @@ public class IconFile extends AbstractFile implements ProdosConstants
         }
     }
 
+    // -------------------------------------------------------------------------------//
     public int size ()
+    // -------------------------------------------------------------------------------//
     {
       return 8 + iconSize * 2;
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
 
@@ -306,7 +321,9 @@ public class IconFile extends AbstractFile implements ProdosConstants
     other color of pixel becoming black."
     */
 
+    // -------------------------------------------------------------------------------//
     private void appendIcon (StringBuilder text, byte[] buffer)
+    // -------------------------------------------------------------------------------//
     {
       int rowBytes = (iconWidth - 1) / 2 + 1;
       for (int i = 0; i < iconImage.length; i += rowBytes)
@@ -324,9 +341,13 @@ public class IconFile extends AbstractFile implements ProdosConstants
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class InvalidImageException extends Exception
+  // ---------------------------------------------------------------------------------//
   {
+    // -------------------------------------------------------------------------------//
     public InvalidImageException (String message)
+    // -------------------------------------------------------------------------------//
     {
       super (message);
     }

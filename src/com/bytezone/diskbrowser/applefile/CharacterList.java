@@ -8,6 +8,8 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.Utility;
+
 // -----------------------------------------------------------------------------------//
 abstract class CharacterList extends AbstractFile
 // -----------------------------------------------------------------------------------//
@@ -35,9 +37,9 @@ abstract class CharacterList extends AbstractFile
   {
     super (name, buffer);
 
-    image = new BufferedImage (                         //
-        dimension (charsX, borderX, sizeX, gapX),       //
-        dimension (charsY, borderY, sizeY, gapY),       //
+    image = new BufferedImage (                                 //
+        Utility.dimension (charsX, borderX, sizeX, gapX),       //
+        Utility.dimension (charsY, borderY, sizeY, gapY),       //
         BufferedImage.TYPE_BYTE_GRAY);
 
     Graphics2D g2d = image.createGraphics ();
@@ -76,13 +78,6 @@ abstract class CharacterList extends AbstractFile
   // ---------------------------------------------------------------------------------//
   abstract Character createCharacter (byte[] buffer, int ptr);
   // ---------------------------------------------------------------------------------//
-
-  // ---------------------------------------------------------------------------------//
-  int dimension (int chars, int border, int size, int gap)
-  // ---------------------------------------------------------------------------------//
-  {
-    return border * 2 + chars * (size + gap) - gap;
-  }
 
   // ---------------------------------------------------------------------------------//
   @Override

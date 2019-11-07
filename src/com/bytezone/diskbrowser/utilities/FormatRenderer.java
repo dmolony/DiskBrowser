@@ -5,17 +5,23 @@ import java.text.Format;
 
 import javax.swing.table.DefaultTableCellRenderer;
 
+// -----------------------------------------------------------------------------------//
 public class FormatRenderer extends DefaultTableCellRenderer
+// -----------------------------------------------------------------------------------//
 {
   private final Format formatter;
 
+  // ---------------------------------------------------------------------------------//
   public FormatRenderer (Format formatter)
+  // ---------------------------------------------------------------------------------//
   {
     this.formatter = formatter;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setValue (Object value)
+  // ---------------------------------------------------------------------------------//
   {
     try
     {
@@ -29,12 +35,16 @@ public class FormatRenderer extends DefaultTableCellRenderer
     super.setValue (value);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static FormatRenderer getDateTimeRenderer ()
+  // ---------------------------------------------------------------------------------//
   {
     return new FormatRenderer (DateFormat.getDateTimeInstance ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public static FormatRenderer getTimeRenderer ()
+  // ---------------------------------------------------------------------------------//
   {
     return new FormatRenderer (DateFormat.getTimeInstance ());
   }

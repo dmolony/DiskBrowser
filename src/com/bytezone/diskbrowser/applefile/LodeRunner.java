@@ -2,15 +2,33 @@ package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class LodeRunner extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
+  private static char[] chars = { ' ',    // space
+                                  '-',    // diggable floor
+                                  '=',    // undiggable floor
+                                  '+',    // ladder
+                                  '^',    // hand over hand bar
+                                  '~',    // trap door
+                                  '#',    // hidden ladder
+                                  '$',    // gold
+                                  '*',    // enemy
+                                  'x'     // player
+  };
+
+  // ---------------------------------------------------------------------------------//
   public LodeRunner (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     text.append ("Lode Runner Level\n\n");
@@ -40,53 +58,14 @@ public class LodeRunner extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private StringBuilder addPosition (StringBuilder text, char c)
+  // ---------------------------------------------------------------------------------//
   {
-    switch (c)
-    {
-      case '0':
-        text.append (' ');          // space
-        break;
-
-      case '1':
-        text.append ('-');          // diggable floor
-        break;
-
-      case '2':
-        text.append ('=');          // undiggable floor
-        break;
-
-      case '3':
-        text.append ('+');          // ladder
-        break;
-
-      case '4':
-        text.append ('^');          // hand over hand bar
-        break;
-
-      case '5':
-        text.append ('~');          // trap door
-        break;
-
-      case '6':
-        text.append ('#');          // hidden ladder
-        break;
-
-      case '7':
-        text.append ('$');          // gold
-        break;
-
-      case '8':
-        text.append ('*');          // enemy
-        break;
-
-      case '9':
-        text.append ('x');          // player
-        break;
-
-      default:
-        text.append (c);
-    }
+    if (c >= 0 && c <= 9)
+      text.append (chars[c]);
+    else
+      text.append (c);
 
     return text;
   }

@@ -23,7 +23,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class ShapeTable extends AbstractFile
 {
-  private final List<Shape> shapes = new ArrayList<Shape> ();
+  private final List<Shape> shapes = new ArrayList<> ();
   private static final int SIZE = 400;
   int maxWidth = 0;
   int maxHeight = 0;
@@ -326,7 +326,7 @@ public class ShapeTable extends AbstractFile
 
     private List<String> split (String line)
     {
-      List<String> list = new ArrayList<String> ();
+      List<String> list = new ArrayList<> ();
       while (line.length () > 48)
       {
         list.add (line.substring (0, 47));

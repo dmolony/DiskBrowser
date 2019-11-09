@@ -5,7 +5,7 @@ import java.util.List;
 
 public class PaletteFactory
 {
-  private final List<Palette> palettes = new ArrayList<Palette> ();
+  private final List<Palette> palettes = new ArrayList<> ();
   private int currentPalette;
 
   public enum CycleDirection

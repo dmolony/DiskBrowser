@@ -382,6 +382,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_PNT:
           if (auxType == 2)
             file = new SHRPictureFile1 (name, exactBuffer, fileType, auxType, endOfFile);
+          else if (endOfFile < 0x222)
+            file = new DefaultAppleFile (name, exactBuffer);
           else
             file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           break;

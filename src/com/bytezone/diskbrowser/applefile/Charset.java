@@ -1,8 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.image.DataBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 // Found on Pascal disks
 // -----------------------------------------------------------------------------------//
@@ -10,23 +8,22 @@ public class Charset extends CharacterList
 // -----------------------------------------------------------------------------------//
 {
   private static final int charsX = 16;
-  private static final int charsY = 8;
-
-  List<Character> characters = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public Charset (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    super (name, buffer, charsX, charsY);
-  }
+    super (name, buffer);
 
-  // ---------------------------------------------------------------------------------//
-  @Override
-  Character createCharacter (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    return new CharsetCharacter (buffer, ptr);
+    int ptr = 0;
+
+    while (ptr < buffer.length)
+    {
+      characters.add (new CharsetCharacter (buffer, ptr));
+      ptr += sizeY;
+    }
+
+    buildImage (borderX, borderY, gapX, gapY, sizeX, sizeY, charsX);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -37,6 +34,8 @@ public class Charset extends CharacterList
     public CharsetCharacter (byte[] buffer, int ptr)
     // -------------------------------------------------------------------------------//
     {
+      super (sizeX, sizeY);
+
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
       ptr += sizeY;         // start at the end and move backwards

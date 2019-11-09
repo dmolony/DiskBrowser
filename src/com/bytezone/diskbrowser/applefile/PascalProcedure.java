@@ -22,7 +22,7 @@ public class PascalProcedure
   int codeEnd;
   int parmSize;
   int dataSize;
-  List<PascalCodeStatement> statements = new ArrayList<PascalCodeStatement> ();
+  List<PascalCodeStatement> statements = new ArrayList<> ();
   AssemblerProgram assembler;
   int jumpTable = -8;
 
@@ -121,7 +121,7 @@ public class PascalProcedure
   public List<PascalCodeStatement> extractStrings ()
   {
     decode ();
-    List<PascalCodeStatement> strings = new ArrayList<PascalCodeStatement> ();
+    List<PascalCodeStatement> strings = new ArrayList<> ();
     for (PascalCodeStatement cs : statements)
       if (cs.val == 166)
         strings.add (cs);

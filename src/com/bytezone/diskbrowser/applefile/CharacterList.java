@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -25,44 +24,33 @@ abstract class CharacterList extends AbstractFile
   List<Character> characters = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  public CharacterList (String name, byte[] buffer, int charsX, int charsY)
-  // ---------------------------------------------------------------------------------//
-  {
-    this (name, buffer, charsX, charsY, 0);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public CharacterList (String name, byte[] buffer, int charsX, int charsY, int offset)
+  public CharacterList (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
+  }
 
-    image = new BufferedImage (                                 //
-        Utility.dimension (charsX, borderX, sizeX, gapX),       //
-        Utility.dimension (charsY, borderY, sizeY, gapY),       //
+  // ---------------------------------------------------------------------------------//
+  void buildImage (int borderX, int borderY, int gapX, int gapY, int sizeX, int sizeY,
+      int charsX)
+  // ---------------------------------------------------------------------------------//
+  {
+    int charsY = (characters.size () - 1) / charsX + 1;
+    image = new BufferedImage (                                //
+        Utility.dimension (charsX, borderX, sizeX, gapX),      //
+        Utility.dimension (charsY, borderY, sizeY, gapY),      //
         BufferedImage.TYPE_BYTE_GRAY);
 
     Graphics2D g2d = image.createGraphics ();
     g2d.setComposite (AlphaComposite.getInstance (AlphaComposite.SRC_OVER, (float) 1.0));
 
-    if (false)        // show gaps around the glyphs
-    {
-      g2d.setColor (new Color (245, 245, 245));   // match background
-      g2d.fillRect (0, 0, image.getWidth (), image.getHeight ());
-    }
-
+    int count = 0;
     int x = borderX;
     int y = borderY;
-    int count = 0;
-    int ptr = offset;
 
-    while (ptr < buffer.length)
+    for (Character character : characters)
     {
-      Character c = createCharacter (buffer, ptr);
-      characters.add (c);
-      ptr += sizeY;
-
-      g2d.drawImage (c.image, x, y, null);
+      g2d.drawImage (character.image, x, y, null);
       if (++count % charsX == 0)
       {
         x = borderX;
@@ -74,10 +62,6 @@ abstract class CharacterList extends AbstractFile
 
     g2d.dispose ();
   }
-
-  // ---------------------------------------------------------------------------------//
-  abstract Character createCharacter (byte[] buffer, int ptr);
-  // ---------------------------------------------------------------------------------//
 
   // ---------------------------------------------------------------------------------//
   @Override
@@ -99,7 +83,14 @@ abstract class CharacterList extends AbstractFile
   class Character
   // ---------------------------------------------------------------------------------//
   {
-    BufferedImage image = new BufferedImage (sizeX, sizeY, BufferedImage.TYPE_BYTE_GRAY);
+    BufferedImage image;
+
+    // -------------------------------------------------------------------------------//
+    public Character (int sizeX, int sizeY)
+    // -------------------------------------------------------------------------------//
+    {
+      image = new BufferedImage (sizeX, sizeY, BufferedImage.TYPE_BYTE_GRAY);
+    }
 
     // -------------------------------------------------------------------------------//
     @Override

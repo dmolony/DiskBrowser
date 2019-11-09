@@ -159,7 +159,7 @@ public class DiskFactory
     {
       if (debug)
         System.out.println (" ** hdv **");
-      ProdosDisk prodosDisk = checkHardDisk (file);
+      FormattedDisk prodosDisk = checkHardDisk (file);
       if (prodosDisk != null)
         return prodosDisk;
 
@@ -520,7 +520,7 @@ public class DiskFactory
     return null;
   }
 
-  private static ProdosDisk checkHardDisk (File file)
+  private static FormattedDisk checkHardDisk (File file)
   {
     if (debug)
     {
@@ -554,6 +554,12 @@ public class DiskFactory
         if (debug)
           System.out.println ("  --> PRODOS hard disk");
         return new ProdosDisk (disk);
+      }
+      if (PascalDisk.isCorrectFormat (disk, debug))
+      {
+        if (debug)
+          System.out.println ("  --> Pascal hard disk");
+        return new PascalDisk (disk);
       }
     }
     catch (Exception e)

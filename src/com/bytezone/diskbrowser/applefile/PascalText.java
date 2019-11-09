@@ -32,6 +32,9 @@ public class PascalText extends AbstractFile
       ptr += line.length () + 1;
     }
 
+    if (text.length () > 0)
+      text.deleteCharAt (text.length () - 1);
+
     return text.toString ();
   }
 

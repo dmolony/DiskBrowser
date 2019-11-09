@@ -116,7 +116,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
   private void buildProcedureList ()
   {
-    procedures = new ArrayList<PascalProcedure> (totalProcedures);
+    procedures = new ArrayList<> (totalProcedures);
 
     for (int i = 1; i <= totalProcedures; i++)
       procedures.add (new PascalProcedure (buffer, i));

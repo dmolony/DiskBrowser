@@ -1,8 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.image.DataBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -12,19 +10,26 @@ public class CharacterRom extends CharacterList
 // -----------------------------------------------------------------------------------//
 {
   private static final int charsX = 16;
-  private static final int charsY = 6;
   private static final int HEADER_LENGTH = 0x100;
 
   String description;
-  List<Character> characters = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public CharacterRom (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    super (name, buffer, charsX, charsY, HEADER_LENGTH);
+    super (name, buffer);
 
     description = HexFormatter.getCString (buffer, 16);
+    int ptr = HEADER_LENGTH;
+
+    while (ptr < buffer.length)
+    {
+      characters.add (new CharacterRomCharacter (buffer, ptr));
+      ptr += sizeY;
+    }
+
+    buildImage (borderX, borderY, gapX, gapY, sizeX, sizeY, charsX);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -42,14 +47,6 @@ public class CharacterRom extends CharacterList
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
-  Character createCharacter (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    return new CharacterRomCharacter (buffer, ptr);
-  }
-
-  // ---------------------------------------------------------------------------------//
   class CharacterRomCharacter extends Character
   // ---------------------------------------------------------------------------------//
   {
@@ -57,6 +54,8 @@ public class CharacterRom extends CharacterList
     public CharacterRomCharacter (byte[] buffer, int ptr)
     // -------------------------------------------------------------------------------//
     {
+      super (sizeX, sizeY);
+
       DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
       int element = 0;
 

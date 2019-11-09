@@ -20,7 +20,7 @@ public class SHRPictureFile2 extends HiResImage
     switch (fileType)
     {
       case ProdosConstants.FILE_TYPE_PNT:           // packed images
-        doPnt (buffer);
+        doPnt ();
         break;
 
       case ProdosConstants.FILE_TYPE_PIC:           // unpacked images
@@ -35,7 +35,7 @@ public class SHRPictureFile2 extends HiResImage
       createImage ();
   }
 
-  private void doPnt (byte[] buffer)
+  private void doPnt ()
   {
     switch (auxType)
     {

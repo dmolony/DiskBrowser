@@ -34,7 +34,7 @@ class DosVTOCSector extends AbstractSector
     maxTracks = buffer[52] & 0xFF;
     maxSectors = buffer[53] & 0xFF;
     sectorSize = HexFormatter.intValue (buffer[54], buffer[55]);
-    flagSectors ();
+    flagSectors2 ();
   }
 
   @Override
@@ -91,7 +91,7 @@ class DosVTOCSector extends AbstractSector
       else if (i == 124)
         extra = "(VTOC and Catalog)";
       addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s",
-          (i - firstSector) / 4, getBitmap (buffer[i], buffer[i + 1]), extra));
+          (i - firstSector) / 4, getBitmap (buffer, i), extra));
     }
 
     text.deleteCharAt (text.length () - 1);
@@ -133,12 +133,10 @@ class DosVTOCSector extends AbstractSector
       String extra = "";
       if (i == firstSector && bootSectorEmpty)
         extra = "(unusable)";
-      //      else if (i <= 64 && !bootSectorEmpty)
-      //        extra = "(reserved for DOS)";
-      //      else if (i == 124)
-      //        extra = "(VTOC and Catalog)";
-      addText (text, buffer, i, 4, String.format ("Track %02X  %s  %s",
-          (i - firstSector) / 4, getBitmap (buffer[i], buffer[i + 1]), extra));
+      String bits = getBitmap (buffer, i);
+      int track = (i - firstSector) / 4;
+      addText (text, buffer, i, 4,
+          String.format ("Track %02X  %s  %s", track, bits, extra));
     }
 
     text.deleteCharAt (text.length () - 1);
@@ -146,63 +144,112 @@ class DosVTOCSector extends AbstractSector
     return text.toString ();
   }
 
-  private String getBitmap (byte left, byte right)
+  //  private String getBitmap (byte left, byte right)
+  //  {
+  //    StringBuilder text = new StringBuilder ();
+  //
+  //    int base = maxSectors == 13 ? 3 : 0;
+  //    right >>= base;
+  //
+  //    for (int i = base; i < 8; i++)
+  //    {
+  //      if ((right & 0x01) == 1)
+  //        text.append (".");
+  //      else
+  //        text.append ("X");
+  //      right >>= 1;
+  //    }
+  //
+  //    for (int i = 0; i < 8; i++)
+  //    {
+  //      if ((left & 0x01) == 1)
+  //        text.append (".");
+  //      else
+  //        text.append ("X");
+  //      left >>= 1;
+  //    }
+  //
+  //    return text.toString ();
+  //  }
+
+  private String getBitmap (byte[] buffer, int offset)
   {
-    int base = maxSectors == 13 ? 3 : 0;
-    right >>= base;
     StringBuilder text = new StringBuilder ();
-    for (int i = base; i < 8; i++)
-    {
-      if ((right & 0x01) == 1)
-        text.append (".");
-      else
-        text.append ("X");
-      right >>= 1;
-    }
-    for (int i = 0; i < 8; i++)
-    {
-      if ((left & 0x01) == 1)
-        text.append (".");
-      else
-        text.append ("X");
-      left >>= 1;
-    }
-    return text.toString ();
+    int value = HexFormatter.getLongBigEndian (buffer, offset);
+
+    String bits = "0000000000000000000000000000000" + Integer.toBinaryString (value);
+    bits = bits.substring (bits.length () - 32);
+    bits = bits.substring (0, maxSectors);
+    bits = bits.replace ('0', 'X');
+    bits = bits.replace ('1', '.');
+    text.append (bits);
+
+    return text.reverse ().toString ();
   }
 
-  public void flagSectors ()
+  private void flagSectors2 ()
   {
-    int block = 0;
-    int base = maxSectors == 13 ? 3 : 0;
     int firstSector = 0x38;
     int max = maxTracks * 4 + firstSector;
     for (int i = firstSector; i < max; i += 4)
     {
-      block = check (buffer[i + 1], block, base);
-      block = check (buffer[i], block, 0);
+      int track = (i - firstSector) / 4;
+      String bits = getBitmap (buffer, i);
+
+      //    System.out.printf ("%08X  %s%n", track, bits);
+      int blockNo = track * maxSectors;
+      char[] chars = bits.toCharArray ();
+      for (int sector = 0; sector < maxSectors; sector++)
+      {
+        //      System.out.printf ("%3d  %s%n", blockNo, chars[sector]);
+        if (chars[sector] == '.')
+        {
+          parentDisk.setSectorFree (blockNo, true);
+          ++freeSectors;
+        }
+        else
+        {
+          parentDisk.setSectorFree (blockNo, false);
+          ++usedSectors;
+        }
+        ++blockNo;
+      }
     }
   }
 
-  private int check (byte b, int block, int base)
-  {
-    b >>= base;
-    for (int i = base; i < 8; i++)
-    {
-      if ((b & 0x01) == 1)
-      {
-        parentDisk.setSectorFree (block, true);
-        ++freeSectors;
-      }
-      else
-      {
-        parentDisk.setSectorFree (block, false);
-        ++usedSectors;
-      }
-      block++;
-      b >>= 1;
-    }
-    return block;
-  }
+  //  private void flagSectors ()
+  //  {
+  //    int block = 0;
+  //    int base = maxSectors == 13 ? 3 : 0;
+  //    int firstSector = 0x38;
+  //    int max = maxTracks * 4 + firstSector;
+  //    for (int i = firstSector; i < max; i += 4)
+  //    {
+  //      block = check (buffer[i + 1], block, base);
+  //      block = check (buffer[i], block, 0);
+  //    }
+  //  }
+
+  //  private int check (byte b, int block, int base)
+  //  {
+  //    b >>= base;
+  //    for (int i = base; i < 8; i++)
+  //    {
+  //      if ((b & 0x01) == 1)
+  //      {
+  //        parentDisk.setSectorFree (block, true);
+  //        ++freeSectors;
+  //      }
+  //      else
+  //      {
+  //        parentDisk.setSectorFree (block, false);
+  //        ++usedSectors;
+  //      }
+  //      block++;
+  //      b >>= 1;
+  //    }
+  //    return block;
+  //  }
 
   // duplicate of DosCatalogSector.getName()
   private String getName (byte[] buffer, int offset)

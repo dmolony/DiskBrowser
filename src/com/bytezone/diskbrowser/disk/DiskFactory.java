@@ -201,14 +201,17 @@ public class DiskFactory
           return disk;
       }
 
-      if (file.length () == 819200)
+      if (file.length () == 819200)         // 800K 3.5"
       {
         if (debug)
           System.out.println ("UniDos ?");
         // 2 x 400k disk images
-        AppleDisk appleDisk = new AppleDisk (file, 50, 32);
-        disk = checkUnidos (appleDisk);
-        return disk == null ? new DataDisk (appleDisk) : disk;
+        AppleDisk appleDisk1 = new AppleDisk (file, 50, 32);
+        AppleDisk appleDisk2 = new AppleDisk (file, 50, 32, 409600);
+        disk = checkUnidos (appleDisk1);
+        disk2 = checkUnidos (appleDisk2);
+        if (disk != null && disk2 != null)
+          return new DualDosDisk (disk, disk2);
       }
 
       if (debug)
@@ -399,7 +402,7 @@ public class DiskFactory
         if (disk2 != null)
           disk = new DualDosDisk (disk, disk2);
       }
-      else if (checksum == 3028642627L    // 
+      else if (checksum == 3028642627L    //
           || checksum == 2070151659L)     // Enchanter
       {
         if (debug)

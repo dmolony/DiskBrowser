@@ -134,7 +134,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
       case 1600:
         if (disk.getSectorsPerTrack () == 32)
-          gridLayout = new Dimension (32, 50);
+          gridLayout = new Dimension (disk.getSectorsPerTrack (), disk.getTotalTracks ());
         else
           gridLayout = new Dimension (16, 100);
         break;

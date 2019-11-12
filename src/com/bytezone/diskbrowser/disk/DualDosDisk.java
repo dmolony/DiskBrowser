@@ -13,6 +13,7 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.gui.DataSource;
 
 // Apple Assembly Lines disks are dual-dos
+// Should be renamed MultiVolumeDisk (and allow >2 volumes)
 
 public class DualDosDisk implements FormattedDisk
 {

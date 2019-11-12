@@ -31,7 +31,7 @@ public class AppleDisk implements Disk
   private final byte[] diskBuffer;        // contains the disk contents in memory
 
   private final int tracks;               // usually 35 for floppy disks
-  private int sectors;                    // 8 or 16
+  private int sectors;                    // 8 or 16 (or 32 for unidos)
   private int blocks;                     // 280 or 560 for floppy disks, higher for HD
 
   private final int trackSize;            // 4096
@@ -84,9 +84,15 @@ public class AppleDisk implements Disk
 
   private WozFile wozFile;
 
-  private final boolean debug = true;
+  private final boolean debug = false;
 
   public AppleDisk (File file, int tracks, int sectors) throws FileFormatException
+  {
+    this (file, tracks, sectors, 0);
+  }
+
+  public AppleDisk (File file, int tracks, int sectors, int skip)
+      throws FileFormatException
   {
     assert (file.exists ()) : "No such path :" + file.getAbsolutePath ();
     assert (!file.isDirectory ()) : "File is directory :" + file.getAbsolutePath ();
@@ -100,7 +106,7 @@ public class AppleDisk implements Disk
 
     byte[] buffer = getPrefix (file);         // HDV could be a 2mg
     String prefix = new String (buffer, 0, 4);
-    int skip = 0;
+    //    int skip = 0;
 
     if (suffix.equalsIgnoreCase ("2mg") || "2IMG".equals (prefix))
     {
@@ -158,7 +164,7 @@ public class AppleDisk implements Disk
     }
     else if (suffix.equalsIgnoreCase ("HDV"))
     {
-      //      this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
+      //this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
       this.blocks = tracks * sectors;
       this.sectorSize = 512;
       this.trackSize = sectors * sectorSize;

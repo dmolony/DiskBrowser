@@ -39,7 +39,8 @@ public class AppleDisk implements Disk
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
-      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // None
+      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+          22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },       // None
         { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos/Pascal
         { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
         { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
@@ -83,7 +84,7 @@ public class AppleDisk implements Disk
 
   private WozFile wozFile;
 
-  private final boolean debug = false;
+  private final boolean debug = true;
 
   public AppleDisk (File file, int tracks, int sectors) throws FileFormatException
   {
@@ -168,6 +169,12 @@ public class AppleDisk implements Disk
       {
         this.blocks = tracks * sectors;
         this.sectorSize = 512;
+        this.trackSize = sectors * sectorSize;
+      }
+      else if (file.length () == 819200 && tracks == 50 && sectors == 32)    // unidisk
+      {
+        this.blocks = tracks * sectors;
+        this.sectorSize = 256;
         this.trackSize = sectors * sectorSize;
       }
       else
@@ -316,12 +323,12 @@ public class AppleDisk implements Disk
 
     for (DiskAddress da : this)         // uses blockList.iterator
     {
-      if (sectorSize == SECTOR_SIZE)
+      if (sectorSize == SECTOR_SIZE)                    // 256 byte sectors
       {
         int diskOffset = getBufferOffset (da);
         hasData[da.getBlock ()] = check (diskOffset);
       }
-      else
+      else                                              // 512 byte blocks
       {
         int diskOffset1 = getBufferOffset (da, 0);
         int diskOffset2 = getBufferOffset (da, 1);

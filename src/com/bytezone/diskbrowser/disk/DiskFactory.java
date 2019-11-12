@@ -201,6 +201,16 @@ public class DiskFactory
           return disk;
       }
 
+      if (file.length () == 819200)
+      {
+        if (debug)
+          System.out.println ("UniDos ?");
+        // 2 x 400k disk images
+        AppleDisk appleDisk = new AppleDisk (file, 50, 32);
+        disk = checkUnidos (appleDisk);
+        return disk == null ? new DataDisk (appleDisk) : disk;
+      }
+
       if (debug)
         System.out.println ("  Checking po or dsk hard drive: " + file.length ());
 
@@ -517,6 +527,29 @@ public class DiskFactory
     }
     if (debug)
       System.out.println ("  not a Prodos disk");
+    return null;
+  }
+
+  private static DosDisk checkUnidos (AppleDisk disk)
+  {
+    if (debug)
+      System.out.println ("Checking UniDOS disk");
+
+    try
+    {
+      if (DosDisk.isCorrectFormat (disk))
+      {
+        if (debug)
+          System.out.println ("  --> UniDOS");
+        return new DosDisk (disk);
+      }
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace ();
+    }
+    if (debug)
+      System.out.println ("  not a UniDOS disk");
     return null;
   }
 

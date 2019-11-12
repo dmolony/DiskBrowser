@@ -235,30 +235,34 @@ public class DosDisk extends AbstractFormattedDisk
   {
     disk.setInterleave (0);
     int catalogBlocks = checkFormat (disk);
+    System.out.printf ("Catalog blocks: %d%n", catalogBlocks);
 
     if (catalogBlocks > 3)
       return true;
-    disk.setInterleave (1);
-    int cb2 = checkFormat (disk);
-    //    if (cb2 > catalogBlocks)
-    if (cb2 > 3)
-      return true;
-    disk.setInterleave (2);
-    if (true)
-    {
-      int cb3 = checkFormat (disk);
-      if (cb3 > 3)
-        return true;
-    }
 
-    if (catalogBlocks > 0)
+    if (disk.getSectorsPerTrack () <= 16)
     {
       disk.setInterleave (1);
-      return true;
-    }
+      int cb2 = checkFormat (disk);
+      if (cb2 > 3)
+        return true;
+      disk.setInterleave (2);
+      if (true)
+      {
+        int cb3 = checkFormat (disk);
+        if (cb3 > 3)
+          return true;
+      }
 
-    if (cb2 > 0)
-      return true;
+      if (catalogBlocks > 0)
+      {
+        disk.setInterleave (1);
+        return true;
+      }
+
+      if (cb2 > 0)
+        return true;
+    }
 
     return false;
   }
@@ -297,7 +301,7 @@ public class DosDisk extends AbstractFormattedDisk
     //    if (buffer[1] != 0x11) // first catalog track
     //      return 0;
 
-    if (buffer[53] != 16 && buffer[53] != 13)         // sectors per track
+    if (buffer[53] != 16 && buffer[53] != 13 && buffer[53] != 32)  // sectors per track
     {
       return 0;
     }
@@ -322,9 +326,8 @@ public class DosDisk extends AbstractFormattedDisk
   private static int countCatalogBlocks (AppleDisk disk, byte[] buffer)
   {
     DiskAddress catalogStart = disk.getDiskAddress (buffer[1], buffer[2]);
-    //    int catalogBlocks = 0;
     DiskAddress da = disk.getDiskAddress (catalogStart.getBlock ());
-    List<DiskAddress> catalogAddresses = new ArrayList<DiskAddress> ();
+    List<DiskAddress> catalogAddresses = new ArrayList<> ();
 
     do
     {
@@ -339,10 +342,7 @@ public class DosDisk extends AbstractFormattedDisk
 
       buffer = disk.readSector (da);
       if (!disk.isValidAddress (buffer[1], buffer[2]))
-      {
-        //        System.out.printf ("Invalid address : %02X / %02X%n", buffer[1], buffer[2]);
         return 0;
-      }
 
       catalogAddresses.add (da);
 

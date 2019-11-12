@@ -31,8 +31,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   protected JTree catalogTree;
   protected Path originalPath;
 
-  protected List<SectorType> sectorTypesList = new ArrayList<SectorType> ();
-  protected List<AppleFileSource> fileEntries = new ArrayList<AppleFileSource> ();
+  protected List<SectorType> sectorTypesList = new ArrayList<> ();
+  protected List<AppleFileSource> fileEntries = new ArrayList<> ();
 
   public SectorType[] sectorTypes;
 
@@ -113,6 +113,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   private void setGridLayout ()
   {
     int totalBlocks = disk.getTotalBlocks ();
+
     switch (totalBlocks)
     {
       case 280:
@@ -132,7 +133,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
         break;
 
       case 1600:
-        gridLayout = new Dimension (16, 100);
+        if (disk.getSectorsPerTrack () == 32)
+          gridLayout = new Dimension (32, 50);
+        else
+          gridLayout = new Dimension (16, 100);
         break;
 
       case 2048:

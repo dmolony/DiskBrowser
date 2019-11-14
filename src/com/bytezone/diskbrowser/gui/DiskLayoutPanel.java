@@ -142,9 +142,9 @@ class DiskLayoutPanel extends JPanel
   public void fileSelected (FileSelectedEvent event)
   {
     // This can happen if a file is selected from a dual-dos disk
-    checkCorrectDisk (event.file.getFormattedDisk ());
+    checkCorrectDisk (event.appleFileSource.getFormattedDisk ());
 
-    diskLayoutImage.setSelection (event.file.getSectors ());
+    diskLayoutImage.setSelection (event.appleFileSource.getSectors ());
   }
 
   class LayoutDetails

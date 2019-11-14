@@ -35,9 +35,11 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
+// -----------------------------------------------------------------------------------//
 class CatalogPanel extends JTabbedPane
     implements RedoListener, SectorSelectionListener, QuitListener, FontChangeListener,
     RootDirectoryChangeListener, DiskTableSelectionListener
+// -----------------------------------------------------------------------------------//
 {
   private static final String prefsLastDiskUsed = "Last disk used";
   private static final String prefsLastDosUsed = "Last dos used";
@@ -53,7 +55,9 @@ class CatalogPanel extends JTabbedPane
   private File rootFolder;
   private boolean restored = false;
 
+  // ---------------------------------------------------------------------------------//
   public CatalogPanel (RedoHandler redoHandler)
+  // ---------------------------------------------------------------------------------//
   {
     this.redoHandler = redoHandler;
 
@@ -61,8 +65,10 @@ class CatalogPanel extends JTabbedPane
     setPreferredSize (new Dimension (360, 802));          // width, height
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
+  // ---------------------------------------------------------------------------------//
   {
     rootFolder = newRootFolder;
     if (!restored)
@@ -76,14 +82,18 @@ class CatalogPanel extends JTabbedPane
     setSelectedIndex (0);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void insertFileSystemTab (DiskSelectedEvent diskEvent)
+  // ---------------------------------------------------------------------------------//
   {
     fileTab = new FileSystemTab (rootFolder, selector, redoHandler, font, diskEvent);
     fileTab.addTreeMouseListener (new MouseListener ());    // listen for disk selection
     insertTab ("Disk Tree", null, fileTab, "Display Apple disks", 0);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void activate ()
+  // ---------------------------------------------------------------------------------//
   {
     if (fileTab == null)
     {
@@ -97,13 +107,17 @@ class CatalogPanel extends JTabbedPane
       setSelectedIndex (0);
   }
 
+  // ---------------------------------------------------------------------------------//
   void setCloseTabAction (CloseTabAction action)
+  // ---------------------------------------------------------------------------------//
   {
     this.closeTabAction = action;
   }
 
   // called after a double-click in the fileTab
+  // ---------------------------------------------------------------------------------//
   public void addDiskPanel (FormattedDisk disk, String lastFileUsed, boolean activate)
+  // ---------------------------------------------------------------------------------//
   {
     int tabNo = 1;
     for (AppleDiskTab tab : diskTabs)
@@ -124,7 +138,9 @@ class CatalogPanel extends JTabbedPane
   }
 
   // Called from RefreshTreeAction
+  // ---------------------------------------------------------------------------------//
   public void refreshTree ()
+  // ---------------------------------------------------------------------------------//
   {
     Tab tab = (Tab) getSelectedComponent ();
     tab.refresh ();
@@ -135,7 +151,9 @@ class CatalogPanel extends JTabbedPane
   }
 
   // Called from CloseTabAction
+  // ---------------------------------------------------------------------------------//
   public void closeCurrentTab ()
+  // ---------------------------------------------------------------------------------//
   {
     Tab tab = (Tab) getSelectedComponent ();
     if (!(tab instanceof AppleDiskTab) || diskTabs.size () < 2)
@@ -151,7 +169,9 @@ class CatalogPanel extends JTabbedPane
     checkCloseTabAction ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void checkCloseTabAction ()
+  // ---------------------------------------------------------------------------------//
   {
     Tab tab = (Tab) getSelectedComponent ();
     if (diskTabs.size () > 1 && tab instanceof AppleDiskTab)
@@ -160,8 +180,10 @@ class CatalogPanel extends JTabbedPane
       closeTabAction.setEnabled (false);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void quit (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     if (fileTab == null)
     {
@@ -203,7 +225,7 @@ class CatalogPanel extends JTabbedPane
 
           if (event instanceof FileSelectedEvent)
           {
-            AppleFileSource afs = ((FileSelectedEvent) event).file;
+            AppleFileSource afs = ((FileSelectedEvent) event).appleFileSource;
             prefs.put (prefsLastFileUsed, afs == null ? "" : afs.getUniqueName ());
             prefs.put (prefsLastSectorsUsed, "");
           }
@@ -217,15 +239,18 @@ class CatalogPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void restore (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
+    System.out.println ("Started CatalogPanel restore");
     String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
     int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
     String lastFileUsed = prefs.get (prefsLastFileUsed, "");
     String lastSectorsUsed = prefs.get (prefsLastSectorsUsed, "");
 
-    if (false)
+    if (true)
     {
       System.out.println ("Last disk    : " + lastDiskUsed);
       System.out.println ("Last dos     : " + lastDosUsed);
@@ -258,6 +283,7 @@ class CatalogPanel extends JTabbedPane
       if (!lastFileUsed.isEmpty ())
       {
         AppleFileSource afs = fd.getFile (lastFileUsed);
+        System.out.println (afs);
         if (afs != null)
         {
           FileSelectedEvent fileEvent = FileSelectedEvent.create (this, afs);
@@ -285,30 +311,41 @@ class CatalogPanel extends JTabbedPane
     }
     addChangeListener (new TabChangeListener ());
     restored = true;
+    System.out.println ("Finished CatalogPanel restore");
   }
 
   // Pass through to DiskSelector
+  // ---------------------------------------------------------------------------------//
   public void addDiskSelectionListener (DiskSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     selector.addDiskSelectionListener (listener);
   }
 
   // Pass through to DiskSelector
+  // ---------------------------------------------------------------------------------//
   public void addFileSelectionListener (FileSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     selector.addFileSelectionListener (listener);
   }
 
   // Pass through to DiskSelector
+  // ---------------------------------------------------------------------------------//
   public void addFileNodeSelectionListener (FileNodeSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     selector.addFileNodeSelectionListener (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   private class TabChangeListener implements ChangeListener
+  // ---------------------------------------------------------------------------------//
   {
+    // -------------------------------------------------------------------------------//
     @Override
     public void stateChanged (ChangeEvent e)
+    // -------------------------------------------------------------------------------//
     {
       Tab tab = (Tab) getSelectedComponent ();
       if (tab != null)
@@ -319,39 +356,44 @@ class CatalogPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void redo (RedoEvent event)
+  // ---------------------------------------------------------------------------------//
   {
+    System.out.println ("Started redo: " + event.type);
     Tab tab = (Tab) getSelectedComponent ();
     selector.redo = true;
 
-    if (event.type.equals ("DiskEvent"))
+    switch (event.type)
     {
-      if (tab instanceof FileSystemTab)
-        ((FileSystemTab) tab).redoEvent (event);
+      case "DiskEvent":
+      case "FileNodeEvent":
+        if (tab instanceof FileSystemTab)
+          ((FileSystemTab) tab).redoEvent (event);
+        break;
+
+      case "FileEvent":
+        if (tab instanceof AppleDiskTab)
+          ((AppleDiskTab) tab).redoEvent (event);
+        break;
+
+      case "SectorEvent":
+        // don't care
+        break;
+
+      default:
+        System.out.println ("Unknown event type : " + event.type);
     }
-    else if (event.type.equals ("FileEvent"))
-    {
-      if (tab instanceof AppleDiskTab)
-        ((AppleDiskTab) tab).redoEvent (event);
-    }
-    else if (event.type.equals ("FileNodeEvent"))
-    {
-      if (tab instanceof FileSystemTab)
-        ((FileSystemTab) tab).redoEvent (event);
-    }
-    else if (event.type.equals ("SectorEvent"))
-    {
-      // don't care
-    }
-    else
-      System.out.println ("Unknown event type : " + event.type);
 
     selector.redo = false;
+    System.out.println ("Finished redo");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void sectorSelected (SectorSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     // user has clicked in the DiskLayoutPanel, so turn off any current file selection
     Tab tab = (Tab) getSelectedComponent ();
@@ -359,8 +401,10 @@ class CatalogPanel extends JTabbedPane
       ((AppleDiskTab) tab).tree.setSelectionPath (null);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void changeFont (FontChangeEvent fontChangeEvent)
+  // ---------------------------------------------------------------------------------//
   {
     font = fontChangeEvent.font;
     if (fileTab != null)
@@ -369,10 +413,14 @@ class CatalogPanel extends JTabbedPane
       tab.setTreeFont (font);
   }
 
+  // ---------------------------------------------------------------------------------//
   private class MouseListener extends MouseAdapter
+  // ---------------------------------------------------------------------------------//
   {
+    // -------------------------------------------------------------------------------//
     @Override
     public void mousePressed (MouseEvent e)
+    // -------------------------------------------------------------------------------//
     {
       JTree tree = (JTree) e.getSource ();
       int selRow = tree.getRowForLocation (e.getX (), e.getY ());
@@ -393,8 +441,10 @@ class CatalogPanel extends JTabbedPane
   }
 
   // a disk has been selected from the Disk Duplicates Table
+  // -------------------------------------------------------------------------------//
   @Override
   public void diskSelected (DiskDetails diskDetails)
+  // -------------------------------------------------------------------------------//
   {
     if (getSelectedIndex () != 0)
       setSelectedIndex (0);

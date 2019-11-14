@@ -49,6 +49,7 @@ class AppleDiskTab extends AbstractTab
       RedoHandler redoHandler, Font font, String lastFileUsed)
   {
     super (redoHandler, selector, font);
+    System.out.println ("******************");
     create (disk);
     //    System.out.println ("ooh - couldn't find the previous file");
     DefaultMutableTreeNode node = findNode (lastFileUsed);
@@ -117,7 +118,7 @@ class AppleDiskTab extends AbstractTab
 
   void redoEvent (RedoEvent event)
   {
-    selectNode (((FileSelectedEvent) event.value).file.getUniqueName ());
+    selectNode (((FileSelectedEvent) event.value).appleFileSource.getUniqueName ());
   }
 
   private DefaultMutableTreeNode findNode (String nodeName)

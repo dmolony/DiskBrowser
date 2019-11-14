@@ -208,8 +208,9 @@ public class DiskFactory
         // 2 x 400k disk images
         AppleDisk appleDisk1 = new AppleDisk (file, 50, 32);
         AppleDisk appleDisk2 = new AppleDisk (file, 50, 32, 409600);
-        disk = checkUnidos (appleDisk1);
-        disk2 = checkUnidos (appleDisk2);
+        disk = checkUnidos (appleDisk1, 1);
+        disk2 = checkUnidos (appleDisk2, 2);
+        assert disk != disk2;
         if (disk != null && disk2 != null)
           return new DualDosDisk (disk, disk2);
       }
@@ -533,7 +534,7 @@ public class DiskFactory
     return null;
   }
 
-  private static DosDisk checkUnidos (AppleDisk disk)
+  private static DosDisk checkUnidos (AppleDisk disk, int side)
   {
     if (debug)
       System.out.println ("Checking UniDOS disk");
@@ -544,7 +545,7 @@ public class DiskFactory
       {
         if (debug)
           System.out.println ("  --> UniDOS");
-        return new DosDisk (disk);
+        return new DosDisk (disk, side);
       }
     }
     catch (Exception e)

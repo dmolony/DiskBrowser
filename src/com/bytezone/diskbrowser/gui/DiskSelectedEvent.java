@@ -35,6 +35,7 @@ public class DiskSelectedEvent extends EventObject
   public static DiskSelectedEvent create (Object source, String path)
   {
     FormattedDisk formattedDisk = DiskFactory.createDisk (path);
+    System.out.println (formattedDisk);
     return formattedDisk == null ? null : new DiskSelectedEvent (source, formattedDisk);
   }
 }

@@ -391,7 +391,7 @@ class DataPanel extends JTabbedPane
   @Override
   public void fileSelected (FileSelectedEvent event)
   {
-    DataSource dataSource = event.file.getDataSource ();
+    DataSource dataSource = event.appleFileSource.getDataSource ();
     setDataSource (dataSource);
   }
 

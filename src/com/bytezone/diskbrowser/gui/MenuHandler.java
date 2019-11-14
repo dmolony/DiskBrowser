@@ -447,9 +447,9 @@ public class MenuHandler
   public void fileSelected (FileSelectedEvent event)
   {
     // This can happen if a file is selected from a dual-dos disk
-    if (event.file.getFormattedDisk () != currentDisk)
+    if (event.appleFileSource.getFormattedDisk () != currentDisk)
     {
-      currentDisk = event.file.getFormattedDisk ();
+      currentDisk = event.appleFileSource.getFormattedDisk ();
       adjustMenus (currentDisk);
     }
   }

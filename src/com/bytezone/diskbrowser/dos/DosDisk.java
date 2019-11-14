@@ -24,6 +24,7 @@ public class DosDisk extends AbstractFormattedDisk
 
   private int freeSectors;
   private int usedSectors;
+  private final int volumeNo;             // for multi-volume disks
 
   public final SectorType vtocSector = new SectorType ("VTOC", Color.magenta);
   public final SectorType catalogSector = new SectorType ("Catalog", green);
@@ -40,7 +41,14 @@ public class DosDisk extends AbstractFormattedDisk
 
   public DosDisk (Disk disk)
   {
+    this (disk, 0);
+  }
+
+  public DosDisk (Disk disk, int volumeNo)
+  {
     super (disk);
+
+    this.volumeNo = volumeNo;
 
     sectorTypesList.add (dosSector);
     sectorTypesList.add (vtocSector);
@@ -95,7 +103,7 @@ public class DosDisk extends AbstractFormattedDisk
       //      if (sectorBuffer[0] != 0 && (sectorBuffer[0] & 0xFF) != 0xFF && false)
       //      {
       //        System.out
-      //            .println ("Dos catalog sector buffer byte #0 invalid : " + sectorBuffer[0]);
+      //       .println ("Dos catalog sector buffer byte #0 invalid : " + sectorBuffer[0]);
       //        break;
       //      }
 
@@ -218,15 +226,23 @@ public class DosDisk extends AbstractFormattedDisk
       deletedFilesNode.setUserObject (getDeletedList ());
       makeNodeVisible (deletedFilesNode.getFirstLeaf ());
     }
+
     volumeNode.setUserObject (getCatalog ());
     makeNodeVisible (volumeNode.getFirstLeaf ());
+  }
+
+  public int getVolumeNo ()
+  {
+    return volumeNo;
   }
 
   @Override
   public void setOriginalPath (Path path)
   {
     super.setOriginalPath (path);
-    volumeNode.setUserObject (getCatalog ());  // this has already been set in the constructor
+
+    // this has already been set in the constructor
+    volumeNode.setUserObject (getCatalog ());
   }
 
   // Beagle Bros FRAMEUP disk only has one catalog block
@@ -355,7 +371,16 @@ public class DosDisk extends AbstractFormattedDisk
   @Override
   public String toString ()
   {
-    StringBuffer text = new StringBuffer (dosVTOCSector.toString ());
+    //    StringBuffer text = new StringBuffer (dosVTOCSector.toString ());
+    //    return text.toString ();
+    StringBuffer text = new StringBuffer ();
+
+    text.append (
+        String.format ("DOS version ........... %s%n", dosVTOCSector.dosVersion));
+    text.append (
+        String.format ("Sectors per track ..... %d%n", dosVTOCSector.maxSectors));
+    text.append (String.format ("Volume no ............. %d", volumeNo));
+
     return text.toString ();
   }
 
@@ -416,8 +441,10 @@ public class DosDisk extends AbstractFormattedDisk
           "%nActual:    Free sectors: %3d    "
               + "Used sectors: %3d    Total sectors: %3d",
           freeSectors, usedSectors, (usedSectors + freeSectors)));
-    return new DefaultAppleFileSource ("Volume " + dosVTOCSector.volume, text.toString (),
-        this);
+
+    String volumeText = volumeNo == 0 ? "" : "Side " + volumeNo + " ";
+    return new DefaultAppleFileSource (volumeText + "Volume " + dosVTOCSector.volume,
+        text.toString (), this);
   }
 
   private AppleFileSource getDeletedList ()

@@ -116,7 +116,7 @@ class CatalogPanel extends JTabbedPane
 
   // called after a double-click in the fileTab
   // ---------------------------------------------------------------------------------//
-  public void addDiskPanel (FormattedDisk disk, String lastFileUsed, boolean activate)
+  public void addDiskPanel (FormattedDisk disk, boolean activate)
   // ---------------------------------------------------------------------------------//
   {
     int tabNo = 1;
@@ -433,7 +433,7 @@ class CatalogPanel extends JTabbedPane
         //        lister.catalogLister.setNode (selectedNode);
       }
       else if (e.getClickCount () == 2)
-        addDiskPanel (node.getFormattedDisk (), null, true);
+        addDiskPanel (node.getFormattedDisk (), true);
     }
   }
 

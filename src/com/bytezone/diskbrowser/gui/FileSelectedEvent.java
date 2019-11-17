@@ -10,6 +10,7 @@ public class FileSelectedEvent extends EventObject
 {
   public final AppleFileSource appleFileSource;
   boolean redo;
+  int volumeNo = -1;
 
   public FileSelectedEvent (Object source, AppleFileSource appleFileSource)
   {
@@ -21,7 +22,10 @@ public class FileSelectedEvent extends EventObject
     FormattedDisk fd = appleFileSource.getFormattedDisk ();
     DualDosDisk ddd = (DualDosDisk) fd.getParent ();
     if (ddd != null)
+    {
       ddd.setCurrentDisk (fd);
+      volumeNo = ddd.getCurrentDiskNo ();
+    }
   }
 
   @Override

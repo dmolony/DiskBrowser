@@ -121,7 +121,13 @@ class AppleDiskTab extends AbstractTab
   void redoEvent (RedoEvent event)
   {
     AppleFileSource afs = ((FileSelectedEvent) event.value).appleFileSource;
-    selectNode (((FileSelectedEvent) event.value).appleFileSource.getUniqueName ());
+    FileSelectedEvent fileSelectedEvent = (FileSelectedEvent) event.value;
+    if (fileSelectedEvent.volumeNo >= 0)
+    {
+      DualDosDisk ddd = (DualDosDisk) afs.getFormattedDisk ().getParent ();
+      ddd.setCurrentDiskNo (fileSelectedEvent.volumeNo);
+    }
+    selectNode (fileSelectedEvent.appleFileSource.getUniqueName ());
   }
 
   private DefaultMutableTreeNode findNode (String nodeName)

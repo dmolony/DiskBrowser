@@ -201,20 +201,6 @@ public class DiskFactory
           return disk;
       }
 
-      if (file.length () == 819200)         // 800K 3.5"
-      {
-        if (debug)
-          System.out.println ("UniDos ?");
-        // 2 x 400k disk images
-        AppleDisk appleDisk1 = new AppleDisk (file, 50, 32);
-        AppleDisk appleDisk2 = new AppleDisk (file, 50, 32, 409600);
-        disk = checkUnidos (appleDisk1, 1);
-        disk2 = checkUnidos (appleDisk2, 2);
-        assert disk != disk2;
-        if (disk != null && disk2 != null)
-          return new DualDosDisk (disk, disk2);
-      }
-
       if (debug)
         System.out.println ("  Checking po or dsk hard drive: " + file.length ());
 
@@ -224,6 +210,19 @@ public class DiskFactory
         if (compressed)
           disk.setOriginalPath (originalPath);
         return disk;
+      }
+
+      if (file.length () == 819200)         // 800K 3.5"
+      {
+        if (debug)
+          System.out.println ("UniDos ?");
+        // 2 x 400k disk images
+        AppleDisk appleDisk1 = new AppleDisk (file, 50, 32);
+        AppleDisk appleDisk2 = new AppleDisk (file, 50, 32, (int) (file.length () / 2));
+        disk = checkUnidos (appleDisk1, 1);
+        disk2 = checkUnidos (appleDisk2, 2);
+        if (disk != null && disk2 != null)
+          return new DualDosDisk (disk, disk2);
       }
 
       if (debug)

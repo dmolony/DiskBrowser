@@ -208,6 +208,8 @@ public class TreeBuilder
 
       File[] files = file.listFiles ();
       if (files != null)
+      {
+        Arrays.sort (files, fileComparator);
         for (File f : files)
         {
           if (f.isHidden ())
@@ -222,6 +224,7 @@ public class TreeBuilder
               f.isDirectory () ? "D" : " ", name, sdf.format (d).replace (".", ""), size,
               type));
         }
+      }
 
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);

@@ -136,6 +136,8 @@ public class DualDosDisk implements FormattedDisk
       currentDisk = 0;
     else if (disks[1] == fd)
       currentDisk = 1;
+    else
+      System.out.println ("Disk not found: " + fd);
   }
 
   // ---------------------------------------------------------------------------------//

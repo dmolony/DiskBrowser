@@ -128,7 +128,7 @@ class AppleDiskTab extends AbstractTab
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
 
-    // check for multi-volume disk
+    // check for multi-volume disk (only search the current branch)
     FormattedDisk fd = ((AppleFileSource) rootNode.getUserObject ()).getFormattedDisk ();
     if (fd instanceof DualDosDisk)
     {

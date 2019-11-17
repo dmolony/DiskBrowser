@@ -250,7 +250,7 @@ class DataPanel extends JTabbedPane
 
     switch (getSelectedIndex ())
     {
-      case 0:             // Formated/Image
+      case 0:             // Formatted/Image
         try
         {
           setText (formattedText, dataSource.getText ());

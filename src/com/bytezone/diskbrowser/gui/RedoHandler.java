@@ -49,7 +49,7 @@ class RedoHandler
   // ---------------------------------------------------------------------------------//
   {
     RedoData data = new RedoData (leftAction, rightAction);
-    this.redoData = data; // doesn't fire an event this way
+    this.redoData = data;                             // doesn't fire an event this way
     return data;
   }
 
@@ -213,7 +213,7 @@ class RedoHandler
   class RedoData
   // ---------------------------------------------------------------------------------//
   {
-    List<RedoEvent> events = new ArrayList<RedoEvent> ();
+    List<RedoEvent> events = new ArrayList<> ();
     int currentEvent = -1;
     Action leftAction;
     Action rightAction;

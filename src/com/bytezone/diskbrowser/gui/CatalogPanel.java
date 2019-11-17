@@ -137,7 +137,7 @@ class CatalogPanel extends JTabbedPane
       setSelectedIndex (diskTabs.size ());
   }
 
-  // Called from RefreshTreeAction
+  // called from RefreshTreeAction
   // ---------------------------------------------------------------------------------//
   public void refreshTree ()
   // ---------------------------------------------------------------------------------//
@@ -150,7 +150,7 @@ class CatalogPanel extends JTabbedPane
       fileTab.replaceDisk (((AppleDiskTab) tab).disk);
   }
 
-  // Called from CloseTabAction
+  // called from CloseTabAction
   // ---------------------------------------------------------------------------------//
   public void closeCurrentTab ()
   // ---------------------------------------------------------------------------------//
@@ -244,13 +244,12 @@ class CatalogPanel extends JTabbedPane
   public void restore (Preferences prefs)
   // ---------------------------------------------------------------------------------//
   {
-    System.out.println ("Started CatalogPanel restore");
     String lastDiskUsed = prefs.get (prefsLastDiskUsed, "");
     int lastDosUsed = prefs.getInt (prefsLastDosUsed, -1);
     String lastFileUsed = prefs.get (prefsLastFileUsed, "");
     String lastSectorsUsed = prefs.get (prefsLastSectorsUsed, "");
 
-    if (true)
+    if (false)
     {
       System.out.println ("Last disk    : " + lastDiskUsed);
       System.out.println ("Last dos     : " + lastDosUsed);
@@ -258,15 +257,16 @@ class CatalogPanel extends JTabbedPane
       System.out.println ("Last sectors : " + lastSectorsUsed);
     }
 
+    FormattedDisk fd1 = null;
     DiskSelectedEvent diskEvent = null;
     if (!lastDiskUsed.isEmpty ())
     {
       diskEvent = DiskSelectedEvent.create (this, lastDiskUsed);
       if (diskEvent != null)
       {
-        FormattedDisk fd = diskEvent.getFormattedDisk ();
-        if (lastDosUsed >= 0 && fd instanceof DualDosDisk)
-          ((DualDosDisk) fd).setCurrentDiskNo (lastDosUsed);
+        fd1 = diskEvent.getFormattedDisk ();
+        if (lastDosUsed >= 0 && fd1 instanceof DualDosDisk)
+          ((DualDosDisk) fd1).setCurrentDiskNo (lastDosUsed);
       }
     }
     else
@@ -279,14 +279,14 @@ class CatalogPanel extends JTabbedPane
     {
       AppleDiskTab tab = null;
       FormattedDisk fd = diskEvent.getFormattedDisk ();
+      assert fd == fd1;
 
       if (!lastFileUsed.isEmpty ())
       {
         AppleFileSource afs = fd.getFile (lastFileUsed);
-        System.out.println (afs);
         if (afs != null)
         {
-          FileSelectedEvent fileEvent = FileSelectedEvent.create (this, afs);
+          FileSelectedEvent fileEvent = new FileSelectedEvent (this, afs);
           tab = new AppleDiskTab (fd, selector, redoHandler, font, fileEvent);
         }
         else
@@ -311,7 +311,6 @@ class CatalogPanel extends JTabbedPane
     }
     addChangeListener (new TabChangeListener ());
     restored = true;
-    System.out.println ("Finished CatalogPanel restore");
   }
 
   // Pass through to DiskSelector
@@ -361,7 +360,6 @@ class CatalogPanel extends JTabbedPane
   public void redo (RedoEvent event)
   // ---------------------------------------------------------------------------------//
   {
-    System.out.println ("Started redo: " + event.type);
     Tab tab = (Tab) getSelectedComponent ();
     selector.redo = true;
 
@@ -387,7 +385,6 @@ class CatalogPanel extends JTabbedPane
     }
 
     selector.redo = false;
-    System.out.println ("Finished redo");
   }
 
   // ---------------------------------------------------------------------------------//

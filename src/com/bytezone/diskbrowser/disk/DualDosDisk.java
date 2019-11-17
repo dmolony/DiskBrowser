@@ -27,8 +27,6 @@ public class DualDosDisk implements FormattedDisk
   public DualDosDisk (FormattedDisk disk0, FormattedDisk disk1)
   // ---------------------------------------------------------------------------------//
   {
-    //    System.out.printf ("Disk0:%n %s%n", disk0);
-    //    System.out.printf ("Disk1:%n %s%n", disk1);
     assert disk0 != disk1;
     String diskName = disk0.getDisk ().getFile ().getName ();
     String text = "This disk contains files from DOS and another OS\n\n"
@@ -134,11 +132,10 @@ public class DualDosDisk implements FormattedDisk
   public void setCurrentDisk (FormattedDisk fd)
   // ---------------------------------------------------------------------------------//
   {
-    if (disks[0] == fd && currentDisk != 0)
+    if (disks[0] == fd)
       currentDisk = 0;
-    else if (disks[1] == fd && currentDisk != 1)
+    else if (disks[1] == fd)
       currentDisk = 1;
-    System.out.printf ("1. Setting disk: %d%n", currentDisk);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -146,7 +143,6 @@ public class DualDosDisk implements FormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     currentDisk = n;
-    System.out.printf ("2. Setting disk: %d%n", currentDisk);
   }
 
   // ---------------------------------------------------------------------------------//

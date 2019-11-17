@@ -17,6 +17,7 @@ import javax.swing.tree.TreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DiskFactory;
+import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 
@@ -49,7 +50,7 @@ class AppleDiskTab extends AbstractTab
       RedoHandler redoHandler, Font font, String lastFileUsed)
   {
     super (redoHandler, selector, font);
-    System.out.println ("******************");
+    System.out.println ("****************** File not found");
     create (disk);
     //    System.out.println ("ooh - couldn't find the previous file");
     DefaultMutableTreeNode node = findNode (lastFileUsed);
@@ -68,7 +69,8 @@ class AppleDiskTab extends AbstractTab
     super (redoHandler, selector, font);
     create (disk);
 
-    AppleFileSource afs = (AppleFileSource) findNode (2).getUserObject (); // select Catalog
+    // select Catalog
+    AppleFileSource afs = (AppleFileSource) findNode (2).getUserObject ();
     if (afs == null)
       afs = (AppleFileSource) findNode (1).getUserObject (); // select Disk
     redoHandler.fileSelected (new FileSelectedEvent (this, afs));
@@ -88,7 +90,7 @@ class AppleDiskTab extends AbstractTab
     eventHandler.redo = true;
     eventHandler.fireDiskSelectionEvent (disk);
     eventHandler.redo = false;
-    tree.setSelectionPath (null); // turn off any current selection to force an event
+    tree.setSelectionPath (null);   // turn off any current selection to force an event
     redoHandler.setCurrentData (redoData);
   }
 
@@ -118,12 +120,22 @@ class AppleDiskTab extends AbstractTab
 
   void redoEvent (RedoEvent event)
   {
+    AppleFileSource afs = ((FileSelectedEvent) event.value).appleFileSource;
     selectNode (((FileSelectedEvent) event.value).appleFileSource.getUniqueName ());
   }
 
   private DefaultMutableTreeNode findNode (String nodeName)
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
+
+    // check for multi-volume disk
+    FormattedDisk fd = ((AppleFileSource) rootNode.getUserObject ()).getFormattedDisk ();
+    if (fd instanceof DualDosDisk)
+    {
+      int volume = ((DualDosDisk) fd).getCurrentDiskNo ();
+      rootNode = (DefaultMutableTreeNode) rootNode.getChildAt (volume);
+    }
+
     Enumeration<TreeNode> children = rootNode.breadthFirstEnumeration ();
     while (children.hasMoreElements ())
     {

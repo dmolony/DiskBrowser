@@ -4,6 +4,7 @@ import java.util.EventObject;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
+import com.bytezone.diskbrowser.disk.FormattedDisk;
 
 public class FileSelectedEvent extends EventObject
 {
@@ -17,24 +18,20 @@ public class FileSelectedEvent extends EventObject
 
     // If a file is selected from a disk which is contained in a Dual-dos disk, then the DDS
     // must be told so that it can ensure its internal currentDisk is set correctly
-    DualDosDisk ddd = (DualDosDisk) appleFileSource.getFormattedDisk ().getParent ();
+    FormattedDisk fd = appleFileSource.getFormattedDisk ();
+    DualDosDisk ddd = (DualDosDisk) fd.getParent ();
     if (ddd != null)
-      ddd.setCurrentDisk (appleFileSource.getFormattedDisk ());
+      ddd.setCurrentDisk (fd);
   }
 
   @Override
   public String toString ()
   {
-    return appleFileSource.getUniqueName ();
+    return appleFileSource.toString ();
   }
 
   public String toText ()
   {
     return appleFileSource.getUniqueName ();
-  }
-
-  public static FileSelectedEvent create (Object source, AppleFileSource afs)
-  {
-    return new FileSelectedEvent (source, afs);
   }
 }

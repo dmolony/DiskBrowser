@@ -130,10 +130,8 @@ public class SHRPictureFile1 extends HiResImage
       //        System.out.println ("fillmode " + fillMode);
 
       // 320 mode
-      //      if (mainBlock.pixelsPerScanLine == 320)
       if (mainBlock.scbMode == 0)
       {
-        //        int max = mainBlock.pixelsPerScanLine / 2;
         int max = mainBlock.unpackedSize[line];
         for (int i = 0; i < max; i++)       // two pixels per col
         {
@@ -161,9 +159,8 @@ public class SHRPictureFile1 extends HiResImage
       }
       else
       {
-        //        int max = mainBlock.pixelsPerScanLine / 4;
         int max = mainBlock.unpackedSize[line];
-        for (int col = 0; col < max; col++)       // four pixels per col
+        for (int i = 0; i < max; i++)       // four pixels per col
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;
           int p2 = (buffer[ptr] & 0x30) >> 4;
@@ -401,9 +398,10 @@ public class SHRPictureFile1 extends HiResImage
       text.append ("\nScan Lines\n");
       text.append ("----------\n\n");
 
-      text.append (" #   Mode  Len       Packed Data\n");
+      text.append (" #   Mode  Len       Packed Data                        "
+          + "                                   Unpack\n");
       text.append ("---  ----  ---   ---------------------------------------");
-      text.append ("------------------------------------------\n");
+      text.append ("--------------------------------   ------\n");
 
       int lineSize = 24;
       for (int i = 0; i < scanLineDirectory.length; i++)
@@ -415,7 +413,15 @@ public class SHRPictureFile1 extends HiResImage
         int ptr = 0;
         while (true)
         {
-          text.append (HexFormatter.getHexString (packedScanLine, ptr, lineSize));
+          String hex = HexFormatter.getHexString (packedScanLine, ptr, lineSize);
+          text.append (hex);
+          if (ptr == 0)
+          {
+            if (hex.length () < 71)
+              text.append (("                                        "
+                  + "                               ").substring (hex.length ()));
+            text.append (String.format ("   %5d", unpackedSize[i]));
+          }
           ptr += lineSize;
           if (ptr >= packedScanLine.length)
             break;

@@ -128,11 +128,26 @@ public class SHRPictureFile1 extends HiResImage
       //      boolean fillMode = (lo & 0x20) != 0;
       //      if (fillMode)
       //        System.out.println ("fillmode " + fillMode);
+      boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
+      int max = mainBlock.unpackedSize[line];
 
-      // 640 mode
-      if (mainBlock.masterMode == 0x80)
+      if (mode320)
       {
-        int max = mainBlock.unpackedSize[line];
+        for (int i = 0; i < max; i++)       // two pixels per col
+        {
+          int left = (buffer[ptr] & 0xF0) >> 4;
+          int right = buffer[ptr++] & 0x0F;
+
+          // get left/right colors
+          int rgbLeft = colorTable.entries[left].color.getRGB ();
+          int rgbRight = colorTable.entries[right].color.getRGB ();
+
+          element1 = draw (dataBuffer, element1, rgbLeft, rgbLeft, rgbRight, rgbRight);
+          element2 = draw (dataBuffer, element2, rgbLeft, rgbLeft, rgbRight, rgbRight);
+        }
+      }
+      else
+      {
         for (int i = 0; i < max; i++)       // four pixels per col
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;
@@ -146,48 +161,12 @@ public class SHRPictureFile1 extends HiResImage
           int rgb3 = colorTable.entries[p3].color.getRGB ();
           int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
 
-          // draw pixels on current line
-          dataBuffer.setElem (element1++, rgb1);
-          dataBuffer.setElem (element1++, rgb2);
-          dataBuffer.setElem (element1++, rgb3);
-          dataBuffer.setElem (element1++, rgb4);
-
-          // draw same pixels on next line
-          dataBuffer.setElem (element2++, rgb1);
-          dataBuffer.setElem (element2++, rgb2);
-          dataBuffer.setElem (element2++, rgb3);
-          dataBuffer.setElem (element2++, rgb4);
+          element1 = draw (dataBuffer, element1, rgb1, rgb2, rgb3, rgb4);
+          element2 = draw (dataBuffer, element2, rgb1, rgb2, rgb3, rgb4);
         }
-        element1 += width;        // skip line already drawn
-        element2 += width;        // one line ahead
       }
-      else
-      {
-        int max = mainBlock.unpackedSize[line];
-        for (int i = 0; i < max; i++)       // two pixels per col
-        {
-          int left = (buffer[ptr] & 0xF0) >> 4;
-          int right = buffer[ptr++] & 0x0F;
-
-          // get left/right colors
-          int rgbLeft = colorTable.entries[left].color.getRGB ();
-          int rgbRight = colorTable.entries[right].color.getRGB ();
-
-          // draw left/right pixels on current line
-          dataBuffer.setElem (element1++, rgbLeft);
-          dataBuffer.setElem (element1++, rgbLeft);
-          dataBuffer.setElem (element1++, rgbRight);
-          dataBuffer.setElem (element1++, rgbRight);
-
-          // draw same left/right pixels on next line
-          dataBuffer.setElem (element2++, rgbLeft);
-          dataBuffer.setElem (element2++, rgbLeft);
-          dataBuffer.setElem (element2++, rgbRight);
-          dataBuffer.setElem (element2++, rgbRight);
-        }
-        element1 += width;        // skip line already drawn
-        element2 += width;        // one line ahead
-      }
+      element1 += width;        // skip line already drawn
+      element2 += width;        // one line ahead
     }
   }
 

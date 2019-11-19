@@ -229,17 +229,8 @@ public class SHRPictureFile2 extends HiResImage
           int rgbLeft = colorTable.entries[left].color.getRGB ();
           int rgbRight = colorTable.entries[right].color.getRGB ();
 
-          // draw left/right pixels on current line
-          dataBuffer.setElem (element1++, rgbLeft);
-          dataBuffer.setElem (element1++, rgbLeft);
-          dataBuffer.setElem (element1++, rgbRight);
-          dataBuffer.setElem (element1++, rgbRight);
-
-          // draw same left/right pixels on next line
-          dataBuffer.setElem (element2++, rgbLeft);
-          dataBuffer.setElem (element2++, rgbLeft);
-          dataBuffer.setElem (element2++, rgbRight);
-          dataBuffer.setElem (element2++, rgbRight);
+          element1 = draw (dataBuffer, element1, rgbLeft, rgbLeft, rgbRight, rgbRight);
+          element2 = draw (dataBuffer, element2, rgbLeft, rgbLeft, rgbRight, rgbRight);
         }
         element1 += 640;        // skip line already drawn
         element2 += 640;        // one line ahead
@@ -259,17 +250,8 @@ public class SHRPictureFile2 extends HiResImage
           int rgb3 = colorTable.entries[p3].color.getRGB ();
           int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
 
-          // draw pixels on current line
-          dataBuffer.setElem (element1++, rgb1);
-          dataBuffer.setElem (element1++, rgb2);
-          dataBuffer.setElem (element1++, rgb3);
-          dataBuffer.setElem (element1++, rgb4);
-
-          // draw same pixels on next line
-          dataBuffer.setElem (element2++, rgb1);
-          dataBuffer.setElem (element2++, rgb2);
-          dataBuffer.setElem (element2++, rgb3);
-          dataBuffer.setElem (element2++, rgb4);
+          element1 = draw (dataBuffer, element1, rgb1, rgb2, rgb3, rgb4);
+          element2 = draw (dataBuffer, element2, rgb1, rgb2, rgb3, rgb4);
         }
         element1 += 640;        // skip line already drawn
         element2 += 640;        // one line ahead

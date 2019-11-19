@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.awt.Color;
+import java.awt.image.DataBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -252,6 +253,16 @@ public abstract class HiResImage extends AbstractFile
 
     text.deleteCharAt (text.length () - 1);
     return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int draw (DataBuffer dataBuffer, int element, int... rgb1)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = 0; i < rgb1.length; i++)
+      dataBuffer.setElem (element++, rgb1[i]);
+
+    return element;
   }
 
   /*

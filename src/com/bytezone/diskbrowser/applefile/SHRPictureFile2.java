@@ -218,9 +218,9 @@ public class SHRPictureFile2 extends HiResImage
       else
         colorTable = colorTables[line];
 
-      if (mode320)
+      if (mode320)       // two pixels per col
       {
-        for (int col = 0; col < 160; col++)       // two pixels per col
+        for (int col = 0; col < 160; col++)
         {
           int left = (buffer[ptr] & 0xF0) >> 4;
           int right = buffer[ptr++] & 0x0F;
@@ -232,12 +232,10 @@ public class SHRPictureFile2 extends HiResImage
           element1 = draw (dataBuffer, element1, rgbLeft, rgbLeft, rgbRight, rgbRight);
           element2 = draw (dataBuffer, element2, rgbLeft, rgbLeft, rgbRight, rgbRight);
         }
-        element1 += 640;        // skip line already drawn
-        element2 += 640;        // one line ahead
       }
-      else          // mode640
+      else              // four pixels per col
       {
-        for (int col = 0; col < 160; col++)       // four pixels per col
+        for (int col = 0; col < 160; col++)
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;
           int p2 = (buffer[ptr] & 0x30) >> 4;
@@ -253,9 +251,9 @@ public class SHRPictureFile2 extends HiResImage
           element1 = draw (dataBuffer, element1, rgb1, rgb2, rgb3, rgb4);
           element2 = draw (dataBuffer, element2, rgb1, rgb2, rgb3, rgb4);
         }
-        element1 += 640;        // skip line already drawn
-        element2 += 640;        // one line ahead
       }
+      element1 += 640;        // skip line already drawn
+      element2 += 640;        // one line ahead
     }
   }
 

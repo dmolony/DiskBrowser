@@ -131,9 +131,9 @@ public class SHRPictureFile1 extends HiResImage
       boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
       int max = mainBlock.unpackedSize[line];
 
-      if (mode320)
+      if (mode320)       // two pixels per col
       {
-        for (int i = 0; i < max; i++)       // two pixels per col
+        for (int i = 0; i < max; i++)
         {
           int left = (buffer[ptr] & 0xF0) >> 4;
           int right = buffer[ptr++] & 0x0F;
@@ -146,9 +146,9 @@ public class SHRPictureFile1 extends HiResImage
           element2 = draw (dataBuffer, element2, rgbLeft, rgbLeft, rgbRight, rgbRight);
         }
       }
-      else
+      else              // four pixels per col
       {
-        for (int i = 0; i < max; i++)       // four pixels per col
+        for (int i = 0; i < max; i++)
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;
           int p2 = (buffer[ptr] & 0x30) >> 4;

@@ -6,14 +6,18 @@ import java.awt.image.DataBuffer;
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class SHRPictureFile2 extends HiResImage
+// -----------------------------------------------------------------------------------//
 {
   ColorTable[] colorTables;
   byte[] controlBytes;
 
   // see Graphics & Animation.2mg
 
+  // ---------------------------------------------------------------------------------//
   public SHRPictureFile2 (String name, byte[] buffer, int fileType, int auxType, int eof)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, fileType, auxType, eof);
 
@@ -35,7 +39,9 @@ public class SHRPictureFile2 extends HiResImage
       createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void doPnt ()
+  // ---------------------------------------------------------------------------------//
   {
     switch (auxType)
     {
@@ -59,6 +65,7 @@ public class SHRPictureFile2 extends HiResImage
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
           colorTables[i] = new ColorTable (i, this.buffer, 32256 + i * 32);
+
         break;
 
       case 2:                             // handled in SHRPictureFile1
@@ -98,6 +105,7 @@ public class SHRPictureFile2 extends HiResImage
         data = new byte[buffer.length - 6404];      // skip APP. and color tables
         System.arraycopy (buffer, 6404, data, 0, data.length);
         this.buffer = unpack (data);
+
         break;
 
       case 4096:                          // seems to be a PIC/$00
@@ -107,6 +115,7 @@ public class SHRPictureFile2 extends HiResImage
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
           colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
+
         break;
 
       default:
@@ -115,7 +124,9 @@ public class SHRPictureFile2 extends HiResImage
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void doPic ()
+  // ---------------------------------------------------------------------------------//
   {
     switch (auxType)
     {
@@ -131,8 +142,12 @@ public class SHRPictureFile2 extends HiResImage
         System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 
         colorTables = new ColorTable[16];
+        int ptr = 32256;
         for (int i = 0; i < colorTables.length; i++)
-          colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
+        {
+          colorTables[i] = new ColorTable (i, buffer, ptr);
+          ptr += 32;
+        }
         break;
 
       case 1:                             // unpacked version of PNT/$03
@@ -150,11 +165,12 @@ public class SHRPictureFile2 extends HiResImage
           return;
         }
         colorTables = new ColorTable[200];
+        ptr = 32000;
         for (int i = 0; i < colorTables.length; i++)
         {
-          int ptr = 32000 + i * 32;
           colorTables[i] = new ColorTable (i, buffer, ptr);
           colorTables[i].reverse ();
+          ptr += 32;
         }
         break;
 
@@ -164,13 +180,17 @@ public class SHRPictureFile2 extends HiResImage
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   void createMonochromeImage ()
+  // ---------------------------------------------------------------------------------//
   {
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   void createColourImage ()
+  // ---------------------------------------------------------------------------------//
   {
     image = new BufferedImage (640, 400, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
@@ -255,8 +275,10 @@ public class SHRPictureFile2 extends HiResImage
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (super.getText ());
     text.append ("\n");

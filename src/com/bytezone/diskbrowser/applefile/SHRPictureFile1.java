@@ -7,15 +7,19 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class SHRPictureFile1 extends HiResImage
+// -----------------------------------------------------------------------------------//
 {
   private final List<Block> blocks = new ArrayList<Block> ();
   private Main mainBlock;
   private Multipal multipalBlock;
   private final boolean debug = false;
 
-  // 0xC0/02 - Apple IIGS Super Hi-Res Picture File (APF)
+  // PNT - 0xC0/02 - Apple IIGS Super Hi-Res Picture File (APF)
+  // ---------------------------------------------------------------------------------//
   public SHRPictureFile1 (String name, byte[] buffer, int fileType, int auxType, int eof)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, fileType, auxType, eof);
 
@@ -71,8 +75,10 @@ public class SHRPictureFile1 extends HiResImage
     createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   void createMonochromeImage ()
+  // ---------------------------------------------------------------------------------//
   {
     image = new BufferedImage (320, 200, BufferedImage.TYPE_BYTE_GRAY);
     DataBuffer db = image.getRaster ().getDataBuffer ();
@@ -93,10 +99,12 @@ public class SHRPictureFile1 extends HiResImage
       }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   void createColourImage ()
+  // ---------------------------------------------------------------------------------//
   {
-    int width = mainBlock.pixelsPerScanLine == 320 ? 640 : mainBlock.pixelsPerScanLine;
+    int width = mainBlock.unpackedSize[0] * (mainBlock.scbMode == 0 ? 4 : 8);
     image =
         new BufferedImage (width, mainBlock.numScanLines * 2, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
@@ -122,9 +130,12 @@ public class SHRPictureFile1 extends HiResImage
       //        System.out.println ("fillmode " + fillMode);
 
       // 320 mode
-      if (mainBlock.pixelsPerScanLine == 320)
+      //      if (mainBlock.pixelsPerScanLine == 320)
+      if (mainBlock.scbMode == 0)
       {
-        for (int i = 0; i < 160; i++)       // two pixels per col
+        //        int max = mainBlock.pixelsPerScanLine / 2;
+        int max = mainBlock.unpackedSize[line];
+        for (int i = 0; i < max; i++)       // two pixels per col
         {
           int left = (buffer[ptr] & 0xF0) >> 4;
           int right = buffer[ptr++] & 0x0F;
@@ -150,7 +161,8 @@ public class SHRPictureFile1 extends HiResImage
       }
       else
       {
-        int max = mainBlock.pixelsPerScanLine / 4;
+        //        int max = mainBlock.pixelsPerScanLine / 4;
+        int max = mainBlock.unpackedSize[line];
         for (int col = 0; col < max; col++)       // four pixels per col
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;
@@ -182,8 +194,10 @@ public class SHRPictureFile1 extends HiResImage
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (super.getText ());
     text.append ("\n\n");
@@ -203,7 +217,9 @@ public class SHRPictureFile1 extends HiResImage
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Block
+  // ---------------------------------------------------------------------------------//
   {
     String kind;
     byte[] data;
@@ -226,7 +242,9 @@ public class SHRPictureFile1 extends HiResImage
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Multipal extends Block
+  // ---------------------------------------------------------------------------------//
   {
     int numPalettes;
     ColorTable[] colorTables;
@@ -251,7 +269,9 @@ public class SHRPictureFile1 extends HiResImage
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Main extends Block
+  // ---------------------------------------------------------------------------------//
   {
     int masterMode;                     // 0 = Brooks, 0 = PNT 320 80 = PNT 640
     int pixelsPerScanLine;              // 320 or 640
@@ -261,17 +281,18 @@ public class SHRPictureFile1 extends HiResImage
     DirEntry[] scanLineDirectory;       // [numScanLines]
     byte[][] packedScanLines;
 
+    int scbMode;
+    int unpackedSize[];
+
     public Main (String kind, byte[] data)
     {
       super (kind, data);
 
       int ptr = 5 + kind.length ();
       masterMode = HexFormatter.unsignedShort (data, ptr);
+      scbMode = masterMode & 0x80;
       pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
       numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
-
-      //      System.out.printf ("mm %02X, pix %d%n", masterMode, pixelsPerScanLine);
-      //      System.out.printf ("color tables: %d%n", numColorTables);
 
       ptr += 6;
       colorTables = new ColorTable[numColorTables];
@@ -285,6 +306,7 @@ public class SHRPictureFile1 extends HiResImage
       ptr += 2;
 
       scanLineDirectory = new DirEntry[numScanLines];
+      unpackedSize = new int[numScanLines];
       packedScanLines = new byte[numScanLines][];
 
       for (int i = 0; i < numScanLines; i++)
@@ -299,13 +321,19 @@ public class SHRPictureFile1 extends HiResImage
       {
         int len = scanLineDirectory[i].numBytes;
         if (ptr + len > data.length)
+        {
+          System.out.println ("breaking early");
           break;
+        }
 
         System.arraycopy (data, ptr, packedScanLines[i], 0, len);
         ptr += len;
       }
 
-      int width = pixelsPerScanLine == 320 ? 160 : pixelsPerScanLine / 4;
+      //      int width = pixelsPerScanLine == 320 ? 160 : (pixelsPerScanLine - 1) / 4 + 1;
+      //      int width = pixelsPerScanLine == 320 ? 160 : pixelsPerScanLine / 4;
+      //      int width = scbMode == 0 ? pixelsPerScanLine / 2 : pixelsPerScanLine / 4;
+      int width = 320;
       byte[] unpackedBuffer = new byte[numScanLines * width];
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
@@ -316,7 +344,10 @@ public class SHRPictureFile1 extends HiResImage
           break;
         }
 
+        int oldPtr = ptr;
         ptr = unpackLine (packedScanLines[line], unpackedBuffer, ptr);
+        //        System.out.printf ("%3d  %5d  %5d  %3d%n", line, oldPtr, ptr, ptr - oldPtr);
+        unpackedSize[line] = ptr - oldPtr;
 
         // something strange happening here
         if (line == 102 && name.equals ("DRAGON.SHR"))

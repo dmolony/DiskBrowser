@@ -323,7 +323,7 @@ public abstract class HiResImage extends AbstractFile
     int ptr = 0;
     while (ptr < buffer.length)
     {
-      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
       if (ptr >= buffer.length)       // needed for NAGELxx
@@ -373,7 +373,7 @@ public abstract class HiResImage extends AbstractFile
     int size = 0;
     while (ptr < buffer.length)
     {
-      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
       if (type == 0)

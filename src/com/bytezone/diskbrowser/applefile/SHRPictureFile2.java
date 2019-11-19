@@ -12,6 +12,7 @@ public class SHRPictureFile2 extends HiResImage
 {
   ColorTable[] colorTables;
   byte[] controlBytes;
+  int rows = 200;           // may change
 
   // see Graphics & Animation.2mg
 
@@ -47,19 +48,20 @@ public class SHRPictureFile2 extends HiResImage
     {
       case 0:                               // packed Paintworks SHR
       case 0x8000:                          // Paintworks Gold
-        controlBytes = new byte[200];       // all pointing to 0th color table
         colorTables = new ColorTable[1];
         colorTables[0] = new ColorTable (0, this.buffer, 0);
 
         byte[] data = new byte[buffer.length - 0x222];
         System.arraycopy (buffer, 0x0222, data, 0, data.length);
-        this.buffer = unpack (data);
+        buffer = unpack (data);
+        rows = buffer.length / 160;
+        controlBytes = new byte[rows];    // all pointing to 0th color table
 
         break;
 
       case 1:                             // packed version of PIC/$00
-        this.buffer = unpack (buffer);
-        controlBytes = new byte[200];
+        buffer = unpack (buffer);
+        controlBytes = new byte[rows];
         System.arraycopy (this.buffer, 32000, controlBytes, 0, controlBytes.length);
 
         colorTables = new ColorTable[16];
@@ -109,7 +111,7 @@ public class SHRPictureFile2 extends HiResImage
         break;
 
       case 4096:                          // seems to be a PIC/$00
-        controlBytes = new byte[200];
+        controlBytes = new byte[rows];
         System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 
         colorTables = new ColorTable[16];
@@ -138,7 +140,7 @@ public class SHRPictureFile2 extends HiResImage
         // 32200 - 32255  empty
         // 32256 - 32767  16 color tables of 32 bytes each
 
-        controlBytes = new byte[200];
+        controlBytes = new byte[rows];
         System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 
         colorTables = new ColorTable[16];
@@ -192,7 +194,7 @@ public class SHRPictureFile2 extends HiResImage
   void createColourImage ()
   // ---------------------------------------------------------------------------------//
   {
-    image = new BufferedImage (640, 400, BufferedImage.TYPE_INT_RGB);
+    image = new BufferedImage (640, rows * 2, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
     int element1 = 0;         // first line
@@ -203,7 +205,7 @@ public class SHRPictureFile2 extends HiResImage
     boolean fillMode = false;
     ColorTable colorTable = null;
 
-    for (int line = 0; line < 200; line++)
+    for (int line = 0; line < rows; line++)
     {
       if (controlBytes != null)
       {
@@ -216,7 +218,7 @@ public class SHRPictureFile2 extends HiResImage
       else
         colorTable = colorTables[line];
 
-      if (mode320)       // mode320
+      if (mode320)
       {
         for (int col = 0; col < 160; col++)       // two pixels per col
         {
@@ -289,7 +291,11 @@ public class SHRPictureFile2 extends HiResImage
       for (int i = 0; i < controlBytes.length; i += 8)
       {
         for (int j = 0; j < 8; j++)
+        {
+          if (i + j >= controlBytes.length)
+            break;
           text.append (String.format ("  %3d:  %02X  ", i + j, controlBytes[i + j]));
+        }
         text.append ("\n");
       }
       text.append ("\n");

@@ -104,7 +104,7 @@ public class SHRPictureFile1 extends HiResImage
   void createColourImage ()
   // ---------------------------------------------------------------------------------//
   {
-    int width = mainBlock.unpackedSize[0] * (mainBlock.scbMode == 0 ? 4 : 8);
+    int width = mainBlock.masterMode == 0x80 ? 640 : mainBlock.unpackedSize[0] * 4;
     image =
         new BufferedImage (width, mainBlock.numScanLines * 2, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
@@ -129,35 +129,8 @@ public class SHRPictureFile1 extends HiResImage
       //      if (fillMode)
       //        System.out.println ("fillmode " + fillMode);
 
-      // 320 mode
-      if (mainBlock.scbMode == 0)
-      {
-        int max = mainBlock.unpackedSize[line];
-        for (int i = 0; i < max; i++)       // two pixels per col
-        {
-          int left = (buffer[ptr] & 0xF0) >> 4;
-          int right = buffer[ptr++] & 0x0F;
-
-          // get left/right colors
-          int rgbLeft = colorTable.entries[left].color.getRGB ();
-          int rgbRight = colorTable.entries[right].color.getRGB ();
-
-          // draw left/right pixels on current line
-          dataBuffer.setElem (element1++, rgbLeft);
-          dataBuffer.setElem (element1++, rgbLeft);
-          dataBuffer.setElem (element1++, rgbRight);
-          dataBuffer.setElem (element1++, rgbRight);
-
-          // draw same left/right pixels on next line
-          dataBuffer.setElem (element2++, rgbLeft);
-          dataBuffer.setElem (element2++, rgbLeft);
-          dataBuffer.setElem (element2++, rgbRight);
-          dataBuffer.setElem (element2++, rgbRight);
-        }
-        element1 += width;        // skip line already drawn
-        element2 += width;        // one line ahead
-      }
-      else
+      // 640 mode
+      if (mainBlock.masterMode == 0x80)
       {
         int max = mainBlock.unpackedSize[line];
         for (int i = 0; i < max; i++)       // four pixels per col
@@ -184,6 +157,33 @@ public class SHRPictureFile1 extends HiResImage
           dataBuffer.setElem (element2++, rgb2);
           dataBuffer.setElem (element2++, rgb3);
           dataBuffer.setElem (element2++, rgb4);
+        }
+        element1 += width;        // skip line already drawn
+        element2 += width;        // one line ahead
+      }
+      else
+      {
+        int max = mainBlock.unpackedSize[line];
+        for (int i = 0; i < max; i++)       // two pixels per col
+        {
+          int left = (buffer[ptr] & 0xF0) >> 4;
+          int right = buffer[ptr++] & 0x0F;
+
+          // get left/right colors
+          int rgbLeft = colorTable.entries[left].color.getRGB ();
+          int rgbRight = colorTable.entries[right].color.getRGB ();
+
+          // draw left/right pixels on current line
+          dataBuffer.setElem (element1++, rgbLeft);
+          dataBuffer.setElem (element1++, rgbLeft);
+          dataBuffer.setElem (element1++, rgbRight);
+          dataBuffer.setElem (element1++, rgbRight);
+
+          // draw same left/right pixels on next line
+          dataBuffer.setElem (element2++, rgbLeft);
+          dataBuffer.setElem (element2++, rgbLeft);
+          dataBuffer.setElem (element2++, rgbRight);
+          dataBuffer.setElem (element2++, rgbRight);
         }
         element1 += width;        // skip line already drawn
         element2 += width;        // one line ahead
@@ -327,9 +327,6 @@ public class SHRPictureFile1 extends HiResImage
         ptr += len;
       }
 
-      //      int width = pixelsPerScanLine == 320 ? 160 : (pixelsPerScanLine - 1) / 4 + 1;
-      //      int width = pixelsPerScanLine == 320 ? 160 : pixelsPerScanLine / 4;
-      //      int width = scbMode == 0 ? pixelsPerScanLine / 2 : pixelsPerScanLine / 4;
       int width = 320;
       byte[] unpackedBuffer = new byte[numScanLines * width];
       ptr = 0;

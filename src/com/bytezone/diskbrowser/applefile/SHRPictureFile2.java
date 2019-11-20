@@ -220,40 +220,13 @@ public class SHRPictureFile2 extends HiResImage
         colorTable = colorTables[line];
 
       if (mode320)       // two pixels per col
-      {
-        for (int i = 0; i < max; i++)
-        {
-          int left = (buffer[ptr] & 0xF0) >> 4;
-          int right = buffer[ptr++] & 0x0F;
-
-          // get left/right colors
-          int rgbLeft = colorTable.entries[left].color.getRGB ();
-          int rgbRight = colorTable.entries[right].color.getRGB ();
-
-          draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
-          element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
-        }
-      }
+        ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
       else              // four pixels per col
       {
-        for (int i = 0; i < max; i++)
-        {
-          int p1 = (buffer[ptr] & 0xC0) >> 6;
-          int p2 = (buffer[ptr] & 0x30) >> 4;
-          int p3 = (buffer[ptr] & 0x0C) >> 2;
-          int p4 = (buffer[ptr++] & 0x03);
-
-          // get pixel colors
-          int rgb1 = colorTable.entries[p1 + 8].color.getRGB ();
-          int rgb2 = colorTable.entries[p2 + 12].color.getRGB ();
-          int rgb3 = colorTable.entries[p3].color.getRGB ();
-          int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
-
-          draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);
-          element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);
-        }
+        System.out.println ("here 640");
+        ptr = mode640Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
       }
-      element += imageWidth;        // skip line already drawn
+      element += imageWidth * 2;        // skip line already drawn
     }
   }
 

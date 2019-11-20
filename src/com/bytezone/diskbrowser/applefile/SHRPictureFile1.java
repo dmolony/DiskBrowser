@@ -27,8 +27,11 @@ public class SHRPictureFile1 extends HiResImage
     while (ptr < buffer.length)
     {
       int len = HexFormatter.unsignedLong (buffer, ptr);
-      if (len == 0)
+      if (len == 0 || len > buffer.length)
+      {
+        System.out.printf ("Block length: %d%n", len);
         break;
+      }
 
       String kind = HexFormatter.getPascalString (buffer, ptr + 4);
       byte[] data = new byte[Math.min (len, buffer.length - ptr)];
@@ -104,14 +107,16 @@ public class SHRPictureFile1 extends HiResImage
   void createColourImage ()
   // ---------------------------------------------------------------------------------//
   {
-    int width = mainBlock.masterMode == 0x80 ? 640 : mainBlock.unpackedSize[0] * 4;
-    image =
-        new BufferedImage (width, mainBlock.numScanLines * 2, BufferedImage.TYPE_INT_RGB);
+    if (mainBlock == null)
+      return;
+
+    int imageWidth = mainBlock.masterMode == 0x80 ? 640 : mainBlock.unpackedSize[0] * 4;
+    image = new BufferedImage (imageWidth, mainBlock.numScanLines * 2,
+        BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
-    int element1 = 0;         // first line
-    int element2 = width;     // second line
-    int ptr = 0;              // index into buffer
+    int element = 0;
+    int ptr = 0;
 
     for (int line = 0; line < mainBlock.numScanLines; line++)
     {
@@ -125,48 +130,15 @@ public class SHRPictureFile1 extends HiResImage
       ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[line]
           : mainBlock.colorTables[lo & 0x0F];
 
-      //      boolean fillMode = (lo & 0x20) != 0;
-      //      if (fillMode)
-      //        System.out.println ("fillmode " + fillMode);
       boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
       int max = mainBlock.unpackedSize[line];
 
       if (mode320)       // two pixels per col
-      {
-        for (int i = 0; i < max; i++)
-        {
-          int left = (buffer[ptr] & 0xF0) >> 4;
-          int right = buffer[ptr++] & 0x0F;
-
-          // get left/right colors
-          int rgbLeft = colorTable.entries[left].color.getRGB ();
-          int rgbRight = colorTable.entries[right].color.getRGB ();
-
-          element1 = draw (dataBuffer, element1, rgbLeft, rgbLeft, rgbRight, rgbRight);
-          element2 = draw (dataBuffer, element2, rgbLeft, rgbLeft, rgbRight, rgbRight);
-        }
-      }
+        ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
       else              // four pixels per col
-      {
-        for (int i = 0; i < max; i++)
-        {
-          int p1 = (buffer[ptr] & 0xC0) >> 6;
-          int p2 = (buffer[ptr] & 0x30) >> 4;
-          int p3 = (buffer[ptr] & 0x0C) >> 2;
-          int p4 = (buffer[ptr++] & 0x03);
+        ptr = mode640Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
 
-          // get pixel colors
-          int rgb1 = colorTable.entries[p1 + 8].color.getRGB ();
-          int rgb2 = colorTable.entries[p2 + 12].color.getRGB ();
-          int rgb3 = colorTable.entries[p3].color.getRGB ();
-          int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
-
-          element1 = draw (dataBuffer, element1, rgb1, rgb2, rgb3, rgb4);
-          element2 = draw (dataBuffer, element2, rgb1, rgb2, rgb3, rgb4);
-        }
-      }
-      element1 += width;        // skip line already drawn
-      element2 += width;        // one line ahead
+      element += imageWidth * 2;
     }
   }
 

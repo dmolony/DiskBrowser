@@ -256,6 +256,50 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
+  int mode320Line (int ptr, int element, int max, ColorTable colorTable,
+      DataBuffer dataBuffer, int imageWidth)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = 0; i < max; i++)
+    {
+      int left = (buffer[ptr] & 0xF0) >> 4;
+      int right = buffer[ptr++] & 0x0F;
+
+      // get left/right colors
+      int rgbLeft = colorTable.entries[left].color.getRGB ();
+      int rgbRight = colorTable.entries[right].color.getRGB ();
+
+      draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
+      element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
+    }
+    return ptr;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int mode640Line (int ptr, int element, int max, ColorTable colorTable,
+      DataBuffer dataBuffer, int imageWidth)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = 0; i < max; i++)
+    {
+      int p1 = (buffer[ptr] & 0xC0) >> 6;
+      int p2 = (buffer[ptr] & 0x30) >> 4;
+      int p3 = (buffer[ptr] & 0x0C) >> 2;
+      int p4 = (buffer[ptr++] & 0x03);
+
+      // get pixel colors
+      int rgb1 = colorTable.entries[p1 + 8].color.getRGB ();
+      int rgb2 = colorTable.entries[p2 + 12].color.getRGB ();
+      int rgb3 = colorTable.entries[p3].color.getRGB ();
+      int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
+
+      draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);
+      element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);
+    }
+    return ptr;
+  }
+
+  // ---------------------------------------------------------------------------------//
   int draw (DataBuffer dataBuffer, int element, int... rgb1)
   // ---------------------------------------------------------------------------------//
   {

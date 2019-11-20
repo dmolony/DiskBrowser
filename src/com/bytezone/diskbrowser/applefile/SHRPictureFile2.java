@@ -194,16 +194,17 @@ public class SHRPictureFile2 extends HiResImage
   void createColourImage ()
   // ---------------------------------------------------------------------------------//
   {
-    image = new BufferedImage (640, rows * 2, BufferedImage.TYPE_INT_RGB);
+    int imageWidth = 640;
+    image = new BufferedImage (imageWidth, rows * 2, BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
 
-    int element1 = 0;         // first line
-    int element2 = 640;       // second line
+    int element = 0;
     int ptr = 0;
 
     boolean mode320 = true;
     boolean fillMode = false;
     ColorTable colorTable = null;
+    int max = 160;
 
     for (int line = 0; line < rows; line++)
     {
@@ -220,7 +221,7 @@ public class SHRPictureFile2 extends HiResImage
 
       if (mode320)       // two pixels per col
       {
-        for (int col = 0; col < 160; col++)
+        for (int i = 0; i < max; i++)
         {
           int left = (buffer[ptr] & 0xF0) >> 4;
           int right = buffer[ptr++] & 0x0F;
@@ -229,13 +230,13 @@ public class SHRPictureFile2 extends HiResImage
           int rgbLeft = colorTable.entries[left].color.getRGB ();
           int rgbRight = colorTable.entries[right].color.getRGB ();
 
-          element1 = draw (dataBuffer, element1, rgbLeft, rgbLeft, rgbRight, rgbRight);
-          element2 = draw (dataBuffer, element2, rgbLeft, rgbLeft, rgbRight, rgbRight);
+          draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
+          element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
         }
       }
       else              // four pixels per col
       {
-        for (int col = 0; col < 160; col++)
+        for (int i = 0; i < max; i++)
         {
           int p1 = (buffer[ptr] & 0xC0) >> 6;
           int p2 = (buffer[ptr] & 0x30) >> 4;
@@ -248,12 +249,11 @@ public class SHRPictureFile2 extends HiResImage
           int rgb3 = colorTable.entries[p3].color.getRGB ();
           int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
 
-          element1 = draw (dataBuffer, element1, rgb1, rgb2, rgb3, rgb4);
-          element2 = draw (dataBuffer, element2, rgb1, rgb2, rgb3, rgb4);
+          draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);
+          element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);
         }
       }
-      element1 += 640;        // skip line already drawn
-      element2 += 640;        // one line ahead
+      element += imageWidth;        // skip line already drawn
     }
   }
 

@@ -110,7 +110,7 @@ public class SHRPictureFile2 extends HiResImage
 
         break;
 
-      case 4096:                          // seems to be a PIC/$00
+      case 0x1000:                        // seems to be a PIC/$00
         controlBytes = new byte[rows];
         System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 
@@ -133,8 +133,9 @@ public class SHRPictureFile2 extends HiResImage
     switch (auxType)
     {
       case 0:                             // unpacked version of PNT/$01
-      case 0x4100:                        // no idea what this is
       case 0x2000:                        // see TotalReplay.2mg
+      case 0x4100:                        // no idea what this is
+      case 0x4950:
         // 00000 - 31999  pixel data 32,000 bytes
         // 32000 - 32199  200 control bytes (one per scan line)
         // 32200 - 32255  empty
@@ -144,12 +145,9 @@ public class SHRPictureFile2 extends HiResImage
         System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 
         colorTables = new ColorTable[16];
-        int ptr = 32256;
         for (int i = 0; i < colorTables.length; i++)
-        {
-          colorTables[i] = new ColorTable (i, buffer, ptr);
-          ptr += 32;
-        }
+          colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
+
         break;
 
       case 1:                             // unpacked version of PNT/$03
@@ -167,12 +165,10 @@ public class SHRPictureFile2 extends HiResImage
           return;
         }
         colorTables = new ColorTable[200];
-        ptr = 32000;
         for (int i = 0; i < colorTables.length; i++)
         {
-          colorTables[i] = new ColorTable (i, buffer, ptr);
+          colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
           colorTables[i].reverse ();
-          ptr += 32;
         }
         break;
 

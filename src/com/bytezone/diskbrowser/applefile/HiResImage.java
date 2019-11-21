@@ -11,49 +11,60 @@ import javax.imageio.ImageIO;
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public abstract class HiResImage extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
-  //  File Type   Aux     Name
-  //   $06 BIN                 isGif()               - OriginalHiResImage
-  //   $06 BIN                 isPng()               - OriginalHiResImage
-  //   $06 BIN          .BMP   isBmp()               - OriginalHiResImage
-  //   $06 BIN          .AUX                         - DoubleHiResImage
-  //   $06 BIN          .PAC                         - DoubleHiResImage
-  //   $06 BIN          .A2FC                        - DoubleHiResImage
-  //   $06 BIN   $2000  eof $4000                    - DoubleHiResImage
-  //   $06 BIN   $1FFF  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
-  //   $06 BIN   $2000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage
-  //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000  - OriginalHiResImage   (?)
-  //   $06 BIN   $4000  eof $4000                    - DoubleHiResImage     (?)
-  //   $06 BIN          .3200                        - SHRPictureFile2
-  //   $06 BIN          .3201                        - SHRPictureFile2
+  static final String[] auxTypes =
+      { "Paintworks Packed SHR Image", "Packed Super Hi-Res Image",
+        "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
+        "Packed Super Hi-Res 3200 color image" };
 
-  //   $08 FOT  <$4000  Apple II Graphics File       -       ???
-  //   $08 FOT   $4000  Packed Hi-Res file           -       ???
-  //   $08 FOT   $4001  Packed Double Hi-Res file    -       ???
-  //   $08 FOT   $8066  Fadden Hi-res                - FaddenHiResImage
-
-  // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res           - SHRPictureFile2
-  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image           - SHRPictureFile2
-  // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)     - SHRPictureFile
-  //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File       - SHRPictureFile2 *
-  // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks) .3201  - SHRPictureFile2
+  //  ---- ---- ------  --------------------------------------  ------------------------
+  //  File Type  Aux    Name                                    Description
+  //  ---- ---- ------  --------------------------------------  ------------------------
+  //   $06 BIN                 isGif()                          OriginalHiResImage
+  //   $06 BIN                 isPng()                          OriginalHiResImage
+  //   $06 BIN          .BMP   isBmp()                          OriginalHiResImage
+  //   $06 BIN          .AUX                                    DoubleHiResImage
+  //   $06 BIN          .PAC                                    DoubleHiResImage
+  //   $06 BIN          .A2FC                                   DoubleHiResImage
+  //   $06 BIN   $2000  eof $4000                               DoubleHiResImage
+  //   $06 BIN   $1FFF  eof $1FF8/$1FFF/$2000/$4000             OriginalHiResImage
+  //   $06 BIN   $2000  eof $1FF8/$1FFF/$2000/$4000             OriginalHiResImage
+  //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000             OriginalHiResImage (?)
+  //   $06 BIN   $4000  eof $4000                               DoubleHiResImage   (?)
+  //   $06 BIN          .3200                                   SHRPictureFile2
+  //   $06 BIN          .3201                                   SHRPictureFile2 packed
+  //  ---- ---- ------  --------------------------------------  ------------------------
+  //   $08 FOT  <$4000  Apple II Graphics File                        ???
+  //   $08 FOT   $4000  Packed Hi-Res file                            ???
+  //   $08 FOT   $4001  Packed Double Hi-Res file                     ???
+  //   $08 FOT   $8066  Fadden Hi-res                           FaddenHiResImage
+  //  ---- ---- ------  --------------------------------------  ------------------------
+  // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res          SHRPictureFile2
+  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image          SHRPictureFile2
+  // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)    SHRPictureFile1
+  //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File      SHRPictureFile2 *
+  // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks)       SHRPictureFile2 .3201
   //   $C0 PNT   $1000
   //   $C0 PNT   $8000  Drawplus? Paintworks Gold?
   //   $C0 PNT   $8001  GTv background picture
   //   $C0 PNT   $8005  DreamGraphix document
   //   $C0 PNT   $8006  GIF
-
-  // * $C1 PIC   $0000  IIGS Super Hi-Res Image                  - SHRPictureFile2
-  //   $C1 PIC   $0001  IIGS QuickDraw II PICT File              - SHRPictureFile2 *
-  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks) .3200         - SHRPictureFile2
+  //  ---- ---- ------  --------------------------------------  ------------------------
+  // * $C1 PIC   $0000  IIGS Super Hi-Res Image                 SHRPictureFile2
+  //   $C1 PIC   $0001  IIGS QuickDraw II PICT File             SHRPictureFile2 *
+  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks)              SHRPictureFile2 .3200
   //   $C1 PIC   $2000  ?
+  //   $C1 PIC   $4950  ?
   //   $C1 PIC   $8001  Allison raw image
   //   $C1 PIC   $8002  Thunderscan
   //   $C1 PIC   $8003  DreamGraphix
-
+  //  ---- ---- ------  --------------------------------------  ------------------------
   //   $C2 ANI          Paintworks animation
   //   $C3 PAL          Paintworks palette
+  //  ---- ---- ------  --------------------------------------  ------------------------
 
   static PaletteFactory paletteFactory = new PaletteFactory ();
 
@@ -70,17 +81,23 @@ public abstract class HiResImage extends AbstractFile
   int paletteIndex;
   String failureReason = "";
 
+  // ---------------------------------------------------------------------------------//
   public HiResImage (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   public HiResImage (String name, byte[] buffer, int loadAddress)
+  // ---------------------------------------------------------------------------------//
   {
     this (name, buffer, loadAddress, false);
   }
 
+  // ---------------------------------------------------------------------------------//
   public HiResImage (String name, byte[] buffer, int loadAddress, boolean scrunched)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -90,7 +107,9 @@ public abstract class HiResImage extends AbstractFile
       this.buffer = unscrunch (buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   public HiResImage (String name, byte[] buffer, int fileType, int auxType, int eof)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -99,7 +118,9 @@ public abstract class HiResImage extends AbstractFile
     this.eof = eof;
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void createImage ()
+  // ---------------------------------------------------------------------------------//
   {
     if (failureReason.isEmpty ())
       if (isGif (buffer) || isPng (buffer) || isBmp (buffer) || isTiff (buffer))
@@ -110,23 +131,33 @@ public abstract class HiResImage extends AbstractFile
         createColourImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   abstract void createMonochromeImage ();
+  // ---------------------------------------------------------------------------------//
 
+  // ---------------------------------------------------------------------------------//
   abstract void createColourImage ();
+  // ---------------------------------------------------------------------------------//
 
+  // ---------------------------------------------------------------------------------//
   public void checkPalette ()
+  // ---------------------------------------------------------------------------------//
   {
     if (!monochrome && paletteIndex != paletteFactory.getCurrentPaletteIndex ())
       createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setPalette ()
+  // ---------------------------------------------------------------------------------//
   {
     if (!monochrome)
       createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setColourQuirks (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     if (colourQuirks == value)
       return;
@@ -137,7 +168,9 @@ public abstract class HiResImage extends AbstractFile
       createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setMonochrome (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     if (monochrome == value)
       return;
@@ -146,12 +179,16 @@ public abstract class HiResImage extends AbstractFile
     createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static void setDefaultColourQuirks (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     colourQuirks = value;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static void setDefaultMonochrome (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     monochrome = value;
   }
@@ -175,8 +212,10 @@ public abstract class HiResImage extends AbstractFile
 
   // also: https://groups.google.com/forum/#!topic/comp.sys.apple2/zYhZ5YdNNxQ
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     String auxText = "";
     StringBuilder text = new StringBuilder ();
@@ -203,26 +242,7 @@ public abstract class HiResImage extends AbstractFile
         break;
 
       case ProdosConstants.FILE_TYPE_PNT:           // 0xC0
-        switch (auxType)
-        {
-          case 0:
-            auxText = "Paintworks Packed SHR Image";
-            break;
-          case 1:
-            auxText = "Packed Super Hi-Res Image";
-            break;
-          case 2:
-            auxText = "Super Hi-Res Image (Apple Preferred Format)";
-            break;
-          case 3:
-            auxText = "Packed QuickDraw II PICT File";
-            break;
-          case 4:
-            auxText = "Packed Super Hi-Res 3200 color image";
-            break;
-          default:
-            auxText = "Unknown aux: " + auxType;
-        }
+        auxText = auxType > 4 ? "Unknown aux: " + auxType : auxTypes[auxType];
         break;
 
       case ProdosConstants.FILE_TYPE_PIC:           // 0xC1
@@ -324,7 +344,9 @@ public abstract class HiResImage extends AbstractFile
   */
 
   // this should call unpackLine()
+  // ---------------------------------------------------------------------------------//
   byte[] unpack (byte[] buffer) throws ArrayIndexOutOfBoundsException
+  // ---------------------------------------------------------------------------------//
   {
     // routine found here - http://kpreid.livejournal.com/4319.html
 
@@ -371,7 +393,9 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // Super Hi-res IIGS (MAIN in $C0/02)
+  // ---------------------------------------------------------------------------------//
   int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] fourBuf = new byte[4];
 
@@ -422,7 +446,9 @@ public abstract class HiResImage extends AbstractFile
     return newPtr;
   }
 
+  // ---------------------------------------------------------------------------------//
   private int calculateBufferSize (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
     int size = 0;
@@ -456,7 +482,9 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // Beagle Bros routine to expand a hi-res screen
+  // ---------------------------------------------------------------------------------//
   private byte[] unscrunch (byte[] src)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] dst = new byte[0x2000];
     int p1 = 0;
@@ -478,7 +506,9 @@ public abstract class HiResImage extends AbstractFile
     return dst;
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void makeImage ()
+  // ---------------------------------------------------------------------------------//
   {
     try
     {
@@ -497,7 +527,9 @@ public abstract class HiResImage extends AbstractFile
 
   // http://commandlinefanatic.com/cgi-bin/showarticle.cgi?article=art011
   // https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+  // ---------------------------------------------------------------------------------//
   public static boolean isGif (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < 6)
       return false;
@@ -506,7 +538,9 @@ public abstract class HiResImage extends AbstractFile
     return text.equals ("GIF89a") || text.equals ("GIF87a");
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isPng (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < pngHeader.length)
       return false;
@@ -518,7 +552,9 @@ public abstract class HiResImage extends AbstractFile
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isTiff (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < 3)
       return false;
@@ -531,7 +567,9 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // http://www.daubnet.com/en/file-format-bmp
+  // ---------------------------------------------------------------------------------//
   public static boolean isBmp (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < 26)
       return false;
@@ -559,7 +597,9 @@ public abstract class HiResImage extends AbstractFile
     return text.equals ("BM") && size <= buffer.length;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isAPP (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < 4)
       return false;
@@ -567,22 +607,30 @@ public abstract class HiResImage extends AbstractFile
         && buffer[2] == (byte) 0xD0 && buffer[3] == 0;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static PaletteFactory getPaletteFactory ()
+  // ---------------------------------------------------------------------------------//
   {
     return paletteFactory;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static List<Palette> getPalettes ()
+  // ---------------------------------------------------------------------------------//
   {
     return paletteFactory.getPalettes ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class ColorTable
+  // ---------------------------------------------------------------------------------//
   {
     int id;
     ColorEntry[] entries = new ColorEntry[16];
 
+    // -------------------------------------------------------------------------------//
     public ColorTable ()
+    // -------------------------------------------------------------------------------//
     {
       // default empty table
       id = -1;
@@ -590,7 +638,9 @@ public abstract class HiResImage extends AbstractFile
         entries[i] = new ColorEntry ();
     }
 
+    // -------------------------------------------------------------------------------//
     public ColorTable (int id, byte[] data, int offset)
+    // -------------------------------------------------------------------------------//
     {
       this.id = id;
       for (int i = 0; i < 16; i++)
@@ -600,7 +650,9 @@ public abstract class HiResImage extends AbstractFile
       }
     }
 
+    // -------------------------------------------------------------------------------//
     String toLine ()
+    // -------------------------------------------------------------------------------//
     {
 
       StringBuilder text = new StringBuilder ();
@@ -612,7 +664,9 @@ public abstract class HiResImage extends AbstractFile
       return text.toString ();
     }
 
+    // -------------------------------------------------------------------------------//
     void reverse ()
+    // -------------------------------------------------------------------------------//
     {
       for (int i = 0; i < 8; i++)
       {
@@ -622,8 +676,10 @@ public abstract class HiResImage extends AbstractFile
       }
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       StringBuilder text = new StringBuilder ();
 
@@ -638,19 +694,25 @@ public abstract class HiResImage extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class ColorEntry
+  // ---------------------------------------------------------------------------------//
   {
     int value;          // 0RGB
     Color color;
 
+    // -------------------------------------------------------------------------------//
     public ColorEntry ()
+    // -------------------------------------------------------------------------------//
     {
       // default empty entry
       value = 0;
       color = new Color (0, 0, 0);
     }
 
+    // -------------------------------------------------------------------------------//
     public ColorEntry (byte[] data, int offset)
+    // -------------------------------------------------------------------------------//
     {
       value = HexFormatter.unsignedShort (data, offset);
 
@@ -661,26 +723,34 @@ public abstract class HiResImage extends AbstractFile
       color = new Color (red, green, blue);
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       return String.format ("ColorEntry: %04X", value);
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class DirEntry
+  // ---------------------------------------------------------------------------------//
   {
     int numBytes;
     int mode;
 
+    // -------------------------------------------------------------------------------//
     public DirEntry (byte[] data, int offset)
+    // -------------------------------------------------------------------------------//
     {
       numBytes = HexFormatter.unsignedShort (data, offset);
       mode = HexFormatter.unsignedShort (data, offset + 2);
     }
 
+    // -------------------------------------------------------------------------------//
     @Override
     public String toString ()
+    // -------------------------------------------------------------------------------//
     {
       return String.format ("Bytes: %5d, mode: %02X", numBytes, mode);
     }

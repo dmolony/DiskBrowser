@@ -64,6 +64,9 @@ public class SHRPictureFile1 extends HiResImage
         case "Platinum Paint":
         case "VSDV":
         case "VSMK":
+        case "Nseq":
+        case "816/Paint":
+        case "SHRConvert":
           blocks.add (new Block (kind, data));
           break;
 

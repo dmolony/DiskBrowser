@@ -72,7 +72,7 @@ public abstract class HiResImage extends AbstractFile
   // $06.3200                  1
   // $06.3201                  .
   // $C0 0000                  1
-  // $C0 0001    $C1 0000      .     1
+  // $C0 0001    $C1 0000      2     1
   // $C0 0002                  1
   // $C0 0003    $C1 0001      .     .
   // $C0 0004    $C1 0002      .     1
@@ -89,6 +89,7 @@ public abstract class HiResImage extends AbstractFile
   // $C1 8003                  .
 
   // 1 Graphics & Animation.2mg
+  // 2 0603 Katie's Farm - Disk 2.po
   //
 
   static PaletteFactory paletteFactory = new PaletteFactory ();
@@ -650,7 +651,7 @@ public abstract class HiResImage extends AbstractFile
   class ColorTable
   // ---------------------------------------------------------------------------------//
   {
-    int id;
+    private int id;
     ColorEntry[] entries = new ColorEntry[16];
 
     // -------------------------------------------------------------------------------//

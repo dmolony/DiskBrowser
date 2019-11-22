@@ -56,8 +56,9 @@ public abstract class HiResImage extends AbstractFile
   // * $C1 PIC   $0000  IIGS Super Hi-Res Image                 SHRPictureFile2
   //   $C1 PIC   $0001  IIGS QuickDraw II PICT File             SHRPictureFile2 *
   // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks)              SHRPictureFile2 .3200
-  //   $C1 PIC   $2000  ?
-  //   $C1 PIC   $4950  ?
+  //   $C1 PIC   $2000  = $C1/0000
+  //   $C1 PIC   $4100  = $C1/0000
+  //   $C1 PIC   $4950  = $C1/0000
   //   $C1 PIC   $8001  Allison raw image
   //   $C1 PIC   $8002  Thunderscan
   //   $C1 PIC   $8003  DreamGraphix
@@ -65,6 +66,29 @@ public abstract class HiResImage extends AbstractFile
   //   $C2 ANI          Paintworks animation
   //   $C3 PAL          Paintworks palette
   //  ---- ---- ------  --------------------------------------  ------------------------
+
+  // packed      unpacked
+  // $06.3200                  1
+  // $06.3201                  .
+  // $C0 0000                  1
+  // $C0 0001    $C1 0000      .     1
+  // $C0 0002                  1
+  // $C0 0003    $C1 0001      .     .
+  // $C0 0004    $C1 0002      .     1
+  // $C0 1000                  .
+  // $C0 8000                  .
+  // $C0 8001                  .
+  // $C0 8005                  .
+  // $C0 8006                  .
+  // $C1 2000                  .
+  // $C1 4100                  1
+  // $C1 4950                  .
+  // $C1 8001                  .
+  // $C1 8002                  .
+  // $C1 8003                  .
+
+  // 1 Graphics & Animation.2mg
+  //
 
   static PaletteFactory paletteFactory = new PaletteFactory ();
 

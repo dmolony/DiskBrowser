@@ -159,12 +159,13 @@ public class SHRPictureFile2 extends HiResImage
         // 00000 - 31999  pixel data 32,000 bytes
         // 32000 - 38399  200 color tables of 32 bytes each (one color table per scan line)
 
-        if (buffer.length < 38400)
+        if (buffer.length < 38400 && false)
         {
           failureReason = "Buffer should be 38,400 bytes";
           return;
         }
-        colorTables = new ColorTable[200];
+        int maxTables = (buffer.length - 3200) / 32;
+        colorTables = new ColorTable[maxTables];
         for (int i = 0; i < colorTables.length; i++)
         {
           colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);

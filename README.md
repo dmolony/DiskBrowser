@@ -17,6 +17,7 @@
 - CPM disks
 - Comprehensive disk listing
 - woz format disks
+- UniDos disks
 
 ### Documentation
 * [Usage](resources/usage.md)
@@ -25,7 +26,7 @@
 * Install the **latest** version of the [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JRE or JDK).
 * Download DiskBrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
 * Double-click the jar file, or enter 'java -jar DiskBrowser.jar' in the terminal.
-* Set your root folder (where you keep your disk images).
+* Set your root folder (the top-level folder where you keep your disk images).
 
 ### Example Screens
 #### Disk listing

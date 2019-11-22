@@ -66,7 +66,7 @@ public class SHRPictureFile2 extends HiResImage
 
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
-          colorTables[i] = new ColorTable (i, this.buffer, 32256 + i * 32);
+          colorTables[i] = new ColorTable (i, this.buffer, 32256 + i * COLOR_TABLE_SIZE);
 
         break;
 
@@ -100,7 +100,7 @@ public class SHRPictureFile2 extends HiResImage
         colorTables = new ColorTable[200];
         for (int i = 0; i < colorTables.length; i++)
         {
-          colorTables[i] = new ColorTable (i, this.buffer, 4 + i * 32);
+          colorTables[i] = new ColorTable (i, this.buffer, 4 + i * COLOR_TABLE_SIZE);
           colorTables[i].reverse ();
         }
 
@@ -116,7 +116,7 @@ public class SHRPictureFile2 extends HiResImage
 
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
-          colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
+          colorTables[i] = new ColorTable (i, buffer, 32256 + i * COLOR_TABLE_SIZE);
 
         break;
 
@@ -146,7 +146,7 @@ public class SHRPictureFile2 extends HiResImage
 
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
-          colorTables[i] = new ColorTable (i, buffer, 32256 + i * 32);
+          colorTables[i] = new ColorTable (i, buffer, 32256 + i * COLOR_TABLE_SIZE);
 
         break;
 
@@ -164,11 +164,11 @@ public class SHRPictureFile2 extends HiResImage
           failureReason = "Buffer should be 38,400 bytes";
           return;
         }
-        int maxTables = (buffer.length - 3200) / 32;
+        int maxTables = (buffer.length - 3200) / COLOR_TABLE_SIZE;
         colorTables = new ColorTable[maxTables];
         for (int i = 0; i < colorTables.length; i++)
         {
-          colorTables[i] = new ColorTable (i, buffer, 32000 + i * 32);
+          colorTables[i] = new ColorTable (i, buffer, 32000 + i * COLOR_TABLE_SIZE);
           colorTables[i].reverse ();
         }
         break;

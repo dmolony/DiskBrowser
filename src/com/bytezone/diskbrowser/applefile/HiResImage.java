@@ -19,6 +19,7 @@ public abstract class HiResImage extends AbstractFile
       { "Paintworks Packed SHR Image", "Packed Super Hi-Res Image",
         "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
         "Packed Super Hi-Res 3200 color image" };
+  static final int COLOR_TABLE_SIZE = 32;
 
   //  ---- ---- ------  --------------------------------------  ------------------------
   //  File Type  Aux    Name                                    Description

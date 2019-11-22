@@ -18,11 +18,6 @@ import com.bytezone.diskbrowser.duplicates.RootFolderData;
 public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
 // -----------------------------------------------------------------------------------//
 {
-  //  static long start;
-  //  static
-  //  {
-  //    start = System.currentTimeMillis ();
-  //  }
   private static String[] args;
   private static final String windowTitle = "Apple ][ Disk Browser";
   private final Preferences prefs = Preferences.userNodeForPackage (this.getClass ());

@@ -5,3 +5,4 @@ resources/buildNumber
 /bin/
 .project
 .classpath
+build.xml

@@ -111,6 +111,11 @@ public class SHRPictureFile2 extends HiResImage
         break;
 
       case 0x1000:                        // seems to be a PIC/$00
+        if (buffer.length < 32768)
+        {
+          failureReason = "file size not 32,768";
+          break;
+        }
         controlBytes = new byte[rows];
         System.arraycopy (buffer, 32000, controlBytes, 0, controlBytes.length);
 

@@ -308,6 +308,7 @@ public abstract class HiResImage extends AbstractFile
   {
     for (int i = 0; i < max; i++)
     {
+      // get two pixels from this byte
       int left = (buffer[ptr] & 0xF0) >> 4;
       int right = buffer[ptr++] & 0x0F;
 
@@ -315,6 +316,7 @@ public abstract class HiResImage extends AbstractFile
       int rgbLeft = colorTable.entries[left].color.getRGB ();
       int rgbRight = colorTable.entries[right].color.getRGB ();
 
+      // draw pixels on two lines
       draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
       element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
     }
@@ -328,6 +330,7 @@ public abstract class HiResImage extends AbstractFile
   {
     for (int i = 0; i < max; i++)
     {
+      // get four pixels from this byte
       int p1 = (buffer[ptr] & 0xC0) >> 6;
       int p2 = (buffer[ptr] & 0x30) >> 4;
       int p3 = (buffer[ptr] & 0x0C) >> 2;
@@ -339,6 +342,7 @@ public abstract class HiResImage extends AbstractFile
       int rgb3 = colorTable.entries[p3].color.getRGB ();
       int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
 
+      // draw pixels on two lines
       draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);
       element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);
     }

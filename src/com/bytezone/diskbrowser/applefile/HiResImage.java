@@ -311,7 +311,7 @@ public abstract class HiResImage extends AbstractFile
       int left = (buffer[ptr] & 0xF0) >> 4;
       int right = buffer[ptr++] & 0x0F;
 
-      // get left/right colors
+      // get pixel colors
       int rgbLeft = colorTable.entries[left].color.getRGB ();
       int rgbRight = colorTable.entries[right].color.getRGB ();
 

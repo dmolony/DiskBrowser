@@ -343,8 +343,8 @@ public abstract class HiResImage extends AbstractFile
       int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
 
       // draw pixels on two lines
-      draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);
-      element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);
+      draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);    // 2nd line
+      element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);       // 1st line
     }
     return ptr;
   }

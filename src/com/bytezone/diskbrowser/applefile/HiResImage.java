@@ -71,6 +71,10 @@ public abstract class HiResImage extends AbstractFile
   // packed      unpacked
   // $06.3200                  1
   // $06.3201                  .
+  // $08 0000                  .
+  // $08 4000                  .
+  // $08 4001                  .
+  // $08 8066                  .
   // $C0 0000                  1
   // $C0 0001    $C1 0000      2     1
   // $C0 0002                  1
@@ -148,13 +152,15 @@ public abstract class HiResImage extends AbstractFile
   protected void createImage ()
   // ---------------------------------------------------------------------------------//
   {
-    if (failureReason.isEmpty ())
-      if (isGif (buffer) || isPng (buffer) || isBmp (buffer) || isTiff (buffer))
-        makeImage ();
-      else if (monochrome)
-        createMonochromeImage ();
-      else
-        createColourImage ();
+    if (!failureReason.isEmpty ())
+      return;
+
+    if (isGif (buffer) || isPng (buffer) || isBmp (buffer) || isTiff (buffer))
+      makeImage ();
+    else if (monochrome)
+      createMonochromeImage ();
+    else
+      createColourImage ();
   }
 
   // ---------------------------------------------------------------------------------//

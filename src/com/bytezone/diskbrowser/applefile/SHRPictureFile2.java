@@ -139,6 +139,8 @@ public class SHRPictureFile2 extends HiResImage
     {
       case 0:                             // unpacked version of PNT/$01
       case 0x2000:                        // see TotalReplay.2mg
+      case 0x0042:
+      case 0x0043:
       case 0x4100:                        // no idea what this is
       case 0x4950:
         // 00000 - 31999  pixel data 32,000 bytes
@@ -189,6 +191,7 @@ public class SHRPictureFile2 extends HiResImage
   void createMonochromeImage ()
   // ---------------------------------------------------------------------------------//
   {
+    System.out.println ("monochrome not written");
   }
 
   // ---------------------------------------------------------------------------------//
@@ -224,10 +227,8 @@ public class SHRPictureFile2 extends HiResImage
       if (mode320)       // two pixels per col
         ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
       else              // four pixels per col
-      {
-        System.out.println ("here 640");
         ptr = mode640Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
-      }
+
       element += imageWidth * 2;        // skip line already drawn
     }
   }
@@ -238,7 +239,7 @@ public class SHRPictureFile2 extends HiResImage
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (super.getText ());
-    text.append ("\n");
+    text.append ("\n\n");
 
     if (controlBytes != null)
     {

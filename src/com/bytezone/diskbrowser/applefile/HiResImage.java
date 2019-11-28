@@ -20,6 +20,7 @@ public abstract class HiResImage extends AbstractFile
         "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
         "Packed Super Hi-Res 3200 color image" };
   static final int COLOR_TABLE_SIZE = 32;
+  public static final int FADDEN_AUX = 0x8066;
 
   //  ---- ---- ------  --------------------------------------  ------------------------
   //  File Type  Aux    Name                                    Description
@@ -74,7 +75,7 @@ public abstract class HiResImage extends AbstractFile
   // $08 0000                  .
   // $08 4000                  .
   // $08 4001                  .
-  // $08 8066                  .
+  // $08 8066                  3
   // $C0 0000                  1
   // $C0 0001    $C1 0000      2     1
   // $C0 0002                  1
@@ -85,6 +86,8 @@ public abstract class HiResImage extends AbstractFile
   // $C0 8001                  .
   // $C0 8005                  .
   // $C0 8006                  .
+  // $C1 0042                  4
+  // $C1 0043                  4
   // $C1 2000                  .
   // $C1 4100                  1
   // $C1 4950                  .
@@ -94,6 +97,8 @@ public abstract class HiResImage extends AbstractFile
 
   // 1 Graphics & Animation.2mg
   // 2 0603 Katie's Farm - Disk 2.po
+  // 3 CompressedSlides.do
+  // 4 System Addons.hdv
   //
 
   static PaletteFactory paletteFactory = new PaletteFactory ();
@@ -267,7 +272,7 @@ public abstract class HiResImage extends AbstractFile
           auxText = "Packed Hi-Res File";
         else if (auxType == 0x4001)
           auxText = "Packed Double Hi-Res File";
-        else if (auxType == 0x8066)
+        else if (auxType == FADDEN_AUX)
           auxText = "Fadden Hi-Res File";
         else
           auxText = "Unknown aux: " + auxType;
@@ -282,6 +287,8 @@ public abstract class HiResImage extends AbstractFile
         {
           case 0:
           case 0x2000:
+          case 0x0042:
+          case 0x0043:
             auxText = "Super Hi-res Screen Image";
             break;
           case 1:
@@ -639,6 +646,7 @@ public abstract class HiResImage extends AbstractFile
   {
     if (buffer.length < 4)
       return false;
+
     return buffer[0] == (byte) 0xC1 && buffer[1] == (byte) 0xD0
         && buffer[2] == (byte) 0xD0 && buffer[3] == 0;
   }

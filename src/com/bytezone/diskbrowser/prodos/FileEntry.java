@@ -4,7 +4,32 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
+import com.bytezone.diskbrowser.applefile.AssemblerProgram;
+import com.bytezone.diskbrowser.applefile.BasicProgramGS;
+import com.bytezone.diskbrowser.applefile.CharacterRom;
+import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
+import com.bytezone.diskbrowser.applefile.DeviceDriver;
+import com.bytezone.diskbrowser.applefile.DoubleHiResImage;
+import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
+import com.bytezone.diskbrowser.applefile.FaddenHiResImage;
+import com.bytezone.diskbrowser.applefile.FileSystemTranslator;
+import com.bytezone.diskbrowser.applefile.FileTypeDescriptorTable;
+import com.bytezone.diskbrowser.applefile.FontFile;
+import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.IconFile;
+import com.bytezone.diskbrowser.applefile.IntegerBasicProgram;
+import com.bytezone.diskbrowser.applefile.LodeRunner;
+import com.bytezone.diskbrowser.applefile.MerlinSource;
+import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
+import com.bytezone.diskbrowser.applefile.QuickDrawFont;
+import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
+import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
+import com.bytezone.diskbrowser.applefile.ShapeTable;
+import com.bytezone.diskbrowser.applefile.SimpleText;
+import com.bytezone.diskbrowser.applefile.StoredVariables;
+import com.bytezone.diskbrowser.applefile.TextBuffer;
+import com.bytezone.diskbrowser.applefile.TextFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
@@ -393,7 +418,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_FOT:
-          if (auxType == 0x8066)        // Fadden
+          if (auxType == HiResImage.FADDEN_AUX)
             file = new FaddenHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           else
           {

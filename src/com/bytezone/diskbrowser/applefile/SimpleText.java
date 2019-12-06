@@ -1,16 +1,22 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public class SimpleText extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   // LISA text file
 
+  // ---------------------------------------------------------------------------------//
   public SimpleText (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -29,7 +35,9 @@ public class SimpleText extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getLine (int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder ();
 
@@ -40,7 +48,9 @@ public class SimpleText extends AbstractFile
     return line.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isHTML (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     String text = new String (buffer, 0, buffer.length);
     if (text.indexOf ("HTML") > 0 || text.indexOf ("html") > 0)

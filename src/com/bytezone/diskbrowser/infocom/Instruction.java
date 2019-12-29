@@ -7,15 +7,15 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Instruction
 {
-  Opcode opcode;
-  int startPtr;
-  byte[] buffer;
+  final Opcode opcode;
+  private int startPtr;
+  private byte[] buffer;
   //	List<ZString> abbreviations;
-  Header header;
+  private Header header;
 
   enum OperandType
   {
-    VAR_STACK, VAR_LOCAL, VAR_GLOBAL, BYTE, WORD, ARG_BRANCH, ARG_STRING
+    VAR_SP, VAR_LOCAL, VAR_GLOBAL, BYTE, WORD, ARG_BRANCH, ARG_STRING
   }
 
   static final String[] name2OP =
@@ -38,26 +38,23 @@ class Instruction
         "scan_table", "not", "call_vn", "call_vn2", "tokenise", "encode_text",
         "copy_table", "print_table", "check_arg" };
 
-  public Instruction (byte[] buffer, int ptr, Header header)
+  Instruction (byte[] buffer, int ptr, Header header)
   {
     this.buffer = buffer;
     this.startPtr = ptr;
     this.header = header;
     byte b1 = buffer[ptr];
 
-    // long
-    if ((b1 & 0x80) == 0)
+    if ((b1 & 0x80) == 0)                           // long
       opcode = new Opcode2OPLong (buffer, ptr);
-    // short
-    else if ((b1 & 0x40) == 0)
+    else if ((b1 & 0x40) == 0)                      // short
     {
       if ((b1 & 0x30) == 0x30)
         opcode = new Opcode0OP (buffer, ptr);
       else
         opcode = new Opcode1OP (buffer, ptr);
     }
-    // variable
-    else
+    else                                            // variable
     {
       if ((b1 & 0x20) == 0)
         opcode = new Opcode2OPVar (buffer, ptr);
@@ -66,43 +63,43 @@ class Instruction
     }
   }
 
-  public int length ()
+  int length ()
   {
     return opcode.length ();
   }
 
-  public boolean isReturn ()
+  boolean isReturn ()
   {
     return opcode.isReturn;
   }
 
-  public boolean isPrint ()
+  boolean isPrint ()
   {
     return opcode.string != null;
   }
 
-  public boolean isCall ()
+  boolean isCall ()
   {
     return opcode.isCall;
   }
 
-  public boolean isJump ()
+  boolean isJump ()
   {
     // could use jumpTarget != 0
     return (opcode instanceof Opcode1OP && opcode.opcodeNumber == 12);
   }
 
-  public boolean isBranch ()
+  boolean isBranch ()
   {
     return opcode.branch != null;
   }
 
-  public boolean isStore ()
+  boolean isStore ()
   {
     return opcode.store != null;
   }
 
-  public int target ()
+  int target ()
   {
     return isBranch () ? opcode.branch.target : 0;
   }
@@ -117,8 +114,10 @@ class Instruction
       max = 9;
       extra = "..";
     }
+
     String hex = HexFormatter.getHexString (buffer, startPtr, max);
-    return String.format ("%-26s%2s %s", hex, extra, opcode.toString ());
+
+    return String.format ("%05X : %-26s%2s %s", startPtr, hex, extra, opcode.toString ());
   }
 
   abstract class Opcode
@@ -134,7 +133,7 @@ class Instruction
     int jumpTarget;
     int callTarget;
 
-    public Opcode ()
+    Opcode ()
     {
       operands = new ArrayList<Operand> ();
     }
@@ -143,9 +142,9 @@ class Instruction
     public String toString ()
     {
       StringBuilder text = new StringBuilder ();
-      if (false)
-        text.append (HexFormatter.formatNoHeader (buffer, startPtr, length ()) + "\n");
-      text.append (String.format ("%05X : %-12s", startPtr, opcodeName ()));
+
+      text.append (String.format ("%-12s", opcodeName ()));
+
       if (jumpTarget != 0)
         text.append (String.format (" L:%05X", jumpTarget));
       else if (isCall)
@@ -173,7 +172,7 @@ class Instruction
       return text.toString ();
     }
 
-    public int length ()
+    int length ()
     {
       int length = totalOperandLength + opcodeLength;
       if (branch != null)
@@ -185,7 +184,7 @@ class Instruction
       return length;
     }
 
-    public abstract String opcodeName ();
+    abstract String opcodeName ();
 
     private void addOperand (Operand operand)
     {
@@ -193,7 +192,7 @@ class Instruction
       totalOperandLength += operand.length;
     }
 
-    protected void addOperand (byte[] buffer, int ptr, boolean bit1, boolean bit2)
+    void addOperand (byte[] buffer, int ptr, boolean bit1, boolean bit2)
     {
       int offset = ptr + totalOperandLength;
       if (bit1)
@@ -207,7 +206,7 @@ class Instruction
         addOperand (new OperandWord (header.getWord (offset)));   // %00
     }
 
-    protected void addOperand (byte[] buffer, int ptr, boolean bit)
+    void addOperand (byte[] buffer, int ptr, boolean bit)
     {
       int address = ptr + totalOperandLength;
       if (address >= buffer.length)
@@ -221,7 +220,7 @@ class Instruction
         addOperand (new OperandByte (buffer[address]));
     }
 
-    protected void setVariableOperands (int ptr)
+    void setVariableOperands (int ptr)
     {
       int value = buffer[ptr + 1] & 0xFF;
       for (int i = 0; i < 4; i++)
@@ -235,21 +234,21 @@ class Instruction
       }
     }
 
-    protected void setStore (byte[] buffer)
+    void setStore (byte[] buffer)
     {
       store = new OperandVariable (buffer[startPtr + totalOperandLength + opcodeLength]);
     }
 
-    protected void setBranch (byte[] buffer)
+    void setBranch (byte[] buffer)
     {
       int offset = startPtr + totalOperandLength + (store == null ? 0 : 1) + opcodeLength;
-      if ((buffer[offset] & 0x40) == 0x40)
+      if ((buffer[offset] & 0x40) != 0)
         branch = new ArgumentBranch (buffer[offset], offset);
       else
         branch = new ArgumentBranch (header.getWord (offset), offset);
     }
 
-    protected void setZString (byte[] buffer)
+    void setZString (byte[] buffer)
     {
       int offset = startPtr + totalOperandLength + opcodeLength;
       string = new ArgumentString (buffer, offset);
@@ -258,7 +257,7 @@ class Instruction
 
   class Opcode0OP extends Opcode
   {
-    public Opcode0OP (byte[] buffer, int ptr)
+    Opcode0OP (byte[] buffer, int ptr)
     {
       opcodeNumber = buffer[ptr] & 0x0F;
       opcodeLength = 1;
@@ -286,7 +285,7 @@ class Instruction
 
   class Opcode1OP extends Opcode
   {
-    public Opcode1OP (byte[] buffer, int ptr)
+    Opcode1OP (byte[] buffer, int ptr)
     {
       opcodeNumber = buffer[ptr] & 0x0F;
       opcodeLength = 1;
@@ -315,12 +314,12 @@ class Instruction
 
   abstract class Opcode2OP extends Opcode
   {
-    public Opcode2OP ()
+    Opcode2OP ()
     {
       opcodeLength = 1;
     }
 
-    public void setArguments (byte[] buffer)
+    void setArguments (byte[] buffer)
     {
       if ((opcodeNumber >= 1 && opcodeNumber <= 7) || opcodeNumber == 10)
         setBranch (buffer);
@@ -338,7 +337,7 @@ class Instruction
 
   class Opcode2OPLong extends Opcode2OP
   {
-    public Opcode2OPLong (byte[] buffer, int ptr)
+    Opcode2OPLong (byte[] buffer, int ptr)
     {
       opcodeNumber = buffer[ptr] & 0x1F;
       boolean bit1 = ((buffer[ptr] & 0x40) == 0x40);
@@ -352,7 +351,7 @@ class Instruction
 
   class Opcode2OPVar extends Opcode2OP
   {
-    public Opcode2OPVar (byte[] buffer, int ptr)
+    Opcode2OPVar (byte[] buffer, int ptr)
     {
       opcodeNumber = buffer[ptr] & 0x1F;
       opcodeLength = 2;
@@ -363,7 +362,7 @@ class Instruction
 
   class OpcodeVar extends Opcode
   {
-    public OpcodeVar (byte[] buffer, int ptr)
+    OpcodeVar (byte[] buffer, int ptr)
     {
       opcodeNumber = buffer[ptr] & 0x1F;
       opcodeLength = 2;
@@ -394,7 +393,7 @@ class Instruction
 
   class OperandWord extends Operand
   {
-    public OperandWord (int value)
+    OperandWord (int value)
     {
       this.value = value;
       length = 2;
@@ -410,7 +409,7 @@ class Instruction
 
   class OperandByte extends Operand
   {
-    public OperandByte (byte value)
+    OperandByte (byte value)
     {
       this.value = value & 0xFF;
       length = 1;
@@ -426,13 +425,13 @@ class Instruction
 
   class OperandVariable extends Operand
   {
-    public OperandVariable (byte value)
+    OperandVariable (byte value)
     {
       this.value = value & 0xFF;
       length = 1;
 
       if (value == 0)
-        operandType = OperandType.VAR_STACK;
+        operandType = OperandType.VAR_SP;
       else if (value <= 15)
         operandType = OperandType.VAR_LOCAL;
       else
@@ -442,8 +441,8 @@ class Instruction
     @Override
     public String toString ()
     {
-      if (operandType == OperandType.VAR_STACK)
-        return ("ToS");
+      if (operandType == OperandType.VAR_SP)
+        return ("SP");
       if (operandType == OperandType.VAR_LOCAL)
         return (String.format ("L%02d", value));
       return String.format ("G%03d", (value - 15));
@@ -452,13 +451,13 @@ class Instruction
 
   class ArgumentBranch extends Operand
   {
-    int target;
-    boolean branchOnTrue;
+    private int target;
+    private boolean branchOnTrue;
 
-    public ArgumentBranch (byte value, int offset)
+    ArgumentBranch (byte value, int offset)
     {
-      branchOnTrue = (value & 0x80) == 0x80;
-      int val = value & 0x3F;                           // unsigned
+      branchOnTrue = (value & 0x80) != 0;
+      int val = value & 0x3F;                           // 0 - 63
       if (val <= 1)
         target = val;
       else
@@ -467,12 +466,19 @@ class Instruction
       operandType = OperandType.ARG_BRANCH;
     }
 
-    public ArgumentBranch (int value, int offset)
+    ArgumentBranch (int value, int offset)
     {
-      branchOnTrue = (value & 0x8000) == 0x8000;
-      int val = value & 0x3FFF;                         // signed
-      if (val > 8191)
-        val -= 16384;
+      branchOnTrue = (value & 0x8000) != 0;
+      int val = ((value & 0x3FFF) << 18) >> 18;     // signed 14-bit number
+      //      int val = value & 0x3FFF;                         // signed
+      //      if (val >= 0x2000)
+      //      {
+      //        System.out.printf ("%04X -> %d%n", val, (val - 0x4000));
+      //        val -= 0x4000;
+      //      }
+      //      else
+      //        System.out.printf ("%04X%n", val);
+
       target = val + offset;
       length = 2;
       operandType = OperandType.ARG_BRANCH;
@@ -493,11 +499,11 @@ class Instruction
 
   class ArgumentString extends Operand
   {
-    ZString text;
-    int startPtr;
-    byte[] buffer;
+    private ZString text;
+    private int startPtr;
+    private byte[] buffer;
 
-    public ArgumentString (byte[] buffer, int offset)
+    ArgumentString (byte[] buffer, int offset)
     {
       this.buffer = buffer;
       text = new ZString (header, offset);

@@ -623,6 +623,7 @@ public class AppleDisk implements Disk
   private int getBufferOffset (DiskAddress da)
   {
     assert sectorSize == SECTOR_SIZE;
+
     return da.getTrack () * trackSize
         + interleaveSector[interleave][da.getSector ()] * SECTOR_SIZE;
   }
@@ -630,6 +631,7 @@ public class AppleDisk implements Disk
   private int getBufferOffset (DiskAddress da, int seq)
   {
     assert sectorSize == BLOCK_SIZE;
+
     assert seq == 0 || seq == 1;
 
     return da.getTrack () * trackSize

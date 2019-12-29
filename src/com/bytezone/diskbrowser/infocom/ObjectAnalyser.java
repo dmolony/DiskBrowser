@@ -39,10 +39,7 @@ class ObjectAnalyser
     pt.addTest (hmc);
     pt.doTests ();
 
-    //    System.out.println ("\nSetting the string pointer\n");
-
-    for (Integer propertyNo : pt)
-      // list of all properties that passed all tests
+    for (Integer propertyNo : pt)       // list of all properties that passed all tests
       list.add (hmc.statistics[propertyNo]);
     Collections.sort (list);
 
@@ -88,22 +85,22 @@ class ObjectAnalyser
     System.out.println ("Routines found : " + totRoutines);
   }
 
-  public void checkThreeByteProperties ()
-  {
-    for (ZObject object : parent.getObjects ())
-    {
-      for (Property property : object.properties)
-      {
-        if (header.getPropertyName (property.propertyNumber).charAt (0) < 'a'
-            && property.length == 3)
-        {
-          int address = header.getWord (property.ptr + 1) * 2;
-          System.out.println ("checking " + address);
-          header.codeManager.addRoutine (address, 0);
-        }
-      }
-    }
-  }
+  //  private void checkThreeByteProperties ()
+  //  {
+  //    for (ZObject object : parent.getObjects ())
+  //    {
+  //      for (Property property : object.properties)
+  //      {
+  //        if (header.getPropertyName (property.propertyNumber).charAt (0) < 'a'
+  //            && property.length == 3)
+  //        {
+  //          int address = header.getWord (property.ptr + 1) * 2;
+  //          System.out.println ("checking " + address);
+  //          header.codeManager.addRoutine (address, 0);
+  //        }
+  //      }
+  //    }
+  //  }
 
   // find the property with only dictionary entries
   public void setDictionary ()

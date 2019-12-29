@@ -11,7 +11,12 @@ import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.disk.*;
+import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
+import com.bytezone.diskbrowser.disk.AppleDisk;
+import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -25,12 +30,11 @@ public class InfocomDisk extends AbstractFormattedDisk
   private static final boolean TYPE_NODE = true;
   private static final boolean TYPE_LEAF = false;
   private byte[] data;
-  //  private int version;
   private final Header header;
 
   Color green = new Color (0, 200, 0);
 
-  SectorType bootSector = new SectorType ("Boot code", Color.lightGray);
+  SectorType bootSector = new SectorType ("ZIP code", Color.lightGray);
   SectorType stringsSector = new SectorType ("Strings", Color.magenta);
   SectorType objectsSector = new SectorType ("Objects", green);
   SectorType dictionarySector = new SectorType ("Dictionary", Color.blue);

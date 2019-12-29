@@ -1,6 +1,11 @@
 package com.bytezone.diskbrowser.infocom;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
@@ -70,6 +75,7 @@ class Grammar extends InfocomAbstractFile
     hexBlocks.add (new HexBlock (actionPtr, actionSize, "Action routines:"));
     hexBlocks.add (new HexBlock (preActionPtr, preActionSize, "Pre-action routines:"));
     hexBlocks.add (new HexBlock (prepositionPtr, prepositionSize, "Preposition table:"));
+    //    System.out.println (getHexDump ());
 
     // create SentenceGroup and Sentence objects and action lists
     int count = 255;

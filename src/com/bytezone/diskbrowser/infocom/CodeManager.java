@@ -60,10 +60,33 @@ class CodeManager extends AbstractFile
     return blocks;
   }
 
-  void addMissingRoutines ()
+  void addRoutines (int programCounter)
+  {
+    addRoutine (programCounter - 1, 0);   // 
+    addActionRoutines ();                 // obtained from Grammar
+    addCodeRoutines ();                   // obtained from Object properties
+    addMissingRoutines ();                // requires stringPtr to be set
+
+    if (false)
+    {
+      int ptr = header.highMemory;
+      for (int key : routines.keySet ())
+      {
+        if (ptr % 2 == 1)
+          ++ptr;
+        Routine routine = routines.get (key);
+        if (routine.startPtr > ptr)
+          System.out.printf ("skipped %d bytes%n", routine.startPtr - ptr);
+        System.out.println (routine);
+        ptr = routine.startPtr + routine.length;
+      }
+    }
+  }
+
+  private void addMissingRoutines ()
   {
     System.out.printf ("%nWalking the code block%n%n");
-    int total = 0;
+    int total = routines.size ();
     int ptr = header.highMemory;
 
     while (ptr < header.stringPointer)
@@ -71,7 +94,7 @@ class CodeManager extends AbstractFile
       if (ptr >= 0 && ptr % 2 == 1)            // routine must start on a word boundary
         ptr++;
 
-      if (containsRoutineAt (ptr))
+      if (routines.containsKey (ptr))
       {
         ptr += getRoutine (ptr).length;
         continue;
@@ -81,18 +104,20 @@ class CodeManager extends AbstractFile
       if (routine == null)
       {
         System.out.printf ("Invalid routine found : %05X%n", ptr);
-        ptr = findNextRoutine (ptr + 1);
+        int nextRoutinePtr = findNextRoutine (ptr + 1);
+        //        System.out.println (Utility.getHex (buffer, ptr, nextRoutinePtr - ptr));
+        ptr = nextRoutinePtr;
         System.out.printf ("skipping to %05X%n", ptr);
         if (ptr == 0)
           break;
       }
       else
       {
-        total++;
         ptr += routine.length;
       }
     }
-    System.out.printf ("%n%d new routines found by walking the code block%n%n", total);
+    System.out.printf ("%n%d new routines found by walking the code block%n%n",
+        routines.size () - total);
   }
 
   private int findNextRoutine (int address)
@@ -125,12 +150,7 @@ class CodeManager extends AbstractFile
     return text.toString ();
   }
 
-  boolean containsRoutineAt (int address)
-  {
-    return (routines.containsKey (address));
-  }
-
-  void addCodeRoutines ()
+  private void addCodeRoutines ()
   {
     List<Integer> routines = header.objectManager.getCodeRoutines ();
     System.out.println ("Adding " + routines.size () + " code routines");
@@ -138,8 +158,9 @@ class CodeManager extends AbstractFile
       addRoutine (address, 0);
   }
 
-  void addActionRoutines ()
+  private void addActionRoutines ()
   {
+    // process actionRoutines and preActionRoutines
     List<Integer> routines = header.grammar.getActionRoutines ();
     System.out.println ("Adding " + routines.size () + " action routines");
     for (Integer address : routines)
@@ -150,6 +171,7 @@ class CodeManager extends AbstractFile
   {
     if (address == 0)                                       // stack-based call
       return null;
+
     if (address > header.fileLength)
       return null;
 
@@ -163,7 +185,7 @@ class CodeManager extends AbstractFile
 
     // try to create a new Routine
     Routine r = new Routine (address, header, caller);
-    if (r.length == 0)                                      // invalid routine
+    if (!r.isValid ())
       return null;
 
     // recursively add all routines called by this one

@@ -73,10 +73,7 @@ class Header extends InfocomAbstractFile
     // add all the ZStrings
     stringManager = new StringManager ("Strings", buffer, this);
 
-    codeManager.addRoutine (programCounter - 1, 0);
-    codeManager.addActionRoutines ();                 // obtained from Grammar
-    codeManager.addCodeRoutines ();                   // obtained from Object properties
-    codeManager.addMissingRoutines ();                // requires stringPtr to be set
+    codeManager.addRoutines (programCounter);
 
     // add entries for AbstractFile.getHexDump ()
     hexBlocks.add (new HexBlock (0, 64, "Header data:"));
@@ -139,6 +136,41 @@ class Header extends InfocomAbstractFile
     text.append (String.format ("Total objects                     %d%n",
         objectManager.getObjects ().size ()));
 
+    text.append (getAlternate ());
+
+    return text.toString ();
+  }
+
+  private String getAlternate ()
+  {
+    StringBuilder text = new StringBuilder ("\n\n");
+
+    text.append (getLine (0, 1, "version"));
+    text.append (getLine (1, 3, "flags 1"));
+    text.append (getLine (4, 2, "high memory"));
+    text.append (getLine (6, 2, "program counter"));
+    text.append (getLine (8, 2, "dictionary"));
+    text.append (getLine (10, 2, "object table"));
+    text.append (getLine (12, 2, "global variables"));
+    text.append (getLine (14, 2, "static memory"));
+    text.append (getLine (16, 2, "flags 2"));
+    text.append (getLine (24, 2, "abbreviations table"));
+    text.append (getLine (26, 2, "length of file (x2 = " + fileLength + ")"));
+    text.append (getLine (28, 2, "checksum"));
+    text.append (getLine (50, 1, "revision number"));
+    return text.toString ();
+  }
+
+  private String getLine (int offset, int size, String description)
+  {
+    StringBuilder text = new StringBuilder ();
+    text.append (String.format ("%04X - %04X  ", offset, offset + size - 1));
+    for (int i = 0; i < size; i++)
+      text.append (String.format ("%02X ", buffer[offset + i]));
+    while (text.length () < 24)
+      text.append (" ");
+    text.append (description);
+    text.append ("\n");
     return text.toString ();
   }
 

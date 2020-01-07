@@ -52,8 +52,9 @@ class Grammar extends InfocomAbstractFile
     totalPrepositions = header.getWord (prepositionPtr);
     prepositionSize = totalPrepositions * 4 + 2;
 
-    if (false)
+    if (true)
     {
+      System.out.println ("\n" + name);
       System.out.printf ("indexPtr      %,8d  %4X%n", indexPtr, indexPtr);
       System.out.printf ("indexSize     %,8d%n", indexSize);
       System.out.printf ("indexEntries  %,8d%n", indexEntries);
@@ -78,19 +79,22 @@ class Grammar extends InfocomAbstractFile
     //    System.out.println (getHexDump ());
 
     // create SentenceGroup and Sentence objects and action lists
-    int count = 255;
+    int id = 255;
     for (int i = 0; i < indexEntries; i++)
     {
       int offset = header.getWord (indexPtr + i * 2);
-      SentenceGroup sg = new SentenceGroup (count--, offset);
-      sentenceGroups.add (sg);
-      for (Sentence sentence : sg)
+      SentenceGroup sentenceGroup = new SentenceGroup (id--, offset);
+      sentenceGroups.add (sentenceGroup);
+
+      for (Sentence sentence : sentenceGroup)
       {
-        if (!actionList.containsKey (sentence.actionId))    // add to hashmap
+        // add to hashmap
+        if (!actionList.containsKey (sentence.actionId))
           actionList.put (sentence.actionId, new ArrayList<Sentence> ());
         actionList.get (sentence.actionId).add (sentence);
 
-        if (sentence.preActionRoutine > 0         // add to pre-action routine list
+        // add to pre-action routine list
+        if (sentence.preActionRoutine > 0
             && !preActionRoutines.contains (sentence.preActionRoutine))
           preActionRoutines.add (sentence.preActionRoutine);
 
@@ -138,13 +142,13 @@ class Grammar extends InfocomAbstractFile
     return highest + 1;           // zero-based, so increment it
   }
 
-  public List<Integer> getActionRoutines ()
-  {
-    List<Integer> routines = new ArrayList<> ();
-    routines.addAll (actionRoutines);
-    routines.addAll (preActionRoutines);
-    return routines;
-  }
+  //  List<Integer> getActionRoutines ()
+  //  {
+  //    List<Integer> routines = new ArrayList<> ();
+  //    routines.addAll (actionRoutines);
+  //    routines.addAll (preActionRoutines);
+  //    return routines;
+  //  }
 
   @Override
   public String getText ()
@@ -205,6 +209,11 @@ class Grammar extends InfocomAbstractFile
     return text.toString ();
   }
 
+  List<SentenceGroup> getSentenceGroups ()
+  {
+    return sentenceGroups;
+  }
+
   private List<Sentence> getSentences (int routine)
   {
     List<Sentence> sentences = new ArrayList<> ();
@@ -233,12 +242,12 @@ class Grammar extends InfocomAbstractFile
     return text.toString ();
   }
 
-  private class SentenceGroup implements Iterable<Sentence>
+  class SentenceGroup implements Iterable<Sentence>
   {
     int startPtr;
     int id;
     List<Sentence> sentences = new ArrayList<> ();
-    String verbString; // list of synonyms inside []
+    String verbString;                          // list of synonyms inside []
 
     public SentenceGroup (int id, int ptr)
     {
@@ -269,7 +278,7 @@ class Grammar extends InfocomAbstractFile
     }
   }
 
-  private class Sentence
+  class Sentence
   {
     int startPtr;
     SentenceGroup parent;
@@ -302,7 +311,7 @@ class Grammar extends InfocomAbstractFile
 
       // get action pointer from byte 7
       actionId = buffer[startPtr + 7] & 0xFF;
-      int targetOffset = actionId * 2; // index into the action and pre-action blocks
+      int targetOffset = actionId * 2;      // index into the action and pre-action blocks
       actionRoutine = header.getWord (actionPtr + targetOffset) * 2;
       preActionRoutine = header.getWord (preActionPtr + targetOffset) * 2;
     }
@@ -324,9 +333,11 @@ class Grammar extends InfocomAbstractFile
     {
       StringBuilder text =
           new StringBuilder (String.format ("%3d  %04X  ", parent.id, startPtr));
+
       text.append (HexFormatter.getHexString (buffer, startPtr, SENTENCE_LENGTH));
       String r1 = preActionRoutine == 0 ? "" : String.format ("R:%05X", preActionRoutine);
       text.append (String.format ("  %-7s  R:%05X  %s", r1, actionRoutine, getText ()));
+
       return text.toString ();
     }
   }

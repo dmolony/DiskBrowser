@@ -28,7 +28,7 @@ class ObjectAnalyser
     createPropertyLinks ();
 
     // assumes that all properties with exactly three bytes are routine addresses
-    //		checkThreeByteProperties ();
+    checkThreeByteProperties ();
   }
 
   public void setStringPointer ()
@@ -85,22 +85,25 @@ class ObjectAnalyser
     System.out.println ("Routines found : " + totRoutines);
   }
 
-  //  private void checkThreeByteProperties ()
-  //  {
-  //    for (ZObject object : parent.getObjects ())
-  //    {
-  //      for (Property property : object.properties)
-  //      {
-  //        if (header.getPropertyName (property.propertyNumber).charAt (0) < 'a'
-  //            && property.length == 3)
-  //        {
-  //          int address = header.getWord (property.ptr + 1) * 2;
-  //          System.out.println ("checking " + address);
-  //          header.codeManager.addRoutine (address, 0);
-  //        }
-  //      }
-  //    }
-  //  }
+  private void checkThreeByteProperties ()
+  {
+    System.out.printf ("Checking %d objects%n", parent.getObjects ().size ());
+    for (ZObject object : parent.getObjects ())
+    {
+      for (Property property : object.properties)
+      {
+        if (property.length == 3)
+        {
+          int address = header.getWord (property.ptr + 1) * 2;
+          if (address > header.highMemory && address < header.stringPointer)
+          {
+            System.out.printf ("checking %05X%n", address);
+            header.codeManager.addRoutine (address, 0);
+          }
+        }
+      }
+    }
+  }
 
   // find the property with only dictionary entries
   public void setDictionary ()

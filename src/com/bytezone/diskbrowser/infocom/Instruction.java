@@ -8,7 +8,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 class Instruction
 {
   final Opcode opcode;
-  private int startPtr;
+  final int startPtr;
   private byte[] buffer;
   //	List<ZString> abbreviations;
   private Header header;
@@ -101,11 +101,16 @@ class Instruction
 
   int target ()
   {
-    return isBranch () ? opcode.branch.target : 0;
+    return isBranch () ? opcode.branch.target : isJump () ? opcode.jumpTarget : 0;
   }
 
-  @Override
-  public String toString ()
+  String dump ()
+  {
+    return String.format ("%05X : %s", startPtr,
+        HexFormatter.getHexString (buffer, startPtr, opcode.length ()));
+  }
+
+  String getHex ()
   {
     int max = opcode.length ();
     String extra = "";
@@ -116,8 +121,13 @@ class Instruction
     }
 
     String hex = HexFormatter.getHexString (buffer, startPtr, max);
+    return String.format ("%05X : %-26s%2s", startPtr, hex, extra);
+  }
 
-    return String.format ("%05X : %-26s%2s %s", startPtr, hex, extra, opcode.toString ());
+  @Override
+  public String toString ()
+  {
+    return opcode.toString ();
   }
 
   abstract class Opcode
@@ -370,6 +380,7 @@ class Instruction
 
       if (opcodeNumber == 0 || opcodeNumber == 7)
         setStore (buffer);
+
       if (opcodeNumber == 0)
       {
         isCall = true;
@@ -403,7 +414,7 @@ class Instruction
     @Override
     public String toString ()
     {
-      return String.format ("#%05d", value);
+      return String.format ("#%04X", value);
     }
   }
 
@@ -419,7 +430,7 @@ class Instruction
     @Override
     public String toString ()
     {
-      return String.format ("#%03d", value);
+      return String.format ("#%02X", value);
     }
   }
 
@@ -430,9 +441,9 @@ class Instruction
       this.value = value & 0xFF;
       length = 1;
 
-      if (value == 0)
+      if (this.value == 0)
         operandType = OperandType.VAR_SP;
-      else if (value <= 15)
+      else if (this.value <= 15)
         operandType = OperandType.VAR_LOCAL;
       else
         operandType = OperandType.VAR_GLOBAL;
@@ -442,10 +453,10 @@ class Instruction
     public String toString ()
     {
       if (operandType == OperandType.VAR_SP)
-        return ("SP");
+        return ("(SP)");
       if (operandType == OperandType.VAR_LOCAL)
-        return (String.format ("L%02d", value));
-      return String.format ("G%03d", (value - 15));
+        return (String.format ("L%02X", value));
+      return String.format ("G%02X", (value - 16));
     }
   }
 
@@ -469,15 +480,7 @@ class Instruction
     ArgumentBranch (int value, int offset)
     {
       branchOnTrue = (value & 0x8000) != 0;
-      int val = ((value & 0x3FFF) << 18) >> 18;     // signed 14-bit number
-      //      int val = value & 0x3FFF;                         // signed
-      //      if (val >= 0x2000)
-      //      {
-      //        System.out.printf ("%04X -> %d%n", val, (val - 0x4000));
-      //        val -= 0x4000;
-      //      }
-      //      else
-      //        System.out.printf ("%04X%n", val);
+      int val = ((value & 0x3FFF) << 18) >> 18;         // signed 14-bit number
 
       target = val + offset;
       length = 2;

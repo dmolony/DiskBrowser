@@ -15,6 +15,7 @@ class Dictionary extends AbstractFile
   private final int totalSeparators;
   private final int dictionaryPtr, dictionarySize;
   private final int entryLength;
+  private final String separators;
 
   Map<Integer, List<WordEntry>> synonymList = new TreeMap<> ();
 
@@ -26,6 +27,12 @@ class Dictionary extends AbstractFile
     dictionary = new TreeMap<> ();
 
     totalSeparators = buffer[dictionaryPtr] & 0xFF;
+
+    StringBuilder sep = new StringBuilder ();
+    for (int i = 0; i < totalSeparators; i++)
+      sep.append ((char) (buffer[dictionaryPtr + i + 1] & 0xFF));
+    separators = sep.toString ();
+
     int ptr = dictionaryPtr + totalSeparators + 1;
     entryLength = buffer[ptr++] & 0xFF;
 
@@ -48,13 +55,15 @@ class Dictionary extends AbstractFile
       }
       wordEntryList.add (wordEntry);
 
-      // check for words with the property flag
+      // check for words with the direction flag
       if ((buffer[ptr + 4] & 0x10) != 0)
       {
         int b1 = buffer[ptr + 5] & 0xFF;
-        int property = (b1 >= 1 && b1 <= 31) ? b1 : buffer[ptr + 6] & 0xFF;
-        if (header.getPropertyName (property) == null
-            || header.getPropertyName (property).length () > string.value.length ())
+        int b2 = buffer[ptr + 6] & 0xFF;
+        int property = b2 == 0 ? b1 : b2;
+        String propertyName = header.getPropertyName (property);
+        System.out.printf ("%02X  %s%n", property, string.value);
+        if (propertyName == null || propertyName.length () > string.value.length ())
           header.propertyNames[property] = string.value;
       }
       ptr += entryLength;
@@ -67,7 +76,7 @@ class Dictionary extends AbstractFile
         header.propertyNames[i] = i + "";
 
     // testing (only works in Zork 1)
-    if (false)
+    if (true)
     {
       if (header.propertyNames[4].equals ("4"))
         header.propertyNames[4] = "PSEUDO";
@@ -89,24 +98,35 @@ class Dictionary extends AbstractFile
         header.propertyNames[16] = "ADJ";
     }
 
-    // 4     = PSEUDO    (property 4)
-    // 5     = GLOBAL    (property 5)
-    // 6     = VTYPE     (property 6)
-    // 7     = STRENGTH  (property 7)
+    // 04    = PSEUDO    (property 4)
+    // 05    = GLOBAL    (property 5)
+    // 06    = VTYPE     (property 6)
+    // 07    = STRENGTH  (property 7)
     // STR3  = TEXT      (property 8)
     // CODE2 = DESCFCN   (property 9)
-    // 10    = CAPACITY  (property 10)
+    // 0A    = CAPACITY  (property 10)
     // STR1  = LDESC     (property 11)
-    // 12    = TVALUE    (property 12)   value in trophy case
-    // 13    = VALUE     (property 13)
+    // 0C    = TVALUE    (property 12)   value in trophy case
+    // 0D    = VALUE     (property 13)
     // STR2  = FDESC     (property 14)
-    // 15    = SIZE      (property 15)
-    // 16    = ADJ       (property 16)
+    // 0F    = SIZE      (property 15)
+    // 10    = ADJ       (property 16)
     // CODE1 = ACTION    (property 17)
-    // 18    = DICT      (property 18)
-    // 19    = LAND      (property 19)
-    // 20    = OUT       (property 20)
-    // 21    = IN        (property 21)
+    // 12    = DICT      (property 18)
+
+    // 13  land
+    // 14  out
+    // 15  in, inside, into
+    // 16  d, down
+    // 17  u, up
+    // 18  sw, southw
+    // 19  se, southe
+    // 1A  nw, northw
+    // 1B  ne, northe
+    // 1C  s, south
+    // 1D  w, west
+    // 1E  e, east
+    // 1F  n, north
   }
 
   public boolean containsWordAt (int address)
@@ -172,17 +192,22 @@ class Dictionary extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    //		text.append (String.format ("Total entries : %,6d%n", totalEntries));
-    //		text.append (String.format ("Separators    : %,6d%n", totalSeparators));
-    //		text.append (String.format ("Offset        : %,6d   %04X%n%n", dictionaryPtr, dictionaryPtr));
+    text.append (String.format ("Entries    : %,6d%n", totalEntries));
+    text.append (String.format ("Separators : %s%n", separators));
+    text.append (
+        String.format ("Offset     : %,6d   %04X%n%n", dictionaryPtr, dictionaryPtr));
 
     int count = 0;
     int ptr = dictionaryPtr + totalSeparators + 4;
 
     for (ZString word : dictionary.values ())
     {
-      text.append (String.format ("%04X   %3d   %-6s   %s", ptr, count++, word.value,
-          HexFormatter.getHexString (buffer, ptr + 4, entryLength - 4)));
+      String bits = Integer.toBinaryString (buffer[ptr + 4] & 0xFF);
+      if (bits.length () < 8)
+        bits = "00000000".substring (bits.length ()) + bits;
+
+      text.append (String.format ("%04X   %3d   %-6s   %s  %s", ptr, count++, word.value,
+          bits, HexFormatter.getHexString (buffer, ptr + 4, entryLength - 4)));
       int b1 = buffer[ptr + 4] & 0xFF;
       int b2 = buffer[ptr + 5] & 0xFF;
       int b3 = buffer[ptr + 6] & 0xFF;
@@ -195,19 +220,19 @@ class Dictionary extends AbstractFile
       ptr += entryLength;
     }
 
-    if (true)
+    if (false)
     {
       int lastValue = 0;
       for (List<WordEntry> list : synonymList.values ())
       {
         WordEntry wordEntry = list.get (0);
-        if (wordEntry.value != lastValue)
+        if (wordEntry.flags != lastValue)
         {
-          lastValue = wordEntry.value;
+          lastValue = wordEntry.flags;
           text.append ("\n");
         }
 
-        if (wordEntry.value == 0x80)            // nouns are all in one entry
+        if (wordEntry.flags == 0x80)            // nouns are all in one entry
         {
           for (WordEntry we : list)
             text.append (we + "\n");
@@ -215,8 +240,42 @@ class Dictionary extends AbstractFile
         }
         else
           text.append (wordEntry);
+
         if ((buffer[wordEntry.word.startPtr + 4] & 0x10) != 0)
-          text.append ("  property");
+          text.append ("  direction");
+
+        text.append ("\n");
+      }
+    }
+
+    if (true)
+    {
+      text.append ("\n");
+      int lastValue = 0;
+
+      for (int bit = 1; bit < 256; bit *= 2)
+      {
+        text.append (String.format ("Bit: %d%n", bit));
+        for (List<WordEntry> list : synonymList.values ())
+        {
+          WordEntry wordEntry = list.get (0);
+          if ((wordEntry.flags & bit) != 0)
+          {
+            if (wordEntry.flags != lastValue)
+            {
+              lastValue = wordEntry.flags;
+              text.append ("\n");
+            }
+            if (wordEntry.flags == 0x80)            // nouns are all in one entry
+            {
+              for (WordEntry we : list)
+                text.append (we + "\n");
+              //              text.deleteCharAt (text.length () - 1);
+            }
+            else
+              text.append (wordEntry + "\n");
+          }
+        }
         text.append ("\n");
       }
     }
@@ -229,7 +288,7 @@ class Dictionary extends AbstractFile
   {
     ZString word;
     int seq;
-    int value;
+    int flags;
     int key;
     String bits;
 
@@ -244,7 +303,7 @@ class Dictionary extends AbstractFile
       int b3 = buffer[word.startPtr + 6] & 0xFF;
 
       this.key = (b1 << 16) | (b2 << 8) | b3;
-      this.value = b1;
+      this.flags = b1;
       this.bits = Integer.toBinaryString (b1);
       if (bits.length () < 8)
         bits = "00000000".substring (bits.length ()) + bits;
@@ -253,7 +312,7 @@ class Dictionary extends AbstractFile
     @Override
     public int compareTo (WordEntry o)
     {
-      return this.value - o.value;
+      return this.flags - o.flags;
     }
 
     @Override

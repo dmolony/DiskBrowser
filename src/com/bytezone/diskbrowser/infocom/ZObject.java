@@ -30,7 +30,7 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     this.startPtr = offset;
     this.id = id;
 
-    // attributes
+    // 32 attributes
     int bitIndex = 0;
     for (int i = 0; i < 4; i++)
     {
@@ -195,7 +195,6 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
             appendRoutine (text, address);
             break;
           case 4:
-            //            text.append (getObject ().name + " : ");
             text.append (String.format ("%s : IF G%02X ELSE ", getObject ().name,
                 header.getByte (ptr + 2)));
             address = header.getWord (ptr + 3) * 2;

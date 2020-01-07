@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 
 class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
 {
-  private final Header header;
+  //  private final Header header;
   private final List<ZObject> list;
   private List<ZObject> sortedList;
   private final int defaultsPtr, defaultsSize;
@@ -23,10 +23,10 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
   public ObjectManager (Header header)
   {
     super ("Objects", header.buffer);
-    this.header = header;
+    //    this.header = header;
 
     defaultsPtr = header.objectTableOffset;
-    defaultsSize = 62;
+    defaultsSize = 62;                                // 31 words
     tablePtr = header.objectTableOffset + 62;
     propertyPtr = header.getWord (tablePtr + 7);
     propertySize = header.globalsOffset - propertyPtr;

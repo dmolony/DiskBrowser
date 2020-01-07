@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.infocom.Instruction.Operand;
 import com.bytezone.diskbrowser.infocom.Instruction.OperandType;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Routine extends InfocomAbstractFile
     implements Iterable<Instruction>, Comparable<Routine>
@@ -17,6 +18,7 @@ class Routine extends InfocomAbstractFile
   List<Integer> calls = new ArrayList<Integer> ();
   List<Integer> calledBy = new ArrayList<Integer> ();
   List<Integer> actions = new ArrayList<Integer> ();          // not used yet
+  List<Integer> targets = new ArrayList<Integer> ();
 
   public Routine (int ptr, Header header, int caller)
   {
@@ -30,7 +32,9 @@ class Routine extends InfocomAbstractFile
     }
 
     startPtr = ptr++;                             // also used to flag a valid routine
-    calledBy.add (caller);
+
+    if (!calledBy.contains (caller))
+      calledBy.add (caller);
 
     for (int i = 1; i <= locals; i++)
     {
@@ -54,6 +58,12 @@ class Routine extends InfocomAbstractFile
 
       if (instruction.isPrint ())
         strings++;
+
+      if (instruction.isBranch () && !targets.contains (instruction.target ()))
+        targets.add (instruction.target ());
+
+      if (instruction.isJump () && !targets.contains (instruction.target ()))
+        targets.add (instruction.target ());
 
       for (Operand operand : instruction.opcode.operands)
         if (operand.operandType == OperandType.VAR_GLOBAL)
@@ -92,6 +102,20 @@ class Routine extends InfocomAbstractFile
           System.out.println (instruction);
       }
     }
+  }
+
+  String dump ()
+  {
+    StringBuilder text = new StringBuilder ();
+    text.append (String.format ("%05X : %s", startPtr,
+        HexFormatter.getHexString (buffer, startPtr, 1 + locals * 2)));
+    text.append ("\n");
+    for (Instruction instruction : instructions)
+    {
+      text.append (instruction.dump ());
+      text.append ("\n");
+    }
+    return text.toString ();
   }
 
   boolean isValid ()
@@ -135,7 +159,15 @@ class Routine extends InfocomAbstractFile
     text.append ("\n");
 
     for (Instruction instruction : instructions)
+    {
+      text.append (instruction.getHex ());
+      int offset = instruction.startPtr;
+      if (targets.contains (offset))
+        text.append ("  L000 ");
+      else
+        text.append ("       ");
       text.append (instruction + "\n");
+    }
 
     if (calledBy.size () > 0)
     {
@@ -148,6 +180,13 @@ class Routine extends InfocomAbstractFile
     {
       text.append ("\n\nCalls\n\n");
       for (int i : calls)
+        text.append (String.format ("%05X%n", i));
+    }
+
+    if (targets.size () > 0)
+    {
+      text.append ("\n\nTargets\n\n");
+      for (int i : targets)
         text.append (String.format ("%05X%n", i));
     }
 

@@ -11,6 +11,8 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.infocom.Grammar.Sentence;
+import com.bytezone.diskbrowser.infocom.Grammar.SentenceGroup;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class CodeManager extends AbstractFile
@@ -62,18 +64,43 @@ class CodeManager extends AbstractFile
 
   void addRoutines (int programCounter)
   {
-    addRoutine (programCounter - 1, 0);   // 
+    addRoutine (programCounter - 1, -1);
     addActionRoutines ();                 // obtained from Grammar
     addCodeRoutines ();                   // obtained from Object properties
     addMissingRoutines ();                // requires stringPtr to be set
+    //    checkThreeByteProperties ();
+
+    if (false)
+    {
+      int routineNo = 0;
+      int ptr = header.highMemory;
+      for (Routine routine : routines.values ())
+      {
+        if (ptr < routine.startPtr)
+        {
+          int extraBytes = routine.startPtr - ptr;
+          if (extraBytes > 1)
+            System.out.println ("Orphan bytes\n------------");
+          if (extraBytes == 1)
+            System.out.println (String.format ("%05X : %s%n", ptr,
+                HexFormatter.getHexString (buffer, ptr, extraBytes)));
+          else
+            System.out
+                .println (HexFormatter.format (buffer, ptr, extraBytes, ptr) + "\n");
+        }
+        System.out.printf ("Routine #%3d%n", ++routineNo);
+        System.out.println ("------------");
+        System.out.println (routine.dump ());
+        ptr = routine.startPtr + routine.length;
+      }
+    }
 
     if (false)
     {
       int ptr = header.highMemory;
       for (int key : routines.keySet ())
       {
-        if (ptr % 2 == 1)
-          ++ptr;
+        ptr = checkAlignment (ptr);
         Routine routine = routines.get (key);
         if (routine.startPtr > ptr)
           System.out.printf ("skipped %d bytes%n", routine.startPtr - ptr);
@@ -81,6 +108,13 @@ class CodeManager extends AbstractFile
         ptr = routine.startPtr + routine.length;
       }
     }
+  }
+
+  private int checkAlignment (int ptr)
+  {
+    if (ptr % 2 == 1)         // routine must start on a word boundary
+      ++ptr;
+    return ptr;
   }
 
   private void addMissingRoutines ()
@@ -91,8 +125,7 @@ class CodeManager extends AbstractFile
 
     while (ptr < header.stringPointer)
     {
-      if (ptr >= 0 && ptr % 2 == 1)            // routine must start on a word boundary
-        ptr++;
+      ptr = checkAlignment (ptr);
 
       if (routines.containsKey (ptr))
       {
@@ -104,9 +137,7 @@ class CodeManager extends AbstractFile
       if (routine == null)
       {
         System.out.printf ("Invalid routine found : %05X%n", ptr);
-        int nextRoutinePtr = findNextRoutine (ptr + 1);
-        //        System.out.println (Utility.getHex (buffer, ptr, nextRoutinePtr - ptr));
-        ptr = nextRoutinePtr;
+        ptr = findNextRoutine (ptr + 1);
         System.out.printf ("skipping to %05X%n", ptr);
         if (ptr == 0)
           break;
@@ -114,6 +145,7 @@ class CodeManager extends AbstractFile
       else
       {
         ptr += routine.length;
+        System.out.printf ("Routine found: %05X%n", routine.startPtr);
       }
     }
     System.out.printf ("%n%d new routines found by walking the code block%n%n",
@@ -160,11 +192,17 @@ class CodeManager extends AbstractFile
 
   private void addActionRoutines ()
   {
-    // process actionRoutines and preActionRoutines
-    List<Integer> routines = header.grammar.getActionRoutines ();
-    System.out.println ("Adding " + routines.size () + " action routines");
-    for (Integer address : routines)
-      addRoutine (address, 0);
+    int total = routines.size ();
+
+    for (SentenceGroup sentenceGroup : header.grammar.getSentenceGroups ())
+      for (Sentence sentence : sentenceGroup)
+      {
+        if (sentence.preActionRoutine > 0)
+          addRoutine (sentence.preActionRoutine, sentence.startPtr);
+        addRoutine (sentence.actionRoutine, sentence.startPtr);
+      }
+
+    System.out.printf ("Added %d action routines%n", routines.size () - total);
   }
 
   Routine addRoutine (int address, int caller)

@@ -67,6 +67,7 @@ class CodeManager extends AbstractFile
     addRoutine (programCounter - 1, -1);
     addActionRoutines ();                 // obtained from Grammar
     addCodeRoutines ();                   // obtained from Object properties
+    addGlobalRoutines ();
     addMissingRoutines ();                // requires stringPtr to be set
     //    checkThreeByteProperties ();
 
@@ -115,6 +116,11 @@ class CodeManager extends AbstractFile
     if (ptr % 2 == 1)         // routine must start on a word boundary
       ++ptr;
     return ptr;
+  }
+
+  private void addGlobalRoutines ()
+  {
+
   }
 
   private void addMissingRoutines ()

@@ -7,6 +7,8 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 class Instruction
 {
+  static int version = 3;
+
   final Opcode opcode;
   final int startPtr;
   private byte[] buffer;
@@ -45,21 +47,27 @@ class Instruction
     this.header = header;
     byte b1 = buffer[ptr];
 
-    if ((b1 & 0x80) == 0)                           // long
-      opcode = new Opcode2OPLong (buffer, ptr);
-    else if ((b1 & 0x40) == 0)                      // short
+    int type = (b1 & 0xC0) >>> 6;
+    switch (type)
     {
-      if ((b1 & 0x30) == 0x30)
-        opcode = new Opcode0OP (buffer, ptr);
-      else
-        opcode = new Opcode1OP (buffer, ptr);
-    }
-    else                                            // variable
-    {
-      if ((b1 & 0x20) == 0)
-        opcode = new Opcode2OPVar (buffer, ptr);
-      else
-        opcode = new OpcodeVar (buffer, ptr);
+      case 0x03:                                      // 11 - variable
+        if ((b1 & 0x20) == 0x20)
+          opcode = new OpcodeVar (buffer, ptr);
+        else
+          opcode = new Opcode2OPVar (buffer, ptr);
+        break;
+
+      case 0x02:                                      // 10 - extended or short
+        if (b1 == 0xBE && version >= 5)
+          opcode = null;
+        else if ((b1 & 0x30) == 0x30)
+          opcode = new Opcode0OP (buffer, ptr);
+        else
+          opcode = new Opcode1OP (buffer, ptr);
+        break;
+
+      default:                                        // 00, 01 - long
+        opcode = new Opcode2OPLong (buffer, ptr);
     }
   }
 

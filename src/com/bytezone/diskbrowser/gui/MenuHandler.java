@@ -8,16 +8,28 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
 
 import com.bytezone.common.FontAction;
-import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.applefile.AssemblerProgram;
+import com.bytezone.diskbrowser.applefile.BasicProgram;
+import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.Palette;
+import com.bytezone.diskbrowser.applefile.PaletteFactory;
+import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
 
-public class MenuHandler
-    implements DiskSelectionListener, FileSelectionListener, QuitListener
+public class MenuHandler implements DiskSelectionListener, FileSelectionListener,
+    QuitListener, SectorSelectionListener
 {
   static final String PREFS_LINE_WRAP = "line wrap";
   private static final String PREFS_SHOW_CATALOG = "show catalog";
@@ -44,6 +56,7 @@ public class MenuHandler
 
   FormattedDisk currentDisk;
   private final SaveTempFileAction saveTempFileAction = new SaveTempFileAction ();
+  final SaveSectorsAction saveSectorsAction = new SaveSectorsAction ();
 
   private final BasicPreferences basicPreferences = new BasicPreferences ();
   private final List<BasicPreferencesListener> basicPreferencesListeners =
@@ -71,6 +84,7 @@ public class MenuHandler
   final JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
   JMenuItem executeDiskItem;
   final JMenuItem saveDiskItem = new JMenuItem ("Save converted disk as...");
+  final JMenuItem saveSectorsItem = new JMenuItem ("Save sectors as...");
   final JMenuItem printItem = new JMenuItem ("Print output panel...");
   final JMenuItem closeTabItem = new JMenuItem ();
   final JMenuItem duplicateItem = new JMenuItem ();
@@ -128,6 +142,7 @@ public class MenuHandler
     fileMenu.addSeparator ();
     fileMenu.add (refreshTreeItem);
     fileMenu.add (saveDiskItem);
+    fileMenu.add (saveSectorsItem);
 
     addLauncherMenu ();
 
@@ -252,6 +267,7 @@ public class MenuHandler
     interleaveGroup.add (interleave3Item);
 
     saveDiskItem.setAction (saveTempFileAction);
+    saveSectorsItem.setAction (saveSectorsAction);
   }
 
   private void setBasicPreferences ()
@@ -499,5 +515,11 @@ public class MenuHandler
 
     saveDiskItem.setEnabled (disk.isTempDisk ());
     saveTempFileAction.setDisk (disk);
+  }
+
+  @Override
+  public void sectorSelected (SectorSelectedEvent event)
+  {
+    //    List<DiskAddress> sectors = event.getSectors ();
   }
 }

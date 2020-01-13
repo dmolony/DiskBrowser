@@ -35,6 +35,14 @@ public class WindowSaver
 
     Dimension screen = java.awt.Toolkit.getDefaultToolkit ().getScreenSize ();
 
+    if (false)
+    {
+      System.out.printf ("Screen height ..... %d%n", screen.height);
+      System.out.printf ("Screen width ...... %d%n", screen.width);
+      System.out.printf ("Window height ..... %d%n", height);
+      System.out.printf ("Window width ...... %d%n", width);
+    }
+
     if (width < 0)                                    // nothing to restore
     {
       frame.setLocation (100, 100);
@@ -43,8 +51,8 @@ public class WindowSaver
       return false;
     }
 
-    if (width > screen.getWidth () - 15)
-      width = (int) (screen.getWidth () - 15);
+    if (width > screen.getWidth ())
+      width = (int) (screen.getWidth ());
 
     frame.setSize (width, height);
     frame.setLocation (x, y);

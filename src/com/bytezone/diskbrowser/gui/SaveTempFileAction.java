@@ -17,12 +17,18 @@ public class SaveTempFileAction extends DefaultAction
 
   public SaveTempFileAction ()
   {
-    super ("Save converted file...", "Save converted file");
+    super ("Save converted disk...", "Save converted disk");
   }
 
   @Override
   public void actionPerformed (ActionEvent evt)
   {
+    if (disk == null)
+    {
+      System.out.println ("No disk");
+      return;
+    }
+
     JFileChooser fileChooser = new JFileChooser ();
     fileChooser.setDialogTitle ("Save converted disk");
     String name = disk.getName ();
@@ -45,5 +51,6 @@ public class SaveTempFileAction extends DefaultAction
   void setDisk (FormattedDisk disk)
   {
     this.disk = disk;
+    this.setEnabled (true);
   }
 }

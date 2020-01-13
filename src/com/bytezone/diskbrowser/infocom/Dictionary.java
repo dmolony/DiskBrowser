@@ -255,7 +255,11 @@ class Dictionary extends AbstractFile
 
       for (int bit = 1; bit < 256; bit *= 2)
       {
-        text.append (String.format ("Bit: %d%n", bit));
+        String bits = Integer.toBinaryString (bit & 0xFF);
+        if (bits.length () < 8)
+          bits = "00000000".substring (bits.length ()) + bits;
+
+        text.append (String.format ("Bits:                 %s%n", bits));
         for (List<WordEntry> list : synonymList.values ())
         {
           WordEntry wordEntry = list.get (0);
@@ -270,7 +274,6 @@ class Dictionary extends AbstractFile
             {
               for (WordEntry we : list)
                 text.append (we + "\n");
-              //              text.deleteCharAt (text.length () - 1);
             }
             else
               text.append (wordEntry + "\n");

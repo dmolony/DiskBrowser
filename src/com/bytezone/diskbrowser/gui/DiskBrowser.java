@@ -10,7 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
 
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
@@ -33,7 +40,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   // ---------------------------------------------------------------------------------//
   {
     super (windowTitle);
-    //    System.out.printf ("Start Init: %,5d%n", System.currentTimeMillis () - start);
 
     if (args.length > 0 && "-reset".equals (args[0]))
       new WindowState (prefs).clear ();
@@ -107,6 +113,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     diskLayoutPanel.addSectorSelectionListener (dataPanel);
     diskLayoutPanel.addSectorSelectionListener (redoHandler);
     diskLayoutPanel.addSectorSelectionListener (catalogPanel);
+    diskLayoutPanel.addSectorSelectionListener (menuHandler);
+    diskLayoutPanel.addSectorSelectionListener (menuHandler.saveSectorsAction);
 
     duplicateAction.addTableSelectionListener (catalogPanel);
 
@@ -166,6 +174,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // restore the menuHandler items before they are referenced
     fireRestoreEvent ();
+
     diskLayoutPanel.setFree (menuHandler.showFreeSectorsItem.isSelected ());
     dataPanel.setLineWrap (menuHandler.lineWrapItem.isSelected ());
 
@@ -180,7 +189,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // activate the highest panel now that the listeners are ready
     catalogPanel.activate ();
-    //    System.out.printf ("End Init  : %,5d%n", System.currentTimeMillis () - start);
   }
 
   // ---------------------------------------------------------------------------------//

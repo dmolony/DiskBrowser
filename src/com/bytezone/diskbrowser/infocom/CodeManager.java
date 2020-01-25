@@ -228,16 +228,16 @@ class CodeManager extends AbstractFile
     }
 
     // try to create a new Routine
-    Routine r = new Routine (address, header, caller);
-    if (!r.isValid ())
+    Routine routine = new Routine (address, header, caller);
+    if (!routine.isValid ())
       return null;
 
     // recursively add all routines called by this one
-    routines.put (address, r);
-    for (int ptr : r.calls)
+    routines.put (address, routine);
+    for (int ptr : routine.calls)
       addRoutine (ptr, address);
 
-    return r;
+    return routine;
   }
 
   Routine getRoutine (int address)

@@ -106,7 +106,6 @@ public class AppleDisk implements Disk
 
     byte[] buffer = getPrefix (file);         // HDV could be a 2mg
     String prefix = new String (buffer, 0, 4);
-    //    int skip = 0;
 
     if (suffix.equalsIgnoreCase ("2mg") || "2IMG".equals (prefix))
     {
@@ -162,7 +161,8 @@ public class AppleDisk implements Disk
         this.trackSize = sectors * sectorSize;
       }
     }
-    else if (suffix.equalsIgnoreCase ("HDV"))
+    else if (suffix.equalsIgnoreCase ("HDV")
+        || (suffix.equalsIgnoreCase ("po") && tracks > 50)) // ULTIMATE APPLE1 CFFA 3.5.po
     {
       //this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
       this.blocks = tracks * sectors;

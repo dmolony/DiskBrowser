@@ -202,7 +202,7 @@ public class DiskFactory
       }
 
       if (debug)
-        System.out.println ("  Checking po or dsk hard drive: " + file.length ());
+        System.out.printf ("  Checking po or dsk hard drive: %,d%n", file.length ());
 
       disk = checkHardDisk (file);
       if (disk != null)
@@ -232,7 +232,7 @@ public class DiskFactory
       {
         AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
         if (debug)
-          System.out.println ("  created data usk");
+          System.out.println ("  created data disk");
         return new DataDisk (appleDisk);
       }
       catch (FileFormatException e)

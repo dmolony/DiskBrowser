@@ -17,7 +17,7 @@ class Instruction
 
   enum OperandType
   {
-    VAR_SP, VAR_LOCAL, VAR_GLOBAL, BYTE, WORD, ARG_BRANCH, ARG_STRING
+    VAR_SP, VAR_LOCAL, VAR_GLOBAL, BYTE, WORD, ARG_BRANCH, ARG_STRING, OBJECT
   }
 
   static final String[] name2OP =
@@ -142,7 +142,7 @@ class Instruction
   {
     int opcodeNumber;
     int opcodeLength;
-    List<Operand> operands;
+    List<Operand> operands = new ArrayList<> ();
     int totalOperandLength;
     ArgumentBranch branch;
     ArgumentString string;
@@ -150,11 +150,6 @@ class Instruction
     boolean isReturn, isCall, isExit;
     int jumpTarget;
     int callTarget;
-
-    Opcode ()
-    {
-      operands = new ArrayList<Operand> ();
-    }
 
     @Override
     public String toString ()
@@ -174,7 +169,7 @@ class Instruction
             text.append (op + ", ");
         if (operands.size () > 1)
           text.delete (text.length () - 2, text.length ());
-        text.append (") --> " + store);
+        text.append (") -> " + store);
       }
       else
       {
@@ -183,7 +178,7 @@ class Instruction
         if (branch != null)
           text.append (branch);
         if (store != null)
-          text.append (" --> " + store);
+          text.append (" -> " + store);
         if (string != null)
           text.append (" \"" + string + "\"");
       }
@@ -360,8 +355,17 @@ class Instruction
       opcodeNumber = buffer[ptr] & 0x1F;
       boolean bit1 = ((buffer[ptr] & 0x40) == 0x40);
       boolean bit2 = ((buffer[ptr] & 0x20) == 0x20);
-      addOperand (buffer, ptr + 1, bit1);
-      addOperand (buffer, ptr + 1, bit2);
+
+      if (opcodeNumber == 0x0D)                   // store (variable) value
+      {
+        addOperand (buffer, ptr + 1, true);       // always a variable
+        addOperand (buffer, ptr + 1, bit2);
+      }
+      else
+      {
+        addOperand (buffer, ptr + 1, bit1);
+        addOperand (buffer, ptr + 1, bit2);
+      }
 
       setArguments (buffer);
     }
@@ -389,10 +393,16 @@ class Instruction
       if (opcodeNumber == 0 || opcodeNumber == 7)
         setStore (buffer);
 
-      if (opcodeNumber == 0)
+      if (opcodeNumber == 0)        // call routine
       {
         isCall = true;
         callTarget = operands.get (0).value * 2;
+      }
+
+      if (opcodeNumber == 3)        // put prop object propertyValue
+      {
+        // first parameter is the object id
+        operands.get (0).operandType = OperandType.OBJECT;
       }
     }
 
@@ -408,6 +418,34 @@ class Instruction
     int length;
     int value;
     OperandType operandType;
+
+    @Override
+    public String toString ()
+    {
+      switch (operandType)
+      {
+        case VAR_SP:
+          return ("(SP)");
+
+        case VAR_LOCAL:
+          return (String.format ("L%02X", value - 1));
+
+        case VAR_GLOBAL:
+          return String.format ("G%02X", (value - 16));
+
+        case BYTE:
+          return String.format ("#%02X", value);
+
+        case WORD:
+          return String.format ("#%04X", value);
+
+        case OBJECT:
+          return "\"" + header.objectManager.getObject (value - 1).getName () + "\"";
+
+        default:
+          return "*** Illegal ***";
+      }
+    }
   }
 
   class OperandWord extends Operand
@@ -418,12 +456,6 @@ class Instruction
       length = 2;
       operandType = OperandType.WORD;
     }
-
-    @Override
-    public String toString ()
-    {
-      return String.format ("#%04X", value);
-    }
   }
 
   class OperandByte extends Operand
@@ -433,12 +465,6 @@ class Instruction
       this.value = value & 0xFF;
       length = 1;
       operandType = OperandType.BYTE;
-    }
-
-    @Override
-    public String toString ()
-    {
-      return String.format ("#%02X", value);
     }
   }
 
@@ -455,16 +481,6 @@ class Instruction
         operandType = OperandType.VAR_LOCAL;
       else
         operandType = OperandType.VAR_GLOBAL;
-    }
-
-    @Override
-    public String toString ()
-    {
-      if (operandType == OperandType.VAR_SP)
-        return ("(SP)");
-      if (operandType == OperandType.VAR_LOCAL)
-        return (String.format ("L%02X", value));
-      return String.format ("G%02X", (value - 16));
     }
   }
 

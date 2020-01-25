@@ -12,7 +12,13 @@ import javax.swing.tree.DefaultTreeModel;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
-import com.bytezone.diskbrowser.disk.*;
+import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
+import com.bytezone.diskbrowser.disk.AppleDisk;
+import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
+import com.bytezone.diskbrowser.disk.DefaultSector;
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.gui.ProdosPreferences;
 import com.bytezone.diskbrowser.utilities.HexFormatter;

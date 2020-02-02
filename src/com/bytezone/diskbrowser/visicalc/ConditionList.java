@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ConditionList implements Iterable<Value>
 {
-  private final List<Value> conditions = new ArrayList<Value> ();
+  private final List<Value> conditions = new ArrayList<> ();
 
   public ConditionList (Cell cell, String text)
   {

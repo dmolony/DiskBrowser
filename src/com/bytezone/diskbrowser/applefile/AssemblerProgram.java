@@ -201,10 +201,9 @@ public class AssemblerProgram extends AbstractFile
 
   private List<AssemblerStatement> getLines ()
   {
-    List<AssemblerStatement> lines = new ArrayList<AssemblerStatement> ();
-    Map<Integer, AssemblerStatement> linesMap =
-        new HashMap<Integer, AssemblerStatement> ();
-    List<Integer> targets = new ArrayList<Integer> ();
+    List<AssemblerStatement> lines = new ArrayList<> ();
+    Map<Integer, AssemblerStatement> linesMap = new HashMap<> ();
+    List<Integer> targets = new ArrayList<> ();
 
     int ptr = executeOffset;
     int address = loadAddress + executeOffset;

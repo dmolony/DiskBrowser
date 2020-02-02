@@ -15,7 +15,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class MazeGridV5 extends AbstractFile
 {
   private final MessageBlock messageBlock;
-  List<MazeGrid> grids = new ArrayList<MazeGrid> ();
+  List<MazeGrid> grids = new ArrayList<> ();
   int minX = 9999;
   int minY = 9999;
   int maxX = 0;

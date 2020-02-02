@@ -1,6 +1,11 @@
 package com.bytezone.diskbrowser.duplicates;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -33,8 +38,7 @@ public class RootFolderData implements RootDirectoryChangeListener
 
   public DisksWindow disksWindow;
 
-  public final List<DiskTableSelectionListener> listeners =
-      new ArrayList<DiskTableSelectionListener> ();
+  public final List<DiskTableSelectionListener> listeners = new ArrayList<> ();
 
   public boolean doChecksums;
 
@@ -196,7 +200,7 @@ public class RootFolderData implements RootDirectoryChangeListener
 
   public List<DiskDetails> listDuplicates (long checksum)
   {
-    List<DiskDetails> list = new ArrayList<DiskDetails> ();
+    List<DiskDetails> list = new ArrayList<> ();
     DiskDetails original = checksumMap.get (checksum);
     if (original != null)
     {

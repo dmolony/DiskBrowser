@@ -11,7 +11,7 @@ class Record
 {
   AppleworksADBFile parent;
   int length;
-  List<String> items = new ArrayList<String> ();
+  List<String> items = new ArrayList<> ();
   Map<Integer, Double> calculatedItems = new HashMap<Integer, Double> ();// move to TableReport
 
   public Record (AppleworksADBFile parent, byte[] buffer, int ptr)

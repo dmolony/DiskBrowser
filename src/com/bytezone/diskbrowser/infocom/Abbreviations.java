@@ -29,7 +29,7 @@ class Abbreviations extends InfocomAbstractFile
 
   private void populate ()
   {
-    list = new ArrayList<ZString> ();
+    list = new ArrayList<> ();
 
     for (int i = header.abbreviationsTable; i < header.objectTableOffset; i += 2)
       list.add (new ZString (header, header.getWord (i) * 2));

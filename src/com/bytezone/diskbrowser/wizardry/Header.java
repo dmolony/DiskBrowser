@@ -30,7 +30,7 @@ class Header
 
   String scenarioTitle;
   public int scenarioID;
-  List<ScenarioData> data = new ArrayList<ScenarioData> (8);
+  List<ScenarioData> data = new ArrayList<> (8);
   FormattedDisk owner;
 
   public Header (DefaultMutableTreeNode dataNode, FormattedDisk owner)
@@ -100,7 +100,7 @@ class Header
 
   private void linkText (String title, DiskAddress da, DefaultMutableTreeNode headerNode)
   {
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
 
     StringBuilder text = new StringBuilder (scenarioTitle + "\n\n");
@@ -132,7 +132,7 @@ class Header
   private void linkPictures (String title, DiskAddress da,
       DefaultMutableTreeNode headerNode)
   {
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
 
     byte[] buffer = owner.getDisk ().readSector (da);
@@ -148,7 +148,7 @@ class Header
   private void linkSpells (String title, DiskAddress da,
       DefaultMutableTreeNode headerNode)
   {
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
     int level = 1;
 
@@ -223,7 +223,7 @@ class Header
       dataOffset = buffer[offset + 48] & 0xFF;
       type = seq;
 
-      this.sectors = new ArrayList<DiskAddress> (totalBlocks);
+      this.sectors = new ArrayList<> (totalBlocks);
       for (int i = dataOffset, max = dataOffset + totalBlocks; i < max; i++)
         if (i < sectors.size ())
           this.sectors.add (sectors.get (i));

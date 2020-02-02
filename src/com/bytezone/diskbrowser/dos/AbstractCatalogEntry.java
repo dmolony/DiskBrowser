@@ -4,7 +4,22 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
+import com.bytezone.diskbrowser.applefile.AssemblerProgram;
+import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
+import com.bytezone.diskbrowser.applefile.DoubleHiResImage;
+import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
+import com.bytezone.diskbrowser.applefile.FontFile;
+import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.IntegerBasicProgram;
+import com.bytezone.diskbrowser.applefile.MerlinSource;
+import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
+import com.bytezone.diskbrowser.applefile.PrintShopGraphic;
+import com.bytezone.diskbrowser.applefile.ShapeTable;
+import com.bytezone.diskbrowser.applefile.SimpleText2;
+import com.bytezone.diskbrowser.applefile.TextFile;
+import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -27,8 +42,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   protected LocalDateTime lastModified;
 
   protected DiskAddress catalogSectorDA;
-  protected final List<DiskAddress> dataSectors = new ArrayList<DiskAddress> ();
-  protected final List<DiskAddress> tsSectors = new ArrayList<DiskAddress> ();
+  protected final List<DiskAddress> dataSectors = new ArrayList<> ();
+  protected final List<DiskAddress> tsSectors = new ArrayList<> ();
 
   private CatalogEntry link;
 
@@ -355,7 +370,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   @Override
   public List<DiskAddress> getSectors ()
   {
-    List<DiskAddress> sectors = new ArrayList<DiskAddress> ();
+    List<DiskAddress> sectors = new ArrayList<> ();
     sectors.add (catalogSectorDA);
     sectors.addAll (tsSectors);
     sectors.addAll (dataSectors);

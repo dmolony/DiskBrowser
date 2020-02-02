@@ -19,7 +19,7 @@ public class Sheet
 
   private final Map<Integer, Cell> rowOrderCells = new TreeMap<Integer, Cell> ();
   private final Map<Integer, Cell> columnOrderCells = new TreeMap<Integer, Cell> ();
-  private final List<String> lines = new ArrayList<String> ();
+  private final List<String> lines = new ArrayList<> ();
 
   private final Map<Integer, Integer> columnWidths = new TreeMap<Integer, Integer> ();
   private int columnWidth = 9;
@@ -388,7 +388,7 @@ public class Sheet
 
     if (debug)
     {
-      List<String> counts = new ArrayList<String> ();
+      List<String> counts = new ArrayList<> ();
       for (int i = 0; i < functionTotals.length; i++)
         if (functionTotals[i] > 0)
         {

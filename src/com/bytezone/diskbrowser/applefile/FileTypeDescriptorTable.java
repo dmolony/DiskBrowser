@@ -15,7 +15,7 @@ public class FileTypeDescriptorTable extends AbstractFile
   int indexRecordSize;
   int offsetToIdx;
 
-  private final List<IndexRecord> indexRecords = new ArrayList<IndexRecord> ();
+  private final List<IndexRecord> indexRecords = new ArrayList<> ();
 
   public FileTypeDescriptorTable (String name, byte[] buffer)
   {

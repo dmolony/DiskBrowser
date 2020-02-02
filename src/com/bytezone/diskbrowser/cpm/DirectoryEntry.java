@@ -29,8 +29,8 @@ public class DirectoryEntry implements AppleFileSource
   private final int recordsUsed;                      // records used in this extent
   private final byte[] blockList = new byte[16];      // allocation blocks used
 
-  private final List<DirectoryEntry> entries = new ArrayList<DirectoryEntry> ();
-  private final List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+  private final List<DirectoryEntry> entries = new ArrayList<> ();
+  private final List<DiskAddress> blocks = new ArrayList<> ();
   private final boolean readOnly;
   private final boolean systemFile;
 

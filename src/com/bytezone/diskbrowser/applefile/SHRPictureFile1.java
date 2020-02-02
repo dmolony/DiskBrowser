@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class SHRPictureFile1 extends HiResImage
 // -----------------------------------------------------------------------------------//
 {
-  private final List<Block> blocks = new ArrayList<Block> ();
+  private final List<Block> blocks = new ArrayList<> ();
   private Main mainBlock;
   private Multipal multipalBlock;
   private final boolean debug = false;

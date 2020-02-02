@@ -8,8 +8,8 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class Wiz4Monsters extends AbstractFile
 {
-  final List<Wiz4Image> images = new ArrayList<Wiz4Image> ();
-  final List<Integer> blocks = new ArrayList<Integer> ();
+  final List<Wiz4Image> images = new ArrayList<> ();
+  final List<Integer> blocks = new ArrayList<> ();
 
   public Wiz4Monsters (String name, byte[] buffer)
   {

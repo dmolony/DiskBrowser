@@ -10,7 +10,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class PascalCode extends AbstractFile
     implements PascalConstants, Iterable<PascalSegment>
 {
-  private final List<PascalSegment> segments = new ArrayList<PascalSegment> (16);
+  private final List<PascalSegment> segments = new ArrayList<> (16);
   private final String comment;
   //  private final int blockOffset;
   //  private final Relocator relocator;

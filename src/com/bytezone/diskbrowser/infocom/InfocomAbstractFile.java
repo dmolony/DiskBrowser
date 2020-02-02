@@ -8,7 +8,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class InfocomAbstractFile extends AbstractFile
 {
-  protected List<HexBlock> hexBlocks = new ArrayList<HexBlock> ();
+  protected List<HexBlock> hexBlocks = new ArrayList<> ();
 
   public InfocomAbstractFile (String name, byte[] buffer)
   {

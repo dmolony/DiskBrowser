@@ -13,8 +13,7 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
   private final int indexLength;
   private String text;
 
-  private final List<MessageDataBlock> messageDataBlocks =
-      new ArrayList<MessageDataBlock> ();
+  private final List<MessageDataBlock> messageDataBlocks = new ArrayList<> ();
 
   public MessageBlock (byte[] buffer, Huffman huffman)
   {
@@ -49,7 +48,7 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
 
   public List<String> getMessageLines (int messageNo)
   {
-    List<String> lines = new ArrayList<String> ();
+    List<String> lines = new ArrayList<> ();
 
     for (MessageDataBlock messageDataBlock : messageDataBlocks)
     {

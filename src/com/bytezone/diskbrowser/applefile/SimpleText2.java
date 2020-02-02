@@ -7,7 +7,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 public class SimpleText2 extends AbstractFile
 {
-  List<Integer> lineStarts = new ArrayList<Integer> ();
+  List<Integer> lineStarts = new ArrayList<> ();
   int loadAddress;
   boolean showByte = false;
 

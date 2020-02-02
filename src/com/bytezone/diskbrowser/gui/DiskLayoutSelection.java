@@ -18,7 +18,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
 
   public DiskLayoutSelection ()
   {
-    highlights = new ArrayList<DiskAddress> ();
+    highlights = new ArrayList<> ();
   }
 
   public void doClick (Disk disk, DiskAddress da, boolean extend, boolean append)
@@ -136,7 +136,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
   // This must return a copy, or the redo function will get very confused
   public List<DiskAddress> getHighlights ()
   {
-    return new ArrayList<DiskAddress> (highlights);
+    return new ArrayList<> (highlights);
   }
 
   public boolean isSelected (DiskAddress da)

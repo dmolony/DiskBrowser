@@ -38,8 +38,8 @@ public class AppleworksADBFile extends AbstractFile
   private final int[] continuation = new int[3];
   private final String[] comparison = new String[3];
 
-  private final List<Report> reports = new ArrayList<Report> ();
-  final List<Record> records = new ArrayList<Record> ();
+  private final List<Report> reports = new ArrayList<> ();
+  final List<Record> records = new ArrayList<> ();
   private final Record standardRecord;
 
   public AppleworksADBFile (String name, byte[] buffer)

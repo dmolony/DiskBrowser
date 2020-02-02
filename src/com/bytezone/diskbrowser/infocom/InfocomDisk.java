@@ -70,7 +70,7 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     headerNode = addToTree (root, "Header", header, TYPE_LEAF);
     DefaultAppleFileSource dafs = (DefaultAppleFileSource) headerNode.getUserObject ();
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (disk.getDiskAddress (3, 0));
     dafs.setSectors (blocks);
 
@@ -133,7 +133,7 @@ public class InfocomDisk extends AbstractFormattedDisk
       DefaultMutableTreeNode node)
   {
     DefaultAppleFileSource dafs = (DefaultAppleFileSource) node.getUserObject ();
-    List<DiskAddress> blocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> blocks = new ArrayList<> ();
 
     int blockNo = sectorFrom / disk.getBlockSize () + 48;
     int blockTo = sectorTo / disk.getBlockSize () + 48;

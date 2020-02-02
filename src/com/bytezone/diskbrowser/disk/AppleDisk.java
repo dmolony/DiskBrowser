@@ -533,7 +533,7 @@ public class AppleDisk implements Disk
   @Override
   public List<DiskAddress> getDiskAddressList (int... blocks)
   {
-    List<DiskAddress> addressList = new ArrayList<DiskAddress> ();
+    List<DiskAddress> addressList = new ArrayList<> ();
 
     for (int block : blocks)
     {
@@ -696,7 +696,7 @@ public class AppleDisk implements Disk
   {
     if (blockList == null)
     {
-      blockList = new ArrayList<DiskAddress> (blocks);
+      blockList = new ArrayList<> (blocks);
       for (int block = 0; block < blocks; block++)
         blockList.add (new AppleDiskAddress (this, block));
     }

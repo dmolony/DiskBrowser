@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ValueList implements Iterable<Value>
 {
-  private final List<Value> values = new ArrayList<Value> ();
+  private final List<Value> values = new ArrayList<> ();
   private boolean hasRange;
 
   public ValueList (Cell cell, String text)

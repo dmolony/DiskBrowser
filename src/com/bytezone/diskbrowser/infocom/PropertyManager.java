@@ -11,7 +11,7 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 
 class PropertyManager extends AbstractFile
 {
-  List<Statistic> list = new ArrayList<Statistic> ();
+  List<Statistic> list = new ArrayList<> ();
   Header header;
 
   public PropertyManager (String name, byte[] buffer, Header header)
@@ -57,7 +57,7 @@ class PropertyManager extends AbstractFile
   private class Statistic
   {
     int id;
-    List<ZObject> list = new ArrayList<ZObject> ();
+    List<ZObject> list = new ArrayList<> ();
 
     public Statistic (int id)
     {

@@ -12,7 +12,15 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
@@ -33,7 +41,7 @@ public class DisksWindow extends JFrame
   private final JButton btnTotals = new JButton ("Totals");
   private final JPanel topPanel = new JPanel ();
 
-  private final List<JCheckBox> boxes = new ArrayList<JCheckBox> ();
+  private final List<JCheckBox> boxes = new ArrayList<> ();
   private TableRowSorter<DiskTableModel> sorter;
   private final CheckBoxActionListener checkBoxActionListener =
       new CheckBoxActionListener ();

@@ -20,7 +20,7 @@ import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 public class Wizardry4BootDisk extends PascalDisk
 {
   public Header scenarioHeader;
-  //  private final List<AppleDisk> disks = new ArrayList<AppleDisk> ();
+  //  private final List<AppleDisk> disks = new ArrayList<> ();
   private Relocator relocator;
   private MessageBlock messageBlock;
   private Huffman huffman;
@@ -78,7 +78,7 @@ public class Wizardry4BootDisk extends PascalDisk
       int count = 0;
       for (MessageDataBlock mdb : messageBlock)
       {
-        List<DiskAddress> messageBlocks = new ArrayList<DiskAddress> ();
+        List<DiskAddress> messageBlocks = new ArrayList<> ();
         messageBlocks.add (blocks.get (count++));
         addToNode (mdb, messagesNode, messageBlocks);
       }
@@ -145,7 +145,7 @@ public class Wizardry4BootDisk extends PascalDisk
     int count = 0;
     for (Wiz4Image image : w4monsters.images)
     {
-      List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
+      List<DiskAddress> monsterBlocks = new ArrayList<> ();
       monsterBlocks.add (pictureBlocks.get (w4monsters.blocks.get (count++)));
       addToNode (image, monstersNode, monsterBlocks);
     }
@@ -162,7 +162,7 @@ public class Wizardry4BootDisk extends PascalDisk
 
     for (Wiz5Monsters.Monster monster : w5monsters)
     {
-      List<DiskAddress> monsterBlocks = new ArrayList<DiskAddress> ();
+      List<DiskAddress> monsterBlocks = new ArrayList<> ();
       for (Integer blockId : monster.getBlocks ())
         monsterBlocks.add (pictureBlocks.get (blockId));
       addToNode (monster.getImage (), monstersNode, monsterBlocks);
@@ -183,7 +183,7 @@ public class Wizardry4BootDisk extends PascalDisk
       int offset = mazeData.dataOffset * 512 + i * 1024;
       System.arraycopy (buffer, offset, level, 0, level.length);
 
-      List<DiskAddress> mazeBlocks = new ArrayList<DiskAddress> ();
+      List<DiskAddress> mazeBlocks = new ArrayList<> ();
       int ptr = mazeData.dataOffset + i * 2;
       mazeBlocks.add (blocks.get (ptr));
       mazeBlocks.add (blocks.get (ptr + 1));
@@ -197,7 +197,7 @@ public class Wizardry4BootDisk extends PascalDisk
     List<DiskAddress> blocks = fileEntry.getSectors ();
 
     DefaultMutableTreeNode mazeNode = linkNode ("Maze", "Level 5 mazes", scenarioNode);
-    List<DiskAddress> allMazeBlocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> allMazeBlocks = new ArrayList<> ();
 
     int dataSize = 0x39A;
     int base = 0x1800;
@@ -209,7 +209,7 @@ public class Wizardry4BootDisk extends PascalDisk
       System.arraycopy (buffer, offset + 0x2000, data, 0x400, dataSize);
       MazeGridV5 grid = new MazeGridV5 ("Maze level " + (i + 1), data, messageBlock);
 
-      List<DiskAddress> mazeBlocks = new ArrayList<DiskAddress> ();
+      List<DiskAddress> mazeBlocks = new ArrayList<> ();
       for (int j = 0; j < 4; j++)
         mazeBlocks.add (blocks.get (12 + i * 4 + j));
       allMazeBlocks.addAll (mazeBlocks);
@@ -227,7 +227,7 @@ public class Wizardry4BootDisk extends PascalDisk
     List<DiskAddress> blocks = fileEntry.getSectors ();
 
     StringBuilder text = new StringBuilder ();
-    List<DiskAddress> allBlocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> allBlocks = new ArrayList<> ();
     for (int i = 0; i < 23; i++)
     {
       allBlocks.add (blocks.get (44 + i));
@@ -254,7 +254,7 @@ public class Wizardry4BootDisk extends PascalDisk
     List<DiskAddress> blocks = fileEntry.getSectors ();
 
     StringBuilder text = new StringBuilder ();
-    List<DiskAddress> allBlocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> allBlocks = new ArrayList<> ();
     for (int i = 0; i < 19; i++)
     {
       allBlocks.add (blocks.get (87 + i));
@@ -296,7 +296,7 @@ public class Wizardry4BootDisk extends PascalDisk
             messageBlock.getMessageText (key)));
     }
 
-    List<DiskAddress> allOracleBlocks = new ArrayList<DiskAddress> ();
+    List<DiskAddress> allOracleBlocks = new ArrayList<> ();
     for (int i = 0; i < 20; i++)
     {
       allOracleBlocks.add (blocks.get (67 + i));

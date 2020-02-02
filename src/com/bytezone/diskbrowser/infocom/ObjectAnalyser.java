@@ -123,7 +123,7 @@ class ObjectAnalyser
     int propertyNumber;
     int lo;
     int hi;
-    List<Integer> offsets = new ArrayList<Integer> ();
+    List<Integer> offsets = new ArrayList<> ();
 
     public Statistics (int propertyNumber)
     {

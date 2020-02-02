@@ -13,8 +13,8 @@ class Reward extends AbstractFile
   int totalElements;
   List<RewardElement> elements;
   List<Item> items;
-  List<Monster> goldMonsters = new ArrayList<Monster> ();
-  List<Monster> chestMonsters = new ArrayList<Monster> ();
+  List<Monster> goldMonsters = new ArrayList<> ();
+  List<Monster> chestMonsters = new ArrayList<> ();
 
   public Reward (String name, byte[] buffer, int id, List<Item> items)
   {
@@ -22,7 +22,7 @@ class Reward extends AbstractFile
     this.id = id;
     this.items = items;
     totalElements = buffer[4];
-    elements = new ArrayList<RewardElement> (totalElements);
+    elements = new ArrayList<> (totalElements);
 
     for (int i = 0; i < totalElements; i++)
     {
@@ -128,8 +128,7 @@ class Reward extends AbstractFile
             for (int j = 0; j < lineItem.length; j++)
               lineItem[j] = i + j <= max ? items.get (i + j).getName () : "";
             text.append (String.format ("%-17s %-16s %-16s %-16s %-16s%n", lineTitle,
-                                        lineItem[0], lineItem[1], lineItem[2],
-                                        lineItem[3]));
+                lineItem[0], lineItem[1], lineItem[2], lineItem[3]));
           }
           break;
         default:

@@ -470,7 +470,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   private class SourceLine
   {
-    List<SubLine> sublines = new ArrayList<SubLine> ();
+    List<SubLine> sublines = new ArrayList<> ();
     int lineNumber;
     int linePtr;
     int length;

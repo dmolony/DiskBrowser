@@ -16,8 +16,8 @@ public class DiskDetails
   private final String type;
   private final long size;
 
-  private final List<DiskDetails> duplicateChecksums = new ArrayList<DiskDetails> ();
-  private final List<DiskDetails> duplicateNames = new ArrayList<DiskDetails> ();
+  private final List<DiskDetails> duplicateChecksums = new ArrayList<> ();
+  private final List<DiskDetails> duplicateNames = new ArrayList<> ();
 
   private boolean isDuplicateName;
   private boolean isDuplicateChecksum;

@@ -13,12 +13,12 @@ class Routine extends InfocomAbstractFile
 {
   int startPtr, length, strings, locals;
 
-  List<Parameter> parameters = new ArrayList<Parameter> ();
-  List<Instruction> instructions = new ArrayList<Instruction> ();
-  List<Integer> calls = new ArrayList<Integer> ();
-  List<Integer> calledBy = new ArrayList<Integer> ();
-  List<Integer> actions = new ArrayList<Integer> ();          // not used yet
-  List<Integer> targets = new ArrayList<Integer> ();
+  List<Parameter> parameters = new ArrayList<> ();
+  List<Instruction> instructions = new ArrayList<> ();
+  List<Integer> calls = new ArrayList<> ();
+  List<Integer> calledBy = new ArrayList<> ();
+  List<Integer> actions = new ArrayList<> ();          // not used yet
+  List<Integer> targets = new ArrayList<> ();
 
   public Routine (int ptr, Header header, int caller)
   {

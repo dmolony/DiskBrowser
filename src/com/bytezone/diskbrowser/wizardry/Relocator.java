@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class Relocator extends AbstractFile
 {
   private final int checkByte;
-  private final List<DiskRecord> diskRecords = new ArrayList<DiskRecord> ();
+  private final List<DiskRecord> diskRecords = new ArrayList<> ();
 
   private final int[] diskBlocks = new int[0x800];
   private final int[] diskOffsets = new int[0x800];
@@ -92,7 +92,7 @@ public class Relocator extends AbstractFile
       text.append ("\n");
     }
 
-    List<String> lines = new ArrayList<String> ();
+    List<String> lines = new ArrayList<> ();
     String heading = " Logical   Size  Disk  Physical";
     String underline = "---------  ----  ----  ---------";
 
@@ -153,7 +153,7 @@ public class Relocator extends AbstractFile
   {
     int diskNumber;
     int totDiskSegments;
-    List<DiskSegment> diskSegments = new ArrayList<DiskSegment> ();
+    List<DiskSegment> diskSegments = new ArrayList<> ();
 
     public DiskRecord (byte[] buffer, int ptr)
     {

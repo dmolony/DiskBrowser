@@ -17,8 +17,8 @@ public class NuFX
   private final byte[] buffer;
   private final boolean debug = false;
 
-  private final List<Record> records = new ArrayList<Record> ();
-  private final List<Thread> threads = new ArrayList<Thread> ();
+  private final List<Record> records = new ArrayList<> ();
+  private final List<Thread> threads = new ArrayList<> ();
 
   public NuFX (Path path) throws FileFormatException, IOException
   {

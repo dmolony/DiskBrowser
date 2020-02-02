@@ -8,7 +8,7 @@ class LZW
   static protected final String[] st = new String[0x1000];
   static protected final int TRACK_LENGTH = 0x1000;
 
-  protected final List<byte[]> chunks = new ArrayList<byte[]> ();
+  protected final List<byte[]> chunks = new ArrayList<> ();
   protected int volume;
   protected byte runLengthChar;
   protected int crc;

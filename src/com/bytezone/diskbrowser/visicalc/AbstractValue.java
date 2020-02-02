@@ -20,7 +20,7 @@ public abstract class AbstractValue implements Value
   protected boolean bool;
 
   protected ValueResult valueResult = ValueResult.VALID;
-  protected List<Value> values = new ArrayList<Value> ();
+  protected List<Value> values = new ArrayList<> ();
 
   public AbstractValue (Cell cell, String text)
   {

@@ -14,7 +14,7 @@ class Range implements Iterable<Address>
   //  private static final Pattern addressList = Pattern.compile ("\\(([^,]+(,[^,]+)*)\\)");
 
   private Address from, to;
-  private final List<Address> range = new ArrayList<Address> ();
+  private final List<Address> range = new ArrayList<> ();
   private final Cell cell;
 
   private boolean isHorizontal;

@@ -20,7 +20,7 @@ public class PascalCodeStatement implements PascalConstants
   int ptr;                    // temp
   byte[] buffer;
   boolean jumpTarget;
-  List<Jump> jumps = new ArrayList<Jump> ();
+  List<Jump> jumps = new ArrayList<> ();
 
   public PascalCodeStatement (byte[] buffer, int ptr, int procPtr)
   {

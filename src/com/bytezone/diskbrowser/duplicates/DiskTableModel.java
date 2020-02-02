@@ -10,7 +10,7 @@ public class DiskTableModel extends AbstractTableModel
   static final String[] headers =
       { "Path", "Name", "Type", "Size", "# names", "Checksum", "# checksums" };
 
-  private final List<TableLine> lines = new ArrayList<DiskTableModel.TableLine> ();
+  private final List<TableLine> lines = new ArrayList<> ();
   private final RootFolderData rootFolderData;
 
   public DiskTableModel (RootFolderData rootFolderData)

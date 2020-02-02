@@ -50,7 +50,7 @@ class Dictionary extends AbstractFile
       List<WordEntry> wordEntryList = synonymList.get (wordEntry.key);
       if (wordEntryList == null)
       {
-        wordEntryList = new ArrayList<WordEntry> ();
+        wordEntryList = new ArrayList<> ();
         synonymList.put (wordEntry.key, wordEntryList);
       }
       wordEntryList.add (wordEntry);
@@ -143,7 +143,7 @@ class Dictionary extends AbstractFile
 
   public List<String> getVerbs (int value)
   {
-    List<String> words = new ArrayList<String> ();
+    List<String> words = new ArrayList<> ();
     int ptr = dictionaryPtr + totalSeparators + 4;
 
     for (ZString word : dictionary.values ())
@@ -162,7 +162,7 @@ class Dictionary extends AbstractFile
 
   public List<String> getPrepositions (int value)
   {
-    List<String> words = new ArrayList<String> ();
+    List<String> words = new ArrayList<> ();
     int ptr = dictionaryPtr + totalSeparators + 4;
 
     for (ZString word : dictionary.values ())

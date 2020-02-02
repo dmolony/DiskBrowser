@@ -35,7 +35,7 @@ abstract class AbstractTab extends JPanel implements Tab
 // -----------------------------------------------------------------------------------//
 {
   private final static Cursor handCursor = new Cursor (Cursor.HAND_CURSOR);
-  private final List<MouseAdapter> adapters = new ArrayList<MouseAdapter> ();
+  private final List<MouseAdapter> adapters = new ArrayList<> ();
   private Font font;
   private final JScrollPane scrollPane;
   final DiskAndFileSelector eventHandler;

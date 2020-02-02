@@ -10,7 +10,7 @@ public class SectorListConverter
 
   public SectorListConverter (String text, Disk disk)
   {
-    sectors = new ArrayList<DiskAddress> ();
+    sectors = new ArrayList<> ();
     sectorText = text;
 
     String[] blocks = text.split (";");

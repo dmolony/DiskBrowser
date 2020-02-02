@@ -12,7 +12,7 @@ public class MessageDataBlock extends AbstractFile
   final int lastMessageNo;
 
   private final int groupCount;
-  private final List<Message> messages = new ArrayList<Message> ();
+  private final List<Message> messages = new ArrayList<> ();
 
   private final Huffman huffman;
 

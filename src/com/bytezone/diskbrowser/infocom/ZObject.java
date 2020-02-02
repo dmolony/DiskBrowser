@@ -19,7 +19,7 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   private final int propertyTableLength;
 
   final int parent, sibling, child;
-  final List<Property> properties = new ArrayList<Property> ();
+  final List<Property> properties = new ArrayList<> ();
   final BitSet attributes = new BitSet (32);
 
   public ZObject (String name, byte[] buffer, int offset, int id, Header header)

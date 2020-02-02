@@ -32,7 +32,7 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
     propertySize = header.globalsOffset - propertyPtr;
     tableSize = (propertyPtr - tablePtr);
     int totalObjects = tableSize / ZObject.HEADER_SIZE;
-    list = new ArrayList<ZObject> (tableSize);
+    list = new ArrayList<> (tableSize);
 
     for (int objectNo = 0; objectNo < totalObjects; objectNo++)
       list.add (new ZObject (null, buffer, tablePtr + objectNo * ZObject.HEADER_SIZE,

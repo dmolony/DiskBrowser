@@ -71,8 +71,8 @@ class MazeLevel extends AbstractFile
         { "", "Stairs", "Pit", "Chute", "Spinner", "Darkness", "Teleport", "Ouch",
           "Elevator", "Rock/Water", "Fizzle", "Message/Item", "Monster" };
 
-    List<MazeAddress> messageList = new ArrayList<MazeAddress> ();
-    List<MazeAddress> monsterList = new ArrayList<MazeAddress> ();
+    List<MazeAddress> messageList = new ArrayList<> ();
+    List<MazeAddress> monsterList = new ArrayList<> ();
 
     text.append ("\n\nValue   Index   Contains          Table\n");
     for (int j = 0; j < 16; j++)

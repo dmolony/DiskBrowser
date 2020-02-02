@@ -9,7 +9,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class AppleworksSSFile extends AbstractFile
 {
   Header header;
-  List<Row> rows = new ArrayList<Row> ();
+  List<Row> rows = new ArrayList<> ();
 
   public AppleworksSSFile (String name, byte[] buffer)
   {
@@ -248,7 +248,7 @@ public class AppleworksSSFile extends AbstractFile
   private class Row
   {
     private final int rowNumber;
-    private final List<Cell> cells = new ArrayList<Cell> ();
+    private final List<Cell> cells = new ArrayList<> ();
 
     public Row (int ptr)
     {

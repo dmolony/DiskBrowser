@@ -5,8 +5,8 @@ import java.util.List;
 
 class Expression extends AbstractValue
 {
-  private final List<String> operators = new ArrayList<String> ();
-  private final List<String> signs = new ArrayList<String> ();
+  private final List<String> operators = new ArrayList<> ();
+  private final List<String> signs = new ArrayList<> ();
 
   public Expression (Cell cell, String text)
   {

@@ -9,7 +9,9 @@ import java.util.TreeMap;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class Grammar extends InfocomAbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private static final int SENTENCE_LENGTH = 8;
   private final Header header;
@@ -28,7 +30,9 @@ class Grammar extends InfocomAbstractFile
   private final List<Integer> actionRoutines = new ArrayList<> ();
   private final List<Integer> preActionRoutines = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   Grammar (String name, byte[] buffer, Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.header = header;
@@ -90,7 +94,7 @@ class Grammar extends InfocomAbstractFile
       {
         // add to hashmap
         if (!actionList.containsKey (sentence.actionId))
-          actionList.put (sentence.actionId, new ArrayList<Sentence> ());
+          actionList.put (sentence.actionId, new ArrayList<> ());
         actionList.get (sentence.actionId).add (sentence);
 
         // add to pre-action routine list
@@ -108,7 +112,9 @@ class Grammar extends InfocomAbstractFile
     Collections.sort (preActionRoutines);
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getPadding ()
+  // ---------------------------------------------------------------------------------//
   {
     // calculate record padding size (Zork has 1 byte padding, Planetfall has 0)
     int r1 = header.getWord (indexPtr);
@@ -117,12 +123,16 @@ class Grammar extends InfocomAbstractFile
     return r2 - r1 - (sentences * SENTENCE_LENGTH) - 1;
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getRecordLength (int recordPtr)
+  // ---------------------------------------------------------------------------------//
   {
     return (buffer[recordPtr] & 0xFF) * SENTENCE_LENGTH + padding + 1;
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getTotalActions ()
+  // ---------------------------------------------------------------------------------//
   {
     // loop through each record in each index entry, and find the highest action number
     int ptr = tablePtr;
@@ -150,8 +160,10 @@ class Grammar extends InfocomAbstractFile
   //    return routines;
   //  }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     String line = "-----------------------------------------------------"
         + "-----------------------------------------------------------\n";
@@ -209,12 +221,16 @@ class Grammar extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   List<SentenceGroup> getSentenceGroups ()
+  // ---------------------------------------------------------------------------------//
   {
     return sentenceGroups;
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<Sentence> getSentences (int routine)
+  // ---------------------------------------------------------------------------------//
   {
     List<Sentence> sentences = new ArrayList<> ();
 
@@ -226,7 +242,9 @@ class Grammar extends InfocomAbstractFile
     return sentences;
   }
 
+  // ---------------------------------------------------------------------------------//
   private String makeWordBlock (List<String> words)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("[");
     if (words.size () > 0)
@@ -242,7 +260,9 @@ class Grammar extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class SentenceGroup implements Iterable<Sentence>
+  // ---------------------------------------------------------------------------------//
   {
     int startPtr;
     int id;
@@ -278,7 +298,9 @@ class Grammar extends InfocomAbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class Sentence
+  // ---------------------------------------------------------------------------------//
   {
     int startPtr;
     SentenceGroup parent;

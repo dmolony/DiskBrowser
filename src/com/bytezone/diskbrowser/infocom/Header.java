@@ -4,7 +4,9 @@ import java.io.File;
 
 import com.bytezone.diskbrowser.disk.Disk;
 
+// -----------------------------------------------------------------------------------//
 class Header extends InfocomAbstractFile
+// -----------------------------------------------------------------------------------//
 {
   final String[] propertyNames = new String[32];
 
@@ -29,7 +31,9 @@ class Header extends InfocomAbstractFile
   final CodeManager codeManager;
   final StringManager stringManager;
 
+  // ---------------------------------------------------------------------------------//
   public Header (String name, byte[] buffer, Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.file = disk.getFile ();
@@ -79,28 +83,38 @@ class Header extends InfocomAbstractFile
     hexBlocks.add (new HexBlock (0, 64, "Header data:"));
   }
 
+  // ---------------------------------------------------------------------------------//
   String getPropertyName (int id)
+  // ---------------------------------------------------------------------------------//
   {
     return propertyNames[id];
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getAbbreviation (int index)
+  // ---------------------------------------------------------------------------------//
   {
     return abbreviations.getAbbreviation (index);
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean containsWordAt (int address)
+  // ---------------------------------------------------------------------------------//
   {
     return dictionary.containsWordAt (address);
   }
 
+  // ---------------------------------------------------------------------------------//
   public String wordAt (int address)
+  // ---------------------------------------------------------------------------------//
   {
     return dictionary.wordAt (address);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -141,7 +155,9 @@ class Header extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getAlternate ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("\n\n");
 
@@ -161,7 +177,9 @@ class Header extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getLine (int offset, int size, String description)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%04X - %04X  ", offset, offset + size - 1));
@@ -174,17 +192,23 @@ class Header extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   ZObject getObject (int index)
+  // ---------------------------------------------------------------------------------//
   {
     return objectManager.getObject (index);
   }
 
+  // ---------------------------------------------------------------------------------//
   int getByte (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     return buffer[offset] & 0xFF;
   }
 
+  // ---------------------------------------------------------------------------------//
   int getWord (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     return ((buffer[offset] << 8) & 0xFF00) | ((buffer[offset + 1]) & 0xFF);
   }

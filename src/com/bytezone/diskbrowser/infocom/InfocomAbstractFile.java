@@ -6,17 +6,23 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class InfocomAbstractFile extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   protected List<HexBlock> hexBlocks = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public InfocomAbstractFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     if (hexBlocks.size () > 0)
     {
@@ -44,7 +50,9 @@ public class InfocomAbstractFile extends AbstractFile
     return HexFormatter.format (buffer, 0, 99999);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected class HexBlock
+  // ---------------------------------------------------------------------------------//
   {
     public int ptr;
     public int size;

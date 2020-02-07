@@ -5,7 +5,9 @@ import java.awt.image.DataBuffer;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class DoubleHiResImage extends HiResImage
+// -----------------------------------------------------------------------------------//
 {
   private static int[] swap = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
 
@@ -13,7 +15,9 @@ public class DoubleHiResImage extends HiResImage
   private DoubleScrunch doubleScrunch;
   byte[] packedBuffer;
 
+  // ---------------------------------------------------------------------------------//
   public DoubleHiResImage (String name, byte[] buffer, byte[] auxBuffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -21,7 +25,9 @@ public class DoubleHiResImage extends HiResImage
     createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public DoubleHiResImage (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -30,8 +36,8 @@ public class DoubleHiResImage extends HiResImage
     if (name.endsWith (".PAC"))
     {
       packedBuffer = buffer;
-      doubleScrunch = new DoubleScrunch ();
-      doubleScrunch.unscrunch (buffer);
+      doubleScrunch = new DoubleScrunch (buffer);
+      //      doubleScrunch.unscrunch (buffer);
       auxBuffer = doubleScrunch.memory[0];
       this.buffer = doubleScrunch.memory[1];
     }
@@ -50,8 +56,10 @@ public class DoubleHiResImage extends HiResImage
     createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void createMonochromeImage ()
+  // ---------------------------------------------------------------------------------//
   {
     // image will be doubled vertically
     image = new BufferedImage (560, 192 * 2, BufferedImage.TYPE_BYTE_GRAY);
@@ -81,8 +89,10 @@ public class DoubleHiResImage extends HiResImage
         }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void createColourImage ()
+  // ---------------------------------------------------------------------------------//
   {
     paletteIndex = paletteFactory.getCurrentPaletteIndex ();
     Palette palette = paletteFactory.getCurrentPalette ();
@@ -115,8 +125,10 @@ public class DoubleHiResImage extends HiResImage
         }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

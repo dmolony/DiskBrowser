@@ -1,13 +1,17 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public class DeviceDriver extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final int auxType;
   private final int classifications;
   private final int driverClass;
   private final boolean inactive;
 
+  // ---------------------------------------------------------------------------------//
   public DeviceDriver (String name, byte[] buffer, int auxType)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.auxType = auxType;
@@ -17,8 +21,10 @@ public class DeviceDriver extends AbstractFile
     inactive = (auxType & 0x8000) != 0;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
 

@@ -7,7 +7,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 public class NuFX
+// -----------------------------------------------------------------------------------//
 {
   private static String[] fileSystems =
       { "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
@@ -20,19 +22,25 @@ public class NuFX
   private final List<Record> records = new ArrayList<> ();
   private final List<Thread> threads = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public NuFX (Path path) throws FileFormatException, IOException
+  // ---------------------------------------------------------------------------------//
   {
     buffer = Files.readAllBytes (path);
     readBuffer ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public NuFX (File file) throws FileFormatException, IOException
+  // ---------------------------------------------------------------------------------//
   {
     buffer = Files.readAllBytes (file.toPath ());
     readBuffer ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void readBuffer ()
+  // ---------------------------------------------------------------------------------//
   {
     header = new Header (buffer);
 
@@ -67,7 +75,9 @@ public class NuFX
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public byte[] getBuffer ()
+  // ---------------------------------------------------------------------------------//
   {
     for (Thread thread : threads)
       if (thread.hasDisk ())
@@ -75,8 +85,10 @@ public class NuFX
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     for (Thread thread : threads)
       if (thread.hasDisk ())
@@ -84,7 +96,9 @@ public class NuFX
     return "no disk";
   }
 
+  // ---------------------------------------------------------------------------------//
   protected static int getCRC (final byte[] buffer, int base)
+  // ---------------------------------------------------------------------------------//
   {
     int crc = base;
     for (int j = 0; j < buffer.length; j++)
@@ -100,7 +114,9 @@ public class NuFX
     return crc;
   }
 
+  // ---------------------------------------------------------------------------------//
   class Header
+  // ---------------------------------------------------------------------------------//
   {
     private final int totalRecords;
     private final int version;
@@ -178,7 +194,9 @@ public class NuFX
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class Record
+  // ---------------------------------------------------------------------------------//
   {
     private final int totThreads;
     private final int crc;

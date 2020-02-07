@@ -2,13 +2,17 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.util.Objects;
 
+// -----------------------------------------------------------------------------------//
 class LZW2 extends LZW
+// -----------------------------------------------------------------------------------//
 {
   private int nextEntry = 0x100;
   private String prev = "";
   private int codeWord;
 
+  // ---------------------------------------------------------------------------------//
   public LZW2 (byte[] buffer, int crc)
+  // ---------------------------------------------------------------------------------//
   {
     bytes = Objects.requireNonNull (buffer);
 
@@ -67,7 +71,9 @@ class LZW2 extends LZW
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   protected byte[] undoLZW (int rleLength)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] lzwBuffer = new byte[rleLength];      // must fill this array from buffer
     int ptr = 0;
@@ -97,8 +103,10 @@ class LZW2 extends LZW
     return lzwBuffer;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

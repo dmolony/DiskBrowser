@@ -2,9 +2,13 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.util.Objects;
 
+// -----------------------------------------------------------------------------------//
 class LZW1 extends LZW
+// -----------------------------------------------------------------------------------//
 {
+  // ---------------------------------------------------------------------------------//
   public LZW1 (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     bytes = Objects.requireNonNull (buffer);
 
@@ -49,11 +53,13 @@ class LZW1 extends LZW
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   protected byte[] undoLZW (int rleLength)
+  // ---------------------------------------------------------------------------------//
   {
-    byte[] lzwBuffer = new byte[rleLength];  // must fill this array from input
+    byte[] lzwBuffer = new byte[rleLength];       // must fill this array from input
     int ptr = 0;
-    int nextEntry = 0x100;                // always start with a fresh table
+    int nextEntry = 0x100;                        // always start with a fresh table
     String prev = "";
 
     while (ptr < rleLength)
@@ -72,8 +78,10 @@ class LZW1 extends LZW
     return lzwBuffer;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

@@ -101,6 +101,9 @@ public abstract class HiResImage extends AbstractFile
   // 4 System Addons.hdv
   //
 
+  // see also - https://docs.google.com/spreadsheets/d
+  //           /1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/edit#gid=0
+
   static PaletteFactory paletteFactory = new PaletteFactory ();
 
   static final byte[] pngHeader =

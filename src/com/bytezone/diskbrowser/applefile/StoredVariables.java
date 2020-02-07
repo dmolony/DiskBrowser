@@ -2,15 +2,21 @@ package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class StoredVariables extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
+  // ---------------------------------------------------------------------------------//
   public StoredVariables (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     String strValue = null;
@@ -69,7 +75,9 @@ public class StoredVariables extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getVariableName (byte b1, byte b2)
+  // ---------------------------------------------------------------------------------//
   {
     char c1, c2, suffix;
 
@@ -102,7 +110,9 @@ public class StoredVariables extends AbstractFile
     return variableName.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getDimensionText (int[] values)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("(");
     for (int i = 0; i < values.length; i++)
@@ -114,7 +124,9 @@ public class StoredVariables extends AbstractFile
     return text.append (')').toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void listArrays (StringBuilder text, int ptr, int totalLength, int strPtr)
+  // ---------------------------------------------------------------------------------//
   {
     while (ptr < totalLength + 5)
     {
@@ -181,7 +193,9 @@ public class StoredVariables extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean hasValue (int p)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < 5; i++)
       if (buffer[p + i] != 0)
@@ -189,8 +203,10 @@ public class StoredVariables extends AbstractFile
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuffer text = new StringBuffer ();
 

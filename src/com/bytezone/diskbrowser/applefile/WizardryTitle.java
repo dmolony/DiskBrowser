@@ -1,14 +1,18 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public class WizardryTitle extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   public WizardryTitle (String name, byte[] buffer)
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     int size = 20;
     StringBuilder text = new StringBuilder ();
@@ -37,7 +41,9 @@ public class WizardryTitle extends AbstractFile
   //    return text;
   //  }
 
+  // ---------------------------------------------------------------------------------//
   private StringBuilder decode2 (int value, StringBuilder text)
+  // ---------------------------------------------------------------------------------//
   {
     for (int bit = 7; bit >= 0; bit--)
     {

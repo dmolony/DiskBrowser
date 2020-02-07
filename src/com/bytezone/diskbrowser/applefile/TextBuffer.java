@@ -3,13 +3,17 @@ package com.bytezone.diskbrowser.applefile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // only used by Prodos text files - note the fixed block size of 512 - bad!
+// -----------------------------------------------------------------------------------//
 public class TextBuffer
+// -----------------------------------------------------------------------------------//
 {
   public final byte[] buffer;
   public final int reclen;
   public final int firstRecNo;
 
+  // ---------------------------------------------------------------------------------//
   public TextBuffer (byte[] tempBuffer, int reclen, int firstBlock)
+  // ---------------------------------------------------------------------------------//
   {
     this.reclen = reclen;
 
@@ -34,8 +38,10 @@ public class TextBuffer
       System.arraycopy (tempBuffer, offset, buffer, 0, copyBytes);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

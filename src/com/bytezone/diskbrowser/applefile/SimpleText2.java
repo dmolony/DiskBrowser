@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class SimpleText2 extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   List<Integer> lineStarts = new ArrayList<> ();
   int loadAddress;
@@ -26,8 +28,10 @@ public class SimpleText2 extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -42,8 +46,10 @@ public class SimpleText2 extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -56,7 +62,9 @@ public class SimpleText2 extends AbstractFile
   }
 
   // convert buffer to text, ignore line-break at the end
+  // ---------------------------------------------------------------------------------//
   private String getLine (int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder ();
     int length = buffer[ptr] & 0xFF;

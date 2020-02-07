@@ -4,19 +4,25 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class TextFile extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private int recordLength;               // prodos aux
   private List<TextBuffer> buffers;       // only used if it is a Prodos text file
   private int eof;
   private boolean prodosFile;
 
+  // ---------------------------------------------------------------------------------//
   public TextFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   public TextFile (String name, byte[] buffer, int auxType, int eof)
+  // ---------------------------------------------------------------------------------//
   {
     this (name, buffer);
     this.eof = eof;
@@ -24,7 +30,9 @@ public class TextFile extends AbstractFile
     prodosFile = true;
   }
 
+  // ---------------------------------------------------------------------------------//
   public TextFile (String name, List<TextBuffer> buffers, int auxType, int eof)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, null);
     this.buffers = buffers;
@@ -33,8 +41,10 @@ public class TextFile extends AbstractFile
     prodosFile = true;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     if (buffers == null)
       return (super.getHexDump ());
@@ -51,8 +61,10 @@ public class TextFile extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -80,7 +92,9 @@ public class TextFile extends AbstractFile
     return knownLength (text, 0).toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String treeFileText (StringBuilder text)
+  // ---------------------------------------------------------------------------------//
   {
     text.append ("  Offset    Record#  Text values\n");
     text.append (
@@ -93,7 +107,9 @@ public class TextFile extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private StringBuilder knownLength (StringBuilder text, int recNo)
+  // ---------------------------------------------------------------------------------//
   {
     for (int ptr = 0; ptr < buffer.length; ptr += recordLength)
     {
@@ -121,7 +137,9 @@ public class TextFile extends AbstractFile
     return text;
   }
 
+  // ---------------------------------------------------------------------------------//
   private String unknownLength (StringBuilder text)
+  // ---------------------------------------------------------------------------------//
   {
     int nulls = 0;
     int ptr = 0;
@@ -182,7 +200,9 @@ public class TextFile extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private int gcd (int a, int b)
+  // ---------------------------------------------------------------------------------//
   {
     return a == 0 ? b : gcd (b % a, a);
   }

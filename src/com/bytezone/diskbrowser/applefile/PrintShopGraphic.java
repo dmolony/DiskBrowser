@@ -5,9 +5,13 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 
+// -----------------------------------------------------------------------------------//
 public class PrintShopGraphic extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
+  // ---------------------------------------------------------------------------------//
   public PrintShopGraphic (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -27,8 +31,10 @@ public class PrintShopGraphic extends AbstractFile
     g2d.dispose ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

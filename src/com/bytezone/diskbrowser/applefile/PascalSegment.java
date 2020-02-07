@@ -6,7 +6,9 @@ import java.util.List;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class PascalSegment extends AbstractFile implements PascalConstants
+// -----------------------------------------------------------------------------------//
 {
   private final static int BLOCK_SIZE = 512;
   final int segmentNoHeader;
@@ -30,7 +32,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   private List<PascalProcedure> procedures;
   //  private List<MultiDiskAddress> addresses;
 
+  // ---------------------------------------------------------------------------------//
   public PascalSegment (String name, byte[] fullBuffer, int seq, int blockOffset)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, fullBuffer);     // sets this.buffer to the full buffer temporarily
 
@@ -114,7 +118,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   //    this.addresses = addresses;
   //  }
 
+  // ---------------------------------------------------------------------------------//
   private void buildProcedureList ()
+  // ---------------------------------------------------------------------------------//
   {
     procedures = new ArrayList<> (totalProcedures);
 
@@ -122,7 +128,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
       procedures.add (new PascalProcedure (buffer, i));
   }
 
+  // ---------------------------------------------------------------------------------//
   public String toText ()
+  // ---------------------------------------------------------------------------------//
   {
     int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
 
@@ -133,8 +141,10 @@ public class PascalSegment extends AbstractFile implements PascalConstants
         getMultiDiskAddresses ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     if (procedures == null)
       buildProcedureList ();
@@ -194,7 +204,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getMultiDiskAddresses ()
+  // ---------------------------------------------------------------------------------//
   {
     String multiDiskAddressText = "";
     //    int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;

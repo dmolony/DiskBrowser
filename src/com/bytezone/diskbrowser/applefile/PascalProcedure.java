@@ -6,7 +6,9 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.PascalCodeStatement.Jump;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class PascalProcedure
+// -----------------------------------------------------------------------------------//
 {
   // all procedures have these fields
   byte[] buffer;
@@ -26,7 +28,9 @@ public class PascalProcedure
   AssemblerProgram assembler;
   int jumpTable = -8;
 
+  // ---------------------------------------------------------------------------------//
   public PascalProcedure (byte[] buffer, int slot)
+  // ---------------------------------------------------------------------------------//
   {
     this.buffer = buffer;
     this.slot = slot;
@@ -46,7 +50,9 @@ public class PascalProcedure
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void decode ()
+  // ---------------------------------------------------------------------------------//
   {
     if (statements.size () > 0 || assembler != null)
       return;
@@ -118,7 +124,9 @@ public class PascalProcedure
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<PascalCodeStatement> extractStrings ()
+  // ---------------------------------------------------------------------------------//
   {
     decode ();
     List<PascalCodeStatement> strings = new ArrayList<> ();
@@ -128,8 +136,10 @@ public class PascalProcedure
     return strings;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     if (!valid)
       return "";

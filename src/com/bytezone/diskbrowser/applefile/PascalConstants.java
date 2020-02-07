@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public interface PascalConstants
+// -----------------------------------------------------------------------------------//
 {
   static String[] mnemonics =
       { "ABI", "ABR", "ADI", "ADR", "LAND", "DIF", "DVI", "DVR", "CHK", "FLO", "FLT",
@@ -66,7 +68,8 @@ public interface PascalConstants
         "Load multiple words - push block of unsigned bytes at *ToS",
         "Store multiple words - store block of UB at ToS to *ToS-1",
         "Load Byte - index the byte pointer ToS-1 by integer index ToS and push that byte",
-        "Store Byte - index the byte pointer ToS-2 by integer index ToS-1 and move ToS to that location",
+        "Store Byte - index the byte pointer ToS-2 by integer "
+            + "index ToS-1 and move ToS to that location",
         "Index packed array - do complicated stuff with :1 and :2",
         "Return from base procedure (pass :1 words)",
         "Call Base Procedure :1 at lex level -1 or 0", "Compare Integer : ToS-1 = ToS",

@@ -21,14 +21,18 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
  *    S2+n     last byte = 0
  */
 
+// -----------------------------------------------------------------------------------//
 public class ShapeTable extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final List<Shape> shapes = new ArrayList<> ();
   private static final int SIZE = 400;
   int maxWidth = 0;
   int maxHeight = 0;
 
+  // ---------------------------------------------------------------------------------//
   public ShapeTable (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -81,8 +85,10 @@ public class ShapeTable extends AbstractFile
     g2d.dispose ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -100,7 +106,9 @@ public class ShapeTable extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isShapeTable (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length == 0)
       return false;
@@ -134,7 +142,9 @@ public class ShapeTable extends AbstractFile
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   class Shape
+  // ---------------------------------------------------------------------------------//
   {
     private final byte[] buffer;
     private final int index;

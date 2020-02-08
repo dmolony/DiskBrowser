@@ -7,35 +7,47 @@ import javax.swing.SwingWorker;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
-public class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
+// -----------------------------------------------------------------------------------//
+class DuplicateSwingWorker extends SwingWorker<Void, RootFolderData>
+// -----------------------------------------------------------------------------------//
 {
   private final RootFolderData rootFolderData;
 
-  public DuplicateSwingWorker (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
+  DuplicateSwingWorker (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
   {
     this.rootFolderData = rootFolderData;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected Void doInBackground () throws Exception
+  // ---------------------------------------------------------------------------------//
   {
     traverse (rootFolderData.getRootFolder ());
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void done ()
+  // ---------------------------------------------------------------------------------//
   {
     rootFolderData.done ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void process (List<RootFolderData> chunks)
+  // ---------------------------------------------------------------------------------//
   {
     rootFolderData.progressPanel.repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void traverse (File directory)
+  // ---------------------------------------------------------------------------------//
   {
     if (rootFolderData.progressPanel.cancelled)
       return;

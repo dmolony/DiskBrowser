@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-public class DiskTableModel extends AbstractTableModel
+// -----------------------------------------------------------------------------------//
+class DiskTableModel extends AbstractTableModel
+// -----------------------------------------------------------------------------------//
 {
   static final String[] headers =
       { "Path", "Name", "Type", "Size", "# names", "Checksum", "# checksums" };
@@ -13,7 +15,9 @@ public class DiskTableModel extends AbstractTableModel
   private final List<TableLine> lines = new ArrayList<> ();
   private final RootFolderData rootFolderData;
 
-  public DiskTableModel (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
+  DiskTableModel (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
   {
     this.rootFolderData = rootFolderData;
 
@@ -27,25 +31,33 @@ public class DiskTableModel extends AbstractTableModel
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public DiskDetails getDiskDetails (int rowIndex)
+  // ---------------------------------------------------------------------------------//
   {
     return lines.get (rowIndex).diskDetails;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getColumnName (int column)
+  // ---------------------------------------------------------------------------------//
   {
     return headers[column];
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getRowCount ()
+  // ---------------------------------------------------------------------------------//
   {
     return lines.size ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getColumnCount ()
+  // ---------------------------------------------------------------------------------//
   {
     if (rootFolderData.doChecksums)
       return headers.length;
@@ -53,14 +65,18 @@ public class DiskTableModel extends AbstractTableModel
       return headers.length - 1;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Class<?> getColumnClass (int columnIndex)
+  // ---------------------------------------------------------------------------------//
   {
     return lines.isEmpty () ? Object.class : getValueAt (0, columnIndex).getClass ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Object getValueAt (int rowIndex, int columnIndex)
+  // ---------------------------------------------------------------------------------//
   {
     TableLine line = lines.get (rowIndex);
     switch (columnIndex)
@@ -84,7 +100,9 @@ public class DiskTableModel extends AbstractTableModel
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getCSV (int rowIndex)
+  // ---------------------------------------------------------------------------------//
   {
     TableLine line = lines.get (rowIndex);
     return String.format ("\"%s\",\"%s\",%s,%d,%s,%s,%d%n", line.path, line.shortName,
@@ -92,14 +110,18 @@ public class DiskTableModel extends AbstractTableModel
         line.checksum);
   }
 
+  // ---------------------------------------------------------------------------------//
   void updateChecksum (int rowIndex)
+  // ---------------------------------------------------------------------------------//
   {
     TableLine line = lines.get (rowIndex);
     line.checksum = line.diskDetails.calculateChecksum ();
     fireTableCellUpdated (rowIndex, 5);
   }
 
+  // ---------------------------------------------------------------------------------//
   class TableLine
+  // ---------------------------------------------------------------------------------//
   {
     private final String shortName;
     private final String fileName;

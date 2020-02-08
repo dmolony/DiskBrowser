@@ -7,9 +7,13 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 
-public class CSVFileWriter
+// -----------------------------------------------------------------------------------//
+class CSVFileWriter
+// -----------------------------------------------------------------------------------//
 {
-  public static void write (DiskTableModel diskTableModel, JTable table)
+  // ---------------------------------------------------------------------------------//
+  static void write (DiskTableModel diskTableModel, JTable table)
+  // ---------------------------------------------------------------------------------//
   {
     String csvFile =
         System.getProperty ("user.home") + File.separator + "DiskBrowser.csv";

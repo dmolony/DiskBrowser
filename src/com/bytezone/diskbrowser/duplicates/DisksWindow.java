@@ -31,7 +31,9 @@ import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.utilities.NumberRenderer;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class DisksWindow extends JFrame
+// -----------------------------------------------------------------------------------//
 {
   private final JTable table;
 
@@ -50,7 +52,9 @@ public class DisksWindow extends JFrame
   private final RootFolderData rootFolderData;
   private final DeleteWindow deleteWindow;
 
+  // ---------------------------------------------------------------------------------//
   public DisksWindow (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
   {
     super (rootFolderData.getRootFolderPathText ());
     this.rootFolderData = rootFolderData;
@@ -123,7 +127,9 @@ public class DisksWindow extends JFrame
   }
 
   // called from DuplicateSwingWorker
+  // ---------------------------------------------------------------------------------//
   public void setTableData (final RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
   {
     diskTableModel = new DiskTableModel (rootFolderData);
     table.setModel (diskTableModel);
@@ -209,7 +215,9 @@ public class DisksWindow extends JFrame
     setVisible (true);
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getFilterText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder filterText = new StringBuilder ();
 
@@ -227,7 +235,9 @@ public class DisksWindow extends JFrame
     return filterText.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class CheckBoxActionListener implements ActionListener
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     public void actionPerformed (ActionEvent e)

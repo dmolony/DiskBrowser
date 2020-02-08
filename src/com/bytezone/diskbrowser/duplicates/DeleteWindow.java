@@ -20,7 +20,9 @@ import javax.swing.table.TableColumnModel;
 
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 
+// -----------------------------------------------------------------------------------//
 public class DeleteWindow extends JFrame implements DiskTableSelectionListener
+// -----------------------------------------------------------------------------------//
 {
   private List<DiskDetails> lines = new ArrayList<> ();
   private final JButton btnHide = new JButton ("Close");
@@ -29,7 +31,9 @@ public class DeleteWindow extends JFrame implements DiskTableSelectionListener
   private final DeleteTableModel deleteTableModel = new DeleteTableModel ();
   private final JTable table = new JTable (deleteTableModel);
 
+  // ---------------------------------------------------------------------------------//
   public DeleteWindow (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Duplicate Disks");
 
@@ -72,14 +76,18 @@ public class DeleteWindow extends JFrame implements DiskTableSelectionListener
     setLocationRelativeTo (null);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void diskSelected (DiskDetails diskDetails)
+  // ---------------------------------------------------------------------------------//
   {
     lines = rootFolderData.listDuplicates (diskDetails.getChecksum ());
     deleteTableModel.fireTableDataChanged ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class DeleteTableModel extends AbstractTableModel
+  // ---------------------------------------------------------------------------------//
   {
     final String[] headers = { "Name", "Type", "Size", "Checksum", };
 

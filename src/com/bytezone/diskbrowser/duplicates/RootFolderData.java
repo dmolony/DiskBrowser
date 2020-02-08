@@ -23,7 +23,9 @@ import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.gui.RootDirectoryChangeListener;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class RootFolderData implements RootDirectoryChangeListener
+// -----------------------------------------------------------------------------------//
 {
   private static final String header =
       "      type        uncmp      .gz     .zip    total";
@@ -55,7 +57,9 @@ public class RootFolderData implements RootDirectoryChangeListener
   JButton btnCancel;
   JButton btnOK;
 
+  // ---------------------------------------------------------------------------------//
   private void createWindows ()
+  // ---------------------------------------------------------------------------------//
   {
     southPanel = new JPanel ();
     btnCancel = new JButton ("Cancel");
@@ -91,7 +95,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     });
   }
 
+  // ---------------------------------------------------------------------------------//
   public void count (boolean doChecksums)
+  // ---------------------------------------------------------------------------------//
   {
     if (dialogTotals == null)
       createWindows ();
@@ -106,7 +112,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     new DuplicateSwingWorker (this).execute ();           // start SwingWorker
   }
 
+  // ---------------------------------------------------------------------------------//
   public void done ()                                     // SwingWorker has completed
+  // ---------------------------------------------------------------------------------//
   {
     print ();
     dialogTotals.repaint ();
@@ -121,7 +129,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setButton (JButton button)
+  // ---------------------------------------------------------------------------------//
   {
     southPanel.removeAll ();
     southPanel.add (button);
@@ -129,7 +139,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     dialogTotals.repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   String getRootFolderPathText ()
+  // ---------------------------------------------------------------------------------//
   {
     String text = rootFolder.getAbsolutePath ();
     String homeDir = System.getProperty ("user.home");
@@ -138,7 +150,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     return text;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void clear ()
+  // ---------------------------------------------------------------------------------//
   {
     typeTotals = new int[4][Utility.suffixes.size ()];
     totalDisks = 0;
@@ -148,17 +162,23 @@ public class RootFolderData implements RootDirectoryChangeListener
     fileNameMap.clear ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public File getRootFolder ()
+  // ---------------------------------------------------------------------------------//
   {
     return rootFolder;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void incrementFolders ()
+  // ---------------------------------------------------------------------------------//
   {
     ++totalFolders;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void incrementType (File file, String filename)
+  // ---------------------------------------------------------------------------------//
   {
     int pos = Utility.getSuffixNo (filename);
     if (pos >= 0)
@@ -178,7 +198,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     checkDuplicates (file, filename);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void checkDuplicates (File file, String filename)
+  // ---------------------------------------------------------------------------------//
   {
     String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
     DiskDetails diskDetails = new DiskDetails (file, rootName, filename, doChecksums);
@@ -198,7 +220,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<DiskDetails> listDuplicates (long checksum)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskDetails> list = new ArrayList<> ();
     DiskDetails original = checksumMap.get (checksum);
@@ -212,12 +236,16 @@ public class RootFolderData implements RootDirectoryChangeListener
     return list;
   }
 
+  // ---------------------------------------------------------------------------------//
   public int getTotalType (int type)
+  // ---------------------------------------------------------------------------------//
   {
     return typeTotals[0][type] + typeTotals[1][type] + typeTotals[2][type];
   }
 
+  // ---------------------------------------------------------------------------------//
   public void print ()
+  // ---------------------------------------------------------------------------------//
   {
     System.out.printf ("%nFolders ...... %,7d%n", totalFolders);
     System.out.printf ("Disks ........ %,7d%n%n", totalDisks);
@@ -248,8 +276,20 @@ public class RootFolderData implements RootDirectoryChangeListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
+  // ---------------------------------------------------------------------------------//
+  {
+    rootFolder = newRootFolder;
+    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
+    disksWindow = null;           // force a recount
+  }
+
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -260,7 +300,9 @@ public class RootFolderData implements RootDirectoryChangeListener
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class ProgressPanel extends JPanel
+  // ---------------------------------------------------------------------------------//
   {
     public volatile boolean cancelled;
 
@@ -308,13 +350,5 @@ public class RootFolderData implements RootDirectoryChangeListener
         g.drawString (line, x, y);
       }
     }
-  }
-
-  @Override
-  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
-  {
-    rootFolder = newRootFolder;
-    rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
-    disksWindow = null;           // force a recount
   }
 }

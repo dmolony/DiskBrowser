@@ -3,17 +3,26 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.KeyStroke;
 
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 
-public class PreviousPaletteAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
+class PreviousPaletteAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   private final DataPanel owner;
   private final ButtonGroup buttonGroup;
 
-  public PreviousPaletteAction (DataPanel owner, ButtonGroup buttonGroup)
+  // ---------------------------------------------------------------------------------//
+  PreviousPaletteAction (DataPanel owner, ButtonGroup buttonGroup)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Previous Palette");
     putValue (Action.SHORT_DESCRIPTION, "Select previous color palette");
@@ -22,8 +31,10 @@ public class PreviousPaletteAction extends AbstractAction
     this.buttonGroup = buttonGroup;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     Palette palette = owner.cyclePalette (CycleDirection.BACKWARDS);
 

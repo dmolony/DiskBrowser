@@ -11,12 +11,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 class HideCatalogAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   JFrame owner;
   JPanel catalogPanel;
 
+  // ---------------------------------------------------------------------------------//
   public HideCatalogAction (JFrame owner, JPanel catalogPanel)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Show catalog panel");
     putValue (Action.SHORT_DESCRIPTION, "Show/hide the catalog panel");
@@ -26,12 +30,17 @@ class HideCatalogAction extends AbstractAction
     this.catalogPanel = catalogPanel;
   }
 
+  // ---------------------------------------------------------------------------------//
+  @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     set (((JMenuItem) e.getSource ()).isSelected ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public void set (boolean show)
+  // ---------------------------------------------------------------------------------//
   {
     if (show)
     {

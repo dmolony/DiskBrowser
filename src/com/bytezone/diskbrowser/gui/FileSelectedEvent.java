@@ -6,13 +6,17 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
-public class FileSelectedEvent extends EventObject
+// -----------------------------------------------------------------------------------//
+class FileSelectedEvent extends EventObject
+// -----------------------------------------------------------------------------------//
 {
   public final AppleFileSource appleFileSource;
   boolean redo;
   int volumeNo = -1;
 
-  public FileSelectedEvent (Object source, AppleFileSource appleFileSource)
+  // ---------------------------------------------------------------------------------//
+  FileSelectedEvent (Object source, AppleFileSource appleFileSource)
+  // ---------------------------------------------------------------------------------//
   {
     super (source);
     this.appleFileSource = appleFileSource;
@@ -28,14 +32,18 @@ public class FileSelectedEvent extends EventObject
     }
   }
 
-  @Override
-  public String toString ()
-  {
-    return appleFileSource.toString ();
-  }
-
+  // ---------------------------------------------------------------------------------//
   public String toText ()
+  // ---------------------------------------------------------------------------------//
   {
     return appleFileSource.getUniqueName ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return appleFileSource.toString ();
   }
 }

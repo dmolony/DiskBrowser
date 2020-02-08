@@ -7,13 +7,17 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.disk.SectorListConverter;
 
-public class SectorSelectedEvent extends EventObject
+// -----------------------------------------------------------------------------------//
+class SectorSelectedEvent extends EventObject
+// -----------------------------------------------------------------------------------//
 {
   private final List<DiskAddress> sectors;
   private final FormattedDisk owner;
   boolean redo;
 
-  public SectorSelectedEvent (Object source, List<DiskAddress> sectors, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
+  SectorSelectedEvent (Object source, List<DiskAddress> sectors, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
   {
     super (source);
     this.sectors = sectors;
@@ -21,17 +25,23 @@ public class SectorSelectedEvent extends EventObject
     this.owner = owner.getParent () == null ? owner : owner.getParent ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     return sectors;
   }
 
+  // ---------------------------------------------------------------------------------//
   public FormattedDisk getFormattedDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String toText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     SectorListConverter slc = new SectorListConverter (sectors);
@@ -39,7 +49,10 @@ public class SectorSelectedEvent extends EventObject
     return text.toString ();
   }
 
-  public static SectorSelectedEvent create (Object source, FormattedDisk owner, String sectorsText)
+  // ---------------------------------------------------------------------------------//
+  public static SectorSelectedEvent create (Object source, FormattedDisk owner,
+      String sectorsText)
+  // ---------------------------------------------------------------------------------//
   {
     if (sectorsText.startsWith ("$"))
       sectorsText = sectorsText.substring (3); // only for old records

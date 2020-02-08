@@ -3,11 +3,14 @@ package com.bytezone.diskbrowser.gui;
 import java.io.File;
 import java.util.Comparator;
 
+// -----------------------------------------------------------------------------------//
 public class FileComparator implements Comparator<File>
+// -----------------------------------------------------------------------------------//
 {
-
+  // ---------------------------------------------------------------------------------//
   @Override
   public int compare (File thisFile, File thatFile)
+  // ---------------------------------------------------------------------------------//
   {
     boolean thisFileIsDirectory = thisFile.isDirectory ();
     boolean thatFileIsDirectory = thatFile.isDirectory ();

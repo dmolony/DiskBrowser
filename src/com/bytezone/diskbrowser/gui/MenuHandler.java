@@ -28,8 +28,10 @@ import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
 
-public class MenuHandler implements DiskSelectionListener, FileSelectionListener,
-    QuitListener, SectorSelectionListener
+// -----------------------------------------------------------------------------------//
+class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitListener,
+    SectorSelectionListener
+// -----------------------------------------------------------------------------------//
 {
   static final String PREFS_LINE_WRAP = "line wrap";
   private static final String PREFS_SHOW_CATALOG = "show catalog";
@@ -128,7 +130,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
 
   ButtonGroup paletteGroup = new ButtonGroup ();
 
-  public MenuHandler ()
+  // ---------------------------------------------------------------------------------//
+  MenuHandler ()
+  // ---------------------------------------------------------------------------------//
   {
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
@@ -270,7 +274,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     saveSectorsItem.setAction (saveSectorsAction);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setBasicPreferences ()
+  // ---------------------------------------------------------------------------------//
   {
     basicPreferences.splitRem = splitRemarkItem.isSelected ();
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
@@ -281,7 +287,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     BasicProgram.setBasicPreferences (basicPreferences);
   }
 
+  // ---------------------------------------------------------------------------------//
   void addBasicPreferencesListener (BasicPreferencesListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     if (!basicPreferencesListeners.contains (listener))
     {
@@ -290,13 +298,17 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   void notifyBasicPreferencesListeners ()
+  // ---------------------------------------------------------------------------------//
   {
     for (BasicPreferencesListener listener : basicPreferencesListeners)
       listener.setBasicPreferences (basicPreferences);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setAssemblerPreferences ()
+  // ---------------------------------------------------------------------------------//
   {
     assemblerPreferences.showTargets = showAssemblerTargetsItem.isSelected ();
     assemblerPreferences.showStrings = showAssemblerStringsItem.isSelected ();
@@ -304,7 +316,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     AssemblerProgram.setAssemblerPreferences (assemblerPreferences);
   }
 
+  // ---------------------------------------------------------------------------------//
   void addAssemblerPreferencesListener (AssemblerPreferencesListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     if (!assemblerPreferencesListeners.contains (listener))
     {
@@ -313,19 +327,25 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   void notifyAssemblerPreferencesListeners ()
+  // ---------------------------------------------------------------------------------//
   {
     for (AssemblerPreferencesListener listener : assemblerPreferencesListeners)
       listener.setAssemblerPreferences (assemblerPreferences);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setProdosPreferences ()
+  // ---------------------------------------------------------------------------------//
   {
     prodosPreferences.sortDirectories = prodosSortDirectoriesItem.isSelected ();
     ProdosDisk.setProdosPreferences (prodosPreferences);
   }
 
+  // ---------------------------------------------------------------------------------//
   void addProdosPreferencesListener (ProdosPreferencesListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     if (!prodosPreferencesListeners.contains (listener))
     {
@@ -334,7 +354,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   void notifyProdosPreferencesListeners ()
+  // ---------------------------------------------------------------------------------//
   {
     for (ProdosPreferencesListener listener : prodosPreferencesListeners)
       listener.setProdosPreferences (prodosPreferences);
@@ -345,7 +367,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
   //    helpMenu.add (new JMenuItem (action));
   //  }
 
+  // ---------------------------------------------------------------------------------//
   private void addLauncherMenu ()
+  // ---------------------------------------------------------------------------------//
   {
     if (!Desktop.isDesktopSupported ())
       return;
@@ -365,8 +389,10 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     fileMenu.addSeparator ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void quit (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     prefs.putBoolean (PREFS_LINE_WRAP, lineWrapItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_LAYOUT, showLayoutItem.isSelected ());
@@ -396,8 +422,10 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
         prodosSortDirectoriesItem.isSelected ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void restore (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     lineWrapItem.setSelected (prefs.getBoolean (PREFS_LINE_WRAP, true));
     showLayoutItem.setSelected (prefs.getBoolean (PREFS_SHOW_LAYOUT, true));
@@ -452,15 +480,19 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     fontAction.restore (prefs);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void diskSelected (DiskSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     currentDisk = event.getFormattedDisk ();
     adjustMenus (currentDisk);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void fileSelected (FileSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     // This can happen if a file is selected from a dual-dos disk
     if (event.appleFileSource.getFormattedDisk () != currentDisk)
@@ -470,7 +502,9 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void adjustMenus (final FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (disk != null)
     {
@@ -517,8 +551,10 @@ public class MenuHandler implements DiskSelectionListener, FileSelectionListener
     saveTempFileAction.setDisk (disk);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void sectorSelected (SectorSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     //    List<DiskAddress> sectors = event.getSectors ();
   }

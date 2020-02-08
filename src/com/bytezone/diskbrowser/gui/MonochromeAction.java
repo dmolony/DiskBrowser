@@ -8,11 +8,15 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-public class MonochromeAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
+class MonochromeAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   private final DataPanel owner;
 
-  public MonochromeAction (DataPanel owner)
+  // ---------------------------------------------------------------------------------//
+  MonochromeAction (DataPanel owner)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Monochrome");
     putValue (Action.SHORT_DESCRIPTION, "Display image in monochrome or color");
@@ -21,8 +25,10 @@ public class MonochromeAction extends AbstractAction
     this.owner = owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     owner.setMonochrome (((JMenuItem) e.getSource ()).isSelected ());
   }

@@ -6,13 +6,25 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 
 import com.bytezone.common.FontTester;
 import com.bytezone.input.SpringUtilities;
 
+// -----------------------------------------------------------------------------------//
 class PreferencesDialog extends JDialog
+// -----------------------------------------------------------------------------------//
 {
   static final String prefsCatalogFont = "CatalogFont";
   static final String prefsDataFont = "DataFont";
@@ -38,7 +50,9 @@ class PreferencesDialog extends JDialog
   private int catalogFontSize;
   private int dataFontSize;
 
-  public PreferencesDialog (JFrame owner, Preferences prefs)
+  // ---------------------------------------------------------------------------------//
+  PreferencesDialog (JFrame owner, Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     super (owner, "Set Preferences", false);
 
@@ -96,7 +110,9 @@ class PreferencesDialog extends JDialog
     setVisible (true);
   }
 
+  // ---------------------------------------------------------------------------------//
   private JComponent getCommandPanel ()
+  // ---------------------------------------------------------------------------------//
   {
     JButton cancel = new JButton ("Cancel");
     cancel.addActionListener (new ActionListener ()
@@ -139,7 +155,9 @@ class PreferencesDialog extends JDialog
     return commandPanel;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void updatePreferences ()
+  // ---------------------------------------------------------------------------------//
   {
     String newFontName = (String) catalogFontList.getSelectedItem ();
     if (!newFontName.equals (catalogFontName))
@@ -170,7 +188,9 @@ class PreferencesDialog extends JDialog
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addCancelByEscapeKey ()
+  // ---------------------------------------------------------------------------------//
   {
     String CANCEL_ACTION_KEY = "CANCEL_ACTION_KEY";
     int noModifiers = 0;
@@ -189,12 +209,16 @@ class PreferencesDialog extends JDialog
     getRootPane ().getActionMap ().put (CANCEL_ACTION_KEY, cancelAction);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void closeDialog ()
+  // ---------------------------------------------------------------------------------//
   {
     dispose ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class Listener implements ActionListener
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     public void actionPerformed (ActionEvent e)

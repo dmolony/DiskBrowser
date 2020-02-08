@@ -11,18 +11,24 @@ import javax.swing.JOptionPane;
 
 import com.bytezone.common.DefaultAction;
 
-public class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
+// -----------------------------------------------------------------------------------//
+class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
+// -----------------------------------------------------------------------------------//
 {
   SectorSelectedEvent event;
 
-  public SaveSectorsAction ()
+  // ---------------------------------------------------------------------------------//
+  SaveSectorsAction ()
+  // ---------------------------------------------------------------------------------//
   {
     super ("Save sectors...", "Save sectors");
     this.setEnabled (false);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent evt)
+  // ---------------------------------------------------------------------------------//
   {
     if (event == null)
     {
@@ -50,8 +56,10 @@ public class SaveSectorsAction extends DefaultAction implements SectorSelectionL
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void sectorSelected (SectorSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     this.event = event;
     this.setEnabled (true);

@@ -12,11 +12,15 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 
+// -----------------------------------------------------------------------------------//
 class PrintAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
 {
   DataPanel owner;
 
+  // ---------------------------------------------------------------------------------//
   public PrintAction (DataPanel owner)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Print...", "Print the contents of the output panel",
         "/com/bytezone/diskbrowser/icons/");
@@ -30,8 +34,10 @@ class PrintAction extends DefaultAction
     setIcon (Action.LARGE_ICON_KEY, "printer_32.png");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     Runnable runner = new Runnable ()
     {

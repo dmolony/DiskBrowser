@@ -6,7 +6,9 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
 
+// -----------------------------------------------------------------------------------//
 class WindowState
+// -----------------------------------------------------------------------------------//
 {
   private static final String PREF_WINDOW_WIDTH = "WindowWidth";
   private static final String PREF_WINDOW_HEIGHT = "WindowHeight";
@@ -14,12 +16,16 @@ class WindowState
 
   public Preferences preferences;
 
-  public WindowState (Preferences preferences)
+  // ---------------------------------------------------------------------------------//
+  WindowState (Preferences preferences)
+  // ---------------------------------------------------------------------------------//
   {
     this.preferences = preferences;
   }
 
-  public void clear ()
+  // ---------------------------------------------------------------------------------//
+  void clear ()
+  // ---------------------------------------------------------------------------------//
   {
     try
     {
@@ -32,19 +38,25 @@ class WindowState
     }
   }
 
-  public Dimension getWindowSize (int defaultWidth, int defaultHeight)
+  // ---------------------------------------------------------------------------------//
+  Dimension getWindowSize (int defaultWidth, int defaultHeight)
+  // ---------------------------------------------------------------------------------//
   {
     int width = preferences.getInt (PREF_WINDOW_WIDTH, defaultWidth);
     int height = preferences.getInt (PREF_WINDOW_HEIGHT, defaultHeight);
     return new Dimension (width, height);
   }
 
-  public int getExtendedState (int defaultState)
+  // ---------------------------------------------------------------------------------//
+  int getExtendedState (int defaultState)
+  // ---------------------------------------------------------------------------------//
   {
     return preferences.getInt (PREF_WINDOW_STATE, defaultState);
   }
 
-  public void save (JFrame window)
+  // ---------------------------------------------------------------------------------//
+  void save (JFrame window)
+  // ---------------------------------------------------------------------------------//
   {
     preferences.putInt (PREF_WINDOW_WIDTH, window.getWidth ());
     preferences.putInt (PREF_WINDOW_HEIGHT, window.getHeight ());

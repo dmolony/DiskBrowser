@@ -20,7 +20,7 @@ import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public class TreeBuilder
+class TreeBuilder
 // -----------------------------------------------------------------------------------//
 {
   private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
@@ -29,7 +29,7 @@ public class TreeBuilder
   private final JTree tree;
 
   // ---------------------------------------------------------------------------------//
-  public TreeBuilder (File rootFolder)
+  TreeBuilder (File rootFolder)
   // ---------------------------------------------------------------------------------//
   {
     assert (rootFolder.exists ());
@@ -48,7 +48,7 @@ public class TreeBuilder
   }
 
   // ---------------------------------------------------------------------------------//
-  public JTree getTree ()
+  JTree getTree ()
   // ---------------------------------------------------------------------------------//
   {
     return tree;
@@ -111,7 +111,7 @@ public class TreeBuilder
    * Class used to control the text displayed by the JTree.
    */
   // ---------------------------------------------------------------------------------//
-  public class FileNode implements DataSource   // why does it implement DataSource?
+  class FileNode implements DataSource   // why does it implement DataSource?
   // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode parentNode;
@@ -124,28 +124,28 @@ public class TreeBuilder
     boolean showDisks;
 
     // -------------------------------------------------------------------------------//
-    public FileNode (File file)
+    FileNode (File file)
     // -------------------------------------------------------------------------------//
     {
       this.file = file;
     }
 
     // -------------------------------------------------------------------------------//
-    public void setTreeNode (DefaultMutableTreeNode node)
+    void setTreeNode (DefaultMutableTreeNode node)
     // -------------------------------------------------------------------------------//
     {
       this.parentNode = node;
     }
 
     // -------------------------------------------------------------------------------//
-    public void readFiles ()
+    void readFiles ()
     // -------------------------------------------------------------------------------//
     {
       addFiles (parentNode, file);
     }
 
     // -------------------------------------------------------------------------------//
-    public FormattedDisk getFormattedDisk ()
+    FormattedDisk getFormattedDisk ()
     // -------------------------------------------------------------------------------//
     {
       if (formattedDisk == null)
@@ -163,7 +163,7 @@ public class TreeBuilder
     }
 
     // -------------------------------------------------------------------------------//
-    public boolean replaceDisk (FormattedDisk disk)
+    boolean replaceDisk (FormattedDisk disk)
     // -------------------------------------------------------------------------------//
     {
       String path = disk.getDisk ().getFile ().getAbsolutePath ();

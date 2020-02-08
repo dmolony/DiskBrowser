@@ -13,11 +13,15 @@ import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
+// -----------------------------------------------------------------------------------//
 public class DuplicateAction extends DefaultAction implements RootDirectoryChangeListener
+// -----------------------------------------------------------------------------------//
 {
   RootFolderData rootFolderData;
 
+  // ---------------------------------------------------------------------------------//
   public DuplicateAction (RootFolderData rootFolderData)
+  // ---------------------------------------------------------------------------------//
   {
     super ("List disks...", "Display a sortable list of disks",
         "/com/bytezone/diskbrowser/icons/");
@@ -31,15 +35,19 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
     setEnabled (rootFolderData.getRootFolder () != null);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
+  // ---------------------------------------------------------------------------------//
   {
     assert rootFolderData.getRootFolder () == newRootFolder;
     setEnabled (rootFolderData.getRootFolder () != null);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent arg0)
+  // ---------------------------------------------------------------------------------//
   {
     if (rootFolderData.disksWindow == null)
     {
@@ -58,13 +66,17 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
       rootFolderData.disksWindow.setVisible (true);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addTableSelectionListener (DiskTableSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     if (!rootFolderData.listeners.contains (listener))
       rootFolderData.listeners.add (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public interface DiskTableSelectionListener
+  // ---------------------------------------------------------------------------------//
   {
     public void diskSelected (DiskDetails diskDetails);
   }

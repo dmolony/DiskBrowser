@@ -14,13 +14,17 @@ import javax.swing.KeyStroke;
 import com.bytezone.common.DefaultAction;
 import com.bytezone.common.Platform;
 
-public class RootDirectoryAction extends DefaultAction implements QuitListener
+// -----------------------------------------------------------------------------------//
+class RootDirectoryAction extends DefaultAction implements QuitListener
+// -----------------------------------------------------------------------------------//
 {
   private static final String prefsRootDirectory = "Root directory";
   private final List<RootDirectoryChangeListener> listeners = new ArrayList<> ();
   private File rootFolder;
 
-  public RootDirectoryAction ()
+  // ---------------------------------------------------------------------------------//
+  RootDirectoryAction ()
+  // ---------------------------------------------------------------------------------//
   {
     super ("Set HOME folder...", "Defines root folder where the disk images are kept",
         "/com/bytezone/diskbrowser/icons/");
@@ -31,8 +35,10 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
     setIcon (Action.LARGE_ICON_KEY, "folder_explore_32.png");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     JFileChooser chooser = new JFileChooser (Platform.userHome);
     chooser.setDialogTitle ("Select FOLDER containing disk images");
@@ -51,21 +57,27 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addListener (RootDirectoryChangeListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     if (!listeners.contains (listener))
       listeners.add (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void quit (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     prefs.put (prefsRootDirectory,
         rootFolder == null ? "" : rootFolder.getAbsolutePath ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void restore (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     String rootDirectory = prefs.get (prefsRootDirectory, "");
 
@@ -79,7 +91,9 @@ public class RootDirectoryAction extends DefaultAction implements QuitListener
     notifyListeners (rootDirectoryFile);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void notifyListeners (File newRootFolder)
+  // ---------------------------------------------------------------------------------//
   {
     File oldRootFolder = rootFolder;
     rootFolder = newRootFolder;

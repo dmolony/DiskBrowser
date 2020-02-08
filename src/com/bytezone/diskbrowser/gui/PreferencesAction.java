@@ -12,12 +12,16 @@ import com.bytezone.common.DefaultAction;
 
 // ********** not currently used ***********
 
+// -----------------------------------------------------------------------------------//
 public class PreferencesAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
 {
   JFrame owner;
   Preferences prefs;
 
+  // ---------------------------------------------------------------------------------//
   public PreferencesAction (JFrame owner, Preferences prefs)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Preferences...", "Set preferences", "/com/bytezone/diskbrowser/icons/");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt P"));
@@ -28,13 +32,17 @@ public class PreferencesAction extends DefaultAction
     this.prefs = prefs;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     prefs ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void prefs ()
+  // ---------------------------------------------------------------------------------//
   {
     new PreferencesDialog (owner, prefs);
   }

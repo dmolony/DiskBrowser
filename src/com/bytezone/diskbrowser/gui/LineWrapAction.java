@@ -11,11 +11,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 class LineWrapAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   List<JTextArea> listeners = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public LineWrapAction ()
+  // ---------------------------------------------------------------------------------//
   {
     super ("Line wrap");
     putValue (Action.SHORT_DESCRIPTION, "Print the contents of the output panel");
@@ -23,14 +27,18 @@ class LineWrapAction extends AbstractAction
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_W);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addListener (JTextArea listener)
+  // ---------------------------------------------------------------------------------//
   {
     if (!listeners.contains (listener))
       listeners.add (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     for (JTextArea listener : listeners)
       listener.setLineWrap (((JMenuItem) e.getSource ()).isSelected ());

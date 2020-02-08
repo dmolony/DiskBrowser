@@ -12,7 +12,9 @@ import java.awt.print.Printable;
 import java.util.Enumeration;
 import java.util.Vector;
 
+// -----------------------------------------------------------------------------------//
 class PrintDocument extends Component implements Printable
+// -----------------------------------------------------------------------------------//
 {
   String lines[];
   int lineHeight;
@@ -22,12 +24,17 @@ class PrintDocument extends Component implements Printable
   int x = 50;
   int y = 20;
 
-  public PrintDocument (String text)
+  // ---------------------------------------------------------------------------------//
+  PrintDocument (String text)
+  // ---------------------------------------------------------------------------------//
   {
     lines = wrapText (text, 112);
   }
 
+  // ---------------------------------------------------------------------------------//
+  @Override
   public int print (Graphics g, PageFormat pageFormat, int page)
+  // ---------------------------------------------------------------------------------//
   {
     Graphics2D g2 = (Graphics2D) g;
     if (lineHeight == 0)
@@ -58,8 +65,11 @@ class PrintDocument extends Component implements Printable
     return (PAGE_EXISTS);
   }
 
-  // Routine copied from http://progcookbook.blogspot.com/2006/02/text-wrapping-function-for-java.html
+  // Routine copied from http://progcookbook.blogspot.com/
+  //           2006/02/text-wrapping-function-for-java.html
+  // ---------------------------------------------------------------------------------//
   static String[] wrapText (String text, int len)
+  // ---------------------------------------------------------------------------------//
   {
     // return empty array for null text
     if (text == null)

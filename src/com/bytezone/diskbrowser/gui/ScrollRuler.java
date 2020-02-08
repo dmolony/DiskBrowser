@@ -13,7 +13,9 @@ import com.bytezone.common.Platform.FontSize;
 import com.bytezone.common.Platform.FontType;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 
+// -----------------------------------------------------------------------------------//
 class ScrollRuler extends JComponent
+// -----------------------------------------------------------------------------------//
 {
   // dimensions of the ruler
   public static final int HEIGHT = 20;
@@ -29,7 +31,9 @@ class ScrollRuler extends JComponent
   private LayoutDetails layoutDetails;
   private final JComponent image;
 
-  public ScrollRuler (JComponent image, int orientation)
+  // ---------------------------------------------------------------------------------//
+  ScrollRuler (JComponent image, int orientation)
+  // ---------------------------------------------------------------------------------//
   {
     this.orientation = orientation;
     this.image = image;
@@ -41,7 +45,9 @@ class ScrollRuler extends JComponent
       setPreferredSize (new Dimension (WIDTH, 0));
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setLayout (LayoutDetails layout)
+  // ---------------------------------------------------------------------------------//
   {
     this.layoutDetails = layout;
 
@@ -56,20 +62,26 @@ class ScrollRuler extends JComponent
     setTrackMode (layout.grid.width == 16 || layout.grid.width == 13);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setTrackMode (boolean trackMode)
+  // ---------------------------------------------------------------------------------//
   {
     isTrackMode = trackMode;
     repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setHex (boolean hex)
+  // ---------------------------------------------------------------------------------//
   {
     isHex = hex;
     repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void paintComponent (Graphics g)
+  // ---------------------------------------------------------------------------------//
   {
     Rectangle clipRect = g.getClipBounds ();
     g.setColor (Color.WHITE);
@@ -87,7 +99,9 @@ class ScrollRuler extends JComponent
       drawVertical (g, clipRect, layoutDetails.block.height);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void drawHorizontal (Graphics g, Rectangle clipRect, int width)
+  // ---------------------------------------------------------------------------------//
   {
     int start = (clipRect.x / width);
     int end = start + clipRect.width / width;
@@ -111,7 +125,9 @@ class ScrollRuler extends JComponent
       g.drawString (String.format (format, i), i * width + offset, 15);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void drawVertical (Graphics g, Rectangle clipRect, int height)
+  // ---------------------------------------------------------------------------------//
   {
     int start = (clipRect.y / height);
     int end = start + clipRect.height / height;

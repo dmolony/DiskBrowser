@@ -7,7 +7,9 @@ import javax.swing.JPanel;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 
+// -----------------------------------------------------------------------------------//
 public class DiskPanel extends JPanel
+// -----------------------------------------------------------------------------------//
 {
   FormattedDisk formattedDisk;
   LayoutDetails layoutDetails;
@@ -17,7 +19,9 @@ public class DiskPanel extends JPanel
 
   Color backgroundColor = new Color (0xE0, 0xE0, 0xE0);
 
+  // ---------------------------------------------------------------------------------//
   public void setDisk (FormattedDisk disk, LayoutDetails details)
+  // ---------------------------------------------------------------------------------//
   {
     formattedDisk = disk;
     layoutDetails = details;

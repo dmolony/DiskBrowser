@@ -8,26 +8,34 @@ import javax.swing.KeyStroke;
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
-public class InterleaveAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
+class InterleaveAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
 {
   int interleave;
   FormattedDisk currentDisk;
   static String[] names = { "No Interleave", "Prodos/Pascal", "Infocom", "CPM" };
 
-  public InterleaveAction (int interleave)
+  // ---------------------------------------------------------------------------------//
+  InterleaveAction (int interleave)
+  // ---------------------------------------------------------------------------------//
   {
     super (names[interleave], "Alter interleave");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt " + interleave));
     this.interleave = interleave;
   }
 
-  public void setDisk (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
+  void setDisk (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     currentDisk = disk;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     currentDisk.getDisk ().setInterleave (interleave);
   }

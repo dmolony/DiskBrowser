@@ -11,12 +11,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 class HideLayoutAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   JFrame owner;
   JPanel layoutPanel;
 
+  // ---------------------------------------------------------------------------------//
   public HideLayoutAction (JFrame owner, JPanel layoutPanel)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Show disk layout panel");
     putValue (Action.SHORT_DESCRIPTION, "Show/hide the disk layout panel");
@@ -26,12 +30,17 @@ class HideLayoutAction extends AbstractAction
     this.layoutPanel = layoutPanel;
   }
 
+  // ---------------------------------------------------------------------------------//
+  @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     set (((JMenuItem) e.getSource ()).isSelected ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public void set (boolean show)
+  // ---------------------------------------------------------------------------------//
   {
     if (show)
     {

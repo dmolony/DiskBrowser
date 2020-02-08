@@ -8,11 +8,15 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 
+// -----------------------------------------------------------------------------------//
 class RefreshTreeAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
 {
   CatalogPanel owner;
 
+  // ---------------------------------------------------------------------------------//
   public RefreshTreeAction (CatalogPanel owner)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Refresh current tree", "Makes newly added/modified disks available",
         "/com/bytezone/diskbrowser/icons/");
@@ -26,8 +30,10 @@ class RefreshTreeAction extends DefaultAction
     setIcon (Action.LARGE_ICON_KEY, "arrow_refresh_32.png");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     owner.refreshTree ();
   }

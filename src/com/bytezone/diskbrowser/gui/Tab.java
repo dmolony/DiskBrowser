@@ -8,7 +8,9 @@ package com.bytezone.diskbrowser.gui;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+// -----------------------------------------------------------------------------------//
 interface Tab
+// -----------------------------------------------------------------------------------//
 {
   public void refresh ();
 

@@ -11,17 +11,23 @@ import javax.swing.JOptionPane;
 import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
-public class SaveTempFileAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
+class SaveTempFileAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
 {
   FormattedDisk disk;
 
-  public SaveTempFileAction ()
+  // ---------------------------------------------------------------------------------//
+  SaveTempFileAction ()
+  // ---------------------------------------------------------------------------------//
   {
     super ("Save converted disk...", "Save converted disk");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent evt)
+  // ---------------------------------------------------------------------------------//
   {
     if (disk == null)
     {
@@ -48,7 +54,9 @@ public class SaveTempFileAction extends DefaultAction
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   void setDisk (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
     this.setEnabled (true);

@@ -9,12 +9,16 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 class ExecuteDiskAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   // should replace this by making the action a listener
   MenuHandler owner;
 
+  // ---------------------------------------------------------------------------------//
   public ExecuteDiskAction (MenuHandler owner)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Run current disk");
     putValue (Action.SHORT_DESCRIPTION, "Same as double-clicking on the disk");
@@ -22,7 +26,10 @@ class ExecuteDiskAction extends AbstractAction
     this.owner = owner;
   }
 
+  // ---------------------------------------------------------------------------------//
+  @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     try
     {
@@ -31,8 +38,9 @@ class ExecuteDiskAction extends AbstractAction
     catch (IOException e1)
     {
       e1.printStackTrace ();
-      JOptionPane.showMessageDialog (null, "Error opening disk : "
-            + owner.currentDisk.getDisk ().getFile (), "Bugger", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog (null,
+          "Error opening disk : " + owner.currentDisk.getDisk ().getFile (), "Bugger",
+          JOptionPane.INFORMATION_MESSAGE);
     }
   }
 }

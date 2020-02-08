@@ -28,7 +28,9 @@ import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 abstract class AbstractCatalogEntry implements AppleFileSource
+// -----------------------------------------------------------------------------------//
 {
   protected Disk disk;
   protected DosDisk dosDisk;
@@ -47,8 +49,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
   private CatalogEntry link;
 
-  public AbstractCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector,
-      byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
+  AbstractCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
   {
     this.dosDisk = dosDisk;
     this.disk = dosDisk.getDisk ();
@@ -88,7 +91,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     catalogName = getName (base, entryBuffer).replace ("^", "");
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getName (String base, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (base);
     int max = buffer[0] == (byte) 0xFF ? 32 : 33;
@@ -115,7 +120,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   protected String getFileType ()
+  // ---------------------------------------------------------------------------------//
   {
     switch (fileType)
     {
@@ -143,15 +150,19 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
   // maybe this should be in the FormattedDisk
   // maybe DiskAddress should have a 'valid' flag
+  // ---------------------------------------------------------------------------------//
   protected DiskAddress getValidAddress (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     if (disk.isValidAddress (buffer[offset], buffer[offset + 1]))
       return disk.getDiskAddress (buffer[offset], buffer[offset + 1]);
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     if (appleFile != null)
       return appleFile;
@@ -297,7 +308,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return appleFile;
   }
 
+  // ---------------------------------------------------------------------------------//
   private byte[] getExactBuffer (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] exactBuffer;
 
@@ -319,14 +332,18 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return exactBuffer;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean isRunCommand (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     // see Stargate - Disk 1, Side A.woz
     return buffer[0] == 0x4C && buffer[1] == (byte) 0xFC && buffer[2] == (byte) 0xA4
         && buffer[3] == 0x00;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean isScrunched (int reportedLength)
+  // ---------------------------------------------------------------------------------//
   {
     if ((name.equals ("FLY LOGO") || name.equals ("FLY LOGO SCRUNCHED"))
         && reportedLength == 0x14FA)
@@ -338,8 +355,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean contains (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     for (DiskAddress sector : tsSectors)
       if (sector.matches (da))
@@ -354,21 +373,27 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getUniqueName ()
+  // ---------------------------------------------------------------------------------//
   {
     // this might not be unique if the file has been deleted
     return name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public FormattedDisk getFormattedDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return dosDisk;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> sectors = new ArrayList<> ();
     sectors.add (catalogSectorDA);
@@ -377,13 +402,17 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     return sectors;
   }
 
+  // ---------------------------------------------------------------------------------//
   void link (CatalogEntry catalogEntry)
+  // ---------------------------------------------------------------------------------//
   {
     this.link = catalogEntry;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return catalogName;
   }

@@ -18,7 +18,9 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 
+// -----------------------------------------------------------------------------------//
 public class DosDisk extends AbstractFormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   private static final int ENTRY_SIZE = 35;
   private static final int CATALOG_TRACK = 17;
@@ -45,12 +47,16 @@ public class DosDisk extends AbstractFormattedDisk
     Text, ApplesoftBasic, IntegerBasic, Binary, Relocatable, SS, AA, BB
   }
 
+  // ---------------------------------------------------------------------------------//
   public DosDisk (Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     this (disk, 0);
   }
 
+  // ---------------------------------------------------------------------------------//
   public DosDisk (Disk disk, int volumeNo)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk);
 
@@ -237,13 +243,17 @@ public class DosDisk extends AbstractFormattedDisk
     makeNodeVisible (volumeNode.getFirstLeaf ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public int getVolumeNo ()
+  // ---------------------------------------------------------------------------------//
   {
     return volumeNo;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setOriginalPath (Path path)
+  // ---------------------------------------------------------------------------------//
   {
     super.setOriginalPath (path);
 
@@ -253,7 +263,9 @@ public class DosDisk extends AbstractFormattedDisk
 
   // Beagle Bros FRAMEUP disk only has one catalog block
   // ARCBOOT.DSK has a catalog which starts at sector 0C
+  // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     disk.setInterleave (0);
     int catalogBlocks = checkFormat (disk);
@@ -288,7 +300,9 @@ public class DosDisk extends AbstractFormattedDisk
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getVersionText ()
+  // ---------------------------------------------------------------------------------//
   {
     switch (getVersion ())
     {
@@ -309,12 +323,16 @@ public class DosDisk extends AbstractFormattedDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public int getVersion ()
+  // ---------------------------------------------------------------------------------//
   {
     return dosVTOCSector.dosVersion;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static int checkFormat (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readSector (0x11, 0x00);
 
@@ -344,7 +362,9 @@ public class DosDisk extends AbstractFormattedDisk
     return countCatalogBlocks (disk, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   private static int countCatalogBlocks (AppleDisk disk, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     DiskAddress catalogStart = disk.getDiskAddress (buffer[1], buffer[2]);
     DiskAddress da = disk.getDiskAddress (catalogStart.getBlock ());
@@ -374,8 +394,10 @@ public class DosDisk extends AbstractFormattedDisk
     return catalogAddresses.size ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     //    StringBuffer text = new StringBuffer (dosVTOCSector.toString ());
     //    return text.toString ();
@@ -390,8 +412,10 @@ public class DosDisk extends AbstractFormattedDisk
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getFormattedSector (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     SectorType type = sectorTypes[da.getBlock ()];
     if (type == vtocSector)
@@ -414,16 +438,20 @@ public class DosDisk extends AbstractFormattedDisk
     return super.getFormattedSector (da);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (fileEntries.size () > 0 && fileEntries.size () > fileNo)
       return fileEntries.get (fileNo).getSectors ();
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getCatalog ()
+  // ---------------------------------------------------------------------------------//
   {
     String newLine = String.format ("%n");
     String line = "- --- ---  ------------------------------  -----  -------------"
@@ -453,7 +481,9 @@ public class DosDisk extends AbstractFormattedDisk
         text.toString (), this);
   }
 
+  // ---------------------------------------------------------------------------------//
   private AppleFileSource getDeletedList ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text =
         new StringBuilder ("List of files that were deleted from this disk\n");

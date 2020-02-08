@@ -5,13 +5,17 @@ import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 
+// -----------------------------------------------------------------------------------//
 class DeletedCatalogEntry extends AbstractCatalogEntry
+// -----------------------------------------------------------------------------------//
 {
   boolean allSectorsAvailable = true;
   boolean debug = false;
 
-  public DeletedCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector,
-      byte[] entryBuffer, int dosVersion)
+  // ---------------------------------------------------------------------------------//
+  DeletedCatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer,
+      int dosVersion)
+  // ---------------------------------------------------------------------------------//
   {
     super (dosDisk, catalogSector, entryBuffer);
 
@@ -93,15 +97,19 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
       allSectorsAvailable = false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getUniqueName ()
+  // ---------------------------------------------------------------------------------//
   {
     // name might not be unique if the file has been deleted
     return "!" + name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     if (!allSectorsAvailable && appleFile == null)
     {
@@ -112,7 +120,9 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
     return super.getDataSource ();
   }
 
-  public String getDetails ()
+  // ---------------------------------------------------------------------------------//
+  String getDetails ()
+  // ---------------------------------------------------------------------------------//
   {
     return String.format ("%-30s  %s", name,
         allSectorsAvailable ? "Recoverable" : "Not recoverable");

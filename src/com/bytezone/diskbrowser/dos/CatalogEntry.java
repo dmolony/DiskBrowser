@@ -5,13 +5,17 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.dos.DosDisk.FileType;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class CatalogEntry extends AbstractCatalogEntry
+// -----------------------------------------------------------------------------------//
 {
   private int textFileGaps;
   private int length;
   private int address;
 
-  public CatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
+  CatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (dosDisk, catalogSector, entryBuffer); // build lists of ts and data sectors
 
@@ -127,7 +131,9 @@ class CatalogEntry extends AbstractCatalogEntry
     }
   }
 
-  public String getDetails ()
+  // ---------------------------------------------------------------------------------//
+  String getDetails ()
+  // ---------------------------------------------------------------------------------//
   {
     int actualSize = dataSectors.size () + tsSectors.size () - textFileGaps;
     String addressText = address == 0 ? "" : String.format ("$%4X", address);

@@ -6,7 +6,9 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 class DosCatalogSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private static final String[] fileTypes =
       { "Text file", "Integer Basic program", "Applesoft Basic program", "Binary file",
@@ -15,15 +17,18 @@ class DosCatalogSector extends AbstractSector
 
   private final DosDisk dosDisk;
 
-  public DosCatalogSector (DosDisk dosDisk, Disk disk, byte[] buffer,
-      DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
+  DosCatalogSector (DosDisk dosDisk, Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
     this.dosDisk = dosDisk;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text =
         getHeader ("DOS " + dosDisk.getVersionText () + " Catalog Sector");
@@ -47,7 +52,9 @@ class DosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void createDos4Text (StringBuilder text, int i)
+  // ---------------------------------------------------------------------------------//
   {
     int track = buffer[i] & 0x3F;
     int sector = buffer[i + 1] & 0x1F;
@@ -82,7 +89,9 @@ class DosCatalogSector extends AbstractSector
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void createDos3Text (StringBuilder text, int i)
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer[i] == (byte) 0xFF)         // file is deleted
     {
@@ -119,7 +128,9 @@ class DosCatalogSector extends AbstractSector
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getName (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     //    int max = buffer[offset] == (byte) 0xFF ? 32 : 33;
@@ -142,7 +153,9 @@ class DosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getType (byte value)
+  // ---------------------------------------------------------------------------------//
   {
     int type = value & 0x7F;
     boolean locked = (value & 0x80) > 0;

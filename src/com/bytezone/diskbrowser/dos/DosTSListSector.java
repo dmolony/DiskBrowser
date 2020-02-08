@@ -5,17 +5,23 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class DosTSListSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private final String name;
 
-  public DosTSListSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
+  DosTSListSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
     this.name = name;
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean isValid (DosDisk dosDisk)
+  // ---------------------------------------------------------------------------------//
   {
     // what is the count of blocks? does it match? this sector can't tell, there
     // might be more than one TS list
@@ -40,15 +46,19 @@ class DosTSListSector extends AbstractSector
   }
 
   // this is in too many places
+  // ---------------------------------------------------------------------------------//
   protected DiskAddress getValidAddress (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     if (disk.isValidAddress (buffer[offset], buffer[offset + 1]))
       return disk.getDiskAddress (buffer[offset], buffer[offset + 1]);
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     DiskAddress da = disk.getDiskAddress (buffer[1], buffer[2]);
     String msg = da.matches (diskAddress) ? " (circular reference)" : "";

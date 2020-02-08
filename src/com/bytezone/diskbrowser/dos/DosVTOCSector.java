@@ -6,7 +6,9 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 class DosVTOCSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   DosDisk parentDisk;
   int volume;
@@ -20,8 +22,9 @@ class DosVTOCSector extends AbstractSector
   int maxSectors;
   int maxTracks;
 
-  public DosVTOCSector (DosDisk parentDisk, Disk disk, byte[] buffer,
-      DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
+  DosVTOCSector (DosDisk parentDisk, Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
 
@@ -37,13 +40,17 @@ class DosVTOCSector extends AbstractSector
     flagSectors2 ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     return dosVersion <= 3 ? createDosText () : createDos4Text ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String createDos4Text ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = getHeader ("DOS 4 VTOC Sector");
     addText (text, buffer, 0, 1, "Not used");
@@ -99,7 +106,9 @@ class DosVTOCSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String createDosText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = getHeader ("VTOC Sector");
     addText (text, buffer, 0, 1, "Not used");
@@ -172,7 +181,9 @@ class DosVTOCSector extends AbstractSector
   //    return text.toString ();
   //  }
 
+  // ---------------------------------------------------------------------------------//
   private String getBitmap (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     int value = HexFormatter.getLongBigEndian (buffer, offset);
@@ -187,7 +198,9 @@ class DosVTOCSector extends AbstractSector
     return text.reverse ().toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void flagSectors2 ()
+  // ---------------------------------------------------------------------------------//
   {
     int firstSector = 0x38;
     int max = maxTracks * 4 + firstSector;
@@ -252,7 +265,9 @@ class DosVTOCSector extends AbstractSector
   //  }
 
   // duplicate of DosCatalogSector.getName()
+  // ---------------------------------------------------------------------------------//
   private String getName (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     int max = 24;
@@ -275,8 +290,10 @@ class DosVTOCSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuffer text = new StringBuffer ();
     text.append ("DOS version      : 3." + dosVersion);

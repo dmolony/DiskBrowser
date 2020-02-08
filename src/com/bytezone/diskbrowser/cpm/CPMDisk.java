@@ -6,10 +6,17 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.disk.*;
+import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
+import com.bytezone.diskbrowser.disk.AppleDisk;
+import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 
+// -----------------------------------------------------------------------------------//
 public class CPMDisk extends AbstractFormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   private final Color green = new Color (0, 200, 0);
 
@@ -27,7 +34,9 @@ public class CPMDisk extends AbstractFormattedDisk
   //                        // http://www.seasip.info/Cpm/format31.html
   private final DefaultMutableTreeNode volumeNode;
 
+  // ---------------------------------------------------------------------------------//
   public CPMDisk (Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk);
 
@@ -109,7 +118,9 @@ public class CPMDisk extends AbstractFormattedDisk
     makeNodeVisible (volumeNode.getFirstLeaf ());
   }
 
+  // ---------------------------------------------------------------------------------//
   private SectorType getSectorType (String type)
+  // ---------------------------------------------------------------------------------//
   {
     if ("COM".equals (type))
       return comSector;
@@ -129,15 +140,19 @@ public class CPMDisk extends AbstractFormattedDisk
     return otherSector;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (fileEntries.size () > 0 && fileEntries.size () > fileNo)
       return fileEntries.get (fileNo).getSectors ();
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private DirectoryEntry findParent (DirectoryEntry child)
+  // ---------------------------------------------------------------------------------//
   {
     for (AppleFileSource entry : fileEntries)
       if (((DirectoryEntry) entry).matches (child))
@@ -146,8 +161,10 @@ public class CPMDisk extends AbstractFormattedDisk
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getFormattedSector (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     SectorType type = sectorTypes[da.getBlock ()];
     byte[] buffer = disk.readSector (da);
@@ -158,8 +175,10 @@ public class CPMDisk extends AbstractFormattedDisk
     return super.getFormattedSector (da);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getCatalog ()
+  // ---------------------------------------------------------------------------------//
   {
     String newLine = String.format ("%n");
     String line =
@@ -182,7 +201,9 @@ public class CPMDisk extends AbstractFormattedDisk
     return new DefaultAppleFileSource ("CPM Disk ", text.toString (), this);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     disk.setInterleave (3);
 
@@ -227,7 +248,9 @@ public class CPMDisk extends AbstractFormattedDisk
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static boolean bufferContainsAll (byte[] buffer, byte value)
+  // ---------------------------------------------------------------------------------//
   {
     for (byte b : buffer)
       if (b != value)
@@ -235,8 +258,10 @@ public class CPMDisk extends AbstractFormattedDisk
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuffer text = new StringBuffer ("CPM disk");
     return text.toString ();

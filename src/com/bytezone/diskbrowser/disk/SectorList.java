@@ -4,12 +4,16 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
+// -----------------------------------------------------------------------------------//
 public class SectorList extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   List<DiskAddress> sectors;
   FormattedDisk formattedDisk;
 
+  // ---------------------------------------------------------------------------------//
   public SectorList (FormattedDisk formattedDisk, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     super ("noname", null);
 
@@ -30,8 +34,10 @@ public class SectorList extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Block  Sector Type         Owner\n");
     text.append (

@@ -3,12 +3,16 @@ package com.bytezone.diskbrowser.disk;
 import java.util.ArrayList;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 public class SectorListConverter
+// -----------------------------------------------------------------------------------//
 {
   public final List<DiskAddress> sectors;
   public final String sectorText;
 
+  // ---------------------------------------------------------------------------------//
   public SectorListConverter (String text, Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     sectors = new ArrayList<> ();
     sectorText = text;
@@ -29,7 +33,9 @@ public class SectorListConverter
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public SectorListConverter (List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     this.sectors = sectors;
     StringBuilder text = new StringBuilder ();
@@ -55,7 +61,9 @@ public class SectorListConverter
     sectorText = text.deleteCharAt (text.length () - 1).toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addToText (StringBuilder text, int firstBlock, int runLength)
+  // ---------------------------------------------------------------------------------//
   {
     if (runLength == 0)
       text.append (firstBlock + ";");

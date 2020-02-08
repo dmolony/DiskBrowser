@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.disk;
 
+// -----------------------------------------------------------------------------------//
 public interface DiskAddress extends Comparable<DiskAddress>
+// -----------------------------------------------------------------------------------//
 {
   public int getBlock ();
 

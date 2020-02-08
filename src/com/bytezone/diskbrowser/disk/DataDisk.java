@@ -5,14 +5,18 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.gui.DataSource;
 
+// -----------------------------------------------------------------------------------//
 public class DataDisk extends AbstractFormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   //  static final byte[] dos = { 0x01, (byte) 0xA5, 0x27, (byte) 0xC9, 0x09 };
 
   // this should somehow tie in with the checksum from DiskFactory to determine
   // whether it has a bootloader
 
+  // ---------------------------------------------------------------------------------//
   public DataDisk (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk);
 
@@ -33,20 +37,26 @@ public class DataDisk extends AbstractFormattedDisk
   }
 
   // no files on data disks
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     return new ArrayList<> ();
   }
 
   // no files on data disks
+  // ---------------------------------------------------------------------------------//
   public DataSource getFile (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return disk.toString ();
   }

@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.disk;
 
+// -----------------------------------------------------------------------------------//
 public class AppleDiskAddress implements DiskAddress
+// -----------------------------------------------------------------------------------//
 {
   private final int block;
   private final int track;
@@ -9,7 +11,9 @@ public class AppleDiskAddress implements DiskAddress
 
   private boolean zeroFlag;
 
+  // ---------------------------------------------------------------------------------//
   public AppleDiskAddress (Disk owner, int block)
+  // ---------------------------------------------------------------------------------//
   {
     this.owner = owner;
     this.block = block;
@@ -26,7 +30,9 @@ public class AppleDiskAddress implements DiskAddress
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public AppleDiskAddress (Disk owner, int track, int sector)
+  // ---------------------------------------------------------------------------------//
   {
     this.owner = owner;
     zeroFlag = (track & 0x40) != 0;
@@ -35,51 +41,67 @@ public class AppleDiskAddress implements DiskAddress
     this.block = this.track * owner.getSectorsPerTrack () + this.sector;
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean zeroFlag ()
+  // ---------------------------------------------------------------------------------//
   {
     return zeroFlag;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int compareTo (DiskAddress that)
+  // ---------------------------------------------------------------------------------//
   {
     return this.block - that.getBlock ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean matches (DiskAddress that)
+  // ---------------------------------------------------------------------------------//
   {
     if (that == null)
       return false;
     return this.block == that.getBlock ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getBlock ()
+  // ---------------------------------------------------------------------------------//
   {
     return block;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getSector ()
+  // ---------------------------------------------------------------------------------//
   {
     return sector;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getTrack ()
+  // ---------------------------------------------------------------------------------//
   {
     return track;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Disk getDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return String.format ("[Block=%3d, Track=%2d, Sector=%2d, Zero=%s]", block, track,
         sector, zeroFlag);

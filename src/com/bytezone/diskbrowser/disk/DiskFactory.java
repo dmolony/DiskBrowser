@@ -26,20 +26,28 @@ import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Wizardry4BootDisk;
 import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 
+// -----------------------------------------------------------------------------------//
 public class DiskFactory
+// -----------------------------------------------------------------------------------//
 {
   private static boolean debug = false;
 
+  // ---------------------------------------------------------------------------------//
   private DiskFactory ()
+  // ---------------------------------------------------------------------------------//
   {
   }
 
+  // ---------------------------------------------------------------------------------//
   public static FormattedDisk createDisk (File file)
+  // ---------------------------------------------------------------------------------//
   {
     return createDisk (file.getAbsolutePath ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public static FormattedDisk createDisk (String path)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("\nFactory : " + path);
@@ -488,7 +496,9 @@ public class DiskFactory
     return disk;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static DosDisk checkDos (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking DOS disk");
@@ -511,7 +521,9 @@ public class DiskFactory
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static ProdosDisk checkProdos (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking Prodos disk");
@@ -533,7 +545,9 @@ public class DiskFactory
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static DosDisk checkUnidos (AppleDisk disk, int side)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking UniDOS disk");
@@ -556,7 +570,9 @@ public class DiskFactory
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static FormattedDisk checkHardDisk (File file)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
     {
@@ -643,7 +659,9 @@ public class DiskFactory
                    must all be zero.
   */
 
+  // ---------------------------------------------------------------------------------//
   private static FormattedDisk check2mgDisk (File file)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking 2mg disk");
@@ -666,7 +684,9 @@ public class DiskFactory
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static FormattedDisk checkPascalDisk (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking Pascal disk");
@@ -722,7 +742,9 @@ public class DiskFactory
     return pascalDisk;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static boolean collectDataDisks (String fileName, int dotPos, AppleDisk[] disks)
+  // ---------------------------------------------------------------------------------//
   {
     char c = fileName.charAt (dotPos - 1);
     String suffix = fileName.substring (dotPos + 1);
@@ -744,7 +766,9 @@ public class DiskFactory
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static InfocomDisk checkInfocomDisk (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking Infocom disk");
@@ -762,7 +786,9 @@ public class DiskFactory
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private static CPMDisk checkCPMDisk (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (debug)
       System.out.println ("Checking CPM disk");
@@ -774,10 +800,5 @@ public class DiskFactory
       System.out.println ("Not a CPM disk");
 
     return null;
-  }
-
-  private static void checkMissingSectors (AppleDisk disk, WozFile wozFile)
-  {
-
   }
 }

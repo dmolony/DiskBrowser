@@ -9,7 +9,9 @@ import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public abstract class AbstractSector implements DataSource
+// -----------------------------------------------------------------------------------//
 {
   private static String newLine = String.format ("%n");
   private static String newLine2 = newLine + newLine;
@@ -17,55 +19,69 @@ public abstract class AbstractSector implements DataSource
   final public byte[] buffer;
   protected Disk disk;
   protected DiskAddress diskAddress;
-  //  private List<DiskAddress> diskAddressList;
   AssemblerProgram assembler;
   String description;
 
+  // ---------------------------------------------------------------------------------//
   public AbstractSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     this.buffer = buffer;
     this.disk = disk;
     this.diskAddress = diskAddress;
   }
 
-  public AbstractSector (Disk disk, byte[] buffer)//, List<DiskAddress> diskAddressList)
+  // ---------------------------------------------------------------------------------//
+  public AbstractSector (Disk disk, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     this.buffer = buffer;
     this.disk = disk;
-    //    this.diskAddressList = diskAddressList;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getAssembler ()
+  // ---------------------------------------------------------------------------------//
   {
     if (assembler == null)
       assembler = new AssemblerProgram ("noname", buffer, 0);
     return assembler.getText ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     return HexFormatter.format (buffer, 0, buffer.length);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public BufferedImage getImage ()
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     if (description == null)
       description = createText ();
     return description;
   }
 
+  // ---------------------------------------------------------------------------------//
   public abstract String createText ();
+  // ---------------------------------------------------------------------------------//
 
+  // ---------------------------------------------------------------------------------//
   protected StringBuilder getHeader (String title)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -76,15 +92,19 @@ public abstract class AbstractSector implements DataSource
     return text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public JComponent getComponent ()
+  // ---------------------------------------------------------------------------------//
   {
     JPanel panel = new JPanel ();
     return panel;
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void addText (StringBuilder text, byte[] buffer, int offset, int size,
       String desc)
+  // ---------------------------------------------------------------------------------//
   {
     if ((offset + size - 1) > buffer.length)
       return;
@@ -113,8 +133,10 @@ public abstract class AbstractSector implements DataSource
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void addTextAndDecimal (StringBuilder text, byte[] b, int offset, int size,
       String desc)
+  // ---------------------------------------------------------------------------------//
   {
     if (size == 1)
       desc += " (" + (b[offset] & 0xFF) + ")";
@@ -124,6 +146,7 @@ public abstract class AbstractSector implements DataSource
     else if (size == 3)
       desc += String.format (" (%,d)", ((b[offset + 2] & 0xFF) * 65536)
           + ((b[offset + 1] & 0xFF) * 256) + (b[offset] & 0xFF));
+
     addText (text, b, offset, size, desc);
   }
 }

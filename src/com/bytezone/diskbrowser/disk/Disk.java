@@ -4,7 +4,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 public interface Disk extends Iterable<DiskAddress>
+// -----------------------------------------------------------------------------------//
 {
   public long getBootChecksum ();
 

@@ -22,7 +22,9 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.gui.DataSource;
 
+// -----------------------------------------------------------------------------------//
 public abstract class AbstractFormattedDisk implements FormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   protected Disk disk;
   protected FormattedDisk parent;                 // used by Dual-dos disks
@@ -49,7 +51,9 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   protected BitSet freeBlocks;
   protected BitSet usedBlocks; // still to be populated - currently using stillAvailable ()
 
+  // ---------------------------------------------------------------------------------//
   public AbstractFormattedDisk (Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
     freeBlocks = new BitSet (disk.getTotalBlocks ());
@@ -94,13 +98,17 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     });
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void setEmptyByte (byte value)
+  // ---------------------------------------------------------------------------------//
   {
     getDisk ().setEmptyByte (value);
     setSectorTypes ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setSectorTypes ()
+  // ---------------------------------------------------------------------------------//
   {
     sectorTypes = new SectorType[disk.getTotalBlocks ()];
 
@@ -110,7 +118,9 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     setGridLayout ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setGridLayout ()
+  // ---------------------------------------------------------------------------------//
   {
     int totalBlocks = disk.getTotalBlocks ();
 
@@ -156,32 +166,42 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Dimension getGridLayout ()
+  // ---------------------------------------------------------------------------------//
   {
     return gridLayout;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Disk getDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return disk;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public FormattedDisk getParent ()
+  // ---------------------------------------------------------------------------------//
   {
     return parent;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setParent (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     parent = disk;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setOriginalPath (Path path)
+  // ---------------------------------------------------------------------------------//
   {
     this.originalPath = path;
 
@@ -191,14 +211,18 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
           new DefaultAppleFileSource (getName (), disk.toString (), this));
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Path getOriginalPath ()
+  // ---------------------------------------------------------------------------------//
   {
     return originalPath;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getAbsolutePath ()
+  // ---------------------------------------------------------------------------------//
   {
     if (originalPath != null)
       return originalPath.toString ();
@@ -206,8 +230,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return disk.getFile ().getAbsolutePath ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getDisplayPath ()
+  // ---------------------------------------------------------------------------------//
   {
     if (originalPath != null)
       return originalPath.toString ();
@@ -220,14 +246,18 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return disk.getFile ().getAbsolutePath ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean isTempDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return originalPath != null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getName ()
+  // ---------------------------------------------------------------------------------//
   {
     if (originalPath != null)
     {
@@ -238,20 +268,26 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return disk.getFile ().getName ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void writeFile (AbstractFile file)
+  // ---------------------------------------------------------------------------------//
   {
     System.out.println ("not implemented yet");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<AppleFileSource> getCatalogList ()
+  // ---------------------------------------------------------------------------------//
   {
     return fileEntries;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getFile (String uniqueName)
+  // ---------------------------------------------------------------------------------//
   {
     for (AppleFileSource afs : fileEntries)
       if (afs.getUniqueName ().equals (uniqueName))
@@ -259,24 +295,32 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public JTree getCatalogTree ()
+  // ---------------------------------------------------------------------------------//
   {
     return catalogTree;
   }
 
+  // ---------------------------------------------------------------------------------//
   public DefaultMutableTreeNode getCatalogTreeRoot ()
+  // ---------------------------------------------------------------------------------//
   {
     return (DefaultMutableTreeNode) catalogTree.getModel ().getRoot ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void makeNodeVisible (DefaultMutableTreeNode node)
+  // ---------------------------------------------------------------------------------//
   {
     catalogTree.makeVisible (
         new TreePath (((DefaultTreeModel) catalogTree.getModel ()).getPathToRoot (node)));
   }
 
+  // ---------------------------------------------------------------------------------//
   protected DefaultMutableTreeNode findNode (DefaultMutableTreeNode node, String name)
+  // ---------------------------------------------------------------------------------//
   {
     Enumeration<TreeNode> children = node.breadthFirstEnumeration ();
     if (children != null)
@@ -292,36 +336,47 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
+
   /*
    * These routines just hand back the information that was created above, and
    * added to by the subclass.
    */
   @Override
   public SectorType getSectorType (int block)
+  // ---------------------------------------------------------------------------------//
   {
     return getSectorType (disk.getDiskAddress (block));
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public SectorType getSectorType (int track, int sector)
+  // ---------------------------------------------------------------------------------//
   {
     return getSectorType (disk.getDiskAddress (track, sector));
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public SectorType getSectorType (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     return sectorTypes[da.getBlock ()];
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<SectorType> getSectorTypeList ()
+  // ---------------------------------------------------------------------------------//
   {
     return sectorTypesList;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setSectorType (int block, SectorType type)
+  // ---------------------------------------------------------------------------------//
   {
     if (block < sectorTypes.length)
       sectorTypes[block] = type;
@@ -330,8 +385,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   }
 
   // Override this so that the correct sector type can be displayed
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getFormattedSector (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     if (da.getBlock () == 0 && bootSector != null)
       return bootSector;
@@ -354,14 +411,18 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   /*
    * Override this with something useful
    */
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getCatalog ()
+  // ---------------------------------------------------------------------------------//
   {
     return new DefaultAppleFileSource (disk.toString (), this);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getSectorFilename (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     for (AppleFileSource entry : fileEntries)
       if (entry.contains (da))
@@ -370,28 +431,36 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     return "";
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int clearOrphans ()
+  // ---------------------------------------------------------------------------------//
   {
     System.out.println ("Not implemented yet");
     return 0;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean isSectorFree (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     return freeBlocks.get (da.getBlock ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean isSectorFree (int blockNo)
+  // ---------------------------------------------------------------------------------//
   {
     return freeBlocks.get (blockNo);
   }
 
   // representation of the Free Sector Table
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setSectorFree (int block, boolean free)
+  // ---------------------------------------------------------------------------------//
   {
     if (block < 0 || block >= freeBlocks.size ())
     {
@@ -404,20 +473,26 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   }
 
   // Check that the sector hasn't already been flagged as part of the disk structure
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean stillAvailable (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     return stillAvailable (da.getBlock ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean stillAvailable (int blockNo)
+  // ---------------------------------------------------------------------------------//
   {
     return sectorTypes[blockNo] == usedSector || sectorTypes[blockNo] == emptySector;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void verify ()
+  // ---------------------------------------------------------------------------------//
   {
     System.out.println ("Sectors to clean :");
     for (int i = 0, max = disk.getTotalBlocks (); i < max; i++)
@@ -436,30 +511,40 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   }
 
   // VTOC flags sector as free, but it is in use by a file
+  // ---------------------------------------------------------------------------------//
   @Override
   public int falsePositiveBlocks ()
+  // ---------------------------------------------------------------------------------//
   {
     return falsePositives;
   }
 
   // VTOC flags sector as in use, but no file is using it (and not in the DOS tracks)
+  // ---------------------------------------------------------------------------------//
   @Override
   public int falseNegativeBlocks ()
+  // ---------------------------------------------------------------------------------//
   {
     return falseNegatives;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addActionListener (ActionListener actionListener)
+  // ---------------------------------------------------------------------------------//
   {
     actionListenerList = AWTEventMulticaster.add (actionListenerList, actionListener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void removeActionListener (ActionListener actionListener)
+  // ---------------------------------------------------------------------------------//
   {
     actionListenerList = AWTEventMulticaster.remove (actionListenerList, actionListener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void notifyListeners (String text)
+  // ---------------------------------------------------------------------------------//
   {
     if (actionListenerList != null)
       actionListenerList

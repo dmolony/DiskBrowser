@@ -10,7 +10,9 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.gui.DataSource;
 
+// -----------------------------------------------------------------------------------//
 public interface FormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   // Methods to be implemented by the implementer
   public DataSource getFormattedSector (DiskAddress da);

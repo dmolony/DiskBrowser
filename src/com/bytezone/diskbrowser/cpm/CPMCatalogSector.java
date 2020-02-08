@@ -4,17 +4,23 @@ import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 
-public class CPMCatalogSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
+class CPMCatalogSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private static int CATALOG_ENTRY_SIZE = 32;
 
-  public CPMCatalogSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
+  CPMCatalogSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = getHeader ("Catalog Sector");
 
@@ -36,7 +42,7 @@ public class CPMCatalogSector extends AbstractSector
         typeBuffer[2] = buffer[i + 11];
         type = new String (typeBuffer).trim ();
         extra = String.format (" (%s%s)", readOnly ? "read only" : "",
-                               systemFile ? "system file" : "");
+            systemFile ? "system file" : "");
       }
       else
       {

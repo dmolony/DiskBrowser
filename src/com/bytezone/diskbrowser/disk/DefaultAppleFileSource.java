@@ -10,32 +10,42 @@ import com.bytezone.diskbrowser.gui.DataSource;
  * and Volume nodes in the tree to show some text in the centre panel, use a
  * DefaultAppleFileSource which returns a DefaultDataSource (just some text).
  */
+// -----------------------------------------------------------------------------------//
 public class DefaultAppleFileSource implements AppleFileSource
+// -----------------------------------------------------------------------------------//
 {
   final String title;
   final DataSource file;
   final FormattedDisk owner;
   List<DiskAddress> blocks;
 
+  // ---------------------------------------------------------------------------------//
   public DefaultAppleFileSource (String text, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
   {
     this ("", text, owner);
   }
 
+  // ---------------------------------------------------------------------------------//
   public DefaultAppleFileSource (String title, String text, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
   {
     this (title, new DefaultDataSource (text), owner);
   }
 
+  // ---------------------------------------------------------------------------------//
   public DefaultAppleFileSource (String title, DataSource file, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
   {
     this.title = title;
     this.file = file;
     this.owner = owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   public DefaultAppleFileSource (String title, DataSource file, FormattedDisk owner,
       List<DiskAddress> blocks)
+  // ---------------------------------------------------------------------------------//
   {
     this (title, file, owner);
     this.blocks = blocks;
@@ -43,27 +53,35 @@ public class DefaultAppleFileSource implements AppleFileSource
       ((DefaultDataSource) file).buffer = owner.getDisk ().readSectors (blocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setSectors (List<DiskAddress> blocks)
+  // ---------------------------------------------------------------------------------//
   {
     this.blocks = blocks;
     if (file instanceof DefaultDataSource)
       ((DefaultDataSource) file).buffer = owner.getDisk ().readSectors (blocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     return file;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public FormattedDisk getFormattedDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     return blocks;
   }
@@ -71,8 +89,10 @@ public class DefaultAppleFileSource implements AppleFileSource
   /*
    * See similar routine in CatalogPanel.DiskNode
    */
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     final int MAX_NAME_LENGTH = 40;
     final int SUFFIX_LENGTH = 12;
@@ -84,14 +104,18 @@ public class DefaultAppleFileSource implements AppleFileSource
     return title;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getUniqueName ()
+  // ---------------------------------------------------------------------------------//
   {
     return title;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean contains (DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     for (DiskAddress da : blocks)
       if (da.matches (diskAddress))

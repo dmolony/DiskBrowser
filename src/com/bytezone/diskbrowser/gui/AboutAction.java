@@ -9,9 +9,13 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 
-public class AboutAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
+class AboutAction extends DefaultAction
+// -----------------------------------------------------------------------------------//
 {
-  public AboutAction ()
+  // ---------------------------------------------------------------------------------//
+  AboutAction ()
+  // ---------------------------------------------------------------------------------//
   {
     super ("About...", "Display build information", "/com/bytezone/diskbrowser/icons/");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt A"));
@@ -21,13 +25,17 @@ public class AboutAction extends DefaultAction
     setIcon (Action.LARGE_ICON_KEY, "information_32.png");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     about ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void about ()
+  // ---------------------------------------------------------------------------------//
   {
     //    int build = 0;
     //    String buildDate = "<no date>";

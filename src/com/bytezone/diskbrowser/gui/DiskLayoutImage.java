@@ -1,6 +1,12 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -19,7 +25,9 @@ import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
+// -----------------------------------------------------------------------------------//
 class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
+// -----------------------------------------------------------------------------------//
 {
   private static final Cursor crosshairCursor = new Cursor (Cursor.CROSSHAIR_CURSOR);
   private static final Color[] lightColors =
@@ -33,7 +41,9 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
   private int gridWidth = 8;
   private int gridHeight = 35;
 
+  // ---------------------------------------------------------------------------------//
   public DiskLayoutImage ()
+  // ---------------------------------------------------------------------------------//
   {
     setPreferredSize (new Dimension (240 + 1, 525 + 1));
     addMouseListener (new MyMouseListener ());
@@ -45,8 +55,10 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     addKeyListener (new MyKeyListener ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setDisk (FormattedDisk disk, LayoutDetails details)
+  // ---------------------------------------------------------------------------------//
   {
     super.setDisk (disk, details);
 
@@ -60,12 +72,16 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public FormattedDisk getDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return formattedDisk;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setShowFreeSectors (boolean showFree)
+  // ---------------------------------------------------------------------------------//
   {
     if (showFree != showFreeSectors)
     {
@@ -74,7 +90,9 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   void setSelection (List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     selectionHandler.setSelection (sectors);
     if (sectors != null && sectors.size () > 0)
@@ -86,8 +104,10 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void paintComponent (Graphics g)
+  // ---------------------------------------------------------------------------------//
   {
     super.paintComponent (g);
 
@@ -130,8 +150,10 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
       }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void drawBlock (Graphics2D g, SectorType type, int x, int y, boolean flagFree,
       boolean selected)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (type.colour);
     g.fillRect (x + 1, y + 1, blockWidth - 1, blockHeight - 1);
@@ -148,7 +170,9 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private Color getContrastColor (SectorType type)
+  // ---------------------------------------------------------------------------------//
   {
     for (Color color : lightColors)
       if (type.colour == color)
@@ -156,40 +180,52 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     return Color.WHITE;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Dimension getPreferredScrollableViewportSize ()
+  // ---------------------------------------------------------------------------------//
   {
     return new Dimension (240 + 1, 525 + 1);          // floppy disk size
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getScrollableUnitIncrement (Rectangle visibleRect, int orientation,
       int direction)
+  // ---------------------------------------------------------------------------------//
   {
     return orientation == SwingConstants.HORIZONTAL ? blockWidth : blockHeight;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int getScrollableBlockIncrement (Rectangle visibleRect, int orientation,
       int direction)
+  // ---------------------------------------------------------------------------------//
   {
     return orientation == SwingConstants.HORIZONTAL ? blockWidth * 4 : blockHeight * 10;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean getScrollableTracksViewportHeight ()
+  // ---------------------------------------------------------------------------------//
   {
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean getScrollableTracksViewportWidth ()
+  // ---------------------------------------------------------------------------------//
   {
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void redo (RedoEvent redoEvent)
+  // ---------------------------------------------------------------------------------//
   {
     redo = true;
     SectorSelectedEvent event = (SectorSelectedEvent) redoEvent.value;
@@ -200,14 +236,18 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     requestFocusInWindow ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void fireSectorSelectionEvent ()
+  // ---------------------------------------------------------------------------------//
   {
     SectorSelectedEvent event =
         new SectorSelectedEvent (this, selectionHandler.getHighlights (), formattedDisk);
     fireSectorSelectionEvent (event);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void fireSectorSelectionEvent (SectorSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     event.redo = redo;
     SectorSelectionListener[] listeners =
@@ -216,17 +256,23 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
       listener.sectorSelected (event);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addSectorSelectionListener (SectorSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.add (SectorSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void removeSectorSelectionListener (SectorSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.remove (SectorSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   class MyKeyListener extends KeyAdapter
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     public void keyPressed (KeyEvent e)
@@ -244,7 +290,9 @@ class DiskLayoutImage extends DiskPanel implements Scrollable, RedoListener
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class MyMouseListener extends MouseAdapter
+  // ---------------------------------------------------------------------------------//
   {
     private Cursor currentCursor;
 

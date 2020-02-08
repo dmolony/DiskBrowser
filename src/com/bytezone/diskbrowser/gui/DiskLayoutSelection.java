@@ -12,7 +12,9 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
+// -----------------------------------------------------------------------------------//
 class DiskLayoutSelection implements Iterable<DiskAddress>
+// -----------------------------------------------------------------------------------//
 {
   private final List<DiskAddress> highlights;
 
@@ -21,7 +23,9 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     highlights = new ArrayList<> ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void doClick (Disk disk, DiskAddress da, boolean extend, boolean append)
+  // ---------------------------------------------------------------------------------//
   {
     /*
      * Single click without modifiers - just replace previous highlights with the new
@@ -67,7 +71,9 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     Collections.sort (highlights);
   }
 
+  // ---------------------------------------------------------------------------------//
   void cursorMove (FormattedDisk formattedDisk, KeyEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     if (highlights.size () == 0)
     {
@@ -121,25 +127,33 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     Collections.sort (highlights);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addHighlight (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     assert da != null;
     highlights.add (da);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Iterator<DiskAddress> iterator ()
+  // ---------------------------------------------------------------------------------//
   {
     return highlights.iterator ();
   }
 
   // This must return a copy, or the redo function will get very confused
+  // ---------------------------------------------------------------------------------//
   public List<DiskAddress> getHighlights ()
+  // ---------------------------------------------------------------------------------//
   {
     return new ArrayList<> (highlights);
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean isSelected (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     for (DiskAddress selection : highlights)
       if (selection != null && da.matches (selection))
@@ -147,7 +161,9 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setSelection (List<DiskAddress> list)
+  // ---------------------------------------------------------------------------------//
   {
     // sparse files contain empty blocks
     highlights.clear ();
@@ -157,14 +173,18 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
           highlights.add (da);
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean checkContiguous ()
+  // ---------------------------------------------------------------------------------//
   {
     int range = highlights.get (highlights.size () - 1).getBlock ()
         - highlights.get (0).getBlock () + 1;
     return (range == highlights.size ());
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extendHighlights (Disk disk, DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     int lo, hi;
 
@@ -185,7 +205,9 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
       addHighlight (disk.getDiskAddress (i));
   }
 
+  // ---------------------------------------------------------------------------------//
   private void adjustHighlights (Disk disk, DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     // If we are outside the discontiguous range, just extend as usual
     if (da.getBlock () < highlights.get (0).getBlock ()

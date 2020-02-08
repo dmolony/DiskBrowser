@@ -8,11 +8,15 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 public class CloseTabAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   CatalogPanel catalogPanel;
 
+  // ---------------------------------------------------------------------------------//
   public CloseTabAction (CatalogPanel catalogPanel)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Close Tab");
     putValue (Action.SHORT_DESCRIPTION, "Close the current disk tab");
@@ -23,8 +27,10 @@ public class CloseTabAction extends AbstractAction
     this.catalogPanel = catalogPanel;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     catalogPanel.closeCurrentTab ();
   }

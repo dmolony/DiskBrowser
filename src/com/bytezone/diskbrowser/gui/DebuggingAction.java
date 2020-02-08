@@ -7,11 +7,15 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 public class DebuggingAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   private final DataPanel owner;
 
+  // ---------------------------------------------------------------------------------//
   public DebuggingAction (DataPanel owner)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Debugging");
     putValue (Action.SHORT_DESCRIPTION, "Show debugging information");
@@ -19,8 +23,10 @@ public class DebuggingAction extends AbstractAction
     this.owner = owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     owner.setDebug (((JMenuItem) e.getSource ()).isSelected ());
   }

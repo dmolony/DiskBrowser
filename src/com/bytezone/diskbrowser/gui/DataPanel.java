@@ -1,26 +1,46 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.bytezone.common.FontAction.FontChangeEvent;
 import com.bytezone.common.FontAction.FontChangeListener;
-import com.bytezone.diskbrowser.applefile.*;
+import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
+import com.bytezone.diskbrowser.applefile.AssemblerProgram;
+import com.bytezone.diskbrowser.applefile.HiResImage;
+import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
+import com.bytezone.diskbrowser.applefile.QuickDrawFont;
+import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 
-class DataPanel extends JTabbedPane
-    implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
-    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
-    AssemblerPreferencesListener
+// -----------------------------------------------------------------------------------//
+class DataPanel extends JTabbedPane implements DiskSelectionListener,
+    FileSelectionListener, SectorSelectionListener, FileNodeSelectionListener,
+    FontChangeListener, BasicPreferencesListener, AssemblerPreferencesListener
+// -----------------------------------------------------------------------------------//
 {
   private static final int TEXT_WIDTH = 65;
   private static final int BACKGROUND = 245;
@@ -46,7 +66,9 @@ class DataPanel extends JTabbedPane
 
   final MenuHandler menuHandler;
 
+  // ---------------------------------------------------------------------------------//
   public DataPanel (MenuHandler mh)
+  // ---------------------------------------------------------------------------------//
   {
     this.menuHandler = mh;
     setTabPlacement (SwingConstants.BOTTOM);
@@ -141,7 +163,9 @@ class DataPanel extends JTabbedPane
     menuHandler.prevPaletteItem.setAction (new PreviousPaletteAction (this, buttonGroup));
   }
 
+  // ---------------------------------------------------------------------------------//
   public void selectPalette (Palette palette)
+  // ---------------------------------------------------------------------------------//
   {
     HiResImage.getPaletteFactory ().setCurrentPalette (palette);
     if (currentDataSource instanceof HiResImage)
@@ -152,7 +176,9 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public Palette cyclePalette (CycleDirection direction)
+  // ---------------------------------------------------------------------------------//
   {
     Palette palette = HiResImage.getPaletteFactory ().cyclePalette (direction);
     if (currentDataSource instanceof HiResImage)
@@ -164,12 +190,16 @@ class DataPanel extends JTabbedPane
     return palette;
   }
 
+  // ---------------------------------------------------------------------------------//
   void setLineWrap (boolean lineWrap)
+  // ---------------------------------------------------------------------------------//
   {
     formattedText.setLineWrap (lineWrap);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setColourQuirks (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     if (currentDataSource instanceof HiResImage)
     {
@@ -179,7 +209,9 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setMonochrome (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     if (currentDataSource instanceof HiResImage)
     {
@@ -189,7 +221,9 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setDebug (boolean value)
+  // ---------------------------------------------------------------------------------//
   {
     debugMode = value;
 
@@ -207,7 +241,9 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setTabsFont (Font font)
+  // ---------------------------------------------------------------------------------//
   {
     formattedText.setFont (font);
     hexText.setFont (font);
@@ -215,14 +251,18 @@ class DataPanel extends JTabbedPane
     imagePane.getVerticalScrollBar ().setUnitIncrement (font.getSize ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getCurrentText ()
+  // ---------------------------------------------------------------------------------//
   {
     int index = getSelectedIndex ();
-    return index == 0 ? formattedText.getText ()
-        : index == 1 ? hexText.getText () : disassemblyText.getText ();
+    return index == 0 ? formattedText.getText () : index == 1 ? hexText.getText ()
+        : disassemblyText.getText ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private JScrollPane setPanel (JTextArea outputPanel, String tabName)
+  // ---------------------------------------------------------------------------------//
   {
     outputPanel.setEditable (false);
     outputPanel.setMargin (new Insets (5, 5, 5, 5));
@@ -235,7 +275,9 @@ class DataPanel extends JTabbedPane
     return outputScrollPane;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setDataSource (DataSource dataSource)
+  // ---------------------------------------------------------------------------------//
   {
     currentDataSource = dataSource;
 
@@ -304,7 +346,9 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void removeImage ()
+  // ---------------------------------------------------------------------------------//
   {
     if (imageVisible)
     {
@@ -316,13 +360,17 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setText (JTextArea textArea, String text)
+  // ---------------------------------------------------------------------------------//
   {
     textArea.setText (text);
     textArea.setCaretPosition (0);
   }
 
+  // ---------------------------------------------------------------------------------//
   private class ImagePanel extends JPanel
+  // ---------------------------------------------------------------------------------//
   {
     private BufferedImage image;
     private int scale = 1;
@@ -377,8 +425,10 @@ class DataPanel extends JTabbedPane
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void diskSelected (DiskSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     setSelectedIndex (0);
     setDataSource (null);
@@ -388,15 +438,19 @@ class DataPanel extends JTabbedPane
       System.out.println ("bollocks in diskSelected()");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void fileSelected (FileSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     DataSource dataSource = event.appleFileSource.getDataSource ();
     setDataSource (dataSource);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void sectorSelected (SectorSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> sectors = event.getSectors ();
     if (sectors == null || sectors.size () == 0)
@@ -412,29 +466,37 @@ class DataPanel extends JTabbedPane
       setDataSource (new SectorList (event.getFormattedDisk (), sectors));
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void fileNodeSelected (FileNodeSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     setSelectedIndex (0);
     setDataSource (event.getFileNode ());
     //    FileNode node = event.getFileNode ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void changeFont (FontChangeEvent fontChangeEvent)
+  // ---------------------------------------------------------------------------------//
   {
     setTabsFont (fontChangeEvent.font);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setBasicPreferences (BasicPreferences basicPreferences)
+  // ---------------------------------------------------------------------------------//
   {
     if (currentDataSource instanceof ApplesoftBasicProgram)
       setDataSource (currentDataSource);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
+  // ---------------------------------------------------------------------------------//
   {
     if (currentDataSource instanceof AssemblerProgram)
       setDataSource (currentDataSource);

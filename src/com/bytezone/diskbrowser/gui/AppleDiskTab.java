@@ -21,13 +21,17 @@ import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 
+// -----------------------------------------------------------------------------------//
 class AppleDiskTab extends AbstractTab
+// -----------------------------------------------------------------------------------//
 {
   FormattedDisk disk;
 
   // restoring from a file selection
+  // ---------------------------------------------------------------------------------//
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, FileSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
     create (disk);
@@ -35,8 +39,10 @@ class AppleDiskTab extends AbstractTab
   }
 
   // restoring from a sector selection
+  // ---------------------------------------------------------------------------------//
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, SectorSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
     create (disk);
@@ -46,8 +52,10 @@ class AppleDiskTab extends AbstractTab
   // This constructor is only called when lastFileUsed is not null, but the disk
   // couldn't find the file entry. Either the file has been deleted, or it is a disk
   // with redefined files (Wizardry, Infocom etc).
+  // ---------------------------------------------------------------------------------//
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, String lastFileUsed)
+  // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
     System.out.println ("****************** File not found");
@@ -63,8 +71,10 @@ class AppleDiskTab extends AbstractTab
   }
 
   // User is selecting a new disk from the catalog
+  // ---------------------------------------------------------------------------------//
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font)
+  // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
     create (disk);
@@ -76,15 +86,19 @@ class AppleDiskTab extends AbstractTab
     redoHandler.fileSelected (new FileSelectedEvent (this, afs));
   }
 
+  // ---------------------------------------------------------------------------------//
   private void create (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
     setTree (disk.getCatalogTree ());
     setSelectionListener (tree);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void activate ()
+  // ---------------------------------------------------------------------------------//
   {
     //    System.out.println ("=========== Activating AppleDiskTab =============");
     eventHandler.redo = true;
@@ -94,8 +108,10 @@ class AppleDiskTab extends AbstractTab
     redoHandler.setCurrentData (redoData);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void refresh ()                  // called when the user gives ALT-R command
+  // ---------------------------------------------------------------------------------//
   {
     Object o = getSelectedObject ();
     String currentFile = (o == null) ? null : ((AppleFileSource) o).getUniqueName ();
@@ -105,7 +121,9 @@ class AppleDiskTab extends AbstractTab
     selectNode (currentFile);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void selectNode (String nodeName)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode selectNode = null;
     if (nodeName != null)
@@ -118,7 +136,9 @@ class AppleDiskTab extends AbstractTab
       System.out.println ("First node not found");
   }
 
+  // ---------------------------------------------------------------------------------//
   void redoEvent (RedoEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     AppleFileSource afs = ((FileSelectedEvent) event.value).appleFileSource;
     FileSelectedEvent fileSelectedEvent = (FileSelectedEvent) event.value;
@@ -130,7 +150,9 @@ class AppleDiskTab extends AbstractTab
     selectNode (fileSelectedEvent.appleFileSource.getUniqueName ());
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode findNode (String nodeName)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode rootNode = getRootNode ();
 
@@ -154,7 +176,9 @@ class AppleDiskTab extends AbstractTab
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean contains (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     return this.disk.getAbsolutePath ().equals (disk.getAbsolutePath ());
   }
@@ -162,7 +186,9 @@ class AppleDiskTab extends AbstractTab
   // This action is triggered by AppleDiskTab.selectNode (String), which calls
   // AbstractTab.showNode (DefaultMutableTreeNode). That will trigger this listener
   // ONLY if the value is different, so it is set to null first to force the event.
+  // ---------------------------------------------------------------------------------//
   private void setSelectionListener (JTree tree)
+  // ---------------------------------------------------------------------------------//
   {
     tree.addTreeSelectionListener (new TreeSelectionListener ()
     {

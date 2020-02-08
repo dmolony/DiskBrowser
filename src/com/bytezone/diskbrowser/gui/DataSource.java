@@ -4,7 +4,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
+// -----------------------------------------------------------------------------------//
 public interface DataSource
+// -----------------------------------------------------------------------------------//
 {
   public String getText ();
 

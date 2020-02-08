@@ -1,14 +1,18 @@
 package com.bytezone.diskbrowser.gui;
 
+// -----------------------------------------------------------------------------------//
 public class AssemblerPreferences
+// -----------------------------------------------------------------------------------//
 {
   public boolean showTargets = true;
   public boolean showStrings = true;
   public boolean offsetFromZero = false;
   public boolean showHeader = true;
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

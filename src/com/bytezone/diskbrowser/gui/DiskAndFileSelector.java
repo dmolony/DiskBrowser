@@ -7,7 +7,9 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
+// -----------------------------------------------------------------------------------//
 class DiskAndFileSelector
+// -----------------------------------------------------------------------------------//
 {
   EventListenerList listenerList = new EventListenerList ();
   FormattedDisk currentDisk;
@@ -16,22 +18,30 @@ class DiskAndFileSelector
   /*
    * Apple DiskSelection routines
    */
+  // ---------------------------------------------------------------------------------//
   public void addDiskSelectionListener (DiskSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.add (DiskSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void removeDiskSelectionListener (DiskSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.remove (DiskSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addFileNodeSelectionListener (FileNodeSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.add (FileNodeSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void removeFileNodeSelectionListener (FileNodeSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.remove (FileNodeSelectionListener.class, listener);
   }
@@ -59,7 +69,9 @@ class DiskAndFileSelector
   //    }
   //  }
 
+  // ---------------------------------------------------------------------------------//
   void fireDiskSelectionEvent (FileNode node)
+  // ---------------------------------------------------------------------------------//
   {
     if (node.file.isDirectory ())
     {
@@ -77,7 +89,9 @@ class DiskAndFileSelector
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   void fireFileNodeSelectionEvent (FileNode node)
+  // ---------------------------------------------------------------------------------//
   {
     FileNodeSelectedEvent e = new FileNodeSelectedEvent (this, node);
     e.redo = redo;
@@ -87,7 +101,9 @@ class DiskAndFileSelector
       listener.fileNodeSelected (e);
   }
 
+  // ---------------------------------------------------------------------------------//
   void fireDiskSelectionEvent (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     if (disk == currentDisk)
     {
@@ -110,21 +126,23 @@ class DiskAndFileSelector
     currentDisk = disk;
   }
 
-  /*
-   * Apple FileSelection routines
-   */
-
+  // ---------------------------------------------------------------------------------//
   public void addFileSelectionListener (FileSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.add (FileSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void removeFileSelectionListener (FileSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     listenerList.remove (FileSelectionListener.class, listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   void fireFileSelectionEvent (AppleFileSource file)
+  // ---------------------------------------------------------------------------------//
   {
     assert file != null;
     currentDisk = null;

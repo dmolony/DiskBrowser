@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.gui;
 
+// -----------------------------------------------------------------------------------//
 public class BasicPreferences
+// -----------------------------------------------------------------------------------//
 {
   public boolean splitRem = false;
   public boolean alignAssign = true;
@@ -11,8 +13,10 @@ public class BasicPreferences
   public int wrapPrintAt = 40;
   public int wrapRemAt = 60;
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

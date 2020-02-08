@@ -8,11 +8,15 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+// -----------------------------------------------------------------------------------//
 public class ColourQuirksAction extends AbstractAction
+// -----------------------------------------------------------------------------------//
 {
   private final DataPanel owner;
 
+  // ---------------------------------------------------------------------------------//
   public ColourQuirksAction (DataPanel owner)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Smear HGR");
     putValue (Action.SHORT_DESCRIPTION, "Display pixels like a TV screen");
@@ -21,8 +25,10 @@ public class ColourQuirksAction extends AbstractAction
     this.owner = owner;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void actionPerformed (ActionEvent e)
+  // ---------------------------------------------------------------------------------//
   {
     owner.setColourQuirks (((JMenuItem) e.getSource ()).isSelected ());
   }

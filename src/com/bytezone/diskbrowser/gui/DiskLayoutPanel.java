@@ -24,8 +24,10 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
+// -----------------------------------------------------------------------------------//
 class DiskLayoutPanel extends JPanel
     implements DiskSelectionListener, FileSelectionListener, RedoListener
+// -----------------------------------------------------------------------------------//
 {
   private static final int SIZE = 15;             // basic unit of a display block
 
@@ -36,7 +38,9 @@ class DiskLayoutPanel extends JPanel
   private final JScrollPane sp;
   private LayoutDetails layout;
 
+  // ---------------------------------------------------------------------------------//
   public DiskLayoutPanel ()
+  // ---------------------------------------------------------------------------------//
   {
     super (new BorderLayout ());
 
@@ -63,7 +67,9 @@ class DiskLayoutPanel extends JPanel
     add (legendPanel, BorderLayout.SOUTH);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setDisk (final FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     layout = new LayoutDetails (disk);
     diskLayoutImage.setDisk (disk, layout);
@@ -105,41 +111,55 @@ class DiskLayoutPanel extends JPanel
     repaint ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setHex (boolean hex)
+  // ---------------------------------------------------------------------------------//
   {
     verticalRuler.setHex (hex);
     horizontalRuler.setHex (hex);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setBlock (boolean block)
+  // ---------------------------------------------------------------------------------//
   {
     verticalRuler.setTrackMode (block);
     horizontalRuler.setTrackMode (block);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setFree (boolean free)
+  // ---------------------------------------------------------------------------------//
   {
     diskLayoutImage.setShowFreeSectors (free);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addSectorSelectionListener (SectorSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     diskLayoutImage.addSectorSelectionListener (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void removeSectorSelectionListener (SectorSelectionListener listener)
+  // ---------------------------------------------------------------------------------//
   {
     diskLayoutImage.removeSectorSelectionListener (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void diskSelected (DiskSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     setDisk (event.getFormattedDisk ());
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void fileSelected (FileSelectedEvent event)
+  // ---------------------------------------------------------------------------------//
   {
     // This can happen if a file is selected from a dual-dos disk
     checkCorrectDisk (event.appleFileSource.getFormattedDisk ());
@@ -147,7 +167,9 @@ class DiskLayoutPanel extends JPanel
     diskLayoutImage.setSelection (event.appleFileSource.getSectors ());
   }
 
+  // ---------------------------------------------------------------------------------//
   class LayoutDetails
+  // ---------------------------------------------------------------------------------//
   {
     Dimension block;
     Dimension grid;
@@ -178,7 +200,9 @@ class DiskLayoutPanel extends JPanel
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class Corner extends JComponent
+  // ---------------------------------------------------------------------------------//
   {
     Color backgroundColor = Color.WHITE;
     boolean showHex = true;

@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.appleworks;
 
-public class CellFormat
+// -----------------------------------------------------------------------------------//
+class CellFormat
+// -----------------------------------------------------------------------------------//
 {
   boolean labelAllowed;
   boolean valueAllowed;
@@ -13,7 +15,9 @@ public class CellFormat
   boolean appropriate;
   int decimals;
 
-  public CellFormat (byte format)
+  // ---------------------------------------------------------------------------------//
+  CellFormat (byte format)
+  // ---------------------------------------------------------------------------------//
   {
     display = (format & 0x40) == 0;
     labelAllowed = (format & 0x10) == 0;
@@ -29,13 +33,17 @@ public class CellFormat
     appropriate = formatting == 6;
   }
 
-  public CellFormat (byte format, byte decimals)
+  // ---------------------------------------------------------------------------------//
+  CellFormat (byte format, byte decimals)
+  // ---------------------------------------------------------------------------------//
   {
     this (format);
     this.decimals = decimals & 0x07;
   }
 
-  public String mask ()
+  // ---------------------------------------------------------------------------------//
+  String mask ()
+  // ---------------------------------------------------------------------------------//
   {
     String fmt = dollars ? "$%" : "%";
     if (commas)

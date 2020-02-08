@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.appleworks;
 
+// -----------------------------------------------------------------------------------//
 class TableReport extends Report
+// -----------------------------------------------------------------------------------//
 {
   private final int[] columnWidths = new int[33];
   private final int[] spaces = new int[33];
@@ -15,7 +17,9 @@ class TableReport extends Report
   private final int groupTotalColumn;
   private final boolean printGroupTotals;
 
-  public TableReport (AppleworksADBFile parent, byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
+  TableReport (AppleworksADBFile parent, byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     super (parent, buffer, offset);
 
@@ -39,8 +43,10 @@ class TableReport extends Report
     printGroupTotals = buffer[offset + 217] != 0;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -69,7 +75,8 @@ class TableReport extends Report
         categoryName = categoryName.substring (0, columnWidths[i]);
 
       header.append (categoryName);
-      header.append (gap.substring (0, columnWidths[i] + spaces[i] - categoryName.length ()));
+      header.append (
+          gap.substring (0, columnWidths[i] + spaces[i] - categoryName.length ()));
       underline.append (line.substring (0, columnWidths[i]));
       underline.append (gap.substring (0, spaces[i]));
     }
@@ -98,8 +105,8 @@ class TableReport extends Report
           String cond = calculatedRules[calcField];
           int col = calculatedColumn[calcField] - 1;
           String format = "%12." + justification[col] + "f";
-          item =
-                String.format (format, record.calculateItem (calcField, i + 97, cond)).trim ();
+          item = String.format (format, record.calculateItem (calcField, i + 97, cond))
+              .trim ();
           //          System.out.println (item);
         }
 
@@ -178,19 +185,23 @@ class TableReport extends Report
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private StringBuilder trimRight (StringBuilder text)
+  // ---------------------------------------------------------------------------------//
   {
     while (text.length () > 0 && text.charAt (text.length () - 1) == ' ')
       text.deleteCharAt (text.length () - 1);
     return text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (super.toString ());
     text.append (String.format ("Calculated ......... %d %d %d%n", calculatedColumn[0],
-                                calculatedColumn[1], calculatedColumn[2]));
+        calculatedColumn[1], calculatedColumn[2]));
     text.append (String.format ("Group total ........ %d%n", groupTotalColumn));
     text.append (String.format ("Print gr totals .... %s%n", printGroupTotals));
     text.append (String.format ("Calc category1 ..... %s%n", calculatedCategory[0]));
@@ -202,9 +213,9 @@ class TableReport extends Report
 
     text.append (String.format ("%n  Width Space Name Foot Just%n"));
     for (int i = 0; i < categoriesOnThisReport; i++)
-      text.append (String.format ("    %2d    %2d   %02X   %02X   %02X %n", columnWidths[i],
-                                  spaces[i], reportCategoryNames[i], footTotals[i],
-                                  justification[i]));
+      text.append (
+          String.format ("    %2d    %2d   %02X   %02X   %02X %n", columnWidths[i],
+              spaces[i], reportCategoryNames[i], footTotals[i], justification[i]));
 
     return text.toString ();
   }

@@ -6,12 +6,16 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class AppleworksSSFile extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   Header header;
   List<Row> rows = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public AppleworksSSFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -32,8 +36,10 @@ public class AppleworksSSFile extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (header.toString ());
 
@@ -47,14 +53,18 @@ public class AppleworksSSFile extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   static String getCellName (int row, int column)
+  // ---------------------------------------------------------------------------------//
   {
     char c1 = (char) ('A' + column / 26 - 1);
     char c2 = (char) ('A' + column % 26);
     return "" + (c1 == '@' ? "" : c1) + c2 + row;
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Header
+  // ---------------------------------------------------------------------------------//
   {
     private final int[] columnWidths = new int[127];
     private final char calcOrder;
@@ -245,7 +255,9 @@ public class AppleworksSSFile extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Row
+  // ---------------------------------------------------------------------------------//
   {
     private final int rowNumber;
     private final List<Cell> cells = new ArrayList<> ();

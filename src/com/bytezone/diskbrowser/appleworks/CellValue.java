@@ -2,7 +2,9 @@ package com.bytezone.diskbrowser.appleworks;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class CellValue extends Cell
+// -----------------------------------------------------------------------------------//
+class CellValue extends Cell
+// -----------------------------------------------------------------------------------//
 {
   CellFormat format;
   CellFormula formula;
@@ -10,7 +12,9 @@ public class CellValue extends Cell
   boolean lastEvalError;
   double saneDouble;
 
-  public CellValue (byte[] buffer, int row, int column, int offset, int length)
+  // ---------------------------------------------------------------------------------//
+  CellValue (byte[] buffer, int row, int column, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     super (row, column, offset, length);
 

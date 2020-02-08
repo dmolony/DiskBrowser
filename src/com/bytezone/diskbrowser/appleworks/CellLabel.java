@@ -2,12 +2,16 @@ package com.bytezone.diskbrowser.appleworks;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class CellLabel extends Cell
+// -----------------------------------------------------------------------------------//
+class CellLabel extends Cell
+// -----------------------------------------------------------------------------------//
 {
   boolean propagated;
   String label;
 
-  public CellLabel (byte[] buffer, int row, int column, int offset, int length)
+  // ---------------------------------------------------------------------------------//
+  CellLabel (byte[] buffer, int row, int column, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     super (row, column, offset, length);
 

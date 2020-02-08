@@ -7,14 +7,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// -----------------------------------------------------------------------------------//
 class Record
+// -----------------------------------------------------------------------------------//
 {
   AppleworksADBFile parent;
   int length;
   List<String> items = new ArrayList<> ();
-  Map<Integer, Double> calculatedItems = new HashMap<Integer, Double> ();// move to TableReport
+  Map<Integer, Double> calculatedItems = new HashMap<> ();      // move to TableReport
 
-  public Record (AppleworksADBFile parent, byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
+  Record (AppleworksADBFile parent, byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     this.parent = parent;
     int count;
@@ -55,16 +59,20 @@ class Record
       items.add ("");
   }
 
-  public String getItem (int index)
+  // ---------------------------------------------------------------------------------//
+  String getItem (int index)
+  // ---------------------------------------------------------------------------------//
   {
     return items.get (index);
   }
 
-  public double calculateItem (int pos, int name, String condition)
+  // ---------------------------------------------------------------------------------//
+  double calculateItem (int pos, int name, String condition)
+  // ---------------------------------------------------------------------------------//
   {
     try
     {
-      //      System.out.printf ("%nCalculating %d (%s): %s%n", pos, (char) name, condition);
+      // System.out.printf ("%nCalculating %d (%s): %s%n", pos, (char) name, condition);
       Pattern p = Pattern.compile ("([A-Za-z]{1,2})(([-+*/]([A-Za-z]{1,2}|[0-9]))*)");
       Matcher m = p.matcher (condition);
       if (m.matches ())
@@ -112,7 +120,9 @@ class Record
     return 0.0;
   }
 
+  // ---------------------------------------------------------------------------------//
   private String valueOf (int field)
+  // ---------------------------------------------------------------------------------//
   {
     int itemNo = field - 'A';
 
@@ -138,12 +148,16 @@ class Record
     return "0.0";
   }
 
-  public String getReportLine (String format)
+  // ---------------------------------------------------------------------------------//
+  String getReportLine (String format)
+  // ---------------------------------------------------------------------------------//
   {
     return String.format (format, (Object[]) items.toArray (new String[items.size ()]));
   }
 
-  public String getReportLine ()
+  // ---------------------------------------------------------------------------------//
+  String getReportLine ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     String format = String.format ("%%-%ds : %%s%%n", parent.maxCategoryName);
@@ -163,8 +177,10 @@ class Record
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     String format = "%-" + parent.maxCategoryName + "s [%s]%n";

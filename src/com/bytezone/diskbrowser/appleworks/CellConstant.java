@@ -2,12 +2,16 @@ package com.bytezone.diskbrowser.appleworks;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
-public class CellConstant extends Cell
+// -----------------------------------------------------------------------------------//
+class CellConstant extends Cell
+// -----------------------------------------------------------------------------------//
 {
   double saneDouble;
   CellFormat format;
 
-  public CellConstant (byte[] buffer, int row, int column, int offset, int length)
+  // ---------------------------------------------------------------------------------//
+  CellConstant (byte[] buffer, int row, int column, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     super (row, column, offset, length);
 

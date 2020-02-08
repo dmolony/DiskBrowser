@@ -2,19 +2,25 @@ package com.bytezone.diskbrowser.appleworks;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
+// -----------------------------------------------------------------------------------//
 public class AppleworksWPFile extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   Header header;
 
+  // ---------------------------------------------------------------------------------//
   public AppleworksWPFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
     header = new Header ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     int leftMargin = header.leftMargin;
     int rightMargin;
@@ -31,7 +37,6 @@ public class AppleworksWPFile extends AbstractFile
     {
       int b1 = buffer[ptr] & 0xFF;
       int b2 = buffer[ptr + 1] & 0xFF;
-      //      System.out.printf ("%02X%02X %n", (buffer[ptr] & 0xFF), (buffer[ptr + 1] & 0xFF));
 
       if (b1 == 0xFF && b2 == 0xFF)
         break;
@@ -144,7 +149,9 @@ public class AppleworksWPFile extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Header
+  // ---------------------------------------------------------------------------------//
   {
     private final char[] tabStops = new char[80];
     private final String tabs;

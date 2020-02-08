@@ -6,7 +6,9 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class AppleworksADBFile extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   static final String line = "-------------------------------------------------------"
       + "-----------------------------------\n";
@@ -42,7 +44,9 @@ public class AppleworksADBFile extends AbstractFile
   final List<Record> records = new ArrayList<> ();
   private final Record standardRecord;
 
+  // ---------------------------------------------------------------------------------//
   public AppleworksADBFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -125,8 +129,10 @@ public class AppleworksADBFile extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -179,7 +185,9 @@ public class AppleworksADBFile extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void removeTrailing (StringBuilder text, char c)
+  // ---------------------------------------------------------------------------------//
   {
     while (text.charAt (text.length () - 1) == c)
       text.deleteCharAt (text.length () - 1);

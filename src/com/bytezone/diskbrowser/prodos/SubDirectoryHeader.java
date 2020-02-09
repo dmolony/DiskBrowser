@@ -6,13 +6,17 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class SubDirectoryHeader extends DirectoryHeader
+// -----------------------------------------------------------------------------------//
 {
   private final int parentPointer;
   private final int parentSequence;
   private final int parentSize;
 
-  public SubDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer, FileEntry parent)
+  // ---------------------------------------------------------------------------------//
+  SubDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer, FileEntry parent)
+  // ---------------------------------------------------------------------------------//
   {
     super (parentDisk, entryBuffer);
     this.parentDirectory = parent.parentDirectory;
@@ -25,21 +29,27 @@ class SubDirectoryHeader extends DirectoryHeader
       System.out.printf ("", parentPointer, parentSequence, parentSize);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     // should this return a directory listing?
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     String locked = (access == 0x01) ? "*" : " ";
     return String.format ("   %s%-40s %15s", locked, "/" + name,

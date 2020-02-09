@@ -23,8 +23,8 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
   private final int usedBlocks;
 
   // ---------------------------------------------------------------------------------//
-  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer,
-      int totalBlocks, int freeBlocks, int usedBlocks)
+  ProdosDirectory (FormattedDisk parent, String name, byte[] buffer, int totalBlocks,
+      int freeBlocks, int usedBlocks)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);

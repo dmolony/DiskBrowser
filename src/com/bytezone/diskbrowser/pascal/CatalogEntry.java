@@ -11,7 +11,9 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 abstract class CatalogEntry implements AppleFileSource
+// -----------------------------------------------------------------------------------//
 {
   protected AbstractFile file;
   protected final PascalDisk parent;
@@ -23,7 +25,9 @@ abstract class CatalogEntry implements AppleFileSource
   protected int bytesUsedInLastBlock;
   protected final List<DiskAddress> blocks = new ArrayList<> ();
 
-  public CatalogEntry (PascalDisk parent, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  CatalogEntry (PascalDisk parent, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     this.parent = parent;
 
@@ -39,8 +43,10 @@ abstract class CatalogEntry implements AppleFileSource
       blocks.add (disk.getDiskAddress (i));
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean contains (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     for (DiskAddress sector : blocks)
       if (sector.matches (da))
@@ -48,27 +54,35 @@ abstract class CatalogEntry implements AppleFileSource
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> sectors = new ArrayList<> (blocks);
     return sectors;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public FormattedDisk getFormattedDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return parent;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getUniqueName ()
+  // ---------------------------------------------------------------------------------//
   {
     return name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     int size = lastBlock - firstBlock;
     String fileTypeText = fileType < 0 || fileType >= parent.fileTypes.length ? "????"

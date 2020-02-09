@@ -10,12 +10,20 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.BootSector;
-import com.bytezone.diskbrowser.disk.*;
+import com.bytezone.diskbrowser.disk.AbstractFormattedDisk;
+import com.bytezone.diskbrowser.disk.AppleDisk;
+import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
+import com.bytezone.diskbrowser.disk.DefaultSector;
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
+import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.wizardry.Relocator;
 
+// -----------------------------------------------------------------------------------//
 public class PascalDisk extends AbstractFormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   static final int CATALOG_ENTRY_SIZE = 26;
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
@@ -40,7 +48,9 @@ public class PascalDisk extends AbstractFormattedDisk
   SectorType[] sectors = { catalogSector, badSector, codeSector, textSector, infoSector,
                            dataSector, grafSector, fotoSector };
 
+  // ---------------------------------------------------------------------------------//
   public PascalDisk (Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk);
 
@@ -125,7 +135,9 @@ public class PascalDisk extends AbstractFormattedDisk
     makeNodeVisible (volumeNode.getFirstLeaf ());
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk, boolean debug)
+  // ---------------------------------------------------------------------------------//
   {
     disk.setInterleave (1);                 // should only ever be Prodos
     if (checkFormat (disk, debug))
@@ -136,7 +148,9 @@ public class PascalDisk extends AbstractFormattedDisk
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean checkFormat (AppleDisk disk, boolean debug)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readSector (2);
     int nameLength = buffer[6] & 0xFF;
@@ -209,8 +223,10 @@ public class PascalDisk extends AbstractFormattedDisk
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getFormattedSector (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     SectorType st = sectorTypes[da.getBlock ()];
     if (st == diskBootSector)
@@ -223,8 +239,10 @@ public class PascalDisk extends AbstractFormattedDisk
     return super.getFormattedSector (da);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getSectorFilename (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     for (AppleFileSource ce : fileEntries)
       if (((CatalogEntry) ce).contains (da))
@@ -232,23 +250,29 @@ public class PascalDisk extends AbstractFormattedDisk
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (fileNo < 0 || fileNo >= fileEntries.size ())
       return null;
     return fileEntries.get (fileNo).getSectors ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public DataSource getFile (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (fileNo < 0 || fileNo >= fileEntries.size ())
       return null;
     return fileEntries.get (fileNo).getDataSource ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getCatalog ()
+  // ---------------------------------------------------------------------------------//
   {
     String newLine = String.format ("%n");
     String newLine2 = newLine + newLine;

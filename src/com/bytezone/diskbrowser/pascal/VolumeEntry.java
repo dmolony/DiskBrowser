@@ -4,12 +4,16 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class VolumeEntry extends CatalogEntry
+// -----------------------------------------------------------------------------------//
 {
   final int totalFiles;
   final int totalBlocks;
 
-  public VolumeEntry (PascalDisk parent, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  VolumeEntry (PascalDisk parent, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (parent, buffer);
 
@@ -18,8 +22,10 @@ class VolumeEntry extends CatalogEntry
     date = HexFormatter.getPascalDate (buffer, 20);                       // 2 bytes
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AbstractFile getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     if (file != null)
       return file;

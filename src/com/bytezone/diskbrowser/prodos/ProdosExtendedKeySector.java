@@ -5,15 +5,21 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 
 // see Prodos 8 Tech note #25
+// -----------------------------------------------------------------------------------//
 class ProdosExtendedKeySector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
-  public ProdosExtendedKeySector (Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
+  ProdosExtendedKeySector (Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = getHeader ("Prodos Extended Key Block");
 
@@ -42,7 +48,9 @@ class ProdosExtendedKeySector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getType (byte flag)
+  // ---------------------------------------------------------------------------------//
   {
     switch ((flag & 0x0F))
     {

@@ -11,7 +11,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
  * There is only one of these - it is always the first entry in the first block.
  * Every other entry will be either a SubDirectoryHeader or a FileEntry.
  */
+// -----------------------------------------------------------------------------------//
 class VolumeDirectoryHeader extends DirectoryHeader
+// -----------------------------------------------------------------------------------//
 {
   protected final int bitMapBlock;
   protected int totalBlocks;
@@ -19,7 +21,9 @@ class VolumeDirectoryHeader extends DirectoryHeader
   protected int usedBlocks;
   protected int totalBitMapBlocks;
 
-  public VolumeDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
+  VolumeDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (parentDisk, entryBuffer);
 
@@ -88,8 +92,10 @@ class VolumeDirectoryHeader extends DirectoryHeader
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getDataSource ()
+  // ---------------------------------------------------------------------------------//
   {
     List<byte[]> blockList = new ArrayList<> ();
     int block = 2;
@@ -111,16 +117,20 @@ class VolumeDirectoryHeader extends DirectoryHeader
         usedBlocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getSectors ()
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> sectors = new ArrayList<> ();
     sectors.addAll (dataBlocks);
     return sectors;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     if (false)
     {

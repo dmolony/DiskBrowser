@@ -6,18 +6,24 @@ import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 
+// -----------------------------------------------------------------------------------//
 class ProdosBitMapSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private final ProdosDisk parent;
 
+  // ---------------------------------------------------------------------------------//
   ProdosBitMapSector (ProdosDisk parent, Disk disk, byte[] buffer, DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, da);
     this.parent = parent;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     Dimension grid = parent.getGridLayout ();
 

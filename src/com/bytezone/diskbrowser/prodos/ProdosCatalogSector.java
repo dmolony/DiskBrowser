@@ -1,6 +1,15 @@
 package com.bytezone.diskbrowser.prodos;
 
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.*;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.FREE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.GSOS_EXTENDED_FILE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.PASCAL_ON_PROFILE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SAPLING;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SEEDLING;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY_HEADER;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.TREE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.VOLUME_HEADER;
 
 import java.util.GregorianCalendar;
 
@@ -9,19 +18,25 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class ProdosCatalogSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private final ProdosDisk parent;
 
+  // ---------------------------------------------------------------------------------//
   ProdosCatalogSector (ProdosDisk parent, Disk disk, byte[] buffer,
       DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
     this.parent = parent;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = getHeader ("Volume Directory Block");
 
@@ -77,7 +92,9 @@ class ProdosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String doFileDescription (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     int fileType = buffer[offset + 16] & 0xFF;
@@ -102,7 +119,9 @@ class ProdosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String doVolumeDirectoryHeader (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     addText (text, buffer, offset + 16, 4, "Not used");
@@ -112,7 +131,9 @@ class ProdosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String doSubdirectoryHeader (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     addText (text, buffer, offset + 16, 1, "Hex $75");
@@ -124,7 +145,9 @@ class ProdosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getCommonHeader (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     addText (text, buffer, offset + 20, 4, "Not used");
@@ -141,7 +164,9 @@ class ProdosCatalogSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getAuxilliaryText (int fileType, int auxType)
+  // ---------------------------------------------------------------------------------//
   {
     switch (fileType)
     {
@@ -165,7 +190,9 @@ class ProdosCatalogSector extends AbstractSector
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getType (byte flag)
+  // ---------------------------------------------------------------------------------//
   {
     switch ((flag & 0xF0) >> 4)
     {
@@ -193,7 +220,9 @@ class ProdosCatalogSector extends AbstractSector
   }
 
   // Deleted files leave the name intact, but set the name length to zero
+  // ---------------------------------------------------------------------------------//
   private String getDeletedName (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     for (int i = offset, max = offset + 15; i < max && buffer[i] != 0; i++)

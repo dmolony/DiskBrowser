@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.prodos;
 
+// -----------------------------------------------------------------------------------//
 public interface ProdosConstants
+// -----------------------------------------------------------------------------------//
 {
   static int FILE_TYPE_NON = 0x00;
   static int FILE_TYPE_PCD = 0x02;

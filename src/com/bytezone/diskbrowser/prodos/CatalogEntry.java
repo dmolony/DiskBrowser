@@ -10,7 +10,9 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 abstract class CatalogEntry implements AppleFileSource
+// -----------------------------------------------------------------------------------//
 {
   ProdosDisk parentDisk;
   DirectoryHeader parentDirectory;
@@ -23,7 +25,9 @@ abstract class CatalogEntry implements AppleFileSource
   List<DiskAddress> dataBlocks = new ArrayList<> ();
   Disk disk;
 
-  public CatalogEntry (ProdosDisk parentDisk, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
+  CatalogEntry (ProdosDisk parentDisk, byte[] entryBuffer)
+  // ---------------------------------------------------------------------------------//
   {
     this.parentDisk = parentDisk;
     this.disk = parentDisk.getDisk ();
@@ -35,22 +39,28 @@ abstract class CatalogEntry implements AppleFileSource
     access = entryBuffer[30] & 0xFF;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getUniqueName ()
+  // ---------------------------------------------------------------------------------//
   {
     if (parentDirectory == null)
       return name;
     return parentDirectory.getUniqueName () + "/" + name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public FormattedDisk getFormattedDisk ()
+  // ---------------------------------------------------------------------------------//
   {
     return parentDisk;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean contains (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
   {
     for (DiskAddress sector : dataBlocks)
       if (sector.matches (da))
@@ -58,8 +68,10 @@ abstract class CatalogEntry implements AppleFileSource
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

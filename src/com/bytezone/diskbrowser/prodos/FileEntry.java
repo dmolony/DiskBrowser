@@ -62,7 +62,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private FileEntry link;
 
   // ---------------------------------------------------------------------------------//
-  public FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
+  FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
       int parentBlock)
   // ---------------------------------------------------------------------------------//
   {

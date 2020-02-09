@@ -5,18 +5,24 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class ProdosIndexSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private final String name;
 
+  // ---------------------------------------------------------------------------------//
   ProdosIndexSector (String name, Disk disk, byte[] buffer, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
     this.name = name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = getHeader ("Prodos Index Block : " + name);
 

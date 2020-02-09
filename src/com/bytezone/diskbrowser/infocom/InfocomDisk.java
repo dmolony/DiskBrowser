@@ -24,7 +24,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 // https://inform-fiction.org/zmachine/standards/
 // https://github.com/historicalsource?tab=repositories
 
+// -----------------------------------------------------------------------------------//
 public class InfocomDisk extends AbstractFormattedDisk
+// -----------------------------------------------------------------------------------//
 {
   private static final int BLOCK_SIZE = 256;
   private static final boolean TYPE_NODE = true;
@@ -44,7 +46,9 @@ public class InfocomDisk extends AbstractFormattedDisk
   SectorType globalsSector = new SectorType ("Globals", Color.darkGray);
   SectorType grammarSector = new SectorType ("Grammar", Color.gray);
 
+  // ---------------------------------------------------------------------------------//
   public InfocomDisk (Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk);
 
@@ -111,7 +115,9 @@ public class InfocomDisk extends AbstractFormattedDisk
     setSectorTypes (header.stringPointer, header.fileLength, stringsSector, stringsNode);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void setInfocomSectorTypes ()
+  // ---------------------------------------------------------------------------------//
   {
     sectorTypesList.add (bootSector);
     sectorTypesList.add (headerSector);
@@ -129,8 +135,10 @@ public class InfocomDisk extends AbstractFormattedDisk
           sectorTypes[track * 16 + sector] = bootSector;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setSectorTypes (int sectorFrom, int sectorTo, SectorType type,
       DefaultMutableTreeNode node)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource dafs = (DefaultAppleFileSource) node.getUserObject ();
     List<DiskAddress> blocks = new ArrayList<> ();
@@ -147,7 +155,9 @@ public class InfocomDisk extends AbstractFormattedDisk
     dafs.setSectors (blocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getFileSize ()
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = null;
     int startBlock = getWord (4) / 256 + 48;
@@ -172,7 +182,9 @@ public class InfocomDisk extends AbstractFormattedDisk
     return fileSize;
   }
 
+  // ---------------------------------------------------------------------------------//
   private byte[] getBuffer (int fileSize)
+  // ---------------------------------------------------------------------------------//
   {
     if (fileSize == 0)
       fileSize = getFileSize ();
@@ -193,8 +205,10 @@ public class InfocomDisk extends AbstractFormattedDisk
     return data;
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode addToTree (DefaultMutableTreeNode root, String title,
       DataSource af, boolean allowsChildren)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource dafs = new DefaultAppleFileSource (title, af, this);
 
@@ -205,25 +219,33 @@ public class InfocomDisk extends AbstractFormattedDisk
     return node;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getCatalog ()
+  // ---------------------------------------------------------------------------------//
   {
     return new DefaultAppleFileSource (header.getText (), this);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     disk.setInterleave (2);
     return checkFormat (disk);
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean checkFormat (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readSector (3, 0);
 
@@ -276,12 +298,16 @@ public class InfocomDisk extends AbstractFormattedDisk
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getWord (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     return (((data[offset] << 8) & 0xFF00) | ((data[offset + 1]) & 0xFF));
   }
 
+  // ---------------------------------------------------------------------------------//
   private void createStoryFile (String fileName)
+  // ---------------------------------------------------------------------------------//
   {
     File f = new File (fileName);
     try

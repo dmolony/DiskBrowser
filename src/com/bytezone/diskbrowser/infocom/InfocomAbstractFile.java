@@ -7,13 +7,13 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
-public class InfocomAbstractFile extends AbstractFile
+class InfocomAbstractFile extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
   protected List<HexBlock> hexBlocks = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  public InfocomAbstractFile (String name, byte[] buffer)
+  InfocomAbstractFile (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);

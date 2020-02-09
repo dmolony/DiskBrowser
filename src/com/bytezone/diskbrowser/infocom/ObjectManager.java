@@ -10,9 +10,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
+// -----------------------------------------------------------------------------------//
 class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
+// -----------------------------------------------------------------------------------//
 {
-  //  private final Header header;
   private final List<ZObject> list;
   private List<ZObject> sortedList;
   private final int defaultsPtr, defaultsSize;
@@ -20,10 +21,11 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
   private final int propertyPtr, propertySize;
   private final ObjectAnalyser analyser;
 
-  public ObjectManager (Header header)
+  // ---------------------------------------------------------------------------------//
+  ObjectManager (Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Objects", header.buffer);
-    //    this.header = header;
 
     defaultsPtr = header.objectTableOffset;
     defaultsSize = 62;                                // 31 words
@@ -47,12 +49,16 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
     hexBlocks.add (new HexBlock (propertyPtr, propertySize, "Properties:"));
   }
 
+  // ---------------------------------------------------------------------------------//
   List<ZObject> getObjects ()
+  // ---------------------------------------------------------------------------------//
   {
     return list;
   }
 
+  // ---------------------------------------------------------------------------------//
   ZObject getObject (int index)
+  // ---------------------------------------------------------------------------------//
   {
     if (index < 0 || index >= list.size ())
     {
@@ -62,7 +68,9 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
     return list.get (index);
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addNodes (DefaultMutableTreeNode root, FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     root.setAllowsChildren (true);
 
@@ -71,8 +79,10 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
         buildObjectTree (zo, root, disk);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void buildObjectTree (ZObject object, DefaultMutableTreeNode parentNode,
       FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultMutableTreeNode child = new DefaultMutableTreeNode (
         new DefaultAppleFileSource (object.getName (), object, disk));
@@ -85,16 +95,18 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
       child.setAllowsChildren (false);
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<Integer> getCodeRoutines ()
+  // ---------------------------------------------------------------------------------//
   {
     return analyser.routines;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
-    //    String header1 = "ID   Attributes  Pr Sb Ch  Prop   Title\n--   -----------"
-    //        + " -- -- -- -----   -----------------------------\n";
     String underline = " ----------------------------------------";
     String titles[] =
         { "ID  ", "Title                                    ",
@@ -109,11 +121,7 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
       sortedList = new ArrayList<> (list);
     Collections.sort (sortedList);
 
-    //    int objectNumber = 0;
     for (ZObject zo : list)
-      //      if (false)
-      //        text.append (String.format ("%02X   %s%n", ++objectNumber, zo));
-      //      else
       text.append (String.format ("%02X %s%n", zo.getId (), zo.getDescription (list)));
 
     text.append ("\n\n");
@@ -125,8 +133,10 @@ class ObjectManager extends InfocomAbstractFile implements Iterable<ZObject>
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Iterator<ZObject> iterator ()
+  // ---------------------------------------------------------------------------------//
   {
     return list.iterator ();
   }

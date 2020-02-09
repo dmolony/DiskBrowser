@@ -6,14 +6,18 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.infocom.ZObject.Property;
 
+// -----------------------------------------------------------------------------------//
 class ObjectAnalyser
+// -----------------------------------------------------------------------------------//
 {
   Header header;
   ObjectManager parent;
   List<Statistics> list = new ArrayList<Statistics> ();
   List<Integer> routines = new ArrayList<Integer> ();
 
+  // ---------------------------------------------------------------------------------//
   public ObjectAnalyser (Header header, ObjectManager parent)
+  // ---------------------------------------------------------------------------------//
   {
     this.header = header;
     this.parent = parent;
@@ -31,7 +35,9 @@ class ObjectAnalyser
     checkThreeByteProperties ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setStringPointer ()
+  // ---------------------------------------------------------------------------------//
   {
     PropertyTester pt = new PropertyTester (parent.getObjects ());
     pt.addTest (new LengthTwoCondition ());
@@ -58,7 +64,9 @@ class ObjectAnalyser
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void createPropertyLinks ()
+  // ---------------------------------------------------------------------------------//
   {
     int sCount = 0;
     int rCount = 0;
@@ -85,7 +93,9 @@ class ObjectAnalyser
     System.out.println ("Routines found : " + totRoutines);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void checkThreeByteProperties ()
+  // ---------------------------------------------------------------------------------//
   {
     System.out.printf ("Checking %d objects%n", parent.getObjects ().size ());
     for (ZObject object : parent.getObjects ())
@@ -106,7 +116,9 @@ class ObjectAnalyser
   }
 
   // find the property with only dictionary entries
+  // ---------------------------------------------------------------------------------//
   public void setDictionary ()
+  // ---------------------------------------------------------------------------------//
   {
     PropertyTester pt = new PropertyTester (parent.getObjects ());
     pt.addTest (new LengthEvenCondition ());
@@ -118,7 +130,9 @@ class ObjectAnalyser
       header.propertyNames[i] = "DICT";       // SYNONYM
   }
 
+  // ---------------------------------------------------------------------------------//
   class Statistics implements Comparable<Statistics>
+  // ---------------------------------------------------------------------------------//
   {
     int propertyNumber;
     int lo;
@@ -153,7 +167,9 @@ class ObjectAnalyser
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class LengthTwoCondition extends Condition
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     boolean test (Property property)
@@ -162,7 +178,9 @@ class ObjectAnalyser
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class LengthThreeCondition extends Condition
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     boolean test (Property property)
@@ -171,7 +189,9 @@ class ObjectAnalyser
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class LengthEvenCondition extends Condition
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     boolean test (Property property)
@@ -180,7 +200,9 @@ class ObjectAnalyser
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class HighMemoryCondition extends Condition
+  // ---------------------------------------------------------------------------------//
   {
     int lo, hi;
     Statistics[] statistics = new Statistics[32]; // note there is no property #0
@@ -202,7 +224,9 @@ class ObjectAnalyser
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class ValidDictionaryCondition extends Condition
+  // ---------------------------------------------------------------------------------//
   {
     @Override
     boolean test (Property property)

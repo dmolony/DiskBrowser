@@ -8,7 +8,9 @@ import java.util.TreeMap;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class Dictionary extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final Map<Integer, ZString> dictionary;
   private final int totalEntries;
@@ -19,7 +21,9 @@ class Dictionary extends AbstractFile
 
   Map<Integer, List<WordEntry>> synonymList = new TreeMap<> ();
 
-  public Dictionary (Header header)
+  // ---------------------------------------------------------------------------------//
+  Dictionary (Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Dictionary", header.buffer);
 
@@ -129,19 +133,25 @@ class Dictionary extends AbstractFile
     // 1F  n, north
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean containsWordAt (int address)
+  // ---------------------------------------------------------------------------------//
   {
     return dictionary.containsKey (address);
   }
 
+  // ---------------------------------------------------------------------------------//
   public String wordAt (int address)
+  // ---------------------------------------------------------------------------------//
   {
     if (dictionary.containsKey (address))
       return dictionary.get (address).value;
     return "dictionary can't find word @ " + address;
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<String> getVerbs (int value)
+  // ---------------------------------------------------------------------------------//
   {
     List<String> words = new ArrayList<> ();
     int ptr = dictionaryPtr + totalSeparators + 4;
@@ -160,7 +170,9 @@ class Dictionary extends AbstractFile
     return words;
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<String> getPrepositions (int value)
+  // ---------------------------------------------------------------------------------//
   {
     List<String> words = new ArrayList<> ();
     int ptr = dictionaryPtr + totalSeparators + 4;
@@ -179,16 +191,20 @@ class Dictionary extends AbstractFile
     return words;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     text.append (HexFormatter.format (buffer, dictionaryPtr, dictionarySize));
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -287,7 +303,9 @@ class Dictionary extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class WordEntry implements Comparable<WordEntry>
+  // ---------------------------------------------------------------------------------//
   {
     ZString word;
     int seq;

@@ -8,8 +8,10 @@ import com.bytezone.diskbrowser.infocom.Instruction.Operand;
 import com.bytezone.diskbrowser.infocom.Instruction.OperandType;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class Routine extends InfocomAbstractFile
     implements Iterable<Instruction>, Comparable<Routine>
+// -----------------------------------------------------------------------------------//
 {
   int startPtr, length, strings, locals;
 
@@ -20,7 +22,9 @@ class Routine extends InfocomAbstractFile
   List<Integer> actions = new ArrayList<> ();          // not used yet
   List<Integer> targets = new ArrayList<> ();
 
-  public Routine (int ptr, Header header, int caller)
+  // ---------------------------------------------------------------------------------//
+  Routine (int ptr, Header header, int caller)
+  // ---------------------------------------------------------------------------------//
   {
     super (String.format ("Routine %05X", ptr), header.buffer);
 
@@ -104,7 +108,9 @@ class Routine extends InfocomAbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   String dump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%05X : %s", startPtr,
@@ -118,13 +124,17 @@ class Routine extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   boolean isValid ()
+  // ---------------------------------------------------------------------------------//
   {
     return startPtr > 0;
   }
 
   // test whether the routine contains any instructions pointing to this address
+  // ---------------------------------------------------------------------------------//
   private boolean isTarget (int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     for (Instruction ins : instructions)
     {
@@ -137,13 +147,17 @@ class Routine extends InfocomAbstractFile
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addCaller (int caller)
+  // ---------------------------------------------------------------------------------//
   {
     calledBy.add (caller);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -193,14 +207,18 @@ class Routine extends InfocomAbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return String.format ("[Start: %05X, Len: %4d, Strings: %2d, Locals: %2d]", startPtr,
         length, strings, locals);
   }
 
+  // ---------------------------------------------------------------------------------//
   class Parameter
+  // ---------------------------------------------------------------------------------//
   {
     int value;
     int sequence;

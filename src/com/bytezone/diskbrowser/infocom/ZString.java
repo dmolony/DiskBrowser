@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.infocom;
 
+// -----------------------------------------------------------------------------------//
 class ZString
+// -----------------------------------------------------------------------------------//
 {
   private static String[] letters =
       { "      abcdefghijklmnopqrstuvwxyz", "      ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -10,7 +12,9 @@ class ZString
   int startPtr;
   int length;
 
-  public ZString (Header header, int offset)
+  // ---------------------------------------------------------------------------------//
+  ZString (Header header, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     ZStringBuilder text = new ZStringBuilder ();
     this.header = header;
@@ -42,13 +46,17 @@ class ZString
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return value;
   }
 
+  // ---------------------------------------------------------------------------------//
   private class ZStringBuilder
+  // ---------------------------------------------------------------------------------//
   {
     int alphabet;
     boolean shift;

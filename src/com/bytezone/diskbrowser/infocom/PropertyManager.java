@@ -9,12 +9,16 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
+// -----------------------------------------------------------------------------------//
 class PropertyManager extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   List<Statistic> list = new ArrayList<> ();
   Header header;
 
-  public PropertyManager (String name, byte[] buffer, Header header)
+  // ---------------------------------------------------------------------------------//
+  PropertyManager (String name, byte[] buffer, Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.header = header;
@@ -26,7 +30,9 @@ class PropertyManager extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addNodes (DefaultMutableTreeNode node, FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     node.setAllowsChildren (true);
 
@@ -41,8 +47,10 @@ class PropertyManager extends AbstractFile
       }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Property   Type    Frequency\n");
     text.append ("--------   -----   ---------\n");
@@ -54,7 +62,9 @@ class PropertyManager extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class Statistic
+  // ---------------------------------------------------------------------------------//
   {
     int id;
     List<ZObject> list = new ArrayList<> ();

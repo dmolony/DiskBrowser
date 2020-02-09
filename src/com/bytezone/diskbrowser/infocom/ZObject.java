@@ -7,7 +7,9 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class ZObject extends AbstractFile implements Comparable<ZObject>
+// -----------------------------------------------------------------------------------//
 {
   static final int HEADER_SIZE = 9;
 
@@ -22,7 +24,9 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   final List<Property> properties = new ArrayList<> ();
   final BitSet attributes = new BitSet (32);
 
-  public ZObject (String name, byte[] buffer, int offset, int id, Header header)
+  // ---------------------------------------------------------------------------------//
+  ZObject (String name, byte[] buffer, int offset, int id, Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -66,13 +70,17 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     propertyTableLength = ptr - propertyTablePtr;
   }
 
+  // ---------------------------------------------------------------------------------//
   int getId ()
+  // ---------------------------------------------------------------------------------//
   {
     return id;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -96,8 +104,10 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Header :\n\n");
     text.append (HexFormatter.formatNoHeader (buffer, startPtr, HEADER_SIZE));
@@ -107,7 +117,9 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   Property getProperty (int id)
+  // ---------------------------------------------------------------------------------//
   {
     for (Property p : properties)
       if (p.propertyNumber == id)
@@ -115,13 +127,17 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return HexFormatter.getHexString (buffer, startPtr, HEADER_SIZE) + "   " + name;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getDescription (List<ZObject> list)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (String.format (" %-40s", getName ()));
 
@@ -140,7 +156,9 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class Property
+  // ---------------------------------------------------------------------------------//
   {
     int propertyNumber;
     int ptr;
@@ -270,8 +288,10 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int compareTo (ZObject o)
+  // ---------------------------------------------------------------------------------//
   {
     return this.name.compareTo (o.name);
   }

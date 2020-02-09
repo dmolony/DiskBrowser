@@ -32,7 +32,7 @@ class Header extends InfocomAbstractFile
   final StringManager stringManager;
 
   // ---------------------------------------------------------------------------------//
-  public Header (String name, byte[] buffer, Disk disk)
+  Header (String name, byte[] buffer, Disk disk)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);

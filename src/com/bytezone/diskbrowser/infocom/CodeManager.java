@@ -15,19 +15,25 @@ import com.bytezone.diskbrowser.infocom.Grammar.Sentence;
 import com.bytezone.diskbrowser.infocom.Grammar.SentenceGroup;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class CodeManager extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final Header header;
   private int codeSize;
   private final Map<Integer, Routine> routines = new TreeMap<> ();
 
-  public CodeManager (Header header)
+  // ---------------------------------------------------------------------------------//
+  CodeManager (Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Code", header.buffer);
     this.header = header;
   }
 
+  // ---------------------------------------------------------------------------------//
   void addNodes (DefaultMutableTreeNode root, InfocomDisk disk)
+  // ---------------------------------------------------------------------------------//
   {
     root.setAllowsChildren (true);
 
@@ -48,7 +54,9 @@ class CodeManager extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<DiskAddress> getSectors (Routine routine, Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     int blockNo = routine.startPtr / 256 + 48;
     int size = routine.length;
@@ -62,7 +70,9 @@ class CodeManager extends AbstractFile
     return blocks;
   }
 
+  // ---------------------------------------------------------------------------------//
   void addRoutines (int programCounter)
+  // ---------------------------------------------------------------------------------//
   {
     addRoutine (programCounter - 1, -1);
     addActionRoutines ();                 // obtained from Grammar
@@ -111,19 +121,25 @@ class CodeManager extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private int checkAlignment (int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     if (ptr % 2 == 1)         // routine must start on a word boundary
       ++ptr;
     return ptr;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addGlobalRoutines ()
+  // ---------------------------------------------------------------------------------//
   {
 
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addMissingRoutines ()
+  // ---------------------------------------------------------------------------------//
   {
     System.out.printf ("%nWalking the code block%n%n");
     int total = routines.size ();
@@ -158,7 +174,9 @@ class CodeManager extends AbstractFile
         routines.size () - total);
   }
 
+  // ---------------------------------------------------------------------------------//
   private int findNextRoutine (int address)
+  // ---------------------------------------------------------------------------------//
   {
     for (Routine routine : routines.values ())
       if (routine.startPtr > address)
@@ -166,8 +184,10 @@ class CodeManager extends AbstractFile
     return 0;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     int count = 0;
@@ -188,7 +208,9 @@ class CodeManager extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addCodeRoutines ()
+  // ---------------------------------------------------------------------------------//
   {
     List<Integer> routines = header.objectManager.getCodeRoutines ();
     System.out.println ("Adding " + routines.size () + " code routines");
@@ -196,7 +218,9 @@ class CodeManager extends AbstractFile
       addRoutine (address, 0);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addActionRoutines ()
+  // ---------------------------------------------------------------------------------//
   {
     int total = routines.size ();
 
@@ -211,7 +235,9 @@ class CodeManager extends AbstractFile
     System.out.printf ("Added %d action routines%n", routines.size () - total);
   }
 
+  // ---------------------------------------------------------------------------------//
   Routine addRoutine (int address, int caller)
+  // ---------------------------------------------------------------------------------//
   {
     if (address == 0)                                       // stack-based call
       return null;
@@ -240,13 +266,17 @@ class CodeManager extends AbstractFile
     return routine;
   }
 
+  // ---------------------------------------------------------------------------------//
   Routine getRoutine (int address)
+  // ---------------------------------------------------------------------------------//
   {
     return routines.get (address);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     // this depends on codeSize being set after the strings have been processed
     return HexFormatter.format (buffer, header.highMemory, codeSize);

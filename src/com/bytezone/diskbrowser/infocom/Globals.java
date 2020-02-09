@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.infocom.Instruction.Operand;
 
+// -----------------------------------------------------------------------------------//
 class Globals extends InfocomAbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private static final int TOTAL_GLOBALS = 240;
   private final Header header;
@@ -13,7 +15,9 @@ class Globals extends InfocomAbstractFile
   private final int arrayPtr, arraySize;
   private final List<List<Routine>> globalRoutines;
 
+  // ---------------------------------------------------------------------------------//
   Globals (Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Globals", header.buffer);
     this.header = header;
@@ -32,15 +36,19 @@ class Globals extends InfocomAbstractFile
       globalRoutines.add (new ArrayList<> ());
   }
 
+  // ---------------------------------------------------------------------------------//
   void addRoutine (Routine routine, Operand operand)
+  // ---------------------------------------------------------------------------------//
   {
     List<Routine> list = globalRoutines.get (operand.value - 16);
     if (!list.contains (routine))
       list.add (routine);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("GLB   Value   Routines\n");
     for (int i = 0; i < TOTAL_GLOBALS; i++)

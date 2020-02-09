@@ -6,12 +6,16 @@ import java.util.TreeMap;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class StringManager extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   Header header;
   Map<Integer, ZString> strings = new TreeMap<Integer, ZString> ();
 
-  public StringManager (String name, byte[] buffer, Header header)
+  // ---------------------------------------------------------------------------------//
+  StringManager (String name, byte[] buffer, Header header)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.header = header;
@@ -28,20 +32,26 @@ class StringManager extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean containsStringAt (int address)
+  // ---------------------------------------------------------------------------------//
   {
     return strings.containsKey (address);
   }
 
+  // ---------------------------------------------------------------------------------//
   public String stringAt (int address)
+  // ---------------------------------------------------------------------------------//
   {
     if (strings.containsKey (address))
       return strings.get (address).value;
     return "String not found at : " + address;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     int count = 0;
@@ -61,8 +71,10 @@ class StringManager extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     int size = header.fileLength - header.stringPointer;
     return HexFormatter.format (buffer, header.stringPointer, size);

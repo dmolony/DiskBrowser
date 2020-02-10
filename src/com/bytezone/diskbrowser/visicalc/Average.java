@@ -2,17 +2,23 @@ package com.bytezone.diskbrowser.visicalc;
 
 import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
-public class Average extends ValueListFunction
+// -----------------------------------------------------------------------------------//
+class Average extends ValueListFunction
+// -----------------------------------------------------------------------------------//
 {
-  public Average (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  Average (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
     assert text.startsWith ("@AVERAGE(") : text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     double total = 0.0;
     int totalChecked = 0;

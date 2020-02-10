@@ -10,7 +10,9 @@ import java.util.regex.Pattern;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
+// -----------------------------------------------------------------------------------//
 public class Sheet
+// -----------------------------------------------------------------------------------//
 {
   private static final Pattern addressPattern =
       Pattern.compile ("([AB]?[A-Z])([0-9]{1,3}):");
@@ -146,7 +148,9 @@ public class Sheet
 
   // /X!/X>A3:>A7:      A3:top-left cell in window, A7:cell to place cursor
 
+  // ---------------------------------------------------------------------------------//
   public Sheet (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     int last = buffer.length;
     while (buffer[--last] == 0)     // ignore trailing zeroes
@@ -182,7 +186,9 @@ public class Sheet
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void calculate (char order)
+  // ---------------------------------------------------------------------------------//
   {
     Map<Integer, Cell> cells = order == 'R' ? rowOrderCells : columnOrderCells;
     for (Cell cell : cells.values ())
@@ -190,7 +196,9 @@ public class Sheet
         cell.calculate ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getLineLength (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = offset;
     while (buffer[ptr] != END_OF_LINE_TOKEN)
@@ -198,7 +206,9 @@ public class Sheet
     return ptr - offset;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void processLine (String line)
+  // ---------------------------------------------------------------------------------//
   {
     Cell currentCell = null;
 
@@ -259,7 +269,9 @@ public class Sheet
       currentCell.setValue (line);               // expression
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addCell (Cell cell)
+  // ---------------------------------------------------------------------------------//
   {
     rowOrderCells.put (cell.getAddress ().getRowKey (), cell);
     columnOrderCells.put (cell.getAddress ().getColumnKey (), cell);
@@ -271,12 +283,16 @@ public class Sheet
     maxColumn = Math.max (maxColumn, cell.getAddress ().getColumn ());
   }
 
+  // ---------------------------------------------------------------------------------//
   Cell getCell (String addressText)
+  // ---------------------------------------------------------------------------------//
   {
     return getCell (new Address (addressText));
   }
 
+  // ---------------------------------------------------------------------------------//
   Cell getCell (Address address)
+  // ---------------------------------------------------------------------------------//
   {
     Cell cell = rowOrderCells.get (address.getRowKey ());
     if (cell == null)
@@ -287,17 +303,23 @@ public class Sheet
     return cell;
   }
 
+  // ---------------------------------------------------------------------------------//
   boolean cellExists (Address address)
+  // ---------------------------------------------------------------------------------//
   {
     return rowOrderCells.get (address.getRowKey ()) != null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public int size ()
+  // ---------------------------------------------------------------------------------//
   {
     return rowOrderCells.size ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void doFormat (String line)
+  // ---------------------------------------------------------------------------------//
   {
     switch (line.charAt (1))
     {
@@ -313,7 +335,9 @@ public class Sheet
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void setGlobal (String line)
+  // ---------------------------------------------------------------------------------//
   {
     switch (line.charAt (2))
     {
@@ -338,7 +362,9 @@ public class Sheet
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getTextDisplay (boolean debug)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     String longLine;
@@ -497,7 +523,9 @@ public class Sheet
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   Function getFunction (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     int functionId = -1;
     for (int i = 0; i < Function.functionList.length; i++)

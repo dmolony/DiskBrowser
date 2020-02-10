@@ -2,17 +2,23 @@ package com.bytezone.diskbrowser.visicalc;
 
 import com.bytezone.diskbrowser.visicalc.Cell.CellType;
 
-public class Choose extends ValueListFunction
+// -----------------------------------------------------------------------------------//
+class Choose extends ValueListFunction
+// -----------------------------------------------------------------------------------//
 {
+  // ---------------------------------------------------------------------------------//
   Choose (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
     assert text.startsWith ("@CHOOSE(") : text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     Value source = list.get (0);
     valueResult = ValueResult.VALID;

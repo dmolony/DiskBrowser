@@ -1,10 +1,14 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class ConditionListFunction extends Function
+// -----------------------------------------------------------------------------------//
+class ConditionListFunction extends Function
+// -----------------------------------------------------------------------------------//
 {
   protected final ConditionList conditions;
 
+  // ---------------------------------------------------------------------------------//
   ConditionListFunction (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -15,8 +19,10 @@ public class ConditionListFunction extends Function
     valueType = ValueType.BOOLEAN;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "CLF";
   }

@@ -1,12 +1,16 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public abstract class ValueFunction extends Function
+// -----------------------------------------------------------------------------------//
+abstract class ValueFunction extends Function
+// -----------------------------------------------------------------------------------//
 {
   protected Value source;
 
   abstract double calculateValue ();
 
+  // ---------------------------------------------------------------------------------//
   ValueFunction (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -15,8 +19,10 @@ public abstract class ValueFunction extends Function
     valueType = ValueType.NUMBER;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     valueResult = ValueResult.VALID;
 
@@ -34,8 +40,10 @@ public abstract class ValueFunction extends Function
       valueResult = ValueResult.ERROR;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "ValueFunction";
   }

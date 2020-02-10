@@ -3,12 +3,16 @@ package com.bytezone.diskbrowser.visicalc;
 import java.util.ArrayList;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 class Expression extends AbstractValue
+// -----------------------------------------------------------------------------------//
 {
   private final List<String> operators = new ArrayList<> ();
   private final List<String> signs = new ArrayList<> ();
 
-  public Expression (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  Expression (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -97,26 +101,34 @@ class Expression extends AbstractValue
     valueType = values.get (0).getValueType ();
   }
 
+  // ---------------------------------------------------------------------------------//
   Value reduce ()
+  // ---------------------------------------------------------------------------------//
   {
     return values.size () == 1 && signs.get (0).equals ("(+)") ? values.get (0) : this;
   }
 
+  // ---------------------------------------------------------------------------------//
   Value get (int index)
+  // ---------------------------------------------------------------------------------//
   {
     if (index < 0 || index >= values.size ())
       throw new IllegalArgumentException ();
     return values.get (index);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "Expression";
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     assert values.size () > 0;
 
@@ -191,7 +203,9 @@ class Expression extends AbstractValue
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private String balanceBrackets (String input)
+  // ---------------------------------------------------------------------------------//
   {
     String line = input.trim ();
 
@@ -224,7 +238,9 @@ class Expression extends AbstractValue
   }
 
   // called for functions and expressions
+  // ---------------------------------------------------------------------------------//
   private String getBalancedText (String text)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = text.indexOf ('(');         // find first left parenthesis
     if (ptr < 0)
@@ -248,7 +264,9 @@ class Expression extends AbstractValue
 
   // reads text up to the next comma that is not part of a function
   // text does not include the outer brackets or calling function name
+  // ---------------------------------------------------------------------------------//
   static String getParameter (String text)
+  // ---------------------------------------------------------------------------------//
   {
     int depth = 0;
     int ptr = 0;
@@ -269,7 +287,9 @@ class Expression extends AbstractValue
   }
 
   // receives a string starting with the function name
+  // ---------------------------------------------------------------------------------//
   private String getFunctionCall (String text)
+  // ---------------------------------------------------------------------------------//
   {
     if (text.charAt (0) != '@')
       throw new IllegalArgumentException ("Bad function name: " + text);
@@ -285,7 +305,9 @@ class Expression extends AbstractValue
     throw new IllegalArgumentException ("Bad function name: " + text);
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getNumberText (String text)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
     while (++ptr < text.length ())
@@ -297,7 +319,9 @@ class Expression extends AbstractValue
     return text.substring (0, ptr);
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getAddressText (String text)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
     while (++ptr < text.length ())
@@ -309,7 +333,9 @@ class Expression extends AbstractValue
     return text.substring (0, ptr);
   }
 
+  // ---------------------------------------------------------------------------------//
   public String fullText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -326,8 +352,10 @@ class Expression extends AbstractValue
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));

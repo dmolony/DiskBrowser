@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractValue implements Value
+// -----------------------------------------------------------------------------------//
+abstract class AbstractValue implements Value
+// -----------------------------------------------------------------------------------//
 {
   protected static final String FMT2 = "| %-9.9s : %-70.70s|%n";
   protected static final String FMT4 = "| %-9.9s : %-50.50s %-8.8s %-10.10s|%n";
@@ -22,69 +24,91 @@ public abstract class AbstractValue implements Value
   protected ValueResult valueResult = ValueResult.VALID;
   protected List<Value> values = new ArrayList<> ();
 
-  public AbstractValue (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  AbstractValue (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     this.cell = cell;
     this.fullText = text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getFullText ()
+  // ---------------------------------------------------------------------------------//
   {
     return fullText;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public ValueType getValueType ()
+  // ---------------------------------------------------------------------------------//
   {
     return valueType;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public ValueResult getValueResult ()
+  // ---------------------------------------------------------------------------------//
   {
     return valueResult;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean isValid ()
+  // ---------------------------------------------------------------------------------//
   {
     return valueResult == ValueResult.VALID;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public double getDouble ()
+  // ---------------------------------------------------------------------------------//
   {
     assert valueType == ValueType.NUMBER;
     return value;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public boolean getBoolean ()
+  // ---------------------------------------------------------------------------------//
   {
     assert valueType == ValueType.BOOLEAN;
     return bool;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public int size ()
+  // ---------------------------------------------------------------------------------//
   {
     return values.size ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     return valueResult == ValueResult.VALID ? getValueText (this) : valueResult + "";
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     //    System.out.println ("calculate not overridden: " + cell);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected void attach (StringBuilder text, String title, String textValue, Value value)
+  // ---------------------------------------------------------------------------------//
   {
     text.append (String.format (FMT4, title, textValue, value.getValueType (),
         getValueText (value)));
@@ -92,7 +116,9 @@ public abstract class AbstractValue implements Value
       text.append (v);
   }
 
+  // ---------------------------------------------------------------------------------//
   protected String getValueText (Value value)
+  // ---------------------------------------------------------------------------------//
   {
     if (value.getValueType () == ValueType.NUMBER)
       return value.getDouble () + "";
@@ -101,8 +127,10 @@ public abstract class AbstractValue implements Value
     return "??*??";
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Iterator<Value> iterator ()
+  // ---------------------------------------------------------------------------------//
   {
     return values.iterator ();
   }

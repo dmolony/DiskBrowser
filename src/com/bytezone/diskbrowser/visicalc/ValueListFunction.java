@@ -1,11 +1,15 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public abstract class ValueListFunction extends Function
+// -----------------------------------------------------------------------------------//
+abstract class ValueListFunction extends Function
+// -----------------------------------------------------------------------------------//
 {
   protected final ValueList list;
   protected final boolean isRange;
 
-  public ValueListFunction (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  ValueListFunction (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -17,8 +21,10 @@ public abstract class ValueListFunction extends Function
       values.add (v);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "ValueListFunction";
   }

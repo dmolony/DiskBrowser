@@ -1,16 +1,22 @@
 package com.bytezone.diskbrowser.visicalc;
 
+// -----------------------------------------------------------------------------------//
 class Lookup extends ValueListFunction
+// -----------------------------------------------------------------------------------//
 {
-  public Lookup (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  Lookup (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
     assert text.startsWith ("@LOOKUP(") : text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     Value source = list.get (0);                 // first Value is the value to look up
     valueResult = ValueResult.VALID;
@@ -55,7 +61,9 @@ class Lookup extends ValueListFunction
   }
 
   // is the range horizontal or vertical?
+  // ---------------------------------------------------------------------------------//
   private boolean isVertical ()
+  // ---------------------------------------------------------------------------------//
   {
     Cell firstCell = (Cell) list.get (1);
     Cell lastCell = (Cell) list.get (list.size () - 1);

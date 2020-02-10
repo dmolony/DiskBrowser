@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
+// -----------------------------------------------------------------------------------//
 abstract class Function extends AbstractValue
+// -----------------------------------------------------------------------------------//
 {
   static final String[] functionList =
       { "@ABS(", "@ACOS(", "@AND(", "@ASIN(", "@ATAN(", "@AVERAGE(", "@COUNT(",
@@ -11,7 +13,9 @@ abstract class Function extends AbstractValue
   protected final String functionName;
   protected final String functionText;
 
+  // ---------------------------------------------------------------------------------//
   Function (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -29,8 +33,10 @@ abstract class Function extends AbstractValue
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("%s%n", LINE));

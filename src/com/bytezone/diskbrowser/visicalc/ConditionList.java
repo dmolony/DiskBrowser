@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ConditionList implements Iterable<Value>
+// -----------------------------------------------------------------------------------//
+class ConditionList implements Iterable<Value>
+// -----------------------------------------------------------------------------------//
 {
   private final List<Value> conditions = new ArrayList<> ();
 
-  public ConditionList (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  ConditionList (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     String remainder = text;
 
@@ -30,18 +34,24 @@ public class ConditionList implements Iterable<Value>
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public Value get (int index)
+  // ---------------------------------------------------------------------------------//
   {
     return conditions.get (index);
   }
 
+  // ---------------------------------------------------------------------------------//
   public int size ()
+  // ---------------------------------------------------------------------------------//
   {
     return conditions.size ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Iterator<Value> iterator ()
+  // ---------------------------------------------------------------------------------//
   {
     return conditions.iterator ();
   }

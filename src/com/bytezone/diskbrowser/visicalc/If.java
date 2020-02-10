@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.visicalc;
 
+// -----------------------------------------------------------------------------------//
 class If extends Function
+// -----------------------------------------------------------------------------------//
 {
   private final String conditionText;
   private final String textTrue;
@@ -10,7 +12,9 @@ class If extends Function
   private final Value expTrue;
   private final Value expFalse;
 
-  public If (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  If (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -42,8 +46,10 @@ class If extends Function
     valueType = expTrue.getValueType ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     valueResult = ValueResult.VALID;
 
@@ -73,14 +79,18 @@ class If extends Function
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "If";
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

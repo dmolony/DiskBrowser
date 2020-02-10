@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 // Predicate
+// -----------------------------------------------------------------------------------//
 class Condition extends AbstractValue implements Iterable<Value>
+// -----------------------------------------------------------------------------------//
 {
   private static final Pattern cellAddress = Pattern.compile ("[A-B]?[A-Z][0-9]{1,3}");
   private static final String[] comparators = { "<>", "<=", ">=", "=", "<", ">" };
@@ -16,7 +18,9 @@ class Condition extends AbstractValue implements Iterable<Value>
   private Value conditionExpression;
   private Value valueExpression;
 
-  public Condition (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
+  Condition (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -52,8 +56,10 @@ class Condition extends AbstractValue implements Iterable<Value>
             "No comparator and not a function or address: " + text);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public void calculate ()
+  // ---------------------------------------------------------------------------------//
   {
     valueResult = ValueResult.VALID;
 
@@ -97,19 +103,25 @@ class Condition extends AbstractValue implements Iterable<Value>
       System.out.printf ("Unexpected comparator result [%s]%n", comparator);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getFullText ()
+  // ---------------------------------------------------------------------------------//
   {
     return fullText;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "Condition";
   }
 
+  // ---------------------------------------------------------------------------------//
   static boolean isCondition (String text)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
     int depth = 0;
@@ -129,14 +141,18 @@ class Condition extends AbstractValue implements Iterable<Value>
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Iterator<Value> iterator ()
+  // ---------------------------------------------------------------------------------//
   {
     return values.iterator ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

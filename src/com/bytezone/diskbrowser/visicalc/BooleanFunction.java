@@ -1,10 +1,14 @@
 package com.bytezone.diskbrowser.visicalc;
 
-public class BooleanFunction extends Function
+// -----------------------------------------------------------------------------------//
+class BooleanFunction extends Function
+// -----------------------------------------------------------------------------------//
 {
   protected Value source;
 
+  // ---------------------------------------------------------------------------------//
   BooleanFunction (Cell cell, String text)
+  // ---------------------------------------------------------------------------------//
   {
     super (cell, text);
 
@@ -13,8 +17,10 @@ public class BooleanFunction extends Function
     valueType = ValueType.BOOLEAN;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return "BooleanFunction";
   }

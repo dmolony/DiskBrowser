@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
+// -----------------------------------------------------------------------------------//
 abstract class Message extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private static int nextId = 0;
   protected String message;
@@ -13,7 +15,9 @@ abstract class Message extends AbstractFile
   private int totalLines;
   List<String> lines = new ArrayList<> ();
 
-  public Message (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  Message (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Message " + nextId, buffer);
     this.id = nextId;
@@ -33,9 +37,13 @@ abstract class Message extends AbstractFile
     message = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   protected abstract String getLine (int offset);
+  // ---------------------------------------------------------------------------------//
 
+  // ---------------------------------------------------------------------------------//
   public boolean match (int messageNum)
+  // ---------------------------------------------------------------------------------//
   {
     if (id == messageNum)
       return true;
@@ -47,13 +55,17 @@ abstract class Message extends AbstractFile
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     return message;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String toHTMLString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder message = new StringBuilder ();
     for (String line : lines)
@@ -64,7 +76,9 @@ abstract class Message extends AbstractFile
     return message.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public static void resetMessageId ()
+  // ---------------------------------------------------------------------------------//
   {
     nextId = 0;
   }

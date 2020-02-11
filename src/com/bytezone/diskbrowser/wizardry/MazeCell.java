@@ -7,7 +7,9 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class MazeCell
+// -----------------------------------------------------------------------------------//
 {
   static Dimension cellSize = new Dimension (22, 22);       // size in pixels
 
@@ -50,12 +52,16 @@ class MazeCell
   public Item itemRequired;
   public Item itemObtained;
 
-  public MazeCell (MazeAddress address)
+  // ---------------------------------------------------------------------------------//
+  MazeCell (MazeAddress address)
+  // ---------------------------------------------------------------------------------//
   {
     this.address = address;
   }
 
-  public void draw (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void draw (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.BLACK);
     g.fillRect (x, y, 22, 22);
@@ -127,29 +133,39 @@ class MazeCell
       drawChar (g, x, y, HexFormatter.format1 (unknown), Color.GRAY);
   }
 
-  public void drawWest (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawWest (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 1, y + 1, x + 1, y + cellSize.height - 1);
   }
 
-  private void drawEast (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawEast (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + cellSize.width - 1, y + 1, x + cellSize.width - 1,
         y + cellSize.height - 1);
   }
 
-  private void drawNorth (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawNorth (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 1, y + 1, x + cellSize.width - 1, y + 1);
   }
 
-  private void drawSouth (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawSouth (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 1, y + cellSize.height - 1, x + cellSize.width - 1,
         y + cellSize.height - 1);
   }
 
-  public void drawStairsUp (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawStairsUp (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 6, y + 18, x + 6, y + 14);
     g.drawLine (x + 6, y + 14, x + 10, y + 14);
@@ -159,7 +175,9 @@ class MazeCell
     g.drawLine (x + 14, y + 6, x + 18, y + 6);
   }
 
-  public void drawStairsDown (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawStairsDown (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 4, y + 7, x + 8, y + 7);
     g.drawLine (x + 8, y + 7, x + 8, y + 11);
@@ -169,20 +187,26 @@ class MazeCell
     g.drawLine (x + 16, y + 15, x + 16, y + 19);
   }
 
-  public void drawPit (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawPit (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 5, y + 14, x + 5, y + 19);
     g.drawLine (x + 5, y + 19, x + 17, y + 19);
     g.drawLine (x + 17, y + 14, x + 17, y + 19);
   }
 
-  public void drawChute (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawChute (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawLine (x + 6, y + 6, x + 10, y + 6);
     g.drawLine (x + 10, y + 6, x + 18, y + 18);
   }
 
-  public void drawElevator (Graphics2D g, int x, int y, int rows)
+  // ---------------------------------------------------------------------------------//
+  void drawElevator (Graphics2D g, int x, int y, int rows)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < rows; i++)
     {
@@ -191,35 +215,45 @@ class MazeCell
     }
   }
 
-  public void drawMonsterLair (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawMonsterLair (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.YELLOW);
     g.fillOval (x + 4, y + 4, 2, 2);
     g.setColor (Color.WHITE);
   }
 
-  public void drawTeleport (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawTeleport (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.GREEN);
     g.fillOval (x + 8, y + 8, 8, 8);
     g.setColor (Color.WHITE);
   }
 
-  public void drawSpellsBlocked (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawSpellsBlocked (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.YELLOW);
     g.fillOval (x + 8, y + 8, 8, 8);
     g.setColor (Color.WHITE);
   }
 
-  public void drawMonster (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawMonster (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.RED);
     g.fillOval (x + 8, y + 8, 8, 8);
     g.setColor (Color.WHITE);
   }
 
-  public void drawDarkness (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawDarkness (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.gray);
     for (int h = 0; h < 15; h += 7)
@@ -228,14 +262,18 @@ class MazeCell
     g.setColor (Color.white);
   }
 
-  public void drawRock (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawRock (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     for (int h = 0; h < 15; h += 7)
       for (int offset = 0; offset < 15; offset += 7)
         g.drawOval (x + offset + 4, y + h + 4, 1, 1);
   }
 
-  public void drawChar (Graphics2D g, int x, int y, String c, Color colour)
+  // ---------------------------------------------------------------------------------//
+  void drawChar (Graphics2D g, int x, int y, String c, Color colour)
+  // ---------------------------------------------------------------------------------//
   {
     g.setColor (colour);
     g.fillRect (x + 7, y + 6, 11, 11);
@@ -243,7 +281,9 @@ class MazeCell
     g.drawString (c, x + 8, y + 16);
   }
 
-  public void drawHotDogStand (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
+  void drawHotDogStand (Graphics2D g, int x, int y)
+  // ---------------------------------------------------------------------------------//
   {
     g.drawRect (x + 5, y + 11, 12, 6);
     g.drawOval (x + 6, y + 18, 3, 3);
@@ -253,7 +293,9 @@ class MazeCell
     g.drawLine (x + 5, y + 5, x + 17, y + 5);
   }
 
-  public String getTooltipText ()
+  // ---------------------------------------------------------------------------------//
+  String getTooltipText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder sign = new StringBuilder ("<html><pre>");
     sign.append ("&nbsp;<b>");

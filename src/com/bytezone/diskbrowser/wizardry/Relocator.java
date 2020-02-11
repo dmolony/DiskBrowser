@@ -9,7 +9,9 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class Relocator extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final int checkByte;
   private final List<DiskRecord> diskRecords = new ArrayList<> ();
@@ -17,7 +19,9 @@ public class Relocator extends AbstractFile
   private final int[] diskBlocks = new int[0x800];
   private final int[] diskOffsets = new int[0x800];
 
+  // ---------------------------------------------------------------------------------//
   public Relocator (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -37,7 +41,9 @@ public class Relocator extends AbstractFile
         addLogicalBlock ((byte) diskRecord.diskNumber, diskSegment);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addLogicalBlock (byte disk, DiskSegment diskSegment)
+  // ---------------------------------------------------------------------------------//
   {
     int lo = diskSegment.logicalBlock;
     int hi = diskSegment.logicalBlock + diskSegment.segmentLength;
@@ -50,7 +56,9 @@ public class Relocator extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void createNewBuffer (Disk[] dataDisks)
+  // ---------------------------------------------------------------------------------//
   {
     AppleDisk master = (AppleDisk) dataDisks[0];
     //    byte[] key1 = { 0x55, 0x55, 0x15, 0x55 };
@@ -78,8 +86,10 @@ public class Relocator extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -149,7 +159,9 @@ public class Relocator extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class DiskRecord
+  // ---------------------------------------------------------------------------------//
   {
     int diskNumber;
     int totDiskSegments;
@@ -202,7 +214,9 @@ public class Relocator extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private class DiskSegment
+  // ---------------------------------------------------------------------------------//
   {
     int logicalBlock;
     int physicalBlock;

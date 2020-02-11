@@ -10,21 +10,27 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class MazeLevel extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   public final int level;
   private List<Message> messages;
   private List<Monster> monsters;
   private List<Item> items;
 
+  // ---------------------------------------------------------------------------------//
   public MazeLevel (byte[] buffer, int level)
+  // ---------------------------------------------------------------------------------//
   {
     super ("Level " + level, buffer);
     this.level = level;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -149,7 +155,9 @@ class MazeLevel extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addWalls (StringBuilder text, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     text.append ("\n\n");
     for (int i = 0; i < 20; i++)
@@ -157,7 +165,9 @@ class MazeLevel extends AbstractFile
           HexFormatter.getHexString (buffer, ptr + i * 6, 6)));
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addEncounters (StringBuilder text, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     text.append ("\n\n");
     for (int i = 0; i < 20; i++)
@@ -185,7 +195,9 @@ class MazeLevel extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addExtras (StringBuilder text, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     text.append ("\n\n");
     for (int i = 0; i < 20; i++)
@@ -202,8 +214,10 @@ class MazeLevel extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public BufferedImage getImage ()
+  // ---------------------------------------------------------------------------------//
   {
     Dimension cellSize = new Dimension (22, 22);
     image = new BufferedImage (20 * cellSize.width + 1, 20 * cellSize.height + 1,
@@ -223,22 +237,30 @@ class MazeLevel extends AbstractFile
     return image;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setMessages (List<Message> messages)
+  // ---------------------------------------------------------------------------------//
   {
     this.messages = messages;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setMonsters (List<Monster> monsters)
+  // ---------------------------------------------------------------------------------//
   {
     this.monsters = monsters;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setItems (List<Item> items)
+  // ---------------------------------------------------------------------------------//
   {
     this.items = items;
   }
 
+  // ---------------------------------------------------------------------------------//
   public MazeCell getLocation (int row, int column)
+  // ---------------------------------------------------------------------------------//
   {
     MazeAddress address = new MazeAddress (level, row, column);
     MazeCell cell = new MazeCell (address);
@@ -411,7 +433,9 @@ class MazeLevel extends AbstractFile
     return cell;
   }
 
+  // ---------------------------------------------------------------------------------//
   private MazeAddress getAddress (int b)      // 0:F
+  // ---------------------------------------------------------------------------------//
   {
     int x = b * 2;
     return new MazeAddress (HexFormatter.intValue (buffer[768 + x], buffer[769 + x]),
@@ -419,7 +443,9 @@ class MazeLevel extends AbstractFile
         HexFormatter.intValue (buffer[832 + x], buffer[833 + x]));
   }
 
+  // ---------------------------------------------------------------------------------//
   private Message getMessage (int messageNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (messages == null)
       return null;
@@ -431,7 +457,9 @@ class MazeLevel extends AbstractFile
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private Monster getMonster (int monsterNo)
+  // ---------------------------------------------------------------------------------//
   {
     if (monsters == null)
       return null;
@@ -443,12 +471,16 @@ class MazeLevel extends AbstractFile
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public int getRows ()
+  // ---------------------------------------------------------------------------------//
   {
     return 20;
   }
 
+  // ---------------------------------------------------------------------------------//
   public int getColumns ()
+  // ---------------------------------------------------------------------------------//
   {
     return 20;
   }

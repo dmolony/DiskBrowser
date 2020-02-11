@@ -8,7 +8,9 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class Character extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final Attributes attributes;
   private final Statistics stats;
@@ -24,7 +26,9 @@ class Character extends AbstractFile
   static String[] statuses =
       { "OK", "Afraid", "Asleep", "Paralyze", "Stoned", "Dead", "Ashes", "Lost" };
 
-  public Character (String name, byte[] buffer, int scenario)
+  // ---------------------------------------------------------------------------------//
+  Character (String name, byte[] buffer, int scenario)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.scenario = scenario;
@@ -77,7 +81,9 @@ class Character extends AbstractFile
     attributes.array[5] = attributes.luck;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void linkItems (List<Item> itemList)
+  // ---------------------------------------------------------------------------------//
   {
     boolean equipped;
     boolean identified;
@@ -104,7 +110,9 @@ class Character extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void linkSpells (List<Spell> spellList)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = 138; i < 145; i++)
       for (int bit = 0; bit < 8; bit++)
@@ -119,8 +127,10 @@ class Character extends AbstractFile
         }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -171,12 +181,16 @@ class Character extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public void linkExperience (ExperienceLevel exp)
+  // ---------------------------------------------------------------------------------//
   {
     stats.nextLevel = exp.getExperiencePoints (stats.level);
   }
 
+  // ---------------------------------------------------------------------------------//
   public int[] getMageSpellPoints ()
+  // ---------------------------------------------------------------------------------//
   {
     int[] spells = new int[7];
 
@@ -186,7 +200,9 @@ class Character extends AbstractFile
     return spells;
   }
 
+  // ---------------------------------------------------------------------------------//
   public int[] getPriestSpellPoints ()
+  // ---------------------------------------------------------------------------------//
   {
     int[] spells = new int[7];
 
@@ -196,13 +212,17 @@ class Character extends AbstractFile
     return spells;
   }
 
+  // ---------------------------------------------------------------------------------//
   public Long getNextLevel ()
+  // ---------------------------------------------------------------------------------//
   {
     return stats.nextLevel;
   }
 
   // this is temporary until I have more data
+  // ---------------------------------------------------------------------------------//
   public String isWinner ()
+  // ---------------------------------------------------------------------------------//
   {
     int v1 = buffer[206];
     int v2 = buffer[207];
@@ -221,53 +241,73 @@ class Character extends AbstractFile
     return "Unknown : " + v1 + " " + v2;
   }
 
+  // ---------------------------------------------------------------------------------//
   public boolean isOut ()
+  // ---------------------------------------------------------------------------------//
   {
     return (buffer[32] == 1);
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getType ()
+  // ---------------------------------------------------------------------------------//
   {
     return stats.type;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getRace ()
+  // ---------------------------------------------------------------------------------//
   {
     return stats.race;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getAlignment ()
+  // ---------------------------------------------------------------------------------//
   {
     return stats.alignment;
   }
 
+  // ---------------------------------------------------------------------------------//
   public Attributes getAttributes ()
+  // ---------------------------------------------------------------------------------//
   {
     return attributes;
   }
 
+  // ---------------------------------------------------------------------------------//
   public Statistics getStatistics ()
+  // ---------------------------------------------------------------------------------//
   {
     return stats;
   }
 
+  // ---------------------------------------------------------------------------------//
   public Iterator<Baggage> getBaggage ()
+  // ---------------------------------------------------------------------------------//
   {
     return baggageList.iterator ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public Iterator<Spell> getSpells ()
+  // ---------------------------------------------------------------------------------//
   {
     return spellBook.iterator ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     return name;
   }
 
+  // ---------------------------------------------------------------------------------//
   public class Baggage
+  // ---------------------------------------------------------------------------------//
   {
     public Item item;
     public boolean equipped;
@@ -288,7 +328,9 @@ class Character extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public class Statistics implements Cloneable
+  // ---------------------------------------------------------------------------------//
   {
     public String race;
     public String type;

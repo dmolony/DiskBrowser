@@ -7,7 +7,9 @@ import java.util.List;
 import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
-public class MessageBlock extends AbstractFile implements Iterable<MessageDataBlock>
+// -----------------------------------------------------------------------------------//
+class MessageBlock extends AbstractFile implements Iterable<MessageDataBlock>
+// -----------------------------------------------------------------------------------//
 {
   private final int indexOffset;
   private final int indexLength;
@@ -15,7 +17,9 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
 
   private final List<MessageDataBlock> messageDataBlocks = new ArrayList<> ();
 
-  public MessageBlock (byte[] buffer, Huffman huffman)
+  // ---------------------------------------------------------------------------------//
+  MessageBlock (byte[] buffer, Huffman huffman)
+  // ---------------------------------------------------------------------------------//
   {
     super ("bollocks", buffer);
 
@@ -35,7 +39,9 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getMessageText (int messageNo)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < messageDataBlocks.size (); i++)
     {
@@ -46,7 +52,9 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<String> getMessageLines (int messageNo)
+  // ---------------------------------------------------------------------------------//
   {
     List<String> lines = new ArrayList<> ();
 
@@ -72,7 +80,9 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
     return lines;
   }
 
+  // ---------------------------------------------------------------------------------//
   public byte[] getMessage (int messageNo)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < messageDataBlocks.size (); i++)
     {
@@ -83,8 +93,10 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     if (text != null)
       return text;
@@ -102,8 +114,10 @@ public class MessageBlock extends AbstractFile implements Iterable<MessageDataBl
     return this.text;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public Iterator<MessageDataBlock> iterator ()
+  // ---------------------------------------------------------------------------------//
   {
     return messageDataBlocks.iterator ();
   }

@@ -6,12 +6,16 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class Wiz4Monsters extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   final List<Wiz4Image> images = new ArrayList<> ();
   final List<Integer> blocks = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public Wiz4Monsters (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -30,8 +34,10 @@ public class Wiz4Monsters extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 

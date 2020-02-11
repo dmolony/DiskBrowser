@@ -7,7 +7,9 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 // link for possible display algorithm:
 // http://stackoverflow.com/questions/14184655/set-position-for-drawing-binary-tree
 
-public class Huffman extends AbstractFile
+// -----------------------------------------------------------------------------------//
+class Huffman extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private static final byte[] mask = { 2, 1 };          // bits: 10 or 01
   private static final int[] offset = { 512, 256 };     // offset to left/right nodes
@@ -19,12 +21,16 @@ public class Huffman extends AbstractFile
 
   private String bufferContents;
 
-  public Huffman (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  Huffman (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
-  public String decodeMessage (byte[] message)
+  // ---------------------------------------------------------------------------------//
+  String decodeMessage (byte[] message)
+  // ---------------------------------------------------------------------------------//
   {
     this.message = message;
     depth = 0;
@@ -39,7 +45,9 @@ public class Huffman extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private byte getChar ()
+  // ---------------------------------------------------------------------------------//
   {
     int treePtr = 0;                            // start at the root
 
@@ -63,8 +71,10 @@ public class Huffman extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     if (bufferContents == null)
     {
@@ -75,7 +85,9 @@ public class Huffman extends AbstractFile
     return bufferContents;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void walk (int treePtr, String path, StringBuilder text)
+  // ---------------------------------------------------------------------------------//
   {
     for (int currentBit = 1; currentBit >= 0; --currentBit)
       if ((buffer[treePtr] & mask[currentBit]) == 0)

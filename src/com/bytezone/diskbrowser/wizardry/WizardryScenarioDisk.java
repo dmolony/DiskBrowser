@@ -22,7 +22,9 @@ import com.bytezone.diskbrowser.wizardry.Character.Statistics;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 import com.bytezone.diskbrowser.wizardry.Spell.SpellType;
 
+// ---------------------------------------------------------------------------------//
 public class WizardryScenarioDisk extends PascalDisk
+// ---------------------------------------------------------------------------------//
 {
   public Header scenarioHeader;
 
@@ -47,7 +49,9 @@ public class WizardryScenarioDisk extends PascalDisk
   SectorType experienceSector = new SectorType ("Experience", Color.darkGray);
   SectorType treasureSector = new SectorType ("Treasure", Color.pink);
 
+  // ---------------------------------------------------------------------------------//
   public WizardryScenarioDisk (Disk disk)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk);
 
@@ -116,8 +120,10 @@ public class WizardryScenarioDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode linkNode (String name, String text,
       DefaultMutableTreeNode parent)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource afs = new DefaultAppleFileSource (name, text, this);
     DefaultMutableTreeNode node = new DefaultMutableTreeNode (afs);
@@ -125,7 +131,9 @@ public class WizardryScenarioDisk extends PascalDisk
     return node;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isWizardryFormat (Disk disk, boolean debug)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readSector (2);
     int totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
@@ -142,31 +150,41 @@ public class WizardryScenarioDisk extends PascalDisk
     return true;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getFile (String fileName)
+  // ---------------------------------------------------------------------------------//
   {
     //    System.out.println ("Wizardry disk looking for : " + fileName);
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getCatalogText ()
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public List<DiskAddress> getFileSectors (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public DataSource getFile (int fileNo)
+  // ---------------------------------------------------------------------------------//
   {
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractRewards (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.TREASURE_TABLE_AREA);
@@ -192,8 +210,10 @@ public class WizardryScenarioDisk extends PascalDisk
     dds.text = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private int addReward (byte[] buffer, List<DiskAddress> blocks,
       DefaultMutableTreeNode node, int seq)
+  // ---------------------------------------------------------------------------------//
   {
     int recLen = 168;
     for (int ptr = 0; ptr < 1008; ptr += recLen)
@@ -208,7 +228,9 @@ public class WizardryScenarioDisk extends PascalDisk
     return seq;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractCharacters (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.CHARACTER_AREA);
@@ -249,8 +271,10 @@ public class WizardryScenarioDisk extends PascalDisk
     dds.text = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addCharacters (byte[] buffer, List<DiskAddress> blocks,
       DefaultMutableTreeNode node)
+  // ---------------------------------------------------------------------------------//
   {
     int recLen = 208;
     for (int ptr = 0; ptr < 832; ptr += recLen)
@@ -269,7 +293,9 @@ public class WizardryScenarioDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractMonsters (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.MONSTER_AREA);
@@ -302,8 +328,10 @@ public class WizardryScenarioDisk extends PascalDisk
     dds.text = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addMonsters (byte[] buffer, List<DiskAddress> blocks,
       DefaultMutableTreeNode node)
+  // ---------------------------------------------------------------------------------//
   {
     int recLen = 158;
     for (int ptr = 0; ptr < 948; ptr += recLen)
@@ -322,7 +350,9 @@ public class WizardryScenarioDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractItems (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.ITEM_AREA);
@@ -355,8 +385,10 @@ public class WizardryScenarioDisk extends PascalDisk
     dds.text = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addItems (byte[] buffer, List<DiskAddress> blocks,
       DefaultMutableTreeNode node)
+  // ---------------------------------------------------------------------------------//
   {
     int recLen = 78;
     for (int ptr = 0; ptr < 1014; ptr += recLen)
@@ -374,7 +406,9 @@ public class WizardryScenarioDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractSpells (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     spells = new ArrayList<> ();
     List<DiskAddress> blocks = new ArrayList<> (2);
@@ -410,7 +444,9 @@ public class WizardryScenarioDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractMessages (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     Message.resetMessageId ();
     messages = new ArrayList<> ();
@@ -469,7 +505,9 @@ public class WizardryScenarioDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractLevels (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.MAZE_AREA);
@@ -503,7 +541,9 @@ public class WizardryScenarioDisk extends PascalDisk
     dds.text = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractImages (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.IMAGE_AREA);
@@ -542,8 +582,10 @@ public class WizardryScenarioDisk extends PascalDisk
     dds.text = text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void extractExperienceLevels (DefaultMutableTreeNode node,
       List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.EXPERIENCE_AREA);
@@ -573,16 +615,20 @@ public class WizardryScenarioDisk extends PascalDisk
     afs.setSectors (nodeSectors);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addToNode (AbstractFile af, DefaultMutableTreeNode node, DiskAddress block,
       SectorType type)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> (1);
     blocks.add (block);
     addToNode (af, node, blocks, type);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addToNode (AbstractFile af, DefaultMutableTreeNode node,
       List<DiskAddress> blocks, SectorType type)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource dafs =
         new DefaultAppleFileSource (af.getName (), af, this, blocks);
@@ -591,8 +637,10 @@ public class WizardryScenarioDisk extends PascalDisk
     childNode.setAllowsChildren (false);
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<DiskAddress> getTwoBlocks (ScenarioData sd, int i,
       List<DiskAddress> sectors)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> (2);
     blocks.add (sectors.get (sd.dataOffset + i * 2));

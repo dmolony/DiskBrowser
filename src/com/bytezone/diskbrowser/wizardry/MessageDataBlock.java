@@ -6,7 +6,9 @@ import java.util.List;
 import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
-public class MessageDataBlock extends AbstractFile
+// -----------------------------------------------------------------------------------//
+class MessageDataBlock extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   final int firstMessageNo;
   final int lastMessageNo;
@@ -16,8 +18,9 @@ public class MessageDataBlock extends AbstractFile
 
   private final Huffman huffman;
 
-  public MessageDataBlock (String name, byte[] buffer, int firstMessageNo,
-      Huffman huffman)
+  // ---------------------------------------------------------------------------------//
+  MessageDataBlock (String name, byte[] buffer, int firstMessageNo, Huffman huffman)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -75,7 +78,9 @@ public class MessageDataBlock extends AbstractFile
     this.name += " - " + lastMessageNo;
   }
 
+  // ---------------------------------------------------------------------------------//
   byte[] getMessage (int messageNo)
+  // ---------------------------------------------------------------------------------//
   {
     for (Message message : messages)
       if (message.msgNo == messageNo)
@@ -87,7 +92,9 @@ public class MessageDataBlock extends AbstractFile
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   String getText (int messageNo)
+  // ---------------------------------------------------------------------------------//
   {
     for (Message message : messages)
       if (message.msgNo == messageNo)
@@ -99,8 +106,10 @@ public class MessageDataBlock extends AbstractFile
     return null;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     if (messages.size () == 0)
       return "No Messages";
@@ -128,8 +137,10 @@ public class MessageDataBlock extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -145,7 +156,9 @@ public class MessageDataBlock extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class Message
+  // ---------------------------------------------------------------------------------//
   {
     final int msgNo;
     final int offset;

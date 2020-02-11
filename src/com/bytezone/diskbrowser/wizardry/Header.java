@@ -12,7 +12,9 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class Header
+// -----------------------------------------------------------------------------------//
 {
   static String[] typeText = { "header", "maze", "monsters", "rewards", "items",
                                "characters", "images", "char levels" };
@@ -33,7 +35,9 @@ class Header
   List<ScenarioData> data = new ArrayList<> (8);
   FormattedDisk owner;
 
-  public Header (DefaultMutableTreeNode dataNode, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
+  Header (DefaultMutableTreeNode dataNode, FormattedDisk owner)
+  // ---------------------------------------------------------------------------------//
   {
     this.owner = owner;
 
@@ -98,7 +102,9 @@ class Header
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkText (String title, DiskAddress da, DefaultMutableTreeNode headerNode)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
@@ -129,8 +135,10 @@ class Header
     headerNode.add (node);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkPictures (String title, DiskAddress da,
       DefaultMutableTreeNode headerNode)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
@@ -145,8 +153,10 @@ class Header
     headerNode.add (node);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkSpells (String title, DiskAddress da,
       DefaultMutableTreeNode headerNode)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
@@ -177,7 +187,9 @@ class Header
     headerNode.add (node);
   }
 
+  // ---------------------------------------------------------------------------------//
   private String printChars (byte[] buffer, int block)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     for (int i = block * 512; i < (block + 1) * 512; i += 64)
@@ -205,7 +217,9 @@ class Header
   }
 
   // this could be the base factory class for all Wizardry types
+  // ---------------------------------------------------------------------------------//
   class ScenarioData
+  // ---------------------------------------------------------------------------------//
   {
     int dunno;
     int total;

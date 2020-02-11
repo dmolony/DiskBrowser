@@ -17,7 +17,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 
+// -----------------------------------------------------------------------------------//
 public class Wizardry4BootDisk extends PascalDisk
+// -----------------------------------------------------------------------------------//
 {
   public Header scenarioHeader;
   //  private final List<AppleDisk> disks = new ArrayList<> ();
@@ -26,7 +28,9 @@ public class Wizardry4BootDisk extends PascalDisk
   private Huffman huffman;
   private final int version;
 
+  // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
+  // ---------------------------------------------------------------------------------//
   {
     super (dataDisks[0]);
 
@@ -133,8 +137,10 @@ public class Wizardry4BootDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode,
       FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
 
@@ -151,8 +157,10 @@ public class Wizardry4BootDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkMonsterImages5 (DefaultMutableTreeNode monstersNode,
       FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
 
@@ -169,7 +177,9 @@ public class Wizardry4BootDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkMazeLevels4 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     ScenarioData mazeData = scenarioHeader.data.get (Header.MAZE_AREA);
 
@@ -191,7 +201,9 @@ public class Wizardry4BootDisk extends PascalDisk
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkMazeLevels5 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = fileEntry.getDataSource ().buffer;
     List<DiskAddress> blocks = fileEntry.getSectors ();
@@ -221,7 +233,9 @@ public class Wizardry4BootDisk extends PascalDisk
     afs.setSectors (allMazeBlocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkBlock1 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = fileEntry.getDataSource ().buffer;
     List<DiskAddress> blocks = fileEntry.getSectors ();
@@ -248,7 +262,9 @@ public class Wizardry4BootDisk extends PascalDisk
     afs.setSectors (allBlocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkBlock2 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = fileEntry.getDataSource ().buffer;
     List<DiskAddress> blocks = fileEntry.getSectors ();
@@ -275,7 +291,9 @@ public class Wizardry4BootDisk extends PascalDisk
     afs.setSectors (allBlocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void linkOracle (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = fileEntry.getDataSource ().buffer;
     List<DiskAddress> blocks = fileEntry.getSectors ();
@@ -309,8 +327,10 @@ public class Wizardry4BootDisk extends PascalDisk
     afs.setSectors (allOracleBlocks);
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addToNode (AbstractFile af, DefaultMutableTreeNode node,
       List<DiskAddress> blocks)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource dafs =
         new DefaultAppleFileSource (af.getName (), af, this, blocks);
@@ -319,8 +339,10 @@ public class Wizardry4BootDisk extends PascalDisk
     node.add (childNode);
   }
 
+  // ---------------------------------------------------------------------------------//
   private DefaultMutableTreeNode linkNode (String name, String text,
       DefaultMutableTreeNode parent)
+  // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource afs = new DefaultAppleFileSource (name, text, this);
     DefaultMutableTreeNode node = new DefaultMutableTreeNode (afs);
@@ -328,7 +350,9 @@ public class Wizardry4BootDisk extends PascalDisk
     return node;
   }
 
+  // ---------------------------------------------------------------------------------//
   public static boolean isWizardryIVorV (Disk disk, boolean debug)
+  // ---------------------------------------------------------------------------------//
   {
     // Wizardry IV or V boot code
     byte[] header = { 0x00, (byte) 0xEA, (byte) 0xA9, 0x60, (byte) 0x8D, 0x01, 0x08 };

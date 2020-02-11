@@ -3,9 +3,13 @@ package com.bytezone.diskbrowser.wizardry;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 
+// -----------------------------------------------------------------------------------//
 public class Wiz4Image extends AbstractImage
+// -----------------------------------------------------------------------------------//
 {
+  // ---------------------------------------------------------------------------------//
   public Wiz4Image (String name, byte[] buffer, int rows, int cols)   // 5, 6
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 

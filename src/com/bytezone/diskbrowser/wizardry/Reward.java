@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
+// -----------------------------------------------------------------------------------//
 class Reward extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   static String[] types = { "gold", "item" };
   static final int SEGMENT_LENGTH = 18;
@@ -16,7 +18,9 @@ class Reward extends AbstractFile
   List<Monster> goldMonsters = new ArrayList<> ();
   List<Monster> chestMonsters = new ArrayList<> ();
 
-  public Reward (String name, byte[] buffer, int id, List<Item> items)
+  // ---------------------------------------------------------------------------------//
+  Reward (String name, byte[] buffer, int id, List<Item> items)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.id = id;
@@ -32,7 +36,9 @@ class Reward extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addMonster (Monster monster, int location)
+  // ---------------------------------------------------------------------------------//
   {
     if (location == 0)
       goldMonsters.add (monster);
@@ -40,13 +46,17 @@ class Reward extends AbstractFile
       chestMonsters.add (monster);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     return getText (true);
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getText (boolean showLinks)
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     for (RewardElement re : elements)
@@ -71,7 +81,9 @@ class Reward extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getDump ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     int seq = 0;
@@ -84,7 +96,9 @@ class Reward extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class RewardElement
+  // ---------------------------------------------------------------------------------//
   {
     int type;
     int odds;

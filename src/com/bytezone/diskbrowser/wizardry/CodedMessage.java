@@ -2,17 +2,23 @@ package com.bytezone.diskbrowser.wizardry;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 class CodedMessage extends Message
+// -----------------------------------------------------------------------------------//
 {
   public static int codeOffset = 185;
 
-  public CodedMessage (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  CodedMessage (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected String getLine (int offset)
+  // ---------------------------------------------------------------------------------//
   {
     int length = buffer[offset] & 0xFF;
     byte[] translation = new byte[length];

@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
+import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgram;
@@ -79,7 +80,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   JMenu applesoftMenu = new JMenu ("Applesoft");
   JMenu assemblerMenu = new JMenu ("Assembler");
   JMenu prodosMenu = new JMenu ("Prodos");
-  //  JMenu helpMenu = new JMenu ("Help");
+  JMenu helpMenu = new JMenu ("Help");
 
   // File menu items
   final JMenuItem rootItem = new JMenuItem ("Set root folder...");
@@ -140,7 +141,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     menuBar.add (applesoftMenu);
     menuBar.add (assemblerMenu);
     menuBar.add (prodosMenu);
-    //    menuBar.add (helpMenu);
+    menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
     fileMenu.addSeparator ();
@@ -253,7 +254,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     prodosSortDirectoriesItem.addActionListener (prodosPreferencesAction);
 
-    //    helpMenu.add (new JMenuItem (new EnvironmentAction ()));
+    helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
     sector256Item.setActionCommand ("256");
     sector256Item.setAccelerator (KeyStroke.getKeyStroke ("alt 4"));

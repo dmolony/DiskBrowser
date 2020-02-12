@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 import com.bytezone.common.FontTester;
 import com.bytezone.input.SpringUtilities;
 
+// not currently used
 // -----------------------------------------------------------------------------------//
 class PreferencesDialog extends JDialog
 // -----------------------------------------------------------------------------------//

@@ -9,6 +9,7 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.common.DefaultAction;
 
+// this is not being used
 // -----------------------------------------------------------------------------------//
 class AboutAction extends DefaultAction
 // -----------------------------------------------------------------------------------//
@@ -37,27 +38,7 @@ class AboutAction extends DefaultAction
   public void about ()
   // ---------------------------------------------------------------------------------//
   {
-    //    int build = 0;
-    //    String buildDate = "<no date>";
-    //    Properties props = new Properties ();
-    //    InputStream in = this.getClass ().getResourceAsStream ("build.properties");
-    //    if (in != null)
-    //    {
-    //      try
-    //      {
-    //        props.load (in);
-    //        in.close ();
-    //        build = Integer.parseInt (props.getProperty ("build.number"));
-    //        buildDate = props.getProperty ("build.date");
-    //      }
-    //      catch (IOException e1)
-    //      {
-    //        System.out.println ("Properties file not found");
-    //      }
-    //    }
-
     JOptionPane.showMessageDialog (null, "Author - Denis Molony"       //
-        //        + "\nBuild #" + String.format ("%d", build) + " - " + buildDate + "\n"      //
         + "\nGitHub - https://github.com/dmolony/DiskBrowser",         //
         //        + "\nContact - dmolony@iinet.net.au",         //
         "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE);

@@ -151,22 +151,20 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
             "Author - Denis Molony\nGitHub - https://github.com/dmolony/DiskBrowser",
             "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE));
 
+      if (desktop.isSupported (Desktop.Action.APP_PREFERENCES) && false)
+        desktop.setPreferencesHandler (
+            e -> JOptionPane.showMessageDialog (null, "Preferences dialog"));
+
       if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
         desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
       else
-      {
-        addWindowListener (new WindowAdapter ()
-        {
-          @Override
-          public void windowClosing (WindowEvent e)
-          {
-            fireQuitEvent ();
-          }
-        });
-      }
+        setQuitHandler ();
     }
     else
+    {
       System.out.println ("Desktop not supported");
+      setQuitHandler ();
+    }
 
     catalogPanel.setCloseTabAction (closeTabAction);
 
@@ -189,6 +187,21 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // activate the highest panel now that the listeners are ready
     catalogPanel.activate ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void setQuitHandler ()
+  // ---------------------------------------------------------------------------------//
+  {
+    addWindowListener (new WindowAdapter ()
+    {
+      @Override
+      public void windowClosing (WindowEvent e)
+      {
+        fireQuitEvent ();
+      }
+    });
+
   }
 
   // ---------------------------------------------------------------------------------//

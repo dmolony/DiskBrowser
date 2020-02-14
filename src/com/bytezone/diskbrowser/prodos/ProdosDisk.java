@@ -235,7 +235,7 @@ public class ProdosDisk extends AbstractFormattedDisk
       return false;
 
     int bitMapBlock = HexFormatter.intValue (buffer[0x27], buffer[0x28]);
-    if (bitMapBlock != 6)
+    if (bitMapBlock < 3 || bitMapBlock > 10)
       return false;
 
     return true;

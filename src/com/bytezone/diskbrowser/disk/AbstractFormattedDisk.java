@@ -138,6 +138,10 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
         gridLayout = new Dimension (16, 35);
         break;
 
+      case 704:
+        gridLayout = new Dimension (16, 44);
+        break;
+
       case 768:
         gridLayout = new Dimension (16, 48);
         break;

@@ -52,15 +52,16 @@ class AppleDiskTab extends AbstractTab
   // This constructor is only called when lastFileUsed is not null, but the disk
   // couldn't find the file entry. Either the file has been deleted, or it is a disk
   // with redefined files (Wizardry, Infocom etc).
+  // Or possibly a root volume folder.
   // ---------------------------------------------------------------------------------//
   public AppleDiskTab (FormattedDisk disk, DiskAndFileSelector selector,
       RedoHandler redoHandler, Font font, String lastFileUsed)
   // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
-    System.out.println ("****************** File not found");
+    System.out.println ("File not found: " + lastFileUsed);
     create (disk);
-    //    System.out.println ("ooh - couldn't find the previous file");
+
     DefaultMutableTreeNode node = findNode (lastFileUsed);
     if (node != null)
     {

@@ -362,10 +362,15 @@ public class ProdosDisk extends AbstractFormattedDisk
     @Override
     public int compare (DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
     {
-      if (o1.isLeaf () && !o2.isLeaf ())
+      boolean folder1 = o1.getAllowsChildren ();
+      boolean folder2 = o2.getAllowsChildren ();
+
+      //      if (o1.isLeaf () && !o2.isLeaf ())
+      if (folder1 && !folder2)
         return -1;
 
-      if (!o1.isLeaf () && o2.isLeaf ())
+      //      if (!o1.isLeaf () && o2.isLeaf ())
+      if (!folder1 && folder2)
         return 1;
 
       String name1 = ((FileEntry) o1.getUserObject ()).name;

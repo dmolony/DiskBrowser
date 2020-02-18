@@ -108,7 +108,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
       case PASCAL_ON_PROFILE:
         indexBlocks.add (disk.getDiskAddress (keyPtr));
-        System.out.println ("PASCAL on PROFILE: " + name);
+        System.out.println ("PASCAL on PROFILE: " + name);    // PDUCSD12.PO
         // are these blocks guaranteed to be contiguous?
         break;
 

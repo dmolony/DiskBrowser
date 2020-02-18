@@ -124,10 +124,12 @@ class ProdosCatalogSector extends AbstractSector
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
+
     addText (text, buffer, offset + 16, 4, "Not used");
     text.append (getCommonHeader (offset));
     addTextAndDecimal (text, buffer, offset + 35, 2, "Bit map pointer");
     addTextAndDecimal (text, buffer, offset + 37, 2, "Total blocks");
+
     return text.toString ();
   }
 
@@ -136,12 +138,14 @@ class ProdosCatalogSector extends AbstractSector
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
+
     addText (text, buffer, offset + 16, 1, "Hex $75");
     addText (text, buffer, offset + 17, 3, "Not used");
     text.append (getCommonHeader (offset));
     addTextAndDecimal (text, buffer, offset + 35, 2, "Parent block");
     addTextAndDecimal (text, buffer, offset + 37, 1, "Parent entry number");
     addTextAndDecimal (text, buffer, offset + 38, 1, "Parent entry length");
+
     return text.toString ();
   }
 
@@ -150,13 +154,16 @@ class ProdosCatalogSector extends AbstractSector
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
+
     addText (text, buffer, offset + 20, 4, "Not used");
     GregorianCalendar created = HexFormatter.getAppleDate (buffer, offset + 24);
     String dateC = created == null ? "" : parent.df.format (created.getTime ());
     addText (text, buffer, offset + 24, 4, "Creation date : " + dateC);
+
     addText (text, buffer, offset + 28, 1, "Prodos version");
     addText (text, buffer, offset + 29, 1, "Minimum version");
     addText (text, buffer, offset + 30, 1, "Access");
+
     addTextAndDecimal (text, buffer, offset + 31, 1, "Entry length");
     addTextAndDecimal (text, buffer, offset + 32, 1, "Entries per block");
     addTextAndDecimal (text, buffer, offset + 33, 2, "File count");
@@ -220,13 +227,18 @@ class ProdosCatalogSector extends AbstractSector
   }
 
   // Deleted files leave the name intact, but set the name length to zero
+  // Also - the pointers in the master blocks of a sapling or tree file are 
+  // swapped when the file is deleted.
+
   // ---------------------------------------------------------------------------------//
   private String getDeletedName (int offset)
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
+
     for (int i = offset, max = offset + 15; i < max && buffer[i] != 0; i++)
       text.append ((char) (buffer[i] & 0xFF));
+
     return text.toString ();
   }
 }

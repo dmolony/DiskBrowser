@@ -373,7 +373,8 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
   // ---------------------------------------------------------------------------------//
   {
     private BufferedImage image;
-    private int scale = 1;
+    private double scale = 1;
+    private double userScale = 1.5;
 
     public ImagePanel ()
     {
@@ -406,7 +407,9 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
           scale = 4;
       }
 
-      setPreferredSize (new Dimension (width * scale, height * scale));
+      scale *= userScale;
+
+      setPreferredSize (new Dimension ((int) (width * scale), (int) (height * scale)));
       repaint ();
     }
 
@@ -419,8 +422,8 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
       {
         Graphics2D g2 = ((Graphics2D) g);
         g2.transform (AffineTransform.getScaleInstance (scale, scale));
-        g2.drawImage (image, (getWidth () - image.getWidth () * scale) / 2 / scale, 4,
-            this);
+        g2.drawImage (image,
+            (int) ((getWidth () - image.getWidth () * scale) / 2 / scale), 4, this);
       }
     }
   }

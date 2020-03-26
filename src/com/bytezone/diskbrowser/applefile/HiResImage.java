@@ -78,7 +78,7 @@ public abstract class HiResImage extends AbstractFile
   // $08 8066                  3
   // $C0 0000                  1
   // $C0 0001    $C1 0000      2     1
-  // $C0 0002                  1
+  // $C0 0002                  1,5
   // $C0 0003    $C1 0001      .     .
   // $C0 0004    $C1 0002      .     1
   // $C0 1000                  .
@@ -99,6 +99,7 @@ public abstract class HiResImage extends AbstractFile
   // 2 0603 Katie's Farm - Disk 2.po
   // 3 CompressedSlides.do
   // 4 System Addons.hdv
+  // 5 gfx.po
   //
 
   // see also - https://docs.google.com/spreadsheets/d
@@ -332,7 +333,7 @@ public abstract class HiResImage extends AbstractFile
       int rgbLeft = colorTable.entries[left].color.getRGB ();
       int rgbRight = colorTable.entries[right].color.getRGB ();
 
-      // draw pixels on two lines
+      // draw two pixels (twice) on two lines
       draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
       element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
     }
@@ -358,7 +359,7 @@ public abstract class HiResImage extends AbstractFile
       int rgb3 = colorTable.entries[p3].color.getRGB ();
       int rgb4 = colorTable.entries[p4 + 4].color.getRGB ();
 
-      // draw pixels on two lines
+      // draw four pixels on two lines
       draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);    // 2nd line
       element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);       // 1st line
     }
@@ -369,6 +370,12 @@ public abstract class HiResImage extends AbstractFile
   int draw (DataBuffer dataBuffer, int element, int... rgb1)
   // ---------------------------------------------------------------------------------//
   {
+    if (dataBuffer.getSize () < rgb1.length + element)
+    {
+      System.out.printf ("Bollocks: %d %d %d%n", dataBuffer.getSize (), rgb1.length,
+          element);
+      return element;
+    }
     for (int i = 0; i < rgb1.length; i++)
       dataBuffer.setElem (element++, rgb1[i]);
 
@@ -676,13 +683,54 @@ public abstract class HiResImage extends AbstractFile
     ColorEntry[] entries = new ColorEntry[16];
 
     // -------------------------------------------------------------------------------//
-    public ColorTable ()
+    public ColorTable (int id, int mode)
     // -------------------------------------------------------------------------------//
     {
       // default empty table
-      id = -1;
-      for (int i = 0; i < 16; i++)
-        entries[i] = new ColorEntry ();
+      this.id = id;
+
+      if ((mode & 0x80) == 0)
+      {
+        entries[0] = new ColorEntry (0x00, 0x00, 0x00);
+        entries[1] = new ColorEntry (0x07, 0x07, 0x07);
+        entries[2] = new ColorEntry (0x08, 0x04, 0x01);
+        entries[3] = new ColorEntry (0x07, 0x02, 0x0C);
+        entries[4] = new ColorEntry (0x00, 0x00, 0x0F);
+        entries[5] = new ColorEntry (0x00, 0x08, 0x00);
+        entries[6] = new ColorEntry (0x0F, 0x07, 0x00);
+        entries[7] = new ColorEntry (0x0D, 0x00, 0x00);
+
+        entries[8] = new ColorEntry (0x0F, 0x0A, 0x09);
+        entries[9] = new ColorEntry (0x0F, 0x0F, 0x00);
+        entries[10] = new ColorEntry (0x00, 0x0E, 0x00);
+        entries[11] = new ColorEntry (0x04, 0x0D, 0x0F);
+        entries[12] = new ColorEntry (0x0D, 0x0A, 0x0F);
+        entries[13] = new ColorEntry (0x07, 0x08, 0x0F);
+        entries[14] = new ColorEntry (0x0C, 0x0C, 0x0C);
+        entries[15] = new ColorEntry (0x0F, 0x0F, 0x0F);
+      }
+      else
+      {
+        entries[0] = new ColorEntry (0x00, 0x00, 0x00);
+        entries[1] = new ColorEntry (0x00, 0x00, 0x0F);
+        entries[2] = new ColorEntry (0x0F, 0x0F, 0x00);
+        entries[3] = new ColorEntry (0x0F, 0x0F, 0x0F);
+
+        entries[4] = new ColorEntry (0x00, 0x00, 0x00);
+        entries[5] = new ColorEntry (0x0D, 0x00, 0x00);
+        entries[6] = new ColorEntry (0x00, 0x0E, 0x00);
+        entries[7] = new ColorEntry (0x0F, 0x0F, 0x0F);
+
+        entries[0] = new ColorEntry (0x00, 0x00, 0x00);
+        entries[1] = new ColorEntry (0x00, 0x00, 0x0F);
+        entries[2] = new ColorEntry (0x0F, 0x0F, 0x00);
+        entries[3] = new ColorEntry (0x0F, 0x0F, 0x0F);
+
+        entries[4] = new ColorEntry (0x00, 0x00, 0x00);
+        entries[5] = new ColorEntry (0x0D, 0x00, 0x00);
+        entries[6] = new ColorEntry (0x00, 0x0E, 0x00);
+        entries[7] = new ColorEntry (0x0F, 0x0F, 0x0F);
+      }
     }
 
     // -------------------------------------------------------------------------------//
@@ -730,7 +778,7 @@ public abstract class HiResImage extends AbstractFile
     {
       StringBuilder text = new StringBuilder ();
 
-      text.append (String.format ("%2d ColorTable%n", id));
+      text.append (String.format ("%3d ColorTable%n", id));
       for (int i = 0; i < 8; i++)
         text.append (String.format ("  %2d: %04X", i, entries[i].value));
       text.append ("\n");
@@ -749,12 +797,12 @@ public abstract class HiResImage extends AbstractFile
     Color color;
 
     // -------------------------------------------------------------------------------//
-    public ColorEntry ()
+    public ColorEntry (int red, int green, int blue)
     // -------------------------------------------------------------------------------//
     {
       // default empty entry
-      value = 0;
-      color = new Color (0, 0, 0);
+      value = (red << 8) | (green << 4) | blue;
+      color = new Color (red, green, blue);
     }
 
     // -------------------------------------------------------------------------------//

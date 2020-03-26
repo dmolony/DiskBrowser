@@ -121,7 +121,12 @@ public class SHRPictureFile1 extends HiResImage
       return;
     }
 
+    boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
+
     int imageWidth = mainBlock.masterMode == 0x80 ? 640 : mainBlock.unpackedSize[0] * 4;
+    imageWidth = Math.max (mainBlock.pixelsPerScanLine, imageWidth);
+    assert imageWidth == 640;
+
     image = new BufferedImage (imageWidth, mainBlock.numScanLines * 2,
         BufferedImage.TYPE_INT_RGB);
     DataBuffer dataBuffer = image.getRaster ().getDataBuffer ();
@@ -135,18 +140,21 @@ public class SHRPictureFile1 extends HiResImage
       int hi = dirEntry.mode & 0xFF00;      // always 0
       int lo = dirEntry.mode & 0x00FF;      // mode bit if hi == 0
 
+      boolean fillMode = (dirEntry.mode & 0x20) != 0;
+      //      assert fillMode == false;
+
       if (hi != 0)
         System.out.println ("hi not zero");
 
-      ColorTable colorTable = multipalBlock != null ? multipalBlock.colorTables[line]
-          : mainBlock.colorTables[lo & 0x0F];
+      ColorTable colorTable = //
+          multipalBlock != null ? multipalBlock.colorTables[line]
+              : mainBlock.colorTables[lo & 0x0F];
 
-      boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
       int max = mainBlock.unpackedSize[line];
 
-      if (mode320)       // two pixels per col
+      if (mode320)       // two pixels per byte
         ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
-      else              // four pixels per col
+      else              // four pixels per byte
         ptr = mode640Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
 
       element += imageWidth * 2;        // drawing two lines at a time
@@ -214,7 +222,7 @@ public class SHRPictureFile1 extends HiResImage
   private class Multipal extends Block
   // ---------------------------------------------------------------------------------//
   {
-    int numPalettes;
+    int numColorTables;
     ColorTable[] colorTables;
 
     // -------------------------------------------------------------------------------//
@@ -224,18 +232,38 @@ public class SHRPictureFile1 extends HiResImage
       super (kind, data);
 
       int ptr = 5 + kind.length ();
-      numPalettes = HexFormatter.unsignedShort (data, ptr);
+      numColorTables = HexFormatter.unsignedShort (data, ptr);
 
       ptr += 2;
-      colorTables = new ColorTable[numPalettes];
-      for (int i = 0; i < numPalettes; i++)
+      colorTables = new ColorTable[numColorTables];
+
+      for (int i = 0; i < numColorTables; i++)
       {
         if (ptr < data.length - 32)
           colorTables[i] = new ColorTable (i, data, ptr);
         else
-          colorTables[i] = new ColorTable ();      // default empty table
+          colorTables[i] = new ColorTable (i, 0x00);      // default empty table
         ptr += 32;
       }
+    }
+
+    // ---------------------------------------------------------------------------------//
+    @Override
+    public String toString ()
+    // ---------------------------------------------------------------------------------//
+    {
+      StringBuilder text = new StringBuilder ();
+
+      text.append (String.format ("Kind ................. %s%n", kind));
+      text.append (String.format ("NumColorTables ....... %d%n%n", numColorTables));
+
+      for (int line = 0; line < numColorTables; line++)
+      {
+        text.append (colorTables[line]);
+        text.append ("\n\n");
+      }
+
+      return text.toString ();
     }
   }
 
@@ -261,6 +289,7 @@ public class SHRPictureFile1 extends HiResImage
       masterMode = HexFormatter.unsignedShort (data, ptr);
       pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
       numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
+      assert numColorTables > 0;
 
       ptr += 6;
       colorTables = new ColorTable[numColorTables];
@@ -277,28 +306,28 @@ public class SHRPictureFile1 extends HiResImage
       unpackedSize = new int[numScanLines];
       packedScanLines = new byte[numScanLines][];
 
-      for (int i = 0; i < numScanLines; i++)
+      for (int line = 0; line < numScanLines; line++)
       {
         DirEntry dirEntry = new DirEntry (data, ptr);
-        scanLineDirectory[i] = dirEntry;
-        packedScanLines[i] = new byte[dirEntry.numBytes];
+        scanLineDirectory[line] = dirEntry;
+        packedScanLines[line] = new byte[dirEntry.numBytes];
         ptr += 4;
       }
 
-      for (int i = 0; i < numScanLines; i++)
+      for (int line = 0; line < numScanLines; line++)
       {
-        int len = scanLineDirectory[i].numBytes;
-        if (ptr + len > data.length)
+        int numBytes = scanLineDirectory[line].numBytes;
+        if (ptr + numBytes > data.length)
         {
           System.out.println ("breaking early");
           break;
         }
 
-        System.arraycopy (data, ptr, packedScanLines[i], 0, len);
-        ptr += len;
+        System.arraycopy (data, ptr, packedScanLines[line], 0, numBytes);
+        ptr += numBytes;
       }
 
-      int width = 320;
+      int width = 160;
       byte[] unpackedBuffer = new byte[numScanLines * width];
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
@@ -313,6 +342,8 @@ public class SHRPictureFile1 extends HiResImage
         ptr = unpackLine (packedScanLines[line], unpackedBuffer, ptr);
         //   System.out.printf ("%3d  %5d  %5d  %3d%n", line, oldPtr, ptr, ptr - oldPtr);
         unpackedSize[line] = ptr - oldPtr;
+        if (unpackedSize[line] != 160)
+          System.out.printf ("Unexpected unpacked line size: %d%n", unpackedSize);
 
         // something strange happening here
         if (line == 102 && name.equals ("DRAGON.SHR"))
@@ -320,6 +351,8 @@ public class SHRPictureFile1 extends HiResImage
       }
 
       SHRPictureFile1.this.buffer = unpackedBuffer;
+
+      //      System.out.printf ("Wasted: %d%n", (unpackedBuffer.length - ptr));
     }
 
     // -------------------------------------------------------------------------------//
@@ -381,7 +414,7 @@ public class SHRPictureFile1 extends HiResImage
         DirEntry dirEntry = scanLineDirectory[i];
         byte[] packedScanLine = packedScanLines[i];
         text.append (
-            String.format ("%3d   %3d  %3d   ", i, dirEntry.mode, packedScanLine.length));
+            String.format ("%3d  %04X  %3d   ", i, dirEntry.mode, packedScanLine.length));
         int ptr = 0;
         while (true)
         {

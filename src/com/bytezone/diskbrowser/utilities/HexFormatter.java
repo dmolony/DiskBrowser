@@ -387,7 +387,7 @@ public class HexFormatter
   {
     if (ptr >= buffer.length)
     {
-      System.out.println ("index out of range: " + ptr);
+      System.out.println ("Index out of range (unsigned short): " + ptr);
       return 0;
     }
     return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
@@ -399,7 +399,7 @@ public class HexFormatter
   {
     if (ptr >= buffer.length)
     {
-      System.out.println ("index out of range: " + ptr);
+      System.out.println ("Index out of range (signed short): " + ptr);
       return 0;
     }
     return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));

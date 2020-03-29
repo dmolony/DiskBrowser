@@ -171,7 +171,7 @@ public class SHRPictureFile2 extends HiResImage
           failureReason = "Buffer should be 38,400 bytes";
           return;
         }
-        int maxTables = (buffer.length - 3200) / COLOR_TABLE_SIZE;
+        int maxTables = (buffer.length - 32000) / COLOR_TABLE_SIZE;
         colorTables = new ColorTable[maxTables];
         for (int i = 0; i < colorTables.length; i++)
         {

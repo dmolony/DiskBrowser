@@ -123,9 +123,7 @@ public class SHRPictureFile1 extends HiResImage
 
     boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
 
-    int imageWidth = mainBlock.masterMode == 0x80 ? 640 : mainBlock.unpackedSize[0] * 4;
-    imageWidth = Math.max (mainBlock.pixelsPerScanLine, imageWidth);
-    assert imageWidth == 640;
+    int imageWidth = mainBlock.pixelsPerScanLine * (mode320 ? 2 : 4);
 
     image = new BufferedImage (imageWidth, mainBlock.numScanLines * 2,
         BufferedImage.TYPE_INT_RGB);
@@ -150,7 +148,7 @@ public class SHRPictureFile1 extends HiResImage
           multipalBlock != null ? multipalBlock.colorTables[line]
               : mainBlock.colorTables[lo & 0x0F];
 
-      int max = mainBlock.unpackedSize[line];
+      int max = mainBlock.pixelsPerScanLine / (mode320 ? 2 : 4);
 
       if (mode320)       // two pixels per byte
         ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
@@ -278,8 +276,7 @@ public class SHRPictureFile1 extends HiResImage
     int numScanLines;                   // >0
     DirEntry[] scanLineDirectory;       // [numScanLines]
     byte[][] packedScanLines;
-
-    int unpackedSize[];
+    boolean mode640;
 
     public Main (String kind, byte[] data)
     {
@@ -290,6 +287,7 @@ public class SHRPictureFile1 extends HiResImage
       pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
       numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
       assert numColorTables > 0;
+      mode640 = (masterMode & 0x80) != 0;
 
       ptr += 6;
       colorTables = new ColorTable[numColorTables];
@@ -303,7 +301,6 @@ public class SHRPictureFile1 extends HiResImage
       ptr += 2;
 
       scanLineDirectory = new DirEntry[numScanLines];
-      unpackedSize = new int[numScanLines];
       packedScanLines = new byte[numScanLines][];
 
       for (int line = 0; line < numScanLines; line++)
@@ -327,7 +324,8 @@ public class SHRPictureFile1 extends HiResImage
         ptr += numBytes;
       }
 
-      int width = 160;
+      int width = pixelsPerScanLine / (mode640 ? 4 : 2);
+
       byte[] unpackedBuffer = new byte[numScanLines * width];
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
@@ -340,10 +338,10 @@ public class SHRPictureFile1 extends HiResImage
 
         int oldPtr = ptr;
         ptr = unpackLine (packedScanLines[line], unpackedBuffer, ptr);
-        //   System.out.printf ("%3d  %5d  %5d  %3d%n", line, oldPtr, ptr, ptr - oldPtr);
-        unpackedSize[line] = ptr - oldPtr;
-        if (unpackedSize[line] != 160)
-          System.out.printf ("Unexpected unpacked line size: %d%n", unpackedSize);
+        if (oldPtr + width != ptr)
+          System.out.printf ("Unexpected line width %3d  %5d  %5d  %3d%n", line, oldPtr,
+              ptr, ptr - oldPtr);
+        ptr = oldPtr + width;
 
         // something strange happening here
         if (line == 102 && name.equals ("DRAGON.SHR"))
@@ -351,8 +349,6 @@ public class SHRPictureFile1 extends HiResImage
       }
 
       SHRPictureFile1.this.buffer = unpackedBuffer;
-
-      //      System.out.printf ("Wasted: %d%n", (unpackedBuffer.length - ptr));
     }
 
     // -------------------------------------------------------------------------------//
@@ -403,10 +399,9 @@ public class SHRPictureFile1 extends HiResImage
       text.append ("\nScan Lines\n");
       text.append ("----------\n\n");
 
-      text.append (" #   Mode  Len       Packed Data                        "
-          + "                                   Unpack\n");
+      text.append (" #   Mode  Len       Packed Data\n");
       text.append ("---  ----  ---   ---------------------------------------");
-      text.append ("--------------------------------   ------\n");
+      text.append ("--------------------------------\n");
 
       int lineSize = 24;
       for (int i = 0; i < scanLineDirectory.length; i++)
@@ -425,7 +420,6 @@ public class SHRPictureFile1 extends HiResImage
             if (hex.length () < 71)
               text.append (("                                        "
                   + "                               ").substring (hex.length ()));
-            text.append (String.format ("   %5d", unpackedSize[i]));
           }
           ptr += lineSize;
           if (ptr >= packedScanLine.length)

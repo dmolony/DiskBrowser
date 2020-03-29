@@ -325,6 +325,11 @@ public abstract class HiResImage extends AbstractFile
   {
     for (int i = 0; i < max; i++)
     {
+      if (ptr >= buffer.length)
+      {
+        System.out.printf ("too big: %d  %d%n", ptr, buffer.length);
+        return ptr;
+      }
       // get two pixels from this byte
       int left = (buffer[ptr] & 0xF0) >> 4;
       int right = buffer[ptr++] & 0x0F;
@@ -458,9 +463,10 @@ public abstract class HiResImage extends AbstractFile
       int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
-      if (ptr >= buffer.length)       // needed for NAGELxx
-        break;
+      //      if (ptr >= buffer.length)       // needed for NAGELxx
+      //        break;
 
+      //      System.out.printf ("%3d  %d  %d  %d%n", ptr, type, count, newPtr);
       switch (type)
       {
         case 0:

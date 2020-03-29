@@ -20,6 +20,7 @@ public abstract class HiResImage extends AbstractFile
         "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
         "Packed Super Hi-Res 3200 color image" };
   static final int COLOR_TABLE_SIZE = 32;
+  static final int COLOR_TABLE_OFFSET = 32000;
   public static final int FADDEN_AUX = 0x8066;
 
   //  ---- ---- ------  --------------------------------------  ------------------------
@@ -463,10 +464,6 @@ public abstract class HiResImage extends AbstractFile
       int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
-      //      if (ptr >= buffer.length)       // needed for NAGELxx
-      //        break;
-
-      //      System.out.printf ("%3d  %d  %d  %d%n", ptr, type, count, newPtr);
       switch (type)
       {
         case 0:

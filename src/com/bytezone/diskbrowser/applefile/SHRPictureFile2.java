@@ -153,7 +153,8 @@ public class SHRPictureFile2 extends HiResImage
 
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
-          colorTables[i] = new ColorTable (i, buffer, 32256 + i * COLOR_TABLE_SIZE);
+          colorTables[i] =
+              new ColorTable (i, buffer, COLOR_TABLE_OFFSET_AUX_0 + i * COLOR_TABLE_SIZE);
 
         break;
 
@@ -171,12 +172,12 @@ public class SHRPictureFile2 extends HiResImage
           failureReason = "Buffer should be 38,400 bytes";
           return;
         }
-        int maxTables = (buffer.length - COLOR_TABLE_OFFSET) / COLOR_TABLE_SIZE;
+        int maxTables = (buffer.length - COLOR_TABLE_OFFSET_AUX_2) / COLOR_TABLE_SIZE;
         colorTables = new ColorTable[maxTables];
         for (int i = 0; i < colorTables.length; i++)
         {
           colorTables[i] =
-              new ColorTable (i, buffer, COLOR_TABLE_OFFSET + i * COLOR_TABLE_SIZE);
+              new ColorTable (i, buffer, COLOR_TABLE_OFFSET_AUX_2 + i * COLOR_TABLE_SIZE);
           colorTables[i].reverse ();
         }
         break;

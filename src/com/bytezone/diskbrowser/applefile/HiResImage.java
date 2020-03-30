@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.DataBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -20,8 +21,10 @@ public abstract class HiResImage extends AbstractFile
         "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
         "Packed Super Hi-Res 3200 color image" };
   static final int COLOR_TABLE_SIZE = 32;
-  static final int COLOR_TABLE_OFFSET = 32000;
+  static final int COLOR_TABLE_OFFSET_AUX_0 = 32_256;
+  static final int COLOR_TABLE_OFFSET_AUX_2 = 32_000;
   public static final int FADDEN_AUX = 0x8066;
+  private byte[] fourBuf = new byte[4];
 
   //  ---- ---- ------  --------------------------------------  ------------------------
   //  File Type  Aux    Name                                    Description
@@ -320,11 +323,11 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  int mode320Line (int ptr, int element, int max, ColorTable colorTable,
+  int mode320Line (int ptr, int element, int maxBytes, ColorTable colorTable,
       DataBuffer dataBuffer, int imageWidth)
   // ---------------------------------------------------------------------------------//
   {
-    for (int i = 0; i < max; i++)
+    for (int i = 0; i < maxBytes; i++)
     {
       if (ptr >= buffer.length)
       {
@@ -332,7 +335,7 @@ public abstract class HiResImage extends AbstractFile
         return ptr;
       }
       // get two pixels from this byte
-      int left = (buffer[ptr] & 0xF0) >> 4;
+      int left = (buffer[ptr] & 0xF0) >>> 4;
       int right = buffer[ptr++] & 0x0F;
 
       // get pixel colors
@@ -343,18 +346,19 @@ public abstract class HiResImage extends AbstractFile
       draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
       element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
     }
+
     return ptr;
   }
 
   // ---------------------------------------------------------------------------------//
-  int mode640Line (int ptr, int element, int max, ColorTable colorTable,
+  int mode640Line (int ptr, int element, int maxBytes, ColorTable colorTable,
       DataBuffer dataBuffer, int imageWidth)
   // ---------------------------------------------------------------------------------//
   {
-    for (int i = 0; i < max; i++)
+    for (int i = 0; i < maxBytes; i++)
     {
       // get four pixels from this byte
-      int p1 = (buffer[ptr] & 0xC0) >> 6;
+      int p1 = (buffer[ptr] & 0xC0) >>> 6;
       int p2 = (buffer[ptr] & 0x30) >> 4;
       int p3 = (buffer[ptr] & 0x0C) >> 2;
       int p4 = (buffer[ptr++] & 0x03);
@@ -369,21 +373,23 @@ public abstract class HiResImage extends AbstractFile
       draw (dataBuffer, element + imageWidth, rgb1, rgb2, rgb3, rgb4);    // 2nd line
       element = draw (dataBuffer, element, rgb1, rgb2, rgb3, rgb4);       // 1st line
     }
+
     return ptr;
   }
 
   // ---------------------------------------------------------------------------------//
-  int draw (DataBuffer dataBuffer, int element, int... rgb1)
+  int draw (DataBuffer dataBuffer, int element, int... rgbList)
   // ---------------------------------------------------------------------------------//
   {
-    if (dataBuffer.getSize () < rgb1.length + element)
+    if (dataBuffer.getSize () < rgbList.length + element)
     {
-      System.out.printf ("Bollocks: %d %d %d%n", dataBuffer.getSize (), rgb1.length,
+      System.out.printf ("Bollocks: %d %d %d%n", dataBuffer.getSize (), rgbList.length,
           element);
       return element;
     }
-    for (int i = 0; i < rgb1.length; i++)
-      dataBuffer.setElem (element++, rgb1[i]);
+
+    for (int rgb : rgbList)
+      dataBuffer.setElem (element++, rgb);
 
     return element;
   }
@@ -410,41 +416,45 @@ public abstract class HiResImage extends AbstractFile
     // routine found here - http://kpreid.livejournal.com/4319.html
 
     byte[] newBuf = new byte[calculateBufferSize (buffer)];
-    byte[] fourBuf = new byte[4];
 
     int ptr = 0, newPtr = 0;
     while (ptr < buffer.length)
     {
-      int type = (buffer[ptr] & 0xC0) >> 6;         // 0-3
+      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
       switch (type)
       {
         case 0:                           // copy next 1-64 bytes as is
           count = Math.min (count, buffer.length - ptr);
-          while (count-- != 0)
-            newBuf[newPtr++] = buffer[ptr++];
+          System.arraycopy (buffer, ptr, newBuf, newPtr, count);
+          newPtr += count;
+          ptr += count;
           break;
 
         case 1:                          // repeat next byte 3/5/6/7 times
-          byte b = buffer[ptr++];
-          while (count-- != 0)
-            newBuf[newPtr++] = b;
+          Arrays.fill (newBuf, newPtr, newPtr + count, buffer[ptr++]);
+          newPtr += count;
           break;
 
         case 2:                          // repeat next 4 bytes (count) times
-          for (int i = 0; i < 4; i++)
-            fourBuf[i] = buffer[ptr++];
+          fourBuf[0] = buffer[ptr++];
+          fourBuf[1] = buffer[ptr++];
+          fourBuf[2] = buffer[ptr++];
+          fourBuf[3] = buffer[ptr++];
           while (count-- != 0)
-            for (int i = 0; i < 4; i++)
-              newBuf[newPtr++] = fourBuf[i];
+          {
+            newBuf[newPtr++] = fourBuf[0];
+            newBuf[newPtr++] = fourBuf[1];
+            newBuf[newPtr++] = fourBuf[2];
+            newBuf[newPtr++] = fourBuf[3];
+          }
           break;
 
         case 3:                          // repeat next byte (4*count) times
-          b = buffer[ptr++];
           count *= 4;
-          while (count-- != 0)
-            newBuf[newPtr++] = b;
+          Arrays.fill (newBuf, newPtr, newPtr + count, buffer[ptr++]);
+          newPtr += count;
           break;
       }
     }
@@ -456,8 +466,6 @@ public abstract class HiResImage extends AbstractFile
   int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] fourBuf = new byte[4];
-
     int ptr = 0;
     while (ptr < buffer.length)
     {

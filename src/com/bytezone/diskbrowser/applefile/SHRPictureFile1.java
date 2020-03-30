@@ -123,7 +123,9 @@ public class SHRPictureFile1 extends HiResImage
 
     boolean mode320 = (mainBlock.masterMode & 0x80) == 0;
 
-    int imageWidth = mainBlock.pixelsPerScanLine * (mode320 ? 2 : 4);
+    int imageWidth = mainBlock.pixelsPerScanLine;
+    if (mode320)
+      imageWidth *= 2;
 
     image = new BufferedImage (imageWidth, mainBlock.numScanLines * 2,
         BufferedImage.TYPE_INT_RGB);
@@ -148,12 +150,12 @@ public class SHRPictureFile1 extends HiResImage
           multipalBlock != null ? multipalBlock.colorTables[line]
               : mainBlock.colorTables[lo & 0x0F];
 
-      int max = mainBlock.pixelsPerScanLine / (mode320 ? 2 : 4);
+      int maxBytes = mainBlock.pixelsPerScanLine / (mode320 ? 2 : 4);
 
       if (mode320)       // two pixels per byte
-        ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
+        ptr = mode320Line (ptr, element, maxBytes, colorTable, dataBuffer, imageWidth);
       else              // four pixels per byte
-        ptr = mode640Line (ptr, element, max, colorTable, dataBuffer, imageWidth);
+        ptr = mode640Line (ptr, element, maxBytes, colorTable, dataBuffer, imageWidth);
 
       element += imageWidth * 2;        // drawing two lines at a time
     }
@@ -342,10 +344,6 @@ public class SHRPictureFile1 extends HiResImage
           System.out.printf ("Unexpected line width %3d  %5d  %5d  %3d%n", line, oldPtr,
               ptr, ptr - oldPtr);
         ptr = oldPtr + width;
-
-        // something strange happening here
-        if (line == 102 && name.equals ("DRAGON.SHR"))
-          ptr -= 132;
       }
 
       SHRPictureFile1.this.buffer = unpackedBuffer;

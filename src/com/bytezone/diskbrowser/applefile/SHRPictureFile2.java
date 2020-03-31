@@ -223,8 +223,10 @@ public class SHRPictureFile2 extends HiResImage
         mode320 = (controlByte & 0x80) == 0;
         fillMode = (controlByte & 0x20) != 0;
       }
-      else
+      else if (line < colorTables.length)
         colorTable = colorTables[line];
+      else
+        colorTable = null;
 
       if (mode320)       // two pixels per col
         ptr = mode320Line (ptr, element, max, colorTable, dataBuffer, imageWidth);

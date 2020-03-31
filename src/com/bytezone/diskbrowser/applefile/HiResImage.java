@@ -25,6 +25,8 @@ public abstract class HiResImage extends AbstractFile
   static final int COLOR_TABLE_OFFSET_AUX_2 = 32_000;
   public static final int FADDEN_AUX = 0x8066;
   private byte[] fourBuf = new byte[4];
+  private ColorTable defaultColorTable320 = new ColorTable (0, 0x00);
+  private ColorTable defaultColorTable640 = new ColorTable (0, 0x80);
 
   //  ---- ---- ------  --------------------------------------  ------------------------
   //  File Type  Aux    Name                                    Description
@@ -323,11 +325,14 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  int mode320Line (int ptr, int element, int maxBytes, ColorTable colorTable,
+  int mode320Line (int ptr, int element, int dataWidth, ColorTable colorTable,
       DataBuffer dataBuffer, int imageWidth)
   // ---------------------------------------------------------------------------------//
   {
-    for (int i = 0; i < maxBytes; i++)
+    if (colorTable == null)
+      colorTable = defaultColorTable320;
+
+    for (int i = 0; i < dataWidth; i++)
     {
       if (ptr >= buffer.length)
       {
@@ -351,11 +356,14 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  int mode640Line (int ptr, int element, int maxBytes, ColorTable colorTable,
+  int mode640Line (int ptr, int element, int dataWidth, ColorTable colorTable,
       DataBuffer dataBuffer, int imageWidth)
   // ---------------------------------------------------------------------------------//
   {
-    for (int i = 0; i < maxBytes; i++)
+    if (colorTable == null)
+      colorTable = defaultColorTable640;
+
+    for (int i = 0; i < dataWidth; i++)
     {
       // get four pixels from this byte
       int p1 = (buffer[ptr] & 0xC0) >>> 6;
@@ -408,7 +416,7 @@ public abstract class HiResImage extends AbstractFile
   *              (as in 10xxxxxx case)
   */
 
-  // this should call unpackLine()
+  // only called by SHRPictureFile2
   // ---------------------------------------------------------------------------------//
   byte[] unpack (byte[] buffer) throws ArrayIndexOutOfBoundsException
   // ---------------------------------------------------------------------------------//
@@ -462,52 +470,94 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // Super Hi-res IIGS (MAIN in $C0/02)
+  // only called by SHRPictureFile1
   // ---------------------------------------------------------------------------------//
-  int unpackLine (byte[] buffer, byte[] newBuf, int newPtr)
+  int unpackLine (byte[] buffer, int ptr, byte[] newBuf, int newPtr)
   // ---------------------------------------------------------------------------------//
   {
-    int ptr = 0;
-    while (ptr < buffer.length)
+    int savePtr = newPtr;
+
+    while (ptr < buffer.length - 1)                 // minimum 2 bytes needed
     {
       int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
       switch (type)
       {
-        case 0:
-          while (count-- != 0)
-            if (newPtr < newBuf.length && ptr < buffer.length)
-              newBuf[newPtr++] = buffer[ptr++];
+        case 0:                                     // 2-65 bytes
+          while (count-- != 0 && newPtr < newBuf.length && ptr < buffer.length)
+            newBuf[newPtr++] = buffer[ptr++];
           break;
 
-        case 1:
+        case 1:                                     // 2 bytes
           byte b = buffer[ptr++];
-          while (count-- != 0)
-            if (newPtr < newBuf.length)
-              newBuf[newPtr++] = b;
+          while (count-- != 0 && newPtr < newBuf.length)
+            newBuf[newPtr++] = b;
           break;
 
-        case 2:
+        case 2:                                     // 5 bytes
           for (int i = 0; i < 4; i++)
-            if (ptr < buffer.length)
-              fourBuf[i] = buffer[ptr++];
+            fourBuf[i] = ptr < buffer.length ? buffer[ptr++] : 0;
+
           while (count-- != 0)
             for (int i = 0; i < 4; i++)
               if (newPtr < newBuf.length)
                 newBuf[newPtr++] = fourBuf[i];
           break;
 
-        case 3:
+        case 3:                                     // 2 bytes
           b = buffer[ptr++];
           count *= 4;
-          while (count-- != 0)
-            if (newPtr < newBuf.length)
-              newBuf[newPtr++] = b;
+          while (count-- != 0 && newPtr < newBuf.length)
+            newBuf[newPtr++] = b;
           break;
       }
     }
 
-    return newPtr;
+    return newPtr - savePtr;          // bytes unpacked
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void debug (byte[] buffer, int ptr, int length)
+  // ---------------------------------------------------------------------------------//
+  {
+    //    int ptr = 0;
+    int size = 0;
+    int max = ptr + length;
+
+    while (ptr < max)
+    {
+      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
+      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
+
+      System.out.printf ("%04X/%04d: %02X  (%d,%2d)  ", ptr - 1, size, buffer[ptr - 1],
+          type, count);
+
+      if (type == 0)
+      {
+        System.out.println (HexFormatter.getHexString (buffer, ptr, count));
+        ptr += count;
+        size += count;
+      }
+      else if (type == 1)
+      {
+        System.out.println (HexFormatter.getHexString (buffer, ptr, 1));
+        ptr++;
+        size += count;
+      }
+      else if (type == 2)
+      {
+        System.out.println (HexFormatter.getHexString (buffer, ptr, 4));
+        ptr += 4;
+        size += count * 4;
+      }
+      else
+      {
+        System.out.println (HexFormatter.getHexString (buffer, ptr, 1));
+        ptr++;
+        size += count * 4;
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------------//

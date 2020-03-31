@@ -125,7 +125,7 @@ public class SHRPictureFile1 extends HiResImage
 
     int imageWidth = mainBlock.pixelsPerScanLine;
     if (mode320)
-      imageWidth *= 2;
+      imageWidth *= 2;        // every horizontal pixel is drawn twice
 
     image = new BufferedImage (imageWidth, mainBlock.numScanLines * 2,
         BufferedImage.TYPE_INT_RGB);
@@ -150,12 +150,12 @@ public class SHRPictureFile1 extends HiResImage
           multipalBlock != null ? multipalBlock.colorTables[line]
               : mainBlock.colorTables[lo & 0x0F];
 
-      int maxBytes = mainBlock.pixelsPerScanLine / (mode320 ? 2 : 4);
+      int dataWidth = mainBlock.pixelsPerScanLine / (mode320 ? 2 : 4);
 
-      if (mode320)       // two pixels per byte
-        ptr = mode320Line (ptr, element, maxBytes, colorTable, dataBuffer, imageWidth);
+      if (mode320)       // two pixels per byte, each shown twice
+        ptr = mode320Line (ptr, element, dataWidth, colorTable, dataBuffer, imageWidth);
       else              // four pixels per byte
-        ptr = mode640Line (ptr, element, maxBytes, colorTable, dataBuffer, imageWidth);
+        ptr = mode640Line (ptr, element, dataWidth, colorTable, dataBuffer, imageWidth);
 
       element += imageWidth * 2;        // drawing two lines at a time
     }
@@ -242,7 +242,7 @@ public class SHRPictureFile1 extends HiResImage
         if (ptr < data.length - 32)
           colorTables[i] = new ColorTable (i, data, ptr);
         else
-          colorTables[i] = new ColorTable (i, 0x00);      // default empty table
+          colorTables[i] = new ColorTable (i, 0x00);      // default empty table !! not finished
         ptr += 32;
       }
     }
@@ -279,6 +279,7 @@ public class SHRPictureFile1 extends HiResImage
     DirEntry[] scanLineDirectory;       // [numScanLines]
     byte[][] packedScanLines;
     boolean mode640;
+    int dataWidth;
 
     public Main (String kind, byte[] data)
     {
@@ -326,9 +327,9 @@ public class SHRPictureFile1 extends HiResImage
         ptr += numBytes;
       }
 
-      int width = pixelsPerScanLine / (mode640 ? 4 : 2);
+      dataWidth = pixelsPerScanLine / (mode640 ? 4 : 2);
 
-      byte[] unpackedBuffer = new byte[numScanLines * width];
+      byte[] unpackedBuffer = new byte[numScanLines * dataWidth];
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
       {
@@ -338,12 +339,13 @@ public class SHRPictureFile1 extends HiResImage
           break;
         }
 
-        int oldPtr = ptr;
-        ptr = unpackLine (packedScanLines[line], unpackedBuffer, ptr);
-        if (oldPtr + width != ptr)
-          System.out.printf ("Unexpected line width %3d  %5d  %5d  %3d%n", line, oldPtr,
-              ptr, ptr - oldPtr);
-        ptr = oldPtr + width;
+        int bytesUnpacked = unpackLine (packedScanLines[line], 0, unpackedBuffer, ptr);
+
+        if (bytesUnpacked != dataWidth)
+          System.out.printf ("Unexpected line width %3d  %5d  %3d  %3d%n", line, ptr,
+              bytesUnpacked, dataWidth);
+
+        ptr += dataWidth;
       }
 
       SHRPictureFile1.this.buffer = unpackedBuffer;
@@ -370,7 +372,8 @@ public class SHRPictureFile1 extends HiResImage
 
       text.append (String.format ("Kind ................. %s%n", kind));
       text.append (String.format ("MasterMode ........... %04X%n", masterMode));
-      text.append (String.format ("PixelsPerScanLine .... %d%n", pixelsPerScanLine));
+      text.append (String.format ("PixelsPerScanLine .... %d / %d = %d bytes%n",
+          pixelsPerScanLine, (mode640 ? 4 : 2), dataWidth));
       text.append (String.format ("NumColorTables ....... %d%n", numColorTables));
       text.append (String.format ("NumScanLines ......... %d%n%n", numScanLines));
 

@@ -339,7 +339,8 @@ public class SHRPictureFile1 extends HiResImage
           break;
         }
 
-        int bytesUnpacked = unpackLine (packedScanLines[line], 0, unpackedBuffer, ptr);
+        int bytesUnpacked = unpackLine2 (packedScanLines[line], 0,
+            packedScanLines[line].length, unpackedBuffer, ptr);
 
         if (bytesUnpacked != dataWidth)
           System.out.printf ("Unexpected line width %3d  %5d  %3d  %3d%n", line, ptr,

@@ -423,7 +423,13 @@ public abstract class HiResImage extends AbstractFile
   {
     // routine found here - http://kpreid.livejournal.com/4319.html
 
+    // this should be pixelsPerLine * (2 or 4) * screenLines
     byte[] newBuf = new byte[calculateBufferSize (buffer)];
+    if (true)
+    {
+      unpackLine2 (buffer, 0, buffer.length, newBuf, 0);
+      return newBuf;
+    }
 
     int ptr = 0, newPtr = 0;
     while (ptr < buffer.length)
@@ -472,7 +478,53 @@ public abstract class HiResImage extends AbstractFile
   // Super Hi-res IIGS (MAIN in $C0/02)
   // only called by SHRPictureFile1
   // ---------------------------------------------------------------------------------//
-  int unpackLine (byte[] buffer, int ptr, byte[] newBuf, int newPtr)
+  int unpackLine2 (byte[] buffer, int ptr, int max, byte[] newBuf, int newPtr)
+  // ---------------------------------------------------------------------------------//
+  {
+    int savePtr = newPtr;
+
+    while (ptr < max - 1)                 // minimum 2 bytes needed
+    {
+      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
+      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
+
+      switch (type)
+      {
+        case 0:                                     // 2-65 bytes
+          while (count-- != 0 && newPtr < newBuf.length && ptr < max)
+            newBuf[newPtr++] = buffer[ptr++];
+          break;
+
+        case 1:                                     // 2 bytes
+          byte b = buffer[ptr++];
+          while (count-- != 0 && newPtr < newBuf.length)
+            newBuf[newPtr++] = b;
+          break;
+
+        case 2:                                     // 5 bytes
+          for (int i = 0; i < 4; i++)
+            fourBuf[i] = ptr < max ? buffer[ptr++] : 0;
+
+          while (count-- != 0)
+            for (int i = 0; i < 4; i++)
+              if (newPtr < newBuf.length)
+                newBuf[newPtr++] = fourBuf[i];
+          break;
+
+        case 3:                                     // 2 bytes
+          b = buffer[ptr++];
+          count *= 4;
+          while (count-- != 0 && newPtr < newBuf.length)
+            newBuf[newPtr++] = b;
+          break;
+      }
+    }
+
+    return newPtr - savePtr;          // bytes unpacked
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int unpackLineX (byte[] buffer, int ptr, byte[] newBuf, int newPtr)
   // ---------------------------------------------------------------------------------//
   {
     int savePtr = newPtr;

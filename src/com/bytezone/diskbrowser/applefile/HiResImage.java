@@ -347,7 +347,7 @@ public abstract class HiResImage extends AbstractFile
       int rgbLeft = colorTable.entries[left].color.getRGB ();
       int rgbRight = colorTable.entries[right].color.getRGB ();
 
-      // draw two pixels (twice) on two lines
+      // draw two pixels (twice each) on two lines
       draw (dataBuffer, element + imageWidth, rgbLeft, rgbLeft, rgbRight, rgbRight);
       element = draw (dataBuffer, element, rgbLeft, rgbLeft, rgbRight, rgbRight);
     }
@@ -402,27 +402,11 @@ public abstract class HiResImage extends AbstractFile
     return element;
   }
 
-  /*
-  * Unpack the Apple PackBytes format.
-  *
-  * Format is:
-  *  <flag><data> ...
-  *
-  * Flag values (first 6 bits of flag byte):
-  *  00xxxxxx: (0-63) 1 to 64 bytes follow, all different
-  *  01xxxxxx: (0-63) 1 to 64 repeats of next byte
-  *  10xxxxxx: (0-63) 1 to 64 repeats of next 4 bytes
-  *  11xxxxxx: (0-63) 1 to 64 repeats of next byte taken as 4 bytes
-  *              (as in 10xxxxxx case)
-  */
-
   // only called by SHRPictureFile2
   // ---------------------------------------------------------------------------------//
   byte[] unpack (byte[] buffer) throws ArrayIndexOutOfBoundsException
   // ---------------------------------------------------------------------------------//
   {
-    // routine found here - http://kpreid.livejournal.com/4319.html
-
     // this should be pixelsPerLine * (2 or 4) * screenLines
     byte[] newBuf = new byte[calculateBufferSize (buffer)];
     if (true)
@@ -476,7 +460,6 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // Super Hi-res IIGS (MAIN in $C0/02)
-  // only called by SHRPictureFile1
   // ---------------------------------------------------------------------------------//
   int unpackLine2 (byte[] buffer, int ptr, int max, byte[] newBuf, int newPtr)
   // ---------------------------------------------------------------------------------//
@@ -570,7 +553,7 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  void debug (byte[] buffer, int ptr, int length)
+  private void debug (byte[] buffer, int ptr, int length)
   // ---------------------------------------------------------------------------------//
   {
     //    int ptr = 0;
@@ -913,7 +896,6 @@ public abstract class HiResImage extends AbstractFile
     public ColorEntry (int red, int green, int blue)
     // -------------------------------------------------------------------------------//
     {
-      // default empty entry
       value = (red << 8) | (green << 4) | blue;
       color = new Color (red, green, blue);
     }

@@ -15,6 +15,7 @@ import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
 import com.bytezone.diskbrowser.applefile.FaddenHiResImage;
 import com.bytezone.diskbrowser.applefile.FileSystemTranslator;
 import com.bytezone.diskbrowser.applefile.FileTypeDescriptorTable;
+import com.bytezone.diskbrowser.applefile.FinderData;
 import com.bytezone.diskbrowser.applefile.FontFile;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.IconFile;
@@ -443,7 +444,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new FileSystemTranslator (name, exactBuffer);
           break;
 
-        case FILE_TYPE_FINDER:
         case FILE_TYPE_PASCAL_VOLUME:
         case FILE_TYPE_GEO:
         case FILE_TYPE_LDF:
@@ -458,6 +458,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else
             file = new DefaultAppleFile (name, exactBuffer);
+          break;
+
+        case FILE_TYPE_FINDER:
+          file = new FinderData (name, exactBuffer);
           break;
 
         default:

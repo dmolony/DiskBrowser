@@ -51,16 +51,35 @@ public class SHRPictureFile2 extends HiResImage
         colorTables = new ColorTable[1];
         colorTables[0] = new ColorTable (0, this.buffer, 0);
 
-        byte[] data = new byte[buffer.length - 0x222];
-        System.arraycopy (buffer, 0x0222, data, 0, data.length);
-        buffer = unpack (data);
+        //        if (false)
+        //        {
+        //          byte[] data = new byte[buffer.length - 0x222];
+        //          System.arraycopy (buffer, 0x0222, data, 0, data.length);
+        //          buffer = unpack (data);
+        //          System.out.println ("paintworks");
+        //        }
+        //        else
+        //        {
+        byte[] newBuffer = new byte[calculateBufferSize (buffer, 0x222)];
+        unpack (buffer, 0x222, buffer.length, newBuffer, 0);
+        buffer = newBuffer;
+        //        }
         rows = buffer.length / 160;
         controlBytes = new byte[rows];    // all pointing to 0th color table
 
         break;
 
       case 1:                             // packed version of PIC/$00
-        buffer = unpack (buffer);
+        //        if (false)
+        //        {
+        //          buffer = unpack (buffer);
+        //        }
+        //        else
+        //        {
+        newBuffer = new byte[calculateBufferSize (buffer, 0)];
+        unpack (buffer, 0, buffer.length, newBuffer, 0);
+        buffer = newBuffer;
+        //        }
         controlBytes = new byte[rows];
         System.arraycopy (this.buffer, 32000, controlBytes, 0, controlBytes.length);
 
@@ -79,7 +98,14 @@ public class SHRPictureFile2 extends HiResImage
 
         // Apple IIGS Tech Note #46
         // https://www.prepressure.com/library/file-formats/pict
-        this.buffer = unpack (buffer);
+        //        if (false)
+        //          buffer = unpack (buffer);
+        //        else
+        //        {
+        newBuffer = new byte[calculateBufferSize (buffer, 0)];
+        unpack (buffer, 0, buffer.length, newBuffer, 0);
+        buffer = newBuffer;
+        //        }
         int mode = HexFormatter.unsignedShort (this.buffer, 0);
         int rect1 = HexFormatter.unsignedLong (this.buffer, 2);
         int rect2 = HexFormatter.unsignedLong (this.buffer, 6);
@@ -104,9 +130,18 @@ public class SHRPictureFile2 extends HiResImage
           colorTables[i].reverse ();
         }
 
-        data = new byte[buffer.length - 6404];      // skip APP. and color tables
-        System.arraycopy (buffer, 6404, data, 0, data.length);
-        this.buffer = unpack (data);
+        //        if (false)
+        //        {
+        //          byte[] data = new byte[buffer.length - 6404];      // skip APP. and color tables
+        //          System.arraycopy (buffer, 6404, data, 0, data.length);
+        //          this.buffer = unpack (data);
+        //        }
+        //        else
+        //        {
+        newBuffer = new byte[calculateBufferSize (buffer, 6404)];
+        unpack (buffer, 6404, buffer.length, newBuffer, 0);
+        buffer = newBuffer;
+        //        }
 
         break;
 

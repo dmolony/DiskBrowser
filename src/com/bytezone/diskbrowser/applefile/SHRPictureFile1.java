@@ -272,10 +272,10 @@ public class SHRPictureFile1 extends HiResImage
   // ---------------------------------------------------------------------------------//
   {
     int masterMode;                     // 0 = Brooks, 0 = PNT 320 80 = PNT 640
-    int pixelsPerScanLine;              // 320 or 640 (but not always)
+    int pixelsPerScanLine;              // image width in pixels
     int numColorTables;                 // 1 = Brooks, 16 = Other (may be zero)
     ColorTable[] colorTables;           // [numColorTables]
-    int numScanLines;                   // >0
+    int numScanLines;                   // image height in pixels
     DirEntry[] scanLineDirectory;       // [numScanLines]
     byte[][] packedScanLines;
     boolean mode640;
@@ -289,7 +289,6 @@ public class SHRPictureFile1 extends HiResImage
       masterMode = HexFormatter.unsignedShort (data, ptr);
       pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
       numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
-      assert numColorTables > 0;
       mode640 = (masterMode & 0x80) != 0;
 
       ptr += 6;
@@ -333,16 +332,16 @@ public class SHRPictureFile1 extends HiResImage
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
       {
-        if (isOddAndEmpty (packedScanLines[line]))
-        {
-          System.out.println ("Odd number of bytes in empty buffer in " + name);
-          break;
-        }
+        //        if (isOddAndEmpty (packedScanLines[line]))
+        //        {
+        //          System.out.println ("Odd number of bytes in empty buffer in " + name);
+        //          break;
+        //        }
 
-        int bytesUnpacked = unpackLine2 (packedScanLines[line], 0,
+        int bytesUnpacked = unpack (packedScanLines[line], 0,
             packedScanLines[line].length, unpackedBuffer, ptr);
 
-        if (bytesUnpacked != dataWidth)
+        if (bytesUnpacked != dataWidth && false)
           System.out.printf ("Unexpected line width %3d  %5d  %3d  %3d%n", line, ptr,
               bytesUnpacked, dataWidth);
 
@@ -353,16 +352,16 @@ public class SHRPictureFile1 extends HiResImage
     }
 
     // -------------------------------------------------------------------------------//
-    private boolean isOddAndEmpty (byte[] buffer)
-    // -------------------------------------------------------------------------------//
-    {
-      if (buffer.length % 2 == 0)
-        return false;
-      for (byte b : buffer)
-        if (b != 0)
-          return false;
-      return true;
-    }
+    //    private boolean isOddAndEmpty (byte[] buffer)
+    //    // -------------------------------------------------------------------------------//
+    //    {
+    //      if (buffer.length % 2 == 0)
+    //        return false;
+    //      for (byte b : buffer)
+    //        if (b != 0)
+    //          return false;
+    //      return true;
+    //    }
 
     // -------------------------------------------------------------------------------//
     @Override

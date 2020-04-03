@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.DataBuffer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -402,66 +401,8 @@ public abstract class HiResImage extends AbstractFile
     return element;
   }
 
-  // only called by SHRPictureFile2
   // ---------------------------------------------------------------------------------//
-  byte[] unpack (byte[] buffer) throws ArrayIndexOutOfBoundsException
-  // ---------------------------------------------------------------------------------//
-  {
-    // this should be pixelsPerLine * (2 or 4) * screenLines
-    byte[] newBuf = new byte[calculateBufferSize (buffer)];
-    if (true)
-    {
-      unpackLine2 (buffer, 0, buffer.length, newBuf, 0);
-      return newBuf;
-    }
-
-    int ptr = 0, newPtr = 0;
-    while (ptr < buffer.length)
-    {
-      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
-      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
-
-      switch (type)
-      {
-        case 0:                           // copy next 1-64 bytes as is
-          count = Math.min (count, buffer.length - ptr);
-          System.arraycopy (buffer, ptr, newBuf, newPtr, count);
-          newPtr += count;
-          ptr += count;
-          break;
-
-        case 1:                          // repeat next byte 3/5/6/7 times
-          Arrays.fill (newBuf, newPtr, newPtr + count, buffer[ptr++]);
-          newPtr += count;
-          break;
-
-        case 2:                          // repeat next 4 bytes (count) times
-          fourBuf[0] = buffer[ptr++];
-          fourBuf[1] = buffer[ptr++];
-          fourBuf[2] = buffer[ptr++];
-          fourBuf[3] = buffer[ptr++];
-          while (count-- != 0)
-          {
-            newBuf[newPtr++] = fourBuf[0];
-            newBuf[newPtr++] = fourBuf[1];
-            newBuf[newPtr++] = fourBuf[2];
-            newBuf[newPtr++] = fourBuf[3];
-          }
-          break;
-
-        case 3:                          // repeat next byte (4*count) times
-          count *= 4;
-          Arrays.fill (newBuf, newPtr, newPtr + count, buffer[ptr++]);
-          newPtr += count;
-          break;
-      }
-    }
-    return newBuf;
-  }
-
-  // Super Hi-res IIGS (MAIN in $C0/02)
-  // ---------------------------------------------------------------------------------//
-  int unpackLine2 (byte[] buffer, int ptr, int max, byte[] newBuf, int newPtr)
+  int unpack (byte[] buffer, int ptr, int max, byte[] newBuf, int newPtr)
   // ---------------------------------------------------------------------------------//
   {
     int savePtr = newPtr;
@@ -487,52 +428,6 @@ public abstract class HiResImage extends AbstractFile
         case 2:                                     // 5 bytes
           for (int i = 0; i < 4; i++)
             fourBuf[i] = ptr < max ? buffer[ptr++] : 0;
-
-          while (count-- != 0)
-            for (int i = 0; i < 4; i++)
-              if (newPtr < newBuf.length)
-                newBuf[newPtr++] = fourBuf[i];
-          break;
-
-        case 3:                                     // 2 bytes
-          b = buffer[ptr++];
-          count *= 4;
-          while (count-- != 0 && newPtr < newBuf.length)
-            newBuf[newPtr++] = b;
-          break;
-      }
-    }
-
-    return newPtr - savePtr;          // bytes unpacked
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int unpackLineX (byte[] buffer, int ptr, byte[] newBuf, int newPtr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int savePtr = newPtr;
-
-    while (ptr < buffer.length - 1)                 // minimum 2 bytes needed
-    {
-      int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
-      int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
-
-      switch (type)
-      {
-        case 0:                                     // 2-65 bytes
-          while (count-- != 0 && newPtr < newBuf.length && ptr < buffer.length)
-            newBuf[newPtr++] = buffer[ptr++];
-          break;
-
-        case 1:                                     // 2 bytes
-          byte b = buffer[ptr++];
-          while (count-- != 0 && newPtr < newBuf.length)
-            newBuf[newPtr++] = b;
-          break;
-
-        case 2:                                     // 5 bytes
-          for (int i = 0; i < 4; i++)
-            fourBuf[i] = ptr < buffer.length ? buffer[ptr++] : 0;
 
           while (count-- != 0)
             for (int i = 0; i < 4; i++)
@@ -596,10 +491,10 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private int calculateBufferSize (byte[] buffer)
+  int calculateBufferSize (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    int ptr = 0;
+    //    int ptr = 0;
     int size = 0;
     while (ptr < buffer.length)
     {

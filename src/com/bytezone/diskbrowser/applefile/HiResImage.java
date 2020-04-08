@@ -448,46 +448,48 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private void debug (byte[] buffer, int ptr, int length)
+  String debug (byte[] buffer, int ptr, int length)
   // ---------------------------------------------------------------------------------//
   {
-    //    int ptr = 0;
     int size = 0;
     int max = ptr + length;
+    StringBuffer text = new StringBuffer ();
 
     while (ptr < max)
     {
       int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
-      System.out.printf ("%04X/%04d: %02X  (%d,%2d)  ", ptr - 1, size, buffer[ptr - 1],
-          type, count);
+      text.append (String.format ("%04X/%04d: %02X  (%d,%2d)  ", ptr - 1, size,
+          buffer[ptr - 1], type, count));
 
       if (type == 0)
       {
-        System.out.println (HexFormatter.getHexString (buffer, ptr, count));
+        text.append (
+            String.format ("%s%n", HexFormatter.getHexString (buffer, ptr, count)));
         ptr += count;
         size += count;
       }
       else if (type == 1)
       {
-        System.out.println (HexFormatter.getHexString (buffer, ptr, 1));
+        text.append (String.format ("%s%n", HexFormatter.getHexString (buffer, ptr, 1)));
         ptr++;
         size += count;
       }
       else if (type == 2)
       {
-        System.out.println (HexFormatter.getHexString (buffer, ptr, 4));
+        text.append (String.format ("%s%n", HexFormatter.getHexString (buffer, ptr, 4)));
         ptr += 4;
         size += count * 4;
       }
       else
       {
-        System.out.println (HexFormatter.getHexString (buffer, ptr, 1));
+        text.append (String.format ("%s%n", HexFormatter.getHexString (buffer, ptr, 1)));
         ptr++;
         size += count * 4;
       }
     }
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//

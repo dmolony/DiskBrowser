@@ -55,9 +55,9 @@ class CatalogEntry extends AbstractCatalogEntry
           da = getValidAddress (sectorBuffer, i);
           if (da == null)
           {
-            System.out.print ("T/S list in sector " + i);
-            System.out.printf (" contains an invalid address : %02X, %02X (file %s)%n",
-                sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
+            System.out.printf (
+                "T/S list at offset %02X contains an invalid address : %02X, %02X (file %s)%n",
+                i, sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
             break loop;
           }
           if (da.getBlock () == 0 && !((AppleDiskAddress) da).zeroFlag ())

@@ -103,7 +103,7 @@ public class AppleDiskAddress implements DiskAddress
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    return String.format ("[Block=%3d, Track=%2d, Sector=%2d, Zero=%s]", block, track,
+    return String.format ("[Block=%02X, Track=%02X, Sector=%02X, Zero=%s]", block, track,
         sector, zeroFlag);
   }
 }

@@ -214,6 +214,7 @@ public class AppleDisk implements Disk
     }
 
     diskBuffer = new byte[blocks * sectorSize];
+
     hasData = new boolean[blocks];
 
     if (debug)
@@ -222,13 +223,13 @@ public class AppleDisk implements Disk
       System.out.printf ("Skip size       : %,d%n", skip);
     }
 
-    try
+    try (BufferedInputStream in = new BufferedInputStream (new FileInputStream (file)))
     {
-      BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
+
       if (skip > 0)
         in.skip (skip);
       in.read (diskBuffer);
-      in.close ();
+      //      in.close ();
     }
     catch (IOException e)
     {
@@ -236,6 +237,17 @@ public class AppleDisk implements Disk
       System.exit (1);
     }
 
+    checkSectorsForData ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void switchToDos ()       // experimental
+  // ---------------------------------------------------------------------------------//
+  {
+    sectorSize = 256;
+    sectors = 16;
+    blocks = 560;
+    hasData = new boolean[blocks];
     checkSectorsForData ();
   }
 

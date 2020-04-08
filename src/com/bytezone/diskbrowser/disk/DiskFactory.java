@@ -671,7 +671,12 @@ public class DiskFactory
       AppleDisk disk = new AppleDisk (file, 0, 0);
       if (disk.getTotalBlocks () > 0 && ProdosDisk.isCorrectFormat (disk))
         return new ProdosDisk (disk);
-      // should check for DOS, but AppleDisk assumes 2mg has 512 byte blocks
+
+      // switch sector size
+      disk.switchToDos ();
+      //      System.out.println (disk);
+      if (disk.getTotalBlocks () > 0 && DosDisk.isCorrectFormat (disk))
+        return new DosDisk (disk);
     }
     catch (Exception e)
     {

@@ -61,6 +61,9 @@ class DosTSListSector extends AbstractSector
   // ---------------------------------------------------------------------------------//
   {
     DiskAddress da = disk.getDiskAddress (buffer[1], buffer[2]);
+    if (da == null)
+      return String.format ("Invalid address: %02X %02X", buffer[1], buffer[2]);
+
     String msg = da.matches (diskAddress) ? " (circular reference)" : "";
 
     StringBuilder text = getHeader ("TS List Sector : " + name);

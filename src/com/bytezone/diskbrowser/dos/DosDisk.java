@@ -358,6 +358,7 @@ public class DosDisk extends AbstractFormattedDisk
       System.out.printf ("Bad version : %02X%n", version);
       return 0;
     }
+    //    System.out.printf ("Catalog blocks: %s%n", countCatalogBlocks (disk, buffer));
 
     return countCatalogBlocks (disk, buffer);
   }

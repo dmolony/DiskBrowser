@@ -141,7 +141,7 @@ public class SHRPictureFile1 extends HiResImage
       int lo = dirEntry.mode & 0x00FF;      // mode bit if hi == 0
 
       boolean fillMode = (dirEntry.mode & 0x20) != 0;
-      assert fillMode == false;
+      //      assert fillMode == false;
 
       if (hi != 0)
         System.out.println ("hi not zero");

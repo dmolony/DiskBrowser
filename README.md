@@ -47,7 +47,7 @@ Click on any sector in the Disk Layout panel and the Output panel will display t
 #### Infocom
 ![Infocom](resources/zork.png?raw=true "Infocom")
 #### Graphics 
-![Graphics](resources/planetfall.png?raw=true "Graphics")
+![Graphics](resources/graphics.png?raw=true "Graphics")
 #### Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
 #### Visicalc

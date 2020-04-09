@@ -42,6 +42,8 @@ public class DosDisk extends AbstractFormattedDisk
 
   protected List<AppleFileSource> deletedFileEntries = new ArrayList<> ();
 
+  private static boolean debug = false;
+
   enum FileType
   {
     Text, ApplesoftBasic, IntegerBasic, Binary, Relocatable, SS, AA, BB
@@ -267,34 +269,49 @@ public class DosDisk extends AbstractFormattedDisk
   public static boolean isCorrectFormat (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
+    if (debug)
+      System.out.println ("Checking interleave 0");
     disk.setInterleave (0);
-    int catalogBlocks = checkFormat (disk);
 
-    if (catalogBlocks > 3)
+    int catalogBlocks0 = checkFormat (disk);
+    if (catalogBlocks0 > 3)
       return true;
 
-    if (disk.getSectorsPerTrack () <= 16)
+    if (disk.getSectorsPerTrack () > 16)
+      return false;
+
+    if (debug)
+      System.out.println ("Checking interleave 1");
+    disk.setInterleave (1);
+
+    int catalogBlocks1 = checkFormat (disk);
+    if (catalogBlocks1 > 3)
+      return true;
+
+    if (debug)
+      System.out.println ("Checking interleave 2");
+    disk.setInterleave (2);
+
+    int catalogBlocks2 = checkFormat (disk);
+    if (catalogBlocks2 > 3)
+      return true;
+
+    if (catalogBlocks0 > 0)
+    {
+      disk.setInterleave (0);
+      return true;
+    }
+
+    if (catalogBlocks1 > 0)
     {
       disk.setInterleave (1);
-      int cb2 = checkFormat (disk);
-      if (cb2 > 3)
-        return true;
+      return true;
+    }
+
+    if (catalogBlocks2 > 0)
+    {
       disk.setInterleave (2);
-      if (true)
-      {
-        int cb3 = checkFormat (disk);
-        if (cb3 > 3)
-          return true;
-      }
-
-      if (catalogBlocks > 0)
-      {
-        disk.setInterleave (1);
-        return true;
-      }
-
-      if (cb2 > 0)
-        return true;
+      return true;
     }
 
     return false;
@@ -340,8 +357,12 @@ public class DosDisk extends AbstractFormattedDisk
     //    if (buffer[1] != 0x11) // first catalog track
     //      return 0;
 
+    if (debug)
+      System.out.printf ("Sectors per track: %02X%n", buffer[53]);
+
     if (buffer[53] != 16 && buffer[53] != 13 && buffer[53] != 32)  // sectors per track
     {
+      System.out.printf ("Bad sectors per track : %02X%n", buffer[53]);
       return 0;
     }
 
@@ -353,14 +374,19 @@ public class DosDisk extends AbstractFormattedDisk
     //    }
 
     int version = buffer[3] & 0xFF;
+    if (debug)
+      System.out.printf ("Version: %02X%n", buffer[3]);
     if (version > 0x43 && version != 0xFF)
     {
       System.out.printf ("Bad version : %02X%n", version);
       return 0;
     }
-    //    System.out.printf ("Catalog blocks: %s%n", countCatalogBlocks (disk, buffer));
 
-    return countCatalogBlocks (disk, buffer);
+    int catalogBlocks = countCatalogBlocks (disk, buffer);
+    if (debug)
+      System.out.printf ("Catalog blocks: %s%n", catalogBlocks);
+
+    return catalogBlocks;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -373,8 +399,15 @@ public class DosDisk extends AbstractFormattedDisk
 
     do
     {
+      if (debug)
+        System.out.printf ("Checking: %s%n", da);
+
       if (!disk.isValidAddress (da))
+      {
+        if (debug)
+          System.out.printf ("Invalid address: %s%n", da);
         return 0;
+      }
 
       if (catalogAddresses.contains (da))
       {
@@ -384,7 +417,11 @@ public class DosDisk extends AbstractFormattedDisk
 
       buffer = disk.readSector (da);
       if (!disk.isValidAddress (buffer[1], buffer[2]))
-        return 0;
+      {
+        if (debug)
+          System.out.printf ("Invalid address: %02X %02X%n", buffer[1], buffer[2]);
+        return catalogAddresses.size ();
+      }
 
       catalogAddresses.add (da);
 
@@ -392,6 +429,8 @@ public class DosDisk extends AbstractFormattedDisk
 
     } while (da.getBlock () != 0);
 
+    if (debug)
+      System.out.printf ("Catalog blocks: %d%n", catalogAddresses.size ());
     return catalogAddresses.size ();
   }
 

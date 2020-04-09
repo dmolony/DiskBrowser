@@ -59,7 +59,7 @@ class AppleDiskTab extends AbstractTab
   // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
-    System.out.println ("File not found: " + lastFileUsed);
+    //    System.out.println ("File not found: " + lastFileUsed);
     create (disk);
 
     DefaultMutableTreeNode node = findNode (lastFileUsed);

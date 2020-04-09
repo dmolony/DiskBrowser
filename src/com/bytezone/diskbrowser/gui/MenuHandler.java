@@ -454,15 +454,12 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     switch (prefs.getInt (PREFS_SCALE, 2))
     {
       case 1:
-        scale1Item.setSelected (true);
         scale1Item.doClick ();
         break;
       case 2:
-        scale2Item.setSelected (true);
         scale2Item.doClick ();
         break;
       case 3:
-        scale3Item.setSelected (true);
         scale3Item.doClick ();
         break;
     }

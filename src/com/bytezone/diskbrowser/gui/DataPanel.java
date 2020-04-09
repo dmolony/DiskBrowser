@@ -222,6 +222,18 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
   }
 
   // ---------------------------------------------------------------------------------//
+  public void setScale (double scale)
+  // ---------------------------------------------------------------------------------//
+  {
+    imagePanel.setScale (scale);
+    if (currentDataSource instanceof HiResImage)
+    {
+      HiResImage image = (HiResImage) currentDataSource;
+      imagePanel.setImage (image.getImage ());
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
   public void setDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {
@@ -374,11 +386,16 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
   {
     private BufferedImage image;
     private double scale = 1;
-    private double userScale = 1.5;
+    private double userScale = .5;
 
     public ImagePanel ()
     {
       this.setBackground (new Color (BACKGROUND, BACKGROUND, BACKGROUND));
+    }
+
+    private void setScale (double scale)
+    {
+      this.userScale = scale;
     }
 
     private void setImage (BufferedImage image)

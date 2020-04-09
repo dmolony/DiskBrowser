@@ -28,13 +28,22 @@ class CatalogEntry extends AbstractCatalogEntry
       loop: while (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
       {
         if (dosDisk.stillAvailable (da))
-          dosDisk.sectorTypes[da.getBlock ()] = dosDisk.tsListSector;
+        {
+          if (isValidCatalogSector (da))
+            dosDisk.sectorTypes[da.getBlock ()] = dosDisk.tsListSector;
+          else
+          {
+            System.out.printf ("Attempt to assign invalid TS sector " + ": %s from %s%n",
+                da, name);
+            break;
+          }
+        }
         else
         {
           System.out.printf (
               "Attempt to assign TS sector to occupied sector " + ": %s from %s%n", da,
               name);
-          //          break;
+          break;
         }
         tsSectors.add (da);
         byte[] sectorBuffer = disk.readSector (da);
@@ -129,6 +138,20 @@ class CatalogEntry extends AbstractCatalogEntry
           length = HexFormatter.intValue (buffer[2], buffer[3]);
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean isValidCatalogSector (DiskAddress da)
+  // ---------------------------------------------------------------------------------//
+  {
+    byte[] buffer = da.readSector ();
+
+    if (!da.getDisk ().isValidAddress (buffer[1], buffer[2]))
+      return false;
+    if (buffer[4] != 0)
+      return false;
+
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//

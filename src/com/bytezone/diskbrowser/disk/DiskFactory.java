@@ -598,7 +598,6 @@ public class DiskFactory
       if (tracks * 4096 != file.length ())
       {
         System.out.println ("*** extended ***");     // System Addons.hdv
-        //        System.out.println (tracks);
       }
       AppleDisk disk = new AppleDisk (file, tracks, 8);
       if (ProdosDisk.isCorrectFormat (disk))
@@ -669,14 +668,18 @@ public class DiskFactory
     try
     {
       AppleDisk disk = new AppleDisk (file, 0, 0);
-      if (disk.getTotalBlocks () > 0 && ProdosDisk.isCorrectFormat (disk))
-        return new ProdosDisk (disk);
+      if (disk.getTotalBlocks () > 0)
+      {
+        if (ProdosDisk.isCorrectFormat (disk))
+          return new ProdosDisk (disk);
 
-      // switch sector size
-      disk.switchToDos ();
-      //      System.out.println (disk);
-      if (disk.getTotalBlocks () > 0 && DosDisk.isCorrectFormat (disk))
-        return new DosDisk (disk);
+        if (file.length () == 143424)
+        {
+          disk.switchToDos ();                    // switch sector size
+          if (DosDisk.isCorrectFormat (disk))
+            return new DosDisk (disk);
+        }
+      }
     }
     catch (Exception e)
     {
@@ -684,7 +687,7 @@ public class DiskFactory
       //      System.out.println (e);
     }
     if (debug)
-      System.out.println ("Not a Prodos 2mg disk");
+      System.out.println ("Not a 2mg disk");
 
     return null;
   }

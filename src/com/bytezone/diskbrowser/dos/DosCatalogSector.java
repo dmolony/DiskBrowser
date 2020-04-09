@@ -129,7 +129,7 @@ class DosCatalogSector extends AbstractSector
   }
 
   // ---------------------------------------------------------------------------------//
-  private String getName (byte[] buffer, int offset, int length)
+  static String getName (byte[] buffer, int offset, int length)
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();

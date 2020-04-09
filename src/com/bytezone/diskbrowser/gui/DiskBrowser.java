@@ -118,6 +118,10 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     duplicateAction.addTableSelectionListener (catalogPanel);
 
+    menuHandler.scale1Item.setAction (new ScaleAction (dataPanel, 1.0, 1));
+    menuHandler.scale2Item.setAction (new ScaleAction (dataPanel, 1.5, 2));
+    menuHandler.scale3Item.setAction (new ScaleAction (dataPanel, 2.0, 3));
+
     redoHandler.addRedoListener (catalogPanel);
     redoHandler.addRedoListener (diskLayoutPanel);
 

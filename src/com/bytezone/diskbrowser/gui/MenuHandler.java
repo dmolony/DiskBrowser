@@ -40,6 +40,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_FREE_SECTORS = "show free sectors";
   private static final String PREFS_COLOUR_QUIRKS = "colour quirks";
   private static final String PREFS_MONOCHROME = "monochrome";
+  private static final String PREFS_SCALE = "scale";
 
   private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
   private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
@@ -76,7 +77,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
   JMenu formatMenu = new JMenu ("Format");
-  JMenu colourMenu = new JMenu ("Colours");
+  JMenu imageMenu = new JMenu ("Images");
   JMenu applesoftMenu = new JMenu ("Applesoft");
   JMenu assemblerMenu = new JMenu ("Assembler");
   JMenu prodosMenu = new JMenu ("Prodos");
@@ -85,7 +86,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   // File menu items
   final JMenuItem rootItem = new JMenuItem ("Set root folder...");
   final JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
-  JMenuItem executeDiskItem;
+  final JMenuItem executeDiskItem = new JMenuItem ();
   final JMenuItem saveDiskItem = new JMenuItem ("Save converted disk as...");
   final JMenuItem saveSectorsItem = new JMenuItem ("Save sectors as...");
   final JMenuItem printItem = new JMenuItem ("Print output panel...");
@@ -111,6 +112,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
   final JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
   final JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
+  final JMenuItem scale1Item = new JRadioButtonMenuItem ("Scale 1");
+  final JMenuItem scale2Item = new JRadioButtonMenuItem ("Scale 1.5");
+  final JMenuItem scale3Item = new JRadioButtonMenuItem ("Scale 2");
 
   // Applesoft menu items
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
@@ -137,7 +141,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   {
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
-    menuBar.add (colourMenu);
+    menuBar.add (imageMenu);
     menuBar.add (applesoftMenu);
     menuBar.add (assemblerMenu);
     menuBar.add (prodosMenu);
@@ -188,15 +192,19 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     {
       JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem ("x");
       paletteGroup.add (menuItem);
-      colourMenu.add (menuItem);
+      imageMenu.add (menuItem);
     }
 
-    colourMenu.addSeparator ();
-    colourMenu.add (colourQuirksItem);
-    colourMenu.add (monochromeItem);
-    colourMenu.addSeparator ();
-    colourMenu.add (nextPaletteItem);
-    colourMenu.add (prevPaletteItem);
+    imageMenu.addSeparator ();
+    imageMenu.add (colourQuirksItem);
+    imageMenu.add (monochromeItem);
+    imageMenu.addSeparator ();
+    imageMenu.add (nextPaletteItem);
+    imageMenu.add (prevPaletteItem);
+    imageMenu.addSeparator ();
+    imageMenu.add (scale1Item);
+    imageMenu.add (scale2Item);
+    imageMenu.add (scale3Item);
 
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (alignAssignItem);
@@ -263,6 +271,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     ButtonGroup sectorGroup = new ButtonGroup ();
     ButtonGroup interleaveGroup = new ButtonGroup ();
+    ButtonGroup scaleGroup = new ButtonGroup ();
 
     sectorGroup.add (sector256Item);
     sectorGroup.add (sector512Item);
@@ -270,6 +279,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     interleaveGroup.add (interleave1Item);
     interleaveGroup.add (interleave2Item);
     interleaveGroup.add (interleave3Item);
+    scaleGroup.add (scale1Item);
+    scaleGroup.add (scale2Item);
+    scaleGroup.add (scale3Item);
 
     saveDiskItem.setAction (saveTempFileAction);
     saveSectorsItem.setAction (saveSectorsAction);
@@ -385,7 +397,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     if (!openSupported)
       return;
 
-    executeDiskItem = new JMenuItem (new ExecuteDiskAction (this));
+    //    executeDiskItem = new JMenuItem (new ExecuteDiskAction (this));
+    executeDiskItem.setAction (new ExecuteDiskAction (this));
     fileMenu.add (executeDiskItem);
     fileMenu.addSeparator ();
   }
@@ -405,6 +418,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putInt (PREFS_PALETTE,
         HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
     fontAction.quit (prefs);
+
+    int scale = scale1Item.isSelected () ? 1 : scale2Item.isSelected () ? 2 : 3;
+    prefs.putInt (PREFS_SCALE, scale);
 
     prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
     prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
@@ -434,6 +450,22 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showFreeSectorsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FREE_SECTORS, false));
     colourQuirksItem.setSelected (prefs.getBoolean (PREFS_COLOUR_QUIRKS, false));
     monochromeItem.setSelected (prefs.getBoolean (PREFS_MONOCHROME, false));
+
+    switch (prefs.getInt (PREFS_SCALE, 2))
+    {
+      case 1:
+        scale1Item.setSelected (true);
+        scale1Item.doClick ();
+        break;
+      case 2:
+        scale2Item.setSelected (true);
+        scale2Item.doClick ();
+        break;
+      case 3:
+        scale3Item.setSelected (true);
+        scale3Item.doClick ();
+        break;
+    }
 
     //    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
 

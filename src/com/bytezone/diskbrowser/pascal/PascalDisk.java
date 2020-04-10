@@ -65,10 +65,10 @@ public class PascalDisk extends AbstractFormattedDisk
     sectorTypesList.add (badSector);
 
     List<DiskAddress> blocks = disk.getDiskAddressList (0, 1);    // B0, B1
-    this.bootSector = new BootSector (disk, disk.readSectors (blocks), "Pascal");
+    this.bootSector = new BootSector (disk, disk.readBlocks (blocks), "Pascal");
 
     for (int i = 0; i < 2; i++)
-      if (!disk.isSectorEmpty (i))
+      if (!disk.isBlockEmpty (i))
       {
         sectorTypes[i] = diskBootSector;
         freeBlocks.set (i, false);
@@ -77,7 +77,7 @@ public class PascalDisk extends AbstractFormattedDisk
     for (int i = 2; i < disk.getTotalBlocks (); i++)
       freeBlocks.set (i, true);
 
-    byte[] buffer = disk.readSector (2);
+    byte[] buffer = disk.readBlock (2);
     byte[] data = new byte[CATALOG_ENTRY_SIZE];
     System.arraycopy (buffer, 0, data, 0, CATALOG_ENTRY_SIZE);
     volumeEntry = new VolumeEntry (this, data);
@@ -91,20 +91,20 @@ public class PascalDisk extends AbstractFormattedDisk
     for (int i = 2; i < max; i++)
     {
       DiskAddress da = disk.getDiskAddress (i);
-      if (!disk.isSectorEmpty (da))
+      if (!disk.isBlockEmpty (da))
         sectorTypes[i] = catalogSector;
       sectors.add (da);
       freeBlocks.set (i, false);
     }
 
     diskCatalogSector =
-        new PascalCatalogSector (disk, disk.readSectors (sectors), sectors);
+        new PascalCatalogSector (disk, disk.readBlocks (sectors), sectors);
 
     // read the catalog
     List<DiskAddress> addresses = new ArrayList<> ();
     for (int i = 2; i < max; i++)
       addresses.add (disk.getDiskAddress (i));
-    buffer = disk.readSectors (addresses);
+    buffer = disk.readBlocks (addresses);
 
     // loop through each catalog entry (what if there are deleted files?)
     for (int i = 1; i <= volumeEntry.totalFiles; i++)
@@ -152,7 +152,7 @@ public class PascalDisk extends AbstractFormattedDisk
   public static boolean checkFormat (AppleDisk disk, boolean debug)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = disk.readSector (2);
+    byte[] buffer = disk.readBlock (2);
     int nameLength = buffer[6] & 0xFF;
     if (nameLength < 1 || nameLength > 7)
     {
@@ -187,7 +187,7 @@ public class PascalDisk extends AbstractFormattedDisk
     List<DiskAddress> addresses = new ArrayList<> ();
     for (int i = 2; i < to; i++)
       addresses.add (disk.getDiskAddress (i));
-    buffer = disk.readSectors (addresses);
+    buffer = disk.readBlocks (addresses);
 
     int files = HexFormatter.intValue (buffer[16], buffer[17]);
     if (files < 0 || files > 77)
@@ -228,14 +228,14 @@ public class PascalDisk extends AbstractFormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    SectorType st = sectorTypes[da.getBlock ()];
+    SectorType st = sectorTypes[da.getBlockNo ()];
     if (st == diskBootSector)
       return bootSector;
     if (st == catalogSector)
       return diskCatalogSector;
     String name = getSectorFilename (da);
     if (name != null)
-      return new DefaultSector (name, disk, disk.readSector (da), da);
+      return new DefaultSector (name, disk, disk.readBlock (da), da);
     return super.getFormattedSector (da);
   }
 

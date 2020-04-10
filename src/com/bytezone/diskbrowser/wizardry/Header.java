@@ -112,7 +112,7 @@ class Header
     StringBuilder text = new StringBuilder (scenarioTitle + "\n\n");
 
     int ptr = 106;
-    byte[] buffer = owner.getDisk ().readSector (da);
+    byte[] buffer = owner.getDisk ().readBlock (da);
     while (buffer[ptr] != -1)
     {
       text.append (HexFormatter.getPascalString (buffer, ptr) + "\n");
@@ -143,7 +143,7 @@ class Header
     List<DiskAddress> blocks = new ArrayList<> ();
     blocks.add (da);
 
-    byte[] buffer = owner.getDisk ().readSector (da);
+    byte[] buffer = owner.getDisk ().readBlock (da);
     String text = printChars (buffer, 0);
 
     DefaultAppleFileSource dafs = new DefaultAppleFileSource (title, text, owner);
@@ -163,7 +163,7 @@ class Header
     int level = 1;
 
     StringBuilder list = new StringBuilder ("Level " + level + ":\n");
-    byte[] buffer = owner.getDisk ().readSector (da);
+    byte[] buffer = owner.getDisk ().readBlock (da);
     String text = HexFormatter.getString (buffer, 0, 512);
     String[] spells = text.split ("\n");
     for (String s : spells)

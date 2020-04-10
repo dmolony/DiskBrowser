@@ -102,7 +102,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           if (diskAddress == null)
             break;
           dataBlocks.add (diskAddress);
-          byte[] buffer = disk.readSector (block);
+          byte[] buffer = disk.readBlock (block);
           block = HexFormatter.unsignedShort (buffer, 2);
         } while (block > 0);
         break;
@@ -125,7 +125,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     parentDisk.setSectorType (keyPtr, parentDisk.extendedKeySector);
     indexBlocks.add (disk.getDiskAddress (keyPtr));
 
-    byte[] buffer2 = disk.readSector (keyPtr);        // data fork and resource fork
+    byte[] buffer2 = disk.readBlock (keyPtr);        // data fork and resource fork
 
     // read 2 mini entries (data fork & resource fork)
     for (int i = 0; i < 512; i += 256)
@@ -194,7 +194,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       parentDisk.setSectorType (blockPtr, parentDisk.indexSector);
       indexBlocks.add (disk.getDiskAddress (blockPtr));
 
-      byte[] buffer = disk.readSector (blockPtr);
+      byte[] buffer = disk.readBlock (blockPtr);
       for (int i = 0; i < 256; i++)
       {
         int blockNo = (buffer[i] & 0xFF) | ((buffer[i + 0x100] & 0xFF) << 8);
@@ -213,7 +213,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     parentDisk.setSectorType (keyPtr, parentDisk.masterIndexSector);
     indexBlocks.add (disk.getDiskAddress (keyPtr));
 
-    byte[] buffer = disk.readSector (keyPtr);                   // master index
+    byte[] buffer = disk.readBlock (keyPtr);                   // master index
 
     int highest = 0x80;
     while (highest-- > 0)                                       // decrement after test
@@ -537,7 +537,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     List<DiskAddress> addresses = new ArrayList<> ();
     int logicalBlock = 0;
 
-    byte[] mainIndexBuffer = disk.readSector (keyPtr);
+    byte[] mainIndexBuffer = disk.readBlock (keyPtr);
     for (int i = 0; i < 256; i++)
     {
       int indexBlock =
@@ -548,7 +548,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       {
         if (addresses.size () > 0)
         {
-          byte[] tempBuffer = disk.readSectors (addresses);
+          byte[] tempBuffer = disk.readBlocks (addresses);
           buffers.add (
               new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
           addresses.clear ();
@@ -603,24 +603,24 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       case SEEDLING:
       case SAPLING:
       case TREE:
-        return disk.readSectors (dataBlocks);
+        return disk.readBlocks (dataBlocks);
 
       case SUBDIRECTORY:
         byte[] fullBuffer = new byte[dataBlocks.size () * BLOCK_ENTRY_SIZE];
         int offset = 0;
         for (DiskAddress da : dataBlocks)
         {
-          byte[] buffer = disk.readSector (da);
+          byte[] buffer = disk.readBlock (da);
           System.arraycopy (buffer, 4, fullBuffer, offset, BLOCK_ENTRY_SIZE);
           offset += BLOCK_ENTRY_SIZE;
         }
         return fullBuffer;
 
       case GSOS_EXTENDED_FILE:
-        return disk.readSectors (dataBlocks);   // data and resource forks concatenated
+        return disk.readBlocks (dataBlocks);   // data and resource forks concatenated
 
       case PASCAL_ON_PROFILE:
-        return disk.readSectors (dataBlocks);
+        return disk.readBlocks (dataBlocks);
 
       default:
         System.out.println ("Unknown storage type in getBuffer : " + storageType);
@@ -633,7 +633,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       List<TextBuffer> buffers, int logicalBlock)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] indexBuffer = disk.readSector (indexBlock);
+    byte[] indexBuffer = disk.readBlock (indexBlock);
     for (int j = 0; j < 256; j++)
     {
       int block = HexFormatter.intValue (indexBuffer[j], indexBuffer[j + 256]);
@@ -641,7 +641,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         addresses.add (disk.getDiskAddress (block));
       else if (addresses.size () > 0)
       {
-        byte[] tempBuffer = disk.readSectors (addresses);
+        byte[] tempBuffer = disk.readBlocks (addresses);
         buffers
             .add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
         addresses.clear ();

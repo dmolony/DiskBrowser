@@ -76,7 +76,7 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 53, 1, "Maximum sectors");
     addTextAndDecimal (text, buffer, 54, 2, "Bytes per sector");
 
-    boolean bootSectorEmpty = parentDisk.getDisk ().isSectorEmpty (0);
+    boolean bootSectorEmpty = parentDisk.getDisk ().isBlockEmpty (0);
     int firstSector = 0x38;
     int max = maxTracks * 4 + firstSector;
     for (int i = firstSector; i < max; i += 4)
@@ -135,7 +135,7 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 0x35, 1, "Maximum sectors");
     addTextAndDecimal (text, buffer, 0x36, 2, "Bytes per sector");
 
-    boolean bootSectorEmpty = parentDisk.getDisk ().isSectorEmpty (0);
+    boolean bootSectorEmpty = parentDisk.getDisk ().isBlockEmpty (0);
     int firstSector = 0x38;
     int max = maxTracks * 4 + firstSector;
     for (int i = firstSector; i < max; i += 4)

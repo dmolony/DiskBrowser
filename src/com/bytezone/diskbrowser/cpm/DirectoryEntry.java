@@ -188,7 +188,7 @@ class DirectoryEntry implements AppleFileSource
     if (appleFile != null)
       return appleFile;
 
-    byte[] buffer = disk.readSectors (blocks);
+    byte[] buffer = disk.readBlocks (blocks);
 
     if (buffer.length == 0)
     {

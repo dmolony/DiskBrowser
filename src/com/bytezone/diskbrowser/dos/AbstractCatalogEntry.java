@@ -57,7 +57,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     this.disk = dosDisk.getDisk ();
     this.catalogSectorDA = catalogSector;
 
+    name = getName ("", entryBuffer);
     reportedSize = HexFormatter.unsignedShort (entryBuffer, 33);
+    if (reportedSize == 0)
+      System.out.printf ("%s size 0%n", name);
 
     int type = entryBuffer[2] & 0x7F;
     locked = (entryBuffer[2] & 0x80) != 0;
@@ -81,13 +84,12 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     else
       System.out.println ("Unknown file type : " + type);
 
-    name = getName ("", entryBuffer);
     if (dosDisk.getVersion () >= 0x41)
       lastModified = Utility.getDateTime (entryBuffer, 0x1B);
 
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
-    String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
-        (entryBuffer[33] & 0xFF));
+    String base =
+        String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (), reportedSize);
     catalogName = getName (base, entryBuffer).replace ("^", "");
   }
 
@@ -96,9 +98,11 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder (base);
+
     int max = buffer[0] == (byte) 0xFF ? 32 : 33;
     if (dosDisk.getVersion () >= 0x41)
       max = 27;
+
     for (int i = 3; i < max; i++)
     {
       int c = buffer[i] & 0xFF;
@@ -115,8 +119,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       else
         text.append ((char) c);                     // standard ascii
     }
+
     while (text.length () > 0 && text.charAt (text.length () - 1) == ' ')
       text.deleteCharAt (text.length () - 1);       // rtrim()
+
     return text.toString ();
   }
 
@@ -167,7 +173,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     if (appleFile != null)
       return appleFile;
 
-    byte[] buffer = disk.readSectors (dataSectors);
+    byte[] buffer = disk.readBlocks (dataSectors);
     int reportedLength;
     if (buffer.length == 0)
     {
@@ -240,7 +246,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             appleFile = new DoubleHiResImage (name, exactBuffer);
           else if (link != null)
           {
-            byte[] auxBuffer = link.disk.readSectors (link.dataSectors);
+            byte[] auxBuffer = link.disk.readBlocks (link.dataSectors);
             byte[] exactAuxBuffer = getExactBuffer (auxBuffer);
             if (name.endsWith (".AUX"))
               appleFile = new DoubleHiResImage (name, exactAuxBuffer, exactBuffer);

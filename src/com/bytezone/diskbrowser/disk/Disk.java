@@ -22,7 +22,7 @@ public interface Disk extends Iterable<DiskAddress>
 
   public int getTrackSize ();                   // bytes per track - 4096
 
-  public int getSectorsPerTrack ();             // 8 or 16
+  public int getBlocksPerTrack ();              // 8 or 16
 
   public void setInterleave (int interleave);
 
@@ -34,21 +34,21 @@ public interface Disk extends Iterable<DiskAddress>
 
   public DiskAddress getDiskAddress (int track, int sector);
 
-  public byte[] readSector (int block);
+  public byte[] readBlock (int block);
 
-  public byte[] readSector (int track, int sector);
+  public byte[] readBlock (int track, int sector);
 
-  public byte[] readSector (DiskAddress da);
+  public byte[] readBlock (DiskAddress da);
 
-  public byte[] readSectors (List<DiskAddress> daList);
+  public byte[] readBlocks (List<DiskAddress> daList);
 
-  public void writeSector (DiskAddress da, byte[] buffer);
+  public void writeBlock (DiskAddress da, byte[] buffer);
 
-  public boolean isSectorEmpty (int block);
+  public boolean isBlockEmpty (int block);
 
-  public boolean isSectorEmpty (int track, int sector);
+  public boolean isBlockEmpty (int track, int sector);
 
-  public boolean isSectorEmpty (DiskAddress da);
+  public boolean isBlockEmpty (DiskAddress da);
 
   public boolean isValidAddress (int block);
 

@@ -120,7 +120,7 @@ public class FileEntry extends CatalogEntry
   private byte[] getExactBuffer ()
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = parent.getDisk ().readSectors (blocks);
+    byte[] buffer = parent.getDisk ().readBlocks (blocks);
     byte[] exactBuffer;
 
     if (buffer.length > 0 && bytesUsedInLastBlock < 512)

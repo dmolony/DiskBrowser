@@ -356,12 +356,12 @@ public class Wizardry4BootDisk extends PascalDisk
   {
     // Wizardry IV or V boot code
     byte[] header = { 0x00, (byte) 0xEA, (byte) 0xA9, 0x60, (byte) 0x8D, 0x01, 0x08 };
-    byte[] buffer = disk.readSector (0);
+    byte[] buffer = disk.readBlock (0);
 
     if (!Utility.matches (buffer, 0, header))
       return false;
 
-    buffer = disk.readSector (1);
+    buffer = disk.readBlock (1);
     if (buffer[510] != 1 || buffer[511] != 0)       // disk #1
       return false;
 

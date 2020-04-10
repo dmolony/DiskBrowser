@@ -113,7 +113,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     sectorTypes = new SectorType[disk.getTotalBlocks ()];
 
     for (DiskAddress da : disk)
-      sectorTypes[da.getBlock ()] = disk.isSectorEmpty (da) ? emptySector : usedSector;
+      sectorTypes[da.getBlockNo ()] = disk.isBlockEmpty (da) ? emptySector : usedSector;
 
     setGridLayout ();
   }
@@ -147,8 +147,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
         break;
 
       case 1600:
-        if (disk.getSectorsPerTrack () == 32)
-          gridLayout = new Dimension (disk.getSectorsPerTrack (), disk.getTotalTracks ());
+        if (disk.getBlocksPerTrack () == 32)
+          gridLayout = new Dimension (disk.getBlocksPerTrack (), disk.getTotalTracks ());
         else
           gridLayout = new Dimension (16, 100);
         break;
@@ -366,7 +366,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public SectorType getSectorType (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return sectorTypes[da.getBlock ()];
+    return sectorTypes[da.getBlockNo ()];
   }
 
   // ---------------------------------------------------------------------------------//
@@ -394,12 +394,14 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    if (da.getBlock () == 0 && bootSector != null)
+    if (da.getBlockNo () == 0 && bootSector != null)
       return bootSector;
 
-    SectorType sectorType = sectorTypes[da.getBlock ()];
-    byte[] buffer = disk.readSector (da);
-    String address = String.format ("%02X %02X", da.getTrack (), da.getSector ());
+    SectorType sectorType = sectorTypes[da.getBlockNo ()];
+    byte[] buffer = disk.readBlock (da);
+
+    //    String address = String.format ("%02X %02X", da.getTrackNo (), da.getSectorNo ());
+    String address = String.format ("%02X", da.getBlockNo ());
 
     if (sectorType == emptySector)
       return new DefaultSector ("Empty sector at " + address, disk, buffer, da);
@@ -409,6 +411,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     String name = getSectorFilename (da);
     if (!name.isEmpty ())
       name = " : " + name;
+
     return new DefaultSector ("Data sector at " + address + name, disk, buffer, da);
   }
 
@@ -449,7 +452,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public boolean isSectorFree (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return freeBlocks.get (da.getBlock ());
+    return freeBlocks.get (da.getBlockNo ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -482,7 +485,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public boolean stillAvailable (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return stillAvailable (da.getBlock ());
+    return stillAvailable (da.getBlockNo ());
   }
 
   // ---------------------------------------------------------------------------------//

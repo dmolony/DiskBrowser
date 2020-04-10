@@ -339,12 +339,12 @@ public class AppleDisk implements Disk
 
     for (DiskAddress da : this)         // uses blockList.iterator
     {
-      byte[] buffer = readSector (da);
-      hasData[da.getBlock ()] = false;
+      byte[] buffer = readBlock (da);
+      hasData[da.getBlockNo ()] = false;
       for (int i = 0; i < sectorSize; i++)
         if (buffer[i] != emptyByte)
         {
-          hasData[da.getBlock ()] = true;
+          hasData[da.getBlockNo ()] = true;
           break;
         }
     }
@@ -362,13 +362,13 @@ public class AppleDisk implements Disk
       if (sectorSize == SECTOR_SIZE)                    // 256 byte sectors
       {
         int diskOffset = getBufferOffset (da);
-        hasData[da.getBlock ()] = check (diskOffset);
+        hasData[da.getBlockNo ()] = check (diskOffset);
       }
       else                                              // 512 byte blocks
       {
         int diskOffset1 = getBufferOffset (da, 0);
         int diskOffset2 = getBufferOffset (da, 1);
-        hasData[da.getBlock ()] = check (diskOffset1) || check (diskOffset2);
+        hasData[da.getBlockNo ()] = check (diskOffset1) || check (diskOffset2);
       }
     }
   }
@@ -389,7 +389,7 @@ public class AppleDisk implements Disk
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public int getSectorsPerTrack ()
+  public int getBlocksPerTrack ()
   // ---------------------------------------------------------------------------------//
   {
     return trackSize / sectorSize;
@@ -429,15 +429,15 @@ public class AppleDisk implements Disk
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public boolean isSectorEmpty (DiskAddress da)
+  public boolean isBlockEmpty (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return !hasData[da.getBlock ()];
+    return !hasData[da.getBlockNo ()];
   }
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public boolean isSectorEmpty (int block)
+  public boolean isBlockEmpty (int block)
   // ---------------------------------------------------------------------------------//
   {
     return !hasData[block];
@@ -445,10 +445,10 @@ public class AppleDisk implements Disk
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public boolean isSectorEmpty (int track, int sector)
+  public boolean isBlockEmpty (int track, int sector)
   // ---------------------------------------------------------------------------------//
   {
-    return !hasData[getDiskAddress (track, sector).getBlock ()];
+    return !hasData[getDiskAddress (track, sector).getBlockNo ()];
   }
 
   //  @Override
@@ -479,7 +479,7 @@ public class AppleDisk implements Disk
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public byte[] readSector (DiskAddress da)
+  public byte[] readBlock (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = new byte[sectorSize];
@@ -492,7 +492,7 @@ public class AppleDisk implements Disk
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public byte[] readSectors (List<DiskAddress> daList)
+  public byte[] readBlocks (List<DiskAddress> daList)
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = new byte[daList.size () * sectorSize];
@@ -500,7 +500,7 @@ public class AppleDisk implements Disk
     for (DiskAddress da : daList)
     {
       // sparse text/PNT/PIC files may have gaps
-      if (da != null && (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ()))
+      if (da != null && (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ()))
         readBuffer (da, buffer, ptr);
       ptr += sectorSize;
     }
@@ -509,23 +509,23 @@ public class AppleDisk implements Disk
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public byte[] readSector (int track, int sector)
+  public byte[] readBlock (int track, int sector)
   // ---------------------------------------------------------------------------------//
   {
-    return readSector (getDiskAddress (track, sector));
+    return readBlock (getDiskAddress (track, sector));
   }
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public byte[] readSector (int block)
+  public byte[] readBlock (int block)
   // ---------------------------------------------------------------------------------//
   {
-    return readSector (getDiskAddress (block));
+    return readBlock (getDiskAddress (block));
   }
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void writeSector (DiskAddress da, byte[] buffer)
+  public void writeBlock (DiskAddress da, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     writeBuffer (da, buffer);
@@ -644,7 +644,7 @@ public class AppleDisk implements Disk
   public boolean isValidAddress (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return da != null && isValidAddress (da.getTrack (), da.getSector ());
+    return da != null && isValidAddress (da.getTrackNo (), da.getSectorNo ());
   }
 
   /*
@@ -708,8 +708,8 @@ public class AppleDisk implements Disk
   {
     assert sectorSize == SECTOR_SIZE;
 
-    return da.getTrack () * trackSize
-        + interleaveSector[interleave][da.getSector ()] * SECTOR_SIZE;
+    return da.getTrackNo () * trackSize
+        + interleaveSector[interleave][da.getSectorNo ()] * SECTOR_SIZE;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -720,8 +720,8 @@ public class AppleDisk implements Disk
 
     assert seq == 0 || seq == 1;
 
-    return da.getTrack () * trackSize
-        + interleaveSector[interleave][da.getSector () * 2 + seq] * SECTOR_SIZE;
+    return da.getTrackNo () * trackSize
+        + interleaveSector[interleave][da.getSectorNo () * 2 + seq] * SECTOR_SIZE;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -807,7 +807,7 @@ public class AppleDisk implements Disk
   public long getBootChecksum ()
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = readSector (0, 0);
+    byte[] buffer = readBlock (0, 0);
     Checksum checksum = new CRC32 ();
     checksum.update (buffer, 0, buffer.length);
     return checksum.getValue ();

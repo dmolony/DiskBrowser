@@ -72,9 +72,9 @@ public class Relocator extends AbstractFile
       if (diskNo > 0)
       {
         Disk disk = dataDisks[diskNo];
-        byte[] temp = disk.readSector (diskOffsets[logicalBlock]);
+        byte[] temp = disk.readBlock (diskOffsets[logicalBlock]);
         DiskAddress da = master.getDiskAddress (logicalBlock);
-        master.writeSector (da, temp);
+        master.writeBlock (da, temp);
         //        if (da.getBlock () == 0x126)
         //          System.out.println (HexFormatter.format (buffer));
         //        if (Utility.find (temp, key1))

@@ -30,7 +30,7 @@ class ProdosBitMapSector extends AbstractSector
     // check range of bits for current block - so far I don't have a disk that needs
     // more than a single block
     int relativeBlock =
-        diskAddress.getBlock () - parent.getVolumeDirectoryHeader ().bitMapBlock;
+        diskAddress.getBlockNo () - parent.getVolumeDirectoryHeader ().bitMapBlock;
     int startBit = relativeBlock * 4096;
     //    int endBit = startBit + 4096;
     if (startBit >= grid.width * grid.height)

@@ -183,8 +183,8 @@ class DiskLayoutPanel extends JPanel
 
     public Rectangle getLocation (DiskAddress da)
     {
-      int y = da.getBlock () / grid.width;
-      int x = da.getBlock () % grid.width;
+      int y = da.getBlockNo () / grid.width;
+      int x = da.getBlockNo () % grid.width;
       Rectangle r =
           new Rectangle (x * block.width, y * block.height, block.width, block.height);
       return r;

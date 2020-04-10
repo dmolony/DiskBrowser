@@ -42,7 +42,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
     }
     int totalBlocks = 0;
 
-    if (reportedSize <= 1 || !disk.isValidAddress (da.getTrack (), da.getSector ()))
+    if (reportedSize <= 1 || !disk.isValidAddress (da.getTrackNo (), da.getSectorNo ()))
     {
       if (debug)
         System.out.println ("invalid catalog entry");
@@ -51,7 +51,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
     }
 
     // Loop through all TS-list sectors
-    loop: while (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
+    loop: while (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ())
     {
       if (!dosDisk.stillAvailable (da))
       {
@@ -61,16 +61,16 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
       tsSectors.add (da);
       totalBlocks++;
 
-      byte[] sectorBuffer = disk.readSector (da);
+      byte[] sectorBuffer = disk.readBlock (da);
       for (int i = 12, max = disk.getBlockSize (); i < max; i += 2)
       {
         da = getValidAddress (sectorBuffer, i);
         if (da == null)
           break loop;
-        if (da.getBlock () > 0 && debug)
+        if (da.getBlockNo () > 0 && debug)
           System.out.println (da);
 
-        if (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
+        if (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ())
         {
           if (!dosDisk.stillAvailable (da))
           {

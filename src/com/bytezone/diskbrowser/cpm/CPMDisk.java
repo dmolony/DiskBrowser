@@ -55,7 +55,7 @@ public class CPMDisk extends AbstractFormattedDisk
     // search for the version string
     for (int i = 8; i >= 4; i -= 2)
     {
-      byte[] buffer = disk.readSector (0, i);
+      byte[] buffer = disk.readBlock (0, i);
       String text = new String (buffer, 16, 24);
       if ("DIR ERA TYPESAVEREN USER".equals (text))
       {
@@ -72,8 +72,8 @@ public class CPMDisk extends AbstractFormattedDisk
     {
       DiskAddress da = disk.getDiskAddress (3, sector);
 
-      sectorTypes[da.getBlock ()] = catalogSector;
-      byte[] buffer = disk.readSector (da);
+      sectorTypes[da.getBlockNo ()] = catalogSector;
+      byte[] buffer = disk.readBlock (da);
       int b1 = buffer[0] & 0xFF;
       int b2 = buffer[1] & 0xFF;
       if (b1 == 0xE5)
@@ -95,8 +95,8 @@ public class CPMDisk extends AbstractFormattedDisk
         DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
         SectorType sectorType = getSectorType (entry.getType ());
         for (DiskAddress block : entry.getSectors ())
-          if (!disk.isSectorEmpty (block))
-            sectorTypes[block.getBlock ()] = sectorType;
+          if (!disk.isBlockEmpty (block))
+            sectorTypes[block.getBlockNo ()] = sectorType;
 
         DirectoryEntry parent = findParent (entry);
         if (parent == null)
@@ -166,8 +166,8 @@ public class CPMDisk extends AbstractFormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    SectorType type = sectorTypes[da.getBlock ()];
-    byte[] buffer = disk.readSector (da);
+    SectorType type = sectorTypes[da.getBlockNo ()];
+    byte[] buffer = disk.readBlock (da);
 
     if (type == catalogSector)
       return new CPMCatalogSector (disk, buffer, da);
@@ -209,7 +209,7 @@ public class CPMDisk extends AbstractFormattedDisk
 
     for (int i = 8; i >= 4; i -= 2)
     {
-      byte[] buffer = disk.readSector (0, i);
+      byte[] buffer = disk.readBlock (0, i);
       String text = new String (buffer, 16, 24);
       if ("DIR ERA TYPESAVEREN USER".equals (text))
       {
@@ -221,7 +221,7 @@ public class CPMDisk extends AbstractFormattedDisk
 
     for (int sector = 0; sector < 8; sector++)
     {
-      byte[] buffer = disk.readSector (3, sector);
+      byte[] buffer = disk.readBlock (3, sector);
 
       // check if entire sector is empty (everything == 0xE5)
       if (bufferContainsAll (buffer, (byte) 0xE5))

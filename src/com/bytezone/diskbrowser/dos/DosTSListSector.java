@@ -36,7 +36,7 @@ class DosTSListSector extends AbstractSector
         break;            // throw exception?
       }
 
-      if (da.getBlock () > 0 && dosDisk.stillAvailable (da))
+      if (da.getBlockNo () > 0 && dosDisk.stillAvailable (da))
       {
         System.out.println ("Invalid sector address : " + da);
         break;            // throw exception?
@@ -72,8 +72,8 @@ class DosTSListSector extends AbstractSector
 
     if ((buffer[3] != 0 || buffer[4] != 0)         // not supposed to be used
         // Diags2E.dsk stores its own sector address here
-        && (diskAddress.getTrack () == (buffer[3] & 0xFF)
-            && diskAddress.getSector () == (buffer[4] & 0xFF)))
+        && (diskAddress.getTrackNo () == (buffer[3] & 0xFF)
+            && diskAddress.getSectorNo () == (buffer[4] & 0xFF)))
       addText (text, buffer, 3, 2, "Self-reference");
     else
       addText (text, buffer, 3, 2, "Not used");

@@ -4,21 +4,21 @@ package com.bytezone.diskbrowser.disk;
 public interface DiskAddress extends Comparable<DiskAddress>
 // -----------------------------------------------------------------------------------//
 {
-  public int getBlock ();
+  public int getBlockNo ();
 
-  public int getTrack ();
+  public int getTrackNo ();
 
-  public int getSector ();
+  public int getSectorNo ();
 
   public Disk getDisk ();
 
   public boolean matches (DiskAddress other);
 
   // ---------------------------------------------------------------------------------//
-  public default byte[] readSector ()
+  public default byte[] readBlock ()
   // ---------------------------------------------------------------------------------//
   {
-    return getDisk ().readSector (this);
+    return getDisk ().readBlock (this);
   }
 
   // ---------------------------------------------------------------------------------//

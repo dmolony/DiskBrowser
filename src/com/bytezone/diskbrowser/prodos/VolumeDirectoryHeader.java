@@ -39,7 +39,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     do
     {
       dataBlocks.add (disk.getDiskAddress (block));
-      byte[] buffer = disk.readSector (block);
+      byte[] buffer = disk.readBlock (block);
       block = HexFormatter.unsignedShort (buffer, 2);
     } while (block > 0);
 
@@ -47,13 +47,13 @@ class VolumeDirectoryHeader extends DirectoryHeader
     //    int bitMapBytes = totalBlocks / 8;                  // one bit per block
     int bitMapBytes = (totalBlocks - 1) / 8 + 1;                  // one bit per block
     byte[] buffer = new byte[bitMapBytes];
-    int bitMapBlocks = (bitMapBytes - 1) / disk.getSectorsPerTrack () + 1;
+    int bitMapBlocks = (bitMapBytes - 1) / disk.getBlocksPerTrack () + 1;
     int lastBitMapBlock = bitMapBlock + bitMapBlocks - 1;
     int ptr = 0;
 
     for (block = bitMapBlock; block <= lastBitMapBlock; block++)
     {
-      byte[] temp = disk.readSector (block);
+      byte[] temp = disk.readBlock (block);
       int bytesToCopy = buffer.length - ptr;
       if (bytesToCopy > temp.length)
         bytesToCopy = temp.length;
@@ -101,7 +101,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     int block = 2;
     do
     {
-      byte[] buf = disk.readSector (block);
+      byte[] buf = disk.readBlock (block);
       blockList.add (buf);
       block = HexFormatter.intValue (buf[2], buf[3]); // next block
     } while (block > 0);

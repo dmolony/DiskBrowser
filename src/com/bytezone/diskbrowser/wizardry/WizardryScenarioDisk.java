@@ -135,7 +135,7 @@ public class WizardryScenarioDisk extends PascalDisk
   public static boolean isWizardryFormat (Disk disk, boolean debug)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = disk.readSector (2);
+    byte[] buffer = disk.readBlock (2);
     int totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
     if (totalFiles != 3)
       return false;
@@ -196,7 +196,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
       nodeSectors.addAll (blocks);
-      byte[] buffer = disk.readSectors (blocks);
+      byte[] buffer = disk.readBlocks (blocks);
       seq = addReward (buffer, blocks, node, seq);
     }
 
@@ -243,7 +243,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
       nodeSectors.addAll (blocks);
-      byte[] buffer = disk.readSectors (blocks);
+      byte[] buffer = disk.readBlocks (blocks);
       addCharacters (buffer, blocks, node);
     }
 
@@ -306,7 +306,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
       nodeSectors.addAll (blocks);
-      byte[] buffer = disk.readSectors (blocks);
+      byte[] buffer = disk.readBlocks (blocks);
       addMonsters (buffer, blocks, node);
     }
 
@@ -363,7 +363,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
       nodeSectors.addAll (blocks);
-      byte[] buffer = disk.readSectors (blocks);
+      byte[] buffer = disk.readBlocks (blocks);
       addItems (buffer, blocks, node);
     }
 
@@ -419,7 +419,7 @@ public class WizardryScenarioDisk extends PascalDisk
     SpellType spellType = SpellType.MAGE;
     for (DiskAddress da : blocks)
     {
-      byte[] buffer = disk.readSector (da);
+      byte[] buffer = disk.readBlock (da);
       int level = 1;
       int ptr = -1;
       while (ptr < 255)
@@ -459,7 +459,7 @@ public class WizardryScenarioDisk extends PascalDisk
 
     for (DiskAddress da : sectors)
     {
-      byte[] tempBuffer = disk.readSector (da);
+      byte[] tempBuffer = disk.readBlock (da);
       System.arraycopy (tempBuffer, 0, buffer, offset, max);
       offset += max;
     }
@@ -518,7 +518,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
       nodeSectors.addAll (blocks);
-      byte[] buffer = disk.readSectors (blocks);
+      byte[] buffer = disk.readBlocks (blocks);
       byte[] data2 = new byte[896];
       System.arraycopy (buffer, 0, data2, 0, data2.length);
       //      System.out.println (HexFormatter.format (data2));
@@ -554,7 +554,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       DiskAddress da = sectors.get (sd.dataOffset + i);
       nodeSectors.add (da);
-      byte[] buffer = disk.readSector (da);
+      byte[] buffer = disk.readBlock (da);
       byte[] exactBuffer = new byte[480];
       System.arraycopy (buffer, 0, exactBuffer, 0, exactBuffer.length);
 
@@ -596,7 +596,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
       nodeSectors.addAll (blocks);
-      byte[] buffer = disk.readSectors (blocks);
+      byte[] buffer = disk.readBlocks (blocks);
 
       for (int ptr = 0; ptr <= buffer.length; ptr += 78)
       {

@@ -50,7 +50,7 @@ public class DefaultAppleFileSource implements AppleFileSource
     this (title, file, owner);
     this.blocks = blocks;
     if (file instanceof DefaultDataSource)
-      ((DefaultDataSource) file).buffer = owner.getDisk ().readSectors (blocks);
+      ((DefaultDataSource) file).buffer = owner.getDisk ().readBlocks (blocks);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -59,7 +59,7 @@ public class DefaultAppleFileSource implements AppleFileSource
   {
     this.blocks = blocks;
     if (file instanceof DefaultDataSource)
-      ((DefaultDataSource) file).buffer = owner.getDisk ().readSectors (blocks);
+      ((DefaultDataSource) file).buffer = owner.getDisk ().readBlocks (blocks);
   }
 
   // ---------------------------------------------------------------------------------//

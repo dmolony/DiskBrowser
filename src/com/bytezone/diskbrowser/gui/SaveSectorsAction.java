@@ -36,7 +36,7 @@ class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
       return;
     }
     byte[] buffer =
-        event.getFormattedDisk ().getDisk ().readSectors (event.getSectors ());
+        event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
 
     JFileChooser fileChooser = new JFileChooser ();
     fileChooser.setDialogTitle ("Save sectors");

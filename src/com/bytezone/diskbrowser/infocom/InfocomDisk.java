@@ -54,7 +54,7 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     setInfocomSectorTypes ();
 
-    data = disk.readSector (3, 0);          // read first sector to get file size
+    data = disk.readBlock (3, 0);          // read first sector to get file size
     data = getBuffer (getWord (26) * 2);    // read entire file into data buffer
 
     if (false)
@@ -131,7 +131,7 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     for (int track = 0; track < 3; track++)
       for (int sector = 0; sector < 16; sector++)
-        if (!disk.isSectorEmpty (track, sector))
+        if (!disk.isBlockEmpty (track, sector))
           sectorTypes[track * 16 + sector] = bootSector;
   }
 
@@ -148,7 +148,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     while (blockNo <= blockTo)
     {
       blocks.add (disk.getDiskAddress (blockNo));
-      if (!disk.isSectorEmpty (blockNo))
+      if (!disk.isBlockEmpty (blockNo))
         sectorTypes[blockNo] = type;
       blockNo++;
     }
@@ -164,11 +164,11 @@ public class InfocomDisk extends AbstractFormattedDisk
     int fileSize = 0;
     for (DiskAddress da : disk)
     {
-      if (da.getBlock () > startBlock && disk.isSectorEmpty (da))
+      if (da.getBlockNo () > startBlock && disk.isBlockEmpty (da))
       {
         System.out.println ("Empty : " + da);
-        buffer = disk.readSector (da.getBlock () - 1);
-        fileSize = (da.getBlock () - 48) * disk.getBlockSize ();
+        buffer = disk.readBlock (da.getBlockNo () - 1);
+        fileSize = (da.getBlockNo () - 48) * disk.getBlockSize ();
         break;
       }
     }
@@ -193,7 +193,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     for (int track = 3, ptr = 0; track < 35; track++)
       for (int sector = 0; sector < 16; sector++, ptr += BLOCK_SIZE)
       {
-        byte[] temp = disk.readSector (track, sector);
+        byte[] temp = disk.readBlock (track, sector);
         int spaceLeft = fileSize - ptr;
         if (spaceLeft <= BLOCK_SIZE)
         {
@@ -247,7 +247,7 @@ public class InfocomDisk extends AbstractFormattedDisk
   public static boolean checkFormat (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = disk.readSector (3, 0);
+    byte[] buffer = disk.readBlock (3, 0);
 
     int version = buffer[0] & 0xFF;
     int highMemory = HexFormatter.intValue (buffer[5], buffer[4]);

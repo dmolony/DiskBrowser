@@ -17,7 +17,7 @@ public class AppleDiskAddress implements DiskAddress
   {
     this.owner = owner;
     this.block = block;
-    int sectorsPerTrack = owner.getSectorsPerTrack ();
+    int sectorsPerTrack = owner.getBlocksPerTrack ();
     if (sectorsPerTrack == 0)
     {
       track = 0;
@@ -38,7 +38,7 @@ public class AppleDiskAddress implements DiskAddress
     zeroFlag = (track & 0x40) != 0;
     this.track = track & 0x3F;
     this.sector = sector & 0x1F;
-    this.block = this.track * owner.getSectorsPerTrack () + this.sector;
+    this.block = this.track * owner.getBlocksPerTrack () + this.sector;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -53,7 +53,7 @@ public class AppleDiskAddress implements DiskAddress
   public int compareTo (DiskAddress that)
   // ---------------------------------------------------------------------------------//
   {
-    return this.block - that.getBlock ();
+    return this.block - that.getBlockNo ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -63,12 +63,12 @@ public class AppleDiskAddress implements DiskAddress
   {
     if (that == null)
       return false;
-    return this.block == that.getBlock ();
+    return this.block == that.getBlockNo ();
   }
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public int getBlock ()
+  public int getBlockNo ()
   // ---------------------------------------------------------------------------------//
   {
     return block;
@@ -76,7 +76,7 @@ public class AppleDiskAddress implements DiskAddress
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public int getSector ()
+  public int getSectorNo ()
   // ---------------------------------------------------------------------------------//
   {
     return sector;
@@ -84,7 +84,7 @@ public class AppleDiskAddress implements DiskAddress
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public int getTrack ()
+  public int getTrackNo ()
   // ---------------------------------------------------------------------------------//
   {
     return track;

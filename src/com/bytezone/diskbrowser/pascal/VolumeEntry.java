@@ -30,7 +30,7 @@ class VolumeEntry extends CatalogEntry
     if (file != null)
       return file;
 
-    byte[] buffer = parent.getDisk ().readSectors (blocks);
+    byte[] buffer = parent.getDisk ().readBlocks (blocks);
     file = new DefaultAppleFile (name, buffer);
 
     return file;

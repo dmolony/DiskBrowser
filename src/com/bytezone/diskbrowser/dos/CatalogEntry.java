@@ -19,18 +19,19 @@ class CatalogEntry extends AbstractCatalogEntry
   {
     super (dosDisk, catalogSector, entryBuffer); // build lists of ts and data sectors
 
-    if (reportedSize > 0 && disk.isValidAddress (entryBuffer[0], entryBuffer[1]))
+    //    if (reportedSize > 0 && disk.isValidAddress (entryBuffer[0], entryBuffer[1]))
+    if (disk.isValidAddress (entryBuffer[0], entryBuffer[1]))
     {
       // Get address of first TS-list sector
       DiskAddress da = disk.getDiskAddress (entryBuffer[0], entryBuffer[1]);
 
       // Loop through all TS-list sectors
-      loop: while (da.getBlock () > 0 || ((AppleDiskAddress) da).zeroFlag ())
+      loop: while (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ())
       {
         if (dosDisk.stillAvailable (da))
         {
           if (isValidCatalogSector (da))
-            dosDisk.sectorTypes[da.getBlock ()] = dosDisk.tsListSector;
+            dosDisk.sectorTypes[da.getBlockNo ()] = dosDisk.tsListSector;
           else
           {
             System.out.printf ("Attempt to assign invalid TS sector " + ": %s from %s%n",
@@ -46,7 +47,7 @@ class CatalogEntry extends AbstractCatalogEntry
           break;
         }
         tsSectors.add (da);
-        byte[] sectorBuffer = disk.readSector (da);
+        byte[] sectorBuffer = disk.readBlock (da);
 
         int startPtr = 12;
         // the tsList *should* start at 0xC0, but some disks start in the unused bytes
@@ -69,7 +70,7 @@ class CatalogEntry extends AbstractCatalogEntry
                 i, sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
             break loop;
           }
-          if (da.getBlock () == 0 && !((AppleDiskAddress) da).zeroFlag ())
+          if (da.getBlockNo () == 0 && !((AppleDiskAddress) da).zeroFlag ())
           {
             if (fileType != FileType.Text)
               break;
@@ -80,7 +81,7 @@ class CatalogEntry extends AbstractCatalogEntry
           {
             dataSectors.add (da);
             if (dosDisk.stillAvailable (da))
-              dosDisk.sectorTypes[da.getBlock ()] = dosDisk.dataSector;
+              dosDisk.sectorTypes[da.getBlockNo ()] = dosDisk.dataSector;
             else
             {
               System.out
@@ -125,7 +126,7 @@ class CatalogEntry extends AbstractCatalogEntry
     }
     else if (dataSectors.size () > 0)       // get the file length
     {
-      byte[] buffer = disk.readSector (dataSectors.get (0));
+      byte[] buffer = disk.readBlock (dataSectors.get (0));
       switch (fileType)
       {
         case IntegerBasic:
@@ -144,13 +145,13 @@ class CatalogEntry extends AbstractCatalogEntry
   private boolean isValidCatalogSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = da.readSector ();
+    byte[] buffer = da.readBlock ();
 
     if (!da.getDisk ().isValidAddress (buffer[1], buffer[2]))
       return false;
     if (buffer[3] != 0 || buffer[4] != 0)         // not supposed to be used
       // Diags2E.dsk stores its own sector address here
-      if (da.getTrack () != (buffer[3] & 0xFF) && da.getSector () != (buffer[4] & 0xFF))
+      if (da.getTrackNo () != (buffer[3] & 0xFF) && da.getSectorNo () != (buffer[4] & 0xFF))
         return false;
 
     return true;

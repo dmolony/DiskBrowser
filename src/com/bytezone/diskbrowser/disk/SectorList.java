@@ -28,7 +28,7 @@ public class SectorList extends AbstractFile
     {
       if (!disk.isValidAddress (da))
         break;
-      byte[] tempBuffer = disk.readSector (da);
+      byte[] tempBuffer = disk.readBlock (da);
       System.arraycopy (tempBuffer, 0, buffer, ptr, disk.getBlockSize ());
       ptr += disk.getBlockSize ();
     }
@@ -50,7 +50,7 @@ public class SectorList extends AbstractFile
       if (owner == null)
         owner = "";
       text.append (
-          String.format (" %04X  %-18s  %s%n", da.getBlock (), sectorType.name, owner));
+          String.format (" %04X  %-18s  %s%n", da.getBlockNo (), sectorType.name, owner));
     }
 
     return text.toString ();

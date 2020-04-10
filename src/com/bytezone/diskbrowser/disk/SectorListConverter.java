@@ -45,7 +45,7 @@ public class SectorListConverter
 
     for (DiskAddress da : sectors)
     {
-      if (da.getBlock () == firstBlock + 1 + runLength)
+      if (da.getBlockNo () == firstBlock + 1 + runLength)
       {
         ++runLength;
         continue;
@@ -54,7 +54,7 @@ public class SectorListConverter
       if (firstBlock >= 0)
         addToText (text, firstBlock, runLength);
 
-      firstBlock = da.getBlock ();
+      firstBlock = da.getBlockNo ();
       runLength = 0;
     }
     addToText (text, firstBlock, runLength);

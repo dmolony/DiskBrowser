@@ -70,11 +70,11 @@ public class ProdosDisk extends AbstractFormattedDisk
     sectorTypesList.add (extendedKeySector);
 
     for (int block = 0; block < 2; block++)
-      if (!disk.isSectorEmpty (disk.getDiskAddress (block)))
+      if (!disk.isBlockEmpty (disk.getDiskAddress (block)))
         sectorTypes[block] = dosSector;
 
     DiskAddress da = disk.getDiskAddress (0);
-    byte[] buffer = disk.readSector (da);
+    byte[] buffer = disk.readBlock (da);
     bootSector = new BootSector (disk, buffer, "Prodos", da);
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
@@ -86,7 +86,7 @@ public class ProdosDisk extends AbstractFormattedDisk
 
     for (DiskAddress da2 : disk)
     {
-      int blockNo = da2.getBlock ();
+      int blockNo = da2.getBlockNo ();
       if (freeBlocks.get (blockNo))
       {
         if (!stillAvailable (da2))
@@ -113,8 +113,8 @@ public class ProdosDisk extends AbstractFormattedDisk
 
     do
     {
-      byte[] sectorBuffer = disk.readSector (block);
-      if (!disk.isSectorEmpty (block))
+      byte[] sectorBuffer = disk.readBlock (block);
+      if (!disk.isBlockEmpty (block))
         sectorTypes[block] = currentSectorType;
 
       int max = disk.getBlockSize () - ProdosConstants.ENTRY_SIZE;
@@ -135,7 +135,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             assert vdh.entryLength == ProdosConstants.ENTRY_SIZE;
             headerEntries.add (vdh);
             currentSectorType = catalogSector;
-            if (!disk.isSectorEmpty (block))
+            if (!disk.isBlockEmpty (block))
               sectorTypes[block] = currentSectorType;
             for (int i = 0; i < vdh.totalBitMapBlocks; i++)
               sectorTypes[vdh.bitMapBlock + i] = volumeMapSector;
@@ -147,7 +147,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             localHeader = new SubDirectoryHeader (this, entry, parent);
             headerEntries.add (localHeader);
             currentSectorType = subcatalogSector;
-            if (!disk.isSectorEmpty (block))
+            if (!disk.isBlockEmpty (block))
               sectorTypes[block] = currentSectorType;
             break;
 
@@ -221,7 +221,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   public static boolean checkFormat (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = disk.readSector (2);          // Prodos KEY BLOCK
+    byte[] buffer = disk.readBlock (2);          // Prodos KEY BLOCK
     if (debug)
     {
       System.out.println (HexFormatter.format (buffer));
@@ -271,11 +271,11 @@ public class ProdosDisk extends AbstractFormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    if (da.getBlock () == 0)
+    if (da.getBlockNo () == 0)
       return bootSector;
 
-    byte[] buffer = disk.readSector (da);
-    SectorType type = sectorTypes[da.getBlock ()];
+    byte[] buffer = disk.readBlock (da);
+    SectorType type = sectorTypes[da.getBlockNo ()];
 
     if (type == catalogSector || type == subcatalogSector)
       return new ProdosCatalogSector (this, disk, buffer, da);

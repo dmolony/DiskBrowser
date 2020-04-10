@@ -71,20 +71,20 @@ public class DosDisk extends AbstractFormattedDisk
     sectorTypesList.add (dataSector);
 
     DiskAddress da = disk.getDiskAddress (0, 0);
-    byte[] sectorBuffer = disk.readSector (da);               // Boot sector
+    byte[] sectorBuffer = disk.readBlock (da);               // Boot sector
     bootSector = new BootSector (disk, sectorBuffer, "DOS", da);
 
     da = disk.getDiskAddress (CATALOG_TRACK, VTOC_SECTOR);
-    sectorBuffer = disk.readSector (da);          // VTOC
+    sectorBuffer = disk.readBlock (da);          // VTOC
     dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer, da);
-    sectorTypes[da.getBlock ()] = vtocSector;
+    sectorTypes[da.getBlockNo ()] = vtocSector;
 
     DiskAddress catalogStart = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
     if (dosVTOCSector.sectorSize != disk.getBlockSize ())
       System.out.printf ("%s - invalid sector size : %d%n", disk.getFile ().getName (),
           dosVTOCSector.sectorSize);
-    if (dosVTOCSector.maxSectors != disk.getSectorsPerTrack ())
+    if (dosVTOCSector.maxSectors != disk.getBlocksPerTrack ())
       System.out.printf ("%s - invalid sectors per track : %d%n",
           disk.getFile ().getName (), dosVTOCSector.maxSectors);
 
@@ -105,12 +105,12 @@ public class DosDisk extends AbstractFormattedDisk
     rootNode.add (volumeNode);
 
     // flag the catalog sectors before any file mistakenly grabs them
-    da = disk.getDiskAddress (catalogStart.getBlock ());
+    da = disk.getDiskAddress (catalogStart.getBlockNo ());
     do
     {
       if (!disk.isValidAddress (da))
         break;
-      sectorBuffer = disk.readSector (da);
+      sectorBuffer = disk.readBlock (da);
       if (!disk.isValidAddress (sectorBuffer[1], sectorBuffer[2]))
         break;
 
@@ -123,7 +123,7 @@ public class DosDisk extends AbstractFormattedDisk
       //        break;
       //      }
 
-      sectorTypes[da.getBlock ()] = catalogSector;
+      sectorTypes[da.getBlockNo ()] = catalogSector;
 
       int track = sectorBuffer[1] & 0xFF;
       int sector = sectorBuffer[2] & 0xFF;
@@ -132,15 +132,15 @@ public class DosDisk extends AbstractFormattedDisk
 
       da = disk.getDiskAddress (track, sector);
 
-    } while (da.getBlock () != 0);
+    } while (da.getBlockNo () != 0);
 
     // same loop, but now all the catalog sectors are properly flagged
-    da = disk.getDiskAddress (catalogStart.getBlock ());
+    da = disk.getDiskAddress (catalogStart.getBlockNo ());
     do
     {
       if (!disk.isValidAddress (da))
         break;
-      sectorBuffer = disk.readSector (da);
+      sectorBuffer = disk.readBlock (da);
       if (!disk.isValidAddress (sectorBuffer[1], sectorBuffer[2]))
         break;
 
@@ -186,7 +186,7 @@ public class DosDisk extends AbstractFormattedDisk
 
       da = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
-    } while (da.getBlock () != 0);
+    } while (da.getBlockNo () != 0);
 
     // link double hi-res files
     for (AppleFileSource fe : fileEntries)
@@ -210,7 +210,7 @@ public class DosDisk extends AbstractFormattedDisk
     int lastDosSector = dosVTOCSector.maxSectors * 3;       // first three tracks
     for (DiskAddress da2 : disk)
     {
-      int blockNo = da2.getBlock ();
+      int blockNo = da2.getBlockNo ();
       if (blockNo < lastDosSector) // in the DOS region
       {
         if (freeBlocks.get (blockNo))                       // according to the VTOC
@@ -277,7 +277,7 @@ public class DosDisk extends AbstractFormattedDisk
       return true;
     }
 
-    if (disk.getSectorsPerTrack () > 16)
+    if (disk.getBlocksPerTrack () > 16)
       return false;
 
     int[] cb = new int[3];
@@ -342,7 +342,7 @@ public class DosDisk extends AbstractFormattedDisk
   private static int checkFormat (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = disk.readSector (0x11, 0x00);
+    byte[] buffer = disk.readBlock (0x11, 0x00);
 
     // DISCCOMMANDER.DSK uses track 0x17 for the catalog
     //    if (buffer[1] != 0x11) // first catalog track
@@ -386,7 +386,7 @@ public class DosDisk extends AbstractFormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     DiskAddress catalogStart = disk.getDiskAddress (buffer[1], buffer[2]);
-    DiskAddress da = disk.getDiskAddress (catalogStart.getBlock ());
+    DiskAddress da = disk.getDiskAddress (catalogStart.getBlockNo ());
     List<DiskAddress> catalogAddresses = new ArrayList<> ();
 
     do
@@ -408,7 +408,7 @@ public class DosDisk extends AbstractFormattedDisk
         return 0;
       }
 
-      buffer = disk.readSector (da);
+      buffer = disk.readBlock (da);
       if (!disk.isValidAddress (buffer[1], buffer[2]))
       {
         if (debug)
@@ -420,7 +420,7 @@ public class DosDisk extends AbstractFormattedDisk
 
       da = disk.getDiskAddress (buffer[1], buffer[2]);
 
-    } while (da.getBlock () != 0);
+    } while (da.getBlockNo () != 0);
 
     if (debug)
       System.out.printf ("Catalog blocks: %d%n", catalogAddresses.size ());
@@ -432,7 +432,7 @@ public class DosDisk extends AbstractFormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     for (DiskAddress diskAddress : catalogAddresses)
-      if (diskAddress.getBlock () == da.getBlock ())
+      if (diskAddress.getBlockNo () == da.getBlockNo ())
         return true;
     return false;
   }
@@ -460,14 +460,14 @@ public class DosDisk extends AbstractFormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    SectorType type = sectorTypes[da.getBlock ()];
+    SectorType type = sectorTypes[da.getBlockNo ()];
     if (type == vtocSector)
       return dosVTOCSector;
-    if (da.getBlock () == 0)
+    if (da.getBlockNo () == 0)
       return bootSector;
 
-    byte[] buffer = disk.readSector (da);
-    String address = String.format ("%02X %02X", da.getTrack (), da.getSector ());
+    byte[] buffer = disk.readBlock (da);
+    String address = String.format ("%02X %02X", da.getTrackNo (), da.getSectorNo ());
 
     if (type == tsListSector)
       return new DosTSListSector (getSectorFilename (da), disk, buffer, da);

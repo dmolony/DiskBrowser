@@ -42,7 +42,7 @@ public class DosDisk extends AbstractFormattedDisk
 
   protected List<AppleFileSource> deletedFileEntries = new ArrayList<> ();
 
-  private static boolean debug = false;
+  private static boolean debug = true;
 
   enum FileType
   {
@@ -82,9 +82,11 @@ public class DosDisk extends AbstractFormattedDisk
     DiskAddress catalogStart = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
     if (dosVTOCSector.sectorSize != disk.getBlockSize ())
-      System.out.println ("Invalid sector size : " + dosVTOCSector.sectorSize);
+      System.out.printf ("%s - invalid sector size : %d%n", disk.getFile ().getName (),
+          dosVTOCSector.sectorSize);
     if (dosVTOCSector.maxSectors != disk.getSectorsPerTrack ())
-      System.out.println ("Invalid sectors per track : " + dosVTOCSector.maxSectors);
+      System.out.printf ("%s - invalid sectors per track : %d%n",
+          disk.getFile ().getName (), dosVTOCSector.maxSectors);
 
     //    sectorTypes[CATALOG_TRACK * dosVTOCSector.maxSectors] = vtocSector;
 
@@ -269,9 +271,9 @@ public class DosDisk extends AbstractFormattedDisk
   public static boolean isCorrectFormat (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    if (false)
+    if (false)            // testing
     {
-      disk.setInterleave (2);
+      disk.setInterleave (1);
       return true;
     }
 
@@ -279,27 +281,31 @@ public class DosDisk extends AbstractFormattedDisk
       return false;
 
     int[] cb = new int[3];
+    int best = 0;
+    int il = -1;
+
     for (int interleave = 0; interleave < 3; interleave++)
     {
       if (debug)
         System.out.printf ("Checking interleave %d%n", interleave);
+
       disk.setInterleave (interleave);
       cb[interleave] = checkFormat (disk);
-      if (cb[interleave] > 3)
+      if (cb[interleave] >= 15)
         return true;
+
+      if (cb[interleave] > best)
+      {
+        best = cb[interleave];
+        il = interleave;
+      }
     }
 
-    for (int max = 2; max > 0; max--)
-      for (int interleave = 0; interleave < 3; interleave++)
-      {
-        if (cb[interleave] >= max)
-        {
-          disk.setInterleave (interleave);
-          return true;
-        }
-      }
+    if (best == 0)
+      return false;
 
-    return false;
+    disk.setInterleave (il);
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -347,7 +353,8 @@ public class DosDisk extends AbstractFormattedDisk
 
     if (buffer[53] != 16 && buffer[53] != 13 && buffer[53] != 32)  // sectors per track
     {
-      System.out.printf ("Bad sectors per track : %02X%n", buffer[53]);
+      if (debug)
+        System.out.printf ("Bad sectors per track : %02X%n", buffer[53]);
       return 0;
     }
 
@@ -394,9 +401,10 @@ public class DosDisk extends AbstractFormattedDisk
         return 0;
       }
 
-      if (catalogAddresses.contains (da))
+      if (isDuplicate (catalogAddresses, da))
       {
-        System.out.println ("Catalog looping");
+        if (debug)
+          System.out.println ("Catalog looping");
         return 0;
       }
 
@@ -417,6 +425,16 @@ public class DosDisk extends AbstractFormattedDisk
     if (debug)
       System.out.printf ("Catalog blocks: %d%n", catalogAddresses.size ());
     return catalogAddresses.size ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static boolean isDuplicate (List<DiskAddress> catalogAddresses, DiskAddress da)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (DiskAddress diskAddress : catalogAddresses)
+      if (diskAddress.getBlock () == da.getBlock ())
+        return true;
+    return false;
   }
 
   // ---------------------------------------------------------------------------------//

@@ -14,7 +14,7 @@ public interface ApplesoftConstants
                      "COLOR=", "POP ", "VTAB ", "HIMEM:",           // 0xA0
                      "LOMEM:", "ONERR ", "RESUME", "RECALL  ",      // 0xA4 - 0xA7
                      "STORE ", "SPEED=", "LET ", "GOTO ",           // 0xA8
-                     "RUN ", "IF ", "RESTORE ", "& ",               // 0xAC
+                     "RUN ", "IF ", "RESTORE ", "&",                // 0xAC
                      "GOSUB ", "RETURN ", "REM ", "STOP ",          // 0xB0
                      "ON ", "WAIT ", "LOAD ", "SAVE ",              // 0xB4
                      "DEF", "POKE ", "PRINT ", "CONT",              // 0xB8

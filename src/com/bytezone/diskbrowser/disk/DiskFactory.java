@@ -30,7 +30,7 @@ import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 public class DiskFactory
 // -----------------------------------------------------------------------------------//
 {
-  private static boolean debug = false;
+  private static boolean debug = true;
 
   // ---------------------------------------------------------------------------------//
   private DiskFactory ()
@@ -199,7 +199,9 @@ public class DiskFactory
       return new DataDisk (appleDisk);
     }
 
-    if (((suffix.equals ("po") || suffix.equals ("dsk")) && file.length () > 143360))
+    // Toolkit.do = 143488
+    if (((suffix.equals ("po") || suffix.equals ("dsk") || suffix.equals ("do"))
+        && file.length () > 143360))
     {
       if (file.length () < 143500)        // slightly bigger than a floppy
       {
@@ -359,7 +361,7 @@ public class DiskFactory
           System.out.println ("  empty sector checksum : " + checksum);
       }
       else if (checksum == 3176296590L  //
-          || checksum == 108825457L     //
+          || checksum == 108825457L     // ARCBOOT.DSK (looping)
           || checksum == 1439356606L    //
           || checksum == 1550012074L    //
           || checksum == 1614602459L    //

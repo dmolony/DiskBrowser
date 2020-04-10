@@ -259,7 +259,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     int abbreviationsTable = HexFormatter.intValue (buffer[25], buffer[24]);
     int fileLength = HexFormatter.intValue (buffer[27], buffer[26]);
 
-    if (true)
+    if (false)
     {
       System.out.printf ("Version         %,6d%n", version);
       System.out.printf ("Abbreviations   %,6d%n", abbreviationsTable);

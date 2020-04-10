@@ -69,7 +69,15 @@ class DosTSListSector extends AbstractSector
     StringBuilder text = getHeader ("TS List Sector : " + name);
     addText (text, buffer, 0, 1, "Not used");
     addText (text, buffer, 1, 2, "Next TS list track/sector" + msg);
-    addText (text, buffer, 3, 2, "Not used");
+
+    if ((buffer[3] != 0 || buffer[4] != 0)         // not supposed to be used
+        // Diags2E.dsk stores its own sector address here
+        && (diskAddress.getTrack () == (buffer[3] & 0xFF)
+            && diskAddress.getSector () == (buffer[4] & 0xFF)))
+      addText (text, buffer, 3, 2, "Self-reference");
+    else
+      addText (text, buffer, 3, 2, "Not used");
+
     addTextAndDecimal (text, buffer, 5, 2, "Sector base number");
     addText (text, buffer, 7, 4, "Not used");
     addText (text, buffer, 11, 1, "Not used");

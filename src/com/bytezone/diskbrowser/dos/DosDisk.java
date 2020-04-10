@@ -269,50 +269,35 @@ public class DosDisk extends AbstractFormattedDisk
   public static boolean isCorrectFormat (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    if (debug)
-      System.out.println ("Checking interleave 0");
-    disk.setInterleave (0);
-
-    int catalogBlocks0 = checkFormat (disk);
-    if (catalogBlocks0 > 3)
-      return true;
-
-    if (disk.getSectorsPerTrack () > 16)
-      return false;
-
-    if (debug)
-      System.out.println ("Checking interleave 1");
-    disk.setInterleave (1);
-
-    int catalogBlocks1 = checkFormat (disk);
-    if (catalogBlocks1 > 3)
-      return true;
-
-    if (debug)
-      System.out.println ("Checking interleave 2");
-    disk.setInterleave (2);
-
-    int catalogBlocks2 = checkFormat (disk);
-    if (catalogBlocks2 > 3)
-      return true;
-
-    if (catalogBlocks0 > 0)
-    {
-      disk.setInterleave (0);
-      return true;
-    }
-
-    if (catalogBlocks1 > 0)
-    {
-      disk.setInterleave (1);
-      return true;
-    }
-
-    if (catalogBlocks2 > 0)
+    if (false)
     {
       disk.setInterleave (2);
       return true;
     }
+
+    if (disk.getSectorsPerTrack () > 16)
+      return false;
+
+    int[] cb = new int[3];
+    for (int interleave = 0; interleave < 3; interleave++)
+    {
+      if (debug)
+        System.out.printf ("Checking interleave %d%n", interleave);
+      disk.setInterleave (interleave);
+      cb[interleave] = checkFormat (disk);
+      if (cb[interleave] > 3)
+        return true;
+    }
+
+    for (int max = 2; max > 0; max--)
+      for (int interleave = 0; interleave < 3; interleave++)
+      {
+        if (cb[interleave] >= max)
+        {
+          disk.setInterleave (interleave);
+          return true;
+        }
+      }
 
     return false;
   }

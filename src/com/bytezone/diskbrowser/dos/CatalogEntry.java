@@ -148,8 +148,10 @@ class CatalogEntry extends AbstractCatalogEntry
 
     if (!da.getDisk ().isValidAddress (buffer[1], buffer[2]))
       return false;
-    if (buffer[4] != 0)
-      return false;
+    if (buffer[3] != 0 || buffer[4] != 0)         // not supposed to be used
+      // Diags2E.dsk stores its own sector address here
+      if (da.getTrack () != (buffer[3] & 0xFF) && da.getSector () != (buffer[4] & 0xFF))
+        return false;
 
     return true;
   }

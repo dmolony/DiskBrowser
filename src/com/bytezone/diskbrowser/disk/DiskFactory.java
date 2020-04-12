@@ -30,7 +30,7 @@ import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
 public class DiskFactory
 // -----------------------------------------------------------------------------------//
 {
-  private static boolean debug = true;
+  private static boolean debug = false;
 
   // ---------------------------------------------------------------------------------//
   private DiskFactory ()

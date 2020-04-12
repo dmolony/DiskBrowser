@@ -13,13 +13,11 @@ import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.nib.NibFile;
 import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
 public class AppleDisk implements Disk
@@ -105,54 +103,28 @@ public class AppleDisk implements Disk
     assert (file.length () <= Integer.MAX_VALUE) : "File too large";
     assert (file.length () != 0) : "File empty";
 
-    String name = file.getName ();
-    int pos = name.lastIndexOf ('.');
+    String fileName = file.getName ();
 
-    String suffix = pos > 0 ? name.substring (pos + 1) : "";
+    int pos = fileName.lastIndexOf ('.');
+    String suffix = pos > 0 ? fileName.substring (pos + 1) : "";
 
     byte[] buffer = getPrefix (file);         // HDV could be a 2mg
     String prefix = new String (buffer, 0, 4);
 
-    if (suffix.equalsIgnoreCase ("2mg") || "2IMG".equals (prefix))
+    if ("2mg".equalsIgnoreCase (suffix) || "2IMG".equals (prefix))
     {
-      if (debug)
-        System.out.println (Utility.toHex (buffer));
-
-      // http://apple2.org.za/gswv/a2zine/Docs/DiskImage_2MG_Info.txt
       if ("2IMG".equals (prefix))
       {
+        Prefix2mg prefix2mg = new Prefix2mg (buffer);
         if (debug)
-        {
-          String creator = new String (buffer, 4, 4);
-          System.out.printf ("Prefix    : %s%n", prefix);
-          System.out.printf ("Creator   : %s%n", creator);
-          int headerSize = Utility.getWord (buffer, 8);
-          System.out.printf ("Header    : %d%n", headerSize);
-          int version = Utility.getWord (buffer, 10);
-          System.out.printf ("Version   : %d%n", version);
-          System.out.printf ("Format    : %02X%n", buffer[12]);
-        }
+          System.out.println (prefix2mg);
 
-        int diskData = Utility.getLong (buffer, 28);
-        blocks = HexFormatter.intValue (buffer[20], buffer[21]);       // 1600
-
-        if (debug)
-        {
-          System.out.printf ("Data size : %08X (%,d)%n", diskData, diskData);
-          System.out.printf ("Blocks    : %,d%n", blocks);
-        }
-
-        if (diskData > 0)
-          this.blocks = diskData / 4096 * 8;    // reduce blocks to a multiple of 8
-
-        // see /Asimov disks/images/gs/os/prodos16/ProDOS 16v1_3.2mg
-
-        if (debug)
-          System.out.printf ("Blocks    : %,d%n", blocks);
+        if (prefix2mg.diskData > 0)
+          this.blocks = prefix2mg.diskData / 4096 * 8;    // reduce blocks to a multiple of 8
 
         this.sectorSize = 512;
         this.trackSize = 8 * sectorSize;
-        skip = Utility.getWord (buffer, 8);
+        skip = prefix2mg.headerSize;
 
         tracks = blocks / 8;          // change parameter!
         sectors = 8;                  // change parameter!
@@ -175,26 +147,23 @@ public class AppleDisk implements Disk
       this.sectorSize = 512;
       this.trackSize = sectors * sectorSize;
     }
+    else if (file.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4
+    {
+      this.blocks = tracks * sectors;
+      this.sectorSize = 512;
+      this.trackSize = sectors * sectorSize;
+    }
+    else if (file.length () == 819200 && tracks == 50 && sectors == 32)    // unidisk
+    {
+      this.blocks = tracks * sectors;
+      this.sectorSize = 256;
+      this.trackSize = sectors * sectorSize;
+    }
     else
     {
-      if (file.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4
-      {
-        this.blocks = tracks * sectors;
-        this.sectorSize = 512;
-        this.trackSize = sectors * sectorSize;
-      }
-      else if (file.length () == 819200 && tracks == 50 && sectors == 32)    // unidisk
-      {
-        this.blocks = tracks * sectors;
-        this.sectorSize = 256;
-        this.trackSize = sectors * sectorSize;
-      }
-      else
-      {
-        this.blocks = tracks * sectors;
-        this.sectorSize = (int) file.length () / blocks;
-        this.trackSize = sectors * sectorSize;
-      }
+      this.blocks = tracks * sectors;
+      this.sectorSize = (int) file.length () / blocks;
+      this.trackSize = sectors * sectorSize;
     }
 
     if (sectorSize != 256 && sectorSize != 512)
@@ -229,7 +198,6 @@ public class AppleDisk implements Disk
       if (skip > 0)
         in.skip (skip);
       in.read (diskBuffer);
-      //      in.close ();
     }
     catch (IOException e)
     {
@@ -241,7 +209,7 @@ public class AppleDisk implements Disk
   }
 
   // ---------------------------------------------------------------------------------//
-  void switchToDos ()       // experimental
+  void switchToDos ()
   // ---------------------------------------------------------------------------------//
   {
     sectorSize = 256;
@@ -310,11 +278,9 @@ public class AppleDisk implements Disk
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = new byte[64];
-    try
+    try (BufferedInputStream file = new BufferedInputStream (new FileInputStream (path)))
     {
-      BufferedInputStream file = new BufferedInputStream (new FileInputStream (path));
       file.read (buffer);
-      file.close ();
     }
     catch (IOException e)
     {
@@ -329,35 +295,10 @@ public class AppleDisk implements Disk
   private void checkSectorsForData ()
   // ---------------------------------------------------------------------------------//
   {
-    if (true)
-    {
-      checkSectorsFaster ();
-      return;
-    }
     // force blockList to be rebuilt with the correct number/size of blocks
     blockList = null;
 
-    for (DiskAddress da : this)         // uses blockList.iterator
-    {
-      byte[] buffer = readBlock (da);
-      hasData[da.getBlockNo ()] = false;
-      for (int i = 0; i < sectorSize; i++)
-        if (buffer[i] != emptyByte)
-        {
-          hasData[da.getBlockNo ()] = true;
-          break;
-        }
-    }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void checkSectorsFaster ()
-  // ---------------------------------------------------------------------------------//
-  {
-    // force blockList to be rebuilt with the correct number/size of blocks
-    blockList = null;
-
-    for (DiskAddress da : this)         // uses blockList.iterator
+    for (DiskAddress da : this)
     {
       if (sectorSize == SECTOR_SIZE)                    // 256 byte sectors
       {
@@ -450,24 +391,6 @@ public class AppleDisk implements Disk
   {
     return !hasData[getDiskAddress (track, sector).getBlockNo ()];
   }
-
-  //  @Override
-  //  public boolean isSectorMissing (DiskAddress da)
-  //  {
-  //    return isMissing[da.getBlock ()];
-  //  }
-  //
-  //  @Override
-  //  public boolean isSectorMissing (int block)
-  //  {
-  //    return isMissing[block];
-  //  }
-  //
-  //  @Override
-  //  public boolean isSectorMissing (int track, int sector)
-  //  {
-  //    return isMissing[getDiskAddress (track, sector).getBlock ()];
-  //  }
 
   // ---------------------------------------------------------------------------------//
   @Override
@@ -647,10 +570,8 @@ public class AppleDisk implements Disk
     return da != null && isValidAddress (da.getTrackNo (), da.getSectorNo ());
   }
 
-  /*
-   * This is the only method that transfers data from the disk buffer to an output buffer.
-   * It handles sectors of 256 or 512 bytes, and both linear and interleaved sectors.
-   */
+  // This is the only method that transfers data from the disk buffer to an output buffer.
+  // It handles sectors of 256 or 512 bytes, and both linear and interleaved sectors.
   // ---------------------------------------------------------------------------------//
   private void readBuffer (DiskAddress da, byte[] buffer, int bufferOffset)
   // ---------------------------------------------------------------------------------//

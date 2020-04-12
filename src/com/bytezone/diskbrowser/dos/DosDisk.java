@@ -42,7 +42,7 @@ public class DosDisk extends AbstractFormattedDisk
 
   protected List<AppleFileSource> deletedFileEntries = new ArrayList<> ();
 
-  private static boolean debug = true;
+  private static boolean debug = false;
 
   enum FileType
   {

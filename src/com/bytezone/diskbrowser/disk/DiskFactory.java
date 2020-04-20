@@ -49,6 +49,19 @@ public class DiskFactory
   public static FormattedDisk createDisk (String path)
   // ---------------------------------------------------------------------------------//
   {
+    FormattedDisk disk = create (path);
+    if (disk.getDisk ().getInterleave () > 0)
+    {
+      System.out.println (disk);
+      System.out.println ();
+    }
+    return disk;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static FormattedDisk create (String path)
+  // ---------------------------------------------------------------------------------//
+  {
     if (debug)
       System.out.println ("\nFactory : " + path);
 

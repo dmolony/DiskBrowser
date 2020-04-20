@@ -335,12 +335,14 @@ public class ProdosDisk extends AbstractFormattedDisk
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuffer text = new StringBuffer ();
+    StringBuilder text = new StringBuilder ();
     String newLine = String.format ("%n");
 
     VolumeDirectoryHeader volumeDirectory = (VolumeDirectoryHeader) headerEntries.get (0);
     String timeC = volumeDirectory.created == null ? ""
         : df.format (volumeDirectory.created.getTime ());
+
+    text.append (String.format ("Disk name          : %s%n", getDisplayPath ()));
     text.append ("Volume name        : " + volumeDirectory.name + newLine);
     text.append ("Creation date      : " + timeC + newLine);
     text.append ("ProDOS version     : " + volumeDirectory.version + newLine);
@@ -351,6 +353,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     text.append ("File count         : " + volumeDirectory.fileCount + newLine);
     text.append ("Bitmap block       : " + volumeDirectory.bitMapBlock + newLine);
     text.append ("Total blocks       : " + volumeDirectory.totalBlocks + newLine);
+    text.append (String.format ("Interleave         : %d", disk.getInterleave ()));
 
     return text.toString ();
   }

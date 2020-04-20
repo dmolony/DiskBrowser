@@ -277,14 +277,20 @@ public class DosDisk extends AbstractFormattedDisk
       return true;
     }
 
-    if (disk.getBlocksPerTrack () > 16)
+    int blocksPerTrack = disk.getBlocksPerTrack ();
+    if (blocksPerTrack > 16 && blocksPerTrack != 32)      // 32 = unidos
+    {
+      if (debug)
+        System.out.printf ("Blocks per track: %d", blocksPerTrack);
       return false;
+    }
 
     int[] cb = new int[3];
     int best = 0;
     int il = -1;
+    int max = disk.getBlocksPerTrack () == 16 ? 3 : 1;    // no interleave for 13 sector?
 
-    for (int interleave = 0; interleave < 3; interleave++)
+    for (int interleave = 0; interleave < max; interleave++)
     {
       if (debug)
         System.out.printf ("Checking interleave %d%n", interleave);
@@ -442,15 +448,15 @@ public class DosDisk extends AbstractFormattedDisk
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    //    StringBuffer text = new StringBuffer (dosVTOCSector.toString ());
-    //    return text.toString ();
-    StringBuffer text = new StringBuffer ();
+    StringBuilder text = new StringBuilder ();
 
+    text.append (String.format ("Disk name ............. %s%n", getDisplayPath ()));
     text.append (
         String.format ("DOS version ........... %s%n", dosVTOCSector.dosVersion));
     text.append (
         String.format ("Sectors per track ..... %d%n", dosVTOCSector.maxSectors));
-    text.append (String.format ("Volume no ............. %d", volumeNo));
+    text.append (String.format ("Volume no ............. %d%n", volumeNo));
+    text.append (String.format ("Interleave ............ %d", disk.getInterleave ()));
 
     return text.toString ();
   }

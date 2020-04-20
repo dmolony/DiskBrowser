@@ -557,4 +557,15 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
       actionListenerList
           .actionPerformed (new ActionEvent (this, ActionEvent.ACTION_PERFORMED, text));
   }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+    text.append (String.format ("Block size..... %d%n", disk.getBlockSize ()));
+    text.append (String.format ("Interleave..... %d", disk.getInterleave ()));
+    return text.toString ();
+  }
 }

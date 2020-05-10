@@ -137,7 +137,11 @@ public class DualDosDisk implements FormattedDisk
     else if (disks[1] == fd)
       currentDisk = 1;
     else
+    {
+      // this happens when the top-level folder is selected (i.e. neither disk)
       System.out.println ("Disk not found: " + fd);
+      //      Utility.printStackTrace ();
+    }
   }
 
   // ---------------------------------------------------------------------------------//

@@ -17,7 +17,7 @@ class CatalogEntry extends AbstractCatalogEntry
   CatalogEntry (DosDisk dosDisk, DiskAddress catalogSector, byte[] entryBuffer)
   // ---------------------------------------------------------------------------------//
   {
-    super (dosDisk, catalogSector, entryBuffer); // build lists of ts and data sectors
+    super (dosDisk, catalogSector, entryBuffer);
 
     //    if (reportedSize > 0 && disk.isValidAddress (entryBuffer[0], entryBuffer[1]))
     if (disk.isValidAddress (entryBuffer[0], entryBuffer[1]))
@@ -26,7 +26,7 @@ class CatalogEntry extends AbstractCatalogEntry
       DiskAddress da = disk.getDiskAddress (entryBuffer[0], entryBuffer[1]);
 
       // Loop through all TS-list sectors
-      loop: while (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ())
+      loop: while (!da.isZero () || ((AppleDiskAddress) da).zeroFlag ())
       {
         if (dosDisk.stillAvailable (da))
         {
@@ -70,7 +70,7 @@ class CatalogEntry extends AbstractCatalogEntry
                 i, sectorBuffer[i], sectorBuffer[i + 1], name.trim ());
             break loop;
           }
-          if (da.getBlockNo () == 0 && !((AppleDiskAddress) da).zeroFlag ())
+          if (da.isZero () && !((AppleDiskAddress) da).zeroFlag ())
           {
             if (fileType != FileType.Text)
               break;
@@ -151,7 +151,8 @@ class CatalogEntry extends AbstractCatalogEntry
       return false;
     if (buffer[3] != 0 || buffer[4] != 0)         // not supposed to be used
       // Diags2E.dsk stores its own sector address here
-      if (da.getTrackNo () != (buffer[3] & 0xFF) && da.getSectorNo () != (buffer[4] & 0xFF))
+      if (da.getTrackNo () != (buffer[3] & 0xFF)
+          && da.getSectorNo () != (buffer[4] & 0xFF))
         return false;
 
     return true;
@@ -175,9 +176,9 @@ class CatalogEntry extends AbstractCatalogEntry
     if (dataSectors.size () == 0)
       message += "No data ";
 
-    String catName = catalogName.length () >= 8 ? catalogName.substring (7) : catalogName;
+    //    String catName = catalogName.length () >= 8 ? catalogName.substring (7) : catalogName;
     String text = String.format ("%1s  %1s  %03d  %-30.30s  %-5s  %-13s %3d %3d   %s",
-        lockedFlag, getFileType (), actualSize, catName, addressText, lengthText,
+        lockedFlag, getFileType (), actualSize, catalogName, addressText, lengthText,
         tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
     if (actualSize == 0)
       text = text.substring (0, 50);

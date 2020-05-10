@@ -113,6 +113,7 @@ public class AppleDisk implements Disk
 
     if ("2mg".equalsIgnoreCase (suffix) || "2IMG".equals (prefix))
     {
+      //      System.out.println ("checking 2mg");
       if ("2IMG".equals (prefix))
       {
         Prefix2mg prefix2mg = new Prefix2mg (buffer);

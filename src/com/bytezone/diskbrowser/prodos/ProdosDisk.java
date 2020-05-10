@@ -152,12 +152,12 @@ public class ProdosDisk extends AbstractFormattedDisk
             break;
 
           case ProdosConstants.SUBDIRECTORY:
-            FileEntry ce = new FileEntry (this, entry, localHeader, block);
-            fileEntries.add (ce);
-            DefaultMutableTreeNode directoryNode = new DefaultMutableTreeNode (ce);
+            FileEntry fileEntry = new FileEntry (this, entry, localHeader, block);
+            fileEntries.add (fileEntry);
+            DefaultMutableTreeNode directoryNode = new DefaultMutableTreeNode (fileEntry);
             directoryNode.setAllowsChildren (true);
             parentNode.add (directoryNode);
-            processDirectoryBlock (ce.keyPtr, ce, directoryNode);       // Recursion !!
+            processDirectoryBlock (fileEntry.keyPtr, fileEntry, directoryNode); // Recursion!!
             break;
 
           case ProdosConstants.SEEDLING:
@@ -165,9 +165,9 @@ public class ProdosDisk extends AbstractFormattedDisk
           case ProdosConstants.TREE:
           case ProdosConstants.PASCAL_ON_PROFILE:
           case ProdosConstants.GSOS_EXTENDED_FILE:
-            FileEntry fe = new FileEntry (this, entry, localHeader, block);
-            fileEntries.add (fe);
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode (fe);
+            fileEntry = new FileEntry (this, entry, localHeader, block);
+            fileEntries.add (fileEntry);
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
             node.setAllowsChildren (false);
             parentNode.add (node);
             break;
@@ -271,7 +271,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    if (da.getBlockNo () == 0)
+    if (da.isZero ())
       return bootSector;
 
     byte[] buffer = disk.readBlock (da);

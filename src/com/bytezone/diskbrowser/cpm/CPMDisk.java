@@ -233,7 +233,7 @@ public class CPMDisk extends AbstractFormattedDisk
         if (val == 0xE5)
           break;
 
-        if (val > 31)   // && val != 0xE5)
+        if (val > 31)
           return false;
 
         for (int j = 1; j <= 8; j++)
@@ -259,11 +259,11 @@ public class CPMDisk extends AbstractFormattedDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
-  public String toString ()
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuffer text = new StringBuffer ("CPM disk");
-    return text.toString ();
-  }
+  //  @Override
+  //  public String toString ()
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    StringBuffer text = new StringBuffer ("CPM disk");
+  //    return text.toString ();
+  //  }
 }

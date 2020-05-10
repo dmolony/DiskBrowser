@@ -26,6 +26,7 @@ import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
+import com.bytezone.diskbrowser.applefile.Selector;
 import com.bytezone.diskbrowser.applefile.ShapeTable;
 import com.bytezone.diskbrowser.applefile.SimpleText;
 import com.bytezone.diskbrowser.applefile.StoredVariables;
@@ -268,10 +269,15 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     {
       switch (fileType)
       {
-        case FILE_TYPE_USER_DEFINED_1:                  // OVL
+        case FILE_TYPE_OVL:
           if (endOfFile == 0x2000 && auxType == 0)
           {
             file = new OriginalHiResImage (name, exactBuffer, auxType);
+            break;
+          }
+          else if (endOfFile == 0x800 && "SELECTOR.LIST".equals (name))
+          {
+            file = new Selector (name, exactBuffer);
             break;
           }
           // drop through

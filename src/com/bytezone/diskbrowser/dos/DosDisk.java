@@ -132,7 +132,7 @@ public class DosDisk extends AbstractFormattedDisk
 
       da = disk.getDiskAddress (track, sector);
 
-    } while (da.getBlockNo () != 0);
+    } while (!da.isZero ());
 
     // same loop, but now all the catalog sectors are properly flagged
     da = disk.getDiskAddress (catalogStart.getBlockNo ());
@@ -149,15 +149,15 @@ public class DosDisk extends AbstractFormattedDisk
         if (sectorBuffer[ptr] == 0)         // empty slot, no more catalog entries
           continue;
 
-        byte[] entry = new byte[ENTRY_SIZE];
-        System.arraycopy (sectorBuffer, ptr, entry, 0, ENTRY_SIZE);
-        int track = entry[0] & 0xFF;
-        boolean deletedFlag = (entry[0] & 0x80) != 0;
+        byte[] entryBuffer = new byte[ENTRY_SIZE];
+        System.arraycopy (sectorBuffer, ptr, entryBuffer, 0, ENTRY_SIZE);
+        int track = entryBuffer[0] & 0xFF;
+        boolean deletedFlag = (entryBuffer[0] & 0x80) != 0;
 
         if (deletedFlag)              // deleted file
         {
           DeletedCatalogEntry deletedCatalogEntry =
-              new DeletedCatalogEntry (this, da, entry, dosVTOCSector.dosVersion);
+              new DeletedCatalogEntry (this, da, entryBuffer, dosVTOCSector.dosVersion);
           deletedFileEntries.add (deletedCatalogEntry);
           DefaultMutableTreeNode node = new DefaultMutableTreeNode (deletedCatalogEntry);
           node.setAllowsChildren (false);
@@ -165,7 +165,7 @@ public class DosDisk extends AbstractFormattedDisk
         }
         else
         {
-          CatalogEntry catalogEntry = new CatalogEntry (this, da, entry);
+          CatalogEntry catalogEntry = new CatalogEntry (this, da, entryBuffer);
           fileEntries.add (catalogEntry);
           DefaultMutableTreeNode node = new DefaultMutableTreeNode (catalogEntry);
           node.setAllowsChildren (false);
@@ -186,7 +186,7 @@ public class DosDisk extends AbstractFormattedDisk
 
       da = disk.getDiskAddress (sectorBuffer[1], sectorBuffer[2]);
 
-    } while (da.getBlockNo () != 0);
+    } while (!da.isZero ());
 
     // link double hi-res files
     for (AppleFileSource fe : fileEntries)
@@ -426,7 +426,7 @@ public class DosDisk extends AbstractFormattedDisk
 
       da = disk.getDiskAddress (buffer[1], buffer[2]);
 
-    } while (da.getBlockNo () != 0);
+    } while (!da.isZero ());
 
     if (debug)
       System.out.printf ("Catalog blocks: %d%n", catalogAddresses.size ());
@@ -469,7 +469,7 @@ public class DosDisk extends AbstractFormattedDisk
     SectorType type = sectorTypes[da.getBlockNo ()];
     if (type == vtocSector)
       return dosVTOCSector;
-    if (da.getBlockNo () == 0)
+    if (da.isZero ())
       return bootSector;
 
     byte[] buffer = disk.readBlock (da);

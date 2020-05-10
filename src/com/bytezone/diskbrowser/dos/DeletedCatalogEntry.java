@@ -51,7 +51,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
     }
 
     // Loop through all TS-list sectors
-    loop: while (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ())
+    loop: while (!da.isZero () || ((AppleDiskAddress) da).zeroFlag ())
     {
       if (!dosDisk.stillAvailable (da))
       {
@@ -67,10 +67,10 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
         da = getValidAddress (sectorBuffer, i);
         if (da == null)
           break loop;
-        if (da.getBlockNo () > 0 && debug)
+        if (!da.isZero () && debug)
           System.out.println (da);
 
-        if (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ())
+        if (!da.isZero () || ((AppleDiskAddress) da).zeroFlag ())
         {
           if (!dosDisk.stillAvailable (da))
           {

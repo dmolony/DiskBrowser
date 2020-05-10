@@ -394,7 +394,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    if (da.getBlockNo () == 0 && bootSector != null)
+    if (da.isZero () && bootSector != null)
       return bootSector;
 
     SectorType sectorType = sectorTypes[da.getBlockNo ()];
@@ -564,6 +564,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
+    text.append (String.format ("Disk name ............. %s%n", getDisplayPath ()));
     text.append (String.format ("Block size..... %d%n", disk.getBlockSize ()));
     text.append (String.format ("Interleave..... %d", disk.getInterleave ()));
     return text.toString ();

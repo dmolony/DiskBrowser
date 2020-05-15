@@ -23,6 +23,7 @@
 - Disk Internals
     - Wizardry
     - Infocom
+- Track / Sector / Block display
 - Comprehensive disk listing
 
 ### Documentation

@@ -16,7 +16,7 @@
 - File Formats
     - Applesoft and Integer Basic
     - Pascal
-    - Assembly language
+    - 6502
     - Appleworks
     - Visicalc
     - Graphics files 

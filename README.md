@@ -15,10 +15,11 @@
     - Unidos
 - File Formats
     - Applesoft and Integer Basic
-    - Pascal disassembler
-    - 6502 disassembler
+    - Pascal
+    - Assembly language
     - Appleworks
     - Visicalc
+    - Graphics files 
 - Disk Internals
     - Wizardry
     - Infocom

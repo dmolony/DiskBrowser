@@ -45,16 +45,15 @@ Double-click a disk from the Disk Tree tab and a new tab appears. This tab conta
 #### Detailed sector display
 Click on any sector in the Disk Layout panel and the Output panel will display the contents of that sector. If it is a recognised sector type, it will be formatted for easier reading.
 ![Sector details](resources/sector.png?raw=true "Sector details")
-#### Windows
+#### Cross-platform
+Java runs on Windows, MacOS and Linux.
 ![Windows](resources/windows.png?raw=true "Windows")
-#### Hard disk
-![Hard disk](resources/disk3.png?raw=true "Hard disk")
+#### Graphics 
+![Graphics](resources/graphics.png?raw=true "Graphics")
 #### Pascal code
 ![Pascal](resources/pascal.png?raw=true "Pascal")
 #### Infocom
 ![Infocom](resources/zork.png?raw=true "Infocom")
-#### Graphics 
-![Graphics](resources/graphics.png?raw=true "Graphics")
 #### Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
 #### Visicalc

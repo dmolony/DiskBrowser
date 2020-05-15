@@ -430,6 +430,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           break;
 
+        case FILE_TYPE_ANI:
+          file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 0x1000, 0x8000);
+          break;
+
         case FILE_TYPE_FOT:
           if (auxType == HiResImage.FADDEN_AUX)
             file = new FaddenHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
@@ -477,7 +481,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_PASCAL_VOLUME:
         case FILE_TYPE_GEO:
         case FILE_TYPE_LDF:
-        case FILE_TYPE_ANI:
         case FILE_TYPE_PAL:
         case FILE_TYPE_IIGS_OBJECT:
           file = new DefaultAppleFile (name, exactBuffer);

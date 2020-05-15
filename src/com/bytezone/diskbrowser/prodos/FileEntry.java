@@ -418,6 +418,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_PNT:
+        case FILE_TYPE_ANI:
           if (auxType == 2)
             file = new SHRPictureFile1 (name, exactBuffer, fileType, auxType, endOfFile);
           else if (endOfFile < 0x222)
@@ -428,10 +429,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
         case FILE_TYPE_PIC:
           file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
-          break;
-
-        case FILE_TYPE_ANI:
-          file = new SHRPictureFile2 (name, exactBuffer, 0xC0, 0x1000, 0x8000);
           break;
 
         case FILE_TYPE_FOT:

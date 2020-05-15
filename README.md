@@ -2,22 +2,27 @@
 
 ### Features
 - Cross-platform (Windows, MacOS, Linux)
-- Applesoft and Integer Basic
-- Pascal disassembler
-- 6502 disassembler
-- Wizardry internals and maps
-- Infocom text adventure internals
-- Appleworks
-- Visicalc
-- HDV and 2mg
-- Compressed disks - shrinkIt, gzip, zip
-- Track and sector display
-- Dual DOS disks
-- DOS 4.1 disks
-- CPM disks
+- Disk formats
+    - DOS
+    - Prodos
+    - Pascal
+    - CPM
+    - HDV
+    - 2mg
+    - shrinkIt, gzip, zip
+    - hybrid disks
+    - woz
+    - Unidos
+- File Formats
+    - Applesoft and Integer Basic
+    - Pascal disassembler
+    - 6502 disassembler
+    - Appleworks
+    - Visicalc
+- Disk Internals
+    - Wizardry
+    - Infocom
 - Comprehensive disk listing
-- woz format disks
-- UniDos disks
 
 ### Documentation
 * [Usage](resources/usage.md)

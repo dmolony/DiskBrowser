@@ -50,11 +50,11 @@ public class DiskFactory
   // ---------------------------------------------------------------------------------//
   {
     FormattedDisk disk = create (path);
-    if (disk.getDisk ().getInterleave () > 0)
-    {
-      System.out.println (disk);
-      System.out.println ();
-    }
+    //    if (disk.getDisk ().getInterleave () > 0)
+    //    {
+    //      System.out.println (disk);
+    //      System.out.println ();
+    //    }
     return disk;
   }
 

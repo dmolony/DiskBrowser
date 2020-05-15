@@ -5,12 +5,14 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class BasicProgramGS extends BasicProgram
+// -----------------------------------------------------------------------------------//
 {
   private static String[] //
-  tokens = { "AUTO", "DEL", "EDI", "HLIST ",                // 0x80 - 0x83
-             "LIST", "RENUM", "BREAK ", "FN ",                // 0x84 - 0x87
-             "PROC ", "GOSUB", " GOTO ", "FOR ",               // 0x88 - 0x8B
+  tokens = { "AUTO", "DEL", "EDI", "HLIST ",                    // 0x80 - 0x83
+             "LIST", "RENUM", "BREAK ", "FN ",                  // 0x84 - 0x87
+             "PROC ", "GOSUB", " GOTO ", "FOR ",                // 0x88 - 0x8B
              " THEN ", "ELSE ", "NEXT ", "OFF ",                // 0x8C - 0x8F
              "ON ", "INPUT ", "OUTPUT ", "TEXT ",               // 0x90 - 0x93
              "TIMER ", "EXCEPTION ", "CAT ", " 97 ",            // 0x94 - 0x97
@@ -79,9 +81,14 @@ public class BasicProgramGS extends BasicProgram
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public BasicProgramGS (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
+
+    // need to validate these files - seem to sometimes contain palette files
+    // 0132 816-Paint.po
 
     int ptr = 5;
     while (ptr < buffer.length)
@@ -97,8 +104,10 @@ public class BasicProgramGS extends BasicProgram
 
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
     for (SourceLine sourceLine : sourceLines)
@@ -106,7 +115,9 @@ public class BasicProgramGS extends BasicProgram
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private class SourceLine
+  // ---------------------------------------------------------------------------------//
   {
     int lineNumber;
     int length;

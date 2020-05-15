@@ -37,6 +37,7 @@ class DosVTOCSector extends AbstractSector
     maxTracks = buffer[52] & 0xFF;
     maxSectors = buffer[53] & 0xFF;
     sectorSize = HexFormatter.intValue (buffer[54], buffer[55]);
+
     flagSectors2 ();
   }
 
@@ -72,7 +73,16 @@ class DosVTOCSector extends AbstractSector
     addTextAndDecimal (text, buffer, 48, 1, "Last allocated track");
     addText (text, buffer, 49, 1, "Direction to look when allocating the next file");
     addText (text, buffer, 50, 2, "Not used");
+
     addTextAndDecimal (text, buffer, 52, 1, "Maximum tracks");
+
+    if (maxTracks != disk.getTotalTracks ())
+    {
+      text.deleteCharAt (text.length () - 1);
+      text.append (String.format ("            <-- Should be 0x%02X !!%n",
+          disk.getTotalTracks ()));
+    }
+
     addTextAndDecimal (text, buffer, 53, 1, "Maximum sectors");
     addTextAndDecimal (text, buffer, 54, 2, "Bytes per sector");
 
@@ -176,7 +186,7 @@ class DosVTOCSector extends AbstractSector
   // ---------------------------------------------------------------------------------//
   {
     int firstSector = 0x38;
-    int max = maxTracks * 4 + firstSector;
+    int max = disk.getTotalTracks () * 4 + firstSector;
     for (int i = firstSector; i < max; i += 4)
     {
       int track = (i - firstSector) / 4;

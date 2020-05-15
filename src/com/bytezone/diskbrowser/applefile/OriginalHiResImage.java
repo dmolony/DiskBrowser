@@ -3,7 +3,9 @@ package com.bytezone.diskbrowser.applefile;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 
+// -----------------------------------------------------------------------------------//
 public class OriginalHiResImage extends HiResImage
+// -----------------------------------------------------------------------------------//
 {
   private static final int WHITE = 0xFFFFFF;
   private static final int BLACK = 0x000000;
@@ -14,23 +16,29 @@ public class OriginalHiResImage extends HiResImage
   private final int[] line = new int[280];
   private final int[] colourBits = new int[280];
 
+  // ---------------------------------------------------------------------------------//
   public OriginalHiResImage (String name, byte[] buffer, int loadAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, loadAddress);
 
     createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public OriginalHiResImage (String name, byte[] buffer, int loadAddress,
       boolean scrunched)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, loadAddress, scrunched);
 
     createImage ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public OriginalHiResImage (String name, byte[] buffer, int fileType, int auxType,
       int eof)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, fileType, auxType, eof);
 
@@ -42,8 +50,10 @@ public class OriginalHiResImage extends HiResImage
   // or... Y = aabbbccc
   //    address = BASE + aa * 0x28 + bb * 0x80 + ccc * 0x0400 + X
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void createMonochromeImage ()
+  // ---------------------------------------------------------------------------------//
   {
     int rows = buffer.length <= 8192 ? 192 : 384;
     image = new BufferedImage (280, rows, BufferedImage.TYPE_BYTE_GRAY);
@@ -69,8 +79,10 @@ public class OriginalHiResImage extends HiResImage
           }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   protected void createColourImage ()
+  // ---------------------------------------------------------------------------------//
   {
     paletteIndex = paletteFactory.getCurrentPaletteIndex ();
     int rows = buffer.length <= 8192 ? 192 : 384;
@@ -89,7 +101,9 @@ public class OriginalHiResImage extends HiResImage
           }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void fillLine (int base)
+  // ---------------------------------------------------------------------------------//
   {
     Palette palette = paletteFactory.getCurrentPalette ();
     int[] colours = palette.getColours ();
@@ -130,12 +144,16 @@ public class OriginalHiResImage extends HiResImage
       applyColourQuirks ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean isColoured (int pixel)
+  // ---------------------------------------------------------------------------------//
   {
     return pixel != BLACK && pixel != WHITE;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void applyColourQuirks ()
+  // ---------------------------------------------------------------------------------//
   {
     for (int x = 3; x < line.length; x++)     // skip first three pixels, refer back
     {

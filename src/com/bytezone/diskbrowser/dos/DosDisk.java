@@ -307,7 +307,7 @@ public class DosDisk extends AbstractFormattedDisk
       }
     }
 
-    if (best == 0)
+    if (best <= 1)
       return false;
 
     disk.setInterleave (il);
@@ -354,6 +354,14 @@ public class DosDisk extends AbstractFormattedDisk
     //    if (buffer[1] != 0x11) // first catalog track
     //      return 0;
 
+    // Apple Assembly Language.dsk claims 0x2A tracks per disk
+    //    if (buffer[52] != 35 && buffer[52] != 50)
+    //    {
+    //      if (debug)
+    //        System.out.printf ("Bad tracks per disk : %02X%n", buffer[52]);
+    //      return 0;
+    //    }
+
     if (debug)
       System.out.printf ("Sectors per track: %02X%n", buffer[53]);
 
@@ -374,9 +382,10 @@ public class DosDisk extends AbstractFormattedDisk
     int version = buffer[3] & 0xFF;
     if (debug)
       System.out.printf ("Version: %02X%n", buffer[3]);
-    if (version > 0x43 && version != 0xFF)
+    if (version == 0 || (version > 0x43 && version != 0xFF))
     {
-      System.out.printf ("Bad version : %02X%n", version);
+      if (debug)
+        System.out.printf ("Bad version : %02X%n", version);
       return 0;
     }
 

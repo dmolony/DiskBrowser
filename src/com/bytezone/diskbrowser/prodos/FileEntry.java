@@ -326,6 +326,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             // see gs basic disk, one of the four pictures looks ok
             file = new SHRPictureFile2 (name, exactBuffer, 0xC1, 0, endOfFile);
           }
+          //  else if (name.endsWith (".PIC"))          // 0091 X-BASIC../../XBASIC.PIC
+          //    file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           else
           {
             file = new AssemblerProgram (name, exactBuffer, auxType);
@@ -352,7 +354,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_GS_BASIC:
-          file = new BasicProgramGS (name, exactBuffer);
+          // 0132 816-Paint.po has GSB files that crash because they are palettes
+          if (buffer[0] == 4 && buffer[1] == 16)      // complete guess
+            file = new BasicProgramGS (name, exactBuffer);
+          else
+            file = new DefaultAppleFile (name, exactBuffer);
           break;
 
         case FILE_TYPE_INTEGER_BASIC:
@@ -427,10 +433,28 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_FOT:
           if (auxType == HiResImage.FADDEN_AUX)
             file = new FaddenHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
+          else if (auxType < 0x4000)
+          {
+            file = new OriginalHiResImage (name, exactBuffer, 0x2000);
+            System.out.printf ("FOT %02X%n", exactBuffer[121]);
+          }
+          else if (auxType == 0x4000)
+          {
+            // packed hi-res
+            System.out.println ("FOT - packed hi res");
+            file = new DefaultAppleFile (name, exactBuffer);
+          }
+          else if (auxType == 0x4001)
+          {
+            // packed double hi-res
+            System.out.println ("FOT - double hi res");
+            file = new DefaultAppleFile (name, exactBuffer);
+          }
           else
           {
-            System.out.println ("Unwritten FOT: " + name);
             file = new DefaultAppleFile (name, exactBuffer);
+            //   file =
+            //     new OriginalHiResImage (name, exactBuffer, fileType, auxType, endOfFile);
           }
           break;
 

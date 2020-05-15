@@ -44,7 +44,7 @@ public abstract class HiResImage extends AbstractFile
   //   $06 BIN          .3200                                   SHRPictureFile2
   //   $06 BIN          .3201                                   SHRPictureFile2 packed
   //  ---- ---- ------  --------------------------------------  ------------------------
-  //   $08 FOT  <$4000  Apple II Graphics File                        ???
+  //   $08 FOT  <$4000  Apple II Graphics File                  OriginalHiResImage
   //   $08 FOT   $4000  Packed Hi-Res file                            ???
   //   $08 FOT   $4001  Packed Double Hi-Res file                     ???
   //   $08 FOT   $8066  Fadden Hi-res                           FaddenHiResImage
@@ -239,6 +239,7 @@ public abstract class HiResImage extends AbstractFile
     monochrome = value;
   }
 
+  // byte +120 is the first screen hole
   /*-
    * Files of type $08 and any auxiliary type less than or equal to $3FFF contain a
    * standard Apple II graphics file in one of several modes. After determining that

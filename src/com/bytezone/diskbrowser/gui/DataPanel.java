@@ -32,12 +32,13 @@ import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
+import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 
 // -----------------------------------------------------------------------------------//
-class DataPanel extends JTabbedPane implements DiskSelectionListener,
+public class DataPanel extends JTabbedPane implements DiskSelectionListener,
     FileSelectionListener, SectorSelectionListener, FileNodeSelectionListener,
     FontChangeListener, BasicPreferencesListener, AssemblerPreferencesListener
 // -----------------------------------------------------------------------------------//
@@ -63,6 +64,8 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
   boolean hexTextValid;
   boolean assemblerTextValid;
   DataSource currentDataSource;
+
+  private Animation animation;
 
   final MenuHandler menuHandler;
 
@@ -234,6 +237,17 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
   }
 
   // ---------------------------------------------------------------------------------//
+  public void update ()
+  // ---------------------------------------------------------------------------------//
+  {
+    if (currentDataSource instanceof HiResImage)
+    {
+      HiResImage image = (HiResImage) currentDataSource;
+      imagePanel.setImage (image.getImage ());
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
   public void setDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {
@@ -343,7 +357,16 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
       {
         ((HiResImage) dataSource).checkPalette ();
         image = dataSource.getImage ();
+        if (((HiResImage) dataSource).isAnimation ())
+        {
+          if (animation != null)
+            animation.cancel ();
+          animation = new Animation ((SHRPictureFile2) dataSource);
+          animation.start ();
+          //          System.out.println ("new animation");
+        }
       }
+
       imagePanel.setImage (image);
       imagePane.setViewportView (imagePanel);
 
@@ -354,6 +377,7 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
         add (imagePane, "Formatted", 0);
         setSelectedIndex (selected);
         imageVisible = true;
+
       }
     }
   }
@@ -369,6 +393,12 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
       add (formattedPane, "Formatted", 0);
       setSelectedIndex (selected);
       imageVisible = false;
+    }
+
+    if (animation != null)
+    {
+      animation.cancel ();
+      animation = null;
     }
   }
 
@@ -520,5 +550,44 @@ class DataPanel extends JTabbedPane implements DiskSelectionListener,
   {
     if (currentDataSource instanceof AssemblerProgram)
       setDataSource (currentDataSource);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  class Animation extends Thread
+  // ---------------------------------------------------------------------------------//
+  {
+    boolean running;
+    SHRPictureFile2 image;
+    int delay;
+
+    public Animation (SHRPictureFile2 image)
+    {
+      this.image = image;
+      delay = image.getDelay ();
+    }
+
+    public void cancel ()
+    {
+      running = false;
+    }
+
+    @Override
+    public void run ()
+    {
+      running = true;
+      try
+      {
+        while (running)
+        {
+          sleep (delay);
+          image.nextFrame ();
+          update ();
+        }
+      }
+      catch (InterruptedException e)
+      {
+        e.printStackTrace ();
+      }
+    }
   }
 }

@@ -8,7 +8,9 @@ import javax.swing.JPanel;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public abstract class AbstractFile implements DataSource
+// -----------------------------------------------------------------------------------//
 {
   protected String name;
   public byte[] buffer;
@@ -16,25 +18,33 @@ public abstract class AbstractFile implements DataSource
   protected BufferedImage image;
   protected int loadAddress;
 
+  // ---------------------------------------------------------------------------------//
   public AbstractFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     this.name = name;
     this.buffer = buffer;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()      // Override this to get a tailored text representation
+  // ---------------------------------------------------------------------------------//
   {
     return "Name : " + name + "\n\nNo text description";
   }
 
+  // ---------------------------------------------------------------------------------//
   public String getName ()
+  // ---------------------------------------------------------------------------------//
   {
     return name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getAssembler ()
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer == null)
       return "No buffer";
@@ -45,8 +55,10 @@ public abstract class AbstractFile implements DataSource
     return assembler.getText ();
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer == null || buffer.length == 0)
       return "No buffer";
@@ -58,14 +70,18 @@ public abstract class AbstractFile implements DataSource
     return HexFormatter.format (buffer, 0, 999999);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public BufferedImage getImage ()
+  // ---------------------------------------------------------------------------------//
   {
     return image;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public JComponent getComponent ()
+  // ---------------------------------------------------------------------------------//
   {
     JPanel panel = new JPanel ();
     return panel;

@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.applefile;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
@@ -13,6 +15,10 @@ public class SHRPictureFile2 extends HiResImage
   ColorTable[] colorTables;
   byte[] controlBytes;
   int rows = 200;           // may change
+
+  List<Integer> framePointers = new ArrayList<> ();
+  int frameNumber;
+  int delay;
 
   // see Graphics & Animation.2mg
 
@@ -33,9 +39,8 @@ public class SHRPictureFile2 extends HiResImage
         break;
 
       case ProdosConstants.FILE_TYPE_ANI:
-        this.auxType = 0x1000;
-        this.eof = 0x8000;
-        doPnt ();
+        doPic ();
+        doAnimation ();
         break;
 
       default:
@@ -57,35 +62,20 @@ public class SHRPictureFile2 extends HiResImage
         colorTables = new ColorTable[1];
         colorTables[0] = new ColorTable (0, this.buffer, 0);
 
-        //        if (false)
-        //        {
-        //          byte[] data = new byte[buffer.length - 0x222];
-        //          System.arraycopy (buffer, 0x0222, data, 0, data.length);
-        //          buffer = unpack (data);
-        //          System.out.println ("paintworks");
-        //        }
-        //        else
-        //        {
         byte[] newBuffer = new byte[calculateBufferSize (buffer, 0x222)];
         unpack (buffer, 0x222, buffer.length, newBuffer, 0);
         buffer = newBuffer;
-        //        }
+
         rows = buffer.length / 160;
         controlBytes = new byte[rows];    // all pointing to 0th color table
 
         break;
 
       case 1:                             // packed version of PIC/$00
-        //        if (false)
-        //        {
-        //          buffer = unpack (buffer);
-        //        }
-        //        else
-        //        {
         newBuffer = new byte[calculateBufferSize (buffer, 0)];
         unpack (buffer, 0, buffer.length, newBuffer, 0);
         buffer = newBuffer;
-        //        }
+
         controlBytes = new byte[rows];
         System.arraycopy (this.buffer, 32000, controlBytes, 0, controlBytes.length);
 
@@ -104,14 +94,10 @@ public class SHRPictureFile2 extends HiResImage
 
         // Apple IIGS Tech Note #46
         // https://www.prepressure.com/library/file-formats/pict
-        //        if (false)
-        //          buffer = unpack (buffer);
-        //        else
-        //        {
         newBuffer = new byte[calculateBufferSize (buffer, 0)];
         unpack (buffer, 0, buffer.length, newBuffer, 0);
         buffer = newBuffer;
-        //        }
+
         int mode = HexFormatter.unsignedShort (this.buffer, 0);
         int rect1 = HexFormatter.unsignedLong (this.buffer, 2);
         int rect2 = HexFormatter.unsignedLong (this.buffer, 6);
@@ -136,18 +122,9 @@ public class SHRPictureFile2 extends HiResImage
           colorTables[i].reverse ();
         }
 
-        //        if (false)
-        //        {
-        //          byte[] data = new byte[buffer.length - 6404];      // skip APP. and color tables
-        //          System.arraycopy (buffer, 6404, data, 0, data.length);
-        //          this.buffer = unpack (data);
-        //        }
-        //        else
-        //        {
         newBuffer = new byte[calculateBufferSize (buffer, 6404)];
         unpack (buffer, 6404, buffer.length, newBuffer, 0);
         buffer = newBuffer;
-        //        }
 
         break;
 
@@ -169,6 +146,40 @@ public class SHRPictureFile2 extends HiResImage
       default:
         System.out.printf ("%s: PNT unknown aux: %04X%n", name, auxType);
         failureReason = "unknown PNT aux";
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void doAnimation ()
+  // ---------------------------------------------------------------------------------//
+  {
+    //    int len = HexFormatter.unsignedLong (buffer, 0x8000);
+    delay = HexFormatter.unsignedLong (buffer, 0x8004);
+    if (delay > 60)
+      delay = 10;
+    delay = delay * 1000 / 60;
+
+    //    int offset = HexFormatter.unsignedLong (buffer, 0x8008);
+    //    int blockLen = eof - 0x8008;
+
+    //    System.out.printf ("Delay: %,d%n", delay);
+    //    System.out.printf ("Blocklen: %,d%n", blockLen);
+    //    System.out.printf ("Offset: %,d%n", offset);
+    //    System.out.printf ("Len: %,d%n", len);
+    //    System.out.println ();
+    int ptr = 0x800C;
+
+    int start = ptr;
+    while (ptr < buffer.length)
+    {
+      int off = HexFormatter.unsignedShort (buffer, ptr);
+
+      ptr += 4;
+      if (off == 0)
+      {
+        framePointers.add (start);
+        start = ptr;
+      }
     }
   }
 
@@ -276,6 +287,34 @@ public class SHRPictureFile2 extends HiResImage
 
       element += imageWidth * 2;        // skip line already drawn
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void nextFrame ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int ptr = framePointers.get (frameNumber++);
+    frameNumber %= framePointers.size ();
+
+    while (true)
+    {
+      int offset = HexFormatter.unsignedShort (buffer, ptr);
+      if (offset == 0)
+        break;
+
+      buffer[offset] = buffer[ptr + 2];
+      buffer[offset + 1] = buffer[ptr + 3];
+
+      ptr += 4;
+    }
+    createImage ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public int getDelay ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return delay;
   }
 
   // ---------------------------------------------------------------------------------//

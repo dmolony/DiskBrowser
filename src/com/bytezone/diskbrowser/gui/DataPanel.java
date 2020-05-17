@@ -21,6 +21,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -65,7 +66,7 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   boolean assemblerTextValid;
   DataSource currentDataSource;
 
-  private Animation animation;
+  private Worker animation;
 
   final MenuHandler menuHandler;
 
@@ -361,8 +362,8 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
         {
           if (animation != null)
             animation.cancel ();
-          animation = new Animation ((SHRPictureFile2) dataSource);
-          animation.start ();
+          animation = new Worker ((SHRPictureFile2) dataSource);
+          animation.execute ();
           //          System.out.println ("new animation");
         }
       }
@@ -553,17 +554,15 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   }
 
   // ---------------------------------------------------------------------------------//
-  class Animation extends Thread
+  class Worker extends SwingWorker<Void, Integer>
   // ---------------------------------------------------------------------------------//
   {
-    boolean running;
+    volatile boolean running;
     SHRPictureFile2 image;
-    int delay;
 
-    public Animation (SHRPictureFile2 image)
+    public Worker (SHRPictureFile2 image)
     {
       this.image = image;
-      delay = image.getDelay ();
     }
 
     public void cancel ()
@@ -572,22 +571,29 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
     }
 
     @Override
-    public void run ()
+    protected Void doInBackground () throws Exception
     {
       running = true;
       try
       {
         while (running)
         {
-          sleep (delay);
-          image.nextFrame ();
-          update ();
+          Thread.sleep (image.getDelay ());
+          publish (0);
         }
       }
       catch (InterruptedException e)
       {
         e.printStackTrace ();
       }
+      return null;
+    }
+
+    @Override
+    protected void process (List<Integer> chunks)
+    {
+      image.nextFrame ();
+      update ();
     }
   }
 }

@@ -54,11 +54,10 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   // these two panes are interchangeable
   private final JScrollPane formattedPane;
   private final JScrollPane imagePane;
+  private boolean imageVisible = false;
 
   private final ImagePanel imagePanel;                        // internal class
   private boolean debugMode;
-
-  private boolean imageVisible = false;
 
   // used to determine whether the text has been set
   boolean formattedTextValid;
@@ -364,7 +363,6 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
             animation.cancel ();
           animation = new Worker ((SHRPictureFile2) dataSource);
           animation.execute ();
-          //          System.out.println ("new animation");
         }
       }
 
@@ -562,6 +560,7 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
 
     public Worker (SHRPictureFile2 image)
     {
+      assert image.isAnimation ();
       this.image = image;
     }
 

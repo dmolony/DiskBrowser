@@ -23,6 +23,7 @@ import com.bytezone.diskbrowser.applefile.IntegerBasicProgram;
 import com.bytezone.diskbrowser.applefile.LodeRunner;
 import com.bytezone.diskbrowser.applefile.MerlinSource;
 import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
+import com.bytezone.diskbrowser.applefile.PascalArea;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
@@ -109,9 +110,12 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         break;
 
       case PASCAL_ON_PROFILE:
-        indexBlocks.add (disk.getDiskAddress (keyPtr));
-        System.out.println ("PASCAL on PROFILE: " + name);    // PDUCSD12.PO
-        // are these blocks guaranteed to be contiguous?
+        for (int i = keyPtr; i < disk.getTotalBlocks (); i++)
+        {
+          dataBlocks.add (disk.getDiskAddress (i));
+          parentDisk.setSectorType (i, parentDisk.dataSector);
+        }
+        //        System.out.println ("PASCAL on PROFILE: " + name);    // PDUCSD12.PO
         break;
 
       default:
@@ -479,6 +483,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_PASCAL_VOLUME:
+          file = new PascalArea (name, exactBuffer);
+          break;
+
         case FILE_TYPE_GEO:
         case FILE_TYPE_LDF:
         case FILE_TYPE_PAL:
@@ -519,26 +526,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       if (val == value)
         return true;
     return false;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private byte[] getExactBuffer (byte[] buffer)
-  // ---------------------------------------------------------------------------------//
-  {
-    byte[] exactBuffer;
-    if (buffer.length < endOfFile)
-    {
-      exactBuffer = new byte[endOfFile];
-      System.arraycopy (buffer, 0, exactBuffer, 0, buffer.length);
-    }
-    else if (buffer.length == endOfFile || endOfFile == 512)    // 512 seems like crap
-      exactBuffer = buffer;
-    else
-    {
-      exactBuffer = new byte[endOfFile];
-      System.arraycopy (buffer, 0, exactBuffer, 0, endOfFile);
-    }
-    return exactBuffer;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -662,6 +649,27 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   }
 
   // ---------------------------------------------------------------------------------//
+  private byte[] getExactBuffer (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
+    byte[] exactBuffer;
+    if (buffer.length < endOfFile)
+    {
+      exactBuffer = new byte[endOfFile];
+      System.arraycopy (buffer, 0, exactBuffer, 0, buffer.length);
+    }
+    // 512 seems like crap
+    else if (buffer.length == endOfFile || endOfFile == 512 || endOfFile == 0)
+      exactBuffer = buffer;
+    else
+    {
+      exactBuffer = new byte[endOfFile];
+      System.arraycopy (buffer, 0, exactBuffer, 0, endOfFile);
+    }
+    return exactBuffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
   private int readIndexBlock (int indexBlock, List<DiskAddress> addresses,
       List<TextBuffer> buffers, int logicalBlock)
   // ---------------------------------------------------------------------------------//
@@ -743,6 +751,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     String timeC = created == null ? "" : parentDisk.df.format (created.getTime ());
     String timeF = modified == null ? "" : parentDisk.df.format (modified.getTime ());
+
     return String.format ("%s %s%-30s %3d %,10d %15s %15s",
         ProdosConstants.fileTypes[fileType], locked, parentDirectory.name + "/" + name,
         blocksUsed, endOfFile, timeC, timeF);

@@ -26,11 +26,4 @@ public class PascalInfo extends AbstractFile
 
     return text.toString ();
   }
-
-  // ---------------------------------------------------------------------------------//
-  private String getHeader ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return "Name : " + name + "\n\n";
-  }
 }

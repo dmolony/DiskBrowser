@@ -248,11 +248,11 @@ public class DosDisk extends AbstractFormattedDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  public int getVolumeNo ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return volumeNo;
-  }
+  //  private int getVolumeNo ()
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    return volumeNo;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   @Override
@@ -514,7 +514,9 @@ public class DosDisk extends AbstractFormattedDisk
     String newLine = String.format ("%n");
     String line = "- --- ---  ------------------------------  -----  -------------"
         + "  -- ----  -------------------" + newLine;
+
     StringBuilder text = new StringBuilder ();
+
     text.append (String.format ("Disk : %s%n%n", getDisplayPath ()));
     text.append ("L Typ Len  Name                            Addr"
         + "   Length         TS Data  Comment" + newLine);
@@ -535,7 +537,8 @@ public class DosDisk extends AbstractFormattedDisk
           freeSectors, usedSectors, (usedSectors + freeSectors)));
 
     String volumeText = volumeNo == 0 ? "" : "Side " + volumeNo + " ";
-    return new DefaultAppleFileSource (volumeText + "Volume " + dosVTOCSector.volume,
+
+    return new DefaultAppleFileSource (volumeText + "DOS Volume " + dosVTOCSector.volume,
         text.toString (), this);
   }
 

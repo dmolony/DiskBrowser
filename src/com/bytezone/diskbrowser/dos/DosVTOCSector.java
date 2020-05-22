@@ -38,7 +38,7 @@ class DosVTOCSector extends AbstractSector
     maxSectors = buffer[53] & 0xFF;
     sectorSize = HexFormatter.intValue (buffer[54], buffer[55]);
 
-    flagSectors2 ();
+    flagSectors ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -168,7 +168,6 @@ class DosVTOCSector extends AbstractSector
   private String getBitmap (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder ();
     int value = HexFormatter.getLongBigEndian (buffer, offset);
 
     String bits = "0000000000000000000000000000000" + Integer.toBinaryString (value);
@@ -176,13 +175,12 @@ class DosVTOCSector extends AbstractSector
     bits = bits.substring (0, maxSectors);
     bits = bits.replace ('0', 'X');
     bits = bits.replace ('1', '.');
-    text.append (bits);
 
-    return text.reverse ().toString ();
+    return new StringBuilder (bits).reverse ().toString ();
   }
 
   // ---------------------------------------------------------------------------------//
-  private void flagSectors2 ()
+  private void flagSectors ()
   // ---------------------------------------------------------------------------------//
   {
     int firstSector = 0x38;

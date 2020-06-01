@@ -30,7 +30,7 @@
 * [Usage](resources/usage.md)
 
 ### Installation
-* Install the **latest** version of the [Java Runtime Environment](http://www.oracle.com/technetwork/java/javase/downloads/index.html) (JRE or JDK).
+* Install the **latest** version of the [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 * Download DiskBrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
 * Double-click the jar file, or enter 'java -jar DiskBrowser.jar' in the terminal.
 * Set your root folder (the top-level folder where you keep your disk images).

@@ -60,7 +60,7 @@ public class ExoBuffer
     tableInit ();
 
     //    tableDump (decCtx.table);
-    decCtxDecrunch ();
+    decrunch ();
 
     if (outPos != outBuffer.length)
     {
@@ -260,7 +260,7 @@ public class ExoBuffer
   }
 
   // ---------------------------------------------------------------------------------//
-  private void decCtxDecrunch ()
+  private void decrunch ()
   // ---------------------------------------------------------------------------------//
   {
     int len;

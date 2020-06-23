@@ -319,22 +319,27 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new DoubleHiResImage (name, exactBuffer);
           else if (endOfFile == 0x4000 && auxType == 0x4000)
             file = new DoubleHiResImage (name, exactBuffer);
-          else if (auxType == 0x3FF8 && HiResImage.isExo (exactBuffer))
+          else if ((auxType == 0x1FF8 || auxType == 0x3FF8)
+              && HiResImage.isExo (exactBuffer))
           {
             ExoBuffer exoBuffer = new ExoBuffer (exactBuffer);
             byte[] outBuffer = exoBuffer.getExpandedBuffer ();
-            if (outBuffer.length == 0x2000)
-              file = new OriginalHiResImage (name, outBuffer, 0x3FF8);
-            else if (outBuffer.length == 0x4000)
-              file = new DoubleHiResImage (name, outBuffer);
-            else
-              file = new AssemblerProgram (name, exactBuffer, auxType);
-          }
-          else if (auxType == 0x1FF8 && HiResImage.isExo (exactBuffer))
-          {
-            ExoBuffer exoBuffer = new ExoBuffer (exactBuffer);
-            byte[] outBuffer = exoBuffer.getExpandedBuffer ();
-            file = new SHRPictureFile2 (name, outBuffer, FILE_TYPE_PIC, 0x2000, 0x8000);
+
+            switch (outBuffer.length)
+            {
+              case 0x2000:
+                file = new OriginalHiResImage (name, outBuffer, 0x3FF8);
+                break;
+              case 0x4000:
+                file = new DoubleHiResImage (name, outBuffer);
+                break;
+              case 0x8000:
+                file =
+                    new SHRPictureFile2 (name, outBuffer, FILE_TYPE_PIC, 0x2000, 0x8000);
+                break;
+              default:
+                file = new AssemblerProgram (name, exactBuffer, auxType);
+            }
           }
           else if (oneOf (endOfFile, 0x1FF8, 0x1FFF, 0x2000, 0x4000)
               && oneOf (auxType, 0x1FFF, 0x2000, 0x4000, 0x6000))

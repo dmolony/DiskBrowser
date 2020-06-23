@@ -18,23 +18,20 @@ public class ExoBuffer
   private static int PFLAG_BITS_ALIGN_START = (1 << PBIT_BITS_ALIGN_START);
   private static int PFLAG_4_OFFSET_TABLES = (1 << PBIT_4_OFFSET_TABLES);
 
-  int inPos;
-  int inEnd;
-  int outPos;
+  private byte[] inBuffer;
+  private byte[] outBuffer = new byte[0x8000];
 
-  byte[] inBuffer;
-  byte[] outBuffer = new byte[50000];
+  private int inPos;
+  private int outPos;
 
-  int bitBuffer;
+  private int bitBuffer;
+  private int flags;
 
-  int bitsRead;
-  int flagsProto;
-
-  int tableBit[] = new int[8];
-  int tableOff[] = new int[8];
-  int tableBi[] = new int[100];
-  int tableLo[] = new int[100];
-  int tableHi[] = new int[100];
+  private int tableBit[] = new int[8];
+  private int tableOff[] = new int[8];
+  private int tableBi[] = new int[100];
+  private int tableLo[] = new int[100];
+  private int tableHi[] = new int[100];
 
   // ---------------------------------------------------------------------------------//
   public ExoBuffer (byte[] inBuffer)
@@ -42,46 +39,42 @@ public class ExoBuffer
   {
     reverse (inBuffer);
 
-    bitsRead = 0;
-
     this.inBuffer = inBuffer;
-    inEnd = inBuffer.length;
 
     inPos = 2;
-    flagsProto = 23;
-
     outPos = 0;
+    flags = 23;
 
-    if ((flagsProto & PFLAG_BITS_ALIGN_START) != 0)
+    if ((flags & PFLAG_BITS_ALIGN_START) != 0)
       bitBuffer = 0;
     else
       bitBuffer = getByte ();
 
     tableInit ();
-
-    //    tableDump (decCtx.table);
     decrunch ();
 
-    if (outPos != outBuffer.length)
+    if (outPos < outBuffer.length)
     {
       byte[] outBuffer2 = new byte[outPos];
-      System.arraycopy (outBuffer, 0, outBuffer2, 0, outBuffer2.length);
+      System.arraycopy (outBuffer, 0, outBuffer2, 0, outPos);
       outBuffer = outBuffer2;
     }
+
     reverse (outBuffer);
   }
 
   // ---------------------------------------------------------------------------------//
-  private void reverse (byte[] inBuffer)
+  private void reverse (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     int lo = 0;
-    int hi = inBuffer.length - 1;
+    int hi = buffer.length - 1;
+
     while (lo < hi)
     {
-      byte temp = inBuffer[lo];
-      inBuffer[lo++] = inBuffer[hi];
-      inBuffer[hi--] = temp;
+      byte temp = buffer[lo];
+      buffer[lo++] = buffer[hi];
+      buffer[hi--] = temp;
     }
   }
 
@@ -98,7 +91,7 @@ public class ExoBuffer
   {
     int carryOut;
 
-    if ((flagsProto & PFLAG_BITS_ORDER_BE) != 0)
+    if ((flags & PFLAG_BITS_ORDER_BE) != 0)
     {
       carryOut = (bitBuffer & 0x80) == 0 ? 0 : 1;
       bitBuffer = (bitBuffer << 1) & 0xFF;
@@ -122,9 +115,7 @@ public class ExoBuffer
   private int getByte ()
   // ---------------------------------------------------------------------------------//
   {
-    bitsRead += 8;
-    int c = inBuffer[inPos++] & 0xFF;
-    return c;
+    return inBuffer[inPos++] & 0xFF;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -134,7 +125,7 @@ public class ExoBuffer
     int byteCopy = 0;
     int value = 0;
 
-    if ((flagsProto & PFLAG_BITS_COPY_GT_7) != 0)
+    if ((flags & PFLAG_BITS_COPY_GT_7) != 0)
     {
       while (count > 7)
       {
@@ -150,12 +141,10 @@ public class ExoBuffer
       if (bitBuffer == 0)
       {
         bitBuffer = getByte ();
-        bitsRead -= 8;
         carry = bitBufRotate (1);
       }
       value <<= 1;
       value |= carry;
-      bitsRead++;
     }
 
     while (byteCopy-- > 0)
@@ -165,26 +154,6 @@ public class ExoBuffer
     }
 
     return value;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int getGammaCode ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int gammaCode = 0;
-
-    while (getBits (1) == 0)
-      ++gammaCode;
-
-    return gammaCode;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int getCooked (int index)
-  // ---------------------------------------------------------------------------------//
-  {
-    int base = tableLo[index] | (tableHi[index] << 8);
-    return base + getBits (tableBi[index]);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -199,7 +168,7 @@ public class ExoBuffer
     tableBit[1] = 4;
     tableBit[2] = 4;
 
-    if ((flagsProto & PFLAG_4_OFFSET_TABLES) != 0)
+    if ((flags & PFLAG_4_OFFSET_TABLES) != 0)
     {
       end = 68;
 
@@ -229,7 +198,7 @@ public class ExoBuffer
       tableLo[i] = a & 0xFF;
       tableHi[i] = a >>> 8;
 
-      if ((flagsProto & PFLAG_BITS_COPY_GT_7) != 0)
+      if ((flags & PFLAG_BITS_COPY_GT_7) != 0)
       {
         b = getBits (3);
         b |= getBits (1) << 3;
@@ -239,6 +208,7 @@ public class ExoBuffer
 
       tableBi[i] = b;
     }
+    //    tableDump ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -266,9 +236,9 @@ public class ExoBuffer
     int len;
     int srcPtr = 0;
     int literal;
-    int threshold = (flagsProto & PFLAG_4_OFFSET_TABLES) != 0 ? 4 : 3;
+    int threshold = (flags & PFLAG_4_OFFSET_TABLES) != 0 ? 4 : 3;
 
-    if ((flagsProto & PFLAG_IMPL_1LITERAL) != 0)
+    if ((flags & PFLAG_IMPL_1LITERAL) != 0)
     {
       len = 1;
       literal = 1;
@@ -277,8 +247,6 @@ public class ExoBuffer
 
     while (true)
     {
-      literal = 0;
-
       if (getBits (1) != 0)
       {
         len = 1;
@@ -299,12 +267,34 @@ public class ExoBuffer
         else
         {
           len = getCooked (val);
+          literal = 0;
+
           int i = (len > threshold ? threshold : len) - 1;
           srcPtr = outPos - getCooked (tableOff[i] + getBits (tableBit[i]));
         }
       }
       srcPtr = copy (len, literal, srcPtr);
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getGammaCode ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int gammaCode = 0;
+
+    while (getBits (1) == 0)
+      ++gammaCode;
+
+    return gammaCode;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getCooked (int index)
+  // ---------------------------------------------------------------------------------//
+  {
+    int base = tableLo[index] | (tableHi[index] << 8);
+    return base + getBits (tableBi[index]);
   }
 
   // ---------------------------------------------------------------------------------//

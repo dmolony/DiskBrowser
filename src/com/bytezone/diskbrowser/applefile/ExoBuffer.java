@@ -19,7 +19,7 @@ public class ExoBuffer
   private static int PFLAG_BITS_ALIGN_START = (1 << PBIT_BITS_ALIGN_START);
   private static int PFLAG_4_OFFSET_TABLES = (1 << PBIT_4_OFFSET_TABLES);
 
-  byte[] outBuffer = new byte[16384];
+  byte[] outBuffer = new byte[50000];
 
   // ---------------------------------------------------------------------------------//
   public ExoBuffer (byte[] inBuffer)

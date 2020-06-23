@@ -666,11 +666,9 @@ public abstract class HiResImage extends AbstractFile
   public static boolean isExo (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    if (buffer[0] == 1 && buffer[1] == 0)
-    {
-      //      ExoBuffer exoBuffer = new ExoBuffer (buffer);
+    if (buffer[0] == 1 && buffer[1] == 0)       // this sucks
       return true;
-    }
+
     return false;
   }
 

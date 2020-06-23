@@ -19,7 +19,7 @@ public class ExoBuffer
   private static int PFLAG_BITS_ALIGN_START = (1 << PBIT_BITS_ALIGN_START);
   private static int PFLAG_4_OFFSET_TABLES = (1 << PBIT_4_OFFSET_TABLES);
 
-  byte[] outBuffer = new byte[8192];
+  byte[] outBuffer = new byte[16384];
 
   // ---------------------------------------------------------------------------------//
   public ExoBuffer (byte[] inBuffer)
@@ -31,21 +31,26 @@ public class ExoBuffer
     //    tableDump (decCtx.table);
     decCtxDecrunch (decCtx);
 
+    if (decCtx.outPos != outBuffer.length)
+    {
+      byte[] outBuffer2 = new byte[decCtx.outPos];
+      System.arraycopy (outBuffer, 0, outBuffer2, 0, outBuffer2.length);
+      outBuffer = outBuffer2;
+    }
     reverse (outBuffer);
-    //    System.out.println (HexFormatter.format (outBuffer));
   }
 
+  // ---------------------------------------------------------------------------------//
   private void reverse (byte[] inBuffer)
+  // ---------------------------------------------------------------------------------//
   {
     int lo = 0;
     int hi = inBuffer.length - 1;
     while (lo < hi)
     {
       byte temp = inBuffer[lo];
-      inBuffer[lo] = inBuffer[hi];
-      inBuffer[hi] = temp;
-      ++lo;
-      --hi;
+      inBuffer[lo++] = inBuffer[hi];
+      inBuffer[hi--] = temp;
     }
   }
 

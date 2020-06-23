@@ -322,12 +322,18 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (auxType == 0x3FF8 && HiResImage.isExo (exactBuffer))
           {
             ExoBuffer exoBuffer = new ExoBuffer (exactBuffer);
-            file = new OriginalHiResImage (name, exoBuffer.getExpandedBuffer (), 0x4000);
+            byte[] outBuffer = exoBuffer.getExpandedBuffer ();
+            if (outBuffer.length == 0x2000)
+              file = new OriginalHiResImage (name, outBuffer, 0x3FF8);
+            else if (outBuffer.length == 0x4000)
+              file = new DoubleHiResImage (name, outBuffer);
+            else
+              file = new AssemblerProgram (name, exactBuffer, auxType);
           }
           else if (oneOf (endOfFile, 0x1FF8, 0x1FFF, 0x2000, 0x4000)
               && oneOf (auxType, 0x1FFF, 0x2000, 0x4000, 0x6000))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
-          else if (endOfFile == 38400 && name.startsWith ("LVL."))
+          else if (endOfFile == 0x9600 && name.startsWith ("LVL."))
             file = new LodeRunner (name, exactBuffer);
           else if (auxType == 0x1000 && CharacterRom.isRom (exactBuffer))
             file = new CharacterRom (name, exactBuffer);

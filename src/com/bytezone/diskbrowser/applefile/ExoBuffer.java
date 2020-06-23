@@ -264,10 +264,7 @@ public class ExoBuffer
   // ---------------------------------------------------------------------------------//
   {
     int len;
-    int offset;
-    int i;
-    int val;
-    int src = 0;
+    int srcPtr = 0;
     int literal;
     int threshold = (flagsProto & PFLAG_4_OFFSET_TABLES) != 0 ? 4 : 3;
 
@@ -275,7 +272,7 @@ public class ExoBuffer
     {
       len = 1;
       literal = 1;
-      src = literal (len, literal, src);
+      srcPtr = copy (len, literal, srcPtr);
     }
 
     while (true)
@@ -286,36 +283,32 @@ public class ExoBuffer
       {
         len = 1;
         literal = 1;
-        src = literal (len, literal, src);
-        continue;
       }
-
-      val = getGammaCode ();
-
-      if (val == 16)
-        break;
-
-      if (val == 17)
+      else
       {
-        len = getBits (16);
-        literal = 1;
-        src = literal (len, literal, src);
-        continue;
+        int val = getGammaCode ();
+
+        if (val == 16)
+          break;
+
+        if (val == 17)
+        {
+          len = getBits (16);
+          literal = 1;
+        }
+        else
+        {
+          len = getCooked (val);
+          int i = (len > threshold ? threshold : len) - 1;
+          srcPtr = outPos - getCooked (tableOff[i] + getBits (tableBit[i]));
+        }
       }
-
-      len = getCooked (val);
-      i = (len > threshold ? threshold : len) - 1;
-      val = tableOff[i] + getBits (tableBit[i]);
-      offset = getCooked (val);
-
-      src = outPos - offset;
-
-      src = literal (len, literal, src);
+      srcPtr = copy (len, literal, srcPtr);
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private int literal (int len, int literal, int src)
+  private int copy (int len, int literal, int src)
   // ---------------------------------------------------------------------------------//
   {
     assert len > 0;

@@ -4,7 +4,7 @@ package com.bytezone.diskbrowser.applefile;
 // unpack: ~/exomizer-3.0.2/src/exomizer raw -d -b -P23 LODE148c,0,-2 -o LODE148x
 
 // -----------------------------------------------------------------------------------//
-public class ExoBuffer
+public class ExoBufferC
 {
   private static int PBIT_BITS_ORDER_BE = 0;
   private static int PBIT_BITS_COPY_GT_7 = 1;
@@ -18,53 +18,21 @@ public class ExoBuffer
   private static int PFLAG_BITS_ALIGN_START = (1 << PBIT_BITS_ALIGN_START);
   private static int PFLAG_4_OFFSET_TABLES = (1 << PBIT_4_OFFSET_TABLES);
 
-  int inPos;
-  int inEnd;
-  int outPos;
-
-  byte[] inBuffer;
   byte[] outBuffer = new byte[50000];
 
-  int bitBuffer;
-
-  int bitsRead;
-  int flagsProto;
-
-  int tableBit[] = new int[8];
-  int tableOff[] = new int[8];
-  int tableBi[] = new int[100];
-  int tableLo[] = new int[100];
-  int tableHi[] = new int[100];
-
   // ---------------------------------------------------------------------------------//
-  public ExoBuffer (byte[] inBuffer)
+  public ExoBufferC (byte[] inBuffer)
   // ---------------------------------------------------------------------------------//
   {
     reverse (inBuffer);
-
-    bitsRead = 0;
-
-    this.inBuffer = inBuffer;
-    inEnd = inBuffer.length;
-
-    inPos = 2;
-    flagsProto = 23;
-
-    outPos = 0;
-
-    if ((flagsProto & PFLAG_BITS_ALIGN_START) != 0)
-      bitBuffer = 0;
-    else
-      bitBuffer = getByte ();
-
-    tableInit ();
-
+    DecCtx decCtx = new DecCtx ();
+    decCtxInit (decCtx, inBuffer, outBuffer, 23);
     //    tableDump (decCtx.table);
-    decCtxDecrunch ();
+    decCtxDecrunch (decCtx);
 
-    if (outPos != outBuffer.length)
+    if (decCtx.outPos != outBuffer.length)
     {
-      byte[] outBuffer2 = new byte[outPos];
+      byte[] outBuffer2 = new byte[decCtx.outPos];
       System.arraycopy (outBuffer, 0, outBuffer2, 0, outBuffer2.length);
       outBuffer = outBuffer2;
     }
@@ -93,48 +61,48 @@ public class ExoBuffer
   }
 
   // ---------------------------------------------------------------------------------//
-  private int bitBufRotate (int carry)
+  private int bitBufRotate (DecCtx decCtx, int carry)
   // ---------------------------------------------------------------------------------//
   {
     int carryOut;
 
-    if ((flagsProto & PFLAG_BITS_ORDER_BE) != 0)
+    if ((decCtx.flagsProto & PFLAG_BITS_ORDER_BE) != 0)
     {
-      carryOut = (bitBuffer & 0x80) == 0 ? 0 : 1;
-      bitBuffer = (bitBuffer << 1) & 0xFF;
+      carryOut = (decCtx.bitBuffer & 0x80) == 0 ? 0 : 1;
+      decCtx.bitBuffer = (decCtx.bitBuffer << 1) & 0xFF;
 
       if (carry != 0)
-        bitBuffer |= 0x01;
+        decCtx.bitBuffer |= 0x01;
     }
     else
     {
-      carryOut = bitBuffer & 0x01;
-      bitBuffer = (bitBuffer >>> 1) & 0xFF;
+      carryOut = decCtx.bitBuffer & 0x01;
+      decCtx.bitBuffer = (decCtx.bitBuffer >>> 1) & 0xFF;
 
       if (carry != 0)
-        bitBuffer |= 0x80;
+        decCtx.bitBuffer |= 0x80;
     }
 
     return carryOut;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getByte ()
+  private int getByte (DecCtx decCtx)
   // ---------------------------------------------------------------------------------//
   {
-    bitsRead += 8;
-    int c = inBuffer[inPos++] & 0xFF;
+    decCtx.bitsRead += 8;
+    int c = decCtx.inBuffer[decCtx.inPos++] & 0xFF;
     return c;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getBits (int count)
+  private int getBits (DecCtx decCtx, int count)
   // ---------------------------------------------------------------------------------//
   {
     int byteCopy = 0;
     int value = 0;
 
-    if ((flagsProto & PFLAG_BITS_COPY_GT_7) != 0)
+    if ((decCtx.flagsProto & PFLAG_BITS_COPY_GT_7) != 0)
     {
       while (count > 7)
       {
@@ -145,78 +113,78 @@ public class ExoBuffer
 
     while (count-- > 0)
     {
-      int carry = bitBufRotate (0);
+      int carry = bitBufRotate (decCtx, 0);
 
-      if (bitBuffer == 0)
+      if (decCtx.bitBuffer == 0)
       {
-        bitBuffer = getByte ();
-        bitsRead -= 8;
-        carry = bitBufRotate (1);
+        decCtx.bitBuffer = getByte (decCtx);
+        decCtx.bitsRead -= 8;
+        carry = bitBufRotate (decCtx, 1);
       }
       value <<= 1;
       value |= carry;
-      bitsRead++;
+      decCtx.bitsRead++;
     }
 
     while (byteCopy-- > 0)
     {
       value <<= 8;
-      value |= getByte ();
+      value |= getByte (decCtx);
     }
 
     return value;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getGammaCode ()
+  private int getGammaCode (DecCtx decCtx)
   // ---------------------------------------------------------------------------------//
   {
     int gammaCode = 0;
 
-    while (getBits (1) == 0)
+    while (getBits (decCtx, 1) == 0)
       ++gammaCode;
 
     return gammaCode;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getCooked (int index)
+  private int getCooked (DecCtx decCtx, int index)
   // ---------------------------------------------------------------------------------//
   {
-    int base = tableLo[index] | (tableHi[index] << 8);
-    return base + getBits (tableBi[index]);
+    int base = decCtx.table.tableLo[index] | (decCtx.table.tableHi[index] << 8);
+    return base + getBits (decCtx, decCtx.table.tableBi[index]);
   }
 
   // ---------------------------------------------------------------------------------//
-  private void tableInit ()
+  private void tableInit (DecCtx decCtx, DecTable decTable)
   // ---------------------------------------------------------------------------------//
   {
     int end;
     int a = 0;
     int b = 0;
 
-    tableBit[0] = 2;
-    tableBit[1] = 4;
-    tableBit[2] = 4;
+    decTable.tableBit[0] = 2;
+    decTable.tableBit[1] = 4;
+    decTable.tableBit[2] = 4;
 
-    if ((flagsProto & PFLAG_4_OFFSET_TABLES) != 0)
+    if ((decCtx.flagsProto & PFLAG_4_OFFSET_TABLES) != 0)
     {
       end = 68;
 
-      tableBit[3] = 4;
+      decTable.tableBit[3] = 4;
 
-      tableOff[0] = 64;
-      tableOff[1] = 48;
-      tableOff[2] = 32;
-      tableOff[3] = 16;
+      decTable.tableOff[0] = 64;
+      decTable.tableOff[1] = 48;
+      decTable.tableOff[2] = 32;
+      decTable.tableOff[3] = 16;
     }
     else
     {
       end = 52;
 
-      tableOff[0] = 48;
-      tableOff[1] = 32;
-      tableOff[2] = 16;
+      decTable.tableOff[0] = 48;
+      decTable.tableOff[1] = 32;
+      decTable.tableOff[2] = 16;
     }
 
     for (int i = 0; i < end; i++)
@@ -226,41 +194,64 @@ public class ExoBuffer
       else
         a = 1;
 
-      tableLo[i] = a & 0xFF;
-      tableHi[i] = a >>> 8;
+      decTable.tableLo[i] = a & 0xFF;
+      decTable.tableHi[i] = a >>> 8;
 
-      if ((flagsProto & PFLAG_BITS_COPY_GT_7) != 0)
+      if ((decCtx.flagsProto & PFLAG_BITS_COPY_GT_7) != 0)
       {
-        b = getBits (3);
-        b |= getBits (1) << 3;
+        b = getBits (decCtx, 3);
+        b |= getBits (decCtx, 1) << 3;
       }
       else
-        b = getBits (4);
+        b = getBits (decCtx, 4);
 
-      tableBi[i] = b;
+      decTable.tableBi[i] = b;
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private void tableDump ()
+  private void tableDump (DecTable table)
   // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < 16; i++)
-      System.out.printf ("%X", tableBi[i]);
+      System.out.printf ("%X", table.tableBi[i]);
 
     for (int j = 0; j < 3; j++)
     {
       System.out.printf (",");
-      int start = tableOff[j];
-      int end = start + (1 << tableBit[j]);
+      int start = table.tableOff[j];
+      int end = start + (1 << table.tableBit[j]);
       for (int i = start; i < end; i++)
-        System.out.printf ("%X", tableBi[i]);
+        System.out.printf ("%X", table.tableBi[i]);
     }
     System.out.println ();
   }
 
   // ---------------------------------------------------------------------------------//
-  private void decCtxDecrunch ()
+  private void decCtxInit (DecCtx decCtx, byte[] inBuffer, byte[] outBuffer, int flags)
+  // ---------------------------------------------------------------------------------//
+  {
+    decCtx.bitsRead = 0;
+
+    decCtx.inBuffer = inBuffer;
+    decCtx.inEnd = inBuffer.length;
+
+    decCtx.inPos = 2;
+    decCtx.flagsProto = flags;
+
+    decCtx.outBuffer = outBuffer;
+    decCtx.outPos = 0;
+
+    if ((decCtx.flagsProto & PFLAG_BITS_ALIGN_START) != 0)
+      decCtx.bitBuffer = 0;
+    else
+      decCtx.bitBuffer = getByte (decCtx);
+
+    tableInit (decCtx, decCtx.table);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void decCtxDecrunch (DecCtx decCtx)
   // ---------------------------------------------------------------------------------//
   {
     int len;
@@ -269,63 +260,92 @@ public class ExoBuffer
     int val;
     int src = 0;
     int literal;
-    int threshold = (flagsProto & PFLAG_4_OFFSET_TABLES) != 0 ? 4 : 3;
+    int threshold = (decCtx.flagsProto & PFLAG_4_OFFSET_TABLES) != 0 ? 4 : 3;
 
-    if ((flagsProto & PFLAG_IMPL_1LITERAL) != 0)
+    if ((decCtx.flagsProto & PFLAG_IMPL_1LITERAL) != 0)
     {
       len = 1;
       literal = 1;
-      src = literal (len, literal, src);
+      src = literal (decCtx, len, literal, src);
     }
 
     while (true)
     {
       literal = 0;
 
-      if (getBits (1) != 0)
+      if (getBits (decCtx, 1) != 0)
       {
         len = 1;
         literal = 1;
-        src = literal (len, literal, src);
+        src = literal (decCtx, len, literal, src);
         continue;
       }
 
-      val = getGammaCode ();
+      val = getGammaCode (decCtx);
 
       if (val == 16)
         break;
 
       if (val == 17)
       {
-        len = getBits (16);
+        len = getBits (decCtx, 16);
         literal = 1;
-        src = literal (len, literal, src);
+        src = literal (decCtx, len, literal, src);
         continue;
       }
 
-      len = getCooked (val);
+      len = getCooked (decCtx, val);
       i = (len > threshold ? threshold : len) - 1;
-      val = tableOff[i] + getBits (tableBit[i]);
-      offset = getCooked (val);
+      val = decCtx.table.tableOff[i] + getBits (decCtx, decCtx.table.tableBit[i]);
+      offset = getCooked (decCtx, val);
 
-      src = outPos - offset;
+      src = decCtx.outPos - offset;
 
-      src = literal (len, literal, src);
+      src = literal (decCtx, len, literal, src);
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private int literal (int len, int literal, int src)
+  private int literal (DecCtx decCtx, int len, int literal, int src)
   // ---------------------------------------------------------------------------------//
   {
     assert len > 0;
     do
     {
-      int val = literal == 0 ? outBuffer[src++] : getByte ();
-      outBuffer[outPos++] = (byte) (val & 0xFF);
+      int val = literal == 0 ? decCtx.outBuffer[src++] : getByte (decCtx);
+      decCtx.outBuffer[decCtx.outPos++] = (byte) (val & 0xFF);
 
     } while (--len > 0);
 
     return src;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  class DecCtx
+  // ---------------------------------------------------------------------------------//
+  {
+    int inPos;
+    int inEnd;
+    int outPos;
+
+    byte[] inBuffer;
+    byte[] outBuffer;
+
+    int bitBuffer;
+
+    DecTable table = new DecTable ();
+    int bitsRead;
+    int flagsProto;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  class DecTable
+  // ---------------------------------------------------------------------------------//
+  {
+    int tableBit[] = new int[8];
+    int tableOff[] = new int[8];
+    int tableBi[] = new int[100];
+    int tableLo[] = new int[100];
+    int tableHi[] = new int[100];
   }
 }

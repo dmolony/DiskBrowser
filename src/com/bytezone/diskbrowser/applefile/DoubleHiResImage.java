@@ -31,8 +31,6 @@ public class DoubleHiResImage extends HiResImage
   {
     super (name, buffer);
 
-    //    assert name.endsWith (".PAC") || name.endsWith ("A2FC");
-
     if (name.endsWith (".PAC"))
     {
       packedBuffer = buffer;

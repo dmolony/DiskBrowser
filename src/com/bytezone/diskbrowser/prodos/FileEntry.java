@@ -12,6 +12,7 @@ import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.applefile.DeviceDriver;
 import com.bytezone.diskbrowser.applefile.DoubleHiResImage;
 import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
+import com.bytezone.diskbrowser.applefile.ExoBuffer;
 import com.bytezone.diskbrowser.applefile.FaddenHiResImage;
 import com.bytezone.diskbrowser.applefile.FileSystemTranslator;
 import com.bytezone.diskbrowser.applefile.FileTypeDescriptorTable;
@@ -318,6 +319,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new DoubleHiResImage (name, exactBuffer);
           else if (endOfFile == 0x4000 && auxType == 0x4000)
             file = new DoubleHiResImage (name, exactBuffer);
+          else if (auxType == 0x3FF8 && HiResImage.isExo (exactBuffer))
+          {
+            ExoBuffer exoBuffer = new ExoBuffer (exactBuffer);
+            file = new OriginalHiResImage (name, exoBuffer.getExpandedBuffer (), 0x4000);
+          }
           else if (oneOf (endOfFile, 0x1FF8, 0x1FFF, 0x2000, 0x4000)
               && oneOf (auxType, 0x1FFF, 0x2000, 0x4000, 0x6000))
             file = new OriginalHiResImage (name, exactBuffer, auxType);

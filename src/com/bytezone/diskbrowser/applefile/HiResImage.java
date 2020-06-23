@@ -663,6 +663,18 @@ public abstract class HiResImage extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
+  public static boolean isExo (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (buffer[0] == 1 && buffer[1] == 0)
+    {
+      //      ExoBuffer exoBuffer = new ExoBuffer (buffer);
+      return true;
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
   public static PaletteFactory getPaletteFactory ()
   // ---------------------------------------------------------------------------------//
   {

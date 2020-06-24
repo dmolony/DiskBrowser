@@ -35,31 +35,22 @@ public class ExoBuffer
   // ---------------------------------------------------------------------------------//
   {
     this.inBuffer = inBuffer;
+    Utility.reverse (inBuffer);
 
-    switch (inBuffer[inBuffer.length - 1])
+    switch (inBuffer[0])
     {
       case 0x60:
-        outBuffer = new byte[0x2000];
+        outBuffer = new byte[0x2000];     // HGR
         break;
       case (byte) 0x80:
-        outBuffer = new byte[0x4000];
+        outBuffer = new byte[0x4000];     // DHGR
         break;
       case (byte) 0xA0:
-        outBuffer = new byte[0x8000];
+        outBuffer = new byte[0x8000];     // SHR
         break;
     }
 
-    Utility.reverse (inBuffer);
-
     decrunch ();
-
-    //    if (newSize < outBuffer.length)
-    //    {
-    //      byte[] outBuffer2 = new byte[newSize];
-    //      System.arraycopy (outBuffer, 0, outBuffer2, 0, newSize);
-    //      outBuffer = outBuffer2;
-    //    }
-
     Utility.reverse (outBuffer);
   }
 
@@ -74,10 +65,6 @@ public class ExoBuffer
   public static boolean isExomizer (byte[] buffer, int auxType)
   // ---------------------------------------------------------------------------------//
   {
-    // 00 60 HGR
-    // 00 80 DHGR
-    // 00 A0 SHR
-
     if (auxType != 0x1FF8 && auxType != 0x3FF8)
       return false;
 
@@ -89,7 +76,7 @@ public class ExoBuffer
         && buffer[last] != (byte) 0xA0)
       return false;
 
-    return true;
+    return true;        // maybe
   }
 
   // ---------------------------------------------------------------------------------//

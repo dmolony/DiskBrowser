@@ -1,22 +1,19 @@
 package com.bytezone.diskbrowser.applefile;
 
+import com.bytezone.diskbrowser.utilities.Utility;
+
 // pack::: ~/exomizer-3.0.2/src/exomizer mem -q -P23 -lnone LODE148@0x4000 -o LODE148c
 // unpack: ~/exomizer-3.0.2/src/exomizer raw -d -b -P23 LODE148c,0,-2 -o LODE148x
 
 // -----------------------------------------------------------------------------------//
 public class ExoBuffer
+// -----------------------------------------------------------------------------------//
 {
-  private static int PBIT_BITS_ORDER_BE = 0;
-  private static int PBIT_BITS_COPY_GT_7 = 1;
-  private static int PBIT_IMPL_1LITERAL = 2;
-  private static int PBIT_BITS_ALIGN_START = 3;
-  private static int PBIT_4_OFFSET_TABLES = 4;
-
-  private static int PFLAG_BITS_ORDER_BE = (1 << PBIT_BITS_ORDER_BE);
-  private static int PFLAG_BITS_COPY_GT_7 = (1 << PBIT_BITS_COPY_GT_7);
-  private static int PFLAG_IMPL_1LITERAL = (1 << PBIT_IMPL_1LITERAL);
-  private static int PFLAG_BITS_ALIGN_START = (1 << PBIT_BITS_ALIGN_START);
-  private static int PFLAG_4_OFFSET_TABLES = (1 << PBIT_4_OFFSET_TABLES);
+  private static final int PFLAG_BITS_ORDER_BE = 1;
+  private static final int PFLAG_BITS_COPY_GT_7 = 2;
+  private static final int PFLAG_IMPL_1LITERAL = 4;
+  private static final int PFLAG_BITS_ALIGN_START = 8;
+  private static final int PFLAG_4_OFFSET_TABLES = 16;
 
   private byte[] inBuffer;
   private byte[] outBuffer = new byte[0x8000];
@@ -37,45 +34,19 @@ public class ExoBuffer
   public ExoBuffer (byte[] inBuffer)
   // ---------------------------------------------------------------------------------//
   {
-    reverse (inBuffer);
-
     this.inBuffer = inBuffer;
+    Utility.reverse (inBuffer);
 
-    inPos = 2;
-    outPos = 0;
-    flags = 23;
+    int newSize = decrunch ();
 
-    if ((flags & PFLAG_BITS_ALIGN_START) != 0)
-      bitBuffer = 0;
-    else
-      bitBuffer = getByte ();
-
-    tableInit ();
-    decrunch ();
-
-    if (outPos < outBuffer.length)
+    if (newSize < outBuffer.length)
     {
-      byte[] outBuffer2 = new byte[outPos];
-      System.arraycopy (outBuffer, 0, outBuffer2, 0, outPos);
+      byte[] outBuffer2 = new byte[newSize];
+      System.arraycopy (outBuffer, 0, outBuffer2, 0, newSize);
       outBuffer = outBuffer2;
     }
 
-    reverse (outBuffer);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void reverse (byte[] buffer)
-  // ---------------------------------------------------------------------------------//
-  {
-    int lo = 0;
-    int hi = buffer.length - 1;
-
-    while (lo < hi)
-    {
-      byte temp = buffer[lo];
-      buffer[lo++] = buffer[hi];
-      buffer[hi--] = temp;
-    }
+    Utility.reverse (outBuffer);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -86,6 +57,19 @@ public class ExoBuffer
   }
 
   // ---------------------------------------------------------------------------------//
+  public static boolean isExomizer (byte[] buffer, int auxType)
+  // ---------------------------------------------------------------------------------//
+  {
+    int last = buffer.length - 1;
+    if ((auxType == 0x1FF8 || auxType == 0x3FF8)      //
+        && buffer[0] == 1 && buffer[1] == 0           //
+        && buffer[last - 1] == 0)                     // this sucks
+      return true;
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
   private int bitBufRotate (int carry)
   // ---------------------------------------------------------------------------------//
   {
@@ -93,7 +77,7 @@ public class ExoBuffer
 
     if ((flags & PFLAG_BITS_ORDER_BE) != 0)
     {
-      carryOut = (bitBuffer & 0x80) == 0 ? 0 : 1;
+      carryOut = (bitBuffer & 0x80) >>> 7;
       bitBuffer = (bitBuffer << 1) & 0xFF;
 
       if (carry != 0)
@@ -143,8 +127,7 @@ public class ExoBuffer
         bitBuffer = getByte ();
         carry = bitBufRotate (1);
       }
-      value <<= 1;
-      value |= carry;
+      value = (value << 1) | carry;
     }
 
     while (byteCopy-- > 0)
@@ -230,9 +213,20 @@ public class ExoBuffer
   }
 
   // ---------------------------------------------------------------------------------//
-  private void decrunch ()
+  private int decrunch ()
   // ---------------------------------------------------------------------------------//
   {
+    inPos = 2;
+    outPos = 0;
+    flags = 23;
+
+    if ((flags & PFLAG_BITS_ALIGN_START) != 0)
+      bitBuffer = 0;
+    else
+      bitBuffer = getByte ();
+
+    tableInit ();
+
     int len;
     int srcPtr = 0;
     boolean literal;
@@ -275,6 +269,7 @@ public class ExoBuffer
       }
       srcPtr = copy (len, literal, srcPtr);
     }
+    return outPos;
   }
 
   // ---------------------------------------------------------------------------------//

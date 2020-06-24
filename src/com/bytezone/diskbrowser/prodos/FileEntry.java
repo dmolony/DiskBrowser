@@ -319,8 +319,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new DoubleHiResImage (name, exactBuffer);
           else if (endOfFile == 0x4000 && auxType == 0x4000)
             file = new DoubleHiResImage (name, exactBuffer);
-          else if ((auxType == 0x1FF8 || auxType == 0x3FF8)
-              && HiResImage.isExo (exactBuffer))
+          else if (ExoBuffer.isExomizer (exactBuffer, auxType))
           {
             ExoBuffer exoBuffer = new ExoBuffer (exactBuffer);
             byte[] outBuffer = exoBuffer.getExpandedBuffer ();

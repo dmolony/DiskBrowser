@@ -327,7 +327,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             switch (outBuffer.length)
             {
               case 0x2000:
-                file = new OriginalHiResImage (name, outBuffer, 0x3FF8);
+                file = new OriginalHiResImage (name, outBuffer, 0x4000);
                 break;
               case 0x4000:
                 file = new DoubleHiResImage (name, outBuffer);

@@ -16,7 +16,7 @@ public class ExoBuffer
   private static final int PFLAG_4_OFFSET_TABLES = 16;
 
   private byte[] inBuffer;
-  private byte[] outBuffer = new byte[0x8000];
+  private byte[] outBuffer;
 
   private int inPos;
   private int outPos;
@@ -35,16 +35,30 @@ public class ExoBuffer
   // ---------------------------------------------------------------------------------//
   {
     this.inBuffer = inBuffer;
+
+    switch (inBuffer[inBuffer.length - 1])
+    {
+      case 0x60:
+        outBuffer = new byte[0x2000];
+        break;
+      case (byte) 0x80:
+        outBuffer = new byte[0x4000];
+        break;
+      case (byte) 0xA0:
+        outBuffer = new byte[0x8000];
+        break;
+    }
+
     Utility.reverse (inBuffer);
 
-    int newSize = decrunch ();
+    decrunch ();
 
-    if (newSize < outBuffer.length)
-    {
-      byte[] outBuffer2 = new byte[newSize];
-      System.arraycopy (outBuffer, 0, outBuffer2, 0, newSize);
-      outBuffer = outBuffer2;
-    }
+    //    if (newSize < outBuffer.length)
+    //    {
+    //      byte[] outBuffer2 = new byte[newSize];
+    //      System.arraycopy (outBuffer, 0, outBuffer2, 0, newSize);
+    //      outBuffer = outBuffer2;
+    //    }
 
     Utility.reverse (outBuffer);
   }
@@ -60,17 +74,26 @@ public class ExoBuffer
   public static boolean isExomizer (byte[] buffer, int auxType)
   // ---------------------------------------------------------------------------------//
   {
-    int last = buffer.length - 1;
-    if ((auxType == 0x1FF8 || auxType == 0x3FF8)      //
-        && buffer[0] == 1 && buffer[1] == 0           //
-        && buffer[last - 1] == 0)                     // this sucks
-      return true;
+    // 00 60 HGR
+    // 00 80 DHGR
+    // 00 A0 SHR
 
-    return false;
+    if (auxType != 0x1FF8 && auxType != 0x3FF8)
+      return false;
+
+    int last = buffer.length - 1;
+    if (buffer[0] != 1 || buffer[1] != 0 || buffer[last - 1] != 0)
+      return false;
+
+    if (buffer[last] != 0x60 && buffer[last] != (byte) 0x80
+        && buffer[last] != (byte) 0xA0)
+      return false;
+
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int bitBufRotate (int carry)
+  private int bitBufRotate (int carryIn)
   // ---------------------------------------------------------------------------------//
   {
     int carryOut;
@@ -80,7 +103,7 @@ public class ExoBuffer
       carryOut = (bitBuffer & 0x80) >>> 7;
       bitBuffer = (bitBuffer << 1) & 0xFF;
 
-      if (carry != 0)
+      if (carryIn != 0)
         bitBuffer |= 0x01;
     }
     else
@@ -88,7 +111,7 @@ public class ExoBuffer
       carryOut = bitBuffer & 0x01;
       bitBuffer = (bitBuffer >>> 1) & 0xFF;
 
-      if (carry != 0)
+      if (carryIn != 0)
         bitBuffer |= 0x80;
     }
 
@@ -213,7 +236,7 @@ public class ExoBuffer
   }
 
   // ---------------------------------------------------------------------------------//
-  private int decrunch ()
+  private void decrunch ()
   // ---------------------------------------------------------------------------------//
   {
     inPos = 2;
@@ -269,7 +292,7 @@ public class ExoBuffer
       }
       srcPtr = copy (len, literal, srcPtr);
     }
-    return outPos;
+    assert outPos == outBuffer.length;
   }
 
   // ---------------------------------------------------------------------------------//

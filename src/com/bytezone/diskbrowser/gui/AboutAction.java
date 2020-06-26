@@ -7,7 +7,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // this is not being used
 // -----------------------------------------------------------------------------------//

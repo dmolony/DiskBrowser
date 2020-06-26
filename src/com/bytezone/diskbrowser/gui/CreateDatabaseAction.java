@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JOptionPane;
 
-import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class CreateDatabaseAction extends DefaultAction

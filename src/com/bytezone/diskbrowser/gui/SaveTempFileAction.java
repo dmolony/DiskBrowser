@@ -8,8 +8,8 @@ import java.nio.file.Files;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class SaveTempFileAction extends DefaultAction

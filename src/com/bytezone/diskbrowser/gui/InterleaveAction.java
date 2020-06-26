@@ -5,8 +5,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.DefaultAction;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class InterleaveAction extends DefaultAction

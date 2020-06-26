@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class RefreshTreeAction extends DefaultAction

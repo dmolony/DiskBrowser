@@ -9,7 +9,7 @@ import java.nio.file.StandardOpenOption;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
@@ -35,8 +35,7 @@ class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
       System.out.println ("No sectors");
       return;
     }
-    byte[] buffer =
-        event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
+    byte[] buffer = event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
 
     JFileChooser fileChooser = new JFileChooser ();
     fileChooser.setDialogTitle ("Save sectors");

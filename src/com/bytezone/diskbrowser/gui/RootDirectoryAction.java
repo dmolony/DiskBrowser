@@ -11,8 +11,7 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.DefaultAction;
-import com.bytezone.common.Platform;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class RootDirectoryAction extends DefaultAction implements QuitListener
@@ -40,7 +39,7 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
   public void actionPerformed (ActionEvent e)
   // ---------------------------------------------------------------------------------//
   {
-    JFileChooser chooser = new JFileChooser (Platform.userHome);
+    JFileChooser chooser = new JFileChooser (System.getProperty ("user.home"));
     chooser.setDialogTitle ("Select FOLDER containing disk images");
     chooser.setFileSelectionMode (JFileChooser.DIRECTORIES_ONLY);
     if (rootFolder != null)

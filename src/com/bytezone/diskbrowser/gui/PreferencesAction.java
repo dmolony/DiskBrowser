@@ -8,7 +8,7 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // ********** not currently used ***********
 

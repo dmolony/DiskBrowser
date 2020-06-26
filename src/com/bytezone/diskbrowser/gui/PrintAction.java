@@ -10,7 +10,7 @@ import java.awt.print.PrinterJob;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.DefaultAction;
+import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
 class PrintAction extends DefaultAction

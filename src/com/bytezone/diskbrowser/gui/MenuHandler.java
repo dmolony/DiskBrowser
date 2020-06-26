@@ -17,7 +17,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
-import com.bytezone.common.EnvironmentAction;
 import com.bytezone.common.FontAction;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgram;
@@ -28,6 +27,7 @@ import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
+import com.bytezone.diskbrowser.utilities.EnvironmentAction;
 
 // -----------------------------------------------------------------------------------//
 class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitListener,

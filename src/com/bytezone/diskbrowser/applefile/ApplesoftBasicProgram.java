@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class ApplesoftBasicProgram extends BasicProgram
 {
@@ -37,7 +38,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int max = buffer.length - 4;    // need at least 4 bytes to make a SourceLine
     while (ptr < max)
     {
-      int offset = HexFormatter.unsignedShort (buffer, ptr);
+      int offset = Utility.unsignedShort (buffer, ptr);
       if (offset <= prevOffset)
         break;
 
@@ -214,7 +215,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int ptr = endPtr + 2;
     if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
     {
-      int offset = HexFormatter.unsignedShort (buffer, 0);
+      int offset = Utility.unsignedShort (buffer, 0);
       int programLoadAddress = offset - getLineLength (0);
       fullText.append ("\nExtra data:\n\n");
       fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
@@ -379,7 +380,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       addHeader (pgm);
 
     int ptr = 0;
-    int offset = HexFormatter.unsignedShort (buffer, 0);
+    int offset = Utility.unsignedShort (buffer, 0);
     int programLoadAddress = offset - getLineLength (0);
 
     while (ptr <= endPtr)             // stop at the same place as the source listing
@@ -423,7 +424,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int programLoadAddress = 0;
     if (buffer.length > 1)
     {
-      int offset = HexFormatter.intValue (buffer[0], buffer[1]);
+      int offset = Utility.intValue (buffer[0], buffer[1]);
       programLoadAddress = offset - getLineLength (0);
     }
     return programLoadAddress;
@@ -431,7 +432,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   private int getLineLength (int ptr)
   {
-    int offset = HexFormatter.unsignedShort (buffer, ptr);
+    int offset = Utility.unsignedShort (buffer, ptr);
     if (offset == 0)
       return 0;
     ptr += 4;               // skip offset and line number
@@ -478,7 +479,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     public SourceLine (int ptr)
     {
       linePtr = ptr;
-      lineNumber = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      lineNumber = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
 
       int startPtr = ptr += 4;
       boolean inString = false;           // can toggle

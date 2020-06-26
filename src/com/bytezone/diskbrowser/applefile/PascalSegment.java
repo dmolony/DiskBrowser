@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class PascalSegment extends AbstractFile implements PascalConstants
@@ -42,14 +43,14 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     //    this.blockOffset = blockOffset;
     //    this.relocator = relocator;
 
-    this.blockNo = HexFormatter.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
-    this.size = HexFormatter.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
+    this.blockNo = Utility.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
+    this.size = Utility.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
 
-    segKind = HexFormatter.intValue (fullBuffer[0xC0 + seq * 2],
-        fullBuffer[0xC0 + seq * 2 + 1]);
+    segKind =
+        Utility.intValue (fullBuffer[0xC0 + seq * 2], fullBuffer[0xC0 + seq * 2 + 1]);
 
-    textAddress = HexFormatter.intValue (fullBuffer[0xE0 + seq * 2],
-        fullBuffer[0xE0 + seq * 2 + 1]);
+    textAddress =
+        Utility.intValue (fullBuffer[0xE0 + seq * 2], fullBuffer[0xE0 + seq * 2 + 1]);
 
     // segment 1 is the main segment, 2-6 are used by the system, and 7
     // onwards is for the program
@@ -64,9 +65,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     version = (flags & 0xD0) >> 5;
 
-    intrinsSegs1 = HexFormatter.intValue (fullBuffer[0x120 + seq * 4],
-        fullBuffer[0x120 + seq * 4 + 1]);
-    intrinsSegs2 = HexFormatter.intValue (fullBuffer[0x120 + seq * 4 + 2],
+    intrinsSegs1 =
+        Utility.intValue (fullBuffer[0x120 + seq * 4], fullBuffer[0x120 + seq * 4 + 1]);
+    intrinsSegs2 = Utility.intValue (fullBuffer[0x120 + seq * 4 + 2],
         fullBuffer[0x120 + seq * 4 + 3]);
 
     int offset = blockNo * 512;

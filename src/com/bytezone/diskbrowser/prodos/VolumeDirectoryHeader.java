@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 /*
  * There is only one of these - it is always the first entry in the first block.
@@ -27,8 +27,8 @@ class VolumeDirectoryHeader extends DirectoryHeader
   {
     super (parentDisk, entryBuffer);
 
-    bitMapBlock = HexFormatter.unsignedShort (entryBuffer, 35);
-    totalBlocks = HexFormatter.unsignedShort (entryBuffer, 37);
+    bitMapBlock = Utility.unsignedShort (entryBuffer, 35);
+    totalBlocks = Utility.unsignedShort (entryBuffer, 37);
 
     //    if (totalBlocks == 0xFFFF || totalBlocks == 0x7FFF)
     //      totalBlocks = (int) disk.getFile ().length () / 4096 * 8;// ignore extra bytes
@@ -40,7 +40,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     {
       dataBlocks.add (disk.getDiskAddress (block));
       byte[] buffer = disk.readBlock (block);
-      block = HexFormatter.unsignedShort (buffer, 2);
+      block = Utility.unsignedShort (buffer, 2);
     } while (block > 0);
 
     // convert the Free Sector Table
@@ -103,7 +103,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     {
       byte[] buf = disk.readBlock (block);
       blockList.add (buf);
-      block = HexFormatter.intValue (buf[2], buf[3]); // next block
+      block = Utility.intValue (buf[2], buf[3]); // next block
     } while (block > 0);
 
     byte[] fullBuffer = new byte[blockList.size () * 507];

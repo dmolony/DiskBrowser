@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.prodos;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 abstract class DirectoryHeader extends CatalogEntry
@@ -18,6 +18,6 @@ abstract class DirectoryHeader extends CatalogEntry
 
     entryLength = entryBuffer[31] & 0xFF;
     entriesPerBlock = entryBuffer[32] & 0xFF;
-    fileCount = HexFormatter.intValue (entryBuffer[33], entryBuffer[34]);
+    fileCount = Utility.intValue (entryBuffer[33], entryBuffer[34]);
   }
 }

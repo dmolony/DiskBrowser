@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.applefile;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // pack::: ~/exomizer-3.0.2/src/exomizer mem -q -P23 -lnone LODE148@0x4000 -o LODE148c
@@ -38,15 +37,15 @@ public class ExoBuffer
     this.inBuffer = inBuffer;
     Utility.reverse (inBuffer);
 
-    switch (inBuffer[0])
+    switch (Utility.getShortBigEndian (inBuffer, 0))
     {
-      case 0x60:
+      case 0x6000:
         outBuffer = new byte[0x2000];     // HGR
         break;
-      case (byte) 0x80:
+      case 0x8000:
         outBuffer = new byte[0x4000];     // DHGR
         break;
-      case (byte) 0xA0:
+      case 0xA000:
         outBuffer = new byte[0x8000];     // SHR
         break;
     }
@@ -69,7 +68,7 @@ public class ExoBuffer
     if (auxType != 0x1FF8 && auxType != 0x3FF8)
       return false;
 
-    int address = HexFormatter.unsignedShort (buffer, buffer.length - 2);
+    int address = Utility.unsignedShort (buffer, buffer.length - 2);
 
     if (address != 0x6000 && address != 0x8000 && address != 0xA000)
       return false;

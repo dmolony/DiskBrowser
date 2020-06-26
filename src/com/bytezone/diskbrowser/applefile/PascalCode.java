@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // ---------------------------------------------------------------------------------//
 public class PascalCode extends AbstractFile
@@ -46,7 +47,7 @@ public class PascalCode extends AbstractFile
     for (int i = 0; i < 16; i++)
     {
       String codeName = HexFormatter.getString (buffer, 0x40 + i * 8, 8).trim ();
-      int size = HexFormatter.intValue (buffer[i * 4 + 2], buffer[i * 4 + 3]);
+      int size = Utility.intValue (buffer[i * 4 + 2], buffer[i * 4 + 3]);
       if (codeName.length () == 0 && size > 0)
         codeName = "<NULL" + ++nonameCounter + ">";
       if (size > 0)

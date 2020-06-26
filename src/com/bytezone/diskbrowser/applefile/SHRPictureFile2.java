@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class SHRPictureFile2 extends HiResImage
@@ -98,10 +99,10 @@ public class SHRPictureFile2 extends HiResImage
         unpack (buffer, 0, buffer.length, newBuffer, 0);
         buffer = newBuffer;
 
-        int mode = HexFormatter.unsignedShort (this.buffer, 0);
-        int rect1 = HexFormatter.unsignedLong (this.buffer, 2);
-        int rect2 = HexFormatter.unsignedLong (this.buffer, 6);
-        int version = HexFormatter.unsignedShort (this.buffer, 10);    // $8211
+        int mode = Utility.unsignedShort (this.buffer, 0);
+        int rect1 = Utility.unsignedLong (this.buffer, 2);
+        int rect2 = Utility.unsignedLong (this.buffer, 6);
+        int version = Utility.unsignedShort (this.buffer, 10);    // $8211
 
         break;
 
@@ -154,7 +155,7 @@ public class SHRPictureFile2 extends HiResImage
   // ---------------------------------------------------------------------------------//
   {
     //    int len = HexFormatter.unsignedLong (buffer, 0x8000);
-    delay = HexFormatter.unsignedLong (buffer, 0x8004);
+    delay = Utility.unsignedLong (buffer, 0x8004);
     if (delay > 60)
       delay = 10;
     delay = delay * 1000 / 60;
@@ -172,7 +173,7 @@ public class SHRPictureFile2 extends HiResImage
     int start = ptr;
     while (ptr < buffer.length)
     {
-      int off = HexFormatter.unsignedShort (buffer, ptr);
+      int off = Utility.unsignedShort (buffer, ptr);
 
       ptr += 4;
       if (off == 0)
@@ -298,7 +299,7 @@ public class SHRPictureFile2 extends HiResImage
 
     while (true)
     {
-      int offset = HexFormatter.unsignedShort (buffer, ptr);
+      int offset = Utility.unsignedShort (buffer, ptr);
       if (offset == 0)
         break;
 

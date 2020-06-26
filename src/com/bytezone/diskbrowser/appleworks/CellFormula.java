@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.appleworks;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class CellFormula
@@ -33,7 +33,7 @@ class CellFormula
       }
       else if (value == 0xFD)
       {
-        double d = HexFormatter.getSANEDouble (buffer, offset + i + 1);
+        double d = Utility.getSANEDouble (buffer, offset + i + 1);
         String num = String.format ("%f", d).trim ();
         while (num.endsWith ("0"))
           num = num.substring (0, num.length () - 1);

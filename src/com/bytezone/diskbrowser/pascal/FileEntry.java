@@ -12,6 +12,7 @@ import com.bytezone.diskbrowser.applefile.PascalSegment;
 import com.bytezone.diskbrowser.applefile.PascalText;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class FileEntry extends CatalogEntry
@@ -25,7 +26,7 @@ public class FileEntry extends CatalogEntry
   {
     super (parent, buffer);
 
-    bytesUsedInLastBlock = HexFormatter.intValue (buffer[22], buffer[23]);
+    bytesUsedInLastBlock = Utility.intValue (buffer[22], buffer[23]);
     date = HexFormatter.getPascalDate (buffer, 24);
 
     int max = Math.min (lastBlock, parent.getDisk ().getTotalBlocks ());

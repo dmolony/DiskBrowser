@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class ProdosDirectory extends AbstractFile implements ProdosConstants
@@ -70,7 +71,7 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
         case ProdosConstants.GSOS_EXTENDED_FILE:
         case ProdosConstants.SUBDIRECTORY:
           int type = buffer[i + 16] & 0xFF;
-          int blocks = HexFormatter.intValue (buffer[i + 19], buffer[i + 20]);
+          int blocks = Utility.intValue (buffer[i + 19], buffer[i + 20]);
 
           GregorianCalendar created = HexFormatter.getAppleDate (buffer, i + 24);
           String dateC = created == null ? NO_DATE
@@ -80,15 +81,14 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
           String dateM = modified == null ? NO_DATE
               : sdf.format (modified.getTime ()).toUpperCase ().replace (".", "");
           String timeM = modified == null ? "" : stf.format (modified.getTime ());
-          int eof =
-              HexFormatter.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
+          int eof = Utility.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
           int fileType = buffer[i + 16] & 0xFF;
           locked = (buffer[i + 30] & 0xE0) == 0xE0 ? " " : "*";
 
           switch (fileType)
           {
             case FILE_TYPE_TEXT:
-              int aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
+              int aux = Utility.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("R=%5d", aux);
               break;
 
@@ -96,12 +96,12 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
             case FILE_TYPE_PNT:
             case FILE_TYPE_PIC:
             case FILE_TYPE_FOT:
-              aux = HexFormatter.intValue (buffer[i + 31], buffer[i + 32]);
+              aux = Utility.intValue (buffer[i + 31], buffer[i + 32]);
               subType = String.format ("A=$%4X", aux);
               break;
 
             case FILE_TYPE_AWP:
-              aux = HexFormatter.intValue (buffer[i + 32], buffer[i + 31]); // backwards!
+              aux = Utility.intValue (buffer[i + 32], buffer[i + 31]); // backwards!
               if (aux != 0)
                 filename = convert (filename, aux);
               break;

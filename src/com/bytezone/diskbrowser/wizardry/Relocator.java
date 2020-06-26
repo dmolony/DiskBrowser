@@ -7,7 +7,7 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.AppleDisk;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class Relocator extends AbstractFile
@@ -25,7 +25,7 @@ public class Relocator extends AbstractFile
   {
     super (name, buffer);
 
-    checkByte = HexFormatter.intValue (buffer[0], buffer[1]);
+    checkByte = Utility.intValue (buffer[0], buffer[1]);
 
     int ptr = 2;            // skip checkByte
 
@@ -169,8 +169,8 @@ public class Relocator extends AbstractFile
 
     public DiskRecord (byte[] buffer, int ptr)
     {
-      diskNumber = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      totDiskSegments = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 4]);
+      diskNumber = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
+      totDiskSegments = Utility.intValue (buffer[ptr + 2], buffer[ptr + 4]);
 
       ptr += 4;
       for (int i = 0; i < totDiskSegments; i++)
@@ -224,9 +224,9 @@ public class Relocator extends AbstractFile
 
     public DiskSegment (byte[] buffer, int ptr)
     {
-      logicalBlock = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      physicalBlock = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
-      segmentLength = HexFormatter.intValue (buffer[ptr + 4], buffer[ptr + 5]);
+      logicalBlock = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
+      physicalBlock = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      segmentLength = Utility.intValue (buffer[ptr + 4], buffer[ptr + 5]);
     }
 
     @Override

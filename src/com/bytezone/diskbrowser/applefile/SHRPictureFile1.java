@@ -5,8 +5,8 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class SHRPictureFile1 extends HiResImage
@@ -27,7 +27,7 @@ public class SHRPictureFile1 extends HiResImage
     int ptr = 0;
     while (ptr < buffer.length)
     {
-      int len = HexFormatter.unsignedLong (buffer, ptr);
+      int len = Utility.unsignedLong (buffer, ptr);
       if (len == 0 || len > buffer.length)
       {
         System.out.printf ("Block length: %d%n", len);
@@ -232,7 +232,7 @@ public class SHRPictureFile1 extends HiResImage
       super (kind, data);
 
       int ptr = 5 + kind.length ();
-      numColorTables = HexFormatter.unsignedShort (data, ptr);
+      numColorTables = Utility.unsignedShort (data, ptr);
 
       ptr += 2;
       colorTables = new ColorTable[numColorTables];
@@ -286,9 +286,9 @@ public class SHRPictureFile1 extends HiResImage
       super (kind, data);
 
       int ptr = 5 + kind.length ();
-      masterMode = HexFormatter.unsignedShort (data, ptr);
-      pixelsPerScanLine = HexFormatter.unsignedShort (data, ptr + 2);
-      numColorTables = HexFormatter.unsignedShort (data, ptr + 4);
+      masterMode = Utility.unsignedShort (data, ptr);
+      pixelsPerScanLine = Utility.unsignedShort (data, ptr + 2);
+      numColorTables = Utility.unsignedShort (data, ptr + 4);
       mode640 = (masterMode & 0x80) != 0;
 
       ptr += 6;
@@ -299,7 +299,7 @@ public class SHRPictureFile1 extends HiResImage
         ptr += 32;
       }
 
-      numScanLines = HexFormatter.unsignedShort (data, ptr);
+      numScanLines = Utility.unsignedShort (data, ptr);
       ptr += 2;
 
       scanLineDirectory = new DirEntry[numScanLines];
@@ -465,7 +465,7 @@ public class SHRPictureFile1 extends HiResImage
       int ptr = 5 + kind.length ();
       while (ptr < data.length)
       {
-        text.append (Utility.toHex (data, ptr, 4) + "\n");
+        text.append (HexFormatter.format (data, ptr, 4) + "\n");
         ptr += 4;
       }
 

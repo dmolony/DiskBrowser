@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class AssemblerStatement
 {
@@ -312,7 +313,7 @@ public class AssemblerStatement
       case 0xEE:  // INC
         operand = address;
         mode = 3; // absolute
-        this.target = HexFormatter.intValue (b1, b2);
+        this.target = Utility.intValue (b1, b2);
         break;
 
       case 0x1D:  // ORA

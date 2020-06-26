@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.wizardry;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class Item extends AbstractFile implements Comparable<Item>
@@ -24,9 +25,9 @@ class Item extends AbstractFile implements Comparable<Item>
     super (name, buffer);
     itemID = counter++;
     type = buffer[32];
-    cost = HexFormatter.intValue (buffer[44], buffer[45])
-        + HexFormatter.intValue (buffer[46], buffer[47]) * 10000
-        + HexFormatter.intValue (buffer[48], buffer[49]) * 100000000L;
+    cost = Utility.intValue (buffer[44], buffer[45])
+        + Utility.intValue (buffer[46], buffer[47]) * 10000
+        + Utility.intValue (buffer[48], buffer[49]) * 100000000L;
     genericName = HexFormatter.getPascalString (buffer, 16);
     damage = new Dice (buffer, 66);
     armourClass = buffer[62];
@@ -95,7 +96,7 @@ class Item extends AbstractFile implements Comparable<Item>
     if (buffer[50] == -1 && buffer[51] == -1)
       return -1;
 
-    return HexFormatter.intValue (buffer[50], buffer[51]);
+    return Utility.intValue (buffer[50], buffer[51]);
   }
 
   // ---------------------------------------------------------------------------------//

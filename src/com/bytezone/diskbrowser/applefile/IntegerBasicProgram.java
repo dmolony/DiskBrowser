@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 public class IntegerBasicProgram extends BasicProgram
 {
@@ -64,7 +65,7 @@ public class IntegerBasicProgram extends BasicProgram
 
     if ((ptr + 4) < buffer.length)
     {
-      int address = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      int address = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
       int remainingBytes = buffer.length - ptr - 5;
       byte[] newBuffer = new byte[remainingBytes];
       System.arraycopy (buffer, ptr + 4, newBuffer, 0, remainingBytes);
@@ -157,7 +158,7 @@ public class IntegerBasicProgram extends BasicProgram
 
   private void appendInteger (StringBuilder text, int ptr, int lineLength)
   {
-    int lineNumber = HexFormatter.intValue (buffer[ptr + 1], buffer[ptr + 2]);
+    int lineNumber = Utility.intValue (buffer[ptr + 1], buffer[ptr + 2]);
 
     boolean inString = false;
     boolean inRemark = false;
@@ -181,7 +182,7 @@ public class IntegerBasicProgram extends BasicProgram
           && (buffer[p - 1] & 0x80) == 0                // not a variable name
           && !inString && !inRemark)
       {
-        text.append (HexFormatter.intValue (buffer[p + 1], buffer[p + 2]));
+        text.append (Utility.intValue (buffer[p + 1], buffer[p + 2]));
         p += 2;
         continue;
       }

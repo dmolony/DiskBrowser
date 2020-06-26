@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public abstract class HiResImage extends AbstractFile
@@ -629,15 +630,15 @@ public abstract class HiResImage extends AbstractFile
       return false;
 
     String text = new String (buffer, 0, 2);
-    int size = HexFormatter.unsignedLong (buffer, 2);
+    int size = Utility.unsignedLong (buffer, 2);
 
     if (false)
     {
-      int empty = HexFormatter.unsignedLong (buffer, 6);
-      int offset = HexFormatter.unsignedLong (buffer, 10);
-      int header = HexFormatter.unsignedLong (buffer, 14);
-      int width = HexFormatter.unsignedLong (buffer, 18);
-      int height = HexFormatter.unsignedLong (buffer, 22);
+      int empty = Utility.unsignedLong (buffer, 6);
+      int offset = Utility.unsignedLong (buffer, 10);
+      int header = Utility.unsignedLong (buffer, 14);
+      int width = Utility.unsignedLong (buffer, 18);
+      int height = Utility.unsignedLong (buffer, 22);
 
       System.out.println (buffer.length);
       System.out.println (size);
@@ -809,7 +810,7 @@ public abstract class HiResImage extends AbstractFile
     public ColorEntry (byte[] data, int offset)
     // -------------------------------------------------------------------------------//
     {
-      value = HexFormatter.unsignedShort (data, offset);
+      value = Utility.unsignedShort (data, offset);
 
       int red = ((value >> 8) & 0x0f) * 17;
       int green = ((value >> 4) & 0x0f) * 17;
@@ -838,8 +839,8 @@ public abstract class HiResImage extends AbstractFile
     public DirEntry (byte[] data, int offset)
     // -------------------------------------------------------------------------------//
     {
-      numBytes = HexFormatter.unsignedShort (data, offset);
-      mode = HexFormatter.unsignedShort (data, offset + 2);
+      numBytes = Utility.unsignedShort (data, offset);
+      mode = Utility.unsignedShort (data, offset + 2);
     }
 
     // -------------------------------------------------------------------------------//

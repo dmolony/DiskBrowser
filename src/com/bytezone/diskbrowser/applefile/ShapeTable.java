@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 /*-
  *  Offset     Meaning
@@ -130,7 +131,7 @@ public class ShapeTable extends AbstractFile
         return false;
 
       // check index points inside the file
-      int offset = HexFormatter.unsignedShort (buffer, ptr);
+      int offset = Utility.unsignedShort (buffer, ptr);
       if (offset == 0 || offset >= buffer.length)
         return false;
 
@@ -169,7 +170,7 @@ public class ShapeTable extends AbstractFile
       int row = startRow;
       int col = startCol;
 
-      offset = HexFormatter.unsignedShort (buffer, index * 2 + 2);
+      offset = Utility.unsignedShort (buffer, index * 2 + 2);
 
       int ptr = offset;
       while (ptr < buffer.length)

@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.dos;
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class DosTSListSector extends AbstractSector
@@ -82,7 +82,7 @@ class DosTSListSector extends AbstractSector
     addText (text, buffer, 7, 4, "Not used");
     addText (text, buffer, 11, 1, "Not used");
 
-    int sectorBase = HexFormatter.intValue (buffer[5], buffer[6]);
+    int sectorBase = Utility.intValue (buffer[5], buffer[6]);
 
     for (int i = 12; i <= 255; i += 2)
     {

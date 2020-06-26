@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 /*
  * from Gerard Putter's email:
@@ -60,9 +61,9 @@ public class V2dFile
       BufferedInputStream in = new BufferedInputStream (new FileInputStream (file));
       in.read (header);
 
-      int diskLength = HexFormatter.getLongBigEndian (header, 0);   // 4 bytes
-      String id = HexFormatter.getString (header, 4, 4);            // 4 bytes
-      tracks = HexFormatter.getShortBigEndian (header, 8);          // 2 bytes
+      int diskLength = Utility.getLongBigEndian (header, 0);   // 4 bytes
+      String id = HexFormatter.getString (header, 4, 4);       // 4 bytes
+      tracks = Utility.getShortBigEndian (header, 8);          // 2 bytes
 
       assert diskLength + 8 == file.length ();
       assert "D5NI".equals (id);
@@ -73,8 +74,8 @@ public class V2dFile
       for (int i = 0; i < tracks; i++)
       {
         in.read (trackHeader);
-        int trackNumber = HexFormatter.getShortBigEndian (trackHeader, 0);
-        int trackLength = HexFormatter.getShortBigEndian (trackHeader, 2);    // 6304
+        int trackNumber = Utility.getShortBigEndian (trackHeader, 0);
+        int trackLength = Utility.getShortBigEndian (trackHeader, 2);    // 6304
 
         assert trackLength == TRACK_LENGTH;
 

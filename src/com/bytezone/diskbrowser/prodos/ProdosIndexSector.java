@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.prodos;
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class ProdosIndexSector extends AbstractSector
@@ -32,7 +32,7 @@ class ProdosIndexSector extends AbstractSector
           String.format ("%02X        %02X %02X", i, buffer[i], buffer[i + 256]));
       if (buffer[i] != 0 || buffer[i + 256] != 0)
       {
-        int blockNo = HexFormatter.intValue (buffer[i], buffer[i + 256]);
+        int blockNo = Utility.intValue (buffer[i], buffer[i + 256]);
         String valid = disk.isValidAddress (blockNo) ? "" : " *** invalid ***";
         text.append (String.format ("         %s%s%n", "block " + blockNo, valid));
       }

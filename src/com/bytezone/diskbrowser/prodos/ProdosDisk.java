@@ -22,6 +22,7 @@ import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.gui.ProdosPreferences;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class ProdosDisk extends AbstractFormattedDisk
@@ -177,7 +178,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             System.out.println (HexFormatter.format (entry, 0, entry.length));
         }
       }
-      block = HexFormatter.intValue (sectorBuffer[2], sectorBuffer[3]);
+      block = Utility.intValue (sectorBuffer[2], sectorBuffer[3]);
     } while (block > 0);
 
     // link double hi-res files
@@ -234,7 +235,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     if (buffer[0x23] != 0x27 || buffer[0x24] != 0x0D)
       return false;
 
-    int bitMapBlock = HexFormatter.intValue (buffer[0x27], buffer[0x28]);
+    int bitMapBlock = Utility.intValue (buffer[0x27], buffer[0x28]);
     if (bitMapBlock < 3 || bitMapBlock > 10)
       return false;
 

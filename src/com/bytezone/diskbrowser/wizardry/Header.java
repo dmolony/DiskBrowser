@@ -11,6 +11,7 @@ import com.bytezone.diskbrowser.disk.DefaultAppleFileSource;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class Header
@@ -122,7 +123,7 @@ class Header
     text.append ("\n");
     while (ptr < 512)
     {
-      int value = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
+      int value = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
       text.append (String.format ("%04X  %,6d%n", value, value));
       ptr += 2;
     }

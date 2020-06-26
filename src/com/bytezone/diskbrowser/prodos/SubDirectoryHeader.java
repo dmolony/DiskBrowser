@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class SubDirectoryHeader extends DirectoryHeader
@@ -21,7 +21,7 @@ class SubDirectoryHeader extends DirectoryHeader
     super (parentDisk, entryBuffer);
     this.parentDirectory = parent.parentDirectory;
 
-    parentPointer = HexFormatter.intValue (entryBuffer[35], entryBuffer[36]);
+    parentPointer = Utility.intValue (entryBuffer[35], entryBuffer[36]);
     parentSequence = entryBuffer[37] & 0xFF;
     parentSize = entryBuffer[38] & 0xFF;
 

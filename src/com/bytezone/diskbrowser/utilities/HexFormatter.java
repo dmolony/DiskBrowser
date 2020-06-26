@@ -334,97 +334,6 @@ public class HexFormatter
   }
 
   // ---------------------------------------------------------------------------------//
-  public static int intValue (byte b1, byte b2)
-  // ---------------------------------------------------------------------------------//
-  {
-    return (b1 & 0xFF) | ((b2 & 0xFF) << 8);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static int intValue (byte b1, byte b2, byte b3)
-  // ---------------------------------------------------------------------------------//
-  {
-    return (b1 & 0xFF) | ((b2 & 0xFF) << 8) | ((b3 & 0xFF) << 16);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static int unsignedLong (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int val = 0;
-    for (int i = 3; i >= 0; i--)
-    {
-      val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
-    }
-    return val;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static int getLongBigEndian (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int val = 0;
-    for (int i = 0; i < 4; i++)
-    {
-      val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
-    }
-    return val;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static int unsignedShort (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (ptr >= buffer.length)
-    {
-      System.out.println ("Index out of range (unsigned short): " + ptr);
-      return 0;
-    }
-    return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static int signedShort (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (ptr >= buffer.length)
-    {
-      System.out.println ("Index out of range (signed short): " + ptr);
-      return 0;
-    }
-    return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static int getShortBigEndian (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int val = 0;
-    for (int i = 0; i < 2; i++)
-    {
-      val <<= 8;
-      val |= buffer[ptr + i] & 0xFF;
-    }
-    return val;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static double getSANEDouble (byte[] buffer, int offset)
-  // ---------------------------------------------------------------------------------//
-  {
-    long bits = 0;
-    for (int i = 7; i >= 0; i--)
-    {
-      bits <<= 8;
-      bits |= buffer[offset + i] & 0xFF;
-    }
-
-    return Double.longBitsToDouble (bits);
-  }
-
-  // ---------------------------------------------------------------------------------//
   public static double floatValueOld (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
@@ -477,7 +386,7 @@ public class HexFormatter
   public static GregorianCalendar getAppleDate (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    int date = HexFormatter.intValue (buffer[offset], buffer[offset + 1]);
+    int date = Utility.intValue (buffer[offset], buffer[offset + 1]);
     if (date > 0)
     {
       int year = (date & 0xFE00) >> 9;

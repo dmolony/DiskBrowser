@@ -18,7 +18,7 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // https://mud.co.uk/richard/htflpism.htm
 // https://inform-fiction.org/zmachine/standards/
@@ -250,14 +250,14 @@ public class InfocomDisk extends AbstractFormattedDisk
     byte[] buffer = disk.readBlock (3, 0);
 
     int version = buffer[0] & 0xFF;
-    int highMemory = HexFormatter.intValue (buffer[5], buffer[4]);
-    int programCounter = HexFormatter.intValue (buffer[7], buffer[6]);
-    int dictionary = HexFormatter.intValue (buffer[9], buffer[8]);
-    int objectTable = HexFormatter.intValue (buffer[11], buffer[10]);
-    int globals = HexFormatter.intValue (buffer[13], buffer[12]);
-    int staticMemory = HexFormatter.intValue (buffer[15], buffer[14]);
-    int abbreviationsTable = HexFormatter.intValue (buffer[25], buffer[24]);
-    int fileLength = HexFormatter.intValue (buffer[27], buffer[26]);
+    int highMemory = Utility.intValue (buffer[5], buffer[4]);
+    int programCounter = Utility.intValue (buffer[7], buffer[6]);
+    int dictionary = Utility.intValue (buffer[9], buffer[8]);
+    int objectTable = Utility.intValue (buffer[11], buffer[10]);
+    int globals = Utility.intValue (buffer[13], buffer[12]);
+    int staticMemory = Utility.intValue (buffer[15], buffer[14]);
+    int abbreviationsTable = Utility.intValue (buffer[25], buffer[24]);
+    int fileLength = Utility.intValue (buffer[27], buffer[26]);
 
     if (false)
     {

@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.dos;
 import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.dos.DosDisk.FileType;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class CatalogEntry extends AbstractCatalogEntry
@@ -131,12 +131,12 @@ class CatalogEntry extends AbstractCatalogEntry
       {
         case IntegerBasic:
         case ApplesoftBasic:
-          length = HexFormatter.intValue (buffer[0], buffer[1]);
+          length = Utility.intValue (buffer[0], buffer[1]);
           break;
 
         default:
-          address = HexFormatter.intValue (buffer[0], buffer[1]);
-          length = HexFormatter.intValue (buffer[2], buffer[3]);
+          address = Utility.intValue (buffer[0], buffer[1]);
+          length = Utility.intValue (buffer[2], buffer[3]);
       }
     }
   }

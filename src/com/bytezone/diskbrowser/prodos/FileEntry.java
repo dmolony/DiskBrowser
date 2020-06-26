@@ -40,6 +40,7 @@ import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // - Set sector types for each used sector
 // - Populate dataBlocks, indexBlocks, catalogBlock and masterIndexBlock
@@ -77,13 +78,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     this.catalogBlock = this.disk.getDiskAddress (parentBlock);
 
     fileType = entryBuffer[0x10] & 0xFF;
-    keyPtr = HexFormatter.unsignedShort (entryBuffer, 0x11);
-    blocksUsed = HexFormatter.unsignedShort (entryBuffer, 0x13);
-    endOfFile = HexFormatter.intValue (entryBuffer[21], entryBuffer[22], entryBuffer[23]);
+    keyPtr = Utility.unsignedShort (entryBuffer, 0x11);
+    blocksUsed = Utility.unsignedShort (entryBuffer, 0x13);
+    endOfFile = Utility.intValue (entryBuffer[21], entryBuffer[22], entryBuffer[23]);
 
-    auxType = HexFormatter.unsignedShort (entryBuffer, 0x1F);
+    auxType = Utility.unsignedShort (entryBuffer, 0x1F);
     modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
-    headerPointer = HexFormatter.unsignedShort (entryBuffer, 0x25);
+    headerPointer = Utility.unsignedShort (entryBuffer, 0x25);
 
     switch (storageType)
     {
@@ -106,7 +107,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             break;
           dataBlocks.add (diskAddress);
           byte[] buffer = disk.readBlock (block);
-          block = HexFormatter.unsignedShort (buffer, 2);
+          block = Utility.unsignedShort (buffer, 2);
         } while (block > 0);
         break;
 
@@ -137,8 +138,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     for (int i = 0; i < 512; i += 256)
     {
       int storageType = buffer2[i] & 0x0F;
-      int keyBlock = HexFormatter.unsignedShort (buffer2, i + 1);
-      int eof = HexFormatter.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
+      int keyBlock = Utility.unsignedShort (buffer2, i + 1);
+      int eof = Utility.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
       addDataBlocks (storageType, keyBlock);
     }
   }
@@ -582,8 +583,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     byte[] mainIndexBuffer = disk.readBlock (keyPtr);
     for (int i = 0; i < 256; i++)
     {
-      int indexBlock =
-          HexFormatter.intValue (mainIndexBuffer[i], mainIndexBuffer[i + 256]);
+      int indexBlock = Utility.intValue (mainIndexBuffer[i], mainIndexBuffer[i + 256]);
       if (indexBlock > 0)
         logicalBlock = readIndexBlock (indexBlock, addresses, buffers, logicalBlock);
       else
@@ -699,7 +699,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     byte[] indexBuffer = disk.readBlock (indexBlock);
     for (int j = 0; j < 256; j++)
     {
-      int block = HexFormatter.intValue (indexBuffer[j], indexBuffer[j + 256]);
+      int block = Utility.intValue (indexBuffer[j], indexBuffer[j + 256]);
       if (block > 0)
         addresses.add (disk.getDiskAddress (block));
       else if (addresses.size () > 0)

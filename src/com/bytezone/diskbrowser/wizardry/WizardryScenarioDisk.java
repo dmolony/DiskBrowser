@@ -17,6 +17,7 @@ import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Character.Attributes;
 import com.bytezone.diskbrowser.wizardry.Character.Statistics;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
@@ -136,7 +137,7 @@ public class WizardryScenarioDisk extends PascalDisk
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readBlock (2);
-    int totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
+    int totalFiles = Utility.intValue (buffer[16], buffer[17]);
     if (totalFiles != 3)
       return false;
 

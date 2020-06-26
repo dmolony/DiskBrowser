@@ -19,6 +19,7 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Relocator;
 
 // -----------------------------------------------------------------------------------//
@@ -167,8 +168,8 @@ public class PascalDisk extends AbstractFormattedDisk
       System.out.println ("Name ok : " + name);
     }
 
-    int from = HexFormatter.intValue (buffer[0], buffer[1]);
-    int to = HexFormatter.intValue (buffer[2], buffer[3]);
+    int from = Utility.intValue (buffer[0], buffer[1]);
+    int to = Utility.intValue (buffer[2], buffer[3]);
     if (from != 0 || to != 6)
     {
       if (debug)
@@ -176,7 +177,7 @@ public class PascalDisk extends AbstractFormattedDisk
       return false;                         // will only work for floppies!
     }
 
-    int blocks = HexFormatter.intValue (buffer[14], buffer[15]);
+    int blocks = Utility.intValue (buffer[14], buffer[15]);
     if (blocks > 280)
     {
       if (debug)
@@ -189,7 +190,7 @@ public class PascalDisk extends AbstractFormattedDisk
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readBlocks (addresses);
 
-    int files = HexFormatter.intValue (buffer[16], buffer[17]);
+    int files = Utility.intValue (buffer[16], buffer[17]);
     if (files < 0 || files > 77)
     {
       if (debug)
@@ -203,9 +204,9 @@ public class PascalDisk extends AbstractFormattedDisk
     for (int i = 1; i <= files; i++)
     {
       int ptr = i * 26;
-      int firstBlock = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1]);
-      int lastBlock = HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]);
-      int kind = HexFormatter.intValue (buffer[ptr + 4], buffer[ptr + 5]);
+      int firstBlock = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
+      int lastBlock = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      int kind = Utility.intValue (buffer[ptr + 4], buffer[ptr + 5]);
       if (lastBlock < firstBlock)
         return false;
       if (kind == 0)
@@ -213,7 +214,7 @@ public class PascalDisk extends AbstractFormattedDisk
       nameLength = buffer[ptr + 6] & 0xFF;
       if (nameLength < 1 || nameLength > 15)
         return false;
-      int lastByte = HexFormatter.intValue (buffer[ptr + 22], buffer[ptr + 23]);
+      int lastByte = Utility.intValue (buffer[ptr + 22], buffer[ptr + 23]);
       GregorianCalendar date = HexFormatter.getPascalDate (buffer, 24);
       if (debug)
         System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,

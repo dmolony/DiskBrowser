@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class PascalCodeStatement implements PascalConstants
@@ -79,8 +80,8 @@ public class PascalCodeStatement implements PascalConstants
             int max = min + (p2 - p1) * 2;
             for (int i = min; i <= max; i += 2)
             {
-              jumps.add (new Jump (i,
-                  i - HexFormatter.intValue (buffer[i], buffer[i + 1]), v++));
+              jumps.add (
+                  new Jump (i, i - Utility.intValue (buffer[i], buffer[i + 1]), v++));
             }
             break;
 

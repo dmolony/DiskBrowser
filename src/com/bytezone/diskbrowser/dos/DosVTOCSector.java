@@ -3,7 +3,6 @@ package com.bytezone.diskbrowser.dos;
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -36,7 +35,7 @@ class DosVTOCSector extends AbstractSector
     direction = buffer[49];
     maxTracks = buffer[52] & 0xFF;
     maxSectors = buffer[53] & 0xFF;
-    sectorSize = HexFormatter.intValue (buffer[54], buffer[55]);
+    sectorSize = Utility.intValue (buffer[54], buffer[55]);
 
     flagSectors ();
   }
@@ -168,7 +167,7 @@ class DosVTOCSector extends AbstractSector
   private String getBitmap (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    int value = HexFormatter.getLongBigEndian (buffer, offset);
+    int value = Utility.getLongBigEndian (buffer, offset);
 
     String bits = "0000000000000000000000000000000" + Integer.toBinaryString (value);
     bits = bits.substring (bits.length () - 32);

@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class PascalArea extends AbstractFile
@@ -21,13 +22,13 @@ public class PascalArea extends AbstractFile
   {
     super (name, buffer);
 
-    size = HexFormatter.unsignedShort (buffer, 0);
-    volumes = HexFormatter.unsignedShort (buffer, 2);
+    size = Utility.unsignedShort (buffer, 0);
+    volumes = Utility.unsignedShort (buffer, 2);
     ppmName = HexFormatter.getPascalString (buffer, 4);
-    start = HexFormatter.unsignedShort (buffer, 8);
-    length = HexFormatter.unsignedShort (buffer, 11);
+    start = Utility.unsignedShort (buffer, 8);
+    length = Utility.unsignedShort (buffer, 11);
     defaultUnit = buffer[13] & 0xFF;
-    oldDriver = HexFormatter.unsignedShort (buffer, 14);
+    oldDriver = Utility.unsignedShort (buffer, 14);
     //    writeProtected = buffer[12] != 0;
   }
 

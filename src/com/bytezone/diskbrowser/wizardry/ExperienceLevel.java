@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.wizardry;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class ExperienceLevel extends AbstractFile
@@ -22,9 +22,9 @@ class ExperienceLevel extends AbstractFile
       if (buffer[ptr] == 0)
         break;
 
-      long points = HexFormatter.intValue (buffer[ptr], buffer[ptr + 1])
-          + HexFormatter.intValue (buffer[ptr + 2], buffer[ptr + 3]) * 10000
-          + HexFormatter.intValue (buffer[ptr + 4], buffer[ptr + 5]) * 100000000L;
+      long points = Utility.intValue (buffer[ptr], buffer[ptr + 1])
+          + Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]) * 10000
+          + Utility.intValue (buffer[ptr + 4], buffer[ptr + 5]) * 100000000L;
       expLevels[seq++] = points;
     }
   }

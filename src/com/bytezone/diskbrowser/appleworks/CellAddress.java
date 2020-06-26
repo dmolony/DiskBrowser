@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.appleworks;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class CellAddress
@@ -14,7 +14,7 @@ class CellAddress
   // ---------------------------------------------------------------------------------//
   {
     colRef = buffer[offset];
-    rowRef = HexFormatter.intValue (buffer[offset + 1], buffer[offset + 2]);
+    rowRef = Utility.intValue (buffer[offset + 1], buffer[offset + 2]);
   }
 
   // ---------------------------------------------------------------------------------//

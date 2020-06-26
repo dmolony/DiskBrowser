@@ -8,6 +8,7 @@ import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class PascalCatalogSector extends AbstractSector
@@ -49,7 +50,7 @@ class PascalCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, 22, 4, "Reserved");
 
     int ptr = PascalDisk.CATALOG_ENTRY_SIZE;
-    int totalFiles = HexFormatter.intValue (buffer[16], buffer[17]);
+    int totalFiles = Utility.intValue (buffer[16], buffer[17]);
 
     while (ptr < buffer.length && totalFiles > 0)
     {

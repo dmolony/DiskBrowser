@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // see IIGS System 6.0.1 - Disk 5 Fonts.po
 // -----------------------------------------------------------------------------------//
@@ -71,37 +72,37 @@ public class QuickDrawFont extends CharacterList
 
     int ptr = nameLength + 1;         // start of header record
 
-    headerSize = HexFormatter.unsignedShort (buffer, ptr);
+    headerSize = Utility.unsignedShort (buffer, ptr);
     fontDefinitionOffset = nameLength + 1 + headerSize * 2;
 
-    fontFamily = HexFormatter.unsignedShort (buffer, ptr + 2);
-    fontStyle = HexFormatter.unsignedShort (buffer, ptr + 4);
-    fontSize = HexFormatter.unsignedShort (buffer, ptr + 6);
+    fontFamily = Utility.unsignedShort (buffer, ptr + 2);
+    fontStyle = Utility.unsignedShort (buffer, ptr + 4);
+    fontSize = Utility.unsignedShort (buffer, ptr + 6);
     versionMajor = buffer[ptr + 8] & 0xFF;
     versionMinor = buffer[ptr + 9] & 0xFF;
-    extent = HexFormatter.unsignedShort (buffer, ptr + 10);
+    extent = Utility.unsignedShort (buffer, ptr + 10);
 
     ptr = fontDefinitionOffset;
 
-    fontType = HexFormatter.unsignedShort (buffer, ptr);
-    firstChar = HexFormatter.unsignedShort (buffer, ptr + 2);
-    lastChar = HexFormatter.unsignedShort (buffer, ptr + 4);
-    widMax = HexFormatter.unsignedShort (buffer, ptr + 6);
-    kernMax = HexFormatter.signedShort (buffer, ptr + 8);
-    nDescent = HexFormatter.signedShort (buffer, ptr + 10);
-    fRectWidth = HexFormatter.unsignedShort (buffer, ptr + 12);
-    fRectHeight = HexFormatter.unsignedShort (buffer, ptr + 14);
+    fontType = Utility.unsignedShort (buffer, ptr);
+    firstChar = Utility.unsignedShort (buffer, ptr + 2);
+    lastChar = Utility.unsignedShort (buffer, ptr + 4);
+    widMax = Utility.unsignedShort (buffer, ptr + 6);
+    kernMax = Utility.signedShort (buffer, ptr + 8);
+    nDescent = Utility.signedShort (buffer, ptr + 10);
+    fRectWidth = Utility.unsignedShort (buffer, ptr + 12);
+    fRectHeight = Utility.unsignedShort (buffer, ptr + 14);
 
-    owTLoc = HexFormatter.unsignedShort (buffer, ptr + 16);
+    owTLoc = Utility.unsignedShort (buffer, ptr + 16);
 
     offsetWidthTableOffset = (ptr + 16) + owTLoc * 2;
     locationTableOffset = offsetWidthTableOffset - (lastChar - firstChar + 3) * 2;
     bitImageOffset = ptr + 26;
 
-    ascent = HexFormatter.unsignedShort (buffer, ptr + 18);
-    descent = HexFormatter.unsignedShort (buffer, ptr + 20);
-    leading = HexFormatter.unsignedShort (buffer, ptr + 22);
-    rowWords = HexFormatter.unsignedShort (buffer, ptr + 24);
+    ascent = Utility.unsignedShort (buffer, ptr + 18);
+    descent = Utility.unsignedShort (buffer, ptr + 20);
+    leading = Utility.unsignedShort (buffer, ptr + 22);
+    rowWords = Utility.unsignedShort (buffer, ptr + 24);
 
     totalCharacters = lastChar - firstChar + 2;       // includes 'missing' character
 
@@ -150,13 +151,12 @@ public class QuickDrawFont extends CharacterList
     for (int i = 0, max = totalCharacters + 1; i < max; i++)
     {
       // index into the strike
-      int location = HexFormatter.unsignedShort (buffer, locationTableOffset + i * 2);
+      int location = Utility.unsignedShort (buffer, locationTableOffset + i * 2);
 
       int j = i + 1;      // next character
       if (j < max)
       {
-        int nextLocation =
-            HexFormatter.unsignedShort (buffer, locationTableOffset + j * 2);
+        int nextLocation = Utility.unsignedShort (buffer, locationTableOffset + j * 2);
         int pixelWidth = nextLocation - location;
 
         if (pixelWidth > 0)
@@ -259,9 +259,9 @@ public class QuickDrawFont extends CharacterList
       if (offset == 255 && width == 255)
         continue;
 
-      int location = HexFormatter.unsignedShort (buffer, locationTableOffset + i * 2);
+      int location = Utility.unsignedShort (buffer, locationTableOffset + i * 2);
       int nextLocation =
-          HexFormatter.unsignedShort (buffer, locationTableOffset + (i + 1) * 2);
+          Utility.unsignedShort (buffer, locationTableOffset + (i + 1) * 2);
       int pixelWidth = nextLocation - location;
 
       text.append (String.format (

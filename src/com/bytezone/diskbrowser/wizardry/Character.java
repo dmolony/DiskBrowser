@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class Character extends AbstractFile
@@ -39,19 +39,19 @@ class Character extends AbstractFile
     stats.race = races[buffer[34] & 0xFF];
     stats.typeInt = buffer[36] & 0xFF;
     stats.type = types[stats.typeInt];
-    stats.ageInWeeks = HexFormatter.intValue (buffer[38], buffer[39]);
+    stats.ageInWeeks = Utility.intValue (buffer[38], buffer[39]);
     stats.statusValue = buffer[40];
     stats.status = statuses[stats.statusValue];
     stats.alignment = alignments[buffer[42] & 0xFF];
 
-    stats.gold = HexFormatter.intValue (buffer[52], buffer[53])
-        + HexFormatter.intValue (buffer[54], buffer[55]) * 10000;
-    stats.experience = HexFormatter.intValue (buffer[124], buffer[125])
-        + HexFormatter.intValue (buffer[126], buffer[127]) * 10000;
-    stats.level = HexFormatter.intValue (buffer[132], buffer[133]);
+    stats.gold = Utility.intValue (buffer[52], buffer[53])
+        + Utility.intValue (buffer[54], buffer[55]) * 10000;
+    stats.experience = Utility.intValue (buffer[124], buffer[125])
+        + Utility.intValue (buffer[126], buffer[127]) * 10000;
+    stats.level = Utility.intValue (buffer[132], buffer[133]);
 
-    stats.hitsLeft = HexFormatter.intValue (buffer[134], buffer[135]);
-    stats.hitsMax = HexFormatter.intValue (buffer[136], buffer[137]);
+    stats.hitsLeft = Utility.intValue (buffer[134], buffer[135]);
+    stats.hitsMax = Utility.intValue (buffer[136], buffer[137]);
     stats.armourClass = buffer[176];
 
     attributes.strength = (buffer[44] & 0xFF) % 16;

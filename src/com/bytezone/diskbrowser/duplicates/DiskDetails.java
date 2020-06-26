@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.common.ComputeCRC32;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -35,7 +34,7 @@ public class DiskDetails
     this.size = file.length ();
 
     if (doChecksum)
-      checksum = ComputeCRC32.getChecksumValue (file);
+      checksum = Utility.getChecksumValue (file);
     else
       checksum = 0;
   }
@@ -136,7 +135,7 @@ public class DiskDetails
   public long calculateChecksum ()
   // ---------------------------------------------------------------------------------//
   {
-    checksum = ComputeCRC32.getChecksumValue (file);
+    checksum = Utility.getChecksumValue (file);
     return checksum;
   }
 

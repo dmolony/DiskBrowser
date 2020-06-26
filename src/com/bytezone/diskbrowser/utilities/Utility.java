@@ -2,10 +2,16 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 // -----------------------------------------------------------------------------------//
 public class Utility
@@ -237,6 +243,30 @@ public class Utility
       buffer[lo++] = buffer[hi];
       buffer[hi--] = temp;
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static long getChecksumValue (File file)
+  // ---------------------------------------------------------------------------------//
+  {
+    Checksum checksum = new CRC32 ();
+    try
+    {
+      BufferedInputStream is =
+          new BufferedInputStream (new FileInputStream (file.getAbsolutePath ()));
+      byte[] bytes = new byte[1024];
+      int len = 0;
+
+      while ((len = is.read (bytes)) >= 0)
+        checksum.update (bytes, 0, len);
+
+      is.close ();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace ();
+    }
+    return checksum.getValue ();
   }
 
   // ---------------------------------------------------------------------------------//

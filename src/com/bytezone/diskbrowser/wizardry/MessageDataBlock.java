@@ -3,8 +3,8 @@ package com.bytezone.diskbrowser.wizardry;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
 class MessageDataBlock extends AbstractFile
@@ -176,7 +176,7 @@ class MessageDataBlock extends AbstractFile
     {
       StringBuilder text = new StringBuilder ();
 
-      String data = Utility.getHex (buffer, offset, length);
+      String data = HexFormatter.format (buffer, offset, length);
       text.append (String.format ("%5d: %03X  %02X : %s", msgNo, offset, length, data));
 
       return text.toString ();

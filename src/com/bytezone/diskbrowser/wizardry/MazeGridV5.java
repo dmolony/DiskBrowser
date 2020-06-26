@@ -8,9 +8,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.common.Utility;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class MazeGridV5 extends AbstractFile
@@ -137,7 +137,7 @@ class MazeGridV5 extends AbstractFile
     offset = 0x320;
     for (int i = 0; i < 15; i++)
     {
-      text.append (Utility.toHex (buffer, offset + i * 10, 10));
+      text.append (HexFormatter.format (buffer, offset + i * 10, 10));
       text.append ("\n");
     }
     text.append ("\n");
@@ -145,7 +145,7 @@ class MazeGridV5 extends AbstractFile
     offset = 0x400;
     for (int i = 0; i < 5; i++)
     {
-      text.append (Utility.toHex (buffer, offset + i * 64, 64));
+      text.append (HexFormatter.format (buffer, offset + i * 64, 64));
       text.append ("\n\n");
     }
 
@@ -170,7 +170,7 @@ class MazeGridV5 extends AbstractFile
     offset = 0x5F0;
     for (int i = 0; i < 7; i++)
     {
-      text.append (Utility.toHex (buffer, offset + i * 64, 64));
+      text.append (HexFormatter.format (buffer, offset + i * 64, 64));
       text.append ("\n\n");
     }
 

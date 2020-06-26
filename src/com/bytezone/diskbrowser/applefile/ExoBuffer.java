@@ -20,6 +20,7 @@ public class ExoBuffer
 
   private int inPos;
   private int outPos;
+  private int srcPtr;
 
   private int bitBuffer;
   private int flags;
@@ -117,13 +118,11 @@ public class ExoBuffer
     int value = 0;
 
     if ((flags & PFLAG_BITS_COPY_GT_7) != 0)
-    {
       while (count > 7)
       {
         byteCopy = count >>> 3;
-        count &= 7;
+        count &= 0x07;
       }
-    }
 
     while (count-- > 0)
     {
@@ -138,10 +137,7 @@ public class ExoBuffer
     }
 
     while (byteCopy-- > 0)
-    {
-      value <<= 8;
-      value |= getByte ();
-    }
+      value = (value << 8) | getByte ();
 
     return value;
   }
@@ -198,7 +194,9 @@ public class ExoBuffer
 
       tableBi[i] = b;
     }
-    //    tableDump ();
+
+    if (false)
+      tableDump ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -223,9 +221,9 @@ public class ExoBuffer
   private void decrunch ()
   // ---------------------------------------------------------------------------------//
   {
-    inPos = 2;
+    inPos = 2;        // skip address
     outPos = 0;
-    flags = 23;
+    flags = 23;       // hard-coded for Total Replay
 
     if ((flags & PFLAG_BITS_ALIGN_START) != 0)
       bitBuffer = 0;
@@ -235,7 +233,6 @@ public class ExoBuffer
     tableInit ();
 
     int len;
-    int srcPtr = 0;
     boolean literal;
     int threshold = (flags & PFLAG_4_OFFSET_TABLES) != 0 ? 4 : 3;
 
@@ -243,19 +240,19 @@ public class ExoBuffer
     {
       len = 1;
       literal = true;
-      srcPtr = copy (len, literal, srcPtr);
+      copy (len, literal);
     }
 
     while (true)
     {
-      if (getBits (1) != 0)
+      if (getBits (1) == 1)
       {
         len = 1;
         literal = true;
       }
       else
       {
-        int val = getGammaCode ();
+        int val = getGammaCode ();      // count zero bits
 
         if (val == 16)
           break;
@@ -274,7 +271,7 @@ public class ExoBuffer
           srcPtr = outPos - getCooked (tableOff[i] + getBits (tableBit[i]));
         }
       }
-      srcPtr = copy (len, literal, srcPtr);
+      copy (len, literal);
     }
     assert outPos == outBuffer.length;
   }
@@ -295,21 +292,18 @@ public class ExoBuffer
   private int getCooked (int index)
   // ---------------------------------------------------------------------------------//
   {
-    int base = tableLo[index] | (tableHi[index] << 8);
-    return base + getBits (tableBi[index]);
+    return ((tableHi[index] << 8) | tableLo[index]) + getBits (tableBi[index]);
   }
 
   // ---------------------------------------------------------------------------------//
-  private int copy (int len, boolean literal, int src)
+  private void copy (int len, boolean literal)
   // ---------------------------------------------------------------------------------//
   {
-    do
+    assert len > 0;
+    while (len-- > 0)
     {
-      int val = literal ? getByte () : outBuffer[src++];
+      int val = literal ? getByte () : outBuffer[srcPtr++];
       outBuffer[outPos++] = (byte) (val & 0xFF);
-
-    } while (--len > 0);
-
-    return src;
+    }
   }
 }

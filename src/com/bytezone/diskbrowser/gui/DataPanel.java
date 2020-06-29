@@ -25,8 +25,6 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.bytezone.common.FontAction.FontChangeEvent;
-import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.HiResImage;
@@ -37,6 +35,8 @@ import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
+import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
+import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
 
 // -----------------------------------------------------------------------------------//
 public class DataPanel extends JTabbedPane implements DiskSelectionListener,

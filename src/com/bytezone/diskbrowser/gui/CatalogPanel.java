@@ -24,13 +24,13 @@ import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import com.bytezone.common.FontAction.FontChangeEvent;
-import com.bytezone.common.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DualDosDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
+import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
+import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;

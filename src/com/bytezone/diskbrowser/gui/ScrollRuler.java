@@ -8,10 +8,10 @@ import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 
-import com.bytezone.common.Platform;
-import com.bytezone.common.Platform.FontSize;
-import com.bytezone.common.Platform.FontType;
 import com.bytezone.diskbrowser.gui.DiskLayoutPanel.LayoutDetails;
+import com.bytezone.diskbrowser.utilities.FontUtility;
+import com.bytezone.diskbrowser.utilities.FontUtility.FontSize;
+import com.bytezone.diskbrowser.utilities.FontUtility.FontType;
 
 // -----------------------------------------------------------------------------------//
 class ScrollRuler extends JComponent
@@ -24,7 +24,7 @@ class ScrollRuler extends JComponent
   public static final int HORIZONTAL = 0;
   public static final int VERTICAL = 1;
 
-  private final Font font = Platform.getFont (FontType.SANS_SERIF, FontSize.BASE);
+  private final Font font = FontUtility.getFont (FontType.SANS_SERIF, FontSize.BASE);
   private final int orientation;
   private boolean isHex = true;
   private boolean isTrackMode = true;

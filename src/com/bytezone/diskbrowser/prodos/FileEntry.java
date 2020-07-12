@@ -23,6 +23,7 @@ import com.bytezone.diskbrowser.applefile.IconFile;
 import com.bytezone.diskbrowser.applefile.IntegerBasicProgram;
 import com.bytezone.diskbrowser.applefile.LodeRunner;
 import com.bytezone.diskbrowser.applefile.MerlinSource;
+import com.bytezone.diskbrowser.applefile.ObjectModule;
 import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PascalArea;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
@@ -433,7 +434,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           break;
 
         case FILE_TYPE_IIGS_APPLICATION:
-          file = new AssemblerProgram (name, buffer, auxType);
+          file = new ObjectModule (name, exactBuffer, auxType);
           break;
 
         case FILE_TYPE_IIGS_DEVICE_DRIVER:

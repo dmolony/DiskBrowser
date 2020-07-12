@@ -140,6 +140,18 @@ public class AppleDisk implements Disk
         this.trackSize = sectors * sectorSize;
       }
     }
+    else if ("img".equals (suffix))
+    {
+      PrefixDiskCopy prefixDiskCopy = new PrefixDiskCopy (buffer);
+
+      blocks = prefixDiskCopy.getBlocks ();
+      this.sectorSize = 512;
+      this.trackSize = 8 * sectorSize;
+      skip = 0x54;
+
+      tracks = blocks / 8;          // change parameter!
+      sectors = 8;                  // change parameter!
+    }
     else if (suffix.equalsIgnoreCase ("HDV")
         || (suffix.equalsIgnoreCase ("po") && tracks > 50)) // ULTIMATE APPLE1 CFFA 3.5.po
     {
@@ -278,7 +290,7 @@ public class AppleDisk implements Disk
   private byte[] getPrefix (File path)
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = new byte[64];
+    byte[] buffer = new byte[0x54];
     try (BufferedInputStream file = new BufferedInputStream (new FileInputStream (path)))
     {
       file.read (buffer);

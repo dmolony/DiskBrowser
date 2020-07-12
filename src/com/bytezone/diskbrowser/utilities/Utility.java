@@ -18,7 +18,7 @@ public class Utility
 // -----------------------------------------------------------------------------------//
 {
   public static final List<String> suffixes =
-      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk", "woz");
+      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk", "woz", "img");
 
   // ---------------------------------------------------------------------------------//
   public static boolean test (Graphics2D g)
@@ -85,6 +85,19 @@ public class Utility
   {
     int val = 0;
     for (int i = 0; i < 4; i++)
+    {
+      val <<= 8;
+      val += buffer[ptr + i] & 0xFF;
+    }
+    return val;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static int getWordBigEndian (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    int val = 0;
+    for (int i = 0; i < 2; i++)
     {
       val <<= 8;
       val += buffer[ptr + i] & 0xFF;

@@ -184,12 +184,12 @@ public class DiskFactory
       if (prodosDisk != null)
         return prodosDisk;
 
-      disk2 = check2mgDisk (file);
-      if (disk2 != null)
+      disk = check2mgDisk (file);
+      if (disk != null)
       {
         if (compressed)
-          disk2.setOriginalPath (originalPath);
-        return disk2;
+          disk.setOriginalPath (originalPath);
+        return disk;
       }
 
       AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
@@ -200,16 +200,23 @@ public class DiskFactory
     {
       if (debug)
         System.out.println (" ** 2mg **");
-      disk2 = check2mgDisk (file);
-      if (disk2 != null)
+      disk = check2mgDisk (file);
+      if (disk != null)
       {
         if (compressed)
-          disk2.setOriginalPath (originalPath);
-        return disk2;
+          disk.setOriginalPath (originalPath);
+        return disk;
       }
 
       AppleDisk appleDisk = new AppleDisk (file, (int) file.length () / 4096, 8);
       return new DataDisk (appleDisk);
+    }
+
+    if (suffix.equals ("img"))
+    {
+      disk = checkDiskCopyDisk (file);
+      if (disk != null)
+        return disk;
     }
 
     // Toolkit.do = 143488
@@ -699,10 +706,36 @@ public class DiskFactory
     catch (Exception e)
     {
       e.printStackTrace ();
-      //      System.out.println (e);
     }
     if (debug)
       System.out.println ("Not a 2mg disk");
+
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static FormattedDisk checkDiskCopyDisk (File file)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (debug)
+      System.out.println ("Checking DiskCopy disk");
+
+    try
+    {
+      AppleDisk disk = new AppleDisk (file, 0, 0);
+      if (disk.getTotalBlocks () > 0)
+      {
+        if (ProdosDisk.isCorrectFormat (disk))
+          return new ProdosDisk (disk);
+      }
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace ();
+    }
+
+    if (debug)
+      System.out.println ("Not a DiskCopy disk");
 
     return null;
   }

@@ -2,14 +2,18 @@ package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class FileSystemTranslator extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   private final String text1;
   private final String text2;
   private final String text3;
   private final String text4;
 
+  // ---------------------------------------------------------------------------------//
   public FileSystemTranslator (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -20,10 +24,15 @@ public class FileSystemTranslator extends AbstractFile
     text3 = HexFormatter.getPascalString (buffer, 0xFC + len1 + 1);
     int len2 = buffer[0xFC + len1 + 1] & 0xFF;
     text4 = HexFormatter.getPascalString (buffer, 0xFC + len1 + len2 + 4);
+
+    SegmentHeader segmentHeader = new SegmentHeader (buffer, 0);
+    System.out.println (segmentHeader);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
 

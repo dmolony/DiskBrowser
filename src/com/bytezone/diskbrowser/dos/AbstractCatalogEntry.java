@@ -70,18 +70,21 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       fileType = FileType.IntegerBasic;
     else if ((type == 0x02))
       fileType = FileType.ApplesoftBasic;
-    else if ((type == 0x04))
+    else if ((type < 0x08))
       fileType = FileType.Binary;
-    else if ((type == 0x08))
+    else if ((type < 0x10))
       fileType = FileType.SS;
-    else if ((type == 0x10))
+    else if ((type < 0x20))
       fileType = FileType.Relocatable;
-    else if ((type == 0x20))
+    else if ((type < 0x40))
       fileType = FileType.AA;
-    else if ((type == 0x40))          // Lisa
-      fileType = FileType.BB;
+    //    else if ((type == 0x40))          // Lisa
     else
-      System.out.println ("Unknown file type : " + type);
+      fileType = FileType.BB;
+    //    else
+    //    {
+    //      System.out.println ("Unknown file type : " + type);
+    //    }
 
     if (dosDisk.getVersion () >= 0x41)
       lastModified = Utility.getDateTime (entryBuffer, 0x1B);
@@ -129,6 +132,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   protected String getFileType ()
   // ---------------------------------------------------------------------------------//
   {
+    if (fileType == null)
+    {
+      return "?";
+    }
     switch (fileType)
     {
       case Text:

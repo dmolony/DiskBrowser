@@ -17,8 +17,8 @@ import java.util.zip.Checksum;
 public class Utility
 // -----------------------------------------------------------------------------------//
 {
-  public static final List<String> suffixes =
-      Arrays.asList ("po", "dsk", "do", "hdv", "2mg", "v2d", "d13", "sdk", "woz", "img");
+  public static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
+      "2mg", "v2d", "d13", "sdk", "woz", "img", "dimg");
 
   // ---------------------------------------------------------------------------------//
   public static boolean test (Graphics2D g)

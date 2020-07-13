@@ -140,7 +140,7 @@ public class AppleDisk implements Disk
         this.trackSize = sectors * sectorSize;
       }
     }
-    else if ("img".equals (suffix))
+    else if ("img".equals (suffix) || "dimg".equals (suffix))
     {
       PrefixDiskCopy prefixDiskCopy = new PrefixDiskCopy (buffer);
 

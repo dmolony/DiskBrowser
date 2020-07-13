@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.disk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// https://www.discferret.com/wiki/Apple_DiskCopy_4.2
 // -----------------------------------------------------------------------------------//
 public class PrefixDiskCopy
 // -----------------------------------------------------------------------------------//

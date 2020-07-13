@@ -212,7 +212,7 @@ public class DiskFactory
       return new DataDisk (appleDisk);
     }
 
-    if (suffix.equals ("img"))
+    if (suffix.equals ("img") || suffix.equals ("dimg"))
     {
       disk = checkDiskCopyDisk (file);
       if (disk != null)
@@ -372,7 +372,8 @@ public class DiskFactory
 
     if (true)
     {
-      long checksum = appleDisk256.getBootChecksum ();
+      //      long checksum = appleDisk256.getBootChecksum ();
+      long checksum = 0;
 
       if (checksum == 227968344L)       // empty boot sector
       {
@@ -380,7 +381,7 @@ public class DiskFactory
         if (debug)
           System.out.println ("  empty sector checksum : " + checksum);
       }
-      else if (checksum == 3176296590L  //
+      else if (checksum == 3176296590L  // HIGHRTXT.DSK
           || checksum == 108825457L     // ARCBOOT.DSK (looping)
           || checksum == 1439356606L    //
           || checksum == 1550012074L    //
@@ -396,7 +397,7 @@ public class DiskFactory
         if (debug)
           System.out.println ("  known DOS checksum : " + checksum);
         disk = checkDos (appleDisk256);
-        disk2 = checkProdos (appleDisk512);     // no need for this
+        //        disk2 = checkProdos (appleDisk512);     // no need for this
         if (disk2 != null && disk != null)      // should be impossible
         {
           if (debug)

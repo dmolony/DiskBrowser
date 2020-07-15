@@ -136,7 +136,7 @@ public class DosDisk extends AbstractFormattedDisk
 
     // same loop, but now all the catalog sectors are properly flagged
     da = disk.getDiskAddress (catalogStart.getBlockNo ());
-    do
+    loop: do
     {
       if (!disk.isValidAddress (da))
         break;
@@ -147,7 +147,7 @@ public class DosDisk extends AbstractFormattedDisk
       for (int ptr = 11; ptr < 256; ptr += ENTRY_SIZE)
       {
         if (sectorBuffer[ptr] == 0)         // empty slot, no more catalog entries
-          continue;
+          break loop;
 
         byte[] entryBuffer = new byte[ENTRY_SIZE];
         System.arraycopy (sectorBuffer, ptr, entryBuffer, 0, ENTRY_SIZE);

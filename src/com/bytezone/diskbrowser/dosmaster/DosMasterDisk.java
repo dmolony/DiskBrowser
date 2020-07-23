@@ -183,7 +183,7 @@ public class DosMasterDisk
       int num = (v - st) / sz - 1;
 
       text.append (String.format (" %d volumes of %d sectors%n", num, sz * 2));
-      // more stupid testing
+      // more stupid testing...
 
       System.out.printf ("   %02X    %04X    %04X    %04X    %04X%n", ptr, st, sz, v,
           num);

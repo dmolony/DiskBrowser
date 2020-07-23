@@ -87,6 +87,8 @@ public class DosMasterDisk
           buffer[0x38 + i], slot, drive, originalFirstBlock, lastBlock, volSize, vols,
           sectors);
 
+      // test restore worked
+
       if (vols > 0 && true)
       {
         int volNo = 1;

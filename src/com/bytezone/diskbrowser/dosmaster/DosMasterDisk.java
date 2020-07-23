@@ -87,7 +87,7 @@ public class DosMasterDisk
           buffer[0x38 + i], slot, drive, originalFirstBlock, lastBlock, volSize, vols,
           sectors);
 
-      // test restore worked again
+      // test restore worked again and again
 
       if (vols > 0 && true)
       {

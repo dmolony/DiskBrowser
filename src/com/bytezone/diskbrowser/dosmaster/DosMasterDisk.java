@@ -181,6 +181,12 @@ public class DosMasterDisk
         st -= 16 * 4096;
 
       int num = (v - st) / sz - 1;
+      
+      int test = switch(num)
+          {
+        case 1->27;
+        default -> throw new IllegalArgumentException ("Unexpected value: " + num);
+          };
 
       text.append (String.format (" %d volumes of %d sectors%n", num, sz * 2));
 

@@ -190,8 +190,6 @@ public class DosMasterDisk
 
       Disk disk = parentDisk.getDisk ();
 
-      // testing 20-06
-
       if (num > 0 && false)
       {
         for (int i = 1; i <= num; i++)

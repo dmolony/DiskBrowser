@@ -11,7 +11,6 @@ import java.util.List;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -24,7 +23,39 @@ public class DosMasterDisk
   public static boolean isDos33 (ProdosDisk parentDisk, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    //    System.out.println (HexFormatter.format (buffer, 0x38, 0x30));
+    //    System.out.println (HexFormatter.format (buffer, 0x38, 0x30, 0x38));
+    System.out.printf ("%nTotal Blocks: %04X (%<,d)%n",
+        parentDisk.getDisk ().getTotalBlocks ());
+
+    System.out.print ("\nSlots/Drives: ");
+    for (int i = 0; i < 8; i++)
+    {
+      System.out.printf ("%02X    ", buffer[0x38 + i]);
+      if (i % 2 == 1)
+        System.out.print (": ");
+    }
+
+    System.out.print ("\nFirst Block : ");
+    for (int i = 0; i < 16; i += 2)
+    {
+      System.out.printf ("%04X  ", Utility.unsignedShort (buffer, 0x40 + i));
+      if (i % 4 == 2)
+        System.out.print (": ");
+    }
+
+    System.out.print ("\nLast Block  : ");
+    for (int i = 0; i < 8; i += 2)
+      System.out.printf ("%04X        : ", Utility.unsignedShort (buffer, 0x50 + i));
+
+    System.out.print ("\nImage Size  : ");
+    for (int i = 0; i < 8; i += 2)
+      System.out.printf ("%04X        : ", Utility.unsignedShort (buffer, 0x58 + i));
+
+    System.out.print ("\nAddress     : ");
+    for (int i = 0; i < 8; i += 2)
+      System.out.printf ("%04X        : ", Utility.unsignedShort (buffer, 0x60 + i));
+
+    System.out.println ();
     System.out.println ();
     System.out.println ("#      S  D  B Lo  B Hi  Size  Vols  Secs");
 
@@ -45,18 +76,20 @@ public class DosMasterDisk
       int lastBlock = Utility.unsignedShort (buffer, 0x50 + skip);        // of last volume
       int volSize = Utility.unsignedShort (buffer, 0x58 + skip);
 
+      int originalFirstBlock = firstBlock;
       if (firstBlock > lastBlock)        // WTF?
-        firstBlock -= 16 * 4096;
+        firstBlock -= 0x10000;
 
       int vols = (lastBlock - firstBlock) / volSize - 1;
       int sectors = volSize * 2;
 
-      System.out.printf ("%d  %02X  %d  %d  %04X  %04X  %04X   %3d   %3d%n", i,
-          buffer[0x38 + i], slot, drive, firstBlock, lastBlock, volSize, vols, sectors);
+      System.out.printf ("%d  %02X  %d  %d  %04X  %04X  %04X   %3d  %4d%n", i,
+          buffer[0x38 + i], slot, drive, originalFirstBlock, lastBlock, volSize, vols,
+          sectors);
 
       if (vols > 0 && true)
       {
-        int volNo = 10;
+        int volNo = 1;
 
         int firstDiskBlock = firstBlock + volNo * volSize;
         int lastDiskBlock = firstDiskBlock + volSize;
@@ -66,14 +99,16 @@ public class DosMasterDisk
           daList.add (disk.getDiskAddress (block));
 
         byte[] diskBuffer = disk.readBlocks (daList);
-        System.out.println (HexFormatter.format (diskBuffer));
-        System.out.printf ("Buffer: %,d%n", diskBuffer.length);
-        System.out.printf ("Blocks: %,d x 2 = %,d%n", daList.size (), daList.size () * 2);
+        //        System.out.println (HexFormatter.format (diskBuffer));
+        //        System.out.printf ("Buffer: %,d%n", diskBuffer.length);
+        //        System.out.printf ("Blocks: %,d x 2 = %,d%n", daList.size (), daList.size () * 2);
 
         if (false)
-          createDisk (String.format ("%sVol%03d.dsk", base, i), diskBuffer);
+          createDisk (String.format ("%sVol%03d.dsk", base, volNo), diskBuffer);
       }
     }
+
+    //    oldCode (parentDisk, buffer);
 
     return false;
   }
@@ -101,7 +136,7 @@ public class DosMasterDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void oldCode (ProdosDisk parentDisk, byte[] buffer)
+  private static void oldCode (ProdosDisk parentDisk, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
 
@@ -139,8 +174,8 @@ public class DosMasterDisk
 
       int ptr = v0 + 2 * d0 + 2 * dr;
       int st = Utility.unsignedShort (buffer, ptr);             // start block of first volume
-      int sz = Utility.unsignedShort (buffer, vsiz + d0);       // blocks per volume
       int v = Utility.unsignedShort (buffer, size + d0);        // end block of last volume
+      int sz = Utility.unsignedShort (buffer, vsiz + d0);       // blocks per volume
 
       if (st > v)
         st -= 16 * 4096;
@@ -156,8 +191,8 @@ public class DosMasterDisk
 
       if (num > 0 && false)
       {
-        //        for (int i = 1; i <= num; i++)
-        int i = 15;
+        for (int i = 1; i <= num; i++)
+        //        int i = 15;
         {
           int firstBlock = st + i * sz;
           int lastBlock = firstBlock + sz;

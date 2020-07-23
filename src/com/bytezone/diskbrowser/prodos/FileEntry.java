@@ -357,8 +357,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           }
           //  else if (name.endsWith (".PIC"))          // 0091 X-BASIC../../XBASIC.PIC
           //    file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
-          else if (name.equals ("DOS.3.3") && endOfFile == 0x2800
-              && DosMasterDisk.isDos33 (parentDisk, exactBuffer))
+          else if ((name.equals ("DOS.3.3") || name.equals ("DDOS.3.3"))
+              && endOfFile == 0x2800 && DosMasterDisk.isDos33 (parentDisk, exactBuffer))
           {
 
           }

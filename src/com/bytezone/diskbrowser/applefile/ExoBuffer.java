@@ -74,7 +74,7 @@ public class ExoBuffer
     if (address != 0x6000 && address != 0x8000 && address != 0xA000)
       return false;
 
-    return false;        // not dealing with fuckwits
+    return true;        // not dealing with fuckwits
   }
 
   // ---------------------------------------------------------------------------------//

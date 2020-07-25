@@ -24,8 +24,8 @@ public class DosMasterDisk
   // ---------------------------------------------------------------------------------//
   {
     //    System.out.println (HexFormatter.format (buffer, 0x38, 0x30, 0x38));
-    System.out.printf ("%nTotal Blocks: %04X (%<,d)%n",
-        parentDisk.getDisk ().getTotalBlocks ());
+    System.out.printf ("%nHighest Block: %04X (%<,d)%n",
+        parentDisk.getDisk ().getTotalBlocks () - 1);
 
     System.out.print ("\nSlots/Drives: ");
     for (int i = 0; i < 8; i++)

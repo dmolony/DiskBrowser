@@ -11,7 +11,6 @@ import java.util.List;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -24,7 +23,7 @@ public class DosMasterDisk
   public static boolean isDos33 (ProdosDisk parentDisk, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    System.out.println (HexFormatter.format (buffer, 0x38, 0x30, 0x38));
+    //    System.out.println (HexFormatter.format (buffer, 0x38, 0x30, 0x38));
     System.out.printf ("%nHighest Block: %04X (%<,d)%n",
         parentDisk.getDisk ().getTotalBlocks () - 1);
 

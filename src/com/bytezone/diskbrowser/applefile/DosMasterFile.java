@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.dosmaster;
+package com.bytezone.diskbrowser.applefile;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,10 +14,17 @@ import com.bytezone.diskbrowser.prodos.ProdosDisk;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public class DosMasterDisk
+public class DosMasterFile extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
   private static final String base = "/Users/denismolony/Dropbox/Examples/Testing/";
+
+  // ---------------------------------------------------------------------------------//
+  public DosMasterFile (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
+    super (name, buffer);
+  }
 
   // ---------------------------------------------------------------------------------//
   public static boolean isDos33 (ProdosDisk parentDisk, byte[] buffer)

@@ -10,6 +10,7 @@ import com.bytezone.diskbrowser.applefile.BasicProgramGS;
 import com.bytezone.diskbrowser.applefile.CharacterRom;
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.applefile.DeviceDriver;
+import com.bytezone.diskbrowser.applefile.DosMasterFile;
 import com.bytezone.diskbrowser.applefile.DoubleHiResImage;
 import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
 import com.bytezone.diskbrowser.applefile.ExoBuffer;
@@ -39,7 +40,6 @@ import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.dosmaster.DosMasterDisk;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -358,9 +358,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           //  else if (name.endsWith (".PIC"))          // 0091 X-BASIC../../XBASIC.PIC
           //    file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
           else if ((name.equals ("DOS.3.3") || name.equals ("DDOS.3.3"))
-              && endOfFile == 0x2800 && DosMasterDisk.isDos33 (parentDisk, exactBuffer))
+              && endOfFile == 0x2800 && DosMasterFile.isDos33 (parentDisk, exactBuffer))
           {
-
+            file = new DosMasterFile (name, exactBuffer);
           }
           else
           {

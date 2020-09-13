@@ -218,19 +218,19 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     imageMenu.add (scale2Item);
     imageMenu.add (scale3Item);
 
+    applesoftMenu.add (showHeaderItem);
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (alignAssignItem);
     applesoftMenu.add (showBasicTargetsItem);
     applesoftMenu.add (onlyShowTargetLinesItem);
-    applesoftMenu.add (showHeaderItem);
     applesoftMenu.add (showCaretItem);
 
+    assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);
     assemblerMenu.add (showAssemblerStringsItem);
-    assemblerMenu.add (showAssemblerHeaderItem);
 
-    textMenu.add (showTextOffsetsItem);
     textMenu.add (showTextHeaderItem);
+    textMenu.add (showTextOffsetsItem);
 
     prodosMenu.add (prodosSortDirectoriesItem);
 

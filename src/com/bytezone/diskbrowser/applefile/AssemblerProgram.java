@@ -13,7 +13,9 @@ import com.bytezone.diskbrowser.gui.AssemblerPreferences;
 import com.bytezone.diskbrowser.gui.DiskBrowser;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class AssemblerProgram extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   static AssemblerPreferences assemblerPreferences;     // set by MenuHandler
 
@@ -27,12 +29,16 @@ public class AssemblerProgram extends AbstractFile
   private List<Integer> entryPoints;
   private List<StringLocation> stringLocations;
 
+  // ---------------------------------------------------------------------------------//
   public static void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
+  // ---------------------------------------------------------------------------------//
   {
     AssemblerProgram.assemblerPreferences = assemblerPreferences;
   }
 
+  // ---------------------------------------------------------------------------------//
   public AssemblerProgram (String name, byte[] buffer, int address)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.loadAddress = address;
@@ -43,13 +49,17 @@ public class AssemblerProgram extends AbstractFile
     //    AssemblerBlocks assemblerBlocks = new AssemblerBlocks (buffer, address);
   }
 
+  // ---------------------------------------------------------------------------------//
   public AssemblerProgram (String name, byte[] buffer, int address, int executeOffset)
+  // ---------------------------------------------------------------------------------//
   {
     this (name, buffer, address);
     this.executeOffset = executeOffset;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setExtraBuffer (byte[] fullBuffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
   {
     if (length >= 0)
     {
@@ -60,8 +70,10 @@ public class AssemblerProgram extends AbstractFile
       System.out.println ("Invalid length in setExtraBuffer() : " + length);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     // It might be useful to add opt-O to change the offset. Sometimes it's useful
     // to see the hex dump offset from zero, other times it's better to use the
@@ -75,8 +87,10 @@ public class AssemblerProgram extends AbstractFile
         .format (extraBuffer, 0, extraBuffer.length, loadAddress + buffer.length);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getAssembler ()
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer == null)
       return "No buffer";
@@ -94,7 +108,9 @@ public class AssemblerProgram extends AbstractFile
     return assembler.getText () + "\n\n" + assemblerProgram.getText ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addHeader (StringBuilder pgm)
+  // ---------------------------------------------------------------------------------//
   {
     pgm.append (String.format ("Name    : %s%n", name));
     pgm.append (String.format ("Length  : $%04X (%,d)%n", buffer.length, buffer.length));
@@ -105,8 +121,10 @@ public class AssemblerProgram extends AbstractFile
     pgm.append ("\n");
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder pgm = new StringBuilder ();
 
@@ -121,7 +139,9 @@ public class AssemblerProgram extends AbstractFile
     return pgm.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getListing ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder pgm = new StringBuilder ();
 
@@ -199,7 +219,9 @@ public class AssemblerProgram extends AbstractFile
   //    return 0;
   //  }
 
+  // ---------------------------------------------------------------------------------//
   private List<AssemblerStatement> getLines ()
+  // ---------------------------------------------------------------------------------//
   {
     List<AssemblerStatement> lines = new ArrayList<> ();
     Map<Integer, AssemblerStatement> linesMap = new HashMap<> ();
@@ -245,7 +267,9 @@ public class AssemblerProgram extends AbstractFile
     return lines;
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getStringsText ()
+  // ---------------------------------------------------------------------------------//
   {
     if (stringLocations.size () == 0)
       return "";
@@ -265,7 +289,9 @@ public class AssemblerProgram extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void getStrings ()
+  // ---------------------------------------------------------------------------------//
   {
     entryPoints = new ArrayList<> ();
     stringLocations = new ArrayList<> ();
@@ -298,7 +324,9 @@ public class AssemblerProgram extends AbstractFile
         }
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getArrow (AssemblerStatement cmd)
+  // ---------------------------------------------------------------------------------//
   {
     String arrow = "";
 
@@ -317,13 +345,17 @@ public class AssemblerProgram extends AbstractFile
     return arrow;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean isLocal (int target)
+  // ---------------------------------------------------------------------------------//
   {
     return target >= loadAddress
         && target < loadAddress + buffer.length + extraBuffer.length;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void getEquates ()
+  // ---------------------------------------------------------------------------------//
   {
     equates = new HashMap<Integer, String> ();
     DataInputStream inputEquates =
@@ -353,7 +385,9 @@ public class AssemblerProgram extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   class StringLocation
+  // ---------------------------------------------------------------------------------//
   {
     int offset;
     byte hi, lo;

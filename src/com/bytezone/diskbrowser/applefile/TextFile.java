@@ -2,16 +2,26 @@ package com.bytezone.diskbrowser.applefile;
 
 import java.util.List;
 
+import com.bytezone.diskbrowser.gui.TextPreferences;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
 public class TextFile extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
-  private int recordLength;               // prodos aux
-  private List<TextBuffer> buffers;       // only used if it is a Prodos text file
+  static TextPreferences textPreferences;     // set by MenuHandler
+
+  private int recordLength;                   // prodos aux
+  private List<TextBuffer> buffers;           // only used if it is a Prodos text file
   private int eof;
   private boolean prodosFile;
+
+  // ---------------------------------------------------------------------------------//
+  public static void setTextPreferences (TextPreferences textPreferences)
+  // ---------------------------------------------------------------------------------//
+  {
+    TextFile.textPreferences = textPreferences;
+  }
 
   // ---------------------------------------------------------------------------------//
   public TextFile (String name, byte[] buffer)
@@ -68,15 +78,19 @@ public class TextFile extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Name          : " + name + "\n");
-    if (prodosFile)
+    if (textPreferences.showHeader)
     {
-      text.append (String.format ("Record length : %,8d%n", recordLength));
-      text.append (String.format ("End of file   : %,8d%n", eof));
+      text.append ("Name          : " + name + "\n");
+
+      if (prodosFile)
+      {
+        text.append (String.format ("Record length : %,8d%n", recordLength));
+        text.append (String.format ("End of file   : %,8d%n", eof));
+      }
+      else
+        text.append (String.format ("End of file   : %,8d%n", buffer.length));
+      text.append ("\n");
     }
-    else
-      text.append (String.format ("End of file   : %,8d%n", buffer.length));
-    text.append ("\n");
 
     // check whether file is spread over multiple buffers
     if (buffers != null)
@@ -145,20 +159,25 @@ public class TextFile extends AbstractFile
     int ptr = 0;
     int size = buffer.length;
     int lastVal = 0;
-    boolean newFormat = true;
-    boolean showAllOffsets = true;
+    //    boolean showAllOffsets = true;
 
-    if (newFormat)
+    if (textPreferences.showTextOffsets)
     {
       text.append ("  Offset    Text values\n");
       text.append ("----------  -------------------------------------------------------"
           + "-------------------\n");
-      if (buffer.length == 0)
-        return text.toString ();
-
-      if (buffer[0] != 0)
-        text.append (String.format ("%,10d  ", ptr));
     }
+    else
+    {
+      text.append (" Text values\n");
+      text.append ("-------------------------------------------------------"
+          + "-------------------------------\n");
+    }
+    if (buffer.length == 0)
+      return text.toString ();
+
+    if (buffer[0] != 0 && textPreferences.showTextOffsets)
+      text.append (String.format ("%,10d  ", ptr));
 
     int gcd = 0;
 
@@ -173,19 +192,15 @@ public class TextFile extends AbstractFile
       {
         if (nulls > 0)
         {
-          if (newFormat)
+          if (textPreferences.showTextOffsets)
             text.append (String.format ("%,10d  ", ptr - 1));
-          else
-            text.append ("\nNew record at : " + (ptr - 1) + "\n");
+
           nulls = 0;
 
           gcd = gcd == 0 ? ptr - 1 : gcd (gcd, ptr - 1);
         }
-        else if (lastVal == 0x0D && newFormat)
-          if (showAllOffsets)
-            text.append (String.format ("%,10d  ", ptr - 1));
-          else
-            text.append ("              ");
+        else if (lastVal == 0x0D && textPreferences.showTextOffsets)
+          text.append (String.format ("%,10d  ", ptr - 1));
 
         text.append ((char) val);
       }

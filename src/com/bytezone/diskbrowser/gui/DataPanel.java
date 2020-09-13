@@ -32,6 +32,7 @@ import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
+import com.bytezone.diskbrowser.applefile.TextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
@@ -39,9 +40,10 @@ import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
 
 // -----------------------------------------------------------------------------------//
-public class DataPanel extends JTabbedPane implements DiskSelectionListener,
-    FileSelectionListener, SectorSelectionListener, FileNodeSelectionListener,
-    FontChangeListener, BasicPreferencesListener, AssemblerPreferencesListener
+public class DataPanel extends JTabbedPane
+    implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
+    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
+    AssemblerPreferencesListener, TextPreferencesListener
 // -----------------------------------------------------------------------------------//
 {
   private static final int TEXT_WIDTH = 65;
@@ -548,6 +550,15 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   // ---------------------------------------------------------------------------------//
   {
     if (currentDataSource instanceof AssemblerProgram)
+      setDataSource (currentDataSource);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void setTextPreferences (TextPreferences textPreferences)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (currentDataSource instanceof TextFile)
       setDataSource (currentDataSource);
   }
 

@@ -22,6 +22,7 @@ import com.bytezone.diskbrowser.applefile.BasicProgram;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory;
+import com.bytezone.diskbrowser.applefile.TextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -54,7 +55,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   private static final String PREFS_PRODOS_SORT_DIRECTORIES = "prodosSortDirectories";
 
-  //  private static final String PREFS_DEBUGGING = "debugging";
+  private static final String PREFS_TEXT_SHOW_OFFSETS = "showTextOffsets";
+  private static final String PREFS_TEXT_SHOW_HEADER = "showTextHeader";
+
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
@@ -73,11 +76,16 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private final List<ProdosPreferencesListener> prodosPreferencesListeners =
       new ArrayList<> ();
 
+  private final TextPreferences textPreferences = new TextPreferences ();
+  private final List<TextPreferencesListener> textPreferencesListeners =
+      new ArrayList<> ();
+
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
   JMenu formatMenu = new JMenu ("Format");
   JMenu imageMenu = new JMenu ("Images");
   JMenu applesoftMenu = new JMenu ("Applesoft");
+  JMenu textMenu = new JMenu ("Text");
   JMenu assemblerMenu = new JMenu ("Assembler");
   JMenu prodosMenu = new JMenu ("Prodos");
   JMenu helpMenu = new JMenu ("Help");
@@ -132,6 +140,10 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   // Prodos menu items
   final JMenuItem prodosSortDirectoriesItem = new JCheckBoxMenuItem ("Sort directories");
 
+  // Text menu items
+  final JMenuItem showTextOffsetsItem = new JCheckBoxMenuItem ("Show offsets");
+  final JMenuItem showTextHeaderItem = new JCheckBoxMenuItem ("Show header");
+
   ButtonGroup paletteGroup = new ButtonGroup ();
 
   // ---------------------------------------------------------------------------------//
@@ -144,6 +156,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     menuBar.add (applesoftMenu);
     menuBar.add (assemblerMenu);
     menuBar.add (prodosMenu);
+    menuBar.add (textMenu);
     menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
@@ -216,6 +229,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     assemblerMenu.add (showAssemblerStringsItem);
     assemblerMenu.add (showAssemblerHeaderItem);
 
+    textMenu.add (showTextOffsetsItem);
+    textMenu.add (showTextHeaderItem);
+
     prodosMenu.add (prodosSortDirectoriesItem);
 
     ActionListener basicPreferencesAction = new ActionListener ()
@@ -248,6 +264,16 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       }
     };
 
+    ActionListener textPreferencesAction = new ActionListener ()
+    {
+      @Override
+      public void actionPerformed (ActionEvent e)
+      {
+        setTextPreferences ();
+        notifyTextPreferencesListeners ();
+      }
+    };
+
     splitRemarkItem.addActionListener (basicPreferencesAction);
     alignAssignItem.addActionListener (basicPreferencesAction);
     showBasicTargetsItem.addActionListener (basicPreferencesAction);
@@ -260,6 +286,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showAssemblerHeaderItem.addActionListener (assemblerPreferencesAction);
 
     prodosSortDirectoriesItem.addActionListener (prodosPreferencesAction);
+
+    showTextOffsetsItem.addActionListener (textPreferencesAction);
+    showTextHeaderItem.addActionListener (textPreferencesAction);
 
     helpMenu.add (new JMenuItem (new EnvironmentAction ()));
 
@@ -374,10 +403,33 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       listener.setProdosPreferences (prodosPreferences);
   }
 
-  //  void addHelpMenuAction (Action action, String functionName)
-  //  {
-  //    helpMenu.add (new JMenuItem (action));
-  //  }
+  // ---------------------------------------------------------------------------------//
+  private void setTextPreferences ()
+  // ---------------------------------------------------------------------------------//
+  {
+    textPreferences.showTextOffsets = showTextOffsetsItem.isSelected ();
+    textPreferences.showHeader = showTextHeaderItem.isSelected ();
+    TextFile.setTextPreferences (textPreferences);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void addTextPreferencesListener (TextPreferencesListener listener)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (!textPreferencesListeners.contains (listener))
+    {
+      textPreferencesListeners.add (listener);
+      listener.setTextPreferences (textPreferences);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void notifyTextPreferencesListeners ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (TextPreferencesListener listener : textPreferencesListeners)
+      listener.setTextPreferences (textPreferences);
+  }
 
   // ---------------------------------------------------------------------------------//
   private void addLauncherMenu ()
@@ -436,6 +488,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     prefs.putBoolean (PREFS_PRODOS_SORT_DIRECTORIES,
         prodosSortDirectoriesItem.isSelected ());
+
+    prefs.putBoolean (PREFS_TEXT_SHOW_OFFSETS, showTextOffsetsItem.isSelected ());
+    prefs.putBoolean (PREFS_TEXT_SHOW_HEADER, showTextHeaderItem.isSelected ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -483,9 +538,13 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prodosSortDirectoriesItem
         .setSelected (prefs.getBoolean (PREFS_PRODOS_SORT_DIRECTORIES, true));
 
+    showTextOffsetsItem.setSelected (prefs.getBoolean (PREFS_TEXT_SHOW_OFFSETS, true));
+    showTextHeaderItem.setSelected (prefs.getBoolean (PREFS_TEXT_SHOW_HEADER, true));
+
     setBasicPreferences ();
     setAssemblerPreferences ();
     setProdosPreferences ();
+    setTextPreferences ();
 
     int paletteIndex = prefs.getInt (PREFS_PALETTE, 0);
     PaletteFactory paletteFactory = HiResImage.getPaletteFactory ();

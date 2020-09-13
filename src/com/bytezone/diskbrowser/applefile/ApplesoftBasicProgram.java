@@ -9,7 +9,9 @@ import java.util.Stack;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class ApplesoftBasicProgram extends BasicProgram
+// -----------------------------------------------------------------------------------//
 {
   private static final byte TOKEN_FOR = (byte) 0x81;
   private static final byte TOKEN_NEXT = (byte) 0x82;
@@ -28,7 +30,9 @@ public class ApplesoftBasicProgram extends BasicProgram
   private final Set<Integer> gotoLines = new HashSet<> ();
   private final Set<Integer> gosubLines = new HashSet<> ();
 
+  // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -50,8 +54,10 @@ public class ApplesoftBasicProgram extends BasicProgram
     endPtr = ptr;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<String> ();
@@ -228,7 +234,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return fullText.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<String> splitPrint (String line)
+  // ---------------------------------------------------------------------------------//
   {
     int first = line.indexOf ("\"") + 1;
     int last = line.indexOf ("\"", first + 1) - 1;
@@ -271,7 +279,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return lines;
   }
 
+  // ---------------------------------------------------------------------------------//
   private List<String> splitRemark (String remark, int wrapLength)
+  // ---------------------------------------------------------------------------------//
   {
     List<String> remarks = new ArrayList<> ();
     while (remark.length () > wrapLength)
@@ -288,7 +298,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return remarks;
   }
 
+  // ---------------------------------------------------------------------------------//
   private int countChars (StringBuilder text, byte ch)
+  // ---------------------------------------------------------------------------------//
   {
     int total = 0;
     for (int i = 0; i < text.length (); i++)
@@ -297,7 +309,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return total;
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getBase (SourceLine line)
+  // ---------------------------------------------------------------------------------//
   {
     if (!basicPreferences.showTargets)
       return String.format (" %5d", line.lineNumber);
@@ -324,7 +338,9 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   // Decide whether the current subline needs to be aligned on its equals sign. If so,
   // and the column hasn't been calculated, read ahead to find the highest position.
+  // ---------------------------------------------------------------------------------//
   private int alignEqualsPosition (SubLine subline, int currentAlignPosition)
+  // ---------------------------------------------------------------------------------//
   {
     if (subline.assignEqualPos > 0)                   // does the line have an equals sign?
     {
@@ -337,7 +353,9 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   // The IF processing is so that any assignment that is being aligned doesn't continue
   // to the next full line (because the indentation has changed).
+  // ---------------------------------------------------------------------------------//
   private int findHighest (SubLine startSubline)
+  // ---------------------------------------------------------------------------------//
   {
     boolean started = false;
     int highestAssign = startSubline.assignEqualPos;
@@ -369,8 +387,10 @@ public class ApplesoftBasicProgram extends BasicProgram
     return highestAssign;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < 2)
       return super.getHexDump ();
@@ -412,14 +432,18 @@ public class ApplesoftBasicProgram extends BasicProgram
     return pgm.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void addHeader (StringBuilder pgm)
+  // ---------------------------------------------------------------------------------//
   {
     pgm.append ("Name    : " + name + "\n");
     pgm.append (String.format ("Length  : $%04X (%<,d)%n", buffer.length));
     pgm.append (String.format ("Load at : $%04X (%<,d)%n%n", getLoadAddress ()));
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getLoadAddress ()
+  // ---------------------------------------------------------------------------------//
   {
     int programLoadAddress = 0;
     if (buffer.length > 1)
@@ -430,7 +454,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return programLoadAddress;
   }
 
+  // ---------------------------------------------------------------------------------//
   private int getLineLength (int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int offset = Utility.unsignedShort (buffer, ptr);
     if (offset == 0)
@@ -444,7 +470,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return length;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void popLoopVariables (Stack<String> loopVariables, SubLine subline)
+  // ---------------------------------------------------------------------------------//
   {
     if (subline.nextVariables.length == 0) // naked NEXT
     {
@@ -459,7 +487,9 @@ public class ApplesoftBasicProgram extends BasicProgram
             break;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean sameVariable (String v1, String v2)
+  // ---------------------------------------------------------------------------------//
   {
     if (v1.equals (v2))
       return true;
@@ -469,7 +499,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   private class SourceLine
+  // ---------------------------------------------------------------------------------//
   {
     List<SubLine> sublines = new ArrayList<> ();
     int lineNumber;
@@ -548,7 +580,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private class SubLine
+  // ---------------------------------------------------------------------------------//
   {
     SourceLine parent;
     int startPtr;

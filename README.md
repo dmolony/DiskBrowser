@@ -47,6 +47,7 @@ Click on any sector in the Disk Layout panel and the Output panel will display t
 ![Sector details](resources/sector.png?raw=true "Sector details")
 #### Cross-platform
 Java runs on Windows, MacOS and Linux.
+  
 ![Windows](resources/windows.png?raw=true "Windows")
 #### Graphics 
 ![Graphics](resources/graphics.png?raw=true "Graphics")

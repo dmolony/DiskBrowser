@@ -3,9 +3,13 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 public class AssemblerBlocks
+// -----------------------------------------------------------------------------------//
 {
+  // ---------------------------------------------------------------------------------//
   public AssemblerBlocks (byte[] buffer, int loadAddress)
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
     boolean inCode = true;

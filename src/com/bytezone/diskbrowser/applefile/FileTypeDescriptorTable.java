@@ -6,7 +6,9 @@ import java.util.List;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class FileTypeDescriptorTable extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   int versionMajor;
   int versionMinor;
@@ -18,7 +20,9 @@ public class FileTypeDescriptorTable extends AbstractFile
 
   private final List<IndexRecord> indexRecords = new ArrayList<> ();
 
+  // ---------------------------------------------------------------------------------//
   public FileTypeDescriptorTable (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
@@ -38,8 +42,10 @@ public class FileTypeDescriptorTable extends AbstractFile
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Name : " + name + "\n\n");
     text.append ("File Type Descriptor Table\n\n");
@@ -62,7 +68,9 @@ public class FileTypeDescriptorTable extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   class IndexRecord
+  // ---------------------------------------------------------------------------------//
   {
     int fileType;
     int auxType;

@@ -5,7 +5,9 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// -----------------------------------------------------------------------------------//
 public class BootSector extends AbstractSector
+// -----------------------------------------------------------------------------------//
 {
   private static final byte[] skew = { 0x00, 0x0D, 0x0B, 0x09, 0x07, 0x05, 0x03, 0x01,
                                        0x0E, 0x0C, 0x0A, 0x08, 0x06, 0x04, 0x02, 0x0F };
@@ -16,20 +18,26 @@ public class BootSector extends AbstractSector
   AssemblerProgram assembler2;
   String name;                                        // DOS or Prodos
 
+  // ---------------------------------------------------------------------------------//
   public BootSector (Disk disk, byte[] buffer, String name, DiskAddress diskAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer, diskAddress);
     this.name = name;
   }
 
+  // ---------------------------------------------------------------------------------//
   public BootSector (Disk disk, byte[] buffer, String name)
+  // ---------------------------------------------------------------------------------//
   {
     super (disk, buffer);
     this.name = name;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String createText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -80,7 +88,9 @@ public class BootSector extends AbstractSector
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean matches (byte[] buffer, int offset, byte[] test)
+  // ---------------------------------------------------------------------------------//
   {
     if (test.length == 0 || test.length > buffer.length - offset)
       return false;

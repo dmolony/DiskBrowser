@@ -3,7 +3,9 @@ package com.bytezone.diskbrowser.applefile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class IntegerBasicProgram extends BasicProgram
+// -----------------------------------------------------------------------------------//
 {
   private static String[] tokens =
       { "?", "?", "?", " : ", "?", "?", "?", "?", "?", "?", "?", "?", "CLR", "?", "?",
@@ -19,13 +21,17 @@ public class IntegerBasicProgram extends BasicProgram
         "LIST ", ",", "LIST ", "POP ", "NODSP ", "NODSP ", "NOTRACE ", "DSP ", "DSP ",
         "TRACE ", "PR#", "IN#", };
 
+  // ---------------------------------------------------------------------------------//
   public IntegerBasicProgram (String name, byte[] buffer)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder pgm = new StringBuilder ();
     pgm.append ("Name    : " + name + "\n");
@@ -77,7 +83,9 @@ public class IntegerBasicProgram extends BasicProgram
     return pgm.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private void appendAssembler (StringBuilder pgm, int ptr, int lineLength)
+  // ---------------------------------------------------------------------------------//
   {
     for (int i = ptr + 3; i < ptr + lineLength - 1; i++)
     {
@@ -93,7 +101,9 @@ public class IntegerBasicProgram extends BasicProgram
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean checkForAssembler ()
+  // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
 
@@ -117,7 +127,9 @@ public class IntegerBasicProgram extends BasicProgram
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
   private boolean checkForSCAssembler ()
+  // ---------------------------------------------------------------------------------//
   {
     if (buffer.length == 0)
     {
@@ -130,7 +142,9 @@ public class IntegerBasicProgram extends BasicProgram
     return buffer[lineLength - 1] == 0;
   }
 
+  // ---------------------------------------------------------------------------------//
   private void appendSCAssembler (StringBuilder text, int ptr)
+  // ---------------------------------------------------------------------------------//
   {
     int lineNumber = (buffer[ptr + 2] & 0xFF) * 256 + (buffer[ptr + 1] & 0xFF);
     text.append (String.format ("%4d: ", lineNumber));
@@ -156,7 +170,9 @@ public class IntegerBasicProgram extends BasicProgram
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   private void appendInteger (StringBuilder text, int ptr, int lineLength)
+  // ---------------------------------------------------------------------------------//
   {
     int lineNumber = Utility.intValue (buffer[ptr + 1], buffer[ptr + 2]);
 
@@ -208,8 +224,10 @@ public class IntegerBasicProgram extends BasicProgram
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getHexDump ()
+  // ---------------------------------------------------------------------------------//
   {
     if (false)
       return super.getHexDump ();
@@ -247,6 +265,7 @@ public class IntegerBasicProgram extends BasicProgram
 
     return pgm.toString ();
   }
+
 /*
  * To find integer basic in memory:
  * $CA $CB contain the starting address ($9464)

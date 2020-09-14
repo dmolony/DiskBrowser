@@ -6,7 +6,9 @@ import java.util.Comparator;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
+// -----------------------------------------------------------------------------------//
 public class AssemblerStatement
+// -----------------------------------------------------------------------------------//
 {
   public byte value;
   public String mnemonic;
@@ -21,7 +23,9 @@ public class AssemblerStatement
   public boolean isTarget;
   public byte operand1, operand2;
 
+  // ---------------------------------------------------------------------------------//
   public static void print ()
+  // ---------------------------------------------------------------------------------//
   {
     AssemblerStatement[] statements = new AssemblerStatement[256];
     System.out.println ();
@@ -67,7 +71,9 @@ public class AssemblerStatement
       }
   }
 
+  // ---------------------------------------------------------------------------------//
   public AssemblerStatement (byte opcode)
+  // ---------------------------------------------------------------------------------//
   {
     this.value = opcode;
     this.opcode = opcode & 0xFF;
@@ -76,7 +82,9 @@ public class AssemblerStatement
     this.operand = "";
   }
 
+  // ---------------------------------------------------------------------------------//
   String getChar (byte val)
+  // ---------------------------------------------------------------------------------//
   {
     int c = val & 0xFF;
     if (c > 127)
@@ -92,7 +100,9 @@ public class AssemblerStatement
       return (char) c + "";
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addData ()
+  // ---------------------------------------------------------------------------------//
   {
     switch (opcode)
     {
@@ -142,7 +152,9 @@ public class AssemblerStatement
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addData (byte b)
+  // ---------------------------------------------------------------------------------//
   {
     operand1 = b;
     String address = "$" + HexFormatter.format2 (b);
@@ -277,7 +289,9 @@ public class AssemblerStatement
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public void addData (byte b1, byte b2)
+  // ---------------------------------------------------------------------------------//
   {
     operand1 = b1;
     operand2 = b2;
@@ -365,8 +379,10 @@ public class AssemblerStatement
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
+  // ---------------------------------------------------------------------------------//
   {
     if (offset == 0)
       return String.format ("%06X  %d  %3s %-10s %02X", address, size, mnemonic, operand,

@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public interface AssemblerConstants
+// -----------------------------------------------------------------------------------//
 {
   // 1A = INC A, 3A = DEC A
   String[] mnemonics = { "BRK", "ORA", "???", "???", "TSB", "ORA", "ASL", "???", // 00

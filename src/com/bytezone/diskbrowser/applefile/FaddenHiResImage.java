@@ -1,11 +1,15 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public class FaddenHiResImage extends OriginalHiResImage
+// -----------------------------------------------------------------------------------//
 {
   // https://github.com/fadden/fhpack/blob/master/fhpack.cpp
 
+  // ---------------------------------------------------------------------------------//
   public FaddenHiResImage (String name, byte[] buffer, int fileType, int auxType,
       int endOfFile)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, fileType, auxType, endOfFile);
 

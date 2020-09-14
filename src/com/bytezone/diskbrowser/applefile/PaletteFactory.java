@@ -3,7 +3,9 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
+// -----------------------------------------------------------------------------------//
 public class PaletteFactory
+// -----------------------------------------------------------------------------------//
 {
   private final List<Palette> palettes = new ArrayList<> ();
   private int currentPalette;
@@ -13,7 +15,9 @@ public class PaletteFactory
     FORWARDS, BACKWARDS
   }
 
+  // ---------------------------------------------------------------------------------//
   public PaletteFactory ()
+  // ---------------------------------------------------------------------------------//
   {
     palettes.add (//
         new Palette ("Virtual II", new int[] { 0x000000, // 0 black
@@ -168,7 +172,9 @@ public class PaletteFactory
         }));
   }
 
+  // ---------------------------------------------------------------------------------//
   public Palette cyclePalette (CycleDirection direction)
+  // ---------------------------------------------------------------------------------//
   {
     switch (direction)
     {
@@ -187,28 +193,38 @@ public class PaletteFactory
     return getCurrentPalette ();
   }
 
+  // ---------------------------------------------------------------------------------//
   public List<Palette> getPalettes ()
+  // ---------------------------------------------------------------------------------//
   {
     return palettes;
   }
 
+  // ---------------------------------------------------------------------------------//
   public Palette getCurrentPalette ()
+  // ---------------------------------------------------------------------------------//
   {
     return palettes.get (currentPalette);
   }
 
+  // ---------------------------------------------------------------------------------//
   public int getCurrentPaletteIndex ()
+  // ---------------------------------------------------------------------------------//
   {
     return currentPalette;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setCurrentPalette (int index)
+  // ---------------------------------------------------------------------------------//
   {
     assert index >= 0 && index < palettes.size ();
     currentPalette = index;
   }
 
+  // ---------------------------------------------------------------------------------//
   public void setCurrentPalette (Palette palette)
+  // ---------------------------------------------------------------------------------//
   {
     int count = 0;
     for (Palette p : palettes)
@@ -222,12 +238,16 @@ public class PaletteFactory
     }
   }
 
+  // ---------------------------------------------------------------------------------//
   public Palette get (int index)
+  // ---------------------------------------------------------------------------------//
   {
     return palettes.get (index);
   }
 
+  // ---------------------------------------------------------------------------------//
   private int rgb (int red, int green, int blue)
+  // ---------------------------------------------------------------------------------//
   {
     return red << 16 | green << 8 | blue;
   }

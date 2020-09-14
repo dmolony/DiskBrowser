@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public interface ApplesoftConstants
+// -----------------------------------------------------------------------------------//
 {
   String[] tokens = { //
                      "END ", "FOR ", "NEXT ", "DATA ",              // 0x80 - 0x83

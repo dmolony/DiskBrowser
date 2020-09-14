@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.applefile;
 
+// -----------------------------------------------------------------------------------//
 public class MerlinSource extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   int ptr;
   private static int[] tabs = { 12, 19, 35 };
@@ -10,7 +12,9 @@ public class MerlinSource extends AbstractFile
   private boolean prodosFile;
 
   // Source : Prodos text file
+  // ---------------------------------------------------------------------------------//
   public MerlinSource (String name, byte[] buffer, int recordLength, int eof)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.eof = eof;
@@ -19,7 +23,9 @@ public class MerlinSource extends AbstractFile
   }
 
   // Source : Dos binary file
+  // ---------------------------------------------------------------------------------//
   public MerlinSource (String name, byte[] buffer, int loadAddress)
+  // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
     this.eof = 0;
@@ -27,8 +33,10 @@ public class MerlinSource extends AbstractFile
     this.loadAddress = loadAddress;
   }
 
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
@@ -53,7 +61,9 @@ public class MerlinSource extends AbstractFile
     return text.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private String getLine ()
+  // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder ();
     boolean comment = false;
@@ -85,7 +95,9 @@ public class MerlinSource extends AbstractFile
     return line.toString ();
   }
 
+  // ---------------------------------------------------------------------------------//
   private StringBuilder tab (StringBuilder text)
+  // ---------------------------------------------------------------------------------//
   {
     int nextTab = 0;
     for (int tab : tabs)

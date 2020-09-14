@@ -5,6 +5,7 @@ package com.bytezone.diskbrowser.applefile;
 
 // -----------------------------------------------------------------------------------//
 public class ExoBufferC
+// -----------------------------------------------------------------------------------//
 {
   private static int PBIT_BITS_ORDER_BE = 0;
   private static int PBIT_BITS_COPY_GT_7 = 1;

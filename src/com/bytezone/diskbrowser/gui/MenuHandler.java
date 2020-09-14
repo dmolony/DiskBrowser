@@ -22,7 +22,7 @@ import com.bytezone.diskbrowser.applefile.BasicProgram;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory;
-import com.bytezone.diskbrowser.applefile.TextFile;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -409,7 +409,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   {
     textPreferences.showTextOffsets = showTextOffsetsItem.isSelected ();
     textPreferences.showHeader = showTextHeaderItem.isSelected ();
-    TextFile.setTextPreferences (textPreferences);
+    BasicTextFile.setTextPreferences (textPreferences);
   }
 
   // ---------------------------------------------------------------------------------//

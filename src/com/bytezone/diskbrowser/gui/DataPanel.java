@@ -32,7 +32,7 @@ import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
-import com.bytezone.diskbrowser.applefile.TextFile;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
@@ -558,7 +558,7 @@ public class DataPanel extends JTabbedPane
   public void setTextPreferences (TextPreferences textPreferences)
   // ---------------------------------------------------------------------------------//
   {
-    if (currentDataSource instanceof TextFile)
+    if (currentDataSource instanceof BasicTextFile)
       setDataSource (currentDataSource);
   }
 

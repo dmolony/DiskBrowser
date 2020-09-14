@@ -18,7 +18,7 @@ import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PrintShopGraphic;
 import com.bytezone.diskbrowser.applefile.ShapeTable;
 import com.bytezone.diskbrowser.applefile.SimpleText2;
-import com.bytezone.diskbrowser.applefile.TextFile;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
@@ -197,7 +197,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           if (VisicalcFile.isVisicalcFile (buffer))
             appleFile = new VisicalcFile (name, buffer);
           else
-            appleFile = new TextFile (name, buffer);
+            appleFile = new BasicTextFile (name, buffer);
           break;
 
         case IntegerBasic:

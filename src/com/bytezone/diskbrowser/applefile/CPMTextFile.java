@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
 // -----------------------------------------------------------------------------------//
-public class CPMTextFile extends AbstractFile
+public class CPMTextFile extends TextFile
 // -----------------------------------------------------------------------------------//
 {
   // ---------------------------------------------------------------------------------//
@@ -18,7 +18,8 @@ public class CPMTextFile extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Name : " + name + "\n\n");
+    if (textPreferences.showHeader)
+      text.append ("Name : " + name + "\n\n");
 
     int ptr = 0;
     while (ptr < buffer.length && buffer[ptr] != (byte) 0x1A)

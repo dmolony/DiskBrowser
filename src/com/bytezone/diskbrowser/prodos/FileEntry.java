@@ -35,7 +35,7 @@ import com.bytezone.diskbrowser.applefile.ShapeTable;
 import com.bytezone.diskbrowser.applefile.SimpleText;
 import com.bytezone.diskbrowser.applefile.StoredVariables;
 import com.bytezone.diskbrowser.applefile.TextBuffer;
-import com.bytezone.diskbrowser.applefile.TextFile;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
@@ -380,7 +380,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           else if (name.endsWith (".GIF") && HiResImage.isGif (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
           else
-            file = new TextFile (name, exactBuffer, auxType, endOfFile);
+            file = new BasicTextFile (name, exactBuffer, auxType, endOfFile);
           break;
 
         case FILE_TYPE_APPLESOFT_BASIC:
@@ -608,7 +608,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     if (buffers.size () == 1 && name.endsWith (".S"))
       return new MerlinSource (name, buffers.get (0).buffer, auxType, endOfFile);
 
-    return new TextFile (name, buffers, auxType, endOfFile);
+    return new BasicTextFile (name, buffers, auxType, endOfFile);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -622,7 +622,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     if (buffers.size () == 1 && name.endsWith (".S"))
       return new MerlinSource (name, buffers.get (0).buffer, auxType, endOfFile);
 
-    return new TextFile (name, buffers, auxType, endOfFile);
+    return new BasicTextFile (name, buffers, auxType, endOfFile);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -640,7 +640,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     if (name.endsWith (".S"))
       return new MerlinSource (name, buffer, auxType, endOfFile);
 
-    return new TextFile (name, buffer, auxType, endOfFile);
+    return new BasicTextFile (name, buffer, auxType, endOfFile);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -2,7 +2,9 @@ package com.bytezone.diskbrowser.applefile;
 
 import com.bytezone.diskbrowser.gui.TextPreferences;
 
+// -----------------------------------------------------------------------------------//
 public abstract class TextFile extends AbstractFile
+// -----------------------------------------------------------------------------------//
 {
   static TextPreferences textPreferences;     // set by MenuHandler
 

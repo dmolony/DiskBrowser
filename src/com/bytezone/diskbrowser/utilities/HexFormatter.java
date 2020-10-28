@@ -167,6 +167,12 @@ public class HexFormatter
   {
     StringBuilder text = new StringBuilder ();
 
+    //    if (buffer.length == 0)
+    //    {
+    //      System.out.println ("empty buffer");
+    //      return text.toString ();
+    //    }
+
     for (int i = offset; i < offset + length; i++)
     {
       int c = buffer[i] & 0xFF;

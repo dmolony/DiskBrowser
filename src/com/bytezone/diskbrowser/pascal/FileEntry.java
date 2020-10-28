@@ -65,6 +65,11 @@ public class FileEntry extends CatalogEntry
       return file;
 
     byte[] buffer = getExactBuffer ();
+    if (buffer.length == 0)
+    {
+      file = new AssemblerProgram (name, buffer, 0);    // see DC16.dsk
+      return file;
+    }
 
     switch (fileType)
     {

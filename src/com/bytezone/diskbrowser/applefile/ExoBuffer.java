@@ -31,6 +31,8 @@ public class ExoBuffer
   private int tableLo[] = new int[100];
   private int tableHi[] = new int[100];
 
+  private static boolean debug = false;
+
   // ---------------------------------------------------------------------------------//
   public ExoBuffer (byte[] inBuffer)
   // ---------------------------------------------------------------------------------//
@@ -43,12 +45,21 @@ public class ExoBuffer
       case 0x6000:
         outBuffer = new byte[0x2000];     // HGR
         break;
+
       case 0x8000:
         outBuffer = new byte[0x4000];     // DHGR
         break;
+
       case 0xA000:
         outBuffer = new byte[0x8000];     // SHR
         break;
+
+      case 0x5FF8:        // this is not working correctly - see CLODE019
+        return;
+
+      default:
+        System.out.printf ("Invalid buffer size: %04X%n",
+            Utility.getShortBigEndian (inBuffer, 0));
     }
 
     decrunch ();
@@ -67,12 +78,20 @@ public class ExoBuffer
   // ---------------------------------------------------------------------------------//
   {
     if (auxType != 0x1FF8 && auxType != 0x3FF8)
+    {
+      if (debug)
+        System.out.println ("wrong auxType");
       return false;
+    }
 
     int address = Utility.unsignedShort (buffer, buffer.length - 2);
 
     if (address != 0x6000 && address != 0x8000 && address != 0xA000)
+    {
+      if (debug)
+        System.out.printf ("wrong address: %04X%n", address);
       return false;
+    }
 
     return true;
   }

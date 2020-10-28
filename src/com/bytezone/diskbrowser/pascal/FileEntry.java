@@ -61,15 +61,18 @@ public class FileEntry extends CatalogEntry
   public AbstractFile getDataSource ()
   // ---------------------------------------------------------------------------------//
   {
-    if (file != null)
+    if (file != null)       // previously built
       return file;
 
-    byte[] buffer = getExactBuffer ();
-    if (buffer.length == 0)
+    // check for empty file (e.g. see DC16.dsk)
+    if (firstBlock == lastBlock)
     {
-      file = new AssemblerProgram (name, buffer, 0);    // see DC16.dsk
+      file = new DefaultAppleFile (name, new byte[0]);
+      node.setAllowsChildren (false);
       return file;
     }
+
+    byte[] buffer = getExactBuffer ();
 
     switch (fileType)
     {

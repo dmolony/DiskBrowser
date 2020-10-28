@@ -60,8 +60,7 @@ abstract class CatalogEntry implements AppleFileSource
   public List<DiskAddress> getSectors ()
   // ---------------------------------------------------------------------------------//
   {
-    List<DiskAddress> sectors = new ArrayList<> (blocks);
-    return sectors;
+    return new ArrayList<> (blocks);       // make a copy
   }
 
   // ---------------------------------------------------------------------------------//

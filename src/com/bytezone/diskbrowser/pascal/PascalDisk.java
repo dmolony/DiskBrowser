@@ -22,6 +22,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Relocator;
 
+// useful : http://pascal.hansotten.com/ucsd-p-system/apple-pascal/apple-ii/
 // -----------------------------------------------------------------------------------//
 public class PascalDisk extends AbstractFormattedDisk
 // -----------------------------------------------------------------------------------//

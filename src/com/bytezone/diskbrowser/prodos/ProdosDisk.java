@@ -3,7 +3,6 @@ package com.bytezone.diskbrowser.prodos;
 import java.awt.Color;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -43,8 +42,7 @@ public class ProdosDisk extends AbstractFormattedDisk
 
   private final List<DirectoryHeader> headerEntries = new ArrayList<> ();
   private final DefaultMutableTreeNode volumeNode;
-  private final NodeComparator nodeComparator = new NodeComparator ();
-  private VolumeDirectoryHeader vdh;
+  private VolumeDirectoryHeader volumeDirectoryHeader;
 
   private static final boolean debug = false;
 
@@ -132,16 +130,16 @@ public class ProdosDisk extends AbstractFormattedDisk
         {
           case ProdosConstants.VOLUME_HEADER:
             assert headerEntries.size () == 0;
-            vdh = new VolumeDirectoryHeader (this, entry);
-            assert vdh.entryLength == ProdosConstants.ENTRY_SIZE;
-            headerEntries.add (vdh);
+            volumeDirectoryHeader = new VolumeDirectoryHeader (this, entry);
+            assert volumeDirectoryHeader.entryLength == ProdosConstants.ENTRY_SIZE;
+            headerEntries.add (volumeDirectoryHeader);
             currentSectorType = catalogSector;
             if (!disk.isBlockEmpty (block))
               sectorTypes[block] = currentSectorType;
-            for (int i = 0; i < vdh.totalBitMapBlocks; i++)
-              sectorTypes[vdh.bitMapBlock + i] = volumeMapSector;
-            parentNode.setUserObject (vdh);         // populate the empty volume node
-            localHeader = vdh;
+            for (int i = 0; i < volumeDirectoryHeader.totalBitMapBlocks; i++)
+              sectorTypes[volumeDirectoryHeader.bitMapBlock + i] = volumeMapSector;
+            parentNode.setUserObject (volumeDirectoryHeader);         // populate the empty volume node
+            localHeader = volumeDirectoryHeader;
             break;
 
           case ProdosConstants.SUBDIRECTORY_HEADER:
@@ -246,7 +244,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   VolumeDirectoryHeader getVolumeDirectoryHeader ()
   // ---------------------------------------------------------------------------------//
   {
-    return vdh;
+    return volumeDirectoryHeader;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -254,7 +252,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     if (fileNo == 0)
-      return ((VolumeDirectoryHeader) headerEntries.get (0)).getDataSource ();
+      return volumeDirectoryHeader.getDataSource ();
     return fileEntries.get (fileNo - 1).getDataSource ();
   }
 
@@ -263,7 +261,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   public AppleFileSource getCatalog ()
   // ---------------------------------------------------------------------------------//
   {
-    return new DefaultAppleFileSource ("Catalog", headerEntries.get (0).getDataSource (),
+    return new DefaultAppleFileSource ("Catalog", volumeDirectoryHeader.getDataSource (),
         this);
   }
 
@@ -301,12 +299,13 @@ public class ProdosDisk extends AbstractFormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     if (fileNo == 0)
-      return ((VolumeDirectoryHeader) headerEntries.get (0)).getSectors ();
+      return volumeDirectoryHeader.getSectors ();
+
     return fileEntries.get (fileNo - 1).getSectors ();
   }
 
   // ---------------------------------------------------------------------------------//
-  public void sortNodes (DefaultMutableTreeNode node)
+  void sortNodes (DefaultMutableTreeNode node)
   // ---------------------------------------------------------------------------------//
   {
     int totalChildren = node.getChildCount ();
@@ -325,7 +324,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     if (totalChildren > 1)
     {
       node.removeAllChildren ();
-      Collections.sort (children, nodeComparator);
+      children.sort (new NodeComparator ());
       for (DefaultMutableTreeNode child : children)
         node.add (child);
     }
@@ -339,21 +338,24 @@ public class ProdosDisk extends AbstractFormattedDisk
     StringBuilder text = new StringBuilder ();
     String newLine = String.format ("%n");
 
-    VolumeDirectoryHeader volumeDirectory = (VolumeDirectoryHeader) headerEntries.get (0);
-    String timeC = volumeDirectory.created == null ? ""
-        : df.format (volumeDirectory.created.getTime ());
+    String timeC = volumeDirectoryHeader.created == null ? ""
+        : df.format (volumeDirectoryHeader.created.getTime ());
 
     text.append (String.format ("Disk name          : %s%n", getDisplayPath ()));
-    text.append ("Volume name        : " + volumeDirectory.name + newLine);
-    text.append ("Creation date      : " + timeC + newLine);
-    text.append ("ProDOS version     : " + volumeDirectory.version + newLine);
-    text.append ("Min ProDOS version : " + volumeDirectory.minVersion + newLine);
-    text.append ("Access rights      : " + volumeDirectory.access + newLine);
-    text.append ("Entry length       : " + volumeDirectory.entryLength + newLine);
-    text.append ("Entries per block  : " + volumeDirectory.entriesPerBlock + newLine);
-    text.append ("File count         : " + volumeDirectory.fileCount + newLine);
-    text.append ("Bitmap block       : " + volumeDirectory.bitMapBlock + newLine);
-    text.append ("Total blocks       : " + volumeDirectory.totalBlocks + newLine);
+    text.append (String.format ("Volume name        : %s%n", volumeDirectoryHeader.name));
+    text.append (String.format ("Creation date      : %s%n", timeC));
+    text.append (
+        String.format ("ProDOS version     : %d%n", volumeDirectoryHeader.version));
+    text.append (
+        String.format ("Min ProDOS version : %d%n", volumeDirectoryHeader.minVersion));
+    text.append ("Access rights      : " + volumeDirectoryHeader.access + newLine);
+    text.append ("Entry length       : " + volumeDirectoryHeader.entryLength + newLine);
+    text.append (
+        "Entries per block  : " + volumeDirectoryHeader.entriesPerBlock + newLine);
+    text.append ("File count         : " + volumeDirectoryHeader.fileCount + newLine);
+    text.append ("Bitmap block       : " + volumeDirectoryHeader.bitMapBlock + newLine);
+    text.append (
+        String.format ("Total blocks       : %d%n", volumeDirectoryHeader.totalBlocks));
     text.append (String.format ("Interleave         : %d", disk.getInterleave ()));
 
     return text.toString ();
@@ -369,11 +371,9 @@ public class ProdosDisk extends AbstractFormattedDisk
       boolean folder1 = o1.getAllowsChildren ();
       boolean folder2 = o2.getAllowsChildren ();
 
-      //      if (o1.isLeaf () && !o2.isLeaf ())
       if (folder1 && !folder2)
         return -1;
 
-      //      if (!o1.isLeaf () && o2.isLeaf ())
       if (!folder1 && folder2)
         return 1;
 

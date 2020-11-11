@@ -313,12 +313,20 @@ public class ApplesoftBasicProgram extends BasicProgram
   private String getBase (SourceLine line)
   // ---------------------------------------------------------------------------------//
   {
+    boolean isTarget =
+        gotoLines.contains (line.lineNumber) || gosubLines.contains (line.lineNumber);
+
     if (!basicPreferences.showTargets)
+    {
+      if (!isTarget && basicPreferences.onlyShowTargetLineNumbers)
+        return "      ";
       return String.format (" %5d", line.lineNumber);
+    }
 
     String lineNumberText = String.format ("%5d", line.lineNumber);
     SubLine subline = line.sublines.get (0);
     String c1 = "  ", c2 = "  ";
+
     if (subline.is (TOKEN_GOSUB))
       c1 = "<<";
     if (subline.is (TOKEN_GOTO))
@@ -331,8 +339,11 @@ public class ApplesoftBasicProgram extends BasicProgram
       c1 = "--";
     if (!c1.equals ("  ") && c2.equals ("  "))
       c2 = "--";
-    if (basicPreferences.onlyShowTargetLineNumbers && !c2.startsWith (">"))
+
+    //    if (basicPreferences.onlyShowTargetLineNumbers && !c2.startsWith (">"))
+    if (!isTarget && basicPreferences.onlyShowTargetLineNumbers)
       lineNumberText = "";
+
     return String.format ("%s%s %s", c1, c2, lineNumberText);
   }
 

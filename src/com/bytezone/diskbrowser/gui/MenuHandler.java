@@ -19,10 +19,10 @@ import javax.swing.KeyStroke;
 
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgram;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory;
-import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -48,6 +48,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_ONLY_SHOW_TARGETS = "onlyShowTargets";
   private static final String PREFS_SHOW_HEADER = "showHeader";
   private static final String PREFS_SHOW_CARET = "showCaret";
+  private static final String PREFS_SHOW_THEN = "showThen";
 
   private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
@@ -131,6 +132,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       new JCheckBoxMenuItem ("Only show target lines");
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
+  final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -224,6 +226,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showBasicTargetsItem);
     applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showCaretItem);
+    applesoftMenu.add (showThenItem);
 
     assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);
@@ -280,6 +283,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     onlyShowTargetLinesItem.addActionListener (basicPreferencesAction);
     showHeaderItem.addActionListener (basicPreferencesAction);
     showCaretItem.addActionListener (basicPreferencesAction);
+    showThenItem.addActionListener (basicPreferencesAction);
 
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
@@ -322,6 +326,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.splitRem = splitRemarkItem.isSelected ();
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
     basicPreferences.showCaret = showCaretItem.isSelected ();
+    basicPreferences.showThen = showThenItem.isSelected ();
     basicPreferences.showHeader = showHeaderItem.isSelected ();
     basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
@@ -476,6 +481,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
     prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
@@ -523,6 +529,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
     alignAssignItem.setSelected (prefs.getBoolean (PREFS_ALIGN_ASSIGN, true));
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
+    showThenItem.setSelected (prefs.getBoolean (PREFS_SHOW_THEN, true));
     showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
     showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
     onlyShowTargetLinesItem

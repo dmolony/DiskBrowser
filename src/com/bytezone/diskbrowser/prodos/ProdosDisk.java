@@ -336,7 +336,6 @@ public class ProdosDisk extends AbstractFormattedDisk
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
-    String newLine = String.format ("%n");
 
     String timeC = volumeDirectoryHeader.created == null ? ""
         : df.format (volumeDirectoryHeader.created.getTime ());
@@ -348,12 +347,16 @@ public class ProdosDisk extends AbstractFormattedDisk
         String.format ("ProDOS version     : %d%n", volumeDirectoryHeader.version));
     text.append (
         String.format ("Min ProDOS version : %d%n", volumeDirectoryHeader.minVersion));
-    text.append ("Access rights      : " + volumeDirectoryHeader.access + newLine);
-    text.append ("Entry length       : " + volumeDirectoryHeader.entryLength + newLine);
     text.append (
-        "Entries per block  : " + volumeDirectoryHeader.entriesPerBlock + newLine);
-    text.append ("File count         : " + volumeDirectoryHeader.fileCount + newLine);
-    text.append ("Bitmap block       : " + volumeDirectoryHeader.bitMapBlock + newLine);
+        String.format ("Access rights      : %d%n", volumeDirectoryHeader.access));
+    text.append (
+        String.format ("Entry length       : %d%n", volumeDirectoryHeader.entryLength));
+    text.append (String.format ("Entries per block  : %d%n",
+        volumeDirectoryHeader.entriesPerBlock));
+    text.append (
+        String.format ("File count         : %d%n", volumeDirectoryHeader.fileCount));
+    text.append (
+        String.format ("Bitmap block       : %d%n", volumeDirectoryHeader.bitMapBlock));
     text.append (
         String.format ("Total blocks       : %d%n", volumeDirectoryHeader.totalBlocks));
     text.append (String.format ("Interleave         : %d", disk.getInterleave ()));

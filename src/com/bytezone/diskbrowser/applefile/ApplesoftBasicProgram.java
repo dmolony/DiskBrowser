@@ -775,7 +775,10 @@ public class ApplesoftBasicProgram extends BasicProgram
             line.append (' ');
           int val = b & 0x7F;
           if (val < ApplesoftConstants.tokens.length)
-            line.append (ApplesoftConstants.tokens[val]);
+          {
+            if (b != TOKEN_THEN || basicPreferences.showThen)
+              line.append (ApplesoftConstants.tokens[val]);
+          }
         }
         else if (isControlCharacter (b))
           line.append (basicPreferences.showCaret ? "^" + (char) (b + 64) : "");

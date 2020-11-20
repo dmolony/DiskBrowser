@@ -11,7 +11,7 @@ public class BasicPreferences
   public boolean onlyShowTargetLineNumbers = true;
   public boolean showCaret = false;
   public boolean showThen = true;
-  public int wrapPrintAt = 40;
+  public int wrapPrintAt = 0;
   public int wrapRemAt = 60;
 
   // ---------------------------------------------------------------------------------//
@@ -21,7 +21,7 @@ public class BasicPreferences
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format ("Split remark .......... %s%n", splitRem));
+    text.append (String.format ("Split REM ............. %s%n", splitRem));
     text.append (String.format ("Align assign .......... %s%n", alignAssign));
     text.append (String.format ("Show targets .......... %s%n", showTargets));
     text.append (

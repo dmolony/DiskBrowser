@@ -39,11 +39,11 @@ public class ApplesoftBasicProgram extends BasicProgram
     int ptr = 0;
     int prevOffset = 0;
 
-    int max = buffer.length - 4;    // need at least 4 bytes to make a SourceLine
-    while (ptr < max)
+    int max = buffer.length - 4;          // need at least 4 bytes to make a SourceLine
+    while (ptr <= max)
     {
       int offset = Utility.unsignedShort (buffer, ptr);
-      if (offset <= prevOffset)
+      if (offset <= prevOffset)           // usually zero
         break;
 
       SourceLine line = new SourceLine (ptr);
@@ -133,7 +133,6 @@ public class ApplesoftBasicProgram extends BasicProgram
         // (see SEA BATTLE on DISK283.DSK)
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt + 4)
         {
-          //          System.out.println (lineText.length ());
           String copy = lineText.substring (4);
           text.append ("REM ");
           int inset = text.length () + 1;
@@ -213,7 +212,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
       }
 
-      // Reset alignment value if we just left an IF - the indentation will be different now.
+      // Reset alignment value if we just left an IF - the indentation will be different now
       if (ifIndent > 0)
         alignPos = 0;
     }
@@ -356,7 +355,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     if (subline.assignEqualPos > 0)                   // does the line have an equals sign?
     {
       if (currentAlignPosition == 0)
-        currentAlignPosition = findHighest (subline); // examine following sublines for alignment
+        currentAlignPosition = findHighest (subline); // examine following sublines
       return currentAlignPosition;
     }
     return 0;                                         // reset it
@@ -459,7 +458,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int programLoadAddress = 0;
     if (buffer.length > 1)
     {
-      int offset = Utility.intValue (buffer[0], buffer[1]);
+      int offset = Utility.unsignedShort (buffer, 0);
       programLoadAddress = offset - getLineLength (0);
     }
     return programLoadAddress;
@@ -485,7 +484,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private void popLoopVariables (Stack<String> loopVariables, SubLine subline)
   // ---------------------------------------------------------------------------------//
   {
-    if (subline.nextVariables.length == 0) // naked NEXT
+    if (subline.nextVariables.length == 0)        // naked NEXT
     {
       if (loopVariables.size () > 0)
         loopVariables.pop ();
@@ -776,6 +775,9 @@ public class ApplesoftBasicProgram extends BasicProgram
       int max = startPtr + length - 1;
       if (buffer[max] == 0)
         --max;
+
+      if (isImpliedGoto () && !basicPreferences.showThen)
+        line.append ("GOTO ");
 
       for (int p = startPtr; p <= max; p++)
       {

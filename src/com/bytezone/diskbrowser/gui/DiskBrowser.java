@@ -267,9 +267,11 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   private static void setLookAndFeel ()
   // ---------------------------------------------------------------------------------//
   {
+    //    FlatLightLaf.install ();
     try
     {
       UIManager.setLookAndFeel (UIManager.getSystemLookAndFeelClassName ());
+      //      UIManager.setLookAndFeel (new FlatLightLaf ());
       if (MAC)
         System.setProperty ("apple.laf.useScreenMenuBar", "true");
     }

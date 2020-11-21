@@ -39,17 +39,17 @@ public class ApplesoftBasicProgram extends BasicProgram
     int ptr = 0;
     int prevOffset = 0;
 
-    int max = buffer.length - 4;          // need at least 4 bytes to make a SourceLine
+    int max = buffer.length - 6;          // need at least 6 bytes to make a SourceLine
     while (ptr <= max)
     {
-      int offset = Utility.unsignedShort (buffer, ptr);
-      if (offset <= prevOffset)           // usually zero
+      int nextAddress = Utility.unsignedShort (buffer, ptr);
+      if (nextAddress <= prevOffset)           // usually zero
         break;
 
       SourceLine line = new SourceLine (ptr);
       sourceLines.add (line);
       ptr += line.length;
-      prevOffset = offset;
+      prevOffset = nextAddress;
     }
     endPtr = ptr;
   }
@@ -521,7 +521,8 @@ public class ApplesoftBasicProgram extends BasicProgram
     public SourceLine (int ptr)
     {
       linePtr = ptr;
-      lineNumber = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      //      lineNumber = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
+      lineNumber = Utility.unsignedShort (buffer, ptr + 2);
 
       int startPtr = ptr += 4;
       boolean inString = false;           // can toggle

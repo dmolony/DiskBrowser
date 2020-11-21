@@ -7,6 +7,7 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.applefile.DoubleHiResImage;
 import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
@@ -18,7 +19,6 @@ import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PrintShopGraphic;
 import com.bytezone.diskbrowser.applefile.ShapeTable;
 import com.bytezone.diskbrowser.applefile.SimpleText2;
-import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
@@ -35,6 +35,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   protected DosDisk dosDisk;
   protected String name;
   protected String catalogName;
+  protected String displayName;
 
   protected FileType fileType;
   protected int reportedSize;
@@ -93,6 +94,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     String base =
         String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (), reportedSize);
     catalogName = getName (base, entryBuffer).replace ("^", "");
+    displayName = getDisplayName (entryBuffer);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -118,6 +120,36 @@ abstract class AbstractCatalogEntry implements AppleFileSource
         c -= c < 160 ? 64 : 128;
       if (c < 32)
         text.append ("^" + (char) (c + 64));        // non-printable ascii
+      else
+        text.append ((char) c);                     // standard ascii
+    }
+
+    while (text.length () > 0 && text.charAt (text.length () - 1) == ' ')
+      text.deleteCharAt (text.length () - 1);       // rtrim()
+
+    return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String getDisplayName (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    int max = buffer[0] == (byte) 0xFF ? 32 : 33;
+    if (dosDisk.getVersion () >= 0x41)
+      max = 27;
+
+    for (int i = 3; i < max; i++)
+    {
+      int c = buffer[i] & 0xFF;
+      if (c == 136)             // don't allow backspaces
+        continue;
+
+      if (c > 127)
+        c -= c < 160 ? 64 : 128;
+      if (c < 32)
+        text.append ((char) (c + 64));              // non-printable ascii
       else
         text.append ((char) c);                     // standard ascii
     }
@@ -301,8 +333,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
         case BB:                                          // Lisa
           loadAddress = Utility.intValue (buffer[0], buffer[1]);
           reportedLength = Utility.intValue (buffer[2], buffer[3]);
-          exactBuffer = new byte[reportedLength];
-          System.arraycopy (buffer, 4, exactBuffer, 0, reportedLength);
+          exactBuffer = new byte[Math.min (buffer.length - 4, reportedLength)];
+          System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
           appleFile = new SimpleText2 (name, exactBuffer, loadAddress);
           break;
 

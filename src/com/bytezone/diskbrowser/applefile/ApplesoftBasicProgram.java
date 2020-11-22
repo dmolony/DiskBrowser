@@ -94,6 +94,14 @@ public class ApplesoftBasicProgram extends BasicProgram
           continue;
         }
 
+        // Beagle Bros often have multiline REM statements
+        if (subline.is (TOKEN_REM) && subline.containsControlChars ())
+        {
+          subline.addFormattedRem (text);
+          fullText.append (text + "\n");
+          continue;
+        }
+
         // Reduce the indent by each NEXT, but only as far as the IF indent allows
         if (subline.is (TOKEN_NEXT))
         {
@@ -751,7 +759,42 @@ public class ApplesoftBasicProgram extends BasicProgram
       for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
         if (isHighBitSet (buffer[p]))
           return true;
+
       return false;
+    }
+
+    public boolean containsControlChars ()
+    {
+      for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
+      {
+        int c = buffer[p] & 0xFF;
+        if (c == 0)
+          break;
+
+        if (c < 32)
+          return true;
+      }
+
+      return false;
+    }
+
+    public void addFormattedRem (StringBuilder text)
+    {
+      int ptr = startPtr + 1;
+      int max = startPtr + length - 2;
+
+      while (ptr <= max)
+      {
+        int c = buffer[ptr] & 0xFF;
+        //        System.out.printf ("%02X  %s%n", c, (char) c);
+        if (c == 0x08 && text.length () > 0)
+          text.deleteCharAt (text.length () - 1);
+        else if (c == 0x0D)
+          text.append ("\n");
+        else
+          text.append ((char) c);
+        ptr++;
+      }
     }
 
     public int getAddress ()

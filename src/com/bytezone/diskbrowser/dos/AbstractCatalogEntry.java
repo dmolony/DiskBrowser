@@ -18,7 +18,6 @@ import com.bytezone.diskbrowser.applefile.MerlinSource;
 import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PrintShopGraphic;
 import com.bytezone.diskbrowser.applefile.ShapeTable;
-import com.bytezone.diskbrowser.applefile.SimpleText2;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
@@ -81,7 +80,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       fileType = FileType.AA;
     //    else if ((type == 0x40))          // Lisa
     else
-      fileType = FileType.BB;
+      fileType = FileType.Binary;
     //    else
     //    {
     //      System.out.println ("Unknown file type : " + type);
@@ -250,6 +249,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
         case Binary:                        // binary file
         case Relocatable:                   // relocatable binary file
+        case BB:
           int loadAddress = Utility.unsignedShort (buffer, 0);
           reportedLength = Utility.unsignedShort (buffer, 2);
           if (reportedLength == 0)
@@ -330,13 +330,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           appleFile = new DefaultAppleFile (name, buffer);
           break;
 
-        case BB:                                          // Lisa
-          loadAddress = Utility.intValue (buffer[0], buffer[1]);
-          reportedLength = Utility.intValue (buffer[2], buffer[3]);
-          exactBuffer = new byte[Math.min (buffer.length - 4, reportedLength)];
-          System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
-          appleFile = new SimpleText2 (name, exactBuffer, loadAddress);
-          break;
+        //        case BB:                                          // Lisa
+        //          loadAddress = Utility.intValue (buffer[0], buffer[1]);
+        //          appleFile = new SimpleText2 (name, getExactBuffer (buffer), loadAddress);
+        //          break;
 
         default:
           System.out.println ("Unknown file type : " + fileType);

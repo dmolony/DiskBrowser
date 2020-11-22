@@ -15,6 +15,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 {
   private static final byte TOKEN_FOR = (byte) 0x81;
   private static final byte TOKEN_NEXT = (byte) 0x82;
+  private static final byte TOKEN_DATA = (byte) 0x83;
   private static final byte TOKEN_INPUT = (byte) 0x84;
   private static final byte TOKEN_LET = (byte) 0xAA;
   private static final byte TOKEN_GOTO = (byte) 0xAB;
@@ -131,23 +132,16 @@ public class ApplesoftBasicProgram extends BasicProgram
 
         // Check for a wrappable REM statement
         // (see SEA BATTLE on DISK283.DSK)
-        if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt + 4)
+        if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
         {
-          String copy = lineText.substring (4);
-          text.append ("REM ");
-          int inset = text.length () + 1;
-          List<String> remarks = splitRemark (copy, basicPreferences.wrapRemAt);
-          boolean first = true;
-          for (String remark : remarks)
-          {
-            if (first)
-            {
-              first = false;
-              text.append (remark);
-            }
-            else
-              text.append ("\n                        ".substring (0, inset) + remark);
-          }
+          List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
+          addSplitLines (lines, text);
+        }
+        else if (subline.is (TOKEN_DATA)
+            && lineText.length () > basicPreferences.wrapDataAt)
+        {
+          List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
+          addSplitLines (lines, text);
         }
         else
           text.append (lineText);
@@ -279,22 +273,45 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private List<String> splitRemark (String remark, int wrapLength)
+  private List<String> splitLine (String line, int wrapLength, char breakChar)
   // ---------------------------------------------------------------------------------//
   {
+    int firstSpace = 0;
+    while (firstSpace < line.length () && line.charAt (firstSpace) != ' ')
+      ++firstSpace;
+
     List<String> remarks = new ArrayList<> ();
-    while (remark.length () > wrapLength)
+    while (line.length () > wrapLength)
     {
-      int max = Math.min (wrapLength, remark.length () - 1);
-      while (max > 0 && remark.charAt (max) != ' ')
+      int max = Math.min (wrapLength, line.length () - 1);
+      while (max > 0 && line.charAt (max) != breakChar)
         --max;
       if (max == 0)
         break;
-      remarks.add (remark.substring (0, max));
-      remark = remark.substring (max);
+      remarks.add (line.substring (0, max + 1));
+      line = "       ".substring (0, firstSpace + 1) + line.substring (max + 1);
     }
-    remarks.add (remark);
+    remarks.add (line);
     return remarks;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addSplitLines (List<String> lines, StringBuilder text)
+  // ---------------------------------------------------------------------------------//
+  {
+    int inset = text.length () + 1;
+    boolean first = true;
+
+    for (String line : lines)
+    {
+      if (first)
+      {
+        first = false;
+        text.append (line);
+      }
+      else
+        text.append ("\n                        ".substring (0, inset) + line);
+    }
   }
 
   // ---------------------------------------------------------------------------------//

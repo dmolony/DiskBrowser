@@ -44,7 +44,6 @@ class VolumeDirectoryHeader extends DirectoryHeader
     } while (block > 0);
 
     // convert the Free Sector Table
-    //    int bitMapBytes = totalBlocks / 8;                  // one bit per block
     int bitMapBytes = (totalBlocks - 1) / 8 + 1;                  // one bit per block
     byte[] buffer = new byte[bitMapBytes];
     int bitMapBlocks = (bitMapBytes - 1) / disk.getBlocksPerTrack () + 1;
@@ -77,19 +76,14 @@ class VolumeDirectoryHeader extends DirectoryHeader
       byte b = buffer[i];
       for (int j = 0; j < 8; j++)
       {
-        if ((b & 0x80) == 0x80)
-        {
+        boolean free = (b & 0x80) != 0;
+        if (free)
           freeBlocks++;
-          parentDisk.setSectorFree (block++, true);
-        }
-        else
-        {
-          usedBlocks++;
-          parentDisk.setSectorFree (block++, false);
-        }
+        parentDisk.setSectorFree (block++, free);
         b <<= 1;
       }
     }
+    usedBlocks = totalBlocks - freeBlocks;    // totalBlocks may not be a multiple of 8
   }
 
   // ---------------------------------------------------------------------------------//

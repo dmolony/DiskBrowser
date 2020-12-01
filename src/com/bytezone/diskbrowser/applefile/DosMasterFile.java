@@ -30,7 +30,6 @@ public class DosMasterFile extends AbstractFile
   public static boolean isDos33 (ProdosDisk parentDisk, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    //    System.out.println (HexFormatter.format (buffer, 0x38, 0x30, 0x38));
     System.out.printf ("%nHighest Block: %04X (%<,d)%n",
         parentDisk.getDisk ().getTotalBlocks () - 1);
 
@@ -106,9 +105,6 @@ public class DosMasterFile extends AbstractFile
           daList.add (disk.getDiskAddress (block));
 
         byte[] diskBuffer = disk.readBlocks (daList);
-        //        System.out.println (HexFormatter.format (diskBuffer));
-        //        System.out.printf ("Buffer: %,d%n", diskBuffer.length);
-        //        System.out.printf ("Blocks: %,d x 2 = %,d%n", daList.size (), daList.size () * 2);
 
         if (false)
           createDisk (String.format ("%sVol%03d.dsk", base, volNo), diskBuffer);

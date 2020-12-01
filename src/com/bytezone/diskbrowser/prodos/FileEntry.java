@@ -7,6 +7,7 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgramGS;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.CharacterRom;
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.applefile.DeviceDriver;
@@ -35,7 +36,6 @@ import com.bytezone.diskbrowser.applefile.ShapeTable;
 import com.bytezone.diskbrowser.applefile.SimpleText;
 import com.bytezone.diskbrowser.applefile.StoredVariables;
 import com.bytezone.diskbrowser.applefile.TextBuffer;
-import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksADBFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
@@ -222,7 +222,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     parentDisk.setSectorType (keyPtr, parentDisk.masterIndexSector);
     indexBlocks.add (disk.getDiskAddress (keyPtr));
 
-    byte[] buffer = disk.readBlock (keyPtr);                   // master index
+    byte[] buffer = disk.readBlock (keyPtr);                    // master index
 
     int highest = 0x80;
     while (highest-- > 0)                                       // decrement after test
@@ -272,6 +272,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     byte[] buffer = getBuffer ();
     byte[] exactBuffer = getExactBuffer (buffer);
+    //    System.out.printf ("Name: %s, EOF: %04X%n", name, endOfFile);
 
     try
     {

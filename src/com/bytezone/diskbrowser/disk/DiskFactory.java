@@ -478,12 +478,25 @@ public class DiskFactory
 
         disk2 = checkProdos (appleDisk512);
         if (disk2 != null)
+        {
           disk = new DualDosDisk (disk, disk2);
+          return disk;
+        }
 
         AppleDisk appleDisk = new AppleDisk (file, 35, 16);
         disk2 = checkCPMDisk (appleDisk);
         if (disk2 != null)
+        {
           disk = new DualDosDisk (disk, disk2);
+          return disk;
+        }
+
+        disk2 = checkPascalDisk (appleDisk512);
+        if (disk2 != null)
+        {
+          disk = new DualDosDisk (disk, disk2);
+          return disk;
+        }
       }
     }
     else if (suffix.equals ("po"))

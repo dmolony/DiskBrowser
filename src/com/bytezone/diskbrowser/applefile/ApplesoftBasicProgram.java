@@ -543,7 +543,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int linePtr;
     int length;
 
-    public SourceLine (int ptr)
+    SourceLine (int ptr)
     {
       linePtr = ptr;
       //      lineNumber = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
@@ -630,7 +630,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     // used for aligning the equals sign
     int assignEqualPos;
 
-    public SubLine (SourceLine parent, int startPtr, int length)
+    SubLine (SourceLine parent, int startPtr, int length)
     {
       this.parent = parent;
       this.startPtr = startPtr;
@@ -738,22 +738,22 @@ public class ApplesoftBasicProgram extends BasicProgram
       return is (TOKEN_REM) && !isFirst ();
     }
 
-    public boolean isFirst ()
+    boolean isFirst ()
     {
       return (parent.linePtr + 4) == startPtr;
     }
 
-    public boolean is (byte token)
+    boolean is (byte token)
     {
       return buffer[startPtr] == token;
     }
 
-    public boolean isEmpty ()
+    boolean isEmpty ()
     {
       return length == 1 && buffer[startPtr] == 0;
     }
 
-    public boolean containsToken ()
+    boolean containsToken ()
     {
       // ignore first byte, check the rest for tokens
       for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
@@ -763,7 +763,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       return false;
     }
 
-    public boolean containsControlChars ()
+    boolean containsControlChars ()
     {
       for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
       {
@@ -778,7 +778,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       return false;
     }
 
-    public void addFormattedRem (StringBuilder text)
+    void addFormattedRem (StringBuilder text)
     {
       int ptr = startPtr + 1;
       int max = startPtr + length - 2;

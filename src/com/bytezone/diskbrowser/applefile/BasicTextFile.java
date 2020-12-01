@@ -92,9 +92,17 @@ public class BasicTextFile extends TextFile
     if (recordLength == 0)
       return unknownLength (text);
 
-    text.append ("Offset  Record#  Text values\n");
-    text.append (
-        "------  -------  -------------------------------------------------------\n");
+    if (textPreferences.showTextOffsets)
+    {
+      text.append ("    Offset  Record#  Text values\n");
+      text.append (
+          "----------  -------  -------------------------------------------------------\n");
+    }
+    else
+    {
+      text.append ("Text values\n");
+      text.append ("-------------------------------------------------------\n");
+    }
     return knownLength (text, 0).toString ();
   }
 
@@ -102,9 +110,17 @@ public class BasicTextFile extends TextFile
   private String treeFileText (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
-    text.append ("  Offset    Record#  Text values\n");
-    text.append (
-        "----------  -------  -------------------------------------------------------\n");
+    if (textPreferences.showTextOffsets)
+    {
+      text.append ("    Offset  Record#  Text values\n");
+      text.append (
+          "----------  -------  -------------------------------------------------------\n");
+    }
+    else
+    {
+      text.append ("Text values\n");
+      text.append ("-------------------------------------------------------\n");
+    }
     for (TextBuffer tb : buffers)
     {
       buffer = tb.buffer;
@@ -135,9 +151,19 @@ public class BasicTextFile extends TextFile
         bytes--;
 
       String line = HexFormatter.getString (buffer, ptr, bytes);
-      line = line.replaceAll ("\\n", "\n                     ");
-      text.append (
-          String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo++, line));
+
+      if (textPreferences.showTextOffsets)
+      {
+        line = line.replaceAll ("\\n", "\n                     ");
+        text.append (
+            String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo++, line));
+      }
+      else
+      {
+        line = line.replaceAll ("\\n", "\n                     ");
+        text.append (String.format ("%s%n", line));
+        recNo++;
+      }
     }
 
     return text;

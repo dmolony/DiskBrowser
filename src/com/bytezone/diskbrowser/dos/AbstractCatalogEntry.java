@@ -88,9 +88,10 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       lastModified = Utility.getDateTime (entryBuffer, 0x1B);
 
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
-    String base =
-        String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (), reportedSize);
-    catalogName = getName (base, entryBuffer).replace ("^", "");
+    String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
+        reportedSize % 1000);
+    System.out.printf ("[%s]%n", base);
+    catalogName = getName (base, entryBuffer);
     displayName = getDisplayName (entryBuffer);
   }
 
@@ -107,7 +108,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     for (int i = 3; i < max; i++)
     {
       int c = buffer[i] & 0xFF;
-      if (c == 136 && !base.isEmpty ())             // allow backspaces
+      if ((c == 0x88 || c == 0x8A) && !base.isEmpty ())             // allow backspaces
       {
         if (text.length () > 0)
           text.deleteCharAt (text.length () - 1);
@@ -115,14 +116,16 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       }
       if (c > 127)
         c -= c < 160 ? 64 : 128;
+      //      c &= 0x7F;
       if (c < 32)
-        text.append ("^" + (char) (c + 64));        // non-printable ascii
+        text.append ((char) (c + 64));              // non-printable ascii
       else
         text.append ((char) c);                     // standard ascii
     }
 
     while (text.length () > 0 && text.charAt (text.length () - 1) == ' ')
       text.deleteCharAt (text.length () - 1);       // rtrim()
+    //    System.out.println (text.toString ());
 
     return text.toString ();
   }
@@ -140,11 +143,12 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     for (int i = 3; i < max; i++)
     {
       int c = buffer[i] & 0xFF;
-      if (c == 136)             // don't allow backspaces
+      if ((c == 0x88 || c == 0x8A))                 // don't allow backspaces
         continue;
 
       if (c > 127)
         c -= c < 160 ? 64 : 128;
+      //      c &= 0x7F;
       if (c < 32)
         text.append ((char) (c + 64));              // non-printable ascii
       else

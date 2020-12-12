@@ -35,7 +35,7 @@ public class AppleDiskAddress implements DiskAddress
   // ---------------------------------------------------------------------------------//
   {
     this.owner = owner;
-    zeroFlag = (track & 0x40) != 0;
+    zeroFlag = (track & 0x40) == 0x40;
     this.track = track & 0x3F;
     this.sector = sector & 0x1F;
     this.block = this.track * owner.getBlocksPerTrack () + this.sector;

@@ -62,6 +62,8 @@ public class FinderData extends AbstractFile
         text.append (String.format ("%02X%n", buffer[ptr++]));
       }
     }
+    else
+      text.append (String.format ("Unknown finder data version: %d%n", version));
 
     if (text.length () > 0)
       text.deleteCharAt (text.length () - 1);

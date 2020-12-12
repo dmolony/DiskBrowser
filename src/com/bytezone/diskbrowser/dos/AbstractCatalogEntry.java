@@ -58,8 +58,6 @@ abstract class AbstractCatalogEntry implements AppleFileSource
 
     name = getName ("", entryBuffer);
     reportedSize = Utility.unsignedShort (entryBuffer, 33);
-    //    if (reportedSize == 0)
-    //      System.out.printf ("%s size 0%n", name);
 
     int type = entryBuffer[2] & 0x7F;
     locked = (entryBuffer[2] & 0x80) != 0;

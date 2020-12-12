@@ -172,15 +172,18 @@ class CatalogEntry extends AbstractCatalogEntry
       message = lastModified.toString ().replace ('T', ' ');
 
     if (reportedSize != actualSize)
-      message += "Bad size (" + reportedSize + ") ";
-    if (dataSectors.size () == 0)
-      message += "No data ";
+      message += "Actual size (" + actualSize + ") ";
+    //    if (dataSectors.size () == 0)
+    //      message += "No data ";
+    if (reportedSize > 999)
+      message += "Reported " + reportedSize;
 
-    String text = String.format ("%1s  %1s  %03d  %-30.30s  %-5s  %-13s %3d %3d   %s",
-        lockedFlag, getFileType (), actualSize, displayName, addressText, lengthText,
-        tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
-    if (actualSize == 0)
-      text = text.substring (0, 50);
+    String text =
+        String.format ("%1s  %1s  %03d  %-30.30s  %-5s  %-13s %3d %3d   %s", lockedFlag,
+            getFileType (), reportedSize % 1000, displayName, addressText, lengthText,
+            tsSectors.size (), (dataSectors.size () - textFileGaps), message.trim ());
+    //    if (actualSize == 0)
+    //      text = text.substring (0, 50);
 
     return text;
   }

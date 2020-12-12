@@ -76,6 +76,7 @@ public class DosDisk extends AbstractFormattedDisk
 
     da = disk.getDiskAddress (CATALOG_TRACK, VTOC_SECTOR);
     sectorBuffer = disk.readBlock (da);          // VTOC
+    ((AppleDisk) disk).setDosVersion (sectorBuffer[3] & 0xFF);
     dosVTOCSector = new DosVTOCSector (this, disk, sectorBuffer, da);
     sectorTypes[da.getBlockNo ()] = vtocSector;
 
@@ -131,8 +132,9 @@ public class DosDisk extends AbstractFormattedDisk
         break;
 
       da = disk.getDiskAddress (track, sector);
+      //      System.out.println ("** " + da + da.isValidAddress ());
 
-    } while (!da.isZero ());
+    } while (!da.isZero () && da.isValidAddress ());
 
     // same loop, but now all the catalog sectors are properly flagged
     da = disk.getDiskAddress (catalogStart.getBlockNo ());
@@ -393,6 +395,7 @@ public class DosDisk extends AbstractFormattedDisk
     if (debug)
       System.out.printf ("Catalog blocks: %s%n", catalogBlocks);
 
+    disk.setDosVersion (version);
     return catalogBlocks;
   }
 

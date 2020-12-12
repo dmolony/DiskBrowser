@@ -33,6 +33,7 @@ public class AppleDisk implements Disk
   private final int tracks;               // usually 35 for floppy disks
   private int sectors;                    // 8 or 16 (or 32 for unidos)
   private int blocks;                     // 280 or 560 for floppy disks, higher for HD
+  private int dosVersion;
 
   private final int trackSize;            // 4096
   public int sectorSize;                  // 256 or 512
@@ -337,6 +338,14 @@ public class AppleDisk implements Disk
     return false;
   }
 
+  // ---------------------------------------------------------------------------------//
+  public void setDosVersion (int version)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.dosVersion = version;
+    //    System.out.printf ("DOS version %02X%n", version);
+  }
+
   /*
    * Routines that implement the Disk interface
    */
@@ -564,8 +573,13 @@ public class AppleDisk implements Disk
   public boolean isValidAddress (int track, int sector)
   // ---------------------------------------------------------------------------------//
   {
-    track &= 0x3F;
-    sector &= 0x1F;
+    if (dosVersion >= 0x41)
+    {
+      track &= 0x3F;
+      sector &= 0x1F;
+    }
+    //    else
+    //      System.out.println ("normal dos");
 
     if (track < 0 || track >= this.tracks)
       return false;

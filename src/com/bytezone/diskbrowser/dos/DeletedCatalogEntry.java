@@ -61,6 +61,7 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
       tsSectors.add (da);
       totalBlocks++;
 
+      DiskAddress sectorDA = da;
       byte[] sectorBuffer = disk.readBlock (da);
       for (int i = 12, max = disk.getBlockSize (); i < max; i += 2)
       {
@@ -82,15 +83,17 @@ class DeletedCatalogEntry extends AbstractCatalogEntry
         }
       }
 
-      da = getValidAddress (sectorBuffer, 1);
+      DiskAddress nextDa = getValidAddress (sectorBuffer, 1);
 
-      if (da == null)
+      if (nextDa == null)
       {
-        System.out.printf ("Next T/S list in sector %s is invalid : %02X, %02X%n", da,
-            sectorBuffer[1], sectorBuffer[2]);
+        System.out.printf ("Next T/S list in sector %s is invalid : %02X, %02X%n",
+            sectorDA, sectorBuffer[1], sectorBuffer[2]);
         break;
       }
+      da = nextDa;
     }
+
     if (debug)
       System.out.printf ("Total blocks recoverable : %d%n", totalBlocks);
     if (totalBlocks != reportedSize)

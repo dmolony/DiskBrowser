@@ -545,7 +545,10 @@ public class DiskFactory
       {
         if (debug)
           System.out.println ("  --> DOS");
-        return new DosDisk (disk);
+        DosDisk dosDisk = new DosDisk (disk);
+        //        disk.setDosVersion (dosDisk.getVersion ());
+
+        return dosDisk;
       }
     }
     catch (Exception e)

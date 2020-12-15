@@ -554,7 +554,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       boolean inRemark = false;           // can only go false -> true
       byte b;
 
-      while ((b = buffer[ptr++]) != 0)
+      while (ptr < buffer.length && (b = buffer[ptr++]) != 0)
       {
         if (inRemark)                     // cannot terminate a REM
           continue;

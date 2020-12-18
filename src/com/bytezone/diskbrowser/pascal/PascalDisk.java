@@ -108,7 +108,6 @@ public class PascalDisk extends AbstractFormattedDisk
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readBlocks (addresses);
 
-    // loop through each catalog entry (what if there are deleted files?)
     for (int i = 1; i <= volumeEntry.totalFiles; i++)
     {
       int ptr = i * CATALOG_ENTRY_SIZE;
@@ -179,11 +178,11 @@ public class PascalDisk extends AbstractFormattedDisk
     }
 
     int blocks = Utility.intValue (buffer[14], buffer[15]);
-    if (blocks > 280)
+    if (blocks != 280 && blocks != 1600)
     {
       if (debug)
         System.out.printf ("Blocks > 280: %d%n", blocks);
-      //      return false;
+      return false;
     }
 
     List<DiskAddress> addresses = new ArrayList<> ();

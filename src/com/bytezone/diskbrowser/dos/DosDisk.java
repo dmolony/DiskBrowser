@@ -395,7 +395,8 @@ public class DosDisk extends AbstractFormattedDisk
     if (debug)
       System.out.printf ("Catalog blocks: %s%n", catalogBlocks);
 
-    disk.setDosVersion (version);
+    if (catalogBlocks > 0)
+      disk.setDosVersion (version);
     return catalogBlocks;
   }
 
@@ -403,6 +404,13 @@ public class DosDisk extends AbstractFormattedDisk
   private static int countCatalogBlocks (AppleDisk disk, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
+    if (!disk.isValidAddress (buffer[1], buffer[2]))
+    {
+      if (debug)
+        System.out.printf ("Invalid address1: %02X %02X%n", buffer[1], buffer[2]);
+      return 0;
+    }
+
     DiskAddress catalogStart = disk.getDiskAddress (buffer[1], buffer[2]);
     DiskAddress da = disk.getDiskAddress (catalogStart.getBlockNo ());
     List<DiskAddress> catalogAddresses = new ArrayList<> ();
@@ -430,14 +438,13 @@ public class DosDisk extends AbstractFormattedDisk
       if (!disk.isValidAddress (buffer[1], buffer[2]))
       {
         if (debug)
-          System.out.printf ("Invalid address: %02X %02X%n", buffer[1], buffer[2]);
+          System.out.printf ("Invalid address2: %02X %02X%n", buffer[1], buffer[2]);
         return catalogAddresses.size ();
       }
 
       catalogAddresses.add (da);
 
       da = disk.getDiskAddress (buffer[1], buffer[2]);
-
     } while (!da.isZero ());
 
     if (debug)

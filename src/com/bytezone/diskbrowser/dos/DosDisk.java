@@ -132,7 +132,6 @@ public class DosDisk extends AbstractFormattedDisk
         break;
 
       da = disk.getDiskAddress (track, sector);
-      //      System.out.println ("** " + da + da.isValidAddress ());
 
     } while (!da.isZero () && da.isValidAddress ());
 

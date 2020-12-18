@@ -8,11 +8,13 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class BasicTextFile extends TextFile
 // -----------------------------------------------------------------------------------//
 {
+  private static String underline = "------------------------------------------"
+      + "------------------------------------\n";
+  private static String fullUnderline = "----------  -------  " + underline;
   private int recordLength;                   // prodos aux
   private List<TextBuffer> buffers;           // only used if it is a Prodos text file
   private int eof;
   private boolean prodosFile;
-  // test
 
   // ---------------------------------------------------------------------------------//
   public BasicTextFile (String name, byte[] buffer)
@@ -96,13 +98,12 @@ public class BasicTextFile extends TextFile
     if (textPreferences.showTextOffsets)
     {
       text.append ("    Offset  Record#  Text values\n");
-      text.append (
-          "----------  -------  -------------------------------------------------------\n");
+      text.append (fullUnderline);
     }
     else
     {
       text.append ("Text values\n");
-      text.append ("-------------------------------------------------------\n");
+      text.append (underline);
     }
     return knownLength (text, 0).toString ();
   }
@@ -114,13 +115,12 @@ public class BasicTextFile extends TextFile
     if (textPreferences.showTextOffsets)
     {
       text.append ("    Offset  Record#  Text values\n");
-      text.append (
-          "----------  -------  -------------------------------------------------------\n");
+      text.append (fullUnderline);
     }
     else
     {
       text.append ("Text values\n");
-      text.append ("-------------------------------------------------------\n");
+      text.append (underline);
     }
 
     for (TextBuffer tb : buffers)
@@ -177,19 +177,16 @@ public class BasicTextFile extends TextFile
     int ptr = 0;
     int size = buffer.length;
     int lastVal = 0;
-    //    boolean showAllOffsets = true;
 
     if (textPreferences.showTextOffsets)
     {
       text.append ("  Offset    Text values\n");
-      text.append ("----------  -------------------------------------------------------"
-          + "-------------------\n");
+      text.append ("----------  " + underline);
     }
     else
     {
       text.append (" Text values\n");
-      text.append ("-------------------------------------------------------"
-          + "-------------------------------\n");
+      text.append (underline);
     }
     if (buffer.length == 0)
       return text.toString ();

@@ -12,6 +12,7 @@ public class BasicTextFile extends TextFile
   private List<TextBuffer> buffers;           // only used if it is a Prodos text file
   private int eof;
   private boolean prodosFile;
+  // test
 
   // ---------------------------------------------------------------------------------//
   public BasicTextFile (String name, byte[] buffer)

@@ -352,7 +352,7 @@ class MazeLevel extends AbstractFile
         cell.unknown = cellFlag;
         break;
 
-      case 8:
+      case 8:       // buttonz
         cell.elevator = true;
         MazeAddress elevatorAddress = getAddress (b);
         cell.elevatorTo = elevatorAddress.row;
@@ -365,40 +365,40 @@ class MazeLevel extends AbstractFile
         cell.rock = true;
         break;
 
-      case 10:
+      case 10:      // fizzle
         cell.spellsBlocked = true;
         break;
 
-      case 11:
+      case 11:      // screen message
         MazeAddress messageAddress = getAddress (b);
-        //        int messageNum = HexFormatter.intValue (buffer[800 + b * 2], buffer[801 + b * 2]);
+        //   int messageNum = HexFormatter.intValue (buffer[800 + b * 2], buffer[801 + b * 2]);
 
         Message m = getMessage (messageAddress.row);
         if (m != null)
           cell.message = m;
 
         cell.messageType = messageAddress.column;
-        //            HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
+        //     HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
 
         int itemID = -1;
 
         if (cell.messageType == 2 && items != null)                 // obtain Item
         {
-          //          itemID = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
+          //   itemID = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
           itemID = messageAddress.level;
           cell.itemObtained = items.get (itemID);
         }
 
         if (cell.messageType == 5 && items != null)                 // requires Item
         {
-          //          itemID = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
+          //  itemID = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
           itemID = messageAddress.level;
           cell.itemRequired = items.get (itemID);
         }
 
         if (cell.messageType == 4)
         {
-          //          value = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
+          //   value = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
           itemID = messageAddress.level;
           if (value <= 100)
           {
@@ -418,9 +418,9 @@ class MazeLevel extends AbstractFile
         }
         break;
 
-      case 12:
+      case 12:      // encounter
         MazeAddress monsterAddress = getAddress (b);
-        //        cell.monsterID = HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
+        //  cell.monsterID = HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
         cell.monsterID = monsterAddress.column;
         cell.monsters = monsters;
         break;

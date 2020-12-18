@@ -121,6 +121,7 @@ public class BasicTextFile extends TextFile
       text.append ("Text values\n");
       text.append ("-------------------------------------------------------\n");
     }
+
     for (TextBuffer tb : buffers)
     {
       buffer = tb.buffer;
@@ -156,14 +157,12 @@ public class BasicTextFile extends TextFile
       {
         line = line.replaceAll ("\\n", "\n                     ");
         text.append (
-            String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo++, line));
+            String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo, line));
       }
       else
-      {
-        line = line.replaceAll ("\\n", "\n                     ");
         text.append (String.format ("%s%n", line));
-        recNo++;
-      }
+
+      recNo++;
     }
 
     return text;

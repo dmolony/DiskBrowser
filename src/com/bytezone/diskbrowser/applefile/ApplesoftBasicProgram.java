@@ -364,7 +364,6 @@ public class ApplesoftBasicProgram extends BasicProgram
     if (!c1.equals ("  ") && c2.equals ("  "))
       c2 = "--";
 
-    //    if (basicPreferences.onlyShowTargetLineNumbers && !c2.startsWith (">"))
     if (!isTarget && basicPreferences.onlyShowTargetLineNumbers)
       lineNumberText = "";
 

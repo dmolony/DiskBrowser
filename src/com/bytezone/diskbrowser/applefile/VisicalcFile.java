@@ -6,7 +6,6 @@ import com.bytezone.diskbrowser.visicalc.Sheet;
 public class VisicalcFile extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
-  private static boolean debug;
   private Sheet sheet;
 
   // ---------------------------------------------------------------------------------//
@@ -30,20 +29,6 @@ public class VisicalcFile extends AbstractFile
     text.append (sheet.getTextDisplay (debug));
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static void setDefaultDebug (boolean value)
-  // ---------------------------------------------------------------------------------//
-  {
-    debug = value;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static void setDebug (boolean value)
-  // ---------------------------------------------------------------------------------//
-  {
-    debug = value;
   }
 
   // ---------------------------------------------------------------------------------//

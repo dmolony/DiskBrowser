@@ -17,14 +17,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
-import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
+import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgram;
 import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory;
-import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DataDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
@@ -570,8 +569,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
     HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
-    VisicalcFile.setDefaultDebug (debuggingItem.isSelected ());
-    ApplesoftBasicProgram.setDefaultDebug (debuggingItem.isSelected ());
+    //    VisicalcFile.setDefaultDebug (debuggingItem.isSelected ());
+    //    ApplesoftBasicProgram.setDefaultDebug (debuggingItem.isSelected ());
+    AbstractFile.setDefaultDebug (debuggingItem.isSelected ());
 
     fontAction.restore (prefs);
   }

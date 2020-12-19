@@ -12,6 +12,8 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public abstract class AbstractFile implements DataSource
 // -----------------------------------------------------------------------------------//
 {
+  static boolean debug;
+
   protected String name;
   public byte[] buffer;
   protected AssemblerProgram assembler;
@@ -32,6 +34,20 @@ public abstract class AbstractFile implements DataSource
   // ---------------------------------------------------------------------------------//
   {
     return "Name : " + name + "\n\nNo text description";
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static void setDefaultDebug (boolean value)
+  // ---------------------------------------------------------------------------------//
+  {
+    debug = value;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static void setDebug (boolean value)
+  // ---------------------------------------------------------------------------------//
+  {
+    debug = value;
   }
 
   // ---------------------------------------------------------------------------------//

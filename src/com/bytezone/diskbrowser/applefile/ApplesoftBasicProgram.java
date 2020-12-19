@@ -26,8 +26,6 @@ public class ApplesoftBasicProgram extends BasicProgram
   private static final byte TOKEN_THEN = (byte) 0xC4;
   private static final byte TOKEN_EQUALS = (byte) 0xD0;
 
-  private static boolean debug;
-
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
   private final Set<Integer> gotoLines = new HashSet<> ();
@@ -55,20 +53,6 @@ public class ApplesoftBasicProgram extends BasicProgram
       prevOffset = nextAddress;
     }
     endPtr = ptr;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static void setDefaultDebug (boolean value)
-  // ---------------------------------------------------------------------------------//
-  {
-    debug = value;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static void setDebug (boolean value)
-  // ---------------------------------------------------------------------------------//
-  {
-    debug = value;
   }
 
   // ---------------------------------------------------------------------------------//

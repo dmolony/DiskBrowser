@@ -25,6 +25,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicTextFile;
@@ -33,7 +34,6 @@ import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
-import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
@@ -70,6 +70,11 @@ public class DataPanel extends JTabbedPane
   private Worker animation;
 
   final MenuHandler menuHandler;
+
+  enum TabType
+  {
+    FORMATTED, HEX, DISASSEMBLED
+  }
 
   // ---------------------------------------------------------------------------------//
   public DataPanel (MenuHandler mh)
@@ -255,20 +260,23 @@ public class DataPanel extends JTabbedPane
   {
     debugMode = value;
 
-    if (currentDataSource instanceof VisicalcFile)
-    {
-      VisicalcFile visicalcFile = (VisicalcFile) currentDataSource;
-      VisicalcFile.setDebug (value);
-      setText (formattedText, visicalcFile.getText ());
-    }
-    else if (currentDataSource instanceof ApplesoftBasicProgram)
-    {
-      ApplesoftBasicProgram basicProgram = (ApplesoftBasicProgram) currentDataSource;
-      ApplesoftBasicProgram.setDebug (value);
-      setText (formattedText, basicProgram.getText ());
-    }
-    // should implement an interface for this
-    else if (currentDataSource instanceof HiResImage
+    AbstractFile.setDebug (value);
+    setText (formattedText, currentDataSource.getText ());
+    //    if (currentDataSource instanceof VisicalcFile)
+    //    {
+    //      VisicalcFile visicalcFile = (VisicalcFile) currentDataSource;
+    //      VisicalcFile.setDebug (value);
+    //      setText (formattedText, visicalcFile.getText ());
+    //    }
+    //    else if (currentDataSource instanceof ApplesoftBasicProgram)
+    //    {
+    //      ApplesoftBasicProgram basicProgram = (ApplesoftBasicProgram) currentDataSource;
+    //      ApplesoftBasicProgram.setDebug (value);
+    //      setText (formattedText, basicProgram.getText ());
+    //    }
+    //    // should implement an interface for this
+    //    else 
+    if (currentDataSource instanceof HiResImage
         || currentDataSource instanceof QuickDrawFont)
     {
       setDataSource (currentDataSource);      // toggles text/image
@@ -324,9 +332,9 @@ public class DataPanel extends JTabbedPane
       return;
     }
 
-    switch (getSelectedIndex ())
+    switch (TabType.values ()[getSelectedIndex ()])
     {
-      case 0:             // Formatted/Image
+      case FORMATTED:
         try
         {
           setText (formattedText, dataSource.getText ());
@@ -340,20 +348,17 @@ public class DataPanel extends JTabbedPane
         assemblerTextValid = false;
         break;
 
-      case 1:             // Hex Dump
+      case HEX:
         setText (hexText, dataSource.getHexDump ());
         formattedTextValid = false;
         assemblerTextValid = false;
         break;
 
-      case 2:             // Disassembly
+      case DISASSEMBLED:
         setText (disassemblyText, dataSource.getAssembler ());
         hexTextValid = false;
         formattedTextValid = false;
         break;
-
-      default:
-        System.out.println ("Invalid index selected in DataPanel");
     }
 
     BufferedImage image = dataSource.getImage ();

@@ -27,12 +27,12 @@ import javax.swing.event.ChangeListener;
 
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
+import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
-import com.bytezone.diskbrowser.applefile.BasicTextFile;
 import com.bytezone.diskbrowser.applefile.VisicalcFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
@@ -110,7 +110,7 @@ public class DataPanel extends JTabbedPane
       {
         switch (getSelectedIndex ())
         {
-          case 0:
+          case 0:                           // Formatted
             if (!formattedTextValid)
             {
               if (currentDataSource == null)
@@ -120,7 +120,7 @@ public class DataPanel extends JTabbedPane
               formattedTextValid = true;
             }
             break;
-          case 1:
+          case 1:                           // Hex
             if (!hexTextValid)
             {
               if (currentDataSource == null)
@@ -130,7 +130,7 @@ public class DataPanel extends JTabbedPane
               hexTextValid = true;
             }
             break;
-          case 2:
+          case 2:                           // Assembler
             if (!assemblerTextValid)
             {
               if (currentDataSource == null)
@@ -261,6 +261,12 @@ public class DataPanel extends JTabbedPane
       VisicalcFile.setDebug (value);
       setText (formattedText, visicalcFile.getText ());
     }
+    else if (currentDataSource instanceof ApplesoftBasicProgram)
+    {
+      ApplesoftBasicProgram basicProgram = (ApplesoftBasicProgram) currentDataSource;
+      ApplesoftBasicProgram.setDebug (value);
+      setText (formattedText, basicProgram.getText ());
+    }
     // should implement an interface for this
     else if (currentDataSource instanceof HiResImage
         || currentDataSource instanceof QuickDrawFont)
@@ -284,8 +290,8 @@ public class DataPanel extends JTabbedPane
   // ---------------------------------------------------------------------------------//
   {
     int index = getSelectedIndex ();
-    return index == 0 ? formattedText.getText () : index == 1 ? hexText.getText ()
-        : disassemblyText.getText ();
+    return index == 0 ? formattedText.getText ()
+        : index == 1 ? hexText.getText () : disassemblyText.getText ();
   }
 
   // ---------------------------------------------------------------------------------//

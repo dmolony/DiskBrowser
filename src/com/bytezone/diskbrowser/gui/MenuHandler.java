@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
+import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgram;
 import com.bytezone.diskbrowser.applefile.BasicTextFile;
@@ -101,6 +102,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem closeTabItem = new JMenuItem ();
   final JMenuItem duplicateItem = new JMenuItem ();
   final FontAction fontAction = new FontAction ();
+  final JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
 
   // Format menu items
   final JMenuItem lineWrapItem = new JCheckBoxMenuItem ("Line wrap");
@@ -117,7 +119,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   final JMenuItem colourQuirksItem = new JCheckBoxMenuItem ("Colour quirks");
   final JMenuItem monochromeItem = new JCheckBoxMenuItem ("Monochrome");
-  final JMenuItem debuggingItem = new JCheckBoxMenuItem ("Debugging");
   final JMenuItem nextPaletteItem = new JMenuItem ("Next Palette");
   final JMenuItem prevPaletteItem = new JMenuItem ("Previous Palette");
   final JMenuItem scale1Item = new JRadioButtonMenuItem ("Scale 1");
@@ -571,6 +572,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
     HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
     VisicalcFile.setDefaultDebug (debuggingItem.isSelected ());
+    ApplesoftBasicProgram.setDefaultDebug (debuggingItem.isSelected ());
 
     fontAction.restore (prefs);
   }

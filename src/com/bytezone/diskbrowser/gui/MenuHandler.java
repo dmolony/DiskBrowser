@@ -454,7 +454,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     if (!openSupported)
       return;
 
-    //    executeDiskItem = new JMenuItem (new ExecuteDiskAction (this));
     executeDiskItem.setAction (new ExecuteDiskAction (this));
     fileMenu.add (executeDiskItem);
     fileMenu.addSeparator ();

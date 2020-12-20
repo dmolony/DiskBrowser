@@ -21,6 +21,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private static final byte TOKEN_GOTO = (byte) 0xAB;
   private static final byte TOKEN_IF = (byte) 0xAD;
   private static final byte TOKEN_GOSUB = (byte) 0xB0;
+  private static final byte TOKEN_RETURN = (byte) 0xB1;
   private static final byte TOKEN_REM = (byte) 0xB2;
   private static final byte TOKEN_PRINT = (byte) 0xBA;
   private static final byte TOKEN_THEN = (byte) 0xC4;
@@ -67,6 +68,9 @@ public class ApplesoftBasicProgram extends BasicProgram
   private String getProgramText ()
   // ---------------------------------------------------------------------------------//
   {
+    int indentSize = 2;
+    boolean blankLine = false;
+
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<> ();
     if (basicPreferences.showHeader)
@@ -136,7 +140,7 @@ public class ApplesoftBasicProgram extends BasicProgram
           if (basicPreferences.alignAssign)
             alignPos = alignEqualsPosition (subline, alignPos);
 
-          int column = indent * 2 + baseOffset;
+          int column = indent * indentSize + baseOffset;
           while (text.length () < column)
             text.append (" ");
         }
@@ -219,6 +223,14 @@ public class ApplesoftBasicProgram extends BasicProgram
           loopVariables.push (subline.forVariable);
           ++indent;
         }
+        else if (basicPreferences.blankAfterReturn && subline.is (TOKEN_RETURN))
+          blankLine = true;
+      }
+
+      if (blankLine)
+      {
+        fullText.append ("\n");
+        blankLine = false;
       }
 
       // Reset alignment value if we just left an IF - the indentation will be different now
@@ -237,7 +249,8 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     if (fullText.length () > 0)
-      fullText.deleteCharAt (fullText.length () - 1);           // remove last newline
+      while (fullText.charAt (fullText.length () - 1) == '\n')
+        fullText.deleteCharAt (fullText.length () - 1);           // remove last newline
 
     return fullText.toString ();
   }

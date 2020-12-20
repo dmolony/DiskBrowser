@@ -49,6 +49,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_HEADER = "showHeader";
   private static final String PREFS_SHOW_CARET = "showCaret";
   private static final String PREFS_SHOW_THEN = "showThen";
+  private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
 
   private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
@@ -133,6 +134,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
+  final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -227,6 +229,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showCaretItem);
     applesoftMenu.add (showThenItem);
+    applesoftMenu.add (blankAfterReturn);
 
     assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);
@@ -284,6 +287,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showHeaderItem.addActionListener (basicPreferencesAction);
     showCaretItem.addActionListener (basicPreferencesAction);
     showThenItem.addActionListener (basicPreferencesAction);
+    blankAfterReturn.addActionListener (basicPreferencesAction);
 
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
@@ -327,6 +331,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showThen = showThenItem.isSelected ();
+    basicPreferences.blankAfterReturn = blankAfterReturn.isSelected ();
     basicPreferences.showHeader = showHeaderItem.isSelected ();
     basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
@@ -484,6 +489,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
+    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturn.isSelected ());
 
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
         showAssemblerTargetsItem.isSelected ());
@@ -533,6 +539,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
     onlyShowTargetLinesItem
         .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));
+    blankAfterReturn.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
 
     showAssemblerTargetsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_TARGETS, true));

@@ -19,7 +19,7 @@ import javax.swing.JScrollPane;
 
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.disk.DualDosDisk;
+import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
@@ -244,8 +244,8 @@ class DiskLayoutPanel extends JPanel
 
   private void checkCorrectDisk (FormattedDisk newDisk)
   {
-    if (newDisk instanceof DualDosDisk)
-      newDisk = ((DualDosDisk) newDisk).getCurrentDisk (); // never set to a Dual-dos disk
+    if (newDisk instanceof HybridDisk)
+      newDisk = ((HybridDisk) newDisk).getCurrentDisk (); // never set to a Dual-dos disk
     if (newDisk != diskLayoutImage.getDisk ())
     {
       LayoutDetails layout = new LayoutDetails (newDisk);

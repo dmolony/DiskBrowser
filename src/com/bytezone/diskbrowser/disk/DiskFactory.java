@@ -252,7 +252,7 @@ public class DiskFactory
         disk = checkUnidos (appleDisk1, 1);
         disk2 = checkUnidos (appleDisk2, 2);
         if (disk != null && disk2 != null)
-          return new DualDosDisk (disk, disk2);
+          return new HybridDisk (disk, disk2);
       }
 
       if (debug)
@@ -403,7 +403,7 @@ public class DiskFactory
           if (debug)
             System.out.println ("  --> Dual dos/prodos 1");
           System.out.println ("** impossible **");
-          disk = new DualDosDisk (disk, disk2);
+          disk = new HybridDisk (disk, disk2);
         }
       }
       else if (checksum == 1737448647L      //
@@ -418,7 +418,7 @@ public class DiskFactory
         {
           if (debug)
             System.out.println ("  --> Dual prodos/dos 2");
-          disk = new DualDosDisk (disk, disk2);
+          disk = new HybridDisk (disk, disk2);
         }
       }
       else if (checksum == 2803644711L    // Apple Pascal disk 0
@@ -431,7 +431,7 @@ public class DiskFactory
         disk = checkPascalDisk (appleDisk512);
         disk2 = checkDos (appleDisk256);
         if (disk2 != null)
-          disk = new DualDosDisk (disk, disk2);
+          disk = new HybridDisk (disk, disk2);
       }
       else if (checksum == 3028642627L    //
           || checksum == 2070151659L)     // Enchanter
@@ -479,7 +479,7 @@ public class DiskFactory
         disk2 = checkProdos (appleDisk512);
         if (disk2 != null)
         {
-          disk = new DualDosDisk (disk, disk2);
+          disk = new HybridDisk (disk, disk2);
           return disk;
         }
 
@@ -487,14 +487,14 @@ public class DiskFactory
         disk2 = checkCPMDisk (appleDisk);
         if (disk2 != null)
         {
-          disk = new DualDosDisk (disk, disk2);
+          disk = new HybridDisk (disk, disk2);
           return disk;
         }
 
         disk2 = checkPascalDisk (appleDisk512);
         if (disk2 != null)
         {
-          disk = new DualDosDisk (disk, disk2);
+          disk = new HybridDisk (disk, disk2);
           return disk;
         }
       }

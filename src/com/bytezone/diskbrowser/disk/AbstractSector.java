@@ -20,7 +20,6 @@ public abstract class AbstractSector implements DataSource
   protected Disk disk;
   protected DiskAddress diskAddress;
   AssemblerProgram assembler;
-  String description;
 
   // ---------------------------------------------------------------------------------//
   public AbstractSector (Disk disk, byte[] buffer, DiskAddress diskAddress)
@@ -70,9 +69,7 @@ public abstract class AbstractSector implements DataSource
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    if (description == null)
-      description = createText ();
-    return description;
+    return createText ();
   }
 
   // ---------------------------------------------------------------------------------//

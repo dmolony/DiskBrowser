@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.bytezone.diskbrowser.disk.AppleDiskAddress;
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -90,7 +89,6 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
       highlights.clear ();
 
     int totalBlocks = disk.getTotalBlocks ();
-    //    int rowSize = disk.getTrackSize () / disk.getBlockSize ();
     Dimension gridLayout = formattedDisk.getGridLayout ();
     int rowSize = gridLayout.width;
 
@@ -165,11 +163,12 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
   public void setSelection (List<DiskAddress> list)
   // ---------------------------------------------------------------------------------//
   {
-    // sparse files contain empty blocks
+    // sparse files contain empty blocks (represented by null)
     highlights.clear ();
     if (list != null)
       for (DiskAddress da : list)
-        if (da != null && (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ()))
+        if (da != null)
+          // && (da.getBlockNo () > 0 || ((AppleDiskAddress) da).zeroFlag ()))
           highlights.add (da);
   }
 
@@ -194,8 +193,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
       lo = da.getBlockNo ();
       hi = highlights.get (0).getBlockNo () - 1;
     }
-    else
-    // No, must be extending at the end
+    else        // No, must be extending at the end
     {
       lo = highlights.get (highlights.size () - 1).getBlockNo () + 1;
       hi = da.getBlockNo ();

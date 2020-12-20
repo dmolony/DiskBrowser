@@ -249,13 +249,6 @@ public class DosDisk extends AbstractFormattedDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  //  private int getVolumeNo ()
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    return volumeNo;
-  //  }
-
-  // ---------------------------------------------------------------------------------//
   @Override
   public void setOriginalPath (Path path)
   // ---------------------------------------------------------------------------------//
@@ -516,12 +509,25 @@ public class DosDisk extends AbstractFormattedDisk
   }
 
   // ---------------------------------------------------------------------------------//
+  private int countEntries (AppleFileSource catalogEntry)
+  // ---------------------------------------------------------------------------------//
+  {
+    int count = 0;
+    for (AppleFileSource ce : fileEntries)
+    {
+      if (ce.getUniqueName ().equals (catalogEntry.getUniqueName ()))
+        count++;
+    }
+    return count;
+  }
+
+  // ---------------------------------------------------------------------------------//
   @Override
   public AppleFileSource getCatalog ()
   // ---------------------------------------------------------------------------------//
   {
     String newLine = String.format ("%n");
-    String line = "- --- ---  ------------------------------  -----  -------------"
+    String underline = "- --- ---  ------------------------------  -----  -------------"
         + "  -- ----  -------------------" + newLine;
 
     StringBuilder text = new StringBuilder ();
@@ -529,12 +535,17 @@ public class DosDisk extends AbstractFormattedDisk
     text.append (String.format ("Disk : %s%n%n", getDisplayPath ()));
     text.append ("L Typ Len  Name                            Addr"
         + "   Length         TS Data  Comment" + newLine);
-    text.append (line);
+    text.append (underline);
 
     for (AppleFileSource fileEntry : fileEntries)
-      text.append (((CatalogEntry) fileEntry).getDetails () + newLine);
+    {
+      String entry = ((CatalogEntry) fileEntry).getDetails ();
+      if (countEntries (fileEntry) > 1)
+        entry += "** duplicate **";
+      text.append (entry + newLine);
+    }
 
-    text.append (line);
+    text.append (underline);
     text.append (String.format (
         "           Free sectors: %3d    " + "Used sectors: %3d    Total sectors: %3d",
         dosVTOCSector.freeSectors, dosVTOCSector.usedSectors,

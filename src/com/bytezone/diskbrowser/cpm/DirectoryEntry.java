@@ -77,6 +77,9 @@ class DirectoryEntry implements AppleFileSource
       for (int i = 0; i < 4; i++)
         blocks.add (new AppleDiskAddress (disk, blockNumber + i));
     }
+    //    if (name.equals ("cp/m"))
+    //      for (DiskAddress da : blocks)
+    //        System.out.println (da);
   }
 
   // ---------------------------------------------------------------------------------//

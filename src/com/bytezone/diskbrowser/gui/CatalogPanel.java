@@ -25,7 +25,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.disk.DualDosDisk;
+import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
@@ -213,8 +213,8 @@ class CatalogPanel extends JTabbedPane
 
         FormattedDisk fd = ((AppleDiskTab) selectedTab).disk;
         prefs.put (prefsLastDiskUsed, fd.getAbsolutePath ());
-        if (fd instanceof DualDosDisk)
-          prefs.putInt (prefsLastDosUsed, ((DualDosDisk) fd).getCurrentDiskNo ());
+        if (fd instanceof HybridDisk)
+          prefs.putInt (prefsLastDosUsed, ((HybridDisk) fd).getCurrentDiskNo ());
         else
           prefs.putInt (prefsLastDosUsed, -1);
 
@@ -265,8 +265,8 @@ class CatalogPanel extends JTabbedPane
       if (diskEvent != null)
       {
         fd1 = diskEvent.getFormattedDisk ();
-        if (lastDosUsed >= 0 && fd1 instanceof DualDosDisk)
-          ((DualDosDisk) fd1).setCurrentDiskNo (lastDosUsed);
+        if (lastDosUsed >= 0 && fd1 instanceof HybridDisk)
+          ((HybridDisk) fd1).setCurrentDiskNo (lastDosUsed);
       }
     }
     else

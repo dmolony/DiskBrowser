@@ -29,6 +29,7 @@ import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicTextFile;
+import com.bytezone.diskbrowser.applefile.BootSector;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.Palette;
 import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
@@ -548,7 +549,8 @@ public class DataPanel extends JTabbedPane
   public void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
   // ---------------------------------------------------------------------------------//
   {
-    if (currentDataSource instanceof AssemblerProgram)
+    if (currentDataSource instanceof AssemblerProgram
+        || currentDataSource instanceof BootSector)
       setDataSource (currentDataSource);
   }
 

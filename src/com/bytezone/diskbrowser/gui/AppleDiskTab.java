@@ -17,7 +17,7 @@ import javax.swing.tree.TreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DiskFactory;
-import com.bytezone.diskbrowser.disk.DualDosDisk;
+import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 
@@ -145,7 +145,7 @@ class AppleDiskTab extends AbstractTab
     FileSelectedEvent fileSelectedEvent = (FileSelectedEvent) event.value;
     if (fileSelectedEvent.volumeNo >= 0)
     {
-      DualDosDisk ddd = (DualDosDisk) afs.getFormattedDisk ().getParent ();
+      HybridDisk ddd = (HybridDisk) afs.getFormattedDisk ().getParent ();
       ddd.setCurrentDiskNo (fileSelectedEvent.volumeNo);
     }
     selectNode (fileSelectedEvent.appleFileSource.getUniqueName ());
@@ -159,9 +159,9 @@ class AppleDiskTab extends AbstractTab
 
     // check for multi-volume disk (only search the current branch)
     FormattedDisk fd = ((AppleFileSource) rootNode.getUserObject ()).getFormattedDisk ();
-    if (fd instanceof DualDosDisk)
+    if (fd instanceof HybridDisk)
     {
-      int volume = ((DualDosDisk) fd).getCurrentDiskNo ();
+      int volume = ((HybridDisk) fd).getCurrentDiskNo ();
       rootNode = (DefaultMutableTreeNode) rootNode.getChildAt (volume);
     }
 

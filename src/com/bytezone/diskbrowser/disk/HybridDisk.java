@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.disk;
 
 import java.awt.Dimension;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTree;
@@ -16,21 +17,21 @@ import com.bytezone.diskbrowser.gui.DataSource;
 // Should be renamed MultiVolumeDisk (and allow >2 volumes)
 
 // -----------------------------------------------------------------------------------//
-public class DualDosDisk implements FormattedDisk
+public class HybridDisk implements FormattedDisk
 // -----------------------------------------------------------------------------------//
 {
-  private final FormattedDisk[] disks = new FormattedDisk[2];
+  private final List<FormattedDisk> disks = new ArrayList<> (2);
   private int currentDisk;
   private final JTree tree;
 
   // ---------------------------------------------------------------------------------//
-  public DualDosDisk (FormattedDisk disk0, FormattedDisk disk1)
+  public HybridDisk (FormattedDisk disk0, FormattedDisk disk1)
   // ---------------------------------------------------------------------------------//
   {
     assert disk0 != disk1;
     String diskName = disk0.getDisk ().getFile ().getName ();
-    String text = "This disk contains files from DOS and another OS\n\n"
-        + disk0.getDisk () + "\n\n" + disk1.getDisk ();
+    String text = "This disk is a hybrid of two or more OS\n\n" + disk0.getDisk ()
+        + "\n\n" + disk1.getDisk ();
 
     DefaultAppleFileSource dafs = new DefaultAppleFileSource (diskName, text, this);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (dafs);
@@ -41,8 +42,8 @@ public class DualDosDisk implements FormattedDisk
     // allow empty nodes to appear as folders
     treeModel.setAsksAllowsChildren (true);
 
-    disks[0] = disk0;
-    disks[1] = disk1;
+    disks.add (disk0);
+    disks.add (disk1);
 
     disk0.setParent (this);
     disk1.setParent (this);
@@ -69,7 +70,7 @@ public class DualDosDisk implements FormattedDisk
   public List<DiskAddress> getFileSectors (int fileNo)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getFileSectors (fileNo);
+    return disks.get (currentDisk).getFileSectors (fileNo);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -77,7 +78,7 @@ public class DualDosDisk implements FormattedDisk
   public List<AppleFileSource> getCatalogList ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getCatalogList ();
+    return disks.get (currentDisk).getCatalogList ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -85,7 +86,7 @@ public class DualDosDisk implements FormattedDisk
   public DataSource getFormattedSector (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getFormattedSector (da);
+    return disks.get (currentDisk).getFormattedSector (da);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -93,7 +94,7 @@ public class DualDosDisk implements FormattedDisk
   public SectorType getSectorType (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getSectorType (da);
+    return disks.get (currentDisk).getSectorType (da);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -101,7 +102,7 @@ public class DualDosDisk implements FormattedDisk
   public SectorType getSectorType (int track, int sector)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getSectorType (track, sector);
+    return disks.get (currentDisk).getSectorType (track, sector);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -109,7 +110,7 @@ public class DualDosDisk implements FormattedDisk
   public SectorType getSectorType (int block)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getSectorType (block);
+    return disks.get (currentDisk).getSectorType (block);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -117,7 +118,7 @@ public class DualDosDisk implements FormattedDisk
   public List<SectorType> getSectorTypeList ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getSectorTypeList ();
+    return disks.get (currentDisk).getSectorTypeList ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -125,23 +126,30 @@ public class DualDosDisk implements FormattedDisk
   public Disk getDisk ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getDisk ();
+    return disks.get (currentDisk).getDisk ();
   }
 
   // ---------------------------------------------------------------------------------//
   public void setCurrentDisk (FormattedDisk fd)
   // ---------------------------------------------------------------------------------//
   {
-    if (disks[0] == fd)
-      currentDisk = 0;
-    else if (disks[1] == fd)
-      currentDisk = 1;
-    else
-    {
-      // this happens when the top-level folder is selected (i.e. neither disk)
-      System.out.println ("Disk not found: " + fd);
-      //      Utility.printStackTrace ();
-    }
+    for (int i = 0; i < disks.size (); i++)
+      if (disks.get (i) == fd)
+      {
+        currentDisk = i;
+        break;
+      }
+
+    //    if (disks[0] == fd)
+    //      currentDisk = 0;
+    //    else if (disks[1] == fd)
+    //      currentDisk = 1;
+    //    else
+    //    {
+    //      // this happens when the top-level folder is selected (i.e. neither disk)
+    //      System.out.println ("Disk not found: " + fd);
+    //      //      Utility.printStackTrace ();
+    //    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -162,7 +170,7 @@ public class DualDosDisk implements FormattedDisk
   public FormattedDisk getCurrentDisk ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk];
+    return disks.get (currentDisk);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -170,7 +178,7 @@ public class DualDosDisk implements FormattedDisk
   public void writeFile (AbstractFile file)
   // ---------------------------------------------------------------------------------//
   {
-    disks[currentDisk].writeFile (file);
+    disks.get (currentDisk).writeFile (file);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -178,10 +186,18 @@ public class DualDosDisk implements FormattedDisk
   public AppleFileSource getCatalog ()
   // ---------------------------------------------------------------------------------//
   {
-    return new DefaultAppleFileSource ("text",
-        disks[0].getCatalog ().getDataSource ().getText () + "\n\n"
-            + disks[1].getCatalog ().getDataSource ().getText (),
-        this);
+    StringBuilder text = new StringBuilder ();
+
+    for (FormattedDisk disk : disks)
+    {
+      text.append (disk.getCatalog ().getDataSource ().getText ());
+      text.append ("\n\n");
+    }
+
+    text.deleteCharAt (text.length () - 1);
+    text.deleteCharAt (text.length () - 1);
+
+    return new DefaultAppleFileSource ("text", text.toString (), this);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -189,7 +205,7 @@ public class DualDosDisk implements FormattedDisk
   public AppleFileSource getFile (String uniqueName)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getFile (uniqueName);
+    return disks.get (currentDisk).getFile (uniqueName);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -197,7 +213,7 @@ public class DualDosDisk implements FormattedDisk
   public int clearOrphans ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].clearOrphans ();
+    return disks.get (currentDisk).clearOrphans ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -205,7 +221,7 @@ public class DualDosDisk implements FormattedDisk
   public boolean isSectorFree (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].isSectorFree (da);
+    return disks.get (currentDisk).isSectorFree (da);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -213,7 +229,7 @@ public class DualDosDisk implements FormattedDisk
   public void verify ()
   // ---------------------------------------------------------------------------------//
   {
-    disks[currentDisk].verify ();
+    disks.get (currentDisk).verify ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -221,7 +237,7 @@ public class DualDosDisk implements FormattedDisk
   public boolean stillAvailable (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].stillAvailable (da);
+    return disks.get (currentDisk).stillAvailable (da);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -229,7 +245,7 @@ public class DualDosDisk implements FormattedDisk
   public void setSectorType (int block, SectorType type)
   // ---------------------------------------------------------------------------------//
   {
-    disks[currentDisk].setSectorType (block, type);
+    disks.get (currentDisk).setSectorType (block, type);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -237,7 +253,7 @@ public class DualDosDisk implements FormattedDisk
   public void setSectorFree (int block, boolean free)
   // ---------------------------------------------------------------------------------//
   {
-    disks[currentDisk].setSectorFree (block, free);
+    disks.get (currentDisk).setSectorFree (block, free);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -245,7 +261,7 @@ public class DualDosDisk implements FormattedDisk
   public int falseNegativeBlocks ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].falseNegativeBlocks ();
+    return disks.get (currentDisk).falseNegativeBlocks ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -253,7 +269,7 @@ public class DualDosDisk implements FormattedDisk
   public int falsePositiveBlocks ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].falsePositiveBlocks ();
+    return disks.get (currentDisk).falsePositiveBlocks ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -261,7 +277,7 @@ public class DualDosDisk implements FormattedDisk
   public Dimension getGridLayout ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getGridLayout ();
+    return disks.get (currentDisk).getGridLayout ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -269,7 +285,7 @@ public class DualDosDisk implements FormattedDisk
   public boolean isSectorFree (int block)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].isSectorFree (block);
+    return disks.get (currentDisk).isSectorFree (block);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -277,7 +293,7 @@ public class DualDosDisk implements FormattedDisk
   public boolean stillAvailable (int block)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].stillAvailable (block);
+    return disks.get (currentDisk).stillAvailable (block);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -285,7 +301,7 @@ public class DualDosDisk implements FormattedDisk
   public void setOriginalPath (Path path)
   // ---------------------------------------------------------------------------------//
   {
-    disks[currentDisk].setOriginalPath (path);
+    disks.get (currentDisk).setOriginalPath (path);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -293,7 +309,7 @@ public class DualDosDisk implements FormattedDisk
   public String getAbsolutePath ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getAbsolutePath ();
+    return disks.get (currentDisk).getAbsolutePath ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -301,7 +317,7 @@ public class DualDosDisk implements FormattedDisk
   public String getDisplayPath ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getDisplayPath ();
+    return disks.get (currentDisk).getDisplayPath ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -309,7 +325,7 @@ public class DualDosDisk implements FormattedDisk
   public FormattedDisk getParent ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getParent ();
+    return disks.get (currentDisk).getParent ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -317,7 +333,7 @@ public class DualDosDisk implements FormattedDisk
   public void setParent (FormattedDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    disks[currentDisk].setParent (disk);
+    disks.get (currentDisk).setParent (disk);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -325,7 +341,7 @@ public class DualDosDisk implements FormattedDisk
   public String getSectorFilename (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getSectorFilename (da);
+    return disks.get (currentDisk).getSectorFilename (da);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -333,7 +349,7 @@ public class DualDosDisk implements FormattedDisk
   public String getName ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getName ();
+    return disks.get (currentDisk).getName ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -341,7 +357,7 @@ public class DualDosDisk implements FormattedDisk
   public boolean isTempDisk ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].isTempDisk ();
+    return disks.get (currentDisk).isTempDisk ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -349,6 +365,6 @@ public class DualDosDisk implements FormattedDisk
   public Path getOriginalPath ()
   // ---------------------------------------------------------------------------------//
   {
-    return disks[currentDisk].getOriginalPath ();
+    return disks.get (currentDisk).getOriginalPath ();
   }
 }

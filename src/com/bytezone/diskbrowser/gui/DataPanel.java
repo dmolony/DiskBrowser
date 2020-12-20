@@ -262,25 +262,10 @@ public class DataPanel extends JTabbedPane
 
     AbstractFile.setDebug (value);
     setText (formattedText, currentDataSource.getText ());
-    //    if (currentDataSource instanceof VisicalcFile)
-    //    {
-    //      VisicalcFile visicalcFile = (VisicalcFile) currentDataSource;
-    //      VisicalcFile.setDebug (value);
-    //      setText (formattedText, visicalcFile.getText ());
-    //    }
-    //    else if (currentDataSource instanceof ApplesoftBasicProgram)
-    //    {
-    //      ApplesoftBasicProgram basicProgram = (ApplesoftBasicProgram) currentDataSource;
-    //      ApplesoftBasicProgram.setDebug (value);
-    //      setText (formattedText, basicProgram.getText ());
-    //    }
-    //    // should implement an interface for this
-    //    else 
+
     if (currentDataSource instanceof HiResImage
         || currentDataSource instanceof QuickDrawFont)
-    {
       setDataSource (currentDataSource);      // toggles text/image
-    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -359,6 +344,9 @@ public class DataPanel extends JTabbedPane
         hexTextValid = false;
         formattedTextValid = false;
         break;
+
+      default:
+        System.out.println ("Unexpected Tab #" + getSelectedIndex ());
     }
 
     BufferedImage image = dataSource.getImage ();

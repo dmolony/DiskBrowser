@@ -54,7 +54,7 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     setInfocomSectorTypes ();
 
-    data = disk.readBlock (3, 0);          // read first sector to get file size
+    data = disk.readBlock (3, 0);           // read first sector to get file size
     data = getBuffer (getWord (26) * 2);    // read entire file into data buffer
 
     if (false)

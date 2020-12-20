@@ -151,7 +151,10 @@ class CodeManager extends AbstractFile
 
       if (routines.containsKey (ptr))
       {
-        ptr += getRoutine (ptr).length;
+        int length = getRoutine (ptr).length;
+        if (length == 0)
+          break;
+        ptr += length;
         continue;
       }
 

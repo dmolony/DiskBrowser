@@ -199,10 +199,13 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
 
       if (propertyNumber >= 19)                   // directions
       {
+        ZObject object = getObject ();
+        String objectName = object == null ? "no object" : object.name;
+
         switch (length)
         {
           case 1:                                 // UEXIT - unconditional exit
-            text.append (getObject ().name);
+            text.append (objectName);
             break;
           case 2:
             text.append ("\"" + header.stringManager.stringAt (offset) + "\"");
@@ -213,15 +216,15 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
             appendRoutine (text, address);
             break;
           case 4:
-            text.append (String.format ("%s : IF G%02X ELSE ", getObject ().name,
+            text.append (String.format ("%s : IF G%02X ELSE ", objectName,
                 header.getByte (ptr + 2)));
             address = header.getWord (ptr + 3) * 2;
             if (address > 0)
               text.append ("\"" + header.stringManager.stringAt (address) + "\"");
             break;
           case 5:
-            text.append (String.format ("%s : IF G%02X ", getObject ().name,
-                header.getByte (ptr + 2)));
+            text.append (
+                String.format ("%s : IF G%02X ", objectName, header.getByte (ptr + 2)));
             break;
           default:
             break;

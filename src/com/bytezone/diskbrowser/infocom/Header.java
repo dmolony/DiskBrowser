@@ -87,6 +87,8 @@ class Header extends InfocomAbstractFile
   String getPropertyName (int id)
   // ---------------------------------------------------------------------------------//
   {
+    if (id >= propertyNames.length)
+      return "Bad id : " + id;
     return propertyNames[id];
   }
 

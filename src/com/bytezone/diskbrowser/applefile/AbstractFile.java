@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public abstract class AbstractFile implements DataSource
 // -----------------------------------------------------------------------------------//
 {
-  static boolean debug;
+  static boolean showDebugText;
 
   protected String name;
   public byte[] buffer;
@@ -40,14 +40,14 @@ public abstract class AbstractFile implements DataSource
   public static void setDefaultDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {
-    debug = value;
+    showDebugText = value;
   }
 
   // ---------------------------------------------------------------------------------//
   public static void setDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {
-    debug = value;
+    showDebugText = value;
   }
 
   // ---------------------------------------------------------------------------------//

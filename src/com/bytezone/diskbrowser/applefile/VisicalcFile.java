@@ -26,7 +26,7 @@ public class VisicalcFile extends AbstractFile
     StringBuilder text = new StringBuilder ();
 
     text.append ("Visicalc : " + name + "\n\n");
-    text.append (sheet.getTextDisplay (debug));
+    text.append (sheet.getTextDisplay (showDebugText));
 
     return text.toString ();
   }

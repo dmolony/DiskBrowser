@@ -60,7 +60,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    return debug ? getHexText () : getProgramText ();
+    return showDebugText ? getHexText () : getProgramText ();
   }
 
   // ---------------------------------------------------------------------------------//

@@ -65,8 +65,13 @@ class Dictionary extends AbstractFile
         int b1 = buffer[ptr + 5] & 0xFF;
         int b2 = buffer[ptr + 6] & 0xFF;
         int property = b2 == 0 ? b1 : b2;
+        property &= 0x1F;
         String propertyName = header.getPropertyName (property);
+
         System.out.printf ("%02X  %s%n", property, string.value);
+        //        if (property >= header.propertyNames.length)
+        //          System.out.println ("Illegal property");
+        //        else
         if (propertyName == null || propertyName.length () > string.value.length ())
           header.propertyNames[property] = string.value;
       }
@@ -80,7 +85,7 @@ class Dictionary extends AbstractFile
         header.propertyNames[i] = i + "";
 
     // testing (only works in Zork 1)
-    if (true)
+    if (false)
     {
       if (header.propertyNames[4].equals ("4"))
         header.propertyNames[4] = "PSEUDO";

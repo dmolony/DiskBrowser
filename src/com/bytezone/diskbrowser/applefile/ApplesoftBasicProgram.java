@@ -152,6 +152,9 @@ public class ApplesoftBasicProgram extends BasicProgram
         if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
           lineText = lineText.replaceFirst ("REM  ", "REM ");
 
+        if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
+          lineText = lineText.replaceFirst ("DATA  ", "DATA ");
+
         // Check for a wrappable REM statement
         // (see SEA BATTLE on DISK283.DSK)
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)

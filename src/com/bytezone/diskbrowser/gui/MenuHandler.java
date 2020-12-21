@@ -51,6 +51,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_THEN = "showThen";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
   private static final String PREFS_DELETE_EXTRA_REM_SPACE = "deleteExtraRemSpace";
+  private static final String PREFS_DELETE_EXTRA_DATA_SPACE = "deleteExtraDataSpace";
 
   private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
@@ -137,6 +138,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
   final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
   final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
+  final JMenuItem deleteExtraDataSpace =
+      new JCheckBoxMenuItem ("Delete extra DATA space");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -233,6 +236,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showThenItem);
     applesoftMenu.add (blankAfterReturn);
     applesoftMenu.add (deleteExtraRemSpace);
+    applesoftMenu.add (deleteExtraDataSpace);
 
     assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);
@@ -292,6 +296,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showThenItem.addActionListener (basicPreferencesAction);
     blankAfterReturn.addActionListener (basicPreferencesAction);
     deleteExtraRemSpace.addActionListener (basicPreferencesAction);
+    deleteExtraDataSpace.addActionListener (basicPreferencesAction);
 
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
@@ -337,6 +342,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.showThen = showThenItem.isSelected ();
     basicPreferences.blankAfterReturn = blankAfterReturn.isSelected ();
     basicPreferences.deleteExtraRemSpace = deleteExtraRemSpace.isSelected ();
+    basicPreferences.deleteExtraDataSpace = deleteExtraDataSpace.isSelected ();
     basicPreferences.showHeader = showHeaderItem.isSelected ();
     basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
@@ -479,7 +485,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
     prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
     prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
-    //    prefs.putBoolean (PREFS_DEBUGGING, debuggingItem.isSelected ());
     prefs.putInt (PREFS_PALETTE,
         HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
     fontAction.quit (prefs);
@@ -496,6 +501,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
     prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturn.isSelected ());
     prefs.putBoolean (PREFS_DELETE_EXTRA_REM_SPACE, deleteExtraRemSpace.isSelected ());
+    prefs.putBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, deleteExtraDataSpace.isSelected ());
 
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
         showAssemblerTargetsItem.isSelected ());
@@ -535,8 +541,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
         break;
     }
 
-    //    debuggingItem.setSelected (prefs.getBoolean (PREFS_DEBUGGING, false));
-
     splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
     alignAssignItem.setSelected (prefs.getBoolean (PREFS_ALIGN_ASSIGN, true));
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
@@ -548,6 +552,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     blankAfterReturn.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
     deleteExtraRemSpace
         .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_REM_SPACE, false));
+    deleteExtraDataSpace
+        .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, false));
 
     showAssemblerTargetsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_TARGETS, true));
@@ -584,8 +590,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     HiResImage.setDefaultColourQuirks (colourQuirksItem.isSelected ());
     HiResImage.setDefaultMonochrome (monochromeItem.isSelected ());
-    //    VisicalcFile.setDefaultDebug (debuggingItem.isSelected ());
-    //    ApplesoftBasicProgram.setDefaultDebug (debuggingItem.isSelected ());
     AbstractFile.setDefaultDebug (debuggingItem.isSelected ());
 
     fontAction.restore (prefs);
@@ -605,7 +609,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   public void fileSelected (FileSelectedEvent event)
   // ---------------------------------------------------------------------------------//
   {
-    // This can happen if a file is selected from a dual-dos disk
+    // This can happen if a file is selected from a hybrid disk
     if (event.appleFileSource.getFormattedDisk () != currentDisk)
     {
       currentDisk = event.appleFileSource.getFormattedDisk ();

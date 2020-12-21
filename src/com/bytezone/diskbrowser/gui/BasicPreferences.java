@@ -13,6 +13,7 @@ public class BasicPreferences
   public boolean showThen = true;
   public boolean blankAfterReturn = false;
   public boolean deleteExtraRemSpace = false;
+  public boolean deleteExtraDataSpace = false;
   public int wrapPrintAt = 0;
   public int wrapRemAt = 60;
   public int wrapDataAt = 60;
@@ -34,6 +35,7 @@ public class BasicPreferences
     text.append (String.format ("Show THEN ................ %s%n", showThen));
     text.append (String.format ("Blank after RETURN ....... %s%n", blankAfterReturn));
     text.append (String.format ("Delete extra REM space ... %s%n", deleteExtraRemSpace));
+    text.append (String.format ("Delete extra DATA space .. %s%n", deleteExtraDataSpace));
     text.append (String.format ("Wrap PRINT at ............ %d%n", wrapPrintAt));
     text.append (String.format ("Wrap REM at .............. %d%n", wrapRemAt));
     text.append (String.format ("Wrap DATA at ............. %d", wrapDataAt));

@@ -69,7 +69,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     int indentSize = 2;
-    boolean blankLine = false;
+    boolean insertBlankLine = false;
 
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<> ();
@@ -149,6 +149,9 @@ public class ApplesoftBasicProgram extends BasicProgram
         int pos = subline.is (TOKEN_REM) ? 0 : alignPos;
         String lineText = subline.getAlignedText (pos);
 
+        if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
+          lineText = lineText.replaceFirst ("REM  ", "REM ");
+
         // Check for a wrappable REM statement
         // (see SEA BATTLE on DISK283.DSK)
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
@@ -224,13 +227,13 @@ public class ApplesoftBasicProgram extends BasicProgram
           ++indent;
         }
         else if (basicPreferences.blankAfterReturn && subline.is (TOKEN_RETURN))
-          blankLine = true;
+          insertBlankLine = true;
       }
 
-      if (blankLine)
+      if (insertBlankLine)
       {
         fullText.append ("\n");
-        blankLine = false;
+        insertBlankLine = false;
       }
 
       // Reset alignment value if we just left an IF - the indentation will be different now

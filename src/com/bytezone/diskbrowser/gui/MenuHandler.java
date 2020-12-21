@@ -50,6 +50,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_CARET = "showCaret";
   private static final String PREFS_SHOW_THEN = "showThen";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
+  private static final String PREFS_DELETE_EXTRA_REM_SPACE = "deleteExtraRemSpace";
 
   private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
@@ -127,7 +128,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   // Applesoft menu items
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
-  final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align assign");
+  final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align consecutive assign");
   final JMenuItem showBasicTargetsItem = new JCheckBoxMenuItem ("Show targets");
   final JMenuItem onlyShowTargetLinesItem =
       new JCheckBoxMenuItem ("Only show target lines");
@@ -135,6 +136,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
   final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
+  final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -157,9 +159,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     menuBar.add (fileMenu);
     menuBar.add (formatMenu);
     menuBar.add (imageMenu);
+    menuBar.add (prodosMenu);
     menuBar.add (applesoftMenu);
     menuBar.add (assemblerMenu);
-    menuBar.add (prodosMenu);
     menuBar.add (textMenu);
     menuBar.add (helpMenu);
 
@@ -230,6 +232,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showCaretItem);
     applesoftMenu.add (showThenItem);
     applesoftMenu.add (blankAfterReturn);
+    applesoftMenu.add (deleteExtraRemSpace);
 
     assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);
@@ -288,6 +291,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showCaretItem.addActionListener (basicPreferencesAction);
     showThenItem.addActionListener (basicPreferencesAction);
     blankAfterReturn.addActionListener (basicPreferencesAction);
+    deleteExtraRemSpace.addActionListener (basicPreferencesAction);
 
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
     showAssemblerStringsItem.addActionListener (assemblerPreferencesAction);
@@ -332,6 +336,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showThen = showThenItem.isSelected ();
     basicPreferences.blankAfterReturn = blankAfterReturn.isSelected ();
+    basicPreferences.deleteExtraRemSpace = deleteExtraRemSpace.isSelected ();
     basicPreferences.showHeader = showHeaderItem.isSelected ();
     basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
@@ -490,6 +495,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
     prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturn.isSelected ());
+    prefs.putBoolean (PREFS_DELETE_EXTRA_REM_SPACE, deleteExtraRemSpace.isSelected ());
 
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
         showAssemblerTargetsItem.isSelected ());
@@ -540,6 +546,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     onlyShowTargetLinesItem
         .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));
     blankAfterReturn.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
+    deleteExtraRemSpace
+        .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_REM_SPACE, false));
 
     showAssemblerTargetsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_TARGETS, true));

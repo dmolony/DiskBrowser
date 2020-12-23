@@ -1,10 +1,10 @@
 package com.bytezone.diskbrowser.applefile;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -29,8 +29,8 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
-  private final Set<Integer> gotoLines = new HashSet<> ();
-  private final Set<Integer> gosubLines = new HashSet<> ();
+  private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
+  private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -70,6 +70,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   {
     int indentSize = 2;
     boolean insertBlankLine = false;
+    boolean showGosubs = true;
 
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<> ();
@@ -254,9 +255,25 @@ public class ApplesoftBasicProgram extends BasicProgram
           programLoadAddress + ptr));
     }
 
+    if (basicPreferences.showXref)
+    {
+      if (fullText.charAt (fullText.length () - 2) != '\n')
+        fullText.append ("\n");
+      fullText.append ("Subroutine:\n");
+      for (Integer line : gosubLines.keySet ())
+      {
+        fullText.append (String.format (" %5s  %s%n", line, gosubLines.get (line)));
+      }
+      fullText.append ("\nGoTo:\n");
+      for (Integer line : gotoLines.keySet ())
+      {
+        fullText.append (String.format (" %5s  %s%n", line, gotoLines.get (line)));
+      }
+    }
+
     if (fullText.length () > 0)
       while (fullText.charAt (fullText.length () - 1) == '\n')
-        fullText.deleteCharAt (fullText.length () - 1);           // remove last newline
+        fullText.deleteCharAt (fullText.length () - 1);         // remove trailing newlines
 
     return fullText.toString ();
   }
@@ -363,8 +380,8 @@ public class ApplesoftBasicProgram extends BasicProgram
   private String getBase (SourceLine line)
   // ---------------------------------------------------------------------------------//
   {
-    boolean isTarget =
-        gotoLines.contains (line.lineNumber) || gosubLines.contains (line.lineNumber);
+    boolean isTarget = gotoLines.containsKey (line.lineNumber)
+        || gosubLines.containsKey (line.lineNumber);
 
     if (!basicPreferences.showTargets)
     {
@@ -381,9 +398,9 @@ public class ApplesoftBasicProgram extends BasicProgram
       c1 = "<<";
     if (subline.is (TOKEN_GOTO))
       c1 = " <";
-    if (gotoLines.contains (line.lineNumber))
+    if (gotoLines.containsKey (line.lineNumber))
       c2 = "> ";
-    if (gosubLines.contains (line.lineNumber))
+    if (gosubLines.containsKey (line.lineNumber))
       c2 = ">>";
     if (c1.equals ("  ") && !c2.equals ("  "))
       c1 = "--";
@@ -570,7 +587,6 @@ public class ApplesoftBasicProgram extends BasicProgram
     SourceLine (int ptr)
     {
       linePtr = ptr;
-      //      lineNumber = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
       lineNumber = Utility.unsignedShort (buffer, ptr + 2);
 
       int startPtr = ptr += 4;
@@ -689,7 +705,19 @@ public class ApplesoftBasicProgram extends BasicProgram
             String target = new String (buffer, startPtr + 1, length - 2);
             try
             {
-              gotoLines.add (Integer.parseInt (target));
+              int targetLine = Integer.parseInt (target);
+              //              gotoLines.add (Integer.parseInt (target));
+              if (gotoLines.containsKey (targetLine))
+              {
+                List<Integer> lines = gotoLines.get (targetLine);
+                lines.add (parent.lineNumber);
+              }
+              else
+              {
+                List<Integer> lines = new ArrayList<> ();
+                lines.add (parent.lineNumber);
+                gotoLines.put (targetLine, lines);
+              }
             }
             catch (NumberFormatException e)
             {
@@ -699,16 +727,28 @@ public class ApplesoftBasicProgram extends BasicProgram
             break;
 
           case TOKEN_GOSUB:
-            String target2 = new String (buffer, startPtr + 1, length - 2);
+            target = new String (buffer, startPtr + 1, length - 2);
             try
             {
-              gosubLines.add (Integer.parseInt (target2));
+              int targetLine = Integer.parseInt (target);
+              //              gosubLines.add (Integer.parseInt (target));
+              if (gosubLines.containsKey (targetLine))
+              {
+                List<Integer> lines = gosubLines.get (targetLine);
+                lines.add (parent.lineNumber);
+              }
+              else
+              {
+                List<Integer> lines = new ArrayList<> ();
+                lines.add (parent.lineNumber);
+                gosubLines.put (targetLine, lines);
+              }
             }
             catch (NumberFormatException e)
             {
               System.out.println (HexFormatter.format (buffer, startPtr + 1, length - 2));
               System.out.println (
-                  "Error parsing : GOSUB " + target2 + " in " + parent.lineNumber);
+                  "Error parsing : GOSUB " + target + " in " + parent.lineNumber);
             }
             break;
         }
@@ -721,7 +761,18 @@ public class ApplesoftBasicProgram extends BasicProgram
           try
           {
             targetLine = Integer.parseInt (target);
-            gotoLines.add (targetLine);
+            //            gotoLines.add (targetLine);
+            if (gotoLines.containsKey (targetLine))
+            {
+              List<Integer> lines = gotoLines.get (targetLine);
+              lines.add (parent.lineNumber);
+            }
+            else
+            {
+              List<Integer> lines = new ArrayList<> ();
+              lines.add (parent.lineNumber);
+              gotoLines.put (targetLine, lines);
+            }
           }
           catch (NumberFormatException e)
           {

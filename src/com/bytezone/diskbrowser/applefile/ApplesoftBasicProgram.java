@@ -255,20 +255,22 @@ public class ApplesoftBasicProgram extends BasicProgram
           programLoadAddress + ptr));
     }
 
-    if (basicPreferences.showXref)
+    if (basicPreferences.showXref && !gosubLines.isEmpty ())
     {
       if (fullText.charAt (fullText.length () - 2) != '\n')
         fullText.append ("\n");
       fullText.append ("Subroutine:\n");
       for (Integer line : gosubLines.keySet ())
-      {
         fullText.append (String.format (" %5s  %s%n", line, gosubLines.get (line)));
-      }
-      fullText.append ("\nGoTo:\n");
+    }
+
+    if (basicPreferences.showXref && !gotoLines.isEmpty ())
+    {
+      if (fullText.charAt (fullText.length () - 2) != '\n')
+        fullText.append ("\n");
+      fullText.append ("GoTo:\n");
       for (Integer line : gotoLines.keySet ())
-      {
         fullText.append (String.format (" %5s  %s%n", line, gotoLines.get (line)));
-      }
     }
 
     if (fullText.length () > 0)
@@ -703,53 +705,12 @@ public class ApplesoftBasicProgram extends BasicProgram
 
           case TOKEN_GOTO:
             String target = new String (buffer, startPtr + 1, length - 2);
-            try
-            {
-              int targetLine = Integer.parseInt (target);
-              //              gotoLines.add (Integer.parseInt (target));
-              if (gotoLines.containsKey (targetLine))
-              {
-                List<Integer> lines = gotoLines.get (targetLine);
-                lines.add (parent.lineNumber);
-              }
-              else
-              {
-                List<Integer> lines = new ArrayList<> ();
-                lines.add (parent.lineNumber);
-                gotoLines.put (targetLine, lines);
-              }
-            }
-            catch (NumberFormatException e)
-            {
-              System.out.println (
-                  "Error parsing : GOTO " + target + " in " + parent.lineNumber);
-            }
+            addXref (target, gotoLines);
             break;
 
           case TOKEN_GOSUB:
             target = new String (buffer, startPtr + 1, length - 2);
-            try
-            {
-              int targetLine = Integer.parseInt (target);
-              //              gosubLines.add (Integer.parseInt (target));
-              if (gosubLines.containsKey (targetLine))
-              {
-                List<Integer> lines = gosubLines.get (targetLine);
-                lines.add (parent.lineNumber);
-              }
-              else
-              {
-                List<Integer> lines = new ArrayList<> ();
-                lines.add (parent.lineNumber);
-                gosubLines.put (targetLine, lines);
-              }
-            }
-            catch (NumberFormatException e)
-            {
-              System.out.println (HexFormatter.format (buffer, startPtr + 1, length - 2));
-              System.out.println (
-                  "Error parsing : GOSUB " + target + " in " + parent.lineNumber);
-            }
+            addXref (target, gosubLines);
             break;
         }
       }
@@ -758,34 +719,36 @@ public class ApplesoftBasicProgram extends BasicProgram
         if (isDigit (b))       // numeric, so must be a line number
         {
           String target = new String (buffer, startPtr, length - 1);
-          try
-          {
-            targetLine = Integer.parseInt (target);
-            //            gotoLines.add (targetLine);
-            if (gotoLines.containsKey (targetLine))
-            {
-              List<Integer> lines = gotoLines.get (targetLine);
-              lines.add (parent.lineNumber);
-            }
-            else
-            {
-              List<Integer> lines = new ArrayList<> ();
-              lines.add (parent.lineNumber);
-              gotoLines.put (targetLine, lines);
-            }
-          }
-          catch (NumberFormatException e)
-          {
-            System.out.printf ("b: %d, start: %d, length: %d%n", b, startPtr,
-                (length - 1));
-            System.out.println (target);
-            System.out.println (HexFormatter.format (buffer, startPtr, length - 1));
-            System.out.println (e);
-          }
+          addXref (target, gotoLines);
         }
-        //        else if (basicPreferences.alignAssign)
         else
           recordEqualsPosition ();
+      }
+    }
+
+    private void addXref (String target, Map<Integer, List<Integer>> map)
+    {
+      try
+      {
+        targetLine = Integer.parseInt (target);
+        if (map.containsKey (targetLine))
+        {
+          List<Integer> lines = map.get (targetLine);
+          lines.add (parent.lineNumber);
+        }
+        else
+        {
+          List<Integer> lines = new ArrayList<> ();
+          lines.add (parent.lineNumber);
+          map.put (targetLine, lines);
+        }
+      }
+      catch (NumberFormatException e)
+      {
+        // System.out.printf ("b: %d, start: %d, length: %d%n", b, startPtr, (length - 1));
+        System.out.println (target);
+        System.out.println (HexFormatter.format (buffer, startPtr, length - 1));
+        System.out.println (e);
       }
     }
 

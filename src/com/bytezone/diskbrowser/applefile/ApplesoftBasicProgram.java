@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -17,6 +19,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private static final byte TOKEN_NEXT = (byte) 0x82;
   private static final byte TOKEN_DATA = (byte) 0x83;
   private static final byte TOKEN_INPUT = (byte) 0x84;
+  private static final byte TOKEN_DIM = (byte) 0x86;
   private static final byte TOKEN_LET = (byte) 0xAA;
   private static final byte TOKEN_GOTO = (byte) 0xAB;
   private static final byte TOKEN_IF = (byte) 0xAD;
@@ -169,6 +172,11 @@ public class ApplesoftBasicProgram extends BasicProgram
             && lineText.length () > basicPreferences.wrapDataAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
+          addSplitLines (lines, text);
+        }
+        else if (subline.is (TOKEN_DIM) && basicPreferences.splitDim)
+        {
+          List<String> lines = splitDim (lineText);
           addSplitLines (lines, text);
         }
         else
@@ -348,7 +356,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     while (firstSpace < line.length () && line.charAt (firstSpace) != ' ')
       ++firstSpace;
 
-    List<String> remarks = new ArrayList<> ();
+    List<String> lines = new ArrayList<> ();
     while (line.length () > wrapLength)
     {
       int max = Math.min (wrapLength, line.length () - 1);
@@ -356,11 +364,31 @@ public class ApplesoftBasicProgram extends BasicProgram
         --max;
       if (max == 0)
         break;
-      remarks.add (line.substring (0, max + 1));
+      lines.add (line.substring (0, max + 1));
       line = "       ".substring (0, firstSpace + 1) + line.substring (max + 1);
     }
-    remarks.add (line);
-    return remarks;
+
+    lines.add (line);
+    return lines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private List<String> splitDim (String line)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<String> lines = new ArrayList<> ();
+    System.out.println (line);
+
+    Pattern p = Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9,]*\\),?");
+    Matcher m = p.matcher (line);
+
+    while (m.find ())
+      lines.add ("    " + m.group ());
+
+    if (lines.size () > 0)
+      lines.set (0, "DIM " + lines.get (0).trim ());
+
+    return lines;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -699,84 +727,94 @@ public class ApplesoftBasicProgram extends BasicProgram
       this.length = length;
 
       byte b = buffer[startPtr];
+
       if (isHighBitSet (b))
-      {
-        switch (b)
-        {
-          case TOKEN_FOR:
-            int p = startPtr + 1;
-            while (buffer[p] != TOKEN_EQUALS)
-              forVariable += (char) buffer[p++];
-            break;
-
-          case TOKEN_NEXT:
-            if (length == 2)                // no variables
-              nextVariables = new String[0];
-            else
-            {
-              String varList = new String (buffer, startPtr + 1, length - 2);
-              nextVariables = varList.split (",");
-            }
-            break;
-
-          case TOKEN_LET:
-            recordEqualsPosition ();
-            break;
-
-          case TOKEN_GOTO:
-            int targetLine = getLineNumber (buffer, startPtr + 1);
-            addXref (targetLine, gotoLines);
-            break;
-
-          case TOKEN_GOSUB:
-            targetLine = getLineNumber (buffer, startPtr + 1);
-            addXref (targetLine, gosubLines);
-            break;
-
-          case TOKEN_ON:
-            p = startPtr + 1;
-            int max = startPtr + length - 1;
-            while (p < max && buffer[p] != TOKEN_GOTO && buffer[p] != TOKEN_GOSUB)
-            {
-              if (isHighBitSet (buffer[p]))
-              {
-                int val = buffer[p] & 0x7F;
-                if (val < ApplesoftConstants.tokens.length)
-                  onExpression += " " + ApplesoftConstants.tokens[val];
-              }
-              else
-                onExpression += (char) (buffer[p]);
-              p++;
-            }
-            //            System.out.println (onExpression); // may contain symbols +,- etc
-            switch (buffer[p++])
-            {
-              case TOKEN_GOSUB:
-                for (int destLine : getLineNumbers (buffer, p))
-                  addXref (destLine, gosubLines);
-                break;
-
-              case TOKEN_GOTO:
-                for (int destLine : getLineNumbers (buffer, p))
-                  addXref (destLine, gotoLines);
-                break;
-
-              default:
-                System.out.println ("GOTO / GOSUB not found");
-            }
-            break;
-        }
-      }
+        doToken (b);
+      else if (isDigit (b))
+        doDigit ();
       else
+        doAlpha ();
+
+    }
+
+    private void doToken (byte b)
+    {
+      switch (b)
       {
-        if (isDigit (b))       // numeric, so must be a line number
-        {
-          int targetLine = getLineNumber (buffer, startPtr);
-          addXref (targetLine, gotoLines);
-        }
-        else
+        case TOKEN_FOR:
+          int p = startPtr + 1;
+          while (buffer[p] != TOKEN_EQUALS)
+            forVariable += (char) buffer[p++];
+          break;
+
+        case TOKEN_NEXT:
+          if (length == 2)                // no variables
+            nextVariables = new String[0];
+          else
+          {
+            String varList = new String (buffer, startPtr + 1, length - 2);
+            nextVariables = varList.split (",");
+          }
+          break;
+
+        case TOKEN_LET:
           recordEqualsPosition ();
+          break;
+
+        case TOKEN_GOTO:
+          int targetLine = getLineNumber (buffer, startPtr + 1);
+          addXref (targetLine, gotoLines);
+          break;
+
+        case TOKEN_GOSUB:
+          targetLine = getLineNumber (buffer, startPtr + 1);
+          addXref (targetLine, gosubLines);
+          break;
+
+        case TOKEN_ON:
+          p = startPtr + 1;
+          int max = startPtr + length - 1;
+          while (p < max && buffer[p] != TOKEN_GOTO && buffer[p] != TOKEN_GOSUB)
+          {
+            if (isHighBitSet (buffer[p]))
+            {
+              int val = buffer[p] & 0x7F;
+              if (val < ApplesoftConstants.tokens.length)
+                onExpression += " " + ApplesoftConstants.tokens[val];
+            }
+            else
+              onExpression += (char) (buffer[p]);
+            p++;
+          }
+          //      System.out.println (onExpression); // may contain symbols +,- etc
+          switch (buffer[p++])
+          {
+            case TOKEN_GOSUB:
+              for (int destLine : getLineNumbers (buffer, p))
+                addXref (destLine, gosubLines);
+              break;
+
+            case TOKEN_GOTO:
+              for (int destLine : getLineNumbers (buffer, p))
+                addXref (destLine, gotoLines);
+              break;
+
+            default:
+              System.out.println ("GOTO / GOSUB not found");
+          }
+          break;
       }
+    }
+
+    private void doDigit ()
+    {
+      int targetLine = getLineNumber (buffer, startPtr);
+      addXref (targetLine, gotoLines);
+    }
+
+    private void doAlpha ()
+    {
+      recordEqualsPosition ();
     }
 
     private List<Integer> getLineNumbers (byte[] buffer, int ptr)

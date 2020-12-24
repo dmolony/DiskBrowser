@@ -43,6 +43,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SCALE = "scale";
 
   private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
+  private static final String PREFS_SPLIT_DIM = "splitDim";
   private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
   private static final String PREFS_SHOW_TARGETS = "showTargets";
   private static final String PREFS_ONLY_SHOW_TARGETS = "onlyShowTargets";
@@ -131,6 +132,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   // Applesoft menu items
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
+  final JMenuItem splitDimItem = new JCheckBoxMenuItem ("Split DIM");
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align consecutive assign");
   final JMenuItem showBasicTargetsItem = new JCheckBoxMenuItem ("Show targets");
   final JMenuItem onlyShowTargetLinesItem =
@@ -234,6 +236,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     applesoftMenu.add (showHeaderItem);
     applesoftMenu.add (splitRemarkItem);
+    applesoftMenu.add (splitDimItem);
     applesoftMenu.add (alignAssignItem);
     applesoftMenu.add (showBasicTargetsItem);
     applesoftMenu.add (onlyShowTargetLinesItem);
@@ -295,6 +298,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     };
 
     splitRemarkItem.addActionListener (basicPreferencesAction);
+    splitDimItem.addActionListener (basicPreferencesAction);
     alignAssignItem.addActionListener (basicPreferencesAction);
     showBasicTargetsItem.addActionListener (basicPreferencesAction);
     onlyShowTargetLinesItem.addActionListener (basicPreferencesAction);
@@ -346,6 +350,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   // ---------------------------------------------------------------------------------//
   {
     basicPreferences.splitRem = splitRemarkItem.isSelected ();
+    basicPreferences.splitDim = splitDimItem.isSelected ();
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showThen = showThenItem.isSelected ();
@@ -504,6 +509,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putInt (PREFS_SCALE, scale);
 
     prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
+    prefs.putBoolean (PREFS_SPLIT_DIM, splitDimItem.isSelected ());
     prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
@@ -555,6 +561,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     }
 
     splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
+    splitDimItem.setSelected (prefs.getBoolean (PREFS_SPLIT_DIM, false));
     alignAssignItem.setSelected (prefs.getBoolean (PREFS_ALIGN_ASSIGN, true));
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
     showThenItem.setSelected (prefs.getBoolean (PREFS_SHOW_THEN, true));

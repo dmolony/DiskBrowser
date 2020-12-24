@@ -31,6 +31,8 @@ public class ApplesoftBasicProgram extends BasicProgram
   private final int endPtr;
   private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
+  private final List<Integer> stringsLine = new ArrayList<> ();
+  private final List<String> stringsText = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -70,7 +72,6 @@ public class ApplesoftBasicProgram extends BasicProgram
   {
     int indentSize = 2;
     boolean insertBlankLine = false;
-    boolean showGosubs = true;
 
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<> ();
@@ -253,13 +254,14 @@ public class ApplesoftBasicProgram extends BasicProgram
       fullText.append ("\nExtra data:\n\n");
       fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
           programLoadAddress + ptr));
+      fullText.append ("\n");
     }
 
     if (basicPreferences.showXref && !gosubLines.isEmpty ())
     {
       if (fullText.charAt (fullText.length () - 2) != '\n')
         fullText.append ("\n");
-      fullText.append ("Subroutine:\n");
+      fullText.append ("GOSUB:\n");
       for (Integer line : gosubLines.keySet ())
         fullText.append (String.format (" %5s  %s%n", line, gosubLines.get (line)));
     }
@@ -268,14 +270,26 @@ public class ApplesoftBasicProgram extends BasicProgram
     {
       if (fullText.charAt (fullText.length () - 2) != '\n')
         fullText.append ("\n");
-      fullText.append ("GoTo:\n");
+      fullText.append ("GOTO:\n");
       for (Integer line : gotoLines.keySet ())
         fullText.append (String.format (" %5s  %s%n", line, gotoLines.get (line)));
     }
 
+    if (basicPreferences.listStrings && stringsLine.size () > 0)
+    {
+      if (fullText.charAt (fullText.length () - 2) != '\n')
+        fullText.append ("\n");
+      fullText.append ("Strings:\n");
+      for (int i = 0; i < stringsLine.size (); i++)
+      {
+        fullText.append (
+            String.format (" %5s  %s%n", stringsLine.get (i), stringsText.get (i)));
+      }
+    }
+
     if (fullText.length () > 0)
       while (fullText.charAt (fullText.length () - 1) == '\n')
-        fullText.deleteCharAt (fullText.length () - 1);         // remove trailing newlines
+        fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
 
     return fullText.toString ();
   }
@@ -595,6 +609,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       boolean inString = false;           // can toggle
       boolean inRemark = false;           // can only go false -> true
       byte b;
+      int stringPtr = 0;
 
       while (ptr < buffer.length && (b = buffer[ptr++]) != 0)
       {
@@ -604,7 +619,12 @@ public class ApplesoftBasicProgram extends BasicProgram
         if (inString)
         {
           if (b == ASCII_QUOTE)           // terminate string
+          {
             inString = false;
+            String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
+            stringsText.add (s);
+            stringsLine.add (lineNumber);
+          }
           continue;
         }
 
@@ -648,6 +668,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
           case ASCII_QUOTE:
             inString = true;
+            stringPtr = ptr;
             break;
         }
       }
@@ -667,10 +688,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int length;
     String[] nextVariables;
     String forVariable = "";
-    int targetLine = -1;
-
-    // used for aligning the equals sign
-    int assignEqualPos;
+    int assignEqualPos;               // used for aligning the equals sign
 
     SubLine (SourceLine parent, int startPtr, int length)
     {
@@ -704,13 +722,13 @@ public class ApplesoftBasicProgram extends BasicProgram
             break;
 
           case TOKEN_GOTO:
-            String target = new String (buffer, startPtr + 1, length - 2);
-            addXref (target, gotoLines);
+            int targetLine = getLineNumber (buffer, startPtr + 1);
+            addXref (targetLine, gotoLines);
             break;
 
           case TOKEN_GOSUB:
-            target = new String (buffer, startPtr + 1, length - 2);
-            addXref (target, gosubLines);
+            targetLine = getLineNumber (buffer, startPtr + 1);
+            addXref (targetLine, gosubLines);
             break;
         }
       }
@@ -718,38 +736,36 @@ public class ApplesoftBasicProgram extends BasicProgram
       {
         if (isDigit (b))       // numeric, so must be a line number
         {
-          String target = new String (buffer, startPtr, length - 1);
-          addXref (target, gotoLines);
+          int targetLine = getLineNumber (buffer, startPtr);
+          addXref (targetLine, gotoLines);
         }
         else
           recordEqualsPosition ();
       }
     }
 
-    private void addXref (String target, Map<Integer, List<Integer>> map)
+    private int getLineNumber (byte[] buffer, int offset)
     {
-      try
+      int lineNumber = 0;
+      while (offset < buffer.length)
       {
-        targetLine = Integer.parseInt (target);
-        if (map.containsKey (targetLine))
-        {
-          List<Integer> lines = map.get (targetLine);
-          lines.add (parent.lineNumber);
-        }
-        else
-        {
-          List<Integer> lines = new ArrayList<> ();
-          lines.add (parent.lineNumber);
-          map.put (targetLine, lines);
-        }
+        int b = (buffer[offset++] & 0xFF) - 0x30;
+        if (b < 0 || b > 9)
+          break;
+        lineNumber = lineNumber * 10 + b;
       }
-      catch (NumberFormatException e)
+      return lineNumber;
+    }
+
+    private void addXref (int targetLine, Map<Integer, List<Integer>> map)
+    {
+      List<Integer> lines = map.get (targetLine);
+      if (lines == null)
       {
-        // System.out.printf ("b: %d, start: %d, length: %d%n", b, startPtr, (length - 1));
-        System.out.println (target);
-        System.out.println (HexFormatter.format (buffer, startPtr, length - 1));
-        System.out.println (e);
+        lines = new ArrayList<> ();
+        map.put (targetLine, lines);
       }
+      lines.add (parent.lineNumber);
     }
 
     private boolean isImpliedGoto ()

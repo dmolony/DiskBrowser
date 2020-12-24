@@ -11,6 +11,7 @@ public class BasicPreferences
   public boolean onlyShowTargetLineNumbers = true;
   public boolean showCaret = false;
   public boolean showThen = true;
+  public boolean listStrings = false;
   public boolean blankAfterReturn = false;
   public boolean deleteExtraRemSpace = false;
   public boolean deleteExtraDataSpace = false;
@@ -35,6 +36,7 @@ public class BasicPreferences
     text.append (String.format ("Show caret ............... %s%n", showCaret));
     text.append (String.format ("Show THEN ................ %s%n", showThen));
     text.append (String.format ("Show Xref ................ %s%n", showXref));
+    text.append (String.format ("List strings ............. %s%n", listStrings));
     text.append (String.format ("Blank after RETURN ....... %s%n", blankAfterReturn));
     text.append (String.format ("Delete extra REM space ... %s%n", deleteExtraRemSpace));
     text.append (String.format ("Delete extra DATA space .. %s%n", deleteExtraDataSpace));

@@ -25,8 +25,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.duplicates.DiskDetails;
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;

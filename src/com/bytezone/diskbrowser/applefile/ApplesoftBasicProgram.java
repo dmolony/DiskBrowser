@@ -23,6 +23,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private static final byte TOKEN_GOSUB = (byte) 0xB0;
   private static final byte TOKEN_RETURN = (byte) 0xB1;
   private static final byte TOKEN_REM = (byte) 0xB2;
+  private static final byte TOKEN_ON = (byte) 0xB4;
   private static final byte TOKEN_PRINT = (byte) 0xBA;
   private static final byte TOKEN_THEN = (byte) 0xC4;
   private static final byte TOKEN_EQUALS = (byte) 0xD0;
@@ -688,6 +689,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int length;
     String[] nextVariables;
     String forVariable = "";
+    String onExpression = "";
     int assignEqualPos;               // used for aligning the equals sign
 
     SubLine (SourceLine parent, int startPtr, int length)
@@ -730,6 +732,39 @@ public class ApplesoftBasicProgram extends BasicProgram
             targetLine = getLineNumber (buffer, startPtr + 1);
             addXref (targetLine, gosubLines);
             break;
+
+          case TOKEN_ON:
+            p = startPtr + 1;
+            int max = startPtr + length - 1;
+            while (p < max && buffer[p] != TOKEN_GOTO && buffer[p] != TOKEN_GOSUB)
+            {
+              if (isHighBitSet (buffer[p]))
+              {
+                int val = buffer[p] & 0x7F;
+                if (val < ApplesoftConstants.tokens.length)
+                  onExpression += " " + ApplesoftConstants.tokens[val];
+              }
+              else
+                onExpression += (char) (buffer[p]);
+              p++;
+            }
+            //            System.out.println (onExpression); // may contain symbols +,- etc
+            switch (buffer[p++])
+            {
+              case TOKEN_GOSUB:
+                for (int destLine : getLineNumbers (buffer, p))
+                  addXref (destLine, gosubLines);
+                break;
+
+              case TOKEN_GOTO:
+                for (int destLine : getLineNumbers (buffer, p))
+                  addXref (destLine, gotoLines);
+                break;
+
+              default:
+                System.out.println ("GOTO / GOSUB not found");
+            }
+            break;
         }
       }
       else
@@ -744,12 +779,37 @@ public class ApplesoftBasicProgram extends BasicProgram
       }
     }
 
-    private int getLineNumber (byte[] buffer, int offset)
+    private List<Integer> getLineNumbers (byte[] buffer, int ptr)
+    {
+      List<Integer> lineNumbers = new ArrayList<> ();
+      int start = ptr;
+
+      while (ptr < buffer.length && buffer[ptr] != 0 && buffer[ptr] != ASCII_COLON)
+        ptr++;
+
+      String s = new String (buffer, start, ptr - start);
+
+      String[] chunks = s.split (",");
+
+      try
+      {
+        for (String chunk : chunks)
+          lineNumbers.add (Integer.parseInt (chunk));
+      }
+      catch (NumberFormatException e)
+      {
+        System.out.printf ("NFE: %s%n", s);
+      }
+
+      return lineNumbers;
+    }
+
+    private int getLineNumber (byte[] buffer, int ptr)
     {
       int lineNumber = 0;
-      while (offset < buffer.length)
+      while (ptr < buffer.length)
       {
-        int b = (buffer[offset++] & 0xFF) - 0x30;
+        int b = (buffer[ptr++] & 0xFF) - 0x30;
         if (b < 0 || b > 9)
           break;
         lineNumber = lineNumber * 10 + b;

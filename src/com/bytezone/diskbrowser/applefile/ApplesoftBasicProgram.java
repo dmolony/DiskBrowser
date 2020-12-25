@@ -163,21 +163,22 @@ public class ApplesoftBasicProgram extends BasicProgram
 
         // Check for a wrappable REM statement
         // (see SEA BATTLE on DISK283.DSK)
+        int inset = Math.max (text.length (), getIndent (fullText)) + 1;
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
-          addSplitLines (lines, text);
+          addSplitLines (lines, text, inset);
         }
         else if (subline.is (TOKEN_DATA)
             && lineText.length () > basicPreferences.wrapDataAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
-          addSplitLines (lines, text);
+          addSplitLines (lines, text, inset);
         }
         else if (subline.is (TOKEN_DIM) && basicPreferences.splitDim)
         {
           List<String> lines = splitDim (lineText);
-          addSplitLines (lines, text);
+          addSplitLines (lines, text, inset);
         }
         else
           text.append (lineText);
@@ -377,9 +378,8 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     List<String> lines = new ArrayList<> ();
-    System.out.println (line);
 
-    Pattern p = Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9,]*\\),?");
+    Pattern p = Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9,]*\\)[,:]?");
     Matcher m = p.matcher (line);
 
     while (m.find ())
@@ -392,10 +392,9 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addSplitLines (List<String> lines, StringBuilder text)
+  private void addSplitLines (List<String> lines, StringBuilder text, int indent)
   // ---------------------------------------------------------------------------------//
   {
-    int inset = text.length () + 1;
     boolean first = true;
 
     for (String line : lines)
@@ -406,8 +405,23 @@ public class ApplesoftBasicProgram extends BasicProgram
         text.append (line);
       }
       else
-        text.append ("\n                        ".substring (0, inset) + line);
+        text.append (
+            "\n                                           ".substring (0, indent) + line);
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getIndent (StringBuilder fullText)
+  // ---------------------------------------------------------------------------------//
+  {
+    int ptr = fullText.length () - 1;
+    int indent = 0;
+    while (ptr >= 0 && fullText.charAt (ptr) != '\n')
+    {
+      --ptr;
+      ++indent;
+    }
+    return indent;
   }
 
   // ---------------------------------------------------------------------------------//

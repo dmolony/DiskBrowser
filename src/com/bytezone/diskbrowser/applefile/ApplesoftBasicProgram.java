@@ -764,8 +764,6 @@ public class ApplesoftBasicProgram extends BasicProgram
       if (is (TOKEN_REM))
         return;
 
-      //      System.out.println (this);
-
       int ptr = startPtr;
       length--;
       String var = "";
@@ -802,14 +800,20 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       if (isLetter ((byte) var.charAt (0)))
       {
-        //        System.out.printf ("  Var: %s%n", var);
         List<Integer> lines = symbolLines.get (var);
         if (lines == null)
         {
           lines = new ArrayList<> ();
           symbolLines.put (var, lines);
         }
-        lines.add (parent.lineNumber);
+        if (lines.size () == 0)
+          lines.add (parent.lineNumber);
+        else
+        {
+          int lastLine = lines.get (lines.size () - 1);
+          if (lastLine != parent.lineNumber)
+            lines.add (parent.lineNumber);
+        }
       }
     }
 

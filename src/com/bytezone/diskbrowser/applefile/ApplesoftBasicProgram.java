@@ -35,6 +35,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private final int endPtr;
   private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
+  private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
   private final List<Integer> stringsLine = new ArrayList<> ();
   private final List<String> stringsText = new ArrayList<> ();
 
@@ -268,21 +269,20 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     if (basicPreferences.showXref && !gosubLines.isEmpty ())
-    {
-      if (fullText.charAt (fullText.length () - 2) != '\n')
-        fullText.append ("\n");
-      fullText.append ("GOSUB:\n");
-      for (Integer line : gosubLines.keySet ())
-        fullText.append (String.format (" %5s  %s%n", line, gosubLines.get (line)));
-    }
+      showLines (fullText, gosubLines, "GOSUB:\n");
 
     if (basicPreferences.showXref && !gotoLines.isEmpty ())
+      showLines (fullText, gotoLines, "GOTO:\n");
+
+    if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
     {
       if (fullText.charAt (fullText.length () - 2) != '\n')
         fullText.append ("\n");
-      fullText.append ("GOTO:\n");
-      for (Integer line : gotoLines.keySet ())
-        fullText.append (String.format (" %5s  %s%n", line, gotoLines.get (line)));
+
+      fullText.append ("Variables:\n");
+
+      for (String symbol : symbolLines.keySet ())
+        fullText.append (String.format ("%6s  %s%n", symbol, symbolLines.get (symbol)));
     }
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
@@ -302,6 +302,18 @@ public class ApplesoftBasicProgram extends BasicProgram
         fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
 
     return fullText.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showLines (StringBuilder fullText, Map<Integer, List<Integer>> lines,
+      String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (fullText.charAt (fullText.length () - 2) != '\n')
+      fullText.append ("\n");
+    fullText.append (heading);
+    for (Integer line : lines.keySet ())
+      fullText.append (String.format (" %5s  %s%n", line, lines.get (line)));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -455,7 +467,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     if (subline.is (TOKEN_GOSUB))
       c1 = "<<";
-    if (subline.is (TOKEN_GOTO))
+    else if (subline.is (TOKEN_GOTO))
       c1 = " <";
     if (gotoLines.containsKey (line.lineNumber))
       c2 = "> ";
@@ -740,15 +752,65 @@ public class ApplesoftBasicProgram extends BasicProgram
       this.startPtr = startPtr;
       this.length = length;
 
-      byte b = buffer[startPtr];
+      byte firstByte = buffer[startPtr];
 
-      if (isHighBitSet (b))
-        doToken (b);
-      else if (isDigit (b))
+      if (isHighBitSet (firstByte))
+        doToken (firstByte);
+      else if (isDigit (firstByte))
         doDigit ();
       else
         doAlpha ();
 
+      if (is (TOKEN_REM))
+        return;
+
+      //      System.out.println (this);
+
+      int ptr = startPtr;
+      length--;
+      String var = "";
+      boolean inQuote = false;
+
+      while (length-- > 0)
+      {
+        byte b = buffer[ptr++];
+
+        if (inQuote && b != ASCII_QUOTE)
+          continue;
+
+        if (isPossibleVariable (b))
+          var += (char) b;
+        else
+        {
+          checkVar (var, b);
+          var = "";
+
+          if (b == ASCII_QUOTE)
+            inQuote = !inQuote;
+        }
+      }
+      checkVar (var, (byte) 0);
+    }
+
+    private void checkVar (String var, byte term)
+    {
+      if (var.length () == 0)
+        return;
+
+      if (term == ASCII_LEFT_BRACKET)
+        var += "(";
+
+      if (isLetter ((byte) var.charAt (0)))
+      {
+        //        System.out.printf ("  Var: %s%n", var);
+        List<Integer> lines = symbolLines.get (var);
+        if (lines == null)
+        {
+          lines = new ArrayList<> ();
+          symbolLines.put (var, lines);
+        }
+        lines.add (parent.lineNumber);
+      }
     }
 
     private void doToken (byte b)

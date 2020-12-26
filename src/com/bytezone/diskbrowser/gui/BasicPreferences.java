@@ -16,6 +16,7 @@ public class BasicPreferences
   public boolean deleteExtraRemSpace = false;
   public boolean deleteExtraDataSpace = false;
   public boolean showXref = false;
+  public boolean showSymbols = false;
   public boolean splitDim = false;
   public int wrapPrintAt = 0;
   public int wrapRemAt = 60;
@@ -37,6 +38,7 @@ public class BasicPreferences
     text.append (String.format ("Show caret ............... %s%n", showCaret));
     text.append (String.format ("Show THEN ................ %s%n", showThen));
     text.append (String.format ("Show Xref ................ %s%n", showXref));
+    text.append (String.format ("Show symbols ............. %s%n", showSymbols));
     text.append (String.format ("List strings ............. %s%n", listStrings));
     text.append (String.format ("Blank after RETURN ....... %s%n", blankAfterReturn));
     text.append (String.format ("Delete extra REM space ... %s%n", deleteExtraRemSpace));

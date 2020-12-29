@@ -138,9 +138,11 @@ public class ApplesoftBasicProgram extends BasicProgram
         {
           // Prepare target indicators for subsequent sublines (ie no line number)
           if (basicPreferences.showTargets && !subline.isFirst ())
-            if (subline.is (TOKEN_GOSUB))
+            if (subline.is (TOKEN_GOSUB)
+                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
               text.append ("<<--");
-            else if (subline.is (TOKEN_GOTO) || subline.isImpliedGoto ())
+            else if (subline.is (TOKEN_GOTO) || subline.isImpliedGoto ()
+                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
               text.append (" <--");
 
           // Align assign statements if required
@@ -465,10 +467,12 @@ public class ApplesoftBasicProgram extends BasicProgram
     SubLine subline = line.sublines.get (0);
     String c1 = "  ", c2 = "  ";
 
-    if (subline.is (TOKEN_GOSUB))
+    if (subline.is (TOKEN_GOSUB) || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
       c1 = "<<";
-    else if (subline.is (TOKEN_GOTO))
+    else if (subline.is (TOKEN_GOTO)
+        || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
       c1 = " <";
+
     if (gotoLines.containsKey (line.lineNumber))
       c2 = "> ";
     if (gosubLines.containsKey (line.lineNumber))
@@ -507,6 +511,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   {
     boolean started = false;
     int highestAssign = startSubline.assignEqualPos;
+
     fast: for (SourceLine line : sourceLines)
     {
       boolean inIf = false;
@@ -621,14 +626,13 @@ public class ApplesoftBasicProgram extends BasicProgram
   private void popLoopVariables (Stack<String> loopVariables, SubLine subline)
   // ---------------------------------------------------------------------------------//
   {
-    if (subline.nextVariables.length == 0)        // naked NEXT
+    if (subline.nextVariables.length == 0)                    // naked NEXT
     {
       if (loopVariables.size () > 0)
         loopVariables.pop ();
     }
     else
-      for (String variable : subline.nextVariables)
-        // e.g. NEXT X,Y,Z
+      for (String variable : subline.nextVariables)           // e.g. NEXT X,Y,Z
         while (loopVariables.size () > 0)
           if (sameVariable (variable, loopVariables.pop ()))
             break;
@@ -761,7 +765,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       else
         doAlpha ();
 
-      if (is (TOKEN_REM))
+      if (is (TOKEN_REM) || is (TOKEN_DATA))
         return;
 
       int ptr = startPtr;
@@ -866,7 +870,7 @@ public class ApplesoftBasicProgram extends BasicProgram
               onExpression += (char) (buffer[p]);
             p++;
           }
-          //      System.out.println (onExpression); // may contain symbols +,- etc
+
           switch (buffer[p++])
           {
             case TOKEN_GOSUB:
@@ -978,6 +982,18 @@ public class ApplesoftBasicProgram extends BasicProgram
     boolean is (byte token)
     {
       return buffer[startPtr] == token;
+    }
+
+    boolean has (byte token)
+    {
+      int ptr = startPtr + 1;
+      int max = startPtr + length;
+      while (ptr < max)
+      {
+        if (buffer[ptr++] == token)
+          return true;
+      }
+      return false;
     }
 
     boolean isEmpty ()

@@ -36,6 +36,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
   private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
+  private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
   private final List<Integer> stringsLine = new ArrayList<> ();
   private final List<String> stringsText = new ArrayList<> ();
 
@@ -285,6 +286,21 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       for (String symbol : symbolLines.keySet ())
         fullText.append (String.format ("%6s  %s%n", symbol, symbolLines.get (symbol)));
+
+      boolean headingShown = false;
+      for (String key : uniqueSymbols.keySet ())
+      {
+        List<String> usage = uniqueSymbols.get (key);
+        if (usage.size () > 1)
+        {
+          if (!headingShown)
+          {
+            headingShown = true;
+            fullText.append ("\nNon-unique Variable Names:\n");
+          }
+          fullText.append (String.format ("%6s  %s%n", key, usage));
+        }
+      }
     }
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
@@ -818,6 +834,7 @@ public class ApplesoftBasicProgram extends BasicProgram
           if (lastLine != parent.lineNumber)
             lines.add (parent.lineNumber);
         }
+        checkUniqueName (var);
       }
     }
 
@@ -888,6 +905,31 @@ public class ApplesoftBasicProgram extends BasicProgram
           }
           break;
       }
+    }
+
+    private String checkUniqueName (String symbol)
+    {
+      int ptr = symbol.length () - 1;
+      if (symbol.charAt (ptr) == ASCII_LEFT_BRACKET)      // array
+        ptr--;
+      if (symbol.charAt (ptr) == ASCII_DOLLAR || symbol.charAt (ptr) == ASCII_PERCENT)
+        ptr--;
+
+      String unique =
+          (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
+
+      List<String> usage = uniqueSymbols.get (unique);
+      if (usage == null)
+      {
+        usage = new ArrayList<> ();
+        uniqueSymbols.put (unique, usage);
+      }
+
+      if (!usage.contains (symbol))
+        usage.add (symbol);
+
+      //      System.out.printf ("%8s %s%n", symbol, unique);
+      return unique;
     }
 
     private void doDigit ()

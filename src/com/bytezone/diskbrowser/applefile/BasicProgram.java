@@ -59,7 +59,9 @@ public abstract class BasicProgram extends AbstractFile
     return value >= 0x41 && value <= 0x5A;
   }
 
+  // ---------------------------------------------------------------------------------//
   boolean isPossibleVariable (byte value)
+  // ---------------------------------------------------------------------------------//
   {
     return isDigit (value) || isLetter (value) || value == ASCII_DOLLAR
         || value == ASCII_PERCENT;

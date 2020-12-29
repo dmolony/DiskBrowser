@@ -286,6 +286,12 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       for (String symbol : symbolLines.keySet ())
         fullText.append (String.format ("%6s  %s%n", symbol, symbolLines.get (symbol)));
+    }
+
+    if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
+    {
+      if (fullText.charAt (fullText.length () - 2) != '\n')
+        fullText.append ("\n");
 
       boolean headingShown = false;
       for (String key : uniqueSymbols.keySet ())
@@ -296,7 +302,7 @@ public class ApplesoftBasicProgram extends BasicProgram
           if (!headingShown)
           {
             headingShown = true;
-            fullText.append ("\nNon-unique Variable Names:\n");
+            fullText.append ("Duplicate Variable Names:\n");
           }
           fullText.append (String.format ("%6s  %s%n", key, usage));
         }
@@ -907,7 +913,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       }
     }
 
-    private String checkUniqueName (String symbol)
+    private void checkUniqueName (String symbol)
     {
       int ptr = symbol.length () - 1;
       if (symbol.charAt (ptr) == ASCII_LEFT_BRACKET)      // array
@@ -927,9 +933,6 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       if (!usage.contains (symbol))
         usage.add (symbol);
-
-      //      System.out.printf ("%8s %s%n", symbol, unique);
-      return unique;
     }
 
     private void doDigit ()

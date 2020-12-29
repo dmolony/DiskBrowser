@@ -52,6 +52,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_THEN = "showThen";
   private static final String PREFS_SHOW_XREF = "showXref";
   private static final String PREFS_SHOW_SYMBOLS = "showSymbols";
+  private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
   private static final String PREFS_LIST_STRINGS = "listStrings";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
   private static final String PREFS_DELETE_EXTRA_REM_SPACE = "deleteExtraRemSpace";
@@ -143,7 +144,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
   final JMenuItem showXrefItem = new JCheckBoxMenuItem ("Show Xref");
   final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("Show variables");
-  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
+  final JMenuItem showDuplicateSymbolsItem =
+      new JCheckBoxMenuItem ("Show duplicate variables");
+  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("Show strings");
   final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
   final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
   final JMenuItem deleteExtraDataSpace =
@@ -246,6 +249,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showThenItem);
     applesoftMenu.add (showXrefItem);
     applesoftMenu.add (showSymbolsItem);
+    applesoftMenu.add (showDuplicateSymbolsItem);
     applesoftMenu.add (listStringsItem);
     applesoftMenu.add (blankAfterReturn);
     applesoftMenu.add (deleteExtraRemSpace);
@@ -310,6 +314,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showThenItem.addActionListener (basicPreferencesAction);
     showXrefItem.addActionListener (basicPreferencesAction);
     showSymbolsItem.addActionListener (basicPreferencesAction);
+    showDuplicateSymbolsItem.addActionListener (basicPreferencesAction);
     listStringsItem.addActionListener (basicPreferencesAction);
     blankAfterReturn.addActionListener (basicPreferencesAction);
     deleteExtraRemSpace.addActionListener (basicPreferencesAction);
@@ -360,6 +365,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.showThen = showThenItem.isSelected ();
     basicPreferences.showXref = showXrefItem.isSelected ();
     basicPreferences.showSymbols = showSymbolsItem.isSelected ();
+    basicPreferences.showDuplicateSymbols = showDuplicateSymbolsItem.isSelected ();
     basicPreferences.listStrings = listStringsItem.isSelected ();
     basicPreferences.blankAfterReturn = blankAfterReturn.isSelected ();
     basicPreferences.deleteExtraRemSpace = deleteExtraRemSpace.isSelected ();
@@ -520,6 +526,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_XREF, showXrefItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_SYMBOLS, showSymbolsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
+        showDuplicateSymbolsItem.isSelected ());
     prefs.putBoolean (PREFS_LIST_STRINGS, listStringsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
@@ -573,6 +581,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showThenItem.setSelected (prefs.getBoolean (PREFS_SHOW_THEN, true));
     showXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_XREF, false));
     showSymbolsItem.setSelected (prefs.getBoolean (PREFS_SHOW_SYMBOLS, false));
+    showDuplicateSymbolsItem
+        .setSelected (prefs.getBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS, false));
     listStringsItem.setSelected (prefs.getBoolean (PREFS_LIST_STRINGS, false));
     showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
     showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));

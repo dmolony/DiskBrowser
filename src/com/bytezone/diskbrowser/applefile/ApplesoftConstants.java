@@ -39,6 +39,22 @@ public interface ApplesoftConstants
                      "", "", "", "",                                // 0xFC - 0xFF
   };
 
+  static final byte TOKEN_FOR = (byte) 0x81;
+  static final byte TOKEN_NEXT = (byte) 0x82;
+  static final byte TOKEN_DATA = (byte) 0x83;
+  static final byte TOKEN_INPUT = (byte) 0x84;
+  static final byte TOKEN_DIM = (byte) 0x86;
+  static final byte TOKEN_LET = (byte) 0xAA;
+  static final byte TOKEN_GOTO = (byte) 0xAB;
+  static final byte TOKEN_IF = (byte) 0xAD;
+  static final byte TOKEN_GOSUB = (byte) 0xB0;
+  static final byte TOKEN_RETURN = (byte) 0xB1;
+  static final byte TOKEN_REM = (byte) 0xB2;
+  static final byte TOKEN_ON = (byte) 0xB4;
+  static final byte TOKEN_PRINT = (byte) 0xBA;
+  static final byte TOKEN_THEN = (byte) 0xC4;
+  static final byte TOKEN_EQUALS = (byte) 0xD0;
+
   int[] tokenAddresses =
       { 0xD870, 0xD766, 0xDCF9, 0xD995, 0xDBB2, 0xF331, 0xDFD9, 0xDBE2, 0xF390, 0xF399,
         0xF1E5, 0xF1DE, 0xF1D5, 0xF225, 0xF232, 0xF241, 0xF3D8, 0xF3E2, 0xF6E9, 0xF6FE,

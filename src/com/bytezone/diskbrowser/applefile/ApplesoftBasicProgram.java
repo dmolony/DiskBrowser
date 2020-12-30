@@ -15,30 +15,14 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class ApplesoftBasicProgram extends BasicProgram
 // -----------------------------------------------------------------------------------//
 {
-  private static final byte TOKEN_FOR = (byte) 0x81;
-  private static final byte TOKEN_NEXT = (byte) 0x82;
-  private static final byte TOKEN_DATA = (byte) 0x83;
-  private static final byte TOKEN_INPUT = (byte) 0x84;
-  private static final byte TOKEN_DIM = (byte) 0x86;
-  private static final byte TOKEN_LET = (byte) 0xAA;
-  private static final byte TOKEN_GOTO = (byte) 0xAB;
-  private static final byte TOKEN_IF = (byte) 0xAD;
-  private static final byte TOKEN_GOSUB = (byte) 0xB0;
-  private static final byte TOKEN_RETURN = (byte) 0xB1;
-  private static final byte TOKEN_REM = (byte) 0xB2;
-  private static final byte TOKEN_ON = (byte) 0xB4;
-  private static final byte TOKEN_PRINT = (byte) 0xBA;
-  private static final byte TOKEN_THEN = (byte) 0xC4;
-  private static final byte TOKEN_EQUALS = (byte) 0xD0;
-
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
-  private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
-  private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
-  private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
-  private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
-  private final List<Integer> stringsLine = new ArrayList<> ();
-  private final List<String> stringsText = new ArrayList<> ();
+  final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
+  final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
+  final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
+  final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
+  final List<Integer> stringsLine = new ArrayList<> ();
+  final List<String> stringsText = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -56,7 +40,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       if (nextAddress <= prevOffset)           // usually zero
         break;
 
-      SourceLine line = new SourceLine (ptr);
+      SourceLine line = new SourceLine (this, buffer, ptr);
       sourceLines.add (line);
       ptr += line.length;
       prevOffset = nextAddress;
@@ -102,7 +86,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
         // A REM statement might conceal an assembler routine
         // - see P.CREATE on Diags2E.DSK
-        if (subline.is (TOKEN_REM) && subline.containsToken ())
+        if (subline.is (ApplesoftConstants.TOKEN_REM) && subline.containsToken ())
         {
           int address = subline.getAddress () + 1;              // skip the REM token
           fullText.append (text + String.format ("REM - Inline assembler @ $%02X (%d)%n",
@@ -114,7 +98,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
 
         // Beagle Bros often have multiline REM statements
-        if (subline.is (TOKEN_REM) && subline.containsControlChars ())
+        if (subline.is (ApplesoftConstants.TOKEN_REM) && subline.containsControlChars ())
         {
           subline.addFormattedRem (text);
           fullText.append (text + "\n");
@@ -122,7 +106,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
 
         // Reduce the indent by each NEXT, but only as far as the IF indent allows
-        if (subline.is (TOKEN_NEXT))
+        if (subline.is (ApplesoftConstants.TOKEN_NEXT))
         {
           popLoopVariables (loopVariables, subline);
           indent = Math.max (ifIndent, loopVariables.size ());
@@ -139,11 +123,13 @@ public class ApplesoftBasicProgram extends BasicProgram
         {
           // Prepare target indicators for subsequent sublines (ie no line number)
           if (basicPreferences.showTargets && !subline.isFirst ())
-            if (subline.is (TOKEN_GOSUB)
-                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
+            if (subline.is (ApplesoftConstants.TOKEN_GOSUB)
+                || (subline.is (ApplesoftConstants.TOKEN_ON)
+                    && subline.has (ApplesoftConstants.TOKEN_GOSUB)))
               text.append ("<<--");
-            else if (subline.is (TOKEN_GOTO) || subline.isImpliedGoto ()
-                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
+            else if (subline.is (ApplesoftConstants.TOKEN_GOTO)
+                || subline.isImpliedGoto () || (subline.is (ApplesoftConstants.TOKEN_ON)
+                    && subline.has (ApplesoftConstants.TOKEN_GOTO)))
               text.append (" <--");
 
           // Align assign statements if required
@@ -156,30 +142,33 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
 
         // Add the current text, then reset it
-        int pos = subline.is (TOKEN_REM) ? 0 : alignPos;
+        int pos = subline.is (ApplesoftConstants.TOKEN_REM) ? 0 : alignPos;
         String lineText = subline.getAlignedText (pos);
 
-        if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
+        if (subline.is (ApplesoftConstants.TOKEN_REM)
+            && basicPreferences.deleteExtraRemSpace)
           lineText = lineText.replaceFirst ("REM  ", "REM ");
 
-        if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
+        if (subline.is (ApplesoftConstants.TOKEN_DATA)
+            && basicPreferences.deleteExtraDataSpace)
           lineText = lineText.replaceFirst ("DATA  ", "DATA ");
 
         // Check for a wrappable REM statement
         // (see SEA BATTLE on DISK283.DSK)
         int inset = Math.max (text.length (), getIndent (fullText)) + 1;
-        if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
+        if (subline.is (ApplesoftConstants.TOKEN_REM)
+            && lineText.length () > basicPreferences.wrapRemAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
           addSplitLines (lines, text, inset);
         }
-        else if (subline.is (TOKEN_DATA)
+        else if (subline.is (ApplesoftConstants.TOKEN_DATA)
             && lineText.length () > basicPreferences.wrapDataAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
           addSplitLines (lines, text, inset);
         }
-        else if (subline.is (TOKEN_DIM) && basicPreferences.splitDim)
+        else if (subline.is (ApplesoftConstants.TOKEN_DIM) && basicPreferences.splitDim)
         {
           List<String> lines = splitDim (lineText);
           addSplitLines (lines, text, inset);
@@ -190,9 +179,10 @@ public class ApplesoftBasicProgram extends BasicProgram
         // Check for a wrappable PRINT statement
         // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
         if (basicPreferences.wrapPrintAt > 0           //
-            && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
-            && countChars (text, ASCII_QUOTE) == 2        // just start and end quotes
-            && countChars (text, ASCII_CARET) == 0)       // no control characters
+            && (subline.is (ApplesoftConstants.TOKEN_PRINT)
+                || subline.is (ApplesoftConstants.TOKEN_INPUT))
+            && countChars (text, Utility.ASCII_QUOTE) == 2        // just start and end quotes
+            && countChars (text, Utility.ASCII_CARET) == 0)       // no control characters
         //    && countChars (text, ASCII_SEMI_COLON) == 0)
         {
           if (true)       // new method
@@ -238,14 +228,15 @@ public class ApplesoftBasicProgram extends BasicProgram
         text.setLength (0);
 
         // Calculate indent changes that take effect after the current subline
-        if (subline.is (TOKEN_IF))
+        if (subline.is (ApplesoftConstants.TOKEN_IF))
           ifIndent = ++indent;
-        else if (subline.is (TOKEN_FOR))
+        else if (subline.is (ApplesoftConstants.TOKEN_FOR))
         {
           loopVariables.push (subline.forVariable);
           ++indent;
         }
-        else if (basicPreferences.blankAfterReturn && subline.is (TOKEN_RETURN))
+        else if (basicPreferences.blankAfterReturn
+            && subline.is (ApplesoftConstants.TOKEN_RETURN))
           insertBlankLine = true;
       }
 
@@ -284,8 +275,11 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       fullText.append ("Variables:\n");
 
+      int longestVarName = getLongestVarName ();
+      String format = longestVarName > 6 ? "%" + longestVarName + "s  %s%n" : "%6s  %s%n";
+
       for (String symbol : symbolLines.keySet ())
-        fullText.append (String.format ("%6s  %s%n", symbol, symbolLines.get (symbol)));
+        fullText.append (String.format (format, symbol, symbolLines.get (symbol)));
     }
 
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
@@ -326,6 +320,17 @@ public class ApplesoftBasicProgram extends BasicProgram
         fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
 
     return fullText.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getLongestVarName ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int longestName = 0;
+    for (String symbol : symbolLines.keySet ())
+      if (symbol.length () > longestName)
+        longestName = symbol.length ();
+    return longestName;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -489,10 +494,13 @@ public class ApplesoftBasicProgram extends BasicProgram
     SubLine subline = line.sublines.get (0);
     String c1 = "  ", c2 = "  ";
 
-    if (subline.is (TOKEN_GOSUB) || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
+    if (subline.is (ApplesoftConstants.TOKEN_GOSUB)
+        || (subline.is (ApplesoftConstants.TOKEN_ON)
+            && subline.has (ApplesoftConstants.TOKEN_GOSUB)))
       c1 = "<<";
-    else if (subline.is (TOKEN_GOTO)
-        || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
+    else if (subline.is (ApplesoftConstants.TOKEN_GOTO)
+        || (subline.is (ApplesoftConstants.TOKEN_ON)
+            && subline.has (ApplesoftConstants.TOKEN_GOTO)))
       c1 = " <";
 
     if (gotoLines.containsKey (line.lineNumber))
@@ -553,7 +561,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
         else if (subline == startSubline)
           started = true;
-        else if (subline.is (TOKEN_IF))
+        else if (subline.is (ApplesoftConstants.TOKEN_IF))
           inIf = true;
       }
       if (started && inIf)
@@ -616,7 +624,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getLoadAddress ()
+  int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
     int programLoadAddress = 0;
@@ -670,490 +678,5 @@ public class ApplesoftBasicProgram extends BasicProgram
         && v1.charAt (1) == v2.charAt (1))
       return true;
     return false;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private class SourceLine
-  // ---------------------------------------------------------------------------------//
-  {
-    List<SubLine> sublines = new ArrayList<> ();
-    int lineNumber;
-    int linePtr;
-    int length;
-
-    SourceLine (int ptr)
-    {
-      linePtr = ptr;
-      lineNumber = Utility.unsignedShort (buffer, ptr + 2);
-
-      int startPtr = ptr += 4;
-      boolean inString = false;           // can toggle
-      boolean inRemark = false;           // can only go false -> true
-      byte b;
-      int stringPtr = 0;
-
-      while (ptr < buffer.length && (b = buffer[ptr++]) != 0)
-      {
-        if (inRemark)                     // cannot terminate a REM
-          continue;
-
-        if (inString)
-        {
-          if (b == ASCII_QUOTE)           // terminate string
-          {
-            inString = false;
-            String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
-            stringsText.add (s);
-            stringsLine.add (lineNumber);
-          }
-          continue;
-        }
-
-        switch (b)
-        {
-          // break IF statements into two sublines (allows for easier line indenting)
-          case TOKEN_IF:
-            // skip to THEN or GOTO - if not found then it's an error
-            while (buffer[ptr] != TOKEN_THEN && buffer[ptr] != TOKEN_GOTO
-                && buffer[ptr] != 0)
-              ptr++;
-
-            // keep THEN with the IF
-            if (buffer[ptr] == TOKEN_THEN)
-              ++ptr;
-
-            // create subline from the condition (and THEN if it exists)
-            sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-            startPtr = ptr;
-
-            break;
-
-          // end of subline, so add it, advance startPtr and continue
-          case ASCII_COLON:
-            sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-            startPtr = ptr;
-            break;
-
-          case TOKEN_REM:
-            if (ptr != startPtr + 1)      // REM appears mid-line (should follow a colon)
-            {
-              System.out.println ("mid-line REM token");
-              //     System.out.println (HexFormatter.format (buffer, startPtr, 10));
-              sublines.add (new SubLine (this, startPtr, (ptr - startPtr) - 1));
-              startPtr = ptr - 1;
-            }
-            else
-              inRemark = true;
-
-            break;
-
-          case ASCII_QUOTE:
-            inString = true;
-            stringPtr = ptr;
-            break;
-        }
-      }
-
-      // add whatever is left
-      sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-      this.length = ptr - linePtr;
-    }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private class SubLine
-  // ---------------------------------------------------------------------------------//
-  {
-    SourceLine parent;
-    int startPtr;
-    int length;
-    String[] nextVariables;
-    String forVariable = "";
-    String onExpression = "";
-    int assignEqualPos;               // used for aligning the equals sign
-
-    SubLine (SourceLine parent, int startPtr, int length)
-    {
-      this.parent = parent;
-      this.startPtr = startPtr;
-      this.length = length;
-
-      byte firstByte = buffer[startPtr];
-
-      if (isHighBitSet (firstByte))
-        doToken (firstByte);
-      else if (isDigit (firstByte))
-        doDigit ();
-      else
-        doAlpha ();
-
-      if (is (TOKEN_REM) || is (TOKEN_DATA))
-        return;
-
-      int ptr = startPtr;
-      length--;
-      String var = "";
-      boolean inQuote = false;
-
-      while (length-- > 0)
-      {
-        byte b = buffer[ptr++];
-
-        if (inQuote && b != ASCII_QUOTE)
-          continue;
-
-        if (isPossibleVariable (b))
-          var += (char) b;
-        else
-        {
-          checkVar (var, b);
-          var = "";
-
-          if (b == ASCII_QUOTE)
-            inQuote = !inQuote;
-        }
-      }
-      checkVar (var, (byte) 0);
-    }
-
-    private void checkVar (String var, byte term)
-    {
-      if (var.length () == 0)
-        return;
-
-      if (term == ASCII_LEFT_BRACKET)
-        var += "(";
-
-      if (isLetter ((byte) var.charAt (0)))
-      {
-        List<Integer> lines = symbolLines.get (var);
-        if (lines == null)
-        {
-          lines = new ArrayList<> ();
-          symbolLines.put (var, lines);
-        }
-        if (lines.size () == 0)
-          lines.add (parent.lineNumber);
-        else
-        {
-          int lastLine = lines.get (lines.size () - 1);
-          if (lastLine != parent.lineNumber)
-            lines.add (parent.lineNumber);
-        }
-        checkUniqueName (var);
-      }
-    }
-
-    private void doToken (byte b)
-    {
-      switch (b)
-      {
-        case TOKEN_FOR:
-          int p = startPtr + 1;
-          while (buffer[p] != TOKEN_EQUALS)
-            forVariable += (char) buffer[p++];
-          break;
-
-        case TOKEN_NEXT:
-          if (length == 2)                // no variables
-            nextVariables = new String[0];
-          else
-          {
-            String varList = new String (buffer, startPtr + 1, length - 2);
-            nextVariables = varList.split (",");
-          }
-          break;
-
-        case TOKEN_LET:
-          recordEqualsPosition ();
-          break;
-
-        case TOKEN_GOTO:
-          int targetLine = getLineNumber (buffer, startPtr + 1);
-          addXref (targetLine, gotoLines);
-          break;
-
-        case TOKEN_GOSUB:
-          targetLine = getLineNumber (buffer, startPtr + 1);
-          addXref (targetLine, gosubLines);
-          break;
-
-        case TOKEN_ON:
-          p = startPtr + 1;
-          int max = startPtr + length - 1;
-          while (p < max && buffer[p] != TOKEN_GOTO && buffer[p] != TOKEN_GOSUB)
-          {
-            if (isHighBitSet (buffer[p]))
-            {
-              int val = buffer[p] & 0x7F;
-              if (val < ApplesoftConstants.tokens.length)
-                onExpression += " " + ApplesoftConstants.tokens[val];
-            }
-            else
-              onExpression += (char) (buffer[p]);
-            p++;
-          }
-
-          switch (buffer[p++])
-          {
-            case TOKEN_GOSUB:
-              for (int destLine : getLineNumbers (buffer, p))
-                addXref (destLine, gosubLines);
-              break;
-
-            case TOKEN_GOTO:
-              for (int destLine : getLineNumbers (buffer, p))
-                addXref (destLine, gotoLines);
-              break;
-
-            default:
-              System.out.println ("GOTO / GOSUB not found");
-          }
-          break;
-      }
-    }
-
-    private void checkUniqueName (String symbol)
-    {
-      int ptr = symbol.length () - 1;
-      if (symbol.charAt (ptr) == ASCII_LEFT_BRACKET)      // array
-        ptr--;
-      if (symbol.charAt (ptr) == ASCII_DOLLAR || symbol.charAt (ptr) == ASCII_PERCENT)
-        ptr--;
-
-      String unique =
-          (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
-
-      List<String> usage = uniqueSymbols.get (unique);
-      if (usage == null)
-      {
-        usage = new ArrayList<> ();
-        uniqueSymbols.put (unique, usage);
-      }
-
-      if (!usage.contains (symbol))
-        usage.add (symbol);
-    }
-
-    private void doDigit ()
-    {
-      int targetLine = getLineNumber (buffer, startPtr);
-      addXref (targetLine, gotoLines);
-    }
-
-    private void doAlpha ()
-    {
-      recordEqualsPosition ();
-    }
-
-    private List<Integer> getLineNumbers (byte[] buffer, int ptr)
-    {
-      List<Integer> lineNumbers = new ArrayList<> ();
-      int start = ptr;
-
-      while (ptr < buffer.length && buffer[ptr] != 0 && buffer[ptr] != ASCII_COLON)
-        ptr++;
-
-      String s = new String (buffer, start, ptr - start);
-
-      String[] chunks = s.split (",");
-
-      try
-      {
-        for (String chunk : chunks)
-          lineNumbers.add (Integer.parseInt (chunk));
-      }
-      catch (NumberFormatException e)
-      {
-        System.out.printf ("NFE: %s%n", s);
-      }
-
-      return lineNumbers;
-    }
-
-    private int getLineNumber (byte[] buffer, int ptr)
-    {
-      int lineNumber = 0;
-      while (ptr < buffer.length)
-      {
-        int b = (buffer[ptr++] & 0xFF) - 0x30;
-        if (b < 0 || b > 9)
-          break;
-        lineNumber = lineNumber * 10 + b;
-      }
-      return lineNumber;
-    }
-
-    private void addXref (int targetLine, Map<Integer, List<Integer>> map)
-    {
-      List<Integer> lines = map.get (targetLine);
-      if (lines == null)
-      {
-        lines = new ArrayList<> ();
-        map.put (targetLine, lines);
-      }
-      lines.add (parent.lineNumber);
-    }
-
-    private boolean isImpliedGoto ()
-    {
-      byte b = buffer[startPtr];
-      if (isHighBitSet (b))
-        return false;
-      return (isDigit (b));
-    }
-
-    // Record the position of the equals sign so it can be aligned with adjacent lines.
-    private void recordEqualsPosition ()
-    {
-      int p = startPtr + 1;
-      int max = startPtr + length;
-      while (buffer[p] != TOKEN_EQUALS && p < max)
-        p++;
-      if (buffer[p] == TOKEN_EQUALS)
-        assignEqualPos = toString ().indexOf ('=');           // use expanded line
-    }
-
-    private boolean isJoinableRem ()
-    {
-      return is (TOKEN_REM) && !isFirst ();
-    }
-
-    boolean isFirst ()
-    {
-      return (parent.linePtr + 4) == startPtr;
-    }
-
-    boolean is (byte token)
-    {
-      return buffer[startPtr] == token;
-    }
-
-    boolean has (byte token)
-    {
-      int ptr = startPtr + 1;
-      int max = startPtr + length;
-      while (ptr < max)
-      {
-        if (buffer[ptr++] == token)
-          return true;
-      }
-      return false;
-    }
-
-    boolean isEmpty ()
-    {
-      return length == 1 && buffer[startPtr] == 0;
-    }
-
-    boolean containsToken ()
-    {
-      // ignore first byte, check the rest for tokens
-      for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
-        if (isHighBitSet (buffer[p]))
-          return true;
-
-      return false;
-    }
-
-    boolean containsControlChars ()
-    {
-      for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
-      {
-        int c = buffer[p] & 0xFF;
-        if (c == 0)
-          break;
-
-        if (c < 32)
-          return true;
-      }
-
-      return false;
-    }
-
-    void addFormattedRem (StringBuilder text)
-    {
-      int ptr = startPtr + 1;
-      int max = startPtr + length - 2;
-
-      while (ptr <= max)
-      {
-        int c = buffer[ptr] & 0xFF;
-        //        System.out.printf ("%02X  %s%n", c, (char) c);
-        if (c == 0x08 && text.length () > 0)
-          text.deleteCharAt (text.length () - 1);
-        else if (c == 0x0D)
-          text.append ("\n");
-        else
-          text.append ((char) c);
-        ptr++;
-      }
-    }
-
-    public int getAddress ()
-    {
-      return getLoadAddress () + startPtr;
-    }
-
-    public String getAlignedText (int alignPosition)
-    {
-      StringBuilder line = toStringBuilder ();
-
-      while (alignPosition-- > assignEqualPos)
-        line.insert (assignEqualPos, ' ');
-
-      return line.toString ();
-    }
-
-    // A REM statement might conceal an assembler routine
-    public String[] getAssembler ()
-    {
-      byte[] buffer2 = new byte[length - 1];
-      System.arraycopy (buffer, startPtr + 1, buffer2, 0, buffer2.length);
-      AssemblerProgram program =
-          new AssemblerProgram ("REM assembler", buffer2, getAddress () + 1);
-      return program.getAssembler ().split ("\n");
-    }
-
-    @Override
-    public String toString ()
-    {
-      return toStringBuilder ().toString ();
-    }
-
-    public StringBuilder toStringBuilder ()
-    {
-      StringBuilder line = new StringBuilder ();
-
-      // All sublines end with 0 or : except IF lines that are split into two
-      int max = startPtr + length - 1;
-      if (buffer[max] == 0)
-        --max;
-
-      if (isImpliedGoto () && !basicPreferences.showThen)
-        line.append ("GOTO ");
-
-      for (int p = startPtr; p <= max; p++)
-      {
-        byte b = buffer[p];
-        if (isHighBitSet (b))
-        {
-          if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
-            line.append (' ');
-          int val = b & 0x7F;
-          if (val < ApplesoftConstants.tokens.length)
-          {
-            if (b != TOKEN_THEN || basicPreferences.showThen)
-              line.append (ApplesoftConstants.tokens[val]);
-          }
-        }
-        else if (isControlCharacter (b))
-          line.append (basicPreferences.showCaret ? "^" + (char) (b + 64) : "");
-        else
-          line.append ((char) b);
-      }
-
-      return line;
-    }
   }
 }

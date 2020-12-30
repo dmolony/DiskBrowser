@@ -17,6 +17,14 @@ import java.util.zip.Checksum;
 public class Utility
 // -----------------------------------------------------------------------------------//
 {
+  public static final byte ASCII_QUOTE = 0x22;
+  public static final byte ASCII_DOLLAR = 0x24;
+  public static final byte ASCII_PERCENT = 0x25;
+  public static final byte ASCII_LEFT_BRACKET = 0x28;
+  public static final byte ASCII_COLON = 0x3A;
+  public static final byte ASCII_SEMI_COLON = 0x3B;
+  public static final byte ASCII_CARET = 0x5E;
+
   public static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
       "2mg", "v2d", "d13", "sdk", "woz", "img", "dimg");
 
@@ -256,6 +264,43 @@ public class Utility
       buffer[lo++] = buffer[hi];
       buffer[hi--] = temp;
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static boolean isHighBitSet (byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    return (value & 0x80) != 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static boolean isControlCharacter (byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    int val = value & 0xFF;
+    return val > 0 && val < 32;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static boolean isDigit (byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    return value >= 0x30 && value <= 0x39;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static boolean isLetter (byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    return value >= 0x41 && value <= 0x5A;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static boolean isPossibleVariable (byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    return isDigit (value) || isLetter (value) || value == ASCII_DOLLAR
+        || value == ASCII_PERCENT;
   }
 
   // ---------------------------------------------------------------------------------//

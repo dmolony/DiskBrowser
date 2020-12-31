@@ -17,6 +17,8 @@ import java.util.zip.Checksum;
 public class Utility
 // -----------------------------------------------------------------------------------//
 {
+  public static final byte ASCII_BACKSPACE = 0x08;
+  public static final byte ASCII_CR = 0x0D;
   public static final byte ASCII_QUOTE = 0x22;
   public static final byte ASCII_DOLLAR = 0x24;
   public static final byte ASCII_PERCENT = 0x25;

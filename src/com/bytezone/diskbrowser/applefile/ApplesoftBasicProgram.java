@@ -17,10 +17,12 @@ public class ApplesoftBasicProgram extends BasicProgram
 {
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
+
   final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
   final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
   final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
+
   final List<Integer> stringsLine = new ArrayList<> ();
   final List<String> stringsText = new ArrayList<> ();
 
@@ -31,19 +33,19 @@ public class ApplesoftBasicProgram extends BasicProgram
     super (name, buffer);
 
     int ptr = 0;
-    int prevOffset = 0;
+    int currentAddress = 0;
 
     int max = buffer.length - 6;          // need at least 6 bytes to make a SourceLine
     while (ptr <= max)
     {
       int nextAddress = Utility.unsignedShort (buffer, ptr);
-      if (nextAddress <= prevOffset)           // usually zero
+      if (nextAddress <= currentAddress)           // usually zero when finished
         break;
 
       SourceLine line = new SourceLine (this, buffer, ptr);
       sourceLines.add (line);
       ptr += line.length;
-      prevOffset = nextAddress;
+      currentAddress = nextAddress;
     }
     endPtr = ptr;
   }
@@ -181,8 +183,8 @@ public class ApplesoftBasicProgram extends BasicProgram
         if (basicPreferences.wrapPrintAt > 0           //
             && (subline.is (ApplesoftConstants.TOKEN_PRINT)
                 || subline.is (ApplesoftConstants.TOKEN_INPUT))
-            && countChars (text, Utility.ASCII_QUOTE) == 2        // just start and end quotes
-            && countChars (text, Utility.ASCII_CARET) == 0)       // no control characters
+            && countChars (text, Utility.ASCII_QUOTE) == 2      // just start and end quotes
+            && countChars (text, Utility.ASCII_CARET) == 0)     // no control characters
         //    && countChars (text, ASCII_SEMI_COLON) == 0)
         {
           if (true)       // new method
@@ -279,7 +281,15 @@ public class ApplesoftBasicProgram extends BasicProgram
       String format = longestVarName > 6 ? "%" + longestVarName + "s  %s%n" : "%6s  %s%n";
 
       for (String symbol : symbolLines.keySet ())
-        fullText.append (String.format (format, symbol, symbolLines.get (symbol)));
+      {
+        String line = symbolLines.get (symbol).toString ();
+        line = line.substring (1, line.length () - 2);
+        for (String s : splitXref (line, 90, ' '))
+        {
+          fullText.append (String.format (format, symbol, s));
+          symbol = "";
+        }
+      }
     }
 
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
@@ -397,6 +407,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     int firstSpace = 0;
     while (firstSpace < line.length () && line.charAt (firstSpace) != ' ')
       ++firstSpace;
+    System.out.println (line);
 
     List<String> lines = new ArrayList<> ();
     while (line.length () > wrapLength)
@@ -408,6 +419,26 @@ public class ApplesoftBasicProgram extends BasicProgram
         break;
       lines.add (line.substring (0, max + 1));
       line = "       ".substring (0, firstSpace + 1) + line.substring (max + 1);
+    }
+
+    lines.add (line);
+    return lines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private List<String> splitXref (String line, int wrapLength, char breakChar)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<String> lines = new ArrayList<> ();
+    while (line.length () > wrapLength)
+    {
+      int max = Math.min (wrapLength, line.length () - 1);
+      while (max > 0 && line.charAt (max) != breakChar)
+        --max;
+      if (max == 0)
+        break;
+      lines.add (line.substring (0, max + 1));
+      line = line.substring (max + 1);
     }
 
     lines.add (line);

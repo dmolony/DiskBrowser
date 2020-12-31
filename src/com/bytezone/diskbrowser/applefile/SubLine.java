@@ -16,7 +16,6 @@ public class SubLine
   int length;
   String[] nextVariables;
   String forVariable = "";
-  String onExpression = "";
   int assignEqualPos;               // used for aligning the equals sign
   byte[] buffer;
 
@@ -150,14 +149,14 @@ public class SubLine
         while (p < max && parent.buffer[p] != ApplesoftConstants.TOKEN_GOTO
             && parent.buffer[p] != ApplesoftConstants.TOKEN_GOSUB)
         {
-          if (Utility.isHighBitSet (parent.buffer[p]))
-          {
-            int val = parent.buffer[p] & 0x7F;
-            if (val < ApplesoftConstants.tokens.length)
-              onExpression += " " + ApplesoftConstants.tokens[val];
-          }
-          else
-            onExpression += (char) (parent.buffer[p]);
+          //          if (Utility.isHighBitSet (parent.buffer[p]))
+          //          {
+          //            int val = parent.buffer[p] & 0x7F;
+          //            if (val < ApplesoftConstants.tokens.length)
+          //              onExpression += " " + ApplesoftConstants.tokens[val];
+          //          }
+          //          else
+          //            onExpression += (char) (parent.buffer[p]);
           p++;
         }
 
@@ -325,6 +324,7 @@ public class SubLine
   {
     int ptr = startPtr + 1;
     int max = startPtr + length;
+
     while (ptr < max)
     {
       if (parent.buffer[ptr++] == token)
@@ -378,14 +378,21 @@ public class SubLine
 
     while (ptr <= max)
     {
-      int c = buffer[ptr] & 0xFF;
-      //        System.out.printf ("%02X  %s%n", c, (char) c);
-      if (c == 0x08 && text.length () > 0)
-        text.deleteCharAt (text.length () - 1);
-      else if (c == 0x0D)
-        text.append ("\n");
-      else
-        text.append ((char) c);
+      switch (buffer[ptr])
+      {
+        case Utility.ASCII_BACKSPACE:
+          if (text.length () > 0)
+            text.deleteCharAt (text.length () - 1);
+          break;
+
+        case Utility.ASCII_CR:
+          text.append ("\n");
+          break;
+
+        default:
+          text.append ((char) buffer[ptr]);     // do not mask with 0xFF
+      }
+
       ptr++;
     }
   }
@@ -418,6 +425,7 @@ public class SubLine
     System.arraycopy (buffer, startPtr + 1, buffer2, 0, buffer2.length);
     AssemblerProgram program =
         new AssemblerProgram ("REM assembler", buffer2, getAddress () + 1);
+
     return program.getAssembler ().split ("\n");
   }
 
@@ -460,7 +468,7 @@ public class SubLine
       }
       else if (Utility.isControlCharacter (b))
         line.append (ApplesoftBasicProgram.basicPreferences.showCaret
-            ? "^" + (char) (b + 64) : "");
+            ? "^" + (char) (b + 64) : ".");
       else
         line.append ((char) b);
     }

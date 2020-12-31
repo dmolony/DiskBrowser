@@ -9,12 +9,12 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class SourceLine
 // -----------------------------------------------------------------------------------//
 {
+  ApplesoftBasicProgram parent;
   List<SubLine> sublines = new ArrayList<> ();
   int lineNumber;
   int linePtr;
   int length;
   byte[] buffer;
-  ApplesoftBasicProgram parent;
 
   // ---------------------------------------------------------------------------------//
   SourceLine (ApplesoftBasicProgram parent, byte[] buffer, int ptr)
@@ -77,7 +77,6 @@ public class SourceLine
           if (ptr != startPtr + 1)      // REM appears mid-line (should follow a colon)
           {
             System.out.println ("mid-line REM token");
-            //     System.out.println (HexFormatter.format (buffer, startPtr, 10));
             sublines.add (new SubLine (this, startPtr, (ptr - startPtr) - 1));
             startPtr = ptr - 1;
           }

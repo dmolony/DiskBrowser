@@ -148,17 +148,7 @@ public class SubLine
         int max = startPtr + length - 1;
         while (p < max && parent.buffer[p] != ApplesoftConstants.TOKEN_GOTO
             && parent.buffer[p] != ApplesoftConstants.TOKEN_GOSUB)
-        {
-          //          if (Utility.isHighBitSet (parent.buffer[p]))
-          //          {
-          //            int val = parent.buffer[p] & 0x7F;
-          //            if (val < ApplesoftConstants.tokens.length)
-          //              onExpression += " " + ApplesoftConstants.tokens[val];
-          //          }
-          //          else
-          //            onExpression += (char) (parent.buffer[p]);
           p++;
-        }
 
         switch (parent.buffer[p++])
         {
@@ -174,6 +164,14 @@ public class SubLine
 
           default:
             System.out.println ("GOTO / GOSUB not found");
+        }
+        break;
+
+      case ApplesoftConstants.TOKEN_ONERR:
+        if (buffer[startPtr + 1] == ApplesoftConstants.TOKEN_GOTO)
+        {
+          targetLine = getLineNumber (parent.buffer, startPtr + 2);
+          addXref (targetLine, gotoLines);
         }
         break;
     }

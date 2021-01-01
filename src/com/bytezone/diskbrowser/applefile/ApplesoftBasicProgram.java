@@ -178,52 +178,14 @@ public class ApplesoftBasicProgram extends BasicProgram
         else
           text.append (lineText);
 
-        // Check for a wrappable PRINT statement
+        // Check for a wrappable PRINT or INPUT statement
         // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
-        if (basicPreferences.wrapPrintAt > 0           //
+        if (basicPreferences.wrapPrintAt > 0
             && (subline.is (ApplesoftConstants.TOKEN_PRINT)
                 || subline.is (ApplesoftConstants.TOKEN_INPUT))
             && countChars (text, Utility.ASCII_QUOTE) == 2      // just start and end quotes
             && countChars (text, Utility.ASCII_CARET) == 0)     // no control characters
-        //    && countChars (text, ASCII_SEMI_COLON) == 0)
-        {
-          if (true)       // new method
-          {
-            List<String> lines = splitPrint (lineText);
-            if (lines != null)
-            {
-              int offset = text.indexOf ("PRINT");
-              if (offset < 0)
-                offset = text.indexOf ("INPUT");
-              String fmt = "%-" + offset + "." + offset + "s%s%n";
-              String padding = text.substring (0, offset);
-              for (String s : lines)
-              {
-                fullText.append (String.format (fmt, padding, s));
-                padding = "";
-              }
-            }
-            else
-              fullText.append (text + "\n");
-          }
-          else            // old method
-          {
-            int first = text.indexOf ("\"") + 1;
-            int last = text.indexOf ("\"", first + 1) - 1;
-            if ((last - first) > basicPreferences.wrapPrintAt)
-            {
-              int ptr = first + basicPreferences.wrapPrintAt;
-              do
-              {
-                fullText.append (text.substring (0, ptr)
-                    + "\n                                 ".substring (0, first + 1));
-                text.delete (0, ptr);
-                ptr = basicPreferences.wrapPrintAt;
-              } while (text.length () > basicPreferences.wrapPrintAt);
-            }
-            fullText.append (text + "\n");
-          }
-        }
+          wrapPrint (fullText, text, lineText);
         else
           fullText.append (text + "\n");
 
@@ -265,25 +227,23 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     if (basicPreferences.showXref && !gosubLines.isEmpty ())
-      showLines (fullText, gosubLines, "GOSUB:\n");
+      showLines (fullText, gosubLines, "  GOSUB");
 
     if (basicPreferences.showXref && !gotoLines.isEmpty ())
-      showLines (fullText, gotoLines, "GOTO:\n");
+      showLines (fullText, gotoLines, "   GOTO");
 
     if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
     {
-      if (fullText.charAt (fullText.length () - 2) != '\n')
-        fullText.append ("\n");
-
-      fullText.append ("Variables:\n");
+      heading (fullText, "Symbol ");
 
       int longestVarName = getLongestVarName ();
-      String format = longestVarName > 6 ? "%" + longestVarName + "s  %s%n" : "%6s  %s%n";
+      String format =
+          longestVarName > 6 ? "%-" + longestVarName + "s  %s%n" : "%-6s  %s%n";
 
       for (String symbol : symbolLines.keySet ())
       {
         String line = symbolLines.get (symbol).toString ();
-        line = line.substring (1, line.length () - 2);
+        line = line.substring (1, line.length () - 1);
         for (String s : splitXref (line, 90, ' '))
         {
           fullText.append (String.format (format, symbol, s));
@@ -294,9 +254,6 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
     {
-      if (fullText.charAt (fullText.length () - 2) != '\n')
-        fullText.append ("\n");
-
       boolean headingShown = false;
       for (String key : uniqueSymbols.keySet ())
       {
@@ -306,23 +263,21 @@ public class ApplesoftBasicProgram extends BasicProgram
           if (!headingShown)
           {
             headingShown = true;
-            fullText.append ("Duplicate Variable Names:\n");
+            heading (fullText, "Symbol   Duplicate Names");
           }
-          fullText.append (String.format ("%6s  %s%n", key, usage));
+          String line = usage.toString ();
+          line = line.substring (1, line.length () - 1);
+          fullText.append (String.format ("%-6s   %s%n", key, line));
         }
       }
     }
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
-      if (fullText.charAt (fullText.length () - 2) != '\n')
-        fullText.append ("\n");
-      fullText.append ("Strings:\n");
+      heading (fullText, "   Line  Strings");
       for (int i = 0; i < stringsLine.size (); i++)
-      {
         fullText.append (
-            String.format (" %5s  %s%n", stringsLine.get (i), stringsText.get (i)));
-      }
+            String.format (" %6s  %s%n", stringsLine.get (i), stringsText.get (i)));
     }
 
     if (fullText.length () > 0)
@@ -330,6 +285,36 @@ public class ApplesoftBasicProgram extends BasicProgram
         fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
 
     return fullText.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void heading (StringBuilder fullText, String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (fullText.charAt (fullText.length () - 2) != '\n')
+      fullText.append ("\n");
+
+    if (heading.length () < 10)
+      fullText.append (heading + "  Line numbers\n");
+    else
+      fullText.append (heading + "\n");
+
+    fullText.append ("-------  --------------------------------------------------"
+        + "------------------------------------------\n");
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showLines (StringBuilder fullText, Map<Integer, List<Integer>> lines,
+      String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    heading (fullText, heading);
+    for (Integer line : lines.keySet ())
+    {
+      String list = lines.get (line).toString ();
+      list = list.substring (1, list.length () - 1);
+      fullText.append (String.format (" %6s  %s%n", line, list));
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -344,15 +329,45 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void showLines (StringBuilder fullText, Map<Integer, List<Integer>> lines,
-      String heading)
+  private void wrapPrint (StringBuilder fullText, StringBuilder text, String lineText)
   // ---------------------------------------------------------------------------------//
   {
-    if (fullText.charAt (fullText.length () - 2) != '\n')
-      fullText.append ("\n");
-    fullText.append (heading);
-    for (Integer line : lines.keySet ())
-      fullText.append (String.format (" %5s  %s%n", line, lines.get (line)));
+    if (true)       // new method
+    {
+      List<String> lines = splitPrint (lineText);
+      if (lines != null)
+      {
+        int offset = text.indexOf ("PRINT");
+        if (offset < 0)
+          offset = text.indexOf ("INPUT");
+        String fmt = "%-" + offset + "." + offset + "s%s%n";
+        String padding = text.substring (0, offset);
+        for (String s : lines)
+        {
+          fullText.append (String.format (fmt, padding, s));
+          padding = "";
+        }
+      }
+      else
+        fullText.append (text + "\n");
+    }
+    else            // old method
+    {
+      int first = text.indexOf ("\"") + 1;
+      int last = text.indexOf ("\"", first + 1) - 1;
+      if ((last - first) > basicPreferences.wrapPrintAt)
+      {
+        int ptr = first + basicPreferences.wrapPrintAt;
+        do
+        {
+          fullText.append (text.substring (0, ptr)
+              + "\n                                 ".substring (0, first + 1));
+          text.delete (0, ptr);
+          ptr = basicPreferences.wrapPrintAt;
+        } while (text.length () > basicPreferences.wrapPrintAt);
+      }
+      fullText.append (text + "\n");
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -407,7 +422,6 @@ public class ApplesoftBasicProgram extends BasicProgram
     int firstSpace = 0;
     while (firstSpace < line.length () && line.charAt (firstSpace) != ' ')
       ++firstSpace;
-    System.out.println (line);
 
     List<String> lines = new ArrayList<> ();
     while (line.length () > wrapLength)

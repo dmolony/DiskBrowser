@@ -42,7 +42,7 @@ public class SubLine
       doAlpha ();
 
     if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA)
-        || is (ApplesoftConstants.TOKEN_AND))
+        || is (ApplesoftConstants.TOKEN_AMPERSAND))
       return;
 
     int ptr = startPtr;

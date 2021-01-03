@@ -20,8 +20,8 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
-  final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
-  final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
+  private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
+  private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
 
   final List<Integer> stringsLine = new ArrayList<> ();
   final List<String> stringsText = new ArrayList<> ();
@@ -46,8 +46,52 @@ public class ApplesoftBasicProgram extends BasicProgram
       sourceLines.add (line);
       ptr += line.length;
       currentAddress = nextAddress;
+
+      for (SubLine subline : line.sublines)
+      {
+        for (String symbol : subline.getSymbols ())
+          checkVar (symbol, line.lineNumber);
+        for (int targetLine : subline.getGosubLines ())
+          addXref (line.lineNumber, targetLine, gosubLines);
+        for (int targetLine : subline.getGotoLines ())
+          addXref (line.lineNumber, targetLine, gotoLines);
+      }
     }
     endPtr = ptr;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void checkVar (String var, int lineNumber)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = symbolLines.get (var);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      symbolLines.put (var, lines);
+    }
+    if (lines.size () == 0)
+      lines.add (lineNumber);
+    else
+    {
+      int lastLine = lines.get (lines.size () - 1);
+      if (lastLine != lineNumber)
+        lines.add (lineNumber);
+    }
+    checkUniqueName (var);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addXref (int sourceLine, int targetLine, Map<Integer, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (targetLine);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (targetLine, lines);
+    }
+    lines.add (sourceLine);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -67,9 +111,10 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<> ();
+
     if (basicPreferences.showHeader)
       addHeader (fullText);
-    int alignPos = 0;
+    int alignEqualsPos = 0;
     StringBuilder text;
     int baseOffset = basicPreferences.showTargets ? 12 : 8;
 
@@ -136,7 +181,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
           // Align assign statements if required
           if (basicPreferences.alignAssign)
-            alignPos = alignEqualsPosition (subline, alignPos);
+            alignEqualsPos = alignEqualsPosition (subline, alignEqualsPos);
 
           int column = indent * indentSize + baseOffset;
           while (text.length () < column)
@@ -144,8 +189,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
 
         // Add the current text, then reset it
-        int pos = subline.is (ApplesoftConstants.TOKEN_REM) ? 0 : alignPos;
-        String lineText = subline.getAlignedText (pos);
+        String lineText = subline.getAlignedText (alignEqualsPos);
 
         if (subline.is (ApplesoftConstants.TOKEN_REM)
             && basicPreferences.deleteExtraRemSpace)
@@ -155,7 +199,7 @@ public class ApplesoftBasicProgram extends BasicProgram
             && basicPreferences.deleteExtraDataSpace)
           lineText = lineText.replaceFirst ("DATA  ", "DATA ");
 
-        // Check for a wrappable REM statement
+        // Check for a wrappable REM/DATA/DIM statement
         // (see SEA BATTLE on DISK283.DSK)
         int inset = Math.max (text.length (), getIndent (fullText)) + 1;
         if (subline.is (ApplesoftConstants.TOKEN_REM)
@@ -196,11 +240,15 @@ public class ApplesoftBasicProgram extends BasicProgram
           ifIndent = ++indent;
         else if (subline.is (ApplesoftConstants.TOKEN_FOR))
         {
-          loopVariables.push (subline.forVariable);
-          ++indent;
+          String latestLoopVar = loopVariables.size () > 0 ? loopVariables.peek () : "";
+          if (!subline.forVariable.equals (latestLoopVar))    // don't add repeated loop
+          {
+            loopVariables.push (subline.forVariable);
+            ++indent;
+          }
         }
         else if (basicPreferences.blankAfterReturn
-            && subline.is (ApplesoftConstants.TOKEN_RETURN))
+            && subline.is (ApplesoftConstants.TOKEN_RETURN) && subline.isFirst ())
           insertBlankLine = true;
       }
 
@@ -212,7 +260,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       // Reset alignment value if we just left an IF - the indentation will be different now
       if (ifIndent > 0)
-        alignPos = 0;
+        alignEqualsPos = 0;
     }
 
     int ptr = endPtr + 2;
@@ -238,7 +286,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
       int longestVarName = getLongestVarName ();
       String format =
-          longestVarName > 6 ? "%-" + longestVarName + "s  %s%n" : "%-6s  %s%n";
+          longestVarName > 6 ? "%-" + longestVarName + "s %s%n" : "%-6s   %s%n";
 
       for (String symbol : symbolLines.keySet ())
       {
@@ -569,7 +617,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   private int alignEqualsPosition (SubLine subline, int currentAlignPosition)
   // ---------------------------------------------------------------------------------//
   {
-    if (subline.assignEqualPos > 0)                   // does the line have an equals sign?
+    if (subline.equalsPosition > 0)                   // does the line have an equals sign?
     {
       if (currentAlignPosition == 0)
         currentAlignPosition = findHighest (subline); // examine following sublines
@@ -585,7 +633,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     boolean started = false;
-    int highestAssign = startSubline.assignEqualPos;
+    int highestAssign = startSubline.equalsPosition;
 
     fast: for (SourceLine line : sourceLines)
     {
@@ -596,13 +644,13 @@ public class ApplesoftBasicProgram extends BasicProgram
         {
           // Stop when we come to a line without an equals sign (except for non-split REMs).
           // Lines that start with a REM always break.
-          if (subline.assignEqualPos == 0
+          if (subline.equalsPosition == 0
               // && (splitRem || !subline.is (TOKEN_REM) || subline.isFirst ()))
               && (basicPreferences.splitRem || !subline.isJoinableRem ()))
             break fast; // of champions
 
-          if (subline.assignEqualPos > highestAssign)
-            highestAssign = subline.assignEqualPos;
+          if (subline.equalsPosition > highestAssign)
+            highestAssign = subline.equalsPosition;
         }
         else if (subline == startSubline)
           started = true;
@@ -717,11 +765,39 @@ public class ApplesoftBasicProgram extends BasicProgram
   private boolean sameVariable (String v1, String v2)
   // ---------------------------------------------------------------------------------//
   {
-    if (v1.equals (v2))
-      return true;
-    if (v1.length () >= 2 && v2.length () >= 2 && v1.charAt (0) == v2.charAt (0)
-        && v1.charAt (1) == v2.charAt (1))
-      return true;
-    return false;
+    return getUniqueName (v1).equals (getUniqueName (v2));
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void checkUniqueName (String symbol)
+  // ---------------------------------------------------------------------------------//
+  {
+    String uniqueName = getUniqueName (symbol);
+
+    List<String> usage = uniqueSymbols.get (uniqueName);
+    if (usage == null)
+    {
+      usage = new ArrayList<> ();
+      uniqueSymbols.put (uniqueName, usage);
+    }
+
+    if (!usage.contains (symbol))
+      usage.add (symbol);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String getUniqueName (String symbol)
+  // ---------------------------------------------------------------------------------//
+  {
+    int ptr = symbol.length () - 1;
+    if (symbol.charAt (ptr) == Utility.ASCII_LEFT_BRACKET)      // array
+      ptr--;
+    if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR             // string
+        || symbol.charAt (ptr) == Utility.ASCII_PERCENT)        // integer
+      ptr--;
+
+    String unique =
+        (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
+    return unique;
   }
 }

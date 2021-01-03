@@ -2,7 +2,6 @@ package com.bytezone.diskbrowser.applefile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
@@ -16,13 +15,12 @@ public class SubLine
   int length;
   String[] nextVariables;
   String forVariable = "";
-  int assignEqualPos;               // used for aligning the equals sign
+  int equalsPosition;               // used for aligning the equals sign
   byte[] buffer;
 
-  private final Map<Integer, List<Integer>> gotoLines;
-  private final Map<Integer, List<Integer>> gosubLines;
-  private final Map<String, List<Integer>> symbolLines;
-  private final Map<String, List<String>> uniqueSymbols;
+  private final List<Integer> gotoLines = new ArrayList<> ();
+  private final List<Integer> gosubLines = new ArrayList<> ();
+  private final List<String> symbols = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   SubLine (SourceLine parent, int startPtr, int length)
@@ -33,13 +31,9 @@ public class SubLine
     this.length = length;
 
     program = parent.parent;
-    this.gotoLines = program.gotoLines;
-    this.gosubLines = program.gosubLines;
-    this.symbolLines = program.symbolLines;
-    this.uniqueSymbols = program.uniqueSymbols;
 
     this.buffer = parent.buffer;
-    byte firstByte = parent.buffer[startPtr];
+    byte firstByte = buffer[startPtr];
 
     if (Utility.isHighBitSet (firstByte))
       doToken (firstByte);
@@ -58,7 +52,7 @@ public class SubLine
 
     while (length-- > 0)
     {
-      byte b = parent.buffer[ptr++];
+      byte b = buffer[ptr++];
 
       if (inQuote && b != Utility.ASCII_QUOTE)
         continue;
@@ -78,33 +72,38 @@ public class SubLine
   }
 
   // ---------------------------------------------------------------------------------//
-  private void checkVar (String var, byte term)
+  private void checkVar (String var, byte terminator)
   // ---------------------------------------------------------------------------------//
   {
     if (var.length () == 0)
       return;
 
-    if (term == Utility.ASCII_LEFT_BRACKET)
+    if (terminator == Utility.ASCII_LEFT_BRACKET)
       var += "(";
 
-    if (Utility.isLetter ((byte) var.charAt (0)))
-    {
-      List<Integer> lines = symbolLines.get (var);
-      if (lines == null)
-      {
-        lines = new ArrayList<> ();
-        symbolLines.put (var, lines);
-      }
-      if (lines.size () == 0)
-        lines.add (parent.lineNumber);
-      else
-      {
-        int lastLine = lines.get (lines.size () - 1);
-        if (lastLine != parent.lineNumber)
-          lines.add (parent.lineNumber);
-      }
-      checkUniqueName (var);
-    }
+    if (Utility.isLetter ((byte) var.charAt (0)) && !symbols.contains (var))
+      symbols.add (var);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getSymbols ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return symbols;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Integer> getGotoLines ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return gotoLines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Integer> getGosubLines ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return gosubLines;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -115,8 +114,8 @@ public class SubLine
     {
       case ApplesoftConstants.TOKEN_FOR:
         int p = startPtr + 1;
-        while (parent.buffer[p] != ApplesoftConstants.TOKEN_EQUALS)
-          forVariable += (char) parent.buffer[p++];
+        while (buffer[p] != ApplesoftConstants.TOKEN_EQUALS)
+          forVariable += (char) buffer[p++];
         break;
 
       case ApplesoftConstants.TOKEN_NEXT:
@@ -124,7 +123,7 @@ public class SubLine
           nextVariables = new String[0];
         else
         {
-          String varList = new String (parent.buffer, startPtr + 1, length - 2);
+          String varList = new String (buffer, startPtr + 1, length - 2);
           nextVariables = varList.split (",");
         }
         break;
@@ -134,31 +133,31 @@ public class SubLine
         break;
 
       case ApplesoftConstants.TOKEN_GOTO:
-        int targetLine = getLineNumber (parent.buffer, startPtr + 1);
+        int targetLine = getLineNumber (buffer, startPtr + 1);
         addXref (targetLine, gotoLines);
         break;
 
       case ApplesoftConstants.TOKEN_GOSUB:
-        targetLine = getLineNumber (parent.buffer, startPtr + 1);
+        targetLine = getLineNumber (buffer, startPtr + 1);
         addXref (targetLine, gosubLines);
         break;
 
       case ApplesoftConstants.TOKEN_ON:
         p = startPtr + 1;
         int max = startPtr + length - 1;
-        while (p < max && parent.buffer[p] != ApplesoftConstants.TOKEN_GOTO
-            && parent.buffer[p] != ApplesoftConstants.TOKEN_GOSUB)
+        while (p < max && buffer[p] != ApplesoftConstants.TOKEN_GOTO
+            && buffer[p] != ApplesoftConstants.TOKEN_GOSUB)
           p++;
 
-        switch (parent.buffer[p++])
+        switch (buffer[p++])
         {
           case ApplesoftConstants.TOKEN_GOSUB:
-            for (int destLine : getLineNumbers (parent.buffer, p))
+            for (int destLine : getLineNumbers (buffer, p))
               addXref (destLine, gosubLines);
             break;
 
           case ApplesoftConstants.TOKEN_GOTO:
-            for (int destLine : getLineNumbers (parent.buffer, p))
+            for (int destLine : getLineNumbers (buffer, p))
               addXref (destLine, gotoLines);
             break;
 
@@ -170,7 +169,7 @@ public class SubLine
       case ApplesoftConstants.TOKEN_ONERR:
         if (buffer[startPtr + 1] == ApplesoftConstants.TOKEN_GOTO)
         {
-          targetLine = getLineNumber (parent.buffer, startPtr + 2);
+          targetLine = getLineNumber (buffer, startPtr + 2);
           addXref (targetLine, gotoLines);
         }
         break;
@@ -178,35 +177,10 @@ public class SubLine
   }
 
   // ---------------------------------------------------------------------------------//
-  private void checkUniqueName (String symbol)
-  // ---------------------------------------------------------------------------------//
-  {
-    int ptr = symbol.length () - 1;
-    if (symbol.charAt (ptr) == Utility.ASCII_LEFT_BRACKET)      // array
-      ptr--;
-    if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR
-        || symbol.charAt (ptr) == Utility.ASCII_PERCENT)
-      ptr--;
-
-    String unique =
-        (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
-
-    List<String> usage = uniqueSymbols.get (unique);
-    if (usage == null)
-    {
-      usage = new ArrayList<> ();
-      uniqueSymbols.put (unique, usage);
-    }
-
-    if (!usage.contains (symbol))
-      usage.add (symbol);
-  }
-
-  // ---------------------------------------------------------------------------------//
   private void doDigit ()
   // ---------------------------------------------------------------------------------//
   {
-    int targetLine = getLineNumber (parent.buffer, startPtr);
+    int targetLine = getLineNumber (buffer, startPtr);
     addXref (targetLine, gotoLines);
   }
 
@@ -215,6 +189,14 @@ public class SubLine
   // ---------------------------------------------------------------------------------//
   {
     recordEqualsPosition ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addXref (int targetLine, List<Integer> list)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (!list.contains (targetLine))
+      list.add (targetLine);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -260,23 +242,10 @@ public class SubLine
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addXref (int targetLine, Map<Integer, List<Integer>> map)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = map.get (targetLine);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      map.put (targetLine, lines);
-    }
-    lines.add (parent.lineNumber);
-  }
-
-  // ---------------------------------------------------------------------------------//
   boolean isImpliedGoto ()
   // ---------------------------------------------------------------------------------//
   {
-    byte b = parent.buffer[startPtr];
+    byte b = buffer[startPtr];
     if (Utility.isHighBitSet (b))
       return false;
     return (Utility.isDigit (b));
@@ -289,10 +258,10 @@ public class SubLine
   {
     int p = startPtr + 1;
     int max = startPtr + length;
-    while (parent.buffer[p] != ApplesoftConstants.TOKEN_EQUALS && p < max)
+    while (buffer[p] != ApplesoftConstants.TOKEN_EQUALS && p < max)
       p++;
     if (buffer[p] == ApplesoftConstants.TOKEN_EQUALS)
-      assignEqualPos = toString ().indexOf ('=');           // use expanded line
+      equalsPosition = toString ().indexOf ('=');           // use expanded line
   }
 
   // ---------------------------------------------------------------------------------//
@@ -313,7 +282,7 @@ public class SubLine
   boolean is (byte token)
   // ---------------------------------------------------------------------------------//
   {
-    return parent.buffer[startPtr] == token;
+    return buffer[startPtr] == token;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -325,7 +294,7 @@ public class SubLine
 
     while (ptr < max)
     {
-      if (parent.buffer[ptr++] == token)
+      if (buffer[ptr++] == token)
         return true;
     }
     return false;
@@ -403,13 +372,15 @@ public class SubLine
   }
 
   // ---------------------------------------------------------------------------------//
-  public String getAlignedText (int alignPosition)
+  public String getAlignedText (int alignEqualsPos)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder line = toStringBuilder ();
+    StringBuilder line = toStringBuilder ();      // get line
 
-    while (alignPosition-- > assignEqualPos)
-      line.insert (assignEqualPos, ' ');
+    // insert spaces before '=' until it lines up with the other assignment lines
+    if (!is (ApplesoftConstants.TOKEN_REM))
+      while (alignEqualsPos-- > equalsPosition)
+        line.insert (equalsPosition, ' ');
 
     return line.toString ();
   }

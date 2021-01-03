@@ -51,6 +51,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_CARET = "showCaret";
   private static final String PREFS_SHOW_THEN = "showThen";
   private static final String PREFS_SHOW_XREF = "showXref";
+  private static final String PREFS_SHOW_CALLS = "showCalls";
   private static final String PREFS_SHOW_SYMBOLS = "showSymbols";
   private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
   private static final String PREFS_LIST_STRINGS = "listStrings";
@@ -142,11 +143,12 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
-  final JMenuItem showXrefItem = new JCheckBoxMenuItem ("Show Xref");
-  final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("Show variables");
+  final JMenuItem showXrefItem = new JCheckBoxMenuItem ("List Xref");
+  final JMenuItem showCallsItem = new JCheckBoxMenuItem ("List CALLs");
+  final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("List variables");
   final JMenuItem showDuplicateSymbolsItem =
-      new JCheckBoxMenuItem ("Show duplicate variables");
-  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("Show strings");
+      new JCheckBoxMenuItem ("List duplicate variables");
+  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
   final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
   final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
   final JMenuItem deleteExtraDataSpace =
@@ -247,13 +249,15 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showCaretItem);
     applesoftMenu.add (showThenItem);
-    applesoftMenu.add (showXrefItem);
-    applesoftMenu.add (showSymbolsItem);
-    applesoftMenu.add (showDuplicateSymbolsItem);
-    applesoftMenu.add (listStringsItem);
     applesoftMenu.add (blankAfterReturn);
     applesoftMenu.add (deleteExtraRemSpace);
     applesoftMenu.add (deleteExtraDataSpace);
+    applesoftMenu.addSeparator ();
+    applesoftMenu.add (showXrefItem);
+    applesoftMenu.add (showCallsItem);
+    applesoftMenu.add (showSymbolsItem);
+    applesoftMenu.add (showDuplicateSymbolsItem);
+    applesoftMenu.add (listStringsItem);
 
     assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);
@@ -313,6 +317,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showCaretItem.addActionListener (basicPreferencesAction);
     showThenItem.addActionListener (basicPreferencesAction);
     showXrefItem.addActionListener (basicPreferencesAction);
+    showCallsItem.addActionListener (basicPreferencesAction);
     showSymbolsItem.addActionListener (basicPreferencesAction);
     showDuplicateSymbolsItem.addActionListener (basicPreferencesAction);
     listStringsItem.addActionListener (basicPreferencesAction);
@@ -364,6 +369,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showThen = showThenItem.isSelected ();
     basicPreferences.showXref = showXrefItem.isSelected ();
+    basicPreferences.showCalls = showCallsItem.isSelected ();
     basicPreferences.showSymbols = showSymbolsItem.isSelected ();
     basicPreferences.showDuplicateSymbols = showDuplicateSymbolsItem.isSelected ();
     basicPreferences.listStrings = listStringsItem.isSelected ();
@@ -525,6 +531,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_XREF, showXrefItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_CALLS, showCallsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_SYMBOLS, showSymbolsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
         showDuplicateSymbolsItem.isSelected ());
@@ -580,6 +587,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
     showThenItem.setSelected (prefs.getBoolean (PREFS_SHOW_THEN, true));
     showXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_XREF, false));
+    showCallsItem.setSelected (prefs.getBoolean (PREFS_SHOW_CALLS, false));
     showSymbolsItem.setSelected (prefs.getBoolean (PREFS_SHOW_SYMBOLS, false));
     showDuplicateSymbolsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS, false));

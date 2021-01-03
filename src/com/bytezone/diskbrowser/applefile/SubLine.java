@@ -10,10 +10,11 @@ public class SubLine
 // -----------------------------------------------------------------------------------//
 {
   SourceLine parent;
-  ApplesoftBasicProgram program;
+
   int startPtr;
   int length;
   String[] nextVariables;
+  String callTarget;
   String forVariable = "";
   int equalsPosition;               // used for aligning the equals sign
   byte[] buffer;
@@ -29,8 +30,6 @@ public class SubLine
     this.parent = parent;
     this.startPtr = startPtr;
     this.length = length;
-
-    program = parent.parent;
 
     this.buffer = parent.buffer;
     byte firstByte = buffer[startPtr];
@@ -172,6 +171,15 @@ public class SubLine
           targetLine = getLineNumber (buffer, startPtr + 2);
           addXref (targetLine, gotoLines);
         }
+        break;
+
+      case ApplesoftConstants.TOKEN_CALL:
+        byte[] buffer = getBuffer ();
+
+        if (buffer[0] == (byte) 0xC9)       // negative
+          callTarget = "-" + new String (buffer, 1, buffer.length - 1);
+        else
+          callTarget = new String (buffer, 0, buffer.length);
         break;
     }
   }
@@ -365,13 +373,6 @@ public class SubLine
   }
 
   // ---------------------------------------------------------------------------------//
-  public int getAddress ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return program.getLoadAddress () + startPtr;
-  }
-
-  // ---------------------------------------------------------------------------------//
   public String getAlignedText (int alignEqualsPos)
   // ---------------------------------------------------------------------------------//
   {
@@ -385,17 +386,18 @@ public class SubLine
     return line.toString ();
   }
 
-  // A REM statement might conceal an assembler routine
   // ---------------------------------------------------------------------------------//
-  public String[] getAssembler ()
+  public byte[] getBuffer ()
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer2 = new byte[length - 1];
+    //    System.out.println (HexFormatter.format (buffer, startPtr, length));
+    int len = length - 1;
+    //    System.out.printf ("%02X%n", buffer[startPtr + len]);
+    if (buffer[startPtr + len] == Utility.ASCII_COLON || buffer[startPtr + len] == 0)
+      len--;
+    byte[] buffer2 = new byte[len];
     System.arraycopy (buffer, startPtr + 1, buffer2, 0, buffer2.length);
-    AssemblerProgram program =
-        new AssemblerProgram ("REM assembler", buffer2, getAddress () + 1);
-
-    return program.getAssembler ().split ("\n");
+    return buffer2;
   }
 
   // ---------------------------------------------------------------------------------//

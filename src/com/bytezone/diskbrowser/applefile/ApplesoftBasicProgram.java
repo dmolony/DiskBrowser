@@ -20,6 +20,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
   final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
+  final Map<String, List<Integer>> callLines = new TreeMap<> ();
   private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
   private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
 
@@ -55,6 +56,8 @@ public class ApplesoftBasicProgram extends BasicProgram
           addXref (line.lineNumber, targetLine, gosubLines);
         for (int targetLine : subline.getGotoLines ())
           addXref (line.lineNumber, targetLine, gotoLines);
+        if (subline.callTarget != null)
+          addXref (line.lineNumber, subline.callTarget, callLines);
       }
     }
     endPtr = ptr;
@@ -90,6 +93,19 @@ public class ApplesoftBasicProgram extends BasicProgram
     {
       lines = new ArrayList<> ();
       map.put (targetLine, lines);
+    }
+    lines.add (sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addXref (int sourceLine, String target, Map<String, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (target);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (target, lines);
     }
     lines.add (sourceLine);
   }
@@ -135,11 +151,11 @@ public class ApplesoftBasicProgram extends BasicProgram
         // - see P.CREATE on Diags2E.DSK
         if (subline.is (ApplesoftConstants.TOKEN_REM) && subline.containsToken ())
         {
-          int address = subline.getAddress () + 1;              // skip the REM token
+          int address = getLoadAddress () + subline.startPtr + 1;  // skip the REM token
           fullText.append (text + String.format ("REM - Inline assembler @ $%02X (%d)%n",
               address, address));
           String padding = "                         ".substring (0, text.length () + 2);
-          for (String asm : subline.getAssembler ())
+          for (String asm : getRemAssembler (subline))
             fullText.append (padding + asm + "\n");
           continue;
         }
@@ -275,10 +291,13 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     if (basicPreferences.showXref && !gosubLines.isEmpty ())
-      showLines (fullText, gosubLines, "  GOSUB");
+      showIntegerLines (fullText, gosubLines, "  GOSUB");
 
     if (basicPreferences.showXref && !gotoLines.isEmpty ())
-      showLines (fullText, gotoLines, "   GOTO");
+      showIntegerLines (fullText, gotoLines, "   GOTO");
+
+    if (basicPreferences.showCalls && !callLines.isEmpty ())
+      showStringLines (fullText, callLines, "   CALL");
 
     if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
     {
@@ -322,7 +341,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
-      heading (fullText, "   Line  Strings");
+      heading (fullText, "   Line  String");
       for (int i = 0; i < stringsLine.size (); i++)
         fullText.append (
             String.format (" %6s  %s%n", stringsLine.get (i), stringsText.get (i)));
@@ -352,8 +371,8 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void showLines (StringBuilder fullText, Map<Integer, List<Integer>> lines,
-      String heading)
+  private void showIntegerLines (StringBuilder fullText,
+      Map<Integer, List<Integer>> lines, String heading)
   // ---------------------------------------------------------------------------------//
   {
     heading (fullText, heading);
@@ -362,6 +381,20 @@ public class ApplesoftBasicProgram extends BasicProgram
       String list = lines.get (line).toString ();
       list = list.substring (1, list.length () - 1);
       fullText.append (String.format (" %6s  %s%n", line, list));
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showStringLines (StringBuilder fullText, Map<String, List<Integer>> lines,
+      String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    heading (fullText, heading);
+    for (String target : lines.keySet ())
+    {
+      String list = lines.get (target).toString ();
+      list = list.substring (1, list.length () - 1);
+      fullText.append (String.format (" %6s  %s%n", target, list));
     }
   }
 
@@ -707,6 +740,17 @@ public class ApplesoftBasicProgram extends BasicProgram
     return pgm.toString ();
   }
 
+  // A REM statement might conceal an assembler routine
+  // ---------------------------------------------------------------------------------//
+  private String[] getRemAssembler (SubLine subline)
+  // ---------------------------------------------------------------------------------//
+  {
+    AssemblerProgram program = new AssemblerProgram ("REM assembler",
+        subline.getBuffer (), getLoadAddress () + subline.startPtr + 1);
+
+    return program.getAssembler ().split ("\n");
+  }
+
   // ---------------------------------------------------------------------------------//
   private void addHeader (StringBuilder pgm)
   // ---------------------------------------------------------------------------------//
@@ -790,14 +834,14 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     int ptr = symbol.length () - 1;
+
     if (symbol.charAt (ptr) == Utility.ASCII_LEFT_BRACKET)      // array
       ptr--;
+
     if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR             // string
         || symbol.charAt (ptr) == Utility.ASCII_PERCENT)        // integer
       ptr--;
 
-    String unique =
-        (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
-    return unique;
+    return (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
   }
 }

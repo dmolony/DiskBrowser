@@ -44,6 +44,7 @@ public interface ApplesoftConstants
   static final byte TOKEN_DATA = (byte) 0x83;
   static final byte TOKEN_INPUT = (byte) 0x84;
   static final byte TOKEN_DIM = (byte) 0x86;
+  static final byte TOKEN_CALL = (byte) 0x8C;
   static final byte TOKEN_ONERR = (byte) 0xA5;
   static final byte TOKEN_LET = (byte) 0xAA;
   static final byte TOKEN_GOTO = (byte) 0xAB;

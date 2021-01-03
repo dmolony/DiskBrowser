@@ -139,11 +139,11 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align consecutive assign");
   final JMenuItem showBasicTargetsItem = new JCheckBoxMenuItem ("Show targets");
   final JMenuItem onlyShowTargetLinesItem =
-      new JCheckBoxMenuItem ("Only show target lines");
+      new JCheckBoxMenuItem ("Only show target line numbers");
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
-  final JMenuItem showXrefItem = new JCheckBoxMenuItem ("List Xref");
+  final JMenuItem showXrefItem = new JCheckBoxMenuItem ("List GOSUB/GOTO");
   final JMenuItem showCallsItem = new JCheckBoxMenuItem ("List CALLs");
   final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("List variables");
   final JMenuItem showDuplicateSymbolsItem =

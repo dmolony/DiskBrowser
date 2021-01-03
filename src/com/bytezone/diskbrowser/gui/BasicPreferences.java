@@ -21,8 +21,8 @@ public class BasicPreferences
   public boolean showDuplicateSymbols = false;
   public boolean splitDim = false;
   public int wrapPrintAt = 0;
-  public int wrapRemAt = 60;
-  public int wrapDataAt = 60;
+  public int wrapRemAt = 80;
+  public int wrapDataAt = 80;
 
   // ---------------------------------------------------------------------------------//
   @Override

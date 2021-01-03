@@ -41,7 +41,8 @@ public class SubLine
     else
       doAlpha ();
 
-    if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA))
+    if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA)
+        || is (ApplesoftConstants.TOKEN_AND))
       return;
 
     int ptr = startPtr;

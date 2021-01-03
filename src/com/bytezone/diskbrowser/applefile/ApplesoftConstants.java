@@ -49,6 +49,7 @@ public interface ApplesoftConstants
   static final byte TOKEN_LET = (byte) 0xAA;
   static final byte TOKEN_GOTO = (byte) 0xAB;
   static final byte TOKEN_IF = (byte) 0xAD;
+  static final byte TOKEN_AND = (byte) 0xAF;
   static final byte TOKEN_GOSUB = (byte) 0xB0;
   static final byte TOKEN_RETURN = (byte) 0xB1;
   static final byte TOKEN_REM = (byte) 0xB2;

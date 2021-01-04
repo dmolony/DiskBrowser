@@ -22,6 +22,8 @@ public class ApplesoftBasicProgram extends BasicProgram
   final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
   final Map<String, List<Integer>> callLines = new TreeMap<> ();
   private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
+  private final Map<String, List<Integer>> functionLines = new TreeMap<> ();
+  private final Map<String, List<Integer>> arrayLines = new TreeMap<> ();
   private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
 
   final List<Integer> stringsLine = new ArrayList<> ();
@@ -52,6 +54,10 @@ public class ApplesoftBasicProgram extends BasicProgram
       {
         for (String symbol : subline.getSymbols ())
           checkVar (symbol, line.lineNumber);
+        for (String symbol : subline.getArrays ())
+          checkArray (symbol, line.lineNumber);
+        for (String symbol : subline.getFunctions ())
+          checkFunction (symbol, line.lineNumber);
         for (int targetLine : subline.getGosubLines ())
           addXref (line.lineNumber, targetLine, gosubLines);
         for (int targetLine : subline.getGotoLines ())
@@ -73,6 +79,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       lines = new ArrayList<> ();
       symbolLines.put (var, lines);
     }
+
     if (lines.size () == 0)
       lines.add (lineNumber);
     else
@@ -81,7 +88,54 @@ public class ApplesoftBasicProgram extends BasicProgram
       if (lastLine != lineNumber)
         lines.add (lineNumber);
     }
+
     checkUniqueName (var);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void checkArray (String var, int lineNumber)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = arrayLines.get (var);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      arrayLines.put (var, lines);
+    }
+
+    if (lines.size () == 0)
+      lines.add (lineNumber);
+    else
+    {
+      int lastLine = lines.get (lines.size () - 1);
+      if (lastLine != lineNumber)
+        lines.add (lineNumber);
+    }
+
+    checkUniqueName (var);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void checkFunction (String var, int lineNumber)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = functionLines.get (var);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      functionLines.put (var, lines);
+    }
+
+    if (lines.size () == 0)
+      lines.add (lineNumber);
+    else
+    {
+      int lastLine = lines.get (lines.size () - 1);
+      if (lastLine != lineNumber)
+        lines.add (lineNumber);
+    }
+
+    //    checkUniqueName (var);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -290,34 +344,14 @@ public class ApplesoftBasicProgram extends BasicProgram
       fullText.append ("\n");
     }
 
-    if (basicPreferences.showXref && !gosubLines.isEmpty ())
-      showIntegerLines (fullText, gosubLines, "  GOSUB");
-
-    if (basicPreferences.showXref && !gotoLines.isEmpty ())
-      showIntegerLines (fullText, gotoLines, "   GOTO");
-
-    if (basicPreferences.showCalls && !callLines.isEmpty ())
-      showStringLines (fullText, callLines, "   CALL");
-
     if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
-    {
-      heading (fullText, "Symbol ");
+      showSymbols (fullText, symbolLines, "Var    ");
 
-      int longestVarName = getLongestVarName ();
-      String format =
-          longestVarName > 6 ? "%-" + longestVarName + "s %s%n" : "%-6s   %s%n";
+    if (basicPreferences.showSymbols && !arrayLines.isEmpty ())
+      showSymbols (fullText, arrayLines, "Array  ");
 
-      for (String symbol : symbolLines.keySet ())
-      {
-        String line = symbolLines.get (symbol).toString ();
-        line = line.substring (1, line.length () - 1);
-        for (String s : splitXref (line, 90, ' '))
-        {
-          fullText.append (String.format (format, symbol, s));
-          symbol = "";
-        }
-      }
-    }
+    if (basicPreferences.showFunctions && !functionLines.isEmpty ())
+      showSymbols (fullText, functionLines, "Fnction");
 
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
     {
@@ -346,6 +380,15 @@ public class ApplesoftBasicProgram extends BasicProgram
         fullText.append (
             String.format (" %6s  %s%n", stringsLine.get (i), stringsText.get (i)));
     }
+
+    if (basicPreferences.showXref && !gosubLines.isEmpty ())
+      showIntegerLines (fullText, gosubLines, "  GOSUB");
+
+    if (basicPreferences.showXref && !gotoLines.isEmpty ())
+      showIntegerLines (fullText, gotoLines, "   GOTO");
+
+    if (basicPreferences.showCalls && !callLines.isEmpty ())
+      showStringLines (fullText, callLines, "   CALL");
 
     if (fullText.length () > 0)
       while (fullText.charAt (fullText.length () - 1) == '\n')
@@ -376,6 +419,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     heading (fullText, heading);
+
     for (Integer line : lines.keySet ())
     {
       String list = lines.get (line).toString ();
@@ -390,22 +434,67 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     heading (fullText, heading);
+
     for (String target : lines.keySet ())
     {
-      String list = lines.get (target).toString ();
-      list = list.substring (1, list.length () - 1);
-      fullText.append (String.format (" %6s  %s%n", target, list));
+      String line = lines.get (target).toString ();
+      //      String line = numToString (lines.get (target));
+      line = line.substring (1, line.length () - 1);
+
+      for (String s : splitXref (line, 90, ' '))
+      {
+        fullText.append (String.format (" %6s  %s%n", target, s));
+        target = "";
+      }
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getLongestVarName ()
+  private String numToString (List<Integer> numbers)
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder (".");
+
+    for (int number : numbers)
+      text.append (String.format ("%5d, ", number));
+    text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showSymbols (StringBuilder fullText, Map<String, List<Integer>> map,
+      String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    heading (fullText, heading);
+
+    int longestVarName = getLongestName (map);
+    String format = longestVarName > 7 ? "%-" + longestVarName + "s %s%n" : "%-7s  %s%n";
+
+    for (String symbol : map.keySet ())
+    {
+      String line = map.get (symbol).toString ();
+      //      String line = numToString (map.get (symbol));
+      line = line.substring (1, line.length () - 1);
+      for (String s : splitXref (line, 90, ' '))
+      {
+        fullText.append (String.format (format, symbol, s));
+        symbol = "";
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getLongestName (Map<String, List<Integer>> map)
   // ---------------------------------------------------------------------------------//
   {
     int longestName = 0;
-    for (String symbol : symbolLines.keySet ())
+
+    for (String symbol : map.keySet ())
       if (symbol.length () > longestName)
         longestName = symbol.length ();
+
     return longestName;
   }
 

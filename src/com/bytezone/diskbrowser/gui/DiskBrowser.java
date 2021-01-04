@@ -161,8 +161,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
       if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
         desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
-      else
-        setQuitHandler ();
+      //      else
+      setQuitHandler ();
     }
     else
     {

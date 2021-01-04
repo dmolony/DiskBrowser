@@ -23,8 +23,10 @@ public class Utility
   public static final byte ASCII_DOLLAR = 0x24;
   public static final byte ASCII_PERCENT = 0x25;
   public static final byte ASCII_LEFT_BRACKET = 0x28;
+  public static final byte ASCII_RIGHT_BRACKET = 0x29;
   public static final byte ASCII_COLON = 0x3A;
   public static final byte ASCII_SEMI_COLON = 0x3B;
+  public static final byte ASCII_EQUALS = 0x3D;
   public static final byte ASCII_CARET = 0x5E;
 
   public static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",

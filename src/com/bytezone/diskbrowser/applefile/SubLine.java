@@ -17,11 +17,16 @@ public class SubLine
   String callTarget;
   String forVariable = "";
   int equalsPosition;               // used for aligning the equals sign
+  String functionArgument;
+  String functionName;
+  boolean isDefine = false;
   byte[] buffer;
 
   private final List<Integer> gotoLines = new ArrayList<> ();
   private final List<Integer> gosubLines = new ArrayList<> ();
   private final List<String> symbols = new ArrayList<> ();
+  private final List<String> functions = new ArrayList<> ();
+  private final List<String> arrays = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   SubLine (SourceLine parent, int startPtr, int length)
@@ -46,22 +51,63 @@ public class SubLine
       return;
 
     int ptr = startPtr;
-    length--;
     String var = "";
     boolean inQuote = false;
+    boolean inFunction = false;
+    boolean inDefine = false;
 
-    while (length-- > 0)
+    int max = startPtr + length - 1;
+    //    System.out.printf ("%02X%n", buffer[max]);
+    if (buffer[max] == 0)
+      --max;
+    //    System.out.printf ("%02X%n", buffer[max]);
+    if (buffer[max] == Utility.ASCII_COLON)
+      --max;
+    //    System.out.printf ("%02X%n", buffer[max]);
+
+    while (ptr <= max)
     {
+      //      System.out.printf ("%02X%n", buffer[ptr]);
       byte b = buffer[ptr++];
+
+      if (b == ApplesoftConstants.TOKEN_DEF)
+      {
+        inDefine = true;
+        isDefine = true;
+        continue;
+      }
+
+      if (inDefine)         // ignore the name and argument
+      {
+        if (b == ApplesoftConstants.TOKEN_EQUALS)
+          inDefine = false;
+
+        continue;
+      }
 
       if (inQuote && b != Utility.ASCII_QUOTE)
         continue;
+
+      if (inFunction && b == Utility.ASCII_RIGHT_BRACKET)
+      {
+        inFunction = false;
+        continue;
+      }
+
+      if (b == ApplesoftConstants.TOKEN_FN)
+      {
+        inFunction = true;
+        continue;
+      }
 
       if (Utility.isPossibleVariable (b))
         var += (char) b;
       else
       {
-        checkVar (var, b);
+        if (inFunction)
+          checkFunction (var, b);
+        else
+          checkVar (var, b);
         var = "";
 
         if (b == Utility.ASCII_QUOTE)
@@ -72,16 +118,36 @@ public class SubLine
   }
 
   // ---------------------------------------------------------------------------------//
+  private void checkFunction (String var, byte terminator)
+  // ---------------------------------------------------------------------------------//
+  {
+    assert terminator == Utility.ASCII_LEFT_BRACKET;
+    //    System.out.printf ("checking function: %6d %s%n", parent.lineNumber, var);
+    if (!functions.contains (var))
+      functions.add (var);
+  }
+
+  // ---------------------------------------------------------------------------------//
   private void checkVar (String var, byte terminator)
   // ---------------------------------------------------------------------------------//
   {
     if (var.length () == 0)
       return;
 
-    if (terminator == Utility.ASCII_LEFT_BRACKET)
-      var += "(";
+    if (!Utility.isLetter ((byte) var.charAt (0)))
+      return;
 
-    if (Utility.isLetter ((byte) var.charAt (0)) && !symbols.contains (var))
+    if (isDefine && (var.equals (functionName) || var.equals (functionArgument)))
+      return;
+
+    if (terminator == Utility.ASCII_LEFT_BRACKET)
+    {
+      //      var += "(";
+      if (!arrays.contains (var))
+        arrays.add (var);
+
+    }
+    else if (!symbols.contains (var))
       symbols.add (var);
   }
 
@@ -90,6 +156,20 @@ public class SubLine
   // ---------------------------------------------------------------------------------//
   {
     return symbols;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getFunctions ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return functions;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getArrays ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return arrays;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -175,14 +255,39 @@ public class SubLine
         break;
 
       case ApplesoftConstants.TOKEN_CALL:
-        byte[] buffer = getBuffer ();
+        byte[] lineBuffer = getBuffer ();
 
-        if (buffer[0] == (byte) 0xC9)       // negative
-          callTarget = "-" + new String (buffer, 1, buffer.length - 1);
+        if (lineBuffer[0] == (byte) 0xC9)       // negative
+          callTarget = "-" + new String (lineBuffer, 1, lineBuffer.length - 1);
         else
-          callTarget = new String (buffer, 0, buffer.length);
+          callTarget = new String (lineBuffer, 0, lineBuffer.length);
+        break;
+
+      case ApplesoftConstants.TOKEN_DEF:
+        lineBuffer = getBuffer ();
+        assert lineBuffer[0] == ApplesoftConstants.TOKEN_FN;
+
+        int leftBracket = getPosition (lineBuffer, 1, Utility.ASCII_LEFT_BRACKET);
+        int rightBracket =
+            getPosition (lineBuffer, leftBracket + 1, Utility.ASCII_RIGHT_BRACKET);
+
+        functionName = new String (lineBuffer, 1, leftBracket - 1);
+        functionArgument =
+            new String (lineBuffer, leftBracket + 1, rightBracket - leftBracket - 1);
+        functions.add (functionName);
+
         break;
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getPosition (byte[] buffer, int start, byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = start; i < buffer.length; i++)
+      if (buffer[i] == value)
+        return i;
+    return -1;
   }
 
   // ---------------------------------------------------------------------------------//

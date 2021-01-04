@@ -53,6 +53,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_XREF = "showXref";
   private static final String PREFS_SHOW_CALLS = "showCalls";
   private static final String PREFS_SHOW_SYMBOLS = "showSymbols";
+  private static final String PREFS_SHOW_FUNCTIONS = "showFunctions";
   private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
   private static final String PREFS_LIST_STRINGS = "listStrings";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
@@ -146,6 +147,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showXrefItem = new JCheckBoxMenuItem ("List GOSUB/GOTO");
   final JMenuItem showCallsItem = new JCheckBoxMenuItem ("List CALLs");
   final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("List variables");
+  final JMenuItem showFunctionsItem = new JCheckBoxMenuItem ("List functions");
   final JMenuItem showDuplicateSymbolsItem =
       new JCheckBoxMenuItem ("List duplicate variables");
   final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
@@ -256,6 +258,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showXrefItem);
     applesoftMenu.add (showCallsItem);
     applesoftMenu.add (showSymbolsItem);
+    applesoftMenu.add (showFunctionsItem);
     applesoftMenu.add (showDuplicateSymbolsItem);
     applesoftMenu.add (listStringsItem);
 
@@ -319,6 +322,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showXrefItem.addActionListener (basicPreferencesAction);
     showCallsItem.addActionListener (basicPreferencesAction);
     showSymbolsItem.addActionListener (basicPreferencesAction);
+    showFunctionsItem.addActionListener (basicPreferencesAction);
     showDuplicateSymbolsItem.addActionListener (basicPreferencesAction);
     listStringsItem.addActionListener (basicPreferencesAction);
     blankAfterReturn.addActionListener (basicPreferencesAction);
@@ -371,6 +375,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.showXref = showXrefItem.isSelected ();
     basicPreferences.showCalls = showCallsItem.isSelected ();
     basicPreferences.showSymbols = showSymbolsItem.isSelected ();
+    basicPreferences.showFunctions = showFunctionsItem.isSelected ();
     basicPreferences.showDuplicateSymbols = showDuplicateSymbolsItem.isSelected ();
     basicPreferences.listStrings = listStringsItem.isSelected ();
     basicPreferences.blankAfterReturn = blankAfterReturn.isSelected ();
@@ -533,6 +538,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_XREF, showXrefItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CALLS, showCallsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_SYMBOLS, showSymbolsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_FUNCTIONS, showFunctionsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
         showDuplicateSymbolsItem.isSelected ());
     prefs.putBoolean (PREFS_LIST_STRINGS, listStringsItem.isSelected ());
@@ -589,6 +595,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_XREF, false));
     showCallsItem.setSelected (prefs.getBoolean (PREFS_SHOW_CALLS, false));
     showSymbolsItem.setSelected (prefs.getBoolean (PREFS_SHOW_SYMBOLS, false));
+    showFunctionsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FUNCTIONS, false));
     showDuplicateSymbolsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS, false));
     listStringsItem.setSelected (prefs.getBoolean (PREFS_LIST_STRINGS, false));

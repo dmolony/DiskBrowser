@@ -27,6 +27,7 @@ public class SubLine
   private final List<String> symbols = new ArrayList<> ();
   private final List<String> functions = new ArrayList<> ();
   private final List<String> arrays = new ArrayList<> ();
+  private final List<Integer> constants = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   SubLine (SourceLine parent, int startPtr, int length)
@@ -135,19 +136,23 @@ public class SubLine
       return;
 
     if (!Utility.isLetter ((byte) var.charAt (0)))
+    {
+      if (!constants.contains (var))
+        constants.add (Integer.parseInt (var));
       return;
+    }
 
     if (isDefine && (var.equals (functionName) || var.equals (functionArgument)))
       return;
 
     if (terminator == Utility.ASCII_LEFT_BRACKET)
     {
-      //      var += "(";
       if (!arrays.contains (var))
         arrays.add (var);
-
+      return;
     }
-    else if (!symbols.contains (var))
+
+    if (!symbols.contains (var))
       symbols.add (var);
   }
 
@@ -184,6 +189,13 @@ public class SubLine
   // ---------------------------------------------------------------------------------//
   {
     return gosubLines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Integer> getConstants ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return constants;
   }
 
   // ---------------------------------------------------------------------------------//

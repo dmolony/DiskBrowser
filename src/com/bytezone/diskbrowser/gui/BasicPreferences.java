@@ -18,6 +18,7 @@ public class BasicPreferences
   public boolean showXref = false;
   public boolean showCalls = false;
   public boolean showSymbols = false;
+  public boolean showConstants = false;
   public boolean showFunctions = false;
   public boolean showDuplicateSymbols = false;
   public boolean splitDim = false;
@@ -43,6 +44,7 @@ public class BasicPreferences
     text.append (String.format ("Show Xref ................ %s%n", showXref));
     text.append (String.format ("Show CALL ................ %s%n", showCalls));
     text.append (String.format ("Show symbols ............. %s%n", showSymbols));
+    text.append (String.format ("Show constants ........... %s%n", showConstants));
     text.append (String.format ("Show functions ........... %s%n", showFunctions));
     text.append (String.format ("Show duplicate symbols ... %s%n", showDuplicateSymbols));
     text.append (String.format ("List strings ............. %s%n", listStrings));

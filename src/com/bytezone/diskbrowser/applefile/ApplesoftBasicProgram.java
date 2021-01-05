@@ -18,13 +18,17 @@ public class ApplesoftBasicProgram extends BasicProgram
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
 
-  final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
-  final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
-  final Map<String, List<Integer>> callLines = new TreeMap<> ();
+  private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
+  private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
+  private final Map<Integer, List<Integer>> constants = new TreeMap<> ();
+
+  private final Map<String, List<Integer>> callLines = new TreeMap<> ();
   private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
   private final Map<String, List<Integer>> functionLines = new TreeMap<> ();
   private final Map<String, List<Integer>> arrayLines = new TreeMap<> ();
+
   private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
+  private final Map<String, List<String>> uniqueArrays = new TreeMap<> ();
 
   final List<Integer> stringsLine = new ArrayList<> ();
   final List<String> stringsText = new ArrayList<> ();
@@ -53,15 +57,17 @@ public class ApplesoftBasicProgram extends BasicProgram
       for (SubLine subline : line.sublines)
       {
         for (String symbol : subline.getSymbols ())
-          checkVar (symbol, line.lineNumber);
+          checkVar (symbol, line.lineNumber, symbolLines, uniqueSymbols);
         for (String symbol : subline.getArrays ())
-          checkArray (symbol, line.lineNumber);
+          checkVar (symbol, line.lineNumber, arrayLines, uniqueArrays);
         for (String symbol : subline.getFunctions ())
           checkFunction (symbol, line.lineNumber);
         for (int targetLine : subline.getGosubLines ())
           addXref (line.lineNumber, targetLine, gosubLines);
         for (int targetLine : subline.getGotoLines ())
           addXref (line.lineNumber, targetLine, gotoLines);
+        for (int targetLine : subline.getConstants ())
+          addXref (line.lineNumber, targetLine, constants);
         if (subline.callTarget != null)
           addXref (line.lineNumber, subline.callTarget, callLines);
       }
@@ -70,14 +76,15 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  void checkVar (String var, int lineNumber)
+  void checkVar (String var, int lineNumber, Map<String, List<Integer>> map,
+      Map<String, List<String>> unique)
   // ---------------------------------------------------------------------------------//
   {
-    List<Integer> lines = symbolLines.get (var);
+    List<Integer> lines = map.get (var);
     if (lines == null)
     {
       lines = new ArrayList<> ();
-      symbolLines.put (var, lines);
+      map.put (var, lines);
     }
 
     if (lines.size () == 0)
@@ -89,30 +96,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         lines.add (lineNumber);
     }
 
-    checkUniqueName (var);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  void checkArray (String var, int lineNumber)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = arrayLines.get (var);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      arrayLines.put (var, lines);
-    }
-
-    if (lines.size () == 0)
-      lines.add (lineNumber);
-    else
-    {
-      int lastLine = lines.get (lines.size () - 1);
-      if (lastLine != lineNumber)
-        lines.add (lineNumber);
-    }
-
-    checkUniqueName (var);
+    checkUniqueName (var, unique);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -353,6 +337,9 @@ public class ApplesoftBasicProgram extends BasicProgram
     if (basicPreferences.showFunctions && !functionLines.isEmpty ())
       showSymbols (fullText, functionLines, "Fnction");
 
+    if (basicPreferences.showConstants && !constants.isEmpty ())
+      showIntegerLines (fullText, constants, "  Const");
+
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
     {
       boolean headingShown = false;
@@ -422,9 +409,16 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     for (Integer line : lines.keySet ())
     {
+      String lineText = line + "";
       String list = lines.get (line).toString ();
       list = list.substring (1, list.length () - 1);
-      fullText.append (String.format (" %6s  %s%n", line, list));
+      //      fullText.append (String.format (" %6s  %s%n", line, list));
+
+      for (String s : splitXref (list, 90, ' '))
+      {
+        fullText.append (String.format (" %6s  %s%n", lineText, s));
+        lineText = "";
+      }
     }
   }
 
@@ -902,16 +896,16 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void checkUniqueName (String symbol)
+  private void checkUniqueName (String symbol, Map<String, List<String>> map)
   // ---------------------------------------------------------------------------------//
   {
     String uniqueName = getUniqueName (symbol);
 
-    List<String> usage = uniqueSymbols.get (uniqueName);
+    List<String> usage = map.get (uniqueName);
     if (usage == null)
     {
       usage = new ArrayList<> ();
-      uniqueSymbols.put (uniqueName, usage);
+      map.put (uniqueName, usage);
     }
 
     if (!usage.contains (symbol))
@@ -924,8 +918,8 @@ public class ApplesoftBasicProgram extends BasicProgram
   {
     int ptr = symbol.length () - 1;
 
-    if (symbol.charAt (ptr) == Utility.ASCII_LEFT_BRACKET)      // array
-      ptr--;
+    //    if (symbol.charAt (ptr) == Utility.ASCII_LEFT_BRACKET)      // array
+    //      ptr--;
 
     if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR             // string
         || symbol.charAt (ptr) == Utility.ASCII_PERCENT)        // integer

@@ -58,6 +58,7 @@ public interface ApplesoftConstants
   static final byte TOKEN_PRINT = (byte) 0xBA;
   static final byte TOKEN_FN = (byte) 0xC2;
   static final byte TOKEN_THEN = (byte) 0xC4;
+  static final byte TOKEN_MINUS = (byte) 0xC9;
   static final byte TOKEN_EQUALS = (byte) 0xD0;
 
   int[] tokenAddresses =

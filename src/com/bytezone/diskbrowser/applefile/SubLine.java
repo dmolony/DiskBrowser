@@ -41,7 +41,12 @@ public class SubLine
     byte firstByte = buffer[startPtr];
 
     if (Utility.isHighBitSet (firstByte))
+    {
       doToken (firstByte);
+      if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA)
+          || is (ApplesoftConstants.TOKEN_AMPERSAND))
+        return;
+    }
     else if (Utility.isDigit (firstByte))
     {
       doDigit ();
@@ -50,10 +55,6 @@ public class SubLine
     else
       doAlpha ();
 
-    if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA)
-        || is (ApplesoftConstants.TOKEN_AMPERSAND))
-      return;
-
     int ptr = startPtr;
     String var = "";
     boolean inQuote = false;
@@ -61,17 +62,13 @@ public class SubLine
     boolean inDefine = false;
 
     int max = startPtr + length - 1;
-    //    System.out.printf ("%02X%n", buffer[max]);
     if (buffer[max] == 0)
       --max;
-    //    System.out.printf ("%02X%n", buffer[max]);
     if (buffer[max] == Utility.ASCII_COLON)
       --max;
-    //    System.out.printf ("%02X%n", buffer[max]);
 
     while (ptr <= max)
     {
-      //      System.out.printf ("%02X%n", buffer[ptr]);
       byte b = buffer[ptr++];
 
       if (b == ApplesoftConstants.TOKEN_DEF)
@@ -118,6 +115,7 @@ public class SubLine
           inQuote = !inQuote;
       }
     }
+
     checkVar (var, (byte) 0);
   }
 
@@ -126,7 +124,7 @@ public class SubLine
   // ---------------------------------------------------------------------------------//
   {
     assert terminator == Utility.ASCII_LEFT_BRACKET;
-    //    System.out.printf ("checking function: %6d %s%n", parent.lineNumber, var);
+
     if (!functions.contains (var))
       functions.add (var);
   }
@@ -277,7 +275,7 @@ public class SubLine
       case ApplesoftConstants.TOKEN_CALL:
         byte[] lineBuffer = getBuffer ();
 
-        if (lineBuffer[0] == (byte) 0xC9)       // negative
+        if (lineBuffer[0] == ApplesoftConstants.TOKEN_MINUS)
           callTarget = "-" + new String (lineBuffer, 1, lineBuffer.length - 1);
         else
           callTarget = new String (lineBuffer, 0, lineBuffer.length);

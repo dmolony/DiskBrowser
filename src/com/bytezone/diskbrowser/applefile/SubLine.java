@@ -43,7 +43,10 @@ public class SubLine
     if (Utility.isHighBitSet (firstByte))
       doToken (firstByte);
     else if (Utility.isDigit (firstByte))
+    {
       doDigit ();
+      return;
+    }
     else
       doAlpha ();
 
@@ -137,8 +140,13 @@ public class SubLine
 
     if (!Utility.isLetter ((byte) var.charAt (0)))
     {
-      if (!constants.contains (var))
-        constants.add (Integer.parseInt (var));
+      if (is (ApplesoftConstants.TOKEN_GOTO) || is (ApplesoftConstants.TOKEN_GOSUB)
+          || is (ApplesoftConstants.TOKEN_ON))
+        return;
+
+      int varInt = Integer.parseInt (var);
+      if (!constants.contains (varInt))
+        constants.add (varInt);
       return;
     }
 

@@ -334,31 +334,17 @@ public class ApplesoftBasicProgram extends BasicProgram
     if (basicPreferences.showSymbols && !arrayLines.isEmpty ())
       showSymbols (fullText, arrayLines, "Array  ");
 
+    if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
+      showDuplicates (fullText, uniqueSymbols, "Var   ");
+
+    if (basicPreferences.showDuplicateSymbols && !uniqueArrays.isEmpty ())
+      showDuplicates (fullText, uniqueArrays, "Array ");
+
     if (basicPreferences.showFunctions && !functionLines.isEmpty ())
       showSymbols (fullText, functionLines, "Fnction");
 
     if (basicPreferences.showConstants && !constants.isEmpty ())
       showIntegerLines (fullText, constants, "  Const");
-
-    if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
-    {
-      boolean headingShown = false;
-      for (String key : uniqueSymbols.keySet ())
-      {
-        List<String> usage = uniqueSymbols.get (key);
-        if (usage.size () > 1)
-        {
-          if (!headingShown)
-          {
-            headingShown = true;
-            heading (fullText, "Symbol   Duplicate Names");
-          }
-          String line = usage.toString ();
-          line = line.substring (1, line.length () - 1);
-          fullText.append (String.format ("%-6s   %s%n", key, line));
-        }
-      }
-    }
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
@@ -385,6 +371,14 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
+  private int getMaxDigits ()
+  // ---------------------------------------------------------------------------------//
+  {
+    SourceLine lastLine = sourceLines.get (sourceLines.size () - 1);
+    return (lastLine.lineNumber + "").length ();
+  }
+
+  // ---------------------------------------------------------------------------------//
   private void heading (StringBuilder fullText, String heading)
   // ---------------------------------------------------------------------------------//
   {
@@ -407,14 +401,12 @@ public class ApplesoftBasicProgram extends BasicProgram
   {
     heading (fullText, heading);
 
-    for (Integer line : lines.keySet ())
+    for (Integer key : lines.keySet ())
     {
-      String lineText = line + "";
-      String list = lines.get (line).toString ();
-      list = list.substring (1, list.length () - 1);
-      //      fullText.append (String.format (" %6s  %s%n", line, list));
+      String lineText = key + "";
+      String line = numToString (lines.get (key));
 
-      for (String s : splitXref (list, 90, ' '))
+      for (String s : splitXref (line, 90, ' '))
       {
         fullText.append (String.format (" %6s  %s%n", lineText, s));
         lineText = "";
@@ -431,9 +423,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     for (String target : lines.keySet ())
     {
-      String line = lines.get (target).toString ();
-      //      String line = numToString (lines.get (target));
-      line = line.substring (1, line.length () - 1);
+      String line = numToString (lines.get (target));
 
       for (String s : splitXref (line, 90, ' '))
       {
@@ -444,16 +434,26 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private String numToString (List<Integer> numbers)
+  private void showDuplicates (StringBuilder fullText, Map<String, List<String>> map,
+      String heading)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder (".");
-
-    for (int number : numbers)
-      text.append (String.format ("%5d, ", number));
-    text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
+    boolean headingShown = false;
+    for (String key : map.keySet ())
+    {
+      List<String> usage = map.get (key);
+      if (usage.size () > 1)
+      {
+        if (!headingShown)
+        {
+          headingShown = true;
+          heading (fullText, heading + "   Duplicate Names");
+        }
+        String line = usage.toString ();
+        line = line.substring (1, line.length () - 1);
+        fullText.append (String.format ("%-6s   %s%n", key, line));
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -468,15 +468,30 @@ public class ApplesoftBasicProgram extends BasicProgram
 
     for (String symbol : map.keySet ())
     {
-      String line = map.get (symbol).toString ();
-      //      String line = numToString (map.get (symbol));
-      line = line.substring (1, line.length () - 1);
+      String line = numToString (map.get (symbol));
+
       for (String s : splitXref (line, 90, ' '))
       {
         fullText.append (String.format (format, symbol, s));
         symbol = "";
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String numToString (List<Integer> numbers)
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    String format = "%" + getMaxDigits () + "d, ";
+    for (int number : numbers)
+      text.append (String.format (format, number));
+
+    text.deleteCharAt (text.length () - 1);
+    text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//

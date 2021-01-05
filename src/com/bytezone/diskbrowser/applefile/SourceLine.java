@@ -10,11 +10,12 @@ public class SourceLine
 // -----------------------------------------------------------------------------------//
 {
   ApplesoftBasicProgram parent;
-  List<SubLine> sublines = new ArrayList<> ();
   int lineNumber;
   int linePtr;
   int length;
   byte[] buffer;
+
+  List<SubLine> sublines = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   SourceLine (ApplesoftBasicProgram parent, byte[] buffer, int ptr)
@@ -22,10 +23,11 @@ public class SourceLine
   {
     this.parent = parent;
     this.buffer = buffer;
+
     linePtr = ptr;
     lineNumber = Utility.unsignedShort (buffer, ptr + 2);
 
-    int startPtr = ptr += 4;
+    int startPtr = ptr += 4;            // skip link to next line and lineNumber
     boolean inString = false;           // can toggle
     boolean inRemark = false;           // can only go false -> true
     byte b;

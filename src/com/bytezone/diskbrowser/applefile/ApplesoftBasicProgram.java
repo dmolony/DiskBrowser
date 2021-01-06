@@ -36,6 +36,10 @@ public class ApplesoftBasicProgram extends BasicProgram
   final List<Integer> stringsLine = new ArrayList<> ();
   final List<String> stringsText = new ArrayList<> ();
 
+  String formatLeft;
+  String formatLineNumber;
+  String formatRight;
+
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
@@ -78,6 +82,11 @@ public class ApplesoftBasicProgram extends BasicProgram
     endPtr = ptr;
 
     longestVarName = getLongestName ();
+    formatLeft = longestVarName > 7 ? "%-" + longestVarName + "." + longestVarName + "s  "
+        : "%-7.7s  ";
+    formatRight = longestVarName > 7 ? "%" + longestVarName + "." + longestVarName + "s  "
+        : "%7.7s  ";
+    formatLineNumber = "%" + getMaxDigits () + "d ";
   }
 
   // ---------------------------------------------------------------------------------//
@@ -123,8 +132,6 @@ public class ApplesoftBasicProgram extends BasicProgram
       if (lastLine != lineNumber)
         lines.add (lineNumber);
     }
-
-    //    checkUniqueName (var);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -334,39 +341,39 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
-      showStringSymbols (fullText, symbolLines, "Var    ");
+      showSymbolsLeft (fullText, symbolLines, "Var");
 
     if (basicPreferences.showSymbols && !arrayLines.isEmpty ())
-      showStringSymbols (fullText, arrayLines, "Array  ");
+      showSymbolsLeft (fullText, arrayLines, "Array");
 
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
-      showDuplicates (fullText, uniqueSymbols, "Var   ");
+      showDuplicates (fullText, uniqueSymbols, "Var");
 
     if (basicPreferences.showDuplicateSymbols && !uniqueArrays.isEmpty ())
-      showDuplicates (fullText, uniqueArrays, "Array ");
+      showDuplicates (fullText, uniqueArrays, "Array");
 
     if (basicPreferences.showFunctions && !functionLines.isEmpty ())
-      showStringSymbols (fullText, functionLines, "Fnction");
+      showSymbolsLeft (fullText, functionLines, "Fnction");
 
     if (basicPreferences.showConstants && !constants.isEmpty ())
-      showIntegerSymbols (fullText, constants, "  Const");
+      showSymbolsRight (fullText, constants, "Const");
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
-      heading (fullText, "%7.7s  ", "Line", "String");
+      heading (fullText, formatRight, "Line", "String");
       for (int i = 0; i < stringsLine.size (); i++)
-        fullText.append (
-            String.format (" %6s  %s%n", stringsLine.get (i), stringsText.get (i)));
+        fullText.append (String.format (formatRight + "%s%n", stringsLine.get (i),
+            stringsText.get (i)));
     }
 
     if (basicPreferences.showXref && !gosubLines.isEmpty ())
-      showIntegerSymbols (fullText, gosubLines, "GOSUB");
+      showSymbolsRight (fullText, gosubLines, "GOSUB");
 
     if (basicPreferences.showXref && !gotoLines.isEmpty ())
-      showIntegerSymbols (fullText, gotoLines, "GOTO");
+      showSymbolsRight (fullText, gotoLines, "GOTO");
 
     if (basicPreferences.showCalls && !callLines.isEmpty ())
-      showStringSymbols (fullText, callLines, "CALL");
+      showSymbolsLeft (fullText, callLines, "CALL");
 
     if (fullText.length () > 0)
       while (fullText.charAt (fullText.length () - 1) == '\n')
@@ -395,6 +402,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       fullText.append ("Line numbers");
     else
       fullText.append (heading[1]);
+
     fullText.append ("\n");
     fullText.append (String.format (format, underline));
     fullText.append (underline);
@@ -415,7 +423,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         if (!headingShown)
         {
           headingShown = true;
-          heading (fullText, "%-7.7s  ", heading, "Duplicate Names");
+          heading (fullText, formatLeft, heading, "Duplicate Names");
         }
         String line = usage.toString ();
         line = line.substring (1, line.length () - 1);
@@ -425,20 +433,16 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void showStringSymbols (StringBuilder fullText, Map<String, List<Integer>> map,
+  private void showSymbolsLeft (StringBuilder fullText, Map<String, List<Integer>> map,
       String heading)
   // ---------------------------------------------------------------------------------//
   {
-    String format1 = longestVarName > 7
-        ? "%-" + longestVarName + "." + longestVarName + "s  " : "%-7.7s  ";
-    String format2 = "%" + getMaxDigits () + "d ";
+    heading (fullText, formatLeft, heading);
 
-    heading (fullText, format1, heading);
-
-    for (String symbol : map.keySet ())
+    for (String symbol : map.keySet ())                   // left-justify strings
     {
       StringBuilder text = new StringBuilder ();
-      text.append (String.format (format1, symbol));
+      text.append (String.format (formatLeft, symbol));
       for (int lineNo : map.get (symbol))
       {
         if (text.length () > 95)
@@ -446,30 +450,27 @@ public class ApplesoftBasicProgram extends BasicProgram
           fullText.append (text);
           fullText.append ("\n");
           text.setLength (0);
-          text.append (String.format (format1, ""));
+          text.append (String.format (formatLeft, ""));
         }
-        text.append (String.format (format2, lineNo));
+        text.append (String.format (formatLineNumber, lineNo));
       }
+
       if (text.length () > longestVarName + 3)
         fullText.append (text + "\n");
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private void showIntegerSymbols (StringBuilder fullText,
-      Map<Integer, List<Integer>> map, String heading)
+  private void showSymbolsRight (StringBuilder fullText, Map<Integer, List<Integer>> map,
+      String heading)
   // ---------------------------------------------------------------------------------//
   {
-    String format1 = longestVarName > 7
-        ? "%" + longestVarName + "." + longestVarName + "s  " : "%7.7s  ";
-    String format2 = "%" + getMaxDigits () + "d ";
+    heading (fullText, formatRight, heading);
 
-    heading (fullText, format1, heading);
-
-    for (Integer symbol : map.keySet ())
+    for (Integer symbol : map.keySet ())                  // right-justify integers
     {
       StringBuilder text = new StringBuilder ();
-      text.append (String.format (format1, symbol));
+      text.append (String.format (formatRight, symbol));
       for (int lineNo : map.get (symbol))
       {
         if (text.length () > 95)
@@ -477,10 +478,11 @@ public class ApplesoftBasicProgram extends BasicProgram
           fullText.append (text);
           fullText.append ("\n");
           text.setLength (0);
-          text.append (String.format (format1, ""));
+          text.append (String.format (formatRight, ""));
         }
-        text.append (String.format (format2, lineNo));
+        text.append (String.format (formatLineNumber, lineNo));
       }
+
       if (text.length () > longestVarName + 3)
         fullText.append (text + "\n");
     }
@@ -915,9 +917,6 @@ public class ApplesoftBasicProgram extends BasicProgram
   // ---------------------------------------------------------------------------------//
   {
     int ptr = symbol.length () - 1;
-
-    //    if (symbol.charAt (ptr) == Utility.ASCII_LEFT_BRACKET)      // array
-    //      ptr--;
 
     if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR             // string
         || symbol.charAt (ptr) == Utility.ASCII_PERCENT)        // integer

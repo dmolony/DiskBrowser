@@ -39,6 +39,7 @@ public class ApplesoftBasicProgram extends BasicProgram
   String formatLeft;
   String formatLineNumber;
   String formatRight;
+  int maxDigits;
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -86,7 +87,9 @@ public class ApplesoftBasicProgram extends BasicProgram
         : "%-7.7s  ";
     formatRight = longestVarName > 7 ? "%" + longestVarName + "." + longestVarName + "s  "
         : "%7.7s  ";
-    formatLineNumber = "%" + getMaxDigits () + "d ";
+
+    maxDigits = getMaxDigits ();
+    formatLineNumber = "%" + maxDigits + "d ";
   }
 
   // ---------------------------------------------------------------------------------//
@@ -397,6 +400,10 @@ public class ApplesoftBasicProgram extends BasicProgram
     if (fullText.charAt (fullText.length () - 2) != '\n')
       fullText.append ("\n");
 
+    fullText.append (String.format (format, underline));
+    fullText.append (underline);
+    fullText.append ("\n");
+
     fullText.append (String.format (format, heading[0]));
     if (heading.length == 1)
       fullText.append ("Line numbers");
@@ -425,6 +432,7 @@ public class ApplesoftBasicProgram extends BasicProgram
           headingShown = true;
           heading (fullText, formatLeft, heading, "Duplicate Names");
         }
+
         String line = usage.toString ();
         line = line.substring (1, line.length () - 1);
         fullText.append (String.format ("%-6s   %s%n", key, line));
@@ -445,7 +453,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       text.append (String.format (formatLeft, symbol));
       for (int lineNo : map.get (symbol))
       {
-        if (text.length () > 95)
+        if (text.length () > underline.length () - maxDigits + longestVarName)
         {
           fullText.append (text);
           fullText.append ("\n");
@@ -473,7 +481,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       text.append (String.format (formatRight, symbol));
       for (int lineNo : map.get (symbol))
       {
-        if (text.length () > 95)
+        if (text.length () > underline.length () - maxDigits + longestVarName)
         {
           fullText.append (text);
           fullText.append ("\n");

@@ -15,8 +15,11 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class ApplesoftBasicProgram extends BasicProgram
 // -----------------------------------------------------------------------------------//
 {
+  static final String underline = "----------------------------------------------------"
+      + "----------------------------------------------";
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
+  private final int longestVarName;
 
   private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
@@ -73,6 +76,8 @@ public class ApplesoftBasicProgram extends BasicProgram
       }
     }
     endPtr = ptr;
+
+    longestVarName = getLongestName ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -329,10 +334,10 @@ public class ApplesoftBasicProgram extends BasicProgram
     }
 
     if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
-      showSymbols (fullText, symbolLines, "Var    ");
+      showStringSymbols (fullText, symbolLines, "Var    ");
 
     if (basicPreferences.showSymbols && !arrayLines.isEmpty ())
-      showSymbols (fullText, arrayLines, "Array  ");
+      showStringSymbols (fullText, arrayLines, "Array  ");
 
     if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
       showDuplicates (fullText, uniqueSymbols, "Var   ");
@@ -341,27 +346,27 @@ public class ApplesoftBasicProgram extends BasicProgram
       showDuplicates (fullText, uniqueArrays, "Array ");
 
     if (basicPreferences.showFunctions && !functionLines.isEmpty ())
-      showSymbols (fullText, functionLines, "Fnction");
+      showStringSymbols (fullText, functionLines, "Fnction");
 
     if (basicPreferences.showConstants && !constants.isEmpty ())
-      showIntegerLines (fullText, constants, "  Const");
+      showIntegerSymbols (fullText, constants, "  Const");
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
-      heading (fullText, "   Line  String");
+      heading (fullText, "%7.7s  ", "Line", "String");
       for (int i = 0; i < stringsLine.size (); i++)
         fullText.append (
             String.format (" %6s  %s%n", stringsLine.get (i), stringsText.get (i)));
     }
 
     if (basicPreferences.showXref && !gosubLines.isEmpty ())
-      showIntegerLines (fullText, gosubLines, "  GOSUB");
+      showIntegerSymbols (fullText, gosubLines, "GOSUB");
 
     if (basicPreferences.showXref && !gotoLines.isEmpty ())
-      showIntegerLines (fullText, gotoLines, "   GOTO");
+      showIntegerSymbols (fullText, gotoLines, "GOTO");
 
     if (basicPreferences.showCalls && !callLines.isEmpty ())
-      showStringLines (fullText, callLines, "   CALL");
+      showStringSymbols (fullText, callLines, "CALL");
 
     if (fullText.length () > 0)
       while (fullText.charAt (fullText.length () - 1) == '\n')
@@ -379,58 +384,21 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void heading (StringBuilder fullText, String heading)
+  private void heading (StringBuilder fullText, String format, String... heading)
   // ---------------------------------------------------------------------------------//
   {
     if (fullText.charAt (fullText.length () - 2) != '\n')
       fullText.append ("\n");
 
-    if (heading.length () < 10)
-      fullText.append (heading + "  Line numbers\n");
+    fullText.append (String.format (format, heading[0]));
+    if (heading.length == 1)
+      fullText.append ("Line numbers");
     else
-      fullText.append (heading + "\n");
-
-    fullText.append ("-------  --------------------------------------------------"
-        + "------------------------------------------\n");
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void showIntegerLines (StringBuilder fullText,
-      Map<Integer, List<Integer>> lines, String heading)
-  // ---------------------------------------------------------------------------------//
-  {
-    heading (fullText, heading);
-
-    for (Integer key : lines.keySet ())
-    {
-      String lineText = key + "";
-      String line = numToString (lines.get (key));
-
-      for (String s : splitXref (line, 90, ' '))
-      {
-        fullText.append (String.format (" %6s  %s%n", lineText, s));
-        lineText = "";
-      }
-    }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void showStringLines (StringBuilder fullText, Map<String, List<Integer>> lines,
-      String heading)
-  // ---------------------------------------------------------------------------------//
-  {
-    heading (fullText, heading);
-
-    for (String target : lines.keySet ())
-    {
-      String line = numToString (lines.get (target));
-
-      for (String s : splitXref (line, 90, ' '))
-      {
-        fullText.append (String.format (" %6s  %s%n", target, s));
-        target = "";
-      }
-    }
+      fullText.append (heading[1]);
+    fullText.append ("\n");
+    fullText.append (String.format (format, underline));
+    fullText.append (underline);
+    fullText.append ("\n");
   }
 
   // ---------------------------------------------------------------------------------//
@@ -447,7 +415,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         if (!headingShown)
         {
           headingShown = true;
-          heading (fullText, heading + "   Duplicate Names");
+          heading (fullText, "%-7.7s  ", heading, "Duplicate Names");
         }
         String line = usage.toString ();
         line = line.substring (1, line.length () - 1);
@@ -457,49 +425,84 @@ public class ApplesoftBasicProgram extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private void showSymbols (StringBuilder fullText, Map<String, List<Integer>> map,
+  private void showStringSymbols (StringBuilder fullText, Map<String, List<Integer>> map,
       String heading)
   // ---------------------------------------------------------------------------------//
   {
-    heading (fullText, heading);
+    String format1 = longestVarName > 7
+        ? "%-" + longestVarName + "." + longestVarName + "s  " : "%-7.7s  ";
+    String format2 = "%" + getMaxDigits () + "d ";
 
-    int longestVarName = getLongestName (map);
-    String format = longestVarName > 7 ? "%-" + longestVarName + "s %s%n" : "%-7s  %s%n";
+    heading (fullText, format1, heading);
 
     for (String symbol : map.keySet ())
     {
-      String line = numToString (map.get (symbol));
-
-      for (String s : splitXref (line, 90, ' '))
+      StringBuilder text = new StringBuilder ();
+      text.append (String.format (format1, symbol));
+      for (int lineNo : map.get (symbol))
       {
-        fullText.append (String.format (format, symbol, s));
-        symbol = "";
+        if (text.length () > 95)
+        {
+          fullText.append (text);
+          fullText.append ("\n");
+          text.setLength (0);
+          text.append (String.format (format1, ""));
+        }
+        text.append (String.format (format2, lineNo));
       }
+      if (text.length () > longestVarName + 3)
+        fullText.append (text + "\n");
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private String numToString (List<Integer> numbers)
+  private void showIntegerSymbols (StringBuilder fullText,
+      Map<Integer, List<Integer>> map, String heading)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder ();
+    String format1 = longestVarName > 7
+        ? "%" + longestVarName + "." + longestVarName + "s  " : "%7.7s  ";
+    String format2 = "%" + getMaxDigits () + "d ";
 
-    String format = "%" + getMaxDigits () + "d, ";
-    for (int number : numbers)
-      text.append (String.format (format, number));
+    heading (fullText, format1, heading);
 
-    text.deleteCharAt (text.length () - 1);
-    text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
+    for (Integer symbol : map.keySet ())
+    {
+      StringBuilder text = new StringBuilder ();
+      text.append (String.format (format1, symbol));
+      for (int lineNo : map.get (symbol))
+      {
+        if (text.length () > 95)
+        {
+          fullText.append (text);
+          fullText.append ("\n");
+          text.setLength (0);
+          text.append (String.format (format1, ""));
+        }
+        text.append (String.format (format2, lineNo));
+      }
+      if (text.length () > longestVarName + 3)
+        fullText.append (text + "\n");
+    }
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getLongestName (Map<String, List<Integer>> map)
+  private int getLongestName ()
   // ---------------------------------------------------------------------------------//
   {
     int longestName = 0;
 
+    longestName = getLongestName (symbolLines, longestName);
+    longestName = getLongestName (arrayLines, longestName);
+    longestName = getLongestName (functionLines, longestName);
+
+    return longestName;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getLongestName (Map<String, List<Integer>> map, int longestName)
+  // ---------------------------------------------------------------------------------//
+  {
     for (String symbol : map.keySet ())
       if (symbol.length () > longestName)
         longestName = symbol.length ();
@@ -612,26 +615,6 @@ public class ApplesoftBasicProgram extends BasicProgram
         break;
       lines.add (line.substring (0, max + 1));
       line = "       ".substring (0, firstSpace + 1) + line.substring (max + 1);
-    }
-
-    lines.add (line);
-    return lines;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private List<String> splitXref (String line, int wrapLength, char breakChar)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<String> lines = new ArrayList<> ();
-    while (line.length () > wrapLength)
-    {
-      int max = Math.min (wrapLength, line.length () - 1);
-      while (max > 0 && line.charAt (max) != breakChar)
-        --max;
-      if (max == 0)
-        break;
-      lines.add (line.substring (0, max + 1));
-      line = line.substring (max + 1);
     }
 
     lines.add (line);

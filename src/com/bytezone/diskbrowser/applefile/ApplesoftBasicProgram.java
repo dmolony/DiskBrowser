@@ -359,7 +359,7 @@ public class ApplesoftBasicProgram extends BasicProgram
       showSymbolsLeft (fullText, functionLines, "Fnction");
 
     if (basicPreferences.showConstants && !constants.isEmpty ())
-      showSymbolsRight (fullText, constants, "Const");
+      showSymbolsRight (fullText, constants, "Literal");
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
@@ -448,24 +448,7 @@ public class ApplesoftBasicProgram extends BasicProgram
     heading (fullText, formatLeft, heading);
 
     for (String symbol : map.keySet ())                   // left-justify strings
-    {
-      StringBuilder text = new StringBuilder ();
-      text.append (String.format (formatLeft, symbol));
-      for (int lineNo : map.get (symbol))
-      {
-        if (text.length () > underline.length () - maxDigits + longestVarName)
-        {
-          fullText.append (text);
-          fullText.append ("\n");
-          text.setLength (0);
-          text.append (String.format (formatLeft, ""));
-        }
-        text.append (String.format (formatLineNumber, lineNo));
-      }
-
-      if (text.length () > longestVarName + 3)
-        fullText.append (text + "\n");
-    }
+      appendLineNumbers (fullText, String.format (formatLeft, symbol), map.get (symbol));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -476,24 +459,31 @@ public class ApplesoftBasicProgram extends BasicProgram
     heading (fullText, formatRight, heading);
 
     for (Integer symbol : map.keySet ())                  // right-justify integers
-    {
-      StringBuilder text = new StringBuilder ();
-      text.append (String.format (formatRight, symbol));
-      for (int lineNo : map.get (symbol))
-      {
-        if (text.length () > underline.length () - maxDigits + longestVarName)
-        {
-          fullText.append (text);
-          fullText.append ("\n");
-          text.setLength (0);
-          text.append (String.format (formatRight, ""));
-        }
-        text.append (String.format (formatLineNumber, lineNo));
-      }
+      appendLineNumbers (fullText, String.format (formatRight, symbol), map.get (symbol));
+  }
 
-      if (text.length () > longestVarName + 3)
-        fullText.append (text + "\n");
+  // ---------------------------------------------------------------------------------//
+  private void appendLineNumbers (StringBuilder fullText, String symbol,
+      List<Integer> lineNumbers)
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+    text.append (symbol);
+
+    for (int lineNo : lineNumbers)
+    {
+      if (text.length () > underline.length () - maxDigits + longestVarName)
+      {
+        fullText.append (text);
+        fullText.append ("\n");
+        text.setLength (0);
+        text.append (String.format (formatRight, ""));
+      }
+      text.append (String.format (formatLineNumber, lineNo));
     }
+
+    if (text.length () > longestVarName + 3)
+      fullText.append (text + "\n");
   }
 
   // ---------------------------------------------------------------------------------//

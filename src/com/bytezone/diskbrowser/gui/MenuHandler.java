@@ -149,7 +149,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showCallsItem = new JCheckBoxMenuItem ("List CALLs");
   final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("List variables");
   final JMenuItem showFunctionsItem = new JCheckBoxMenuItem ("List functions");
-  final JMenuItem showConstantsItem = new JCheckBoxMenuItem ("List constants");
+  final JMenuItem showConstantsItem = new JCheckBoxMenuItem ("List literals");
   final JMenuItem showDuplicateSymbolsItem =
       new JCheckBoxMenuItem ("List duplicate variables");
   final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
@@ -262,8 +262,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showSymbolsItem);
     applesoftMenu.add (showFunctionsItem);
     applesoftMenu.add (showConstantsItem);
-    applesoftMenu.add (showDuplicateSymbolsItem);
     applesoftMenu.add (listStringsItem);
+    applesoftMenu.add (showDuplicateSymbolsItem);
 
     assemblerMenu.add (showAssemblerHeaderItem);
     assemblerMenu.add (showAssemblerTargetsItem);

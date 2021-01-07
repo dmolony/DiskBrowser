@@ -44,7 +44,8 @@ public class SubLine
     {
       doToken (firstByte);
       if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA)
-          || is (ApplesoftConstants.TOKEN_AMPERSAND))
+          || is (ApplesoftConstants.TOKEN_AMPERSAND)
+          || is (ApplesoftConstants.TOKEN_CALL))
         return;
     }
     else if (Utility.isDigit (firstByte))

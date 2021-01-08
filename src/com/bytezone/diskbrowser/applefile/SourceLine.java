@@ -1,5 +1,9 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOTO;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_REM;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_THEN;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,12 +59,12 @@ public class SourceLine
         // break IF statements into two sublines (allows for easier line indenting)
         case ApplesoftConstants.TOKEN_IF:
           // skip to THEN or GOTO - if not found then it's an error
-          while (buffer[ptr] != ApplesoftConstants.TOKEN_THEN
-              && buffer[ptr] != ApplesoftConstants.TOKEN_GOTO && buffer[ptr] != 0)
+          while (buffer[ptr] != TOKEN_THEN && buffer[ptr] != TOKEN_GOTO
+              && buffer[ptr] != 0)
             ptr++;
 
           // keep THEN with the IF
-          if (buffer[ptr] == ApplesoftConstants.TOKEN_THEN)
+          if (buffer[ptr] == TOKEN_THEN)
             ++ptr;
 
           // create subline from the condition (and THEN if it exists)
@@ -75,7 +79,7 @@ public class SourceLine
           startPtr = ptr;
           break;
 
-        case ApplesoftConstants.TOKEN_REM:
+        case TOKEN_REM:
           if (ptr != startPtr + 1)      // REM appears mid-line (should follow a colon)
           {
             System.out.println ("mid-line REM token");

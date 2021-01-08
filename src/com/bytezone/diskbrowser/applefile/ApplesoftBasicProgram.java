@@ -1,5 +1,18 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DATA;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DIM;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_FOR;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOSUB;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOTO;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_IF;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_INPUT;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_NEXT;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_ON;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_PRINT;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_REM;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_RETURN;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +215,7 @@ public class ApplesoftBasicProgram extends BasicProgram
 
         // A REM statement might conceal an assembler routine
         // - see P.CREATE on Diags2E.DSK
-        if (subline.is (ApplesoftConstants.TOKEN_REM) && subline.containsToken ())
+        if (subline.is (TOKEN_REM) && subline.containsToken ())
         {
           int address = getLoadAddress () + subline.startPtr + 1;  // skip the REM token
           fullText.append (text + String.format ("REM - Inline assembler @ $%02X (%d)%n",
@@ -214,7 +227,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
 
         // Beagle Bros often have multiline REM statements
-        if (subline.is (ApplesoftConstants.TOKEN_REM) && subline.containsControlChars ())
+        if (subline.is (TOKEN_REM) && subline.containsControlChars ())
         {
           subline.addFormattedRem (text);
           fullText.append (text + "\n");
@@ -222,7 +235,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
 
         // Reduce the indent by each NEXT, but only as far as the IF indent allows
-        if (subline.is (ApplesoftConstants.TOKEN_NEXT))
+        if (subline.is (TOKEN_NEXT))
         {
           popLoopVariables (loopVariables, subline);
           indent = Math.max (ifIndent, loopVariables.size ());
@@ -239,13 +252,11 @@ public class ApplesoftBasicProgram extends BasicProgram
         {
           // Prepare target indicators for subsequent sublines (ie no line number)
           if (basicPreferences.showTargets && !subline.isFirst ())
-            if (subline.is (ApplesoftConstants.TOKEN_GOSUB)
-                || (subline.is (ApplesoftConstants.TOKEN_ON)
-                    && subline.has (ApplesoftConstants.TOKEN_GOSUB)))
+            if (subline.is (TOKEN_GOSUB)
+                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
               text.append ("<<--");
-            else if (subline.is (ApplesoftConstants.TOKEN_GOTO)
-                || subline.isImpliedGoto () || (subline.is (ApplesoftConstants.TOKEN_ON)
-                    && subline.has (ApplesoftConstants.TOKEN_GOTO)))
+            else if (subline.is (TOKEN_GOTO) || subline.isImpliedGoto ()
+                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
               text.append (" <--");
 
           // Align assign statements if required
@@ -260,30 +271,27 @@ public class ApplesoftBasicProgram extends BasicProgram
         // Add the current text, then reset it
         String lineText = subline.getAlignedText (alignEqualsPos);
 
-        if (subline.is (ApplesoftConstants.TOKEN_REM)
-            && basicPreferences.deleteExtraRemSpace)
+        if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
           lineText = lineText.replaceFirst ("REM  ", "REM ");
 
-        if (subline.is (ApplesoftConstants.TOKEN_DATA)
-            && basicPreferences.deleteExtraDataSpace)
+        if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
           lineText = lineText.replaceFirst ("DATA  ", "DATA ");
 
         // Check for a wrappable REM/DATA/DIM statement
         // (see SEA BATTLE on DISK283.DSK)
         int inset = Math.max (text.length (), getIndent (fullText)) + 1;
-        if (subline.is (ApplesoftConstants.TOKEN_REM)
-            && lineText.length () > basicPreferences.wrapRemAt)
+        if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
           addSplitLines (lines, text, inset);
         }
-        else if (subline.is (ApplesoftConstants.TOKEN_DATA)
+        else if (subline.is (TOKEN_DATA)
             && lineText.length () > basicPreferences.wrapDataAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
           addSplitLines (lines, text, inset);
         }
-        else if (subline.is (ApplesoftConstants.TOKEN_DIM) && basicPreferences.splitDim)
+        else if (subline.is (TOKEN_DIM) && basicPreferences.splitDim)
         {
           List<String> lines = splitDim (lineText);
           addSplitLines (lines, text, inset);
@@ -294,8 +302,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         // Check for a wrappable PRINT or INPUT statement
         // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
         if (basicPreferences.wrapPrintAt > 0
-            && (subline.is (ApplesoftConstants.TOKEN_PRINT)
-                || subline.is (ApplesoftConstants.TOKEN_INPUT))
+            && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
             && countChars (text, Utility.ASCII_QUOTE) == 2      // just start and end quotes
             && countChars (text, Utility.ASCII_CARET) == 0)     // no control characters
           wrapPrint (fullText, text, lineText);
@@ -305,9 +312,9 @@ public class ApplesoftBasicProgram extends BasicProgram
         text.setLength (0);
 
         // Calculate indent changes that take effect after the current subline
-        if (subline.is (ApplesoftConstants.TOKEN_IF))
+        if (subline.is (TOKEN_IF))
           ifIndent = ++indent;
-        else if (subline.is (ApplesoftConstants.TOKEN_FOR))
+        else if (subline.is (TOKEN_FOR))
         {
           String latestLoopVar = loopVariables.size () > 0 ? loopVariables.peek () : "";
           if (!subline.forVariable.equals (latestLoopVar))    // don't add repeated loop
@@ -316,8 +323,8 @@ public class ApplesoftBasicProgram extends BasicProgram
             ++indent;
           }
         }
-        else if (basicPreferences.blankAfterReturn
-            && subline.is (ApplesoftConstants.TOKEN_RETURN) && subline.isFirst ())
+        else if (basicPreferences.blankAfterReturn && subline.is (TOKEN_RETURN)
+            && subline.isFirst ())
           insertBlankLine = true;
       }
 
@@ -701,13 +708,10 @@ public class ApplesoftBasicProgram extends BasicProgram
     SubLine subline = line.sublines.get (0);
     String c1 = "  ", c2 = "  ";
 
-    if (subline.is (ApplesoftConstants.TOKEN_GOSUB)
-        || (subline.is (ApplesoftConstants.TOKEN_ON)
-            && subline.has (ApplesoftConstants.TOKEN_GOSUB)))
+    if (subline.is (TOKEN_GOSUB) || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
       c1 = "<<";
-    else if (subline.is (ApplesoftConstants.TOKEN_GOTO)
-        || (subline.is (ApplesoftConstants.TOKEN_ON)
-            && subline.has (ApplesoftConstants.TOKEN_GOTO)))
+    else if (subline.is (TOKEN_GOTO)
+        || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
       c1 = " <";
 
     if (gotoLines.containsKey (line.lineNumber))
@@ -768,7 +772,7 @@ public class ApplesoftBasicProgram extends BasicProgram
         }
         else if (subline == startSubline)
           started = true;
-        else if (subline.is (ApplesoftConstants.TOKEN_IF))
+        else if (subline.is (TOKEN_IF))
           inIf = true;
       }
       if (started && inIf)

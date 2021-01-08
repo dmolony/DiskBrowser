@@ -1,9 +1,25 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_CALL;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DATA;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DEF;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_EQUALS;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_FN;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_FOR;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOSUB;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOTO;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_LET;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_MINUS;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_NEXT;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_ON;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_ONERR;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_REM;
+import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_THEN;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.utilities.Utility;
+import com.bytezone.diskbrowser.utilities.Utility;;
 
 // -----------------------------------------------------------------------------------//
 public class SubLine
@@ -13,13 +29,16 @@ public class SubLine
 
   int startPtr;
   int length;
+
   String[] nextVariables;
-  String callTarget;
   String forVariable = "";
+
   int equalsPosition;               // used for aligning the equals sign
+
   String functionArgument;
   String functionName;
-  boolean isDefine = false;
+
+  String callTarget;
   byte[] buffer;
 
   private final List<Integer> gotoLines = new ArrayList<> ();
@@ -43,9 +62,7 @@ public class SubLine
     if (Utility.isHighBitSet (firstByte))
     {
       doToken (firstByte);
-      if (is (ApplesoftConstants.TOKEN_REM) || is (ApplesoftConstants.TOKEN_DATA)
-          || is (ApplesoftConstants.TOKEN_AMPERSAND)
-          || is (ApplesoftConstants.TOKEN_CALL))
+      if (is (TOKEN_REM) || is (TOKEN_DATA) || is (TOKEN_CALL))
         return;
     }
     else if (Utility.isDigit (firstByte))
@@ -72,16 +89,15 @@ public class SubLine
     {
       byte b = buffer[ptr++];
 
-      if (b == ApplesoftConstants.TOKEN_DEF)
+      if (b == TOKEN_DEF)
       {
         inDefine = true;
-        isDefine = true;
         continue;
       }
 
       if (inDefine)         // ignore the name and argument
       {
-        if (b == ApplesoftConstants.TOKEN_EQUALS)
+        if (b == TOKEN_EQUALS)
           inDefine = false;
 
         continue;
@@ -96,7 +112,7 @@ public class SubLine
         continue;
       }
 
-      if (b == ApplesoftConstants.TOKEN_FN)
+      if (b == TOKEN_FN)
       {
         inFunction = true;
         continue;
@@ -139,8 +155,7 @@ public class SubLine
 
     if (!Utility.isLetter ((byte) var.charAt (0)))
     {
-      if (is (ApplesoftConstants.TOKEN_GOTO) || is (ApplesoftConstants.TOKEN_GOSUB)
-          || is (ApplesoftConstants.TOKEN_ON))
+      if (is (TOKEN_GOTO) || is (TOKEN_GOSUB) || is (TOKEN_ON))
         return;
 
       int varInt = Integer.parseInt (var);
@@ -149,7 +164,7 @@ public class SubLine
       return;
     }
 
-    if (isDefine && (var.equals (functionName) || var.equals (functionArgument)))
+    if (is (TOKEN_DEF) && (var.equals (functionName) || var.equals (functionArgument)))
       return;
 
     if (terminator == Utility.ASCII_LEFT_BRACKET)
@@ -211,13 +226,13 @@ public class SubLine
   {
     switch (b)
     {
-      case ApplesoftConstants.TOKEN_FOR:
+      case TOKEN_FOR:
         int p = startPtr + 1;
-        while (buffer[p] != ApplesoftConstants.TOKEN_EQUALS)
+        while (buffer[p] != TOKEN_EQUALS)
           forVariable += (char) buffer[p++];
         break;
 
-      case ApplesoftConstants.TOKEN_NEXT:
+      case TOKEN_NEXT:
         if (length == 2)                // no variables
           nextVariables = new String[0];
         else
@@ -227,21 +242,21 @@ public class SubLine
         }
         break;
 
-      case ApplesoftConstants.TOKEN_LET:
+      case TOKEN_LET:
         recordEqualsPosition ();
         break;
 
-      case ApplesoftConstants.TOKEN_GOTO:
+      case TOKEN_GOTO:
         int targetLine = getLineNumber (buffer, startPtr + 1);
         addXref (targetLine, gotoLines);
         break;
 
-      case ApplesoftConstants.TOKEN_GOSUB:
+      case TOKEN_GOSUB:
         targetLine = getLineNumber (buffer, startPtr + 1);
         addXref (targetLine, gosubLines);
         break;
 
-      case ApplesoftConstants.TOKEN_ON:
+      case TOKEN_ON:
         p = startPtr + 1;
         int max = startPtr + length - 1;
         while (p < max && buffer[p] != ApplesoftConstants.TOKEN_GOTO
@@ -250,12 +265,12 @@ public class SubLine
 
         switch (buffer[p++])
         {
-          case ApplesoftConstants.TOKEN_GOSUB:
+          case TOKEN_GOSUB:
             for (int destLine : getLineNumbers (buffer, p))
               addXref (destLine, gosubLines);
             break;
 
-          case ApplesoftConstants.TOKEN_GOTO:
+          case TOKEN_GOTO:
             for (int destLine : getLineNumbers (buffer, p))
               addXref (destLine, gotoLines);
             break;
@@ -265,7 +280,7 @@ public class SubLine
         }
         break;
 
-      case ApplesoftConstants.TOKEN_ONERR:
+      case TOKEN_ONERR:
         if (buffer[startPtr + 1] == ApplesoftConstants.TOKEN_GOTO)
         {
           targetLine = getLineNumber (buffer, startPtr + 2);
@@ -273,18 +288,18 @@ public class SubLine
         }
         break;
 
-      case ApplesoftConstants.TOKEN_CALL:
+      case TOKEN_CALL:
         byte[] lineBuffer = getBuffer ();
 
-        if (lineBuffer[0] == ApplesoftConstants.TOKEN_MINUS)
+        if (lineBuffer[0] == TOKEN_MINUS)
           callTarget = "-" + new String (lineBuffer, 1, lineBuffer.length - 1);
         else
           callTarget = new String (lineBuffer, 0, lineBuffer.length);
         break;
 
-      case ApplesoftConstants.TOKEN_DEF:
+      case TOKEN_DEF:
         lineBuffer = getBuffer ();
-        assert lineBuffer[0] == ApplesoftConstants.TOKEN_FN;
+        assert lineBuffer[0] == TOKEN_FN;
 
         int leftBracket = getPosition (lineBuffer, 1, Utility.ASCII_LEFT_BRACKET);
         int rightBracket =
@@ -364,13 +379,10 @@ public class SubLine
   // ---------------------------------------------------------------------------------//
   {
     int lineNumber = 0;
-    while (ptr < buffer.length)
-    {
-      int b = (buffer[ptr++] & 0xFF) - 0x30;
-      if (b < 0 || b > 9)
-        break;
-      lineNumber = lineNumber * 10 + b;
-    }
+
+    while (ptr < buffer.length && Utility.isDigit (buffer[ptr]))
+      lineNumber = lineNumber * 10 + (buffer[ptr++] & 0xFF) - 0x30;
+
     return lineNumber;
   }
 
@@ -391,9 +403,9 @@ public class SubLine
   {
     int p = startPtr + 1;
     int max = startPtr + length;
-    while (buffer[p] != ApplesoftConstants.TOKEN_EQUALS && p < max)
+    while (buffer[p] != TOKEN_EQUALS && p < max)
       p++;
-    if (buffer[p] == ApplesoftConstants.TOKEN_EQUALS)
+    if (buffer[p] == TOKEN_EQUALS)
       equalsPosition = toString ().indexOf ('=');           // use expanded line
   }
 
@@ -401,7 +413,7 @@ public class SubLine
   boolean isJoinableRem ()
   // ---------------------------------------------------------------------------------//
   {
-    return is (ApplesoftConstants.TOKEN_REM) && !isFirst ();
+    return is (TOKEN_REM) && !isFirst ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -504,7 +516,7 @@ public class SubLine
     StringBuilder line = toStringBuilder ();      // get line
 
     // insert spaces before '=' until it lines up with the other assignment lines
-    if (!is (ApplesoftConstants.TOKEN_REM))
+    if (!is (TOKEN_REM))
       while (alignEqualsPos-- > equalsPosition)
         line.insert (equalsPosition, ' ');
 
@@ -515,9 +527,7 @@ public class SubLine
   public byte[] getBuffer ()
   // ---------------------------------------------------------------------------------//
   {
-    //    System.out.println (HexFormatter.format (buffer, startPtr, length));
     int len = length - 1;
-    //    System.out.printf ("%02X%n", buffer[startPtr + len]);
     if (buffer[startPtr + len] == Utility.ASCII_COLON || buffer[startPtr + len] == 0)
       len--;
     byte[] buffer2 = new byte[len];
@@ -557,8 +567,7 @@ public class SubLine
         int val = b & 0x7F;
         if (val < ApplesoftConstants.tokens.length)
         {
-          if (b != ApplesoftConstants.TOKEN_THEN
-              || ApplesoftBasicProgram.basicPreferences.showThen)
+          if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
             line.append (ApplesoftConstants.tokens[val]);
         }
       }

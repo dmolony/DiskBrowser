@@ -1,16 +1,12 @@
 package com.bytezone.diskbrowser.applefile;
 
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOTO;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_REM;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_THEN;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public class SourceLine
+public class SourceLine implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
   ApplesoftBasicProgram parent;

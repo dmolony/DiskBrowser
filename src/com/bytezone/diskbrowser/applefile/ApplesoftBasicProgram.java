@@ -1,18 +1,5 @@
 package com.bytezone.diskbrowser.applefile;
 
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DATA;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DIM;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_FOR;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOSUB;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOTO;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_IF;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_INPUT;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_NEXT;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_ON;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_PRINT;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_REM;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_RETURN;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +12,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public class ApplesoftBasicProgram extends BasicProgram
+public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
   static final String underline = "----------------------------------------------------"

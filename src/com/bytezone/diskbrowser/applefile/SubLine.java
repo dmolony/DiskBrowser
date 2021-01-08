@@ -1,32 +1,17 @@
 package com.bytezone.diskbrowser.applefile;
 
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_CALL;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DATA;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_DEF;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_EQUALS;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_FN;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_FOR;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOSUB;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_GOTO;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_LET;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_MINUS;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_NEXT;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_ON;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_ONERR;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_REM;
-import static com.bytezone.diskbrowser.applefile.ApplesoftConstants.TOKEN_THEN;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.Utility;;
 
 // -----------------------------------------------------------------------------------//
-public class SubLine
+public class SubLine implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
   SourceLine parent;
 
+  byte[] buffer;
   int startPtr;
   int length;
 
@@ -39,7 +24,6 @@ public class SubLine
   String functionName;
 
   String callTarget;
-  byte[] buffer;
 
   private final List<Integer> gotoLines = new ArrayList<> ();
   private final List<Integer> gosubLines = new ArrayList<> ();
@@ -171,10 +155,8 @@ public class SubLine
     {
       if (!arrays.contains (var))
         arrays.add (var);
-      return;
     }
-
-    if (!symbols.contains (var))
+    else if (!symbols.contains (var))
       symbols.add (var);
   }
 

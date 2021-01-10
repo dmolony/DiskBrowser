@@ -93,46 +93,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private String list ()
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuilder text = new StringBuilder ();
-
-    if (basicPreferences.showHeader)
-      addHeader (text);
-
-    int loadAddress = getLoadAddress ();
-    int ptr = 0;
-    int nextLine;
-    byte b;
-
-    while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
-    {
-      int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
-      text.append (String.format (" %5d ", lineNumber));
-      //      text.append (
-      //          String.format ("%04X  %04X  %5d ", loadAddress + ptr, nextLine, lineNumber));
-      ptr += 4;
-
-      while ((b = buffer[ptr++]) != 0)
-        if (Utility.isHighBitSet (b))
-          text.append (
-              String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F].trim ()));
-        else
-          text.append ((char) b);
-
-      assert ptr == nextLine - loadAddress;
-      //      ptr = nextLine - loadAddress;
-      text.append ("\n");
-    }
-
-    if (text.length () > 0)
-      text.deleteCharAt (text.length () - 1);
-    //    text.append (String.format ("%04X  %04X%n%n", loadAddress + ptr, nextLine));
-    return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
   void checkVar (String var, int lineNumber, Map<String, List<Integer>> map,
       Map<String, List<String>> unique)
   // ---------------------------------------------------------------------------------//
@@ -216,7 +176,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   // ---------------------------------------------------------------------------------//
   {
     if (!basicPreferences.formatApplesoft)
-      return list ();
+      return originalFormat ();
 
     int indentSize = 2;
     boolean insertBlankLine = false;
@@ -958,5 +918,43 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       ptr--;
 
     return (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String originalFormat ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    if (basicPreferences.showHeader)
+      addHeader (text);
+
+    int loadAddress = getLoadAddress ();
+    int ptr = 0;
+    int nextLine;
+    byte b;
+
+    while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
+    {
+      int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
+      text.append (String.format (" %5d ", lineNumber));
+      ptr += 4;
+
+      while ((b = buffer[ptr++]) != 0)
+        if (Utility.isHighBitSet (b))
+          text.append (
+              String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F].trim ()));
+        else
+          text.append ((char) b);
+
+      assert ptr == nextLine - loadAddress;
+      //      ptr = nextLine - loadAddress;
+      text.append ("\n");
+    }
+
+    if (text.length () > 0)
+      text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
   }
 }

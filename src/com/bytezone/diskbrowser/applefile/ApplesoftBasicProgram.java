@@ -109,7 +109,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
     {
       int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
-      text.append (String.format ("%5d ", lineNumber));
+      text.append (String.format (" %5d ", lineNumber));
       //      text.append (
       //          String.format ("%04X  %04X  %5d ", loadAddress + ptr, nextLine, lineNumber));
       ptr += 4;

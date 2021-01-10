@@ -543,7 +543,7 @@ public class SubLine implements ApplesoftConstants
     for (int p = startPtr; p <= max; p++)
     {
       byte b = buffer[p];
-      if (Utility.isHighBitSet (b))
+      if (Utility.isHighBitSet (b))           // token
       {
         if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
           line.append (' ');
@@ -551,7 +551,7 @@ public class SubLine implements ApplesoftConstants
         if (val < ApplesoftConstants.tokens.length)
         {
           if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
-            line.append (ApplesoftConstants.tokens[val]);
+            line.append (ApplesoftConstants.tokens[val] + " ");
         }
       }
       else if (Utility.isControlCharacter (b))

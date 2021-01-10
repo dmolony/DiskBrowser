@@ -942,8 +942,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
       while ((b = buffer[ptr++]) != 0)
         if (Utility.isHighBitSet (b))
-          text.append (
-              String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F].trim ()));
+          text.append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
         else
           text.append ((char) b);
 

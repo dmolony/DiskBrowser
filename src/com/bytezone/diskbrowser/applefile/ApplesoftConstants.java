@@ -19,7 +19,7 @@ public interface ApplesoftConstants
                      "RUN ", "IF ", "RESTORE ", "& ",               // 0xAC
                      "GOSUB ", "RETURN ", "REM ", "STOP ",          // 0xB0
                      "ON ", "WAIT ", "LOAD ", "SAVE ",              // 0xB4
-                     "DEF", "POKE ", "PRINT ", "CONT",              // 0xB8
+                     "DEF ", "POKE ", "PRINT ", "CONT",             // 0xB8
                      "LIST ", "CLEAR ", "GET ", "NEW ",             // 0xBC
                      "TAB(", "TO ", "FN ", "SPC(",                  // 0xC0
                      "THEN ", "AT ", "NOT ", "STEP ",               // 0xC4

@@ -39,8 +39,8 @@ public class SubLine implements ApplesoftConstants
     this.parent = parent;
     this.startPtr = startPtr;
     this.length = length;
-
     this.buffer = parent.buffer;
+
     byte firstByte = buffer[startPtr];
 
     if (Utility.isHighBitSet (firstByte))
@@ -59,6 +59,7 @@ public class SubLine implements ApplesoftConstants
 
     int ptr = startPtr;
     String var = "";
+
     boolean inQuote = false;
     boolean inFunction = false;
     boolean inDefine = false;
@@ -118,6 +119,21 @@ public class SubLine implements ApplesoftConstants
     }
 
     checkVar (var, (byte) 0);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void doDigit ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int targetLine = getLineNumber (buffer, startPtr);
+    addXref (targetLine, gotoLines);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void doAlpha ()
+  // ---------------------------------------------------------------------------------//
+  {
+    recordEqualsPosition ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -304,21 +320,6 @@ public class SubLine implements ApplesoftConstants
       if (buffer[i] == value)
         return i;
     return -1;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void doDigit ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int targetLine = getLineNumber (buffer, startPtr);
-    addXref (targetLine, gotoLines);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void doAlpha ()
-  // ---------------------------------------------------------------------------------//
-  {
-    recordEqualsPosition ();
   }
 
   // ---------------------------------------------------------------------------------//

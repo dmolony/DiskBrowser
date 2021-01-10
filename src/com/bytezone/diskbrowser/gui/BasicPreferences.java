@@ -4,10 +4,11 @@ package com.bytezone.diskbrowser.gui;
 public class BasicPreferences
 // -----------------------------------------------------------------------------------//
 {
+  public boolean showHeader = true;
+  public boolean formatApplesoft = true;
   public boolean splitRem = false;
   public boolean alignAssign = true;
   public boolean showTargets = true;
-  public boolean showHeader = true;
   public boolean onlyShowTargetLineNumbers = true;
   public boolean showCaret = false;
   public boolean showThen = true;
@@ -39,6 +40,7 @@ public class BasicPreferences
     text.append (
         String.format ("Only target lines ........ %s%n", onlyShowTargetLineNumbers));
     text.append (String.format ("Show header .............. %s%n", showHeader));
+    text.append (String.format ("Format applesoft ......... %s%n", formatApplesoft));
     text.append (String.format ("Show caret ............... %s%n", showCaret));
     text.append (String.format ("Show THEN ................ %s%n", showThen));
     text.append (String.format ("Show Xref ................ %s%n", showXref));

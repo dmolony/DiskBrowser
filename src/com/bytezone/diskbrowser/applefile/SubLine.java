@@ -63,6 +63,7 @@ public class SubLine implements ApplesoftConstants
     boolean inQuote = false;
     boolean inFunction = false;
     boolean inDefine = false;
+    //    int functionParens = 0;
 
     int max = startPtr + length - 1;
     if (buffer[max] == 0)
@@ -74,41 +75,38 @@ public class SubLine implements ApplesoftConstants
     {
       byte b = buffer[ptr++];
 
+      if (inDefine)                                 // ignore the name and argument
+      {
+        if (b == TOKEN_EQUALS)
+          inDefine = false;
+        continue;
+      }
+
       if (b == TOKEN_DEF)
       {
         inDefine = true;
         continue;
       }
 
-      if (inDefine)         // ignore the name and argument
-      {
-        if (b == TOKEN_EQUALS)
-          inDefine = false;
-
-        continue;
-      }
-
-      if (inQuote && b != Utility.ASCII_QUOTE)
-        continue;
-
-      if (inFunction && b == Utility.ASCII_RIGHT_BRACKET)
-      {
-        inFunction = false;
-        continue;
-      }
-
       if (b == TOKEN_FN)
       {
+        assert !inDefine;
         inFunction = true;
         continue;
       }
 
-      if (Utility.isPossibleVariable (b))
+      if (inQuote && b != Utility.ASCII_QUOTE)      // ignore strings
+        continue;
+
+      if (Utility.isPossibleVariable (b))           // A-Z 0-9
         var += (char) b;
       else
       {
         if (inFunction)
+        {
           checkFunction (var, b);
+          inFunction = false;
+        }
         else
           checkVar (var, b);
         var = "";
@@ -548,11 +546,11 @@ public class SubLine implements ApplesoftConstants
         if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
           line.append (' ');
         int val = b & 0x7F;
-        if (val < ApplesoftConstants.tokens.length)
-        {
-          if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
-            line.append (ApplesoftConstants.tokens[val] + " ");
-        }
+        //        if (val < ApplesoftConstants.tokens.length)
+        //        {
+        if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
+          line.append (ApplesoftConstants.tokens[val] + " ");
+        //        }
       }
       else if (Utility.isControlCharacter (b))
         line.append (ApplesoftBasicProgram.basicPreferences.showCaret

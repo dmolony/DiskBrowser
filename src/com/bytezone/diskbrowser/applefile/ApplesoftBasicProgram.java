@@ -340,6 +340,20 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       fullText.append ("\n");
     }
 
+    if (basicPreferences.showAllXref)
+      addXref (fullText);
+
+    if (fullText.length () > 0)
+      while (fullText.charAt (fullText.length () - 1) == '\n')
+        fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
+
+    return fullText.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addXref (StringBuilder fullText)
+  // ---------------------------------------------------------------------------------//
+  {
     if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
       showSymbolsLeft (fullText, symbolLines, "Var");
 
@@ -374,12 +388,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
     if (basicPreferences.showCalls && !callLines.isEmpty ())
       showSymbolsLeft (fullText, callLines, "CALL");
-
-    if (fullText.length () > 0)
-      while (fullText.charAt (fullText.length () - 1) == '\n')
-        fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
-
-    return fullText.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -950,6 +958,9 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       //      ptr = nextLine - loadAddress;
       text.append ("\n");
     }
+
+    if (basicPreferences.showAllXref)
+      addXref (text);
 
     if (text.length () > 0)
       text.deleteCharAt (text.length () - 1);

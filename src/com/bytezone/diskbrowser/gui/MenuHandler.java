@@ -45,6 +45,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   private static final String PREFS_SHOW_HEADER = "showHeader";
   private static final String PREFS_FORMAT_APPLESOFT = "formatApplesoft";
+  private static final String PREFS_SHOW_ALL_XREF = "showAllXref";
   private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
   private static final String PREFS_SPLIT_DIM = "splitDim";
   private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
@@ -94,7 +95,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private final List<TextPreferencesListener> textPreferencesListeners =
       new ArrayList<> ();
 
-  private List<JCheckBoxMenuItem> applesoftMenuItems;
+  private List<JCheckBoxMenuItem> applesoftFormatItems;
+  private List<JCheckBoxMenuItem> applesoftXrefItems;
 
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
@@ -142,6 +144,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   // Applesoft menu items
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showFormatApplesoftItem = new JCheckBoxMenuItem ("Format Applesoft");
+  final JMenuItem showAllXrefItem = new JCheckBoxMenuItem ("Show XREF");
+
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
   final JMenuItem splitDimItem = new JCheckBoxMenuItem ("Split DIM");
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align consecutive assign");
@@ -150,6 +154,11 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       new JCheckBoxMenuItem ("Only show target line numbers");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
+  final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
+  final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
+  final JMenuItem deleteExtraDataSpace =
+      new JCheckBoxMenuItem ("Delete extra DATA space");
+
   final JMenuItem showXrefItem = new JCheckBoxMenuItem ("List GOSUB/GOTO");
   final JMenuItem showCallsItem = new JCheckBoxMenuItem ("List CALLs");
   final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("List variables");
@@ -158,10 +167,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showDuplicateSymbolsItem =
       new JCheckBoxMenuItem ("List duplicate variables");
   final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
-  final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
-  final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
-  final JMenuItem deleteExtraDataSpace =
-      new JCheckBoxMenuItem ("Delete extra DATA space");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -252,6 +257,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     applesoftMenu.add (showHeaderItem);
     applesoftMenu.add (showFormatApplesoftItem);
+    applesoftMenu.add (showAllXrefItem);
     applesoftMenu.addSeparator ();
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (splitDimItem);
@@ -281,11 +287,13 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     prodosMenu.add (prodosSortDirectoriesItem);
 
-    applesoftMenuItems = new ArrayList (Arrays.asList (splitRemarkItem, splitDimItem,
+    applesoftFormatItems = new ArrayList (Arrays.asList (splitRemarkItem, splitDimItem,
         alignAssignItem, showBasicTargetsItem, onlyShowTargetLinesItem, showCaretItem,
-        showThenItem, blankAfterReturn, deleteExtraRemSpace, deleteExtraDataSpace,
-        showXrefItem, showCallsItem, showSymbolsItem, showFunctionsItem,
-        showConstantsItem, listStringsItem, showDuplicateSymbolsItem));
+        showThenItem, blankAfterReturn, deleteExtraRemSpace, deleteExtraDataSpace));
+
+    applesoftXrefItems = new ArrayList (
+        Arrays.asList (showXrefItem, showCallsItem, showSymbolsItem, showFunctionsItem,
+            showConstantsItem, listStringsItem, showDuplicateSymbolsItem));
 
     ActionListener basicPreferencesAction = new ActionListener ()
     {
@@ -329,24 +337,10 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     showHeaderItem.addActionListener (basicPreferencesAction);
     showFormatApplesoftItem.addActionListener (basicPreferencesAction);
-    //    splitRemarkItem.addActionListener (basicPreferencesAction);
-    //    splitDimItem.addActionListener (basicPreferencesAction);
-    //    alignAssignItem.addActionListener (basicPreferencesAction);
-    //    showBasicTargetsItem.addActionListener (basicPreferencesAction);
-    //    onlyShowTargetLinesItem.addActionListener (basicPreferencesAction);
-    //    showCaretItem.addActionListener (basicPreferencesAction);
-    //    showThenItem.addActionListener (basicPreferencesAction);
-    //    showXrefItem.addActionListener (basicPreferencesAction);
-    //    showCallsItem.addActionListener (basicPreferencesAction);
-    //    showSymbolsItem.addActionListener (basicPreferencesAction);
-    //    showFunctionsItem.addActionListener (basicPreferencesAction);
-    //    showConstantsItem.addActionListener (basicPreferencesAction);
-    //    showDuplicateSymbolsItem.addActionListener (basicPreferencesAction);
-    //    listStringsItem.addActionListener (basicPreferencesAction);
-    //    blankAfterReturn.addActionListener (basicPreferencesAction);
-    //    deleteExtraRemSpace.addActionListener (basicPreferencesAction);
-    //    deleteExtraDataSpace.addActionListener (basicPreferencesAction);
-    for (JMenuItem item : applesoftMenuItems)
+    showAllXrefItem.addActionListener (basicPreferencesAction);
+    for (JMenuItem item : applesoftFormatItems)
+      item.addActionListener (basicPreferencesAction);
+    for (JMenuItem item : applesoftXrefItems)
       item.addActionListener (basicPreferencesAction);
 
     showAssemblerTargetsItem.addActionListener (assemblerPreferencesAction);
@@ -384,10 +378,18 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   }
 
   // ---------------------------------------------------------------------------------//
-  private void enableApplesoftMenuItems (boolean value)
+  private void enableApplesoftFormatItems (boolean value)
   // ---------------------------------------------------------------------------------//
   {
-    for (JMenuItem item : applesoftMenuItems)
+    for (JMenuItem item : applesoftFormatItems)
+      item.setEnabled (value);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void enableAllXrefItems (boolean value)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (JMenuItem item : applesoftXrefItems)
       item.setEnabled (value);
   }
 
@@ -397,6 +399,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   {
     basicPreferences.showHeader = showHeaderItem.isSelected ();
     basicPreferences.formatApplesoft = showFormatApplesoftItem.isSelected ();
+    basicPreferences.showAllXref = showAllXrefItem.isSelected ();
 
     basicPreferences.splitRem = splitRemarkItem.isSelected ();
     basicPreferences.splitDim = splitDimItem.isSelected ();
@@ -415,9 +418,11 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.deleteExtraDataSpace = deleteExtraDataSpace.isSelected ();
     basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
+
     BasicProgram.setBasicPreferences (basicPreferences);
 
-    enableApplesoftMenuItems (basicPreferences.formatApplesoft);
+    enableApplesoftFormatItems (basicPreferences.formatApplesoft);
+    enableAllXrefItems (basicPreferences.showAllXref);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -565,6 +570,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
     prefs.putBoolean (PREFS_FORMAT_APPLESOFT, showFormatApplesoftItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ALL_XREF, showAllXrefItem.isSelected ());
 
     prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
     prefs.putBoolean (PREFS_SPLIT_DIM, splitDimItem.isSelected ());
@@ -625,6 +631,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
     showFormatApplesoftItem.setSelected (prefs.getBoolean (PREFS_FORMAT_APPLESOFT, true));
+    showAllXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_ALL_XREF, true));
 
     splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
     splitDimItem.setSelected (prefs.getBoolean (PREFS_SPLIT_DIM, false));

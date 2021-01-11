@@ -6,6 +6,7 @@ public class BasicPreferences
 {
   public boolean showHeader = true;
   public boolean formatApplesoft = true;
+  public boolean showAllXref = true;
   public boolean splitRem = false;
   public boolean alignAssign = true;
   public boolean showTargets = true;
@@ -41,9 +42,10 @@ public class BasicPreferences
         String.format ("Only target lines ........ %s%n", onlyShowTargetLineNumbers));
     text.append (String.format ("Show header .............. %s%n", showHeader));
     text.append (String.format ("Format applesoft ......... %s%n", formatApplesoft));
+    text.append (String.format ("Show All Xref ............ %s%n", showAllXref));
     text.append (String.format ("Show caret ............... %s%n", showCaret));
     text.append (String.format ("Show THEN ................ %s%n", showThen));
-    text.append (String.format ("Show Xref ................ %s%n", showXref));
+    text.append (String.format ("Show GOTO/GOSUB .......... %s%n", showXref));
     text.append (String.format ("Show CALL ................ %s%n", showCalls));
     text.append (String.format ("Show symbols ............. %s%n", showSymbols));
     text.append (String.format ("Show constants ........... %s%n", showConstants));

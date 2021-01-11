@@ -168,16 +168,25 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    return showDebugText ? getHexText () : getProgramText ();
+    if (showDebugText)
+      return getHexText ();
+
+    StringBuilder text =
+        basicPreferences.formatApplesoft ? getFormatted () : originalFormat ();
+
+    if (basicPreferences.showAllXref)
+      addXref (text);
+
+    while (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
+      text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
-  private String getProgramText ()
+  private StringBuilder getFormatted ()
   // ---------------------------------------------------------------------------------//
   {
-    if (!basicPreferences.formatApplesoft)
-      return originalFormat ();
-
     int indentSize = 2;
     boolean insertBlankLine = false;
 
@@ -340,14 +349,14 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       fullText.append ("\n");
     }
 
-    if (basicPreferences.showAllXref)
-      addXref (fullText);
+    //    if (basicPreferences.showAllXref)
+    //      addXref (fullText);
+    //
+    //    if (fullText.length () > 0)
+    //      while (fullText.charAt (fullText.length () - 1) == '\n')
+    //        fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
 
-    if (fullText.length () > 0)
-      while (fullText.charAt (fullText.length () - 1) == '\n')
-        fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
-
-    return fullText.toString ();
+    return fullText;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -929,7 +938,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private String originalFormat ()
+  private StringBuilder originalFormat ()
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
@@ -959,12 +968,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       text.append ("\n");
     }
 
-    if (basicPreferences.showAllXref)
-      addXref (text);
-
-    if (text.length () > 0)
-      text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
+    return text;
   }
 }

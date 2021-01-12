@@ -98,8 +98,16 @@ public class SubLine implements ApplesoftConstants
       if (inQuote && b != Utility.ASCII_QUOTE)      // ignore strings
         continue;
 
-      if (Utility.isPossibleVariable (b))           // A-Z 0-9
+      if (Utility.isPossibleVariable (b))           // A-Z 0-9 $ %
+      {
         var += (char) b;
+        if ((b == Utility.ASCII_DOLLAR || b == Utility.ASCII_PERCENT)   // var name end
+            && buffer[ptr] != Utility.ASCII_LEFT_BRACKET)               // not an array
+        {
+          checkVar (var, b);
+          var = "";
+        }
+      }
       else
       {
         if (inFunction)
@@ -285,16 +293,11 @@ public class SubLine implements ApplesoftConstants
         break;
 
       case TOKEN_CALL:
-        byte[] lineBuffer = getBuffer ();
-
-        if (lineBuffer[0] == TOKEN_MINUS)
-          callTarget = "-" + new String (lineBuffer, 1, lineBuffer.length - 1);
-        else
-          callTarget = new String (lineBuffer, 0, lineBuffer.length);
+        callTarget = getExpression ();
         break;
 
       case TOKEN_DEF:
-        lineBuffer = getBuffer ();
+        byte[] lineBuffer = getBuffer ();
         assert lineBuffer[0] == TOKEN_FN;
 
         int leftBracket = getPosition (lineBuffer, 1, Utility.ASCII_LEFT_BRACKET);
@@ -308,6 +311,26 @@ public class SubLine implements ApplesoftConstants
 
         break;
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String getExpression ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    int ptr = startPtr + 1;
+    int max = startPtr + length - 1;
+    while (ptr < max)
+    {
+      if (Utility.isHighBitSet (buffer[ptr]))
+        text.append (tokens[buffer[ptr] & 0x7F]);
+      else
+        text.append ((char) buffer[ptr]);
+      ++ptr;
+    }
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//

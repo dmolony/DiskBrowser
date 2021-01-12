@@ -15,8 +15,11 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
-  static final String underline = "----------------------------------------------------"
-      + "----------------------------------------------";
+  private static final String underline =
+      "----------------------------------------------------"
+          + "----------------------------------------------";
+  private static Pattern dimPattern =
+      Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9,]*\\)[,:]?");
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
@@ -40,6 +43,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   String formatLeft;
   String formatLineNumber;
   String formatRight;
+  String formatCall;
   int maxDigits;
 
   // ---------------------------------------------------------------------------------//
@@ -87,6 +91,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     formatLeft = longestVarName > 7 ? "%-" + longestVarName + "." + longestVarName + "s  "
         : "%-7.7s  ";
     formatRight = formatLeft.replace ("-", "");
+    formatCall = longestVarName > 7 ? "%-" + longestVarName + "s  " : "%-7s  ";
 
     maxDigits = getMaxDigits ();
     formatLineNumber = "%" + maxDigits + "d ";
@@ -349,13 +354,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       fullText.append ("\n");
     }
 
-    //    if (basicPreferences.showAllXref)
-    //      addXref (fullText);
-    //
-    //    if (fullText.length () > 0)
-    //      while (fullText.charAt (fullText.length () - 1) == '\n')
-    //        fullText.deleteCharAt (fullText.length () - 1);     // remove trailing newlines
-
     return fullText;
   }
 
@@ -465,7 +463,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     heading (fullText, formatLeft, heading);
 
     for (String symbol : map.keySet ())                   // left-justify strings
-      appendLineNumbers (fullText, String.format (formatLeft, symbol), map.get (symbol));
+    {
+      if (symbol.length () <= 7)
+        appendLineNumbers (fullText, String.format (formatLeft, symbol),
+            map.get (symbol));
+      else
+        appendLineNumbers (fullText, symbol + " ", map.get (symbol));
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -621,18 +625,28 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     int firstSpace = 0;
     while (firstSpace < line.length () && line.charAt (firstSpace) != ' ')
       ++firstSpace;
+    String indent = "        ".substring (0, firstSpace + 1);
 
     List<String> lines = new ArrayList<> ();
     while (line.length () > wrapLength)
     {
-      int max = Math.min (wrapLength, line.length () - 1);
-      while (max > 0 && line.charAt (max) != breakChar)
-        --max;
-      if (max == 0)
+      int breakAt = wrapLength;
+      while (breakAt > firstSpace && line.charAt (breakAt) != breakChar)
+        --breakAt;
+
+      if (breakAt <= firstSpace)
         break;
-      lines.add (line.substring (0, max + 1));
-      line = "       ".substring (0, firstSpace + 1) + line.substring (max + 1);
+
+      lines.add (line.substring (0, breakAt + 1));      // keep breakChar at end
+      line = indent + line.substring (breakAt + 1);
     }
+
+    if (lines.size () == 0)                             // no breaks
+      while (line.length () > wrapLength)
+      {
+        lines.add (line.substring (0, wrapLength));
+        line = indent + line.substring (wrapLength);
+      }
 
     lines.add (line);
     return lines;
@@ -644,8 +658,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   {
     List<String> lines = new ArrayList<> ();
 
-    Pattern p = Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9,]*\\)[,:]?");
-    Matcher m = p.matcher (line);
+    Matcher m = dimPattern.matcher (line);
 
     while (m.find ())
       lines.add ("    " + m.group ());

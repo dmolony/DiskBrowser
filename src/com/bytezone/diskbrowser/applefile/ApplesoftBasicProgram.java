@@ -19,7 +19,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       "----------------------------------------------------"
           + "----------------------------------------------";
   private static Pattern dimPattern =
-      Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9,]*\\)[,:]?");
+      Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9]+(,[0-9]+)*\\)[,:]?");
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
@@ -176,8 +176,21 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     if (showDebugText)
       return getHexText ();
 
-    StringBuilder text =
-        basicPreferences.formatApplesoft ? getFormatted () : originalFormat ();
+    StringBuilder text = new StringBuilder ();
+
+    if (basicPreferences.showHeader)
+      addHeader (text);
+
+    if (sourceLines.size () == 0)
+    {
+      text.append ("\n\nThis page intentionally left blank");
+      return text.toString ();
+    }
+
+    if (basicPreferences.formatApplesoft)
+      userFormat (text);
+    else
+      appleFormat (text);
 
     if (basicPreferences.showAllXref)
       addXref (text);
@@ -189,17 +202,41 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private StringBuilder getFormatted ()
+  private void appleFormat (StringBuilder text)
+  // ---------------------------------------------------------------------------------//
+  {
+    int loadAddress = getLoadAddress ();
+    int ptr = 0;
+    int nextLine;
+    byte b;
+
+    while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
+    {
+      int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
+      text.append (String.format (" %5d ", lineNumber));
+      ptr += 4;
+
+      while ((b = buffer[ptr++]) != 0)
+        if (Utility.isHighBitSet (b))
+          text.append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
+        else
+          text.append ((char) b);
+
+      assert ptr == nextLine - loadAddress;
+      //      ptr = nextLine - loadAddress;
+      text.append ("\n");
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void userFormat (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     int indentSize = 2;
     boolean insertBlankLine = false;
 
-    StringBuilder fullText = new StringBuilder ();
     Stack<String> loopVariables = new Stack<> ();
 
-    if (basicPreferences.showHeader)
-      addHeader (fullText);
     int alignEqualsPos = 0;
     StringBuilder text;
     int baseOffset = basicPreferences.showTargets ? 12 : 8;
@@ -353,8 +390,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           programLoadAddress + ptr));
       fullText.append ("\n");
     }
-
-    return fullText;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -622,31 +657,31 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private List<String> splitLine (String line, int wrapLength, char breakChar)
   // ---------------------------------------------------------------------------------//
   {
-    int firstSpace = 0;
-    while (firstSpace < line.length () && line.charAt (firstSpace) != ' ')
-      ++firstSpace;
-    String indent = "        ".substring (0, firstSpace + 1);
+    int spaceAt = 0;
+    while (spaceAt < line.length () && line.charAt (spaceAt) != ' ')
+      ++spaceAt;
+    String indent = spaceAt < 8 ? "        ".substring (0, spaceAt + 1) : "        ";
 
     List<String> lines = new ArrayList<> ();
+
     while (line.length () > wrapLength)
     {
-      int breakAt = wrapLength;
-      while (breakAt > firstSpace && line.charAt (breakAt) != breakChar)
+      int breakAt = wrapLength - 1;
+      while (breakAt > spaceAt && line.charAt (breakAt) != breakChar)
         --breakAt;
 
-      if (breakAt <= firstSpace)
+      if (breakAt <= spaceAt)
         break;
 
       lines.add (line.substring (0, breakAt + 1));      // keep breakChar at end
       line = indent + line.substring (breakAt + 1);
     }
 
-    if (lines.size () == 0)                             // no breaks
-      while (line.length () > wrapLength)
-      {
-        lines.add (line.substring (0, wrapLength));
-        line = indent + line.substring (wrapLength);
-      }
+    while (line.length () > wrapLength)                 // no breakChars found
+    {
+      lines.add (line.substring (0, wrapLength));
+      line = indent + line.substring (wrapLength);
+    }
 
     lines.add (line);
     return lines;
@@ -948,39 +983,5 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       ptr--;
 
     return (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private StringBuilder originalFormat ()
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuilder text = new StringBuilder ();
-
-    if (basicPreferences.showHeader)
-      addHeader (text);
-
-    int loadAddress = getLoadAddress ();
-    int ptr = 0;
-    int nextLine;
-    byte b;
-
-    while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
-    {
-      int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
-      text.append (String.format (" %5d ", lineNumber));
-      ptr += 4;
-
-      while ((b = buffer[ptr++]) != 0)
-        if (Utility.isHighBitSet (b))
-          text.append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
-        else
-          text.append ((char) b);
-
-      assert ptr == nextLine - loadAddress;
-      //      ptr = nextLine - loadAddress;
-      text.append ("\n");
-    }
-
-    return text;
   }
 }

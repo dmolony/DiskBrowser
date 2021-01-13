@@ -46,7 +46,7 @@ public class SubLine implements ApplesoftConstants
     if (Utility.isHighBitSet (firstByte))
     {
       doToken (firstByte);
-      if (is (TOKEN_REM) || is (TOKEN_DATA) || is (TOKEN_CALL))
+      if (is (TOKEN_REM) || is (TOKEN_DATA))
         return;
     }
     else if (Utility.isDigit (firstByte))
@@ -63,7 +63,6 @@ public class SubLine implements ApplesoftConstants
     boolean inQuote = false;
     boolean inFunction = false;
     boolean inDefine = false;
-    //    int functionParens = 0;
 
     int max = startPtr + length - 1;
     if (buffer[max] == 0)
@@ -100,7 +99,11 @@ public class SubLine implements ApplesoftConstants
 
       if (Utility.isPossibleVariable (b))           // A-Z 0-9 $ %
       {
+        if (var.isEmpty () && buffer[ptr - 2] == TOKEN_MINUS && Utility.isDigit (b))
+          var = "-";
+
         var += (char) b;
+
         if ((b == Utility.ASCII_DOLLAR || b == Utility.ASCII_PERCENT)   // var name end
             && buffer[ptr] != Utility.ASCII_LEFT_BRACKET)               // not an array
         {
@@ -117,6 +120,7 @@ public class SubLine implements ApplesoftConstants
         }
         else
           checkVar (var, b);
+
         var = "";
 
         if (b == Utility.ASCII_QUOTE)

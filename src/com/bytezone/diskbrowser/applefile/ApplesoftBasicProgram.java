@@ -446,7 +446,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     if (basicPreferences.showConstants && !constantsFloat.isEmpty ())
       showSymbolsRightFloat (fullText, constantsFloat, "Float");
 
-    if (basicPreferences.listStrings && stringsLine.size () > 0)
+    if (basicPreferences.showConstants && stringsLine.size () > 0)
     {
       heading (fullText, formatRight, "Line", "String");
       for (int i = 0; i < stringsLine.size (); i++)

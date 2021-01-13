@@ -111,9 +111,10 @@ public class SubLine implements ApplesoftConstants
         continue;
       }
 
-      if (Utility.isPossibleVariable (b) || b == Utility.ASCII_DOT)     // A-Z 0-9 $ % .
+      if (Utility.isPossibleVariable (b) || Utility.isPossibleNumber (b))
       {
-        if (var.isEmpty () && Utility.isDigit (b) && buffer[ptr - 2] == TOKEN_MINUS)
+        if (var.isEmpty () && Utility.isPossibleNumber (b)
+            && buffer[ptr - 2] == TOKEN_MINUS)
           var = "-";
 
         var += (char) b;
@@ -163,7 +164,7 @@ public class SubLine implements ApplesoftConstants
     if (!Utility.isLetter ((byte) var.charAt (0)))
     {
       if (is (TOKEN_GOTO) || is (TOKEN_GOSUB) || is (TOKEN_ON) || is (TOKEN_ONERR))
-        return;
+        return;                     // ignore line numbers
       addNumber (var);
       return;
     }

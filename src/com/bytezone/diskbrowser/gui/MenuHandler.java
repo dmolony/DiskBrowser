@@ -60,7 +60,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_CONSTANTS = "showConstants";
   private static final String PREFS_SHOW_FUNCTIONS = "showFunctions";
   private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
-  private static final String PREFS_LIST_STRINGS = "listStrings";
+  //  private static final String PREFS_LIST_STRINGS = "listStrings";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
   private static final String PREFS_DELETE_EXTRA_REM_SPACE = "deleteExtraRemSpace";
   private static final String PREFS_DELETE_EXTRA_DATA_SPACE = "deleteExtraDataSpace";
@@ -164,10 +164,10 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showCallsItem = new JCheckBoxMenuItem ("List CALLs");
   final JMenuItem showSymbolsItem = new JCheckBoxMenuItem ("List variables");
   final JMenuItem showFunctionsItem = new JCheckBoxMenuItem ("List functions");
-  final JMenuItem showConstantsItem = new JCheckBoxMenuItem ("List literals");
+  final JMenuItem showConstantsItem = new JCheckBoxMenuItem ("List constants");
   final JMenuItem showDuplicateSymbolsItem =
       new JCheckBoxMenuItem ("List duplicate variables");
-  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
+  //  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -276,7 +276,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showSymbolsItem);
     applesoftMenu.add (showFunctionsItem);
     applesoftMenu.add (showConstantsItem);
-    applesoftMenu.add (listStringsItem);
+    //    applesoftMenu.add (listStringsItem);
     applesoftMenu.add (showDuplicateSymbolsItem);
 
     assemblerMenu.add (showAssemblerHeaderItem);
@@ -292,9 +292,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
         alignAssignItem, showBasicTargetsItem, onlyShowTargetLinesItem, showCaretItem,
         showThenItem, blankAfterReturn, deleteExtraRemSpace, deleteExtraDataSpace));
 
-    applesoftXrefItems = new ArrayList (
-        Arrays.asList (showXrefItem, showCallsItem, showSymbolsItem, showFunctionsItem,
-            showConstantsItem, listStringsItem, showDuplicateSymbolsItem));
+    applesoftXrefItems = new ArrayList (Arrays.asList (showXrefItem, showCallsItem,
+        showSymbolsItem, showFunctionsItem, showConstantsItem, showDuplicateSymbolsItem));
 
     ActionListener basicPreferencesAction = new ActionListener ()
     {
@@ -418,7 +417,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.showSymbols = showSymbolsItem.isSelected ();
     basicPreferences.showFunctions = showFunctionsItem.isSelected ();
     basicPreferences.showConstants = showConstantsItem.isSelected ();
-    basicPreferences.listStrings = listStringsItem.isSelected ();
+    //    basicPreferences.listStrings = listStringsItem.isSelected ();
     basicPreferences.showDuplicateSymbols = showDuplicateSymbolsItem.isSelected ();
 
     BasicProgram.setBasicPreferences (basicPreferences);
@@ -586,7 +585,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_CONSTANTS, showConstantsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
         showDuplicateSymbolsItem.isSelected ());
-    prefs.putBoolean (PREFS_LIST_STRINGS, listStringsItem.isSelected ());
+    //    prefs.putBoolean (PREFS_LIST_STRINGS, listStringsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
     prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturn.isSelected ());
@@ -647,7 +646,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showConstantsItem.setSelected (prefs.getBoolean (PREFS_SHOW_CONSTANTS, false));
     showDuplicateSymbolsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS, false));
-    listStringsItem.setSelected (prefs.getBoolean (PREFS_LIST_STRINGS, false));
+    //    listStringsItem.setSelected (prefs.getBoolean (PREFS_LIST_STRINGS, false));
     showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
     onlyShowTargetLinesItem
         .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));

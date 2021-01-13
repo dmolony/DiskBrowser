@@ -24,6 +24,8 @@ public class Utility
   public static final byte ASCII_PERCENT = 0x25;
   public static final byte ASCII_LEFT_BRACKET = 0x28;
   public static final byte ASCII_RIGHT_BRACKET = 0x29;
+  public static final byte ASCII_MINUS = 0x2D;
+  public static final byte ASCII_DOT = 0x2E;
   public static final byte ASCII_COLON = 0x3A;
   public static final byte ASCII_SEMI_COLON = 0x3B;
   public static final byte ASCII_EQUALS = 0x3D;
@@ -305,6 +307,13 @@ public class Utility
   {
     return isDigit (value) || isLetter (value) || value == ASCII_DOLLAR
         || value == ASCII_PERCENT;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static boolean isPossibleNumber (byte value)
+  // ---------------------------------------------------------------------------------//
+  {
+    return isDigit (value) || value == ASCII_DOT;
   }
 
   // ---------------------------------------------------------------------------------//

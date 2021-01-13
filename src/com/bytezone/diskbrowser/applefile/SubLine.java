@@ -30,7 +30,8 @@ public class SubLine implements ApplesoftConstants
   private final List<String> symbols = new ArrayList<> ();
   private final List<String> functions = new ArrayList<> ();
   private final List<String> arrays = new ArrayList<> ();
-  private final List<Integer> constants = new ArrayList<> ();
+  private final List<Integer> constantsInt = new ArrayList<> ();
+  private final List<Float> constantsFloat = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   SubLine (SourceLine parent, int startPtr, int length)
@@ -41,23 +42,28 @@ public class SubLine implements ApplesoftConstants
     this.length = length;
     this.buffer = parent.buffer;
 
+    int ptr = startPtr;
     byte firstByte = buffer[startPtr];
 
-    if (Utility.isHighBitSet (firstByte))
+    if (Utility.isHighBitSet (firstByte))         // BASIC command
     {
       doToken (firstByte);
-      if (is (TOKEN_REM) || is (TOKEN_DATA))
+      if (is (TOKEN_REM) || is (TOKEN_DATA))      // no further processing
         return;
-    }
-    else if (Utility.isDigit (firstByte))
-    {
-      doDigit ();
-      return;
+      ptr = startPtr + 1;
     }
     else
-      doAlpha ();
+    {
+      ptr = startPtr;
+      if (Utility.isDigit (firstByte))            // implied GOTO
+      {
+        addXref (getLineNumber (buffer, startPtr), gotoLines);
+        return;
+      }
+      else                                        // variable assignment
+        recordEqualsPosition ();
+    }
 
-    int ptr = startPtr;
     String var = "";
 
     boolean inQuote = false;
@@ -65,9 +71,7 @@ public class SubLine implements ApplesoftConstants
     boolean inDefine = false;
 
     int max = startPtr + length - 1;
-    if (buffer[max] == 0)
-      --max;
-    if (buffer[max] == Utility.ASCII_COLON)
+    if (buffer[max] == 0 || buffer[max] == Utility.ASCII_COLON)
       --max;
 
     while (ptr <= max)
@@ -94,16 +98,27 @@ public class SubLine implements ApplesoftConstants
         continue;
       }
 
-      if (inQuote && b != Utility.ASCII_QUOTE)      // ignore strings
-        continue;
-
-      if (Utility.isPossibleVariable (b))           // A-Z 0-9 $ %
+      if (inQuote)
       {
-        if (var.isEmpty () && buffer[ptr - 2] == TOKEN_MINUS && Utility.isDigit (b))
+        if (b == Utility.ASCII_QUOTE)      // ignore strings
+          inQuote = false;
+        continue;
+      }
+
+      if (b == Utility.ASCII_QUOTE)
+      {
+        inQuote = true;
+        continue;
+      }
+
+      if (Utility.isPossibleVariable (b) || b == Utility.ASCII_DOT)     // A-Z 0-9 $ % .
+      {
+        if (var.isEmpty () && Utility.isDigit (b) && buffer[ptr - 2] == TOKEN_MINUS)
           var = "-";
 
         var += (char) b;
 
+        // allow for PRINT A$B$
         if ((b == Utility.ASCII_DOLLAR || b == Utility.ASCII_PERCENT)   // var name end
             && buffer[ptr] != Utility.ASCII_LEFT_BRACKET)               // not an array
         {
@@ -122,28 +137,10 @@ public class SubLine implements ApplesoftConstants
           checkVar (var, b);
 
         var = "";
-
-        if (b == Utility.ASCII_QUOTE)
-          inQuote = !inQuote;
       }
     }
 
     checkVar (var, (byte) 0);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void doDigit ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int targetLine = getLineNumber (buffer, startPtr);
-    addXref (targetLine, gotoLines);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void doAlpha ()
-  // ---------------------------------------------------------------------------------//
-  {
-    recordEqualsPosition ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -165,12 +162,9 @@ public class SubLine implements ApplesoftConstants
 
     if (!Utility.isLetter ((byte) var.charAt (0)))
     {
-      if (is (TOKEN_GOTO) || is (TOKEN_GOSUB) || is (TOKEN_ON))
+      if (is (TOKEN_GOTO) || is (TOKEN_GOSUB) || is (TOKEN_ON) || is (TOKEN_ONERR))
         return;
-
-      int varInt = Integer.parseInt (var);
-      if (!constants.contains (varInt))
-        constants.add (varInt);
+      addNumber (var);
       return;
     }
 
@@ -222,10 +216,17 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  List<Integer> getConstants ()
+  List<Integer> getConstantsInt ()
   // ---------------------------------------------------------------------------------//
   {
-    return constants;
+    return constantsInt;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Float> getConstantsFloat ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return constantsFloat;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -314,6 +315,50 @@ public class SubLine implements ApplesoftConstants
         functions.add (functionName);
 
         break;
+
+      case TOKEN_DATA:
+        String[] chunks = new String (getBuffer ()).split (",");
+        for (String chunk : chunks)
+        {
+          b = (byte) chunk.charAt (0);
+          if (Utility.isDigit (b) || b == Utility.ASCII_MINUS || b == Utility.ASCII_DOT)
+          {
+            addNumber (chunk);
+          }
+          else if (Utility.isLetter (b))
+          {
+            parent.parent.stringsText.add (chunk);
+            parent.parent.stringsLine.add (parent.lineNumber);
+          }
+        }
+
+        break;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addNumber (String var)
+  // ---------------------------------------------------------------------------------//
+  {
+    try
+    {
+      int decimalPos = var.indexOf ('.');
+      if (decimalPos < 0)
+      {
+        int varInt = Integer.parseInt (var);
+        if (!constantsInt.contains (varInt))
+          constantsInt.add (varInt);
+      }
+      else
+      {
+        float varFloat = Float.parseFloat (var);
+        if (!constantsFloat.contains (varFloat))
+          constantsFloat.add (varFloat);
+      }
+    }
+    catch (NumberFormatException nfe)
+    {
+      System.out.printf ("NFE: %s%n", var);
     }
   }
 

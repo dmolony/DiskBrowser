@@ -27,7 +27,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
   private final Map<Integer, List<Integer>> gotoLines = new TreeMap<> ();
   private final Map<Integer, List<Integer>> gosubLines = new TreeMap<> ();
-  private final Map<Integer, List<Integer>> constants = new TreeMap<> ();
+  private final Map<Integer, List<Integer>> constantsInt = new TreeMap<> ();
+  private final Map<Float, List<Integer>> constantsFloat = new TreeMap<> ();
 
   private final Map<String, List<Integer>> callLines = new TreeMap<> ();
   private final Map<String, List<Integer>> symbolLines = new TreeMap<> ();
@@ -79,8 +80,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           addXref (line.lineNumber, targetLine, gosubLines);
         for (int targetLine : subline.getGotoLines ())
           addXref (line.lineNumber, targetLine, gotoLines);
-        for (int targetLine : subline.getConstants ())
-          addXref (line.lineNumber, targetLine, constants);
+        for (int num : subline.getConstantsInt ())
+          addNumberInt (line.lineNumber, num, constantsInt);
+        for (float num : subline.getConstantsFloat ())
+          addNumberFloat (line.lineNumber, num, constantsFloat);
         if (subline.callTarget != null)
           addXref (line.lineNumber, subline.callTarget, callLines);
       }
@@ -151,6 +154,32 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     {
       lines = new ArrayList<> ();
       map.put (targetLine, lines);
+    }
+    lines.add (sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addNumberInt (int sourceLine, Integer num, Map<Integer, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (num);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (num, lines);
+    }
+    lines.add (sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addNumberFloat (int sourceLine, Float num, Map<Float, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (num);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (num, lines);
     }
     lines.add (sourceLine);
   }
@@ -411,8 +440,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     if (basicPreferences.showFunctions && !functionLines.isEmpty ())
       showSymbolsLeft (fullText, functionLines, "Fnction");
 
-    if (basicPreferences.showConstants && !constants.isEmpty ())
-      showSymbolsRight (fullText, constants, "Literal");
+    if (basicPreferences.showConstants && !constantsInt.isEmpty ())
+      showSymbolsRightInt (fullText, constantsInt, "Integer");
+
+    if (basicPreferences.showConstants && !constantsFloat.isEmpty ())
+      showSymbolsRightFloat (fullText, constantsFloat, "Float");
 
     if (basicPreferences.listStrings && stringsLine.size () > 0)
     {
@@ -515,6 +547,28 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     heading (fullText, formatRight, heading);
 
     for (Integer symbol : map.keySet ())                  // right-justify integers
+      appendLineNumbers (fullText, String.format (formatRight, symbol), map.get (symbol));
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showSymbolsRightInt (StringBuilder fullText,
+      Map<Integer, List<Integer>> map, String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    heading (fullText, formatRight, heading);
+
+    for (int symbol : map.keySet ())                  // right-justify integers
+      appendLineNumbers (fullText, String.format (formatRight, symbol), map.get (symbol));
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showSymbolsRightFloat (StringBuilder fullText,
+      Map<Float, List<Integer>> map, String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    heading (fullText, formatRight, heading);
+
+    for (float symbol : map.keySet ())                  // right-justify integers
       appendLineNumbers (fullText, String.format (formatRight, symbol), map.get (symbol));
   }
 

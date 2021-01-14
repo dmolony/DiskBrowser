@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -375,6 +376,11 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     saveDiskItem.setAction (saveTempFileAction);
     saveSectorsItem.setAction (saveSectorsAction);
+
+    KeyStroke keyStroke1 = KeyStroke.getKeyStroke (KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK);
+    showAllFormatItem.setAccelerator (keyStroke1);
+    KeyStroke keyStroke2 = KeyStroke.getKeyStroke (KeyEvent.VK_L, KeyEvent.ALT_DOWN_MASK);
+    showAllXrefItem.setAccelerator (keyStroke2);
   }
 
   // ---------------------------------------------------------------------------------//

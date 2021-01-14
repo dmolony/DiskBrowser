@@ -323,14 +323,14 @@ public class SubLine implements ApplesoftConstants
         {
           b = (byte) chunk.charAt (0);
           if (Utility.isDigit (b) || b == Utility.ASCII_MINUS || b == Utility.ASCII_DOT)
-          {
             addNumber (chunk);
-          }
-          else if (Utility.isLetter (b))
+          else if (Utility.isLetter (b))    // quoted strings are already handled
           {
             parent.parent.stringsText.add (chunk);
             parent.parent.stringsLine.add (parent.lineNumber);
           }
+          else if (b != Utility.ASCII_QUOTE)
+            System.out.println ("Unknown data: " + chunk);
         }
 
         break;

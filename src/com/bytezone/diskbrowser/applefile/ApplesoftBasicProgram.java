@@ -41,11 +41,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   final List<Integer> stringsLine = new ArrayList<> ();
   final List<String> stringsText = new ArrayList<> ();
 
-  String formatLeft;
-  String formatLineNumber;
-  String formatRight;
-  String formatCall;
-  int maxDigits;
+  private final String formatLeft;
+  private final String formatLineNumber;
+  private final String formatRight;
+  final String formatCall;
+  private final int maxDigits;
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -77,15 +77,15 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         for (String symbol : subline.getFunctions ())
           checkFunction (symbol, line.lineNumber);
         for (int targetLine : subline.getGosubLines ())
-          addXref (line.lineNumber, targetLine, gosubLines);
+          addNumberInt (line.lineNumber, targetLine, gosubLines);
         for (int targetLine : subline.getGotoLines ())
-          addXref (line.lineNumber, targetLine, gotoLines);
+          addNumberInt (line.lineNumber, targetLine, gotoLines);
         for (int num : subline.getConstantsInt ())
           addNumberInt (line.lineNumber, num, constantsInt);
         for (float num : subline.getConstantsFloat ())
           addNumberFloat (line.lineNumber, num, constantsFloat);
         if (subline.callTarget != null)
-          addXref (line.lineNumber, subline.callTarget, callLines);
+          addString (line.lineNumber, subline.callTarget, callLines);
       }
     }
     endPtr = ptr;
@@ -146,53 +146,40 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addXref (int sourceLine, int targetLine, Map<Integer, List<Integer>> map)
+  private void addNumberInt (int sourceLine, Integer key, Map<Integer, List<Integer>> map)
   // ---------------------------------------------------------------------------------//
   {
-    List<Integer> lines = map.get (targetLine);
+    List<Integer> lines = map.get (key);
     if (lines == null)
     {
       lines = new ArrayList<> ();
-      map.put (targetLine, lines);
+      map.put (key, lines);
     }
     lines.add (sourceLine);
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addNumberInt (int sourceLine, Integer num, Map<Integer, List<Integer>> map)
+  private void addNumberFloat (int sourceLine, Float key, Map<Float, List<Integer>> map)
   // ---------------------------------------------------------------------------------//
   {
-    List<Integer> lines = map.get (num);
+    List<Integer> lines = map.get (key);
     if (lines == null)
     {
       lines = new ArrayList<> ();
-      map.put (num, lines);
+      map.put (key, lines);
     }
     lines.add (sourceLine);
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addNumberFloat (int sourceLine, Float num, Map<Float, List<Integer>> map)
+  private void addString (int sourceLine, String key, Map<String, List<Integer>> map)
   // ---------------------------------------------------------------------------------//
   {
-    List<Integer> lines = map.get (num);
+    List<Integer> lines = map.get (key);
     if (lines == null)
     {
       lines = new ArrayList<> ();
-      map.put (num, lines);
-    }
-    lines.add (sourceLine);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void addXref (int sourceLine, String target, Map<String, List<Integer>> map)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = map.get (target);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      map.put (target, lines);
+      map.put (key, lines);
     }
     lines.add (sourceLine);
   }
@@ -371,10 +358,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
         // Check for a wrappable PRINT or INPUT statement
         // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
-        if (basicPreferences.wrapPrintAt > 0
+        if (basicPreferences.wrapPrintAt > 0      // not currently used
             && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
-            && countChars (text, Utility.ASCII_QUOTE) == 2      // just start and end quotes
-            && countChars (text, Utility.ASCII_CARET) == 0)     // no control characters
+            && countChars (text, Utility.ASCII_QUOTE) == 2    // just start and end quotes
+            && countChars (text, Utility.ASCII_CARET) == 0)   // no control characters
           wrapPrint (fullText, text, lineText);
         else
           fullText.append (text + "\n");
@@ -404,7 +391,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         insertBlankLine = false;
       }
 
-      // Reset alignment value if we just left an IF - the indentation will be different now
+      // Reset alignment value if we just left an IF 
+      //     - the indentation will be different now
       if (ifIndent > 0)
         alignEqualsPos = 0;
     }
@@ -425,40 +413,52 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private void addXref (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
-    if (basicPreferences.showSymbols && !symbolLines.isEmpty ())
-      showSymbolsLeft (fullText, symbolLines, "Var");
+    if (basicPreferences.showSymbols)
+    {
+      if (!symbolLines.isEmpty ())
+        showSymbolsLeft (fullText, symbolLines, "Var");
 
-    if (basicPreferences.showSymbols && !arrayLines.isEmpty ())
-      showSymbolsLeft (fullText, arrayLines, "Array");
+      if (!arrayLines.isEmpty ())
+        showSymbolsLeft (fullText, arrayLines, "Array");
+    }
 
-    if (basicPreferences.showDuplicateSymbols && !uniqueSymbols.isEmpty ())
-      showDuplicates (fullText, uniqueSymbols, "Var");
+    if (basicPreferences.showDuplicateSymbols)
+    {
+      if (!uniqueSymbols.isEmpty ())
+        showDuplicates (fullText, uniqueSymbols, "Var");
 
-    if (basicPreferences.showDuplicateSymbols && !uniqueArrays.isEmpty ())
-      showDuplicates (fullText, uniqueArrays, "Array");
+      if (!uniqueArrays.isEmpty ())
+        showDuplicates (fullText, uniqueArrays, "Array");
+    }
 
     if (basicPreferences.showFunctions && !functionLines.isEmpty ())
       showSymbolsLeft (fullText, functionLines, "Fnction");
 
-    if (basicPreferences.showConstants && !constantsInt.isEmpty ())
-      showSymbolsRightInt (fullText, constantsInt, "Integer");
-
-    if (basicPreferences.showConstants && !constantsFloat.isEmpty ())
-      showSymbolsRightFloat (fullText, constantsFloat, "Float");
-
-    if (basicPreferences.showConstants && stringsLine.size () > 0)
+    if (basicPreferences.showConstants)
     {
-      heading (fullText, formatRight, "Line", "String");
-      for (int i = 0; i < stringsLine.size (); i++)
-        fullText.append (String.format (formatRight + "%s%n", stringsLine.get (i),
-            stringsText.get (i)));
+      if (!constantsInt.isEmpty ())
+        showSymbolsRightInt (fullText, constantsInt, "Integer");
+
+      if (!constantsFloat.isEmpty ())
+        showSymbolsRightFloat (fullText, constantsFloat, "Float");
+
+      if (stringsLine.size () > 0)
+      {
+        heading (fullText, formatRight, "Line", "String");
+        for (int i = 0; i < stringsLine.size (); i++)
+          fullText.append (String.format (formatRight + "%s%n", stringsLine.get (i),
+              stringsText.get (i)));
+      }
     }
 
-    if (basicPreferences.showXref && !gosubLines.isEmpty ())
-      showSymbolsRight (fullText, gosubLines, "GOSUB");
+    if (basicPreferences.showXref)
+    {
+      if (!gosubLines.isEmpty ())
+        showSymbolsRight (fullText, gosubLines, "GOSUB");
 
-    if (basicPreferences.showXref && !gotoLines.isEmpty ())
-      showSymbolsRight (fullText, gotoLines, "GOTO");
+      if (!gotoLines.isEmpty ())
+        showSymbolsRight (fullText, gotoLines, "GOTO");
+    }
 
     if (basicPreferences.showCalls && !callLines.isEmpty ())
       showSymbolsLeft (fullText, callLines, "CALL");
@@ -643,23 +643,23 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       else
         fullText.append (text + "\n");
     }
-    else            // old method
-    {
-      int first = text.indexOf ("\"") + 1;
-      int last = text.indexOf ("\"", first + 1) - 1;
-      if ((last - first) > basicPreferences.wrapPrintAt)
-      {
-        int ptr = first + basicPreferences.wrapPrintAt;
-        do
-        {
-          fullText.append (text.substring (0, ptr)
-              + "\n                                 ".substring (0, first + 1));
-          text.delete (0, ptr);
-          ptr = basicPreferences.wrapPrintAt;
-        } while (text.length () > basicPreferences.wrapPrintAt);
-      }
-      fullText.append (text + "\n");
-    }
+    //    else            // old method
+    //    {
+    //      int first = text.indexOf ("\"") + 1;
+    //      int last = text.indexOf ("\"", first + 1) - 1;
+    //      if ((last - first) > basicPreferences.wrapPrintAt)
+    //      {
+    //        int ptr = first + basicPreferences.wrapPrintAt;
+    //        do
+    //        {
+    //          fullText.append (text.substring (0, ptr)
+    //              + "\n                                 ".substring (0, first + 1));
+    //          text.delete (0, ptr);
+    //          ptr = basicPreferences.wrapPrintAt;
+    //        } while (text.length () > basicPreferences.wrapPrintAt);
+    //      }
+    //      fullText.append (text + "\n");
+    //    }
   }
 
   // ---------------------------------------------------------------------------------//

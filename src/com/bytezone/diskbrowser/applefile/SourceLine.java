@@ -31,7 +31,6 @@ public class SourceLine implements ApplesoftConstants
     boolean inString = false;           // can toggle
     boolean inRemark = false;           // can only go false -> true
     byte b;
-    int stringPtr = 0;
 
     while (ptr < buffer.length && (b = buffer[ptr++]) != 0)
     {
@@ -41,12 +40,7 @@ public class SourceLine implements ApplesoftConstants
       if (inString)
       {
         if (b == Utility.ASCII_QUOTE)           // terminate string
-        {
           inString = false;
-          String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
-          parent.stringsText.add (s);
-          parent.stringsLine.add (lineNumber);
-        }
         continue;
       }
 
@@ -89,7 +83,6 @@ public class SourceLine implements ApplesoftConstants
 
         case Utility.ASCII_QUOTE:
           inString = true;
-          stringPtr = ptr;
           break;
       }
     }

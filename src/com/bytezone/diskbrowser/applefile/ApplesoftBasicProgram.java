@@ -86,6 +86,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           addNumberFloat (line.lineNumber, num, constantsFloat);
         if (subline.callTarget != null)
           addString (line.lineNumber, subline.callTarget, callLines);
+        for (String s : subline.getStringsText ())
+        {
+          stringsText.add (s);
+          stringsLine.add (line.lineNumber);
+        }
       }
     }
     endPtr = ptr;

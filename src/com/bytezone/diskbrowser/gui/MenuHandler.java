@@ -97,8 +97,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private final List<TextPreferencesListener> textPreferencesListeners =
       new ArrayList<> ();
 
-  private List<JCheckBoxMenuItem> applesoftFormatItems;
-  private List<JCheckBoxMenuItem> applesoftXrefItems;
+  private List<JMenuItem> applesoftFormatItems;
+  private List<JMenuItem> applesoftXrefItems;
 
   JMenuBar menuBar = new JMenuBar ();
   JMenu fileMenu = new JMenu ("File");
@@ -289,14 +289,12 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     prodosMenu.add (prodosSortDirectoriesItem);
 
-    applesoftFormatItems = new ArrayList (Arrays.asList (splitRemarkItem, splitDimItem,
+    applesoftFormatItems = new ArrayList<> (Arrays.asList (splitRemarkItem, splitDimItem,
         alignAssignItem, showBasicTargetsItem, onlyShowTargetLinesItem, showCaretItem,
         showThenItem, blankAfterReturn, deleteExtraRemSpace, deleteExtraDataSpace));
 
-    applesoftXrefItems = new ArrayList (Arrays.asList (showXrefItem, showCallsItem,
+    applesoftXrefItems = new ArrayList<> (Arrays.asList (showXrefItem, showCallsItem,
         showSymbolsItem, showFunctionsItem, showConstantsItem, showDuplicateSymbolsItem));
-
-    List<Integer> anotherList = Arrays.asList (5, 12, 9, 3, 15, 88);
 
     ActionListener basicPreferencesAction = new ActionListener ()
     {

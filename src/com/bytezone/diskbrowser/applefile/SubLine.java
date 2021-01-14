@@ -27,11 +27,15 @@ public class SubLine implements ApplesoftConstants
 
   private final List<Integer> gotoLines = new ArrayList<> ();
   private final List<Integer> gosubLines = new ArrayList<> ();
+
   private final List<String> symbols = new ArrayList<> ();
   private final List<String> functions = new ArrayList<> ();
   private final List<String> arrays = new ArrayList<> ();
+
   private final List<Integer> constantsInt = new ArrayList<> ();
   private final List<Float> constantsFloat = new ArrayList<> ();
+
+  private final List<String> stringsText = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   SubLine (SourceLine parent, int startPtr, int length)
@@ -69,6 +73,7 @@ public class SubLine implements ApplesoftConstants
     boolean inQuote = false;
     boolean inFunction = false;
     boolean inDefine = false;
+    int stringPtr = 0;
 
     int max = startPtr + length - 1;
     if (buffer[max] == 0 || buffer[max] == Utility.ASCII_COLON)
@@ -101,13 +106,18 @@ public class SubLine implements ApplesoftConstants
       if (inQuote)
       {
         if (b == Utility.ASCII_QUOTE)      // ignore strings
+        {
           inQuote = false;
+          String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
+          stringsText.add (s);
+        }
         continue;
       }
 
       if (b == Utility.ASCII_QUOTE)
       {
         inQuote = true;
+        stringPtr = ptr;
         continue;
       }
 
@@ -231,6 +241,13 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
+  List<String> getStringsText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return stringsText;
+  }
+
+  // ---------------------------------------------------------------------------------//
   private void doToken (byte b)
   // ---------------------------------------------------------------------------------//
   {
@@ -324,12 +341,9 @@ public class SubLine implements ApplesoftConstants
           b = (byte) chunk.charAt (0);
           if (Utility.isDigit (b) || b == Utility.ASCII_MINUS || b == Utility.ASCII_DOT)
             addNumber (chunk);
-          else if (Utility.isLetter (b))    // quoted strings are already handled
-          {
-            parent.parent.stringsText.add (chunk);
-            parent.parent.stringsLine.add (parent.lineNumber);
-          }
-          else if (b != Utility.ASCII_QUOTE)
+          else if (Utility.isLetter (b) || b == Utility.ASCII_QUOTE)
+            stringsText.add (chunk);
+          else
             System.out.println ("Unknown data: " + chunk);
         }
 

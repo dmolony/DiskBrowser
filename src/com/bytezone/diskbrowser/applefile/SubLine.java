@@ -335,19 +335,18 @@ public class SubLine implements ApplesoftConstants
         break;
 
       case TOKEN_DATA:
-        lineBuffer = getBuffer ();
-        if (lineBuffer.length == 0)
-          break;
-
-        for (String chunk : new String (lineBuffer).split (","))
+        for (String chunk : new String (getBuffer ()).split (","))
         {
+          chunk = chunk.trim ();
+          if (chunk.isEmpty ())
+            continue;
           b = (byte) chunk.charAt (0);
           if (Utility.isDigit (b) || b == Utility.ASCII_MINUS || b == Utility.ASCII_DOT)
             addNumber (chunk);
           else if (Utility.isLetter (b) || b == Utility.ASCII_QUOTE)
             stringsText.add (chunk);
           else
-            System.out.println ("Unknown data: " + chunk);
+            System.out.printf ("Unknown data: [%s]%n", chunk);
         }
 
         break;

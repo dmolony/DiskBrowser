@@ -296,6 +296,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftXrefItems = new ArrayList (Arrays.asList (showXrefItem, showCallsItem,
         showSymbolsItem, showFunctionsItem, showConstantsItem, showDuplicateSymbolsItem));
 
+    List<Integer> anotherList = Arrays.asList (5, 12, 9, 3, 15, 88);
+
     ActionListener basicPreferencesAction = new ActionListener ()
     {
       @Override
@@ -384,22 +386,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   }
 
   // ---------------------------------------------------------------------------------//
-  private void enableApplesoftFormatItems (boolean value)
-  // ---------------------------------------------------------------------------------//
-  {
-    for (JMenuItem item : applesoftFormatItems)
-      item.setEnabled (value);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void enableAllXrefItems (boolean value)
-  // ---------------------------------------------------------------------------------//
-  {
-    for (JMenuItem item : applesoftXrefItems)
-      item.setEnabled (value);
-  }
-
-  // ---------------------------------------------------------------------------------//
   private void setBasicPreferences ()
   // ---------------------------------------------------------------------------------//
   {
@@ -428,8 +414,11 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     BasicProgram.setBasicPreferences (basicPreferences);
 
-    enableApplesoftFormatItems (basicPreferences.formatApplesoft);
-    enableAllXrefItems (basicPreferences.showAllXref);
+    for (JMenuItem item : applesoftFormatItems)
+      item.setEnabled (basicPreferences.formatApplesoft);
+
+    for (JMenuItem item : applesoftXrefItems)
+      item.setEnabled (basicPreferences.showAllXref);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -241,7 +241,20 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         if (Utility.isHighBitSet (b))
           text.append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
         else
-          text.append ((char) b);
+          switch (b)
+          {
+            case Utility.ASCII_CR:
+              text.append ("\n");
+              break;
+
+            case Utility.ASCII_BACKSPACE:
+              if (text.length () > 0)
+                text.deleteCharAt (text.length () - 1);
+              break;
+
+            default:
+              text.append ((char) b);
+          }
 
       assert ptr == nextLine - loadAddress;
       //      ptr = nextLine - loadAddress;
@@ -466,7 +479,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     }
 
     if (basicPreferences.showCalls && !callLines.isEmpty ())
-      showSymbolsLeft (fullText, callLines, "CALL");
+      showSymbolsLeftRight (fullText, callLines, "   CALL");
   }
 
   // ---------------------------------------------------------------------------------//
@@ -542,6 +555,38 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       else
         appendLineNumbers (fullText, symbol + " ", map.get (symbol));
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void showSymbolsLeftRight (StringBuilder fullText,
+      Map<String, List<Integer>> map, String heading)
+  // ---------------------------------------------------------------------------------//
+  {
+    heading (fullText, formatLeft, heading);
+
+    for (String symbol : map.keySet ())                   // left-justify strings
+    {
+      if (isNumeric (symbol))
+        appendLineNumbers (fullText, String.format (formatRight, symbol),
+            map.get (symbol));
+      else if (symbol.length () <= 7)
+        appendLineNumbers (fullText, String.format (formatLeft, symbol),
+            map.get (symbol));
+      else
+        appendLineNumbers (fullText, symbol + " ", map.get (symbol));
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean isNumeric (String value)
+  // ---------------------------------------------------------------------------------//
+  {
+    byte[] bytes = value.getBytes ();
+    int start = value.charAt (0) == Utility.ASCII_MINUS ? 1 : 0;
+    for (int i = start; i < bytes.length; i++)
+      if (!Utility.isPossibleNumber (bytes[i]))
+        return false;
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//

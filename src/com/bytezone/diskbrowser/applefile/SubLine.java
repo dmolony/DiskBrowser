@@ -108,8 +108,7 @@ public class SubLine implements ApplesoftConstants
         if (b == Utility.ASCII_QUOTE)      // ignore strings
         {
           inQuote = false;
-          String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
-          stringsText.add (s);
+          addString (stringPtr, ptr);
         }
         continue;
       }
@@ -151,7 +150,18 @@ public class SubLine implements ApplesoftConstants
       }
     }
 
+    if (inQuote)      // unterminated string
+      addString (stringPtr, ptr);
+
     checkVar (var, (byte) 0);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addString (int stringPtr, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
+    stringsText.add (s);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -342,7 +352,10 @@ public class SubLine implements ApplesoftConstants
             continue;
           b = (byte) chunk.charAt (0);
           if (Utility.isDigit (b) || b == Utility.ASCII_MINUS || b == Utility.ASCII_DOT)
-            addNumber (chunk);
+          {
+            if (!addNumber (chunk))
+              stringsText.add (chunk);
+          }
           else if (Utility.isLetter (b) || b == Utility.ASCII_QUOTE)
             stringsText.add (chunk);
           else
@@ -354,7 +367,7 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addNumber (String var)
+  private boolean addNumber (String var)
   // ---------------------------------------------------------------------------------//
   {
     try
@@ -375,8 +388,10 @@ public class SubLine implements ApplesoftConstants
     }
     catch (NumberFormatException nfe)
     {
-      System.out.printf ("NFE: %s%n", var);
+      //      System.out.printf ("NFE1: %s%n", var);
+      return false;
     }
+    return true;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -438,7 +453,7 @@ public class SubLine implements ApplesoftConstants
     }
     catch (NumberFormatException e)
     {
-      System.out.printf ("NFE: %s%n", s);
+      System.out.printf ("NFE2: %s%n", s);
     }
 
     return lineNumbers;

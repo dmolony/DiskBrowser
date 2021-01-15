@@ -70,14 +70,14 @@ public class SourceLine implements ApplesoftConstants
           break;
 
         case TOKEN_REM:
-          if (ptr != startPtr + 1)      // REM appears mid-line (should follow a colon)
-          {
-            System.out.println ("mid-line REM token");
+          if (ptr == startPtr + 1)
+            inRemark = true;
+          else
+          {     // REM appears mid-line (should follow a colon)
+            System.out.printf ("%5d %s%n", lineNumber, "mid-line REM token");
             sublines.add (new SubLine (this, startPtr, (ptr - startPtr) - 1));
             startPtr = ptr - 1;
           }
-          else
-            inRemark = true;
 
           break;
 

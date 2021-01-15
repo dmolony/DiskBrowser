@@ -51,6 +51,8 @@ Java runs on Windows, MacOS and Linux.
 ![Windows](resources/windows.png?raw=true "Windows")
 #### Graphics 
 ![Graphics](resources/graphics.png?raw=true "Graphics")
+#### Applesoft Formatting and Analysis
+![Applesoft](resources/basic.png?raw=true "Applesoft")
 #### Pascal code
 ![Pascal](resources/pascal.png?raw=true "Pascal")
 #### Infocom

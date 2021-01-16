@@ -57,10 +57,9 @@ public class SourceLine implements ApplesoftConstants
           if (buffer[ptr] == TOKEN_THEN)
             ++ptr;
 
-          // create subline from the condition (and THEN if it exists)
+          // create subline from the condition (plus THEN if it exists)
           sublines.add (new SubLine (this, startPtr, ptr - startPtr));
           startPtr = ptr;
-
           break;
 
         // end of subline, so add it, advance startPtr and continue
@@ -78,7 +77,6 @@ public class SourceLine implements ApplesoftConstants
             sublines.add (new SubLine (this, startPtr, (ptr - startPtr) - 1));
             startPtr = ptr - 1;
           }
-
           break;
 
         case Utility.ASCII_QUOTE:
@@ -87,8 +85,17 @@ public class SourceLine implements ApplesoftConstants
       }
     }
 
-    // add whatever is left
-    sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-    this.length = ptr - linePtr;
+    length = ptr - linePtr;
+
+    // add whatever is left - will either start with a token, or be a line number
+    int bytesLeft = ptr - startPtr;
+    sublines.add (new SubLine (this, startPtr, bytesLeft));
+
+    //    if (lineNumber == 99)
+    //    {
+    //      System.out.printf ("linePtr: %04X  length: %02X%n", linePtr, length);
+    //      System.out.println (HexFormatter.format (buffer, linePtr, length));
+    //      System.out.println (HexFormatter.format (buffer, startPtr, bytesLeft));
+    //    }
   }
 }

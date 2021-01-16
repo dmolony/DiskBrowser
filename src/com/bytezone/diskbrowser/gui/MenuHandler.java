@@ -63,6 +63,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
   //  private static final String PREFS_LIST_STRINGS = "listStrings";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
+  private static final String PREFS_FORMAT_REM = "formatRem";
   private static final String PREFS_DELETE_EXTRA_REM_SPACE = "deleteExtraRemSpace";
   private static final String PREFS_DELETE_EXTRA_DATA_SPACE = "deleteExtraDataSpace";
 
@@ -156,7 +157,9 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       new JCheckBoxMenuItem ("Only show target line numbers");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
-  final JMenuItem blankAfterReturn = new JCheckBoxMenuItem ("Blank line after RETURN");
+  final JMenuItem blankAfterReturnItem =
+      new JCheckBoxMenuItem ("Blank line after RETURN");
+  final JMenuItem formatRemItem = new JCheckBoxMenuItem ("Allow formatted REM");
   final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
   final JMenuItem deleteExtraDataSpace =
       new JCheckBoxMenuItem ("Delete extra DATA space");
@@ -268,7 +271,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showCaretItem);
     applesoftMenu.add (showThenItem);
-    applesoftMenu.add (blankAfterReturn);
+    applesoftMenu.add (blankAfterReturnItem);
+    applesoftMenu.add (formatRemItem);
     applesoftMenu.add (deleteExtraRemSpace);
     applesoftMenu.add (deleteExtraDataSpace);
     applesoftMenu.addSeparator ();
@@ -291,7 +295,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     applesoftFormatItems = new ArrayList<> (Arrays.asList (splitRemarkItem, splitDimItem,
         alignAssignItem, showBasicTargetsItem, onlyShowTargetLinesItem, showCaretItem,
-        showThenItem, blankAfterReturn, deleteExtraRemSpace, deleteExtraDataSpace));
+        showThenItem, blankAfterReturnItem, formatRemItem, deleteExtraRemSpace,
+        deleteExtraDataSpace));
 
     applesoftXrefItems = new ArrayList<> (Arrays.asList (showXrefItem, showCallsItem,
         showSymbolsItem, showFunctionsItem, showConstantsItem, showDuplicateSymbolsItem));
@@ -398,7 +403,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showThen = showThenItem.isSelected ();
-    basicPreferences.blankAfterReturn = blankAfterReturn.isSelected ();
+    basicPreferences.blankAfterReturn = blankAfterReturnItem.isSelected ();
+    basicPreferences.formatRem = formatRemItem.isSelected ();
     basicPreferences.deleteExtraRemSpace = deleteExtraRemSpace.isSelected ();
     basicPreferences.deleteExtraDataSpace = deleteExtraDataSpace.isSelected ();
 
@@ -581,7 +587,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     //    prefs.putBoolean (PREFS_LIST_STRINGS, listStringsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
     prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
-    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturn.isSelected ());
+    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturnItem.isSelected ());
+    prefs.putBoolean (PREFS_FORMAT_REM, formatRemItem.isSelected ());
     prefs.putBoolean (PREFS_DELETE_EXTRA_REM_SPACE, deleteExtraRemSpace.isSelected ());
     prefs.putBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, deleteExtraDataSpace.isSelected ());
 
@@ -643,7 +650,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
     onlyShowTargetLinesItem
         .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));
-    blankAfterReturn.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
+    blankAfterReturnItem.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
+    formatRemItem.setSelected (prefs.getBoolean (PREFS_FORMAT_REM, false));
     deleteExtraRemSpace
         .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_REM_SPACE, false));
     deleteExtraDataSpace

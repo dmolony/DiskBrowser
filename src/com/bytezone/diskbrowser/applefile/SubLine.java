@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.applefile;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;;
 
 // -----------------------------------------------------------------------------------//
@@ -59,13 +60,16 @@ public class SubLine implements ApplesoftConstants
     else
     {
       ptr = startPtr;
-      if (Utility.isDigit (firstByte))            // implied GOTO
+      if (Utility.isDigit (firstByte))            // split IF xx THEN nnn 
       {
         addXref (getLineNumber (buffer, startPtr), gotoLines);
         return;
       }
-      else                                        // variable assignment
+      else if (Utility.isLetter (firstByte))     // variable assignment
         recordEqualsPosition ();
+      else                                       // probably Beagle Bros 0D...
+        System.out.printf ("Unexpected bytes at %5d: %s%n", parent.lineNumber,
+            HexFormatter.formatNoHeader (buffer, startPtr, length).substring (5));
     }
 
     String var = "";
@@ -403,11 +407,11 @@ public class SubLine implements ApplesoftConstants
     int max = startPtr + length - 1;
     while (ptr < max)
     {
-      if (Utility.isHighBitSet (buffer[ptr]))
-        text.append (tokens[buffer[ptr] & 0x7F]);
+      byte b = buffer[ptr++];
+      if (Utility.isHighBitSet (b))
+        text.append (tokens[b & 0x7F]);
       else
-        text.append ((char) buffer[ptr]);
-      ++ptr;
+        text.append ((char) b);
     }
 
     return text.toString ();
@@ -570,9 +574,10 @@ public class SubLine implements ApplesoftConstants
   // ---------------------------------------------------------------------------------//
   {
     int ptr = startPtr + 1;
-    int max = startPtr + length - 2;
+    int max = startPtr + length - 1;
+    text.append ("REM ");
 
-    while (ptr <= max)
+    while (ptr < max)
     {
       switch (buffer[ptr])
       {

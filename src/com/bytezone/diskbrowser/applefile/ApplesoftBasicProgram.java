@@ -256,8 +256,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
               text.append ((char) b);
           }
 
-      assert ptr == nextLine - loadAddress;
-      //      ptr = nextLine - loadAddress;
+      if (ptr != (nextLine - loadAddress))
+      {
+        System.out.printf ("ptr: %04X, nextLine: %04X%n", ptr, nextLine - loadAddress);
+        //      ptr = nextLine - loadAddress;
+      }
       text.append ("\n");
     }
   }
@@ -302,7 +305,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         }
 
         // Beagle Bros often have multiline REM statements
-        if (subline.is (TOKEN_REM) && subline.containsControlChars ())
+        if (subline.is (TOKEN_REM) && basicPreferences.formatRem
+            && subline.containsControlChars ())
         {
           subline.addFormattedRem (text);
           fullText.append (text + "\n");

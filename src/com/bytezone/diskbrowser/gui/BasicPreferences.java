@@ -14,6 +14,7 @@ public class BasicPreferences
   public boolean showCaret = false;
   public boolean showThen = true;
   public boolean blankAfterReturn = false;
+  public boolean formatRem = false;
   public boolean deleteExtraRemSpace = false;
   public boolean deleteExtraDataSpace = false;
   public boolean showXref = false;
@@ -53,6 +54,7 @@ public class BasicPreferences
     text.append (String.format ("Show duplicate symbols ... %s%n", showDuplicateSymbols));
     //    text.append (String.format ("List strings ............. %s%n", listStrings));
     text.append (String.format ("Blank after RETURN ....... %s%n", blankAfterReturn));
+    text.append (String.format ("Format REM ............... %s%n", formatRem));
     text.append (String.format ("Delete extra REM space ... %s%n", deleteExtraRemSpace));
     text.append (String.format ("Delete extra DATA space .. %s%n", deleteExtraDataSpace));
     text.append (String.format ("Wrap PRINT at ............ %d%n", wrapPrintAt));

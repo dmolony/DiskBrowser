@@ -150,18 +150,17 @@ public class SubLine implements ApplesoftConstants
       }
     }
 
-    if (inQuote)      // unterminated string
-      addString (stringPtr, ptr);
-
-    checkVar (var, (byte) 0);
+    if (inQuote)
+      addString (stringPtr, ptr);     // unterminated string
+    else
+      checkVar (var, (byte) 0);       // unprocessed variable or number
   }
 
   // ---------------------------------------------------------------------------------//
   private void addString (int stringPtr, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    String s = new String (buffer, stringPtr - 1, ptr - stringPtr + 1);
-    stringsText.add (s);
+    stringsText.add (new String (buffer, stringPtr - 1, ptr - stringPtr + 1));
   }
 
   // ---------------------------------------------------------------------------------//

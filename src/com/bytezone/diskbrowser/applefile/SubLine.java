@@ -363,8 +363,6 @@ public class SubLine implements ApplesoftConstants
           }
           else
             stringsText.add (chunk);
-          //          else
-          //            System.out.printf ("Unknown data: [%s]%n", chunk);
         }
 
         break;

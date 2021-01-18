@@ -94,8 +94,5 @@ public class SourceLine implements ApplesoftConstants
     // if no colon was found this is the entire line
     int bytesLeft = ptr - startPtr;
     sublines.add (new SubLine (this, startPtr, bytesLeft));
-
-    //    if (lineNumber == 1022)
-    //      System.out.println (HexFormatter.format (buffer, linePtr, length));
   }
 }

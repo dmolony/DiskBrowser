@@ -20,6 +20,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           + "----------------------------------------------";
   private static Pattern dimPattern =
       Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9]+(,[0-9]+)*\\)[,:]?");
+  private static String NEWLINE = "\n";
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
@@ -200,7 +201,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       addHeader (text);
 
     if (showDebugText)
-      return getHexText (text);
+      return getDebugText (text);
 
     if (sourceLines.size () == 0)
     {
@@ -216,10 +217,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     if (basicPreferences.showAllXref)
       addXref (text);
 
-    while (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
-      text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
+    return Utility.rtrim (text);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -244,7 +242,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           switch (b)
           {
             case Utility.ASCII_CR:
-              text.append ("\n");
+              text.append (NEWLINE);
               break;
 
             case Utility.ASCII_BACKSPACE:
@@ -261,7 +259,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         System.out.printf ("ptr: %04X, nextLine: %04X%n", ptr, nextLine - loadAddress);
         //      ptr = nextLine - loadAddress;
       }
-      text.append ("\n");
+      text.append (NEWLINE);
     }
   }
 
@@ -300,7 +298,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
               address, address));
           String padding = "                         ".substring (0, text.length () + 2);
           for (String asm : getRemAssembler (subline))
-            fullText.append (padding + asm + "\n");
+            fullText.append (padding + asm + NEWLINE);
           continue;
         }
 
@@ -309,7 +307,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
             && subline.containsControlChars ())
         {
           subline.addFormattedRem (text);
-          fullText.append (text + "\n");
+          fullText.append (text + NEWLINE);
           continue;
         }
 
@@ -386,7 +384,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
             && countChars (text, Utility.ASCII_CARET) == 0)   // no control characters
           wrapPrint (fullText, text, lineText);
         else
-          fullText.append (text + "\n");
+          fullText.append (text + NEWLINE);
 
         text.setLength (0);
 
@@ -409,7 +407,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
       if (insertBlankLine)
       {
-        fullText.append ("\n");
+        fullText.append (NEWLINE);
         insertBlankLine = false;
       }
 
@@ -419,15 +417,18 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         alignEqualsPos = 0;
     }
 
-    int ptr = endPtr + 2;
-    if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
+    if (false)
     {
-      int offset = Utility.unsignedShort (buffer, 0);
-      int programLoadAddress = offset - getLineLength (0);
-      fullText.append ("\nExtra data:\n\n");
-      fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
-          programLoadAddress + ptr));
-      fullText.append ("\n");
+      int ptr = endPtr + 2;
+      if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
+      {
+        int offset = Utility.unsignedShort (buffer, 0);
+        int programLoadAddress = offset - getLineLength (0);
+        fullText.append ("\nExtra data:\n\n");
+        fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
+            programLoadAddress + ptr));
+        fullText.append (NEWLINE);
+      }
     }
   }
 
@@ -502,11 +503,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   // ---------------------------------------------------------------------------------//
   {
     if (fullText.charAt (fullText.length () - 2) != '\n')
-      fullText.append ("\n");
+      fullText.append (NEWLINE);
 
     fullText.append (String.format (format, underline));
     fullText.append (underline);
-    fullText.append ("\n");
+    fullText.append (NEWLINE);
 
     fullText.append (String.format (format, heading[0]));
     if (heading.length == 1)
@@ -514,10 +515,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     else
       fullText.append (heading[1]);
 
-    fullText.append ("\n");
+    fullText.append (NEWLINE);
     fullText.append (String.format (format, underline));
     fullText.append (underline);
-    fullText.append ("\n");
+    fullText.append (NEWLINE);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -639,7 +640,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       if (text.length () > underline.length () - maxDigits + longestVarName)
       {
         fullText.append (text);
-        fullText.append ("\n");
+        fullText.append (NEWLINE);
         text.setLength (0);
         text.append (String.format (formatRight, ""));
       }
@@ -678,42 +679,22 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private void wrapPrint (StringBuilder fullText, StringBuilder text, String lineText)
   // ---------------------------------------------------------------------------------//
   {
-    if (true)       // new method
+    List<String> lines = splitPrint (lineText);
+    if (lines != null)
     {
-      List<String> lines = splitPrint (lineText);
-      if (lines != null)
+      int offset = text.indexOf ("PRINT");
+      if (offset < 0)
+        offset = text.indexOf ("INPUT");
+      String fmt = "%-" + offset + "." + offset + "s%s%n";
+      String padding = text.substring (0, offset);
+      for (String s : lines)
       {
-        int offset = text.indexOf ("PRINT");
-        if (offset < 0)
-          offset = text.indexOf ("INPUT");
-        String fmt = "%-" + offset + "." + offset + "s%s%n";
-        String padding = text.substring (0, offset);
-        for (String s : lines)
-        {
-          fullText.append (String.format (fmt, padding, s));
-          padding = "";
-        }
+        fullText.append (String.format (fmt, padding, s));
+        padding = "";
       }
-      else
-        fullText.append (text + "\n");
     }
-    //    else            // old method
-    //    {
-    //      int first = text.indexOf ("\"") + 1;
-    //      int last = text.indexOf ("\"", first + 1) - 1;
-    //      if ((last - first) > basicPreferences.wrapPrintAt)
-    //      {
-    //        int ptr = first + basicPreferences.wrapPrintAt;
-    //        do
-    //        {
-    //          fullText.append (text.substring (0, ptr)
-    //              + "\n                                 ".substring (0, first + 1));
-    //          text.delete (0, ptr);
-    //          ptr = basicPreferences.wrapPrintAt;
-    //        } while (text.length () > basicPreferences.wrapPrintAt);
-    //      }
-    //      fullText.append (text + "\n");
-    //    }
+    else
+      fullText.append (text + "\n");
   }
 
   // ---------------------------------------------------------------------------------//
@@ -948,7 +929,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private String getHexText (StringBuilder text)
+  private String getDebugText (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
     int offset = Utility.unsignedShort (buffer, 0);
@@ -961,74 +942,39 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
               programLoadAddress + sourceLine.linePtr)));
       for (SubLine subline : sourceLine.sublines)
       {
-        byte b = buffer[subline.startPtr];
-        String token =
-            Utility.isHighBitSet (b) ? ApplesoftConstants.tokens[b & 0x7F] : "";
-        String hex = HexFormatter.formatNoHeader (buffer, subline.startPtr,
+        String token = getDisplayToken (buffer[subline.startPtr]);
+        String formattedHex = HexFormatter.formatNoHeader (buffer, subline.startPtr,
             subline.length, programLoadAddress + subline.startPtr);
-        String[] chunks = hex.split ("\n");
-        for (String s : chunks)
+
+        for (String bytes : formattedHex.split (NEWLINE))
         {
-          text.append (String.format ("        %-8s %s%n", token, s));
+          text.append (String.format ("        %-8s %s%n", token, bytes));
           token = "";
         }
       }
-      text.append ("\n");
+      text.append (NEWLINE);
     }
 
     if (endPtr < buffer.length)
     {
-      String hex = HexFormatter.formatNoHeader (buffer, endPtr, buffer.length - endPtr,
-          programLoadAddress + endPtr);
-      String[] chunks = hex.split ("\n");
-      for (String s : chunks)
-        text.append (String.format ("                 %s%n", s));
+      String formattedHex = HexFormatter.formatNoHeader (buffer, endPtr,
+          buffer.length - endPtr, programLoadAddress + endPtr);
+      for (String bytes : formattedHex.split (NEWLINE))
+        text.append (String.format ("                 %s%n", bytes));
     }
 
-    while (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
-      text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
+    return Utility.rtrim (text);
   }
 
   // ---------------------------------------------------------------------------------//
-  private String getHexText2 (StringBuilder text)        // old version
+  private String getDisplayToken (byte b)
   // ---------------------------------------------------------------------------------//
   {
-    if (buffer.length < 2)
-      return super.getHexDump ();
-
-    int ptr = 0;
-    int offset = Utility.unsignedShort (buffer, 0);
-    int programLoadAddress = offset - getLineLength (0);
-
-    while (ptr <= endPtr)             // stop at the same place as the source listing
-    {
-      int length = getLineLength (ptr);
-      if (length == 0)
-      {
-        text.append (
-            HexFormatter.formatNoHeader (buffer, ptr, 2, programLoadAddress + ptr));
-        ptr += 2;
-        break;
-      }
-
-      if (ptr + length < buffer.length)
-        text.append (
-            HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress + ptr)
-                + "\n\n");
-      ptr += length;
-    }
-
-    if (ptr < buffer.length)
-    {
-      int length = buffer.length - ptr;
-      text.append ("\n\n");
-      text.append (
-          HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress + ptr));
-    }
-
-    return text.toString ();
+    if (Utility.isHighBitSet (b))
+      return ApplesoftConstants.tokens[b & 0x7F];
+    else if (Utility.isDigit (b) || Utility.isLetter (b))
+      return "";
+    return "*******";
   }
 
   // A REM statement might conceal an assembler routine

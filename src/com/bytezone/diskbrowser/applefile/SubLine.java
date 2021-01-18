@@ -69,7 +69,7 @@ public class SubLine implements ApplesoftConstants
         recordEqualsPosition ();
       else if (firstByte == Utility.ASCII_COLON || firstByte == 0)  // empty subline
         return;
-      else                                       // probably Beagle Bros 0D...
+      else                                       // probably Beagle Bros 0D or 0A
         System.out.printf ("Unexpected bytes at %5d: %s%n", parent.lineNumber,
             HexFormatter.formatNoHeader (buffer, startPtr, length).substring (5));
     }
@@ -356,15 +356,15 @@ public class SubLine implements ApplesoftConstants
           if (chunk.isEmpty ())
             continue;
           b = (byte) chunk.charAt (0);
-          if (Utility.isDigit (b) || b == Utility.ASCII_MINUS || b == Utility.ASCII_DOT)
+          if (Utility.isPossibleNumber (b) || b == Utility.ASCII_MINUS)
           {
             if (!addNumber (chunk))
               stringsText.add (chunk);
           }
-          else if (Utility.isLetter (b) || b == Utility.ASCII_QUOTE)
-            stringsText.add (chunk);
           else
-            System.out.printf ("Unknown data: [%s]%n", chunk);
+            stringsText.add (chunk);
+          //          else
+          //            System.out.printf ("Unknown data: [%s]%n", chunk);
         }
 
         break;

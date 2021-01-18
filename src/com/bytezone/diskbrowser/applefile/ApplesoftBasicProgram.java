@@ -65,35 +65,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         break;
 
       SourceLine line = new SourceLine (this, buffer, ptr);
+
       sourceLines.add (line);
+      checkXref (line);
       ptr += line.length;
       currentAddress = nextAddress;
-
-      for (SubLine subline : line.sublines)
-      {
-        for (String symbol : subline.getSymbols ())
-          checkVar (symbol, line.lineNumber, symbolLines, uniqueSymbols);
-        for (String symbol : subline.getArrays ())
-          checkVar (symbol, line.lineNumber, arrayLines, uniqueArrays);
-        for (String symbol : subline.getFunctions ())
-          checkFunction (symbol, line.lineNumber);
-        for (int targetLine : subline.getGosubLines ())
-          addNumberInt (line.lineNumber, targetLine, gosubLines);
-        for (int targetLine : subline.getGotoLines ())
-          addNumberInt (line.lineNumber, targetLine, gotoLines);
-        for (int num : subline.getConstantsInt ())
-          addNumberInt (line.lineNumber, num, constantsInt);
-        for (float num : subline.getConstantsFloat ())
-          addNumberFloat (line.lineNumber, num, constantsFloat);
-        if (subline.callTarget != null)
-          addString (line.lineNumber, subline.callTarget, callLines);
-        for (String s : subline.getStringsText ())
-        {
-          stringsText.add (s);
-          stringsLine.add (line.lineNumber);
-        }
-      }
     }
+
     endPtr = ptr;
 
     longestVarName = getLongestName ();
@@ -104,90 +82,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
     maxDigits = getMaxDigits ();
     formatLineNumber = "%" + maxDigits + "d ";
-  }
-
-  // ---------------------------------------------------------------------------------//
-  void checkVar (String var, int lineNumber, Map<String, List<Integer>> map,
-      Map<String, List<String>> unique)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = map.get (var);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      map.put (var, lines);
-    }
-
-    if (lines.size () == 0)
-      lines.add (lineNumber);
-    else
-    {
-      int lastLine = lines.get (lines.size () - 1);
-      if (lastLine != lineNumber)
-        lines.add (lineNumber);
-    }
-
-    checkUniqueName (var, unique);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  void checkFunction (String var, int lineNumber)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = functionLines.get (var);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      functionLines.put (var, lines);
-    }
-
-    if (lines.size () == 0)
-      lines.add (lineNumber);
-    else
-    {
-      int lastLine = lines.get (lines.size () - 1);
-      if (lastLine != lineNumber)
-        lines.add (lineNumber);
-    }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void addNumberInt (int sourceLine, Integer key, Map<Integer, List<Integer>> map)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = map.get (key);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      map.put (key, lines);
-    }
-    lines.add (sourceLine);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void addNumberFloat (int sourceLine, Float key, Map<Float, List<Integer>> map)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = map.get (key);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      map.put (key, lines);
-    }
-    lines.add (sourceLine);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void addString (int sourceLine, String key, Map<String, List<Integer>> map)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<Integer> lines = map.get (key);
-    if (lines == null)
-    {
-      lines = new ArrayList<> ();
-      map.put (key, lines);
-    }
-    lines.add (sourceLine);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -210,9 +104,9 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     }
 
     if (basicPreferences.formatApplesoft)
-      userFormat (text);
+      getUserFormat (text);
     else
-      appleFormat (text);
+      getAppleFormat (text);
 
     if (basicPreferences.showAllXref)
       addXref (text);
@@ -221,7 +115,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private void appleFormat (StringBuilder text)
+  private void getAppleFormat (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
     int loadAddress = getLoadAddress ();
@@ -264,7 +158,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private void userFormat (StringBuilder fullText)
+  private void getUserFormat (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     int indentSize = 2;
@@ -1078,5 +972,129 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       ptr--;
 
     return (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void checkXref (SourceLine line)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (SubLine subline : line.sublines)
+    {
+      for (String symbol : subline.getSymbols ())
+        checkVar (symbol, line.lineNumber, symbolLines, uniqueSymbols);
+      for (String symbol : subline.getArrays ())
+        checkVar (symbol, line.lineNumber, arrayLines, uniqueArrays);
+      for (String symbol : subline.getFunctions ())
+        checkFunction (line.lineNumber, symbol);
+      for (int targetLine : subline.getGosubLines ())
+        addNumberInt (line.lineNumber, targetLine, gosubLines);
+      for (int targetLine : subline.getGotoLines ())
+        addNumberInt (line.lineNumber, targetLine, gotoLines);
+      for (int num : subline.getConstantsInt ())
+        addNumberInt (line.lineNumber, num, constantsInt);
+      for (float num : subline.getConstantsFloat ())
+        addNumberFloat (line.lineNumber, num, constantsFloat);
+      if (subline.callTarget != null)
+        addString (line.lineNumber, subline.callTarget, callLines);
+      for (String s : subline.getStringsText ())
+      {
+        stringsText.add (s);
+        stringsLine.add (line.lineNumber);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void checkVar (String var, int lineNumber, Map<String, List<Integer>> map,
+      Map<String, List<String>> unique)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (var);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (var, lines);
+    }
+
+    if (lines.size () == 0)
+      lines.add (lineNumber);
+    else
+    {
+      int lastLine = lines.get (lines.size () - 1);
+      if (lastLine != lineNumber)
+        lines.add (lineNumber);
+    }
+
+    checkUniqueName (var, unique);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void checkFunction (int sourceLine, String var)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = functionLines.get (var);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      functionLines.put (var, lines);
+    }
+
+    addLine (lines, sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addNumberInt (int sourceLine, Integer key, Map<Integer, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (key);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (key, lines);
+    }
+
+    addLine (lines, sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addNumberFloat (int sourceLine, Float key, Map<Float, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (key);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (key, lines);
+    }
+
+    addLine (lines, sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addString (int sourceLine, String key, Map<String, List<Integer>> map)
+  // ---------------------------------------------------------------------------------//
+  {
+    List<Integer> lines = map.get (key);
+    if (lines == null)
+    {
+      lines = new ArrayList<> ();
+      map.put (key, lines);
+    }
+
+    addLine (lines, sourceLine);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addLine (List<Integer> lines, int lineNumber)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (lines.size () == 0)
+      lines.add (lineNumber);
+    else
+    {
+      int lastLine = lines.get (lines.size () - 1);
+      if (lastLine != lineNumber)
+        lines.add (lineNumber);
+    }
   }
 }

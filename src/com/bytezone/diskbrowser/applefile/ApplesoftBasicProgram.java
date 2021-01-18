@@ -194,13 +194,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    if (showDebugText)
-      return getHexText ();
-
     StringBuilder text = new StringBuilder ();
 
     if (basicPreferences.showHeader)
       addHeader (text);
+
+    if (showDebugText)
+      return getHexText (text);
 
     if (sourceLines.size () == 0)
     {
@@ -948,15 +948,55 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private String getHexText ()
+  private String getHexText (StringBuilder text)
+  // ---------------------------------------------------------------------------------//
+  {
+    int offset = Utility.unsignedShort (buffer, 0);
+    int programLoadAddress = offset - getLineLength (0);
+
+    for (SourceLine sourceLine : sourceLines)
+    {
+      text.append (String.format ("%5d            %s%n", sourceLine.lineNumber,
+          HexFormatter.formatNoHeader (buffer, sourceLine.linePtr, 4,
+              programLoadAddress + sourceLine.linePtr)));
+      for (SubLine subline : sourceLine.sublines)
+      {
+        byte b = buffer[subline.startPtr];
+        String token =
+            Utility.isHighBitSet (b) ? ApplesoftConstants.tokens[b & 0x7F] : "";
+        String hex = HexFormatter.formatNoHeader (buffer, subline.startPtr,
+            subline.length, programLoadAddress + subline.startPtr);
+        String[] chunks = hex.split ("\n");
+        for (String s : chunks)
+        {
+          text.append (String.format ("        %-8s %s%n", token, s));
+          token = "";
+        }
+      }
+      text.append ("\n");
+    }
+
+    if (endPtr < buffer.length)
+    {
+      String hex = HexFormatter.formatNoHeader (buffer, endPtr, buffer.length - endPtr,
+          programLoadAddress + endPtr);
+      String[] chunks = hex.split ("\n");
+      for (String s : chunks)
+        text.append (String.format ("                 %s%n", s));
+    }
+
+    while (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
+      text.deleteCharAt (text.length () - 1);
+
+    return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String getHexText2 (StringBuilder text)        // old version
   // ---------------------------------------------------------------------------------//
   {
     if (buffer.length < 2)
       return super.getHexDump ();
-
-    StringBuilder pgm = new StringBuilder ();
-    if (basicPreferences.showHeader)
-      addHeader (pgm);
 
     int ptr = 0;
     int offset = Utility.unsignedShort (buffer, 0);
@@ -967,14 +1007,14 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       int length = getLineLength (ptr);
       if (length == 0)
       {
-        pgm.append (
+        text.append (
             HexFormatter.formatNoHeader (buffer, ptr, 2, programLoadAddress + ptr));
         ptr += 2;
         break;
       }
 
       if (ptr + length < buffer.length)
-        pgm.append (
+        text.append (
             HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress + ptr)
                 + "\n\n");
       ptr += length;
@@ -983,12 +1023,12 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     if (ptr < buffer.length)
     {
       int length = buffer.length - ptr;
-      pgm.append ("\n\n");
-      pgm.append (
+      text.append ("\n\n");
+      text.append (
           HexFormatter.formatNoHeader (buffer, ptr, length, programLoadAddress + ptr));
     }
 
-    return pgm.toString ();
+    return text.toString ();
   }
 
   // A REM statement might conceal an assembler routine
@@ -1031,6 +1071,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     int offset = Utility.unsignedShort (buffer, ptr);
     if (offset == 0)
       return 0;
+
     ptr += 4;               // skip offset and line number
     int length = 5;
 

@@ -10,6 +10,7 @@ public class SourceLine implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
   ApplesoftBasicProgram parent;
+  int addressNext;
   int lineNumber;
   int linePtr;
   int length;
@@ -25,6 +26,7 @@ public class SourceLine implements ApplesoftConstants
     this.buffer = buffer;
 
     linePtr = ptr;
+    addressNext = Utility.unsignedShort (buffer, ptr);
     lineNumber = Utility.unsignedShort (buffer, ptr + 2);
 
     int startPtr = ptr += 4;            // skip link to next line and lineNumber
@@ -74,8 +76,9 @@ public class SourceLine implements ApplesoftConstants
           else
           {     // REM appears mid-line (should follow a colon)
             System.out.printf ("%5d %s%n", lineNumber, "mid-line REM token");
-            sublines.add (new SubLine (this, startPtr, (ptr - startPtr) - 1));
-            startPtr = ptr - 1;
+            ptr--;            // point back to this REM
+            sublines.add (new SubLine (this, startPtr, ptr - startPtr));
+            startPtr = ptr;
           }
           break;
 
@@ -87,15 +90,12 @@ public class SourceLine implements ApplesoftConstants
 
     length = ptr - linePtr;
 
-    // add whatever is left - will either start with a token, or be a line number
+    // add whatever is left after the last colon
+    // if no colon was found this is the entire line
     int bytesLeft = ptr - startPtr;
     sublines.add (new SubLine (this, startPtr, bytesLeft));
 
-    //    if (lineNumber == 99)
-    //    {
-    //      System.out.printf ("linePtr: %04X  length: %02X%n", linePtr, length);
+    //    if (lineNumber == 1022)
     //      System.out.println (HexFormatter.format (buffer, linePtr, length));
-    //      System.out.println (HexFormatter.format (buffer, startPtr, bytesLeft));
-    //    }
   }
 }

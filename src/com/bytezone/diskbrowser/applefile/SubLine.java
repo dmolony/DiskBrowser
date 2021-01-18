@@ -50,7 +50,7 @@ public class SubLine implements ApplesoftConstants
     int ptr = startPtr;
     byte firstByte = buffer[startPtr];
 
-    if (Utility.isHighBitSet (firstByte))         // BASIC command
+    if (isToken (firstByte))
     {
       doToken (firstByte);
       if (is (TOKEN_REM) || is (TOKEN_DATA))      // no further processing
@@ -67,6 +67,8 @@ public class SubLine implements ApplesoftConstants
       }
       else if (Utility.isLetter (firstByte))     // variable assignment
         recordEqualsPosition ();
+      else if (firstByte == Utility.ASCII_COLON || firstByte == 0)  // empty subline
+        return;
       else                                       // probably Beagle Bros 0D...
         System.out.printf ("Unexpected bytes at %5d: %s%n", parent.lineNumber,
             HexFormatter.formatNoHeader (buffer, startPtr, length).substring (5));
@@ -408,7 +410,7 @@ public class SubLine implements ApplesoftConstants
     while (ptr < max)
     {
       byte b = buffer[ptr++];
-      if (Utility.isHighBitSet (b))
+      if (isToken (b))
         text.append (tokens[b & 0x7F]);
       else
         text.append ((char) b);
@@ -446,7 +448,6 @@ public class SubLine implements ApplesoftConstants
       ptr++;
 
     String s = new String (buffer, start, ptr - start);
-
     String[] chunks = s.split (",");
 
     try
@@ -478,10 +479,7 @@ public class SubLine implements ApplesoftConstants
   boolean isImpliedGoto ()
   // ---------------------------------------------------------------------------------//
   {
-    byte b = buffer[startPtr];
-    if (Utility.isHighBitSet (b))
-      return false;
-    return (Utility.isDigit (b));
+    return (Utility.isDigit (buffer[startPtr]));
   }
 
   // Record the position of the equals sign so it can be aligned with adjacent lines.
@@ -546,7 +544,7 @@ public class SubLine implements ApplesoftConstants
   {
     // ignore first byte, check the rest for tokens
     for (int p = startPtr + 1, max = startPtr + length; p < max; p++)
-      if (Utility.isHighBitSet (buffer[p]))
+      if (isToken (buffer[p]))
         return true;
 
     return false;
@@ -633,6 +631,13 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
+  private boolean isToken (byte b)
+  // ---------------------------------------------------------------------------------//
+  {
+    return Utility.isHighBitSet (b);
+  }
+
+  // ---------------------------------------------------------------------------------//
   public StringBuilder toStringBuilder ()
   // ---------------------------------------------------------------------------------//
   {
@@ -649,20 +654,17 @@ public class SubLine implements ApplesoftConstants
     for (int p = startPtr; p <= max; p++)
     {
       byte b = buffer[p];
-      if (Utility.isHighBitSet (b))           // token
+      if (isToken (b))
       {
         if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
           line.append (' ');
         int val = b & 0x7F;
-        //        if (val < ApplesoftConstants.tokens.length)
-        //        {
         if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
           line.append (ApplesoftConstants.tokens[val] + " ");
-        //        }
       }
       else if (Utility.isControlCharacter (b))
         line.append (ApplesoftBasicProgram.basicPreferences.showCaret
-            ? "^" + (char) (b + 64) : ".");
+            ? "^" + (char) (b + 64) : "?");
       else
         line.append ((char) b);
     }

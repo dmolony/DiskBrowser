@@ -571,7 +571,15 @@ public class SubLine implements ApplesoftConstants
   {
     int ptr = startPtr + 1;
     int max = startPtr + length - 1;
-    text.append ("REM ");
+
+    // apple format uses left-justified line numbers so the length varies
+    if (isFirst ())
+    {
+      text.setLength (0);
+      text.append (String.format (" %d  REM ", parent.lineNumber));
+    }
+    else
+      text.append ("REM ");
 
     while (ptr < max)
     {
@@ -584,6 +592,13 @@ public class SubLine implements ApplesoftConstants
 
         case Utility.ASCII_CR:
           text.append ("\n");
+          break;
+
+        case Utility.ASCII_LF:
+          int indent = Utility.getIndent (text);
+          text.append ("\n");
+          for (int i = 0; i < indent; i++)
+            text.append (" ");
           break;
 
         default:

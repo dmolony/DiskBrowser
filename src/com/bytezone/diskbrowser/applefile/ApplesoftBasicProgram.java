@@ -68,7 +68,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
       sourceLines.add (line);
       checkXref (line);
-      ptr += line.length;
+      ptr += line.length;                 // assumes lines are contiguous
       currentAddress = nextAddress;
     }
 
@@ -115,18 +115,19 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private void getAppleFormat (StringBuilder text)
+  private void getAppleFormat (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     int loadAddress = getLoadAddress ();
     int ptr = 0;
     int nextLine;
     byte b;
+    StringBuilder text = new StringBuilder ();
 
     while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
     {
       int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
-      text.append (String.format (" %5d ", lineNumber));
+      text.append (String.format (" %d ", lineNumber));
       ptr += 4;
 
       while ((b = buffer[ptr++]) != 0)
@@ -144,6 +145,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
                 text.deleteCharAt (text.length () - 1);
               break;
 
+            case Utility.ASCII_LF:
+              int indent = Utility.getIndent (text);
+              text.append ("\n");
+              for (int i = 0; i < indent; i++)
+                text.append (" ");
+              break;
+
             default:
               text.append ((char) b);
           }
@@ -154,6 +162,14 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         //      ptr = nextLine - loadAddress;
       }
       text.append (NEWLINE);
+
+      //      List<String> lines = wrap (text, 29);
+      //      fullText.append (String.format ("%d %s%n", lineNumber, lines.get (0)));
+      //      for (int i = 1; i < lines.size (); i++)
+      //        fullText.append (String.format ("    %s%n", lines.get (i)));
+
+      fullText.append (text);
+      text.setLength (0);
     }
   }
 
@@ -167,12 +183,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     Stack<String> loopVariables = new Stack<> ();
 
     int alignEqualsPos = 0;
-    StringBuilder text;
-    int baseOffset = basicPreferences.showTargets ? 12 : 8;
+    int baseOffset = 7;       // 5 digit line number + 2 spaces
 
     for (SourceLine line : sourceLines)
     {
-      text = new StringBuilder (getBase (line) + "  ");
+      StringBuilder text = new StringBuilder (String.format ("%5d", (line.lineNumber)));
 
       int indent = loopVariables.size ();   // each full line starts at the loop indent
       int ifIndent = 0;                     // IF statement(s) limit back indentation by NEXT
@@ -219,17 +234,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           fullText.deleteCharAt (fullText.length () - 1);         // remove newline
           fullText.append (" ");
         }
-        else    // ... otherwise do all the indenting and showing of targets etc.
+        else    // ... otherwise do all the indenting
         {
-          // Prepare target indicators for subsequent sublines (ie no line number)
-          if (basicPreferences.showTargets && !subline.isFirst ())
-            if (subline.is (TOKEN_GOSUB)
-                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
-              text.append ("<<--");
-            else if (subline.is (TOKEN_GOTO) || subline.isImpliedGoto ()
-                || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
-              text.append (" <--");
-
           // Align assign statements if required
           if (basicPreferences.alignAssign)
             alignEqualsPos = alignEqualsPosition (subline, alignEqualsPos);
@@ -242,15 +248,15 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         // Add the current text, then reset it
         String lineText = subline.getAlignedText (alignEqualsPos);
 
-        if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
-          lineText = lineText.replaceFirst ("REM  ", "REM ");
+        //        if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
+        //          lineText = lineText.replaceFirst ("REM  ", "REM ");
 
         if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
           lineText = lineText.replaceFirst ("DATA  ", "DATA ");
 
         // Check for a wrappable REM/DATA/DIM statement
         // (see SEA BATTLE on DISK283.DSK)
-        int inset = Math.max (text.length (), getIndent (fullText)) + 1;
+        int inset = Math.max (text.length (), Utility.getIndent (fullText)) + 1;
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
@@ -707,20 +713,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getIndent (StringBuilder fullText)
-  // ---------------------------------------------------------------------------------//
-  {
-    int ptr = fullText.length () - 1;
-    int indent = 0;
-    while (ptr >= 0 && fullText.charAt (ptr) != '\n')
-    {
-      --ptr;
-      ++indent;
-    }
-    return indent;
-  }
-
-  // ---------------------------------------------------------------------------------//
   private int countChars (StringBuilder text, byte ch)
   // ---------------------------------------------------------------------------------//
   {
@@ -729,45 +721,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       if (text.charAt (i) == ch)
         total++;
     return total;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private String getBase (SourceLine line)
-  // ---------------------------------------------------------------------------------//
-  {
-    boolean isTarget = gotoLines.containsKey (line.lineNumber)
-        || gosubLines.containsKey (line.lineNumber);
-
-    if (!basicPreferences.showTargets)
-    {
-      if (!isTarget && basicPreferences.onlyShowTargetLineNumbers)
-        return "      ";
-      return String.format (" %5d", line.lineNumber);
-    }
-
-    String lineNumberText = String.format ("%5d", line.lineNumber);
-    SubLine subline = line.sublines.get (0);
-    String c1 = "  ", c2 = "  ";
-
-    if (subline.is (TOKEN_GOSUB) || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOSUB)))
-      c1 = "<<";
-    else if (subline.is (TOKEN_GOTO)
-        || (subline.is (TOKEN_ON) && subline.has (TOKEN_GOTO)))
-      c1 = " <";
-
-    if (gotoLines.containsKey (line.lineNumber))
-      c2 = "> ";
-    if (gosubLines.containsKey (line.lineNumber))
-      c2 = ">>";
-    if (c1.equals ("  ") && !c2.equals ("  "))
-      c1 = "--";
-    if (!c1.equals ("  ") && c2.equals ("  "))
-      c2 = "--";
-
-    if (!isTarget && basicPreferences.onlyShowTargetLineNumbers)
-      lineNumberText = "";
-
-    return String.format ("%s%s %s", c1, c2, lineNumberText);
   }
 
   // Decide whether the current subline needs to be aligned on its equals sign. If so,

@@ -18,6 +18,7 @@ public class Utility
 // -----------------------------------------------------------------------------------//
 {
   public static final byte ASCII_BACKSPACE = 0x08;
+  public static final byte ASCII_LF = 0x0A;
   public static final byte ASCII_CR = 0x0D;
   public static final byte ASCII_QUOTE = 0x22;
   public static final byte ASCII_DOLLAR = 0x24;
@@ -57,6 +58,20 @@ public class Utility
     while (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
       text.deleteCharAt (text.length () - 1);
     return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static int getIndent (StringBuilder fullText)
+  // ---------------------------------------------------------------------------------//
+  {
+    int ptr = fullText.length () - 1;
+    int indent = 0;
+    while (ptr >= 0 && fullText.charAt (ptr) != '\n')
+    {
+      --ptr;
+      ++indent;
+    }
+    return indent;
   }
 
   // ---------------------------------------------------------------------------------//

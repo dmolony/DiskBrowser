@@ -29,7 +29,7 @@ public class SubLine implements ApplesoftConstants
   private final List<Integer> gotoLines = new ArrayList<> ();
   private final List<Integer> gosubLines = new ArrayList<> ();
 
-  private final List<String> symbols = new ArrayList<> ();
+  private final List<String> variables = new ArrayList<> ();
   private final List<String> functions = new ArrayList<> ();
   private final List<String> arrays = new ArrayList<> ();
 
@@ -213,64 +213,8 @@ public class SubLine implements ApplesoftConstants
       if (!arrays.contains (var))
         arrays.add (var);
     }
-    else if (!symbols.contains (var))
-      symbols.add (var);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<String> getSymbols ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return symbols;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<String> getFunctions ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return functions;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<String> getArrays ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return arrays;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<Integer> getGotoLines ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return gotoLines;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<Integer> getGosubLines ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return gosubLines;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<Integer> getConstantsInt ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return constantsInt;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<Float> getConstantsFloat ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return constantsFloat;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  List<String> getStringsText ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return stringsText;
+    else if (!variables.contains (var))
+      variables.add (var);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -386,8 +330,7 @@ public class SubLine implements ApplesoftConstants
   {
     try
     {
-      int decimalPos = var.indexOf ('.');
-      if (decimalPos < 0)
+      if (var.indexOf ('.') < 0)                    // no decimal point
       {
         int varInt = Integer.parseInt (var);
         if (!constantsInt.contains (varInt))
@@ -402,7 +345,6 @@ public class SubLine implements ApplesoftConstants
     }
     catch (NumberFormatException nfe)
     {
-      //      System.out.printf ("NFE1: %s%n", var);
       return false;
     }
     return true;
@@ -416,6 +358,7 @@ public class SubLine implements ApplesoftConstants
 
     int ptr = startPtr + 1;
     int max = startPtr + length - 1;
+
     while (ptr < max)
     {
       byte b = buffer[ptr++];
@@ -437,6 +380,7 @@ public class SubLine implements ApplesoftConstants
     for (int i = start; i < buffer.length; i++)
       if (buffer[i] == value)
         return i;
+
     return -1;
   }
 
@@ -500,8 +444,10 @@ public class SubLine implements ApplesoftConstants
   {
     int p = startPtr + 1;
     int max = startPtr + length;
+
     while (buffer[p] != TOKEN_EQUALS && p < max)
       p++;
+
     if (buffer[p] == TOKEN_EQUALS)
       equalsPosition = toString ().indexOf ('=');           // use expanded line
   }
@@ -645,15 +591,8 @@ public class SubLine implements ApplesoftConstants
       len--;
     byte[] buffer2 = new byte[len];
     System.arraycopy (buffer, startPtr + 1, buffer2, 0, buffer2.length);
-    return buffer2;
-  }
 
-  // ---------------------------------------------------------------------------------//
-  @Override
-  public String toString ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return toStringBuilder ().toString ();
+    return buffer2;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -661,6 +600,62 @@ public class SubLine implements ApplesoftConstants
   // ---------------------------------------------------------------------------------//
   {
     return Utility.isHighBitSet (b);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getVariables ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return variables;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getFunctions ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return functions;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getArrays ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return arrays;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Integer> getGotoLines ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return gotoLines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Integer> getGosubLines ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return gosubLines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Integer> getConstantsInt ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return constantsInt;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<Float> getConstantsFloat ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return constantsFloat;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<String> getStringsText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return stringsText;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -696,5 +691,13 @@ public class SubLine implements ApplesoftConstants
     }
 
     return line;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return toStringBuilder ().toString ();
   }
 }

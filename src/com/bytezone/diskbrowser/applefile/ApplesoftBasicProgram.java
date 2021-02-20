@@ -933,7 +933,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   {
     for (SubLine subline : line.sublines)
     {
-      for (String symbol : subline.getSymbols ())
+      for (String symbol : subline.getVariables ())
         checkVar (symbol, line.lineNumber, symbolLines, uniqueSymbols);
       for (String symbol : subline.getArrays ())
         checkVar (symbol, line.lineNumber, arrayLines, uniqueArrays);

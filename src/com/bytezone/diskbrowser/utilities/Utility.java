@@ -25,6 +25,7 @@ public class Utility
   public static final byte ASCII_PERCENT = 0x25;
   public static final byte ASCII_LEFT_BRACKET = 0x28;
   public static final byte ASCII_RIGHT_BRACKET = 0x29;
+  public static final byte ASCII_COMMA = 0x2C;
   public static final byte ASCII_MINUS = 0x2D;
   public static final byte ASCII_DOT = 0x2E;
   public static final byte ASCII_COLON = 0x3A;

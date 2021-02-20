@@ -331,7 +331,7 @@ public class SubLine implements ApplesoftConstants
         break;
 
       case TOKEN_CALL:
-        callTarget = getExpression ();
+        callTarget = getCallTarget ();
         break;
 
       case TOKEN_DEF:
@@ -398,7 +398,7 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  private String getExpression ()
+  private String getCallTarget ()
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
@@ -410,6 +410,8 @@ public class SubLine implements ApplesoftConstants
       byte b = buffer[ptr++];
       if (isToken (b))
         text.append (tokens[b & 0x7F]);
+      else if (b == Utility.ASCII_COMMA)    // end of call target
+        break;
       else
         text.append ((char) b);
     }
@@ -576,7 +578,7 @@ public class SubLine implements ApplesoftConstants
     if (isFirst ())
     {
       text.setLength (0);
-      text.append (String.format (" %d  REM ", parent.lineNumber));
+      text.append (String.format (" %d  REM ", parent.lineNumber));   // mimic apple
     }
     else
       text.append ("REM ");

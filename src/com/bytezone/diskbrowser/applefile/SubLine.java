@@ -55,7 +55,11 @@ public class SubLine implements ApplesoftConstants
       doToken (firstByte);
       if (is (TOKEN_REM) || is (TOKEN_DATA))      // no further processing
         return;
-      ptr = startPtr + 1;
+
+      if (is (TOKEN_CALL))
+        ptr = startPtr + callTarget.length ();
+      else
+        ptr = startPtr + 1;
     }
     else
     {
@@ -66,8 +70,8 @@ public class SubLine implements ApplesoftConstants
         return;
       }
       else if (Utility.isLetter (firstByte))     // variable assignment
-        recordEqualsPosition ();
-      else if (firstByte == Utility.ASCII_COLON || firstByte == 0)  // empty subline
+        setEqualsPosition ();
+      else if (isEndOfLine (firstByte))          // empty subline
         return;
       else                                       // probably Beagle Bros 0D or 0A
         System.out.printf ("Unexpected bytes at %5d: %s%n", parent.lineNumber,
@@ -82,7 +86,7 @@ public class SubLine implements ApplesoftConstants
     int stringPtr = 0;
 
     int max = startPtr + length - 1;
-    if (buffer[max] == 0 || buffer[max] == Utility.ASCII_COLON)
+    if (isEndOfLine (buffer[max]))
       --max;
 
     while (ptr <= max)
@@ -160,6 +164,13 @@ public class SubLine implements ApplesoftConstants
       addString (stringPtr, ptr);     // unterminated string
     else
       checkVar (var, (byte) 0);       // unprocessed variable or number
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean isEndOfLine (byte b)
+  // ---------------------------------------------------------------------------------//
+  {
+    return b == 0 || b == Utility.ASCII_COLON;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -285,7 +296,7 @@ public class SubLine implements ApplesoftConstants
         break;
 
       case TOKEN_LET:
-        recordEqualsPosition ();
+        setEqualsPosition ();
         break;
 
       case TOKEN_GOTO:
@@ -484,7 +495,7 @@ public class SubLine implements ApplesoftConstants
 
   // Record the position of the equals sign so it can be aligned with adjacent lines.
   // ---------------------------------------------------------------------------------//
-  private void recordEqualsPosition ()
+  private void setEqualsPosition ()
   // ---------------------------------------------------------------------------------//
   {
     int p = startPtr + 1;

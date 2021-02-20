@@ -29,14 +29,14 @@ public class SourceLine implements ApplesoftConstants
     addressNext = Utility.unsignedShort (buffer, ptr);
     lineNumber = Utility.unsignedShort (buffer, ptr + 2);
 
-    int startPtr = ptr += 4;            // skip link to next line and lineNumber
-    boolean inString = false;           // can toggle
-    boolean inRemark = false;           // can only go false -> true
+    int startPtr = ptr += 4;              // skip link to next line and lineNumber
+    boolean inString = false;             // can toggle
+    boolean inRemark = false;             // can only go false -> true
     byte b;
 
     while (ptr < buffer.length && (b = buffer[ptr++]) != 0)
     {
-      if (inRemark)                     // cannot terminate a REM
+      if (inRemark)                       // cannot terminate a REM
         continue;
 
       if (inString)

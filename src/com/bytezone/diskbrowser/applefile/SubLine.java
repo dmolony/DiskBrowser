@@ -1,5 +1,11 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.isDigit;
+import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
+import static com.bytezone.diskbrowser.utilities.Utility.isLetter;
+import static com.bytezone.diskbrowser.utilities.Utility.isPossibleNumber;
+import static com.bytezone.diskbrowser.utilities.Utility.isPossibleVariable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,12 +70,12 @@ public class SubLine implements ApplesoftConstants
     else
     {
       ptr = startPtr;
-      if (Utility.isDigit (firstByte))            // split IF xx THEN nnn 
+      if (isDigit (firstByte))                   // split IF xx THEN nnn 
       {
         addXref (getLineNumber (buffer, startPtr), gotoLines);
         return;
       }
-      else if (Utility.isLetter (firstByte))     // variable assignment
+      else if (isLetter (firstByte))             // variable assignment
         setEqualsPosition ();
       else if (isEndOfLine (firstByte))          // empty subline
         return;
@@ -130,10 +136,9 @@ public class SubLine implements ApplesoftConstants
         continue;
       }
 
-      if (Utility.isPossibleVariable (b) || Utility.isPossibleNumber (b))
+      if (isPossibleVariable (b) || isPossibleNumber (b))
       {
-        if (var.isEmpty () && Utility.isPossibleNumber (b)
-            && buffer[ptr - 2] == TOKEN_MINUS)
+        if (var.isEmpty () && isPossibleNumber (b) && buffer[ptr - 2] == TOKEN_MINUS)
           var = "-";
 
         var += (char) b;
@@ -197,7 +202,7 @@ public class SubLine implements ApplesoftConstants
     if (var.length () == 0)
       return;
 
-    if (!Utility.isLetter ((byte) var.charAt (0)))
+    if (!isLetter ((byte) var.charAt (0)))
     {
       if (is (TOKEN_GOTO) || is (TOKEN_GOSUB) || is (TOKEN_ON) || is (TOKEN_ONERR))
         return;                     // ignore line numbers
@@ -311,7 +316,7 @@ public class SubLine implements ApplesoftConstants
           if (chunk.isEmpty ())
             continue;
           b = (byte) chunk.charAt (0);
-          if (Utility.isPossibleNumber (b) || b == Utility.ASCII_MINUS)
+          if (isPossibleNumber (b) || b == Utility.ASCII_MINUS)
           {
             if (!addNumber (chunk))
               stringsText.add (chunk);
@@ -424,7 +429,7 @@ public class SubLine implements ApplesoftConstants
   {
     int lineNumber = 0;
 
-    while (ptr < buffer.length && Utility.isDigit (buffer[ptr]))
+    while (ptr < buffer.length && isDigit (buffer[ptr]))
       lineNumber = lineNumber * 10 + (buffer[ptr++] & 0xFF) - 0x30;
 
     return lineNumber;
@@ -434,7 +439,7 @@ public class SubLine implements ApplesoftConstants
   boolean isImpliedGoto ()
   // ---------------------------------------------------------------------------------//
   {
-    return (Utility.isDigit (buffer[startPtr]));
+    return (isDigit (buffer[startPtr]));
   }
 
   // Record the position of the equals sign so it can be aligned with adjacent lines.
@@ -599,7 +604,7 @@ public class SubLine implements ApplesoftConstants
   private boolean isToken (byte b)
   // ---------------------------------------------------------------------------------//
   {
-    return Utility.isHighBitSet (b);
+    return isHighBitSet (b);
   }
 
   // ---------------------------------------------------------------------------------//

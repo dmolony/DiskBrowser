@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +28,8 @@ public class SourceLine implements ApplesoftConstants
     this.buffer = buffer;
 
     linePtr = ptr;
-    addressNext = Utility.unsignedShort (buffer, ptr);
-    lineNumber = Utility.unsignedShort (buffer, ptr + 2);
+    addressNext = unsignedShort (buffer, ptr);
+    lineNumber = unsignedShort (buffer, ptr + 2);
 
     int startPtr = ptr += 4;              // skip link to next line and lineNumber
     boolean inString = false;             // can toggle

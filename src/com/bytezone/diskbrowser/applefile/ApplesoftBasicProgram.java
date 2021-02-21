@@ -1,5 +1,12 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
+import static com.bytezone.diskbrowser.utilities.Utility.isDigit;
+import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
+import static com.bytezone.diskbrowser.utilities.Utility.isLetter;
+import static com.bytezone.diskbrowser.utilities.Utility.isPossibleNumber;
+import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +67,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     int max = buffer.length - 6;          // need at least 6 bytes to make a SourceLine
     while (ptr <= max)
     {
-      int nextAddress = Utility.unsignedShort (buffer, ptr);
+      int nextAddress = unsignedShort (buffer, ptr);
       if (nextAddress <= currentAddress)           // usually zero when finished
         break;
 
@@ -124,14 +131,14 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     byte b;
     StringBuilder text = new StringBuilder ();
 
-    while ((nextLine = Utility.unsignedShort (buffer, ptr)) != 0)
+    while ((nextLine = unsignedShort (buffer, ptr)) != 0)
     {
-      int lineNumber = Utility.unsignedShort (buffer, ptr + 2);
+      int lineNumber = unsignedShort (buffer, ptr + 2);
       text.append (String.format (" %d ", lineNumber));
       ptr += 4;
 
       while ((b = buffer[ptr++]) != 0)
-        if (Utility.isHighBitSet (b))
+        if (isHighBitSet (b))
           text.append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
         else
           switch (b)
@@ -146,7 +153,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
               break;
 
             case Utility.ASCII_LF:
-              int indent = Utility.getIndent (text);
+              int indent = getIndent (text);
               text.append ("\n");
               for (int i = 0; i < indent; i++)
                 text.append (" ");
@@ -256,7 +263,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
         // Check for a wrappable REM/DATA/DIM statement
         // (see SEA BATTLE on DISK283.DSK)
-        int inset = Math.max (text.length (), Utility.getIndent (fullText)) + 1;
+        int inset = Math.max (text.length (), getIndent (fullText)) + 1;
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
         {
           List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
@@ -322,7 +329,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       int ptr = endPtr + 2;
       if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
       {
-        int offset = Utility.unsignedShort (buffer, 0);
+        int offset = unsignedShort (buffer, 0);
         int programLoadAddress = offset - getLineLength (0);
         fullText.append ("\nExtra data:\n\n");
         fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
@@ -489,7 +496,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     byte[] bytes = value.getBytes ();
     int start = value.charAt (0) == Utility.ASCII_MINUS ? 1 : 0;
     for (int i = start; i < bytes.length; i++)
-      if (!Utility.isPossibleNumber (bytes[i]))
+      if (!isPossibleNumber (bytes[i]))
         return false;
     return true;
   }
@@ -779,7 +786,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private String getDebugText (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
-    int offset = Utility.unsignedShort (buffer, 0);
+    int offset = unsignedShort (buffer, 0);
     int programLoadAddress = offset - getLineLength (0);
 
     for (SourceLine sourceLine : sourceLines)
@@ -802,12 +809,35 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       text.append (NEWLINE);
     }
 
+    // check for assembler routines after the basic code
     if (endPtr < buffer.length)
     {
-      String formattedHex = HexFormatter.formatNoHeader (buffer, endPtr,
-          buffer.length - endPtr, programLoadAddress + endPtr);
+      int length = buffer.length - endPtr;
+      int ptr = endPtr;
+
+      if (length > 2)
+      {
+        text.append ("                 ");
+        text.append (
+            HexFormatter.formatNoHeader (buffer, endPtr, 2, programLoadAddress + ptr));
+        text.append ("\n\n");
+        ptr += 2;
+        length -= 2;
+      }
+
+      // show the extra bytes as a hex dump
+      String formattedHex = HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
+          programLoadAddress + ptr);
       for (String bytes : formattedHex.split (NEWLINE))
         text.append (String.format ("                 %s%n", bytes));
+
+      // show the extra bytes as a disassembly
+      byte[] extraBuffer = new byte[length];
+      System.arraycopy (buffer, ptr, extraBuffer, 0, extraBuffer.length);
+      AssemblerProgram assemblerProgram =
+          new AssemblerProgram ("extra", extraBuffer, programLoadAddress + ptr);
+      text.append ("\n");
+      text.append (assemblerProgram.getText ());
     }
 
     return Utility.rtrim (text);
@@ -817,9 +847,9 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private String getDisplayToken (byte b)
   // ---------------------------------------------------------------------------------//
   {
-    if (Utility.isHighBitSet (b))
+    if (isHighBitSet (b))
       return ApplesoftConstants.tokens[b & 0x7F];
-    else if (Utility.isDigit (b) || Utility.isLetter (b))
+    else if (isDigit (b) || isLetter (b))
       return "";
     return "*******";
   }
@@ -851,7 +881,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     int programLoadAddress = 0;
     if (buffer.length > 1)
     {
-      int offset = Utility.unsignedShort (buffer, 0);
+      int offset = unsignedShort (buffer, 0);
       programLoadAddress = offset - getLineLength (0);
     }
     return programLoadAddress;
@@ -861,7 +891,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private int getLineLength (int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    int offset = Utility.unsignedShort (buffer, ptr);
+    int offset = unsignedShort (buffer, ptr);
     if (offset == 0)
       return 0;
 

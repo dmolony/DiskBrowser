@@ -59,19 +59,19 @@ public class DiskFactory
   }
 
   // ---------------------------------------------------------------------------------//
-  private static FormattedDisk create (String path)
+  private static FormattedDisk create (String pathName)
   // ---------------------------------------------------------------------------------//
   {
     if (debug)
-      System.out.println ("\nFactory : " + path);
+      System.out.println ("\nFactory : " + pathName);
 
-    File file = new File (path);
+    File file = new File (pathName);
     if (!file.exists ())
       return null;
 
-    String suffix = path.substring (path.lastIndexOf (".") + 1).toLowerCase ();
+    String suffix = pathName.substring (pathName.lastIndexOf (".") + 1).toLowerCase ();
     Boolean compressed = false;
-    Path originalPath = Paths.get (path);
+    Path originalPath = Paths.get (pathName);
 
     if ("gz".equals (suffix))
     {
@@ -79,7 +79,7 @@ public class DiskFactory
         System.out.println (" ** gzip **");
       try
       {
-        InputStream in = new GZIPInputStream (new FileInputStream (path));
+        InputStream in = new GZIPInputStream (new FileInputStream (pathName));
         File tmp = File.createTempFile ("gzip", null);
         FileOutputStream fos = new FileOutputStream (tmp);
 
@@ -108,7 +108,7 @@ public class DiskFactory
         System.out.println (" ** zip **");
       try
       {
-        ZipFile zipFile = new ZipFile (path);
+        ZipFile zipFile = new ZipFile (pathName);
         Enumeration<? extends ZipEntry> entries = zipFile.entries ();
 
         while (entries.hasMoreElements ())        // loop until first valid name
@@ -458,7 +458,7 @@ public class DiskFactory
 
       // empty boot sector
       if (checksum != 227968344L && false)
-        System.out.println ("Unknown checksum : " + checksum + " : " + path);
+        System.out.println ("Unknown checksum : " + checksum + " : " + pathName);
     }
 
     if (debug)

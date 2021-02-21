@@ -1,9 +1,11 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.utilities.Utility;
+import com.bytezone.diskbrowser.utilities.Utility;;
 
 // -----------------------------------------------------------------------------------//
 public class BasicProgramGS extends BasicProgram

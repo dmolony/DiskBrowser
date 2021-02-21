@@ -62,21 +62,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     super (name, buffer);
 
     int ptr = 0;
-    int currentAddress = 0;
 
-    int max = buffer.length - 6;          // need at least 6 bytes to make a SourceLine
-    while (ptr <= max)
+    while (buffer[ptr + 1] != 0)    // msb of link field
     {
-      int nextAddress = unsignedShort (buffer, ptr);
-      if (nextAddress <= currentAddress)           // usually zero when finished
-        break;
-
       SourceLine line = new SourceLine (this, buffer, ptr);
-
       sourceLines.add (line);
       checkXref (line);
-      ptr += line.length;                 // assumes lines are contiguous
-      currentAddress = nextAddress;
+      ptr += line.length;           // assumes lines are contiguous
     }
 
     endPtr = ptr;
@@ -127,56 +119,59 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   {
     int loadAddress = getLoadAddress ();
     int ptr = 0;
-    int nextLine;
+    int linkField;
     byte b;
-    StringBuilder text = new StringBuilder ();
+    StringBuilder currentLine = new StringBuilder ();
 
-    while ((nextLine = unsignedShort (buffer, ptr)) != 0)
+    while ((linkField = unsignedShort (buffer, ptr)) != 0)
     {
       int lineNumber = unsignedShort (buffer, ptr + 2);
-      text.append (String.format (" %d ", lineNumber));
+      currentLine.append (String.format (" %d ", lineNumber));
       ptr += 4;
 
       while ((b = buffer[ptr++]) != 0)
         if (isHighBitSet (b))
-          text.append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
+          currentLine
+              .append (String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]));
         else
           switch (b)
           {
             case Utility.ASCII_CR:
-              text.append (NEWLINE);
+              currentLine.append (NEWLINE);
               break;
 
             case Utility.ASCII_BACKSPACE:
-              if (text.length () > 0)
-                text.deleteCharAt (text.length () - 1);
+              if (currentLine.length () > 0)
+                currentLine.deleteCharAt (currentLine.length () - 1);
               break;
 
             case Utility.ASCII_LF:
-              int indent = getIndent (text);
-              text.append ("\n");
+              int indent = getIndent (currentLine);
+              currentLine.append ("\n");
               for (int i = 0; i < indent; i++)
-                text.append (" ");
+                currentLine.append (" ");
               break;
 
             default:
-              text.append ((char) b);
+              currentLine.append ((char) b);
           }
 
-      if (ptr != (nextLine - loadAddress))
+      if (ptr != (linkField - loadAddress))
       {
-        System.out.printf ("ptr: %04X, nextLine: %04X%n", ptr, nextLine - loadAddress);
-        //      ptr = nextLine - loadAddress;
+        System.out.printf ("%s: ptr: %04X, nextLine: %04X%n", name, ptr + loadAddress,
+            linkField);
+        //        ptr = linkField - loadAddress;      // use this one day
       }
-      text.append (NEWLINE);
+
+      currentLine.append (NEWLINE);
 
       //      List<String> lines = wrap (text, 29);
       //      fullText.append (String.format ("%d %s%n", lineNumber, lines.get (0)));
       //      for (int i = 1; i < lines.size (); i++)
       //        fullText.append (String.format ("    %s%n", lines.get (i)));
 
-      fullText.append (text);
-      text.setLength (0);
+      fullText.append (currentLine);
+      currentLine.setLength (0);
     }
   }
 
@@ -329,8 +324,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       int ptr = endPtr + 2;
       if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
       {
-        int offset = unsignedShort (buffer, 0);
-        int programLoadAddress = offset - getLineLength (0);
+        int linkField = unsignedShort (buffer, 0);
+        int programLoadAddress = linkField - getLineLength (0);
         fullText.append ("\nExtra data:\n\n");
         fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
             programLoadAddress + ptr));
@@ -786,8 +781,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private String getDebugText (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
-    int offset = unsignedShort (buffer, 0);
-    int programLoadAddress = offset - getLineLength (0);
+    int linkField = unsignedShort (buffer, 0);
+    int programLoadAddress = linkField - getLineLength (0);
 
     for (SourceLine sourceLine : sourceLines)
     {
@@ -815,7 +810,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       int length = buffer.length - endPtr;
       int ptr = endPtr;
 
-      if (length > 2)
+      if (length >= 2)
       {
         text.append ("                 ");
         text.append (
@@ -825,19 +820,22 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         length -= 2;
       }
 
-      // show the extra bytes as a hex dump
-      String formattedHex = HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
-          programLoadAddress + ptr);
-      for (String bytes : formattedHex.split (NEWLINE))
-        text.append (String.format ("                 %s%n", bytes));
+      if (length > 0)
+      {
+        // show the extra bytes as a hex dump
+        String formattedHex = HexFormatter.formatNoHeader (buffer, ptr,
+            buffer.length - ptr, programLoadAddress + ptr);
+        for (String bytes : formattedHex.split (NEWLINE))
+          text.append (String.format ("                 %s%n", bytes));
 
-      // show the extra bytes as a disassembly
-      byte[] extraBuffer = new byte[length];
-      System.arraycopy (buffer, ptr, extraBuffer, 0, extraBuffer.length);
-      AssemblerProgram assemblerProgram =
-          new AssemblerProgram ("extra", extraBuffer, programLoadAddress + ptr);
-      text.append ("\n");
-      text.append (assemblerProgram.getText ());
+        // show the extra bytes as a disassembly
+        byte[] extraBuffer = new byte[length];
+        System.arraycopy (buffer, ptr, extraBuffer, 0, extraBuffer.length);
+        AssemblerProgram assemblerProgram =
+            new AssemblerProgram ("extra", extraBuffer, programLoadAddress + ptr);
+        text.append ("\n");
+        text.append (assemblerProgram.getText ());
+      }
     }
 
     return Utility.rtrim (text);
@@ -878,29 +876,25 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
-    int programLoadAddress = 0;
-    if (buffer.length > 1)
-    {
-      int offset = unsignedShort (buffer, 0);
-      programLoadAddress = offset - getLineLength (0);
-    }
-    return programLoadAddress;
+    return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (0) : 0;
   }
 
   // ---------------------------------------------------------------------------------//
   private int getLineLength (int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    int offset = unsignedShort (buffer, ptr);
-    if (offset == 0)
-      return 0;
+    int linkField = unsignedShort (buffer, ptr);
+    if (linkField == 0)
+      return 2;
 
-    ptr += 4;               // skip offset and line number
+    ptr += 4;               // skip link field and line number
     int length = 5;
 
     while (ptr < buffer.length && buffer[ptr++] != 0)
       length++;
 
+    //    System.out.printf ("Length: %4d, Ptr: %4d%n", length, ptr);
+    assert length == ptr;
     return length;
   }
 

@@ -80,8 +80,9 @@ public class SubLine implements ApplesoftConstants
       else if (isEndOfLine (firstByte))          // empty subline
         return;
       else                                       // probably Beagle Bros 0D or 0A
-        System.out.printf ("Unexpected bytes at %5d: %s%n", parent.lineNumber,
-            HexFormatter.formatNoHeader (buffer, startPtr, length).substring (5));
+        System.out.printf ("%s unexpected bytes at %5d: %s%n", parent.parent.name,
+            parent.lineNumber,
+            HexFormatter.formatNoHeader (buffer, startPtr, length).substring (7));
     }
 
     String var = "";
@@ -92,7 +93,7 @@ public class SubLine implements ApplesoftConstants
     int stringPtr = 0;
 
     int max = startPtr + length - 1;
-    if (isEndOfLine (buffer[max]))
+    while (isEndOfLine (buffer[max]))
       --max;
 
     while (ptr <= max)
@@ -536,11 +537,16 @@ public class SubLine implements ApplesoftConstants
     int ptr = startPtr + 1;
     int max = startPtr + length - 1;
 
-    // apple format uses left-justified line numbers so the length varies
     if (isFirst ())
     {
-      text.setLength (0);
-      text.append (String.format (" %d  REM ", parent.lineNumber));   // mimic apple
+      if (containsBackspaces (ptr, max))    // probably going to erase the line number
+      {
+        // apple format uses left-justified line numbers so the length varies
+        text.setLength (0);
+        text.append (String.format (" %d  REM ", parent.lineNumber));   // mimic apple
+      }
+      else
+        text.append ("  REM ");
     }
     else
       text.append ("REM ");
@@ -571,6 +577,17 @@ public class SubLine implements ApplesoftConstants
 
       ptr++;
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean containsBackspaces (int ptr, int max)
+  // ---------------------------------------------------------------------------------//
+  {
+    while (ptr < max)
+      if (buffer[ptr++] == Utility.ASCII_BACKSPACE)
+        return true;
+
+    return false;
   }
 
   // ---------------------------------------------------------------------------------//

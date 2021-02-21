@@ -12,7 +12,7 @@ public class SourceLine implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
   ApplesoftBasicProgram parent;
-  int addressNext;
+  int linkField;
   int lineNumber;
   int linePtr;
   int length;
@@ -28,7 +28,7 @@ public class SourceLine implements ApplesoftConstants
     this.buffer = buffer;
 
     linePtr = ptr;
-    addressNext = unsignedShort (buffer, ptr);
+    linkField = unsignedShort (buffer, ptr);
     lineNumber = unsignedShort (buffer, ptr + 2);
 
     int startPtr = ptr += 4;              // skip link to next line and lineNumber

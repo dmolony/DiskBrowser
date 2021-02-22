@@ -390,20 +390,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       if (ifIndent > 0)
         alignEqualsPos = 0;
     }
-
-    if (false)
-    {
-      int ptr = endPtr + 2;
-      if (ptr < buffer.length - 1)    // sometimes there's an extra byte on the end
-      {
-        int linkField = unsignedShort (buffer, 0);
-        int programLoadAddress = linkField - getLineLength (0);
-        fullText.append ("\nExtra data:\n\n");
-        fullText.append (HexFormatter.formatNoHeader (buffer, ptr, buffer.length - ptr,
-            programLoadAddress + ptr));
-        fullText.append (NEWLINE);
-      }
-    }
   }
 
   // ---------------------------------------------------------------------------------//

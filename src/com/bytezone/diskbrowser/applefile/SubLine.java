@@ -80,9 +80,8 @@ public class SubLine implements ApplesoftConstants
       else if (isEndOfLine (firstByte))          // empty subline
         return;
       else                                       // probably Beagle Bros 0D or 0A
-        System.out.printf ("%s unexpected bytes at %5d: %s%n", parent.parent.name,
-            parent.lineNumber,
-            HexFormatter.formatNoHeader (buffer, startPtr, length).substring (7));
+        System.out.printf ("%s unexpected bytes at line %5d:%n%s%n", parent.parent.name,
+            parent.lineNumber, HexFormatter.formatNoHeader (buffer, startPtr, length));
     }
 
     String var = "";

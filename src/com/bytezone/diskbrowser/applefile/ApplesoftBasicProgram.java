@@ -55,6 +55,9 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   final String formatCall;
   private final int maxDigits;
 
+  private final int lineWrapLeft = 5;
+  private final int lineWrapRight = 33;
+
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
@@ -120,7 +123,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     int loadAddress = getLoadAddress ();
     int ptr = 0;
     int linkField;
-    byte b;
+
     StringBuilder currentLine = new StringBuilder ();
 
     while ((linkField = unsignedShort (buffer, ptr)) != 0)
@@ -130,36 +133,9 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       ptr += 4;
 
       if (basicPreferences.appleLineWrap)
-        ptr = append (currentLine, ptr);
+        ptr = appendWithWrap (currentLine, ptr);
       else
-        while ((b = buffer[ptr++]) != 0)
-          if (isHighBitSet (b))
-          {
-            String token = String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]);
-            currentLine.append (token);
-          }
-          else
-            switch (b)
-            {
-              case Utility.ASCII_CR:
-                currentLine.append (NEWLINE);
-                break;
-
-              case Utility.ASCII_BACKSPACE:
-                if (currentLine.length () > 0)
-                  currentLine.deleteCharAt (currentLine.length () - 1);
-                break;
-
-              case Utility.ASCII_LF:
-                int indent = getIndent (currentLine);
-                currentLine.append ("\n");
-                for (int i = 0; i < indent; i++)
-                  currentLine.append (" ");
-                break;
-
-              default:
-                currentLine.append ((char) b);
-            }
+        ptr = appendWithOutWrap (currentLine, ptr);
 
       if (ptr != (linkField - loadAddress))
       {
@@ -176,28 +152,63 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private int append (StringBuilder currentLine, int ptr)
+  private int appendWithOutWrap (StringBuilder currentLine, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     byte b;
-    int left = 5;
-    int right = 33;
-
-    int cursor = currentLine.length ();
 
     while ((b = buffer[ptr++]) != 0)
       if (isHighBitSet (b))
       {
         String token = String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]);
         currentLine.append (token);
-        cursor = increment (currentLine, cursor, token.length ());
       }
       else
         switch (b)
         {
           case Utility.ASCII_CR:
             currentLine.append (NEWLINE);
-            cursor = left;
+            break;
+
+          case Utility.ASCII_BACKSPACE:
+            if (currentLine.length () > 0)
+              currentLine.deleteCharAt (currentLine.length () - 1);
+            break;
+
+          case Utility.ASCII_LF:
+            int indent = getIndent (currentLine);
+            currentLine.append ("\n");
+            for (int i = 0; i < indent; i++)
+              currentLine.append (" ");
+            break;
+
+          default:
+            currentLine.append ((char) b);
+        }
+
+    return ptr;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int appendWithWrap (StringBuilder currentLine, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    byte b;
+    int cursor = currentLine.length ();       // controls when to wrap
+
+    while ((b = buffer[ptr++]) != 0)
+      if (isHighBitSet (b))
+      {
+        String token = String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]);
+        currentLine.append (token);
+        cursor = incrementCursor (currentLine, cursor, token.length ());
+      }
+      else
+        switch (b)
+        {
+          case Utility.ASCII_CR:
+            currentLine.append (NEWLINE);
+            cursor = lineWrapLeft;
             break;
 
           case Utility.ASCII_BACKSPACE:
@@ -217,35 +228,23 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
           default:
             currentLine.append ((char) b);
-            cursor = increment (currentLine, cursor, 1);
+            cursor = incrementCursor (currentLine, cursor, 1);
         }
 
     return ptr;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int increment (StringBuilder currentLine, int cursor, int size)
+  private int incrementCursor (StringBuilder currentLine, int cursor, int size)
   // ---------------------------------------------------------------------------------//
   {
-    int left = 5;
-    int right = 33;
-
-    cursor += size;
-    if (cursor >= right)
+    if ((cursor += size) >= lineWrapRight)
     {
-      if (cursor < 40)
-      {
-        cursor = left;
-        currentLine.append ("\n                  ".substring (0, left + 1));
-      }
-      else
-      // this is presumably a bug in the applesoft ROM
-      // see line 1610 in KEY-CAT on the UtilityCity.dsk
-      {
-        cursor = 0;
-        currentLine.append ("\n");
-      }
+      // seems to be a bug in the ROM - see line 1610 in KEY-CAT on UtilityCity.dsk
+      cursor = cursor < 40 ? lineWrapLeft : 0;
+      currentLine.append ("\n                  ".substring (0, cursor + 1));
     }
+
     return cursor;
   }
 

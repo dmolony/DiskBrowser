@@ -141,7 +141,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       {
         System.out.printf ("%s: ptr: %04X, nextLine: %04X%n", name, ptr + loadAddress,
             linkField);
-        //        ptr = linkField - loadAddress;      // use this one day
+        //        ptr = linkField - loadAddress;      // use this when tested
       }
 
       currentLine.append (NEWLINE);
@@ -208,11 +208,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         {
           case Utility.ASCII_CR:
             currentLine.append (NEWLINE);
-            cursor = lineWrapLeft;
+            cursor = 0;
             break;
 
           case Utility.ASCII_BACKSPACE:
-            if (currentLine.length () > 0)
+            if (cursor > 0)
             {
               currentLine.deleteCharAt (currentLine.length () - 1);
               --cursor;
@@ -220,9 +220,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
             break;
 
           case Utility.ASCII_LF:
-            int indent = getIndent (currentLine);
             currentLine.append ("\n");
-            for (int i = 0; i < indent; i++)
+            for (int i = 0; i < cursor; i++)
               currentLine.append (" ");
             break;
 

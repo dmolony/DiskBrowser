@@ -7,6 +7,7 @@ public class BasicPreferences
   public boolean showHeader = true;
   public boolean formatApplesoft = true;
   public boolean showAllXref = true;
+  public boolean appleLineWrap = false;
   public boolean splitRem = false;
   public boolean alignAssign = true;
   //  public boolean showTargets = true;
@@ -44,6 +45,7 @@ public class BasicPreferences
     text.append (String.format ("Show header .............. %s%n", showHeader));
     text.append (String.format ("Format applesoft ......... %s%n", formatApplesoft));
     text.append (String.format ("Show All Xref ............ %s%n", showAllXref));
+    text.append (String.format ("Apple line wrap .......... %s%n", appleLineWrap));
     text.append (String.format ("Show caret ............... %s%n", showCaret));
     text.append (String.format ("Show THEN ................ %s%n", showThen));
     text.append (String.format ("Show GOTO/GOSUB .......... %s%n", showXref));

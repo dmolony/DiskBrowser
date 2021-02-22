@@ -48,6 +48,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SHOW_ALL_FORMAT = "formatApplesoft";
   private static final String PREFS_SHOW_ALL_XREF = "showAllXref";
 
+  private static final String PREFS_APPLE_LINE_WRAP = "appleLineWrap";
+
   private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
   private static final String PREFS_SPLIT_DIM = "splitDim";
   private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
@@ -148,6 +150,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showHeaderItem = new JCheckBoxMenuItem ("Show header");
   final JMenuItem showAllFormatItem = new JCheckBoxMenuItem ("Enable Format options");
   final JMenuItem showAllXrefItem = new JCheckBoxMenuItem ("Enable XREF options");
+
+  final JMenuItem appleLineWrapItem = new JCheckBoxMenuItem ("Apple line wrap");
 
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
   final JMenuItem splitDimItem = new JCheckBoxMenuItem ("Split DIM");
@@ -264,6 +268,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showAllFormatItem);
     applesoftMenu.add (showAllXrefItem);
     applesoftMenu.addSeparator ();
+    applesoftMenu.add (appleLineWrapItem);
+    applesoftMenu.addSeparator ();
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (splitDimItem);
     applesoftMenu.add (alignAssignItem);
@@ -343,6 +349,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showHeaderItem.addActionListener (basicPreferencesAction);
     showAllFormatItem.addActionListener (basicPreferencesAction);
     showAllXrefItem.addActionListener (basicPreferencesAction);
+    appleLineWrapItem.addActionListener (basicPreferencesAction);
     for (JMenuItem item : applesoftFormatItems)
       item.addActionListener (basicPreferencesAction);
     for (JMenuItem item : applesoftXrefItems)
@@ -395,6 +402,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.formatApplesoft = showAllFormatItem.isSelected ();
     basicPreferences.showAllXref = showAllXrefItem.isSelected ();
 
+    basicPreferences.appleLineWrap = appleLineWrapItem.isSelected ();
+
     basicPreferences.splitRem = splitRemarkItem.isSelected ();
     basicPreferences.splitDim = splitDimItem.isSelected ();
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
@@ -419,6 +428,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     for (JMenuItem item : applesoftFormatItems)
       item.setEnabled (basicPreferences.formatApplesoft);
+
+    appleLineWrapItem.setEnabled (!basicPreferences.formatApplesoft);
 
     for (JMenuItem item : applesoftXrefItems)
       item.setEnabled (basicPreferences.showAllXref);
@@ -571,6 +582,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_SHOW_ALL_FORMAT, showAllFormatItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_ALL_XREF, showAllXrefItem.isSelected ());
 
+    prefs.putBoolean (PREFS_APPLE_LINE_WRAP, appleLineWrapItem.isSelected ());
+
     prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
     prefs.putBoolean (PREFS_SPLIT_DIM, splitDimItem.isSelected ());
     prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
@@ -632,6 +645,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showHeaderItem.setSelected (prefs.getBoolean (PREFS_SHOW_HEADER, true));
     showAllFormatItem.setSelected (prefs.getBoolean (PREFS_SHOW_ALL_FORMAT, true));
     showAllXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_ALL_XREF, true));
+
+    appleLineWrapItem.setSelected (prefs.getBoolean (PREFS_APPLE_LINE_WRAP, false));
 
     splitRemarkItem.setSelected (prefs.getBoolean (PREFS_SPLIT_REMARKS, false));
     splitDimItem.setSelected (prefs.getBoolean (PREFS_SPLIT_DIM, false));

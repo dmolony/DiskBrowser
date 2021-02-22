@@ -25,9 +25,12 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private static final String underline =
       "----------------------------------------------------"
           + "----------------------------------------------";
-  private static Pattern dimPattern =
+  private static final Pattern dimPattern =
       Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9]+(,[0-9]+)*\\)[,:]?");
-  private static String NEWLINE = "\n";
+  private static final String NEWLINE = "\n";
+
+  private static final int LEFT_MARGIN = 5;
+  private static final int RIGHT_MARGIN = 33;
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
@@ -54,9 +57,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private final String formatRight;
   final String formatCall;
   private final int maxDigits;
-
-  private final int lineWrapLeft = 5;
-  private final int lineWrapRight = 33;
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -237,11 +237,17 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private int incrementCursor (StringBuilder currentLine, int cursor, int size)
   // ---------------------------------------------------------------------------------//
   {
-    if ((cursor += size) >= lineWrapRight)
+    assert size <= 9;           // longest token possible (7 plus 2 spaces)
+    cursor += size;
+
+    if ((cursor) >= RIGHT_MARGIN)
     {
-      // seems to be a bug in the ROM - see line 1610 in KEY-CAT on UtilityCity.dsk
-      cursor = cursor < 40 ? lineWrapLeft : 0;
-      currentLine.append ("\n                  ".substring (0, cursor + 1));
+      if (cursor >= 40)         // already wrapped 
+        cursor -= 40;
+      else
+        cursor = LEFT_MARGIN;
+
+      currentLine.append ("\n     ".substring (0, cursor + 1));
     }
 
     return cursor;

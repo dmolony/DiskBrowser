@@ -1,5 +1,18 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_BACKSPACE;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_COLON;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_COMMA;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_CR;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_DOLLAR;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_LEFT_BRACKET;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_LF;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_MINUS;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_PERCENT;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_QUOTE;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_RIGHT_BRACKET;
+import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
+import static com.bytezone.diskbrowser.utilities.Utility.isControlCharacter;
 import static com.bytezone.diskbrowser.utilities.Utility.isDigit;
 import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
 import static com.bytezone.diskbrowser.utilities.Utility.isLetter;
@@ -9,8 +22,7 @@ import static com.bytezone.diskbrowser.utilities.Utility.isPossibleVariable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
-import com.bytezone.diskbrowser.utilities.Utility;;
+import com.bytezone.diskbrowser.utilities.HexFormatter;;
 
 // -----------------------------------------------------------------------------------//
 public class SubLine implements ApplesoftConstants
@@ -121,7 +133,7 @@ public class SubLine implements ApplesoftConstants
 
       if (inQuote)
       {
-        if (b == Utility.ASCII_QUOTE)      // ignore strings
+        if (b == ASCII_QUOTE)      // ignore strings
         {
           inQuote = false;
           addString (stringPtr, ptr);
@@ -129,7 +141,7 @@ public class SubLine implements ApplesoftConstants
         continue;
       }
 
-      if (b == Utility.ASCII_QUOTE)
+      if (b == ASCII_QUOTE)
       {
         inQuote = true;
         stringPtr = ptr;
@@ -144,8 +156,8 @@ public class SubLine implements ApplesoftConstants
         var += (char) b;
 
         // allow for PRINT A$B$
-        if ((b == Utility.ASCII_DOLLAR || b == Utility.ASCII_PERCENT)   // var name end
-            && buffer[ptr] != Utility.ASCII_LEFT_BRACKET)               // not an array
+        if ((b == ASCII_DOLLAR || b == ASCII_PERCENT)           // var name end
+            && buffer[ptr] != ASCII_LEFT_BRACKET)               // not an array
         {
           checkVar (var, b);
           var = "";
@@ -175,7 +187,7 @@ public class SubLine implements ApplesoftConstants
   private boolean isEndOfLine (byte b)
   // ---------------------------------------------------------------------------------//
   {
-    return b == 0 || b == Utility.ASCII_COLON;
+    return b == 0 || b == ASCII_COLON;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -189,7 +201,7 @@ public class SubLine implements ApplesoftConstants
   private void checkFunction (String var, byte terminator)
   // ---------------------------------------------------------------------------------//
   {
-    assert terminator == Utility.ASCII_LEFT_BRACKET;
+    assert terminator == ASCII_LEFT_BRACKET;
 
     if (!functions.contains (var))
       functions.add (var);
@@ -213,7 +225,7 @@ public class SubLine implements ApplesoftConstants
     if (is (TOKEN_DEF) && (var.equals (functionName) || var.equals (functionArgument)))
       return;
 
-    if (terminator == Utility.ASCII_LEFT_BRACKET)
+    if (terminator == ASCII_LEFT_BRACKET)
     {
       if (!arrays.contains (var))
         arrays.add (var);
@@ -261,8 +273,7 @@ public class SubLine implements ApplesoftConstants
       case TOKEN_ON:
         p = startPtr + 1;
         int max = startPtr + length - 1;
-        while (p < max && buffer[p] != ApplesoftConstants.TOKEN_GOTO
-            && buffer[p] != ApplesoftConstants.TOKEN_GOSUB)
+        while (p < max && buffer[p] != TOKEN_GOTO && buffer[p] != TOKEN_GOSUB)
           p++;
 
         switch (buffer[p++])
@@ -283,7 +294,7 @@ public class SubLine implements ApplesoftConstants
         break;
 
       case TOKEN_ONERR:
-        if (buffer[startPtr + 1] == ApplesoftConstants.TOKEN_GOTO)
+        if (buffer[startPtr + 1] == TOKEN_GOTO)
         {
           targetLine = getLineNumber (buffer, startPtr + 2);
           addXref (targetLine, gotoLines);
@@ -298,9 +309,8 @@ public class SubLine implements ApplesoftConstants
         byte[] lineBuffer = getBuffer ();
         assert lineBuffer[0] == TOKEN_FN;
 
-        int leftBracket = getPosition (lineBuffer, 1, Utility.ASCII_LEFT_BRACKET);
-        int rightBracket =
-            getPosition (lineBuffer, leftBracket + 1, Utility.ASCII_RIGHT_BRACKET);
+        int leftBracket = getPosition (lineBuffer, 1, ASCII_LEFT_BRACKET);
+        int rightBracket = getPosition (lineBuffer, leftBracket + 1, ASCII_RIGHT_BRACKET);
 
         functionName = new String (lineBuffer, 1, leftBracket - 1);
         functionArgument =
@@ -316,7 +326,7 @@ public class SubLine implements ApplesoftConstants
           if (chunk.isEmpty ())
             continue;
           b = (byte) chunk.charAt (0);
-          if (isPossibleNumber (b) || b == Utility.ASCII_MINUS)
+          if (isPossibleNumber (b) || b == ASCII_MINUS)
           {
             if (!addNumber (chunk))
               stringsText.add (chunk);
@@ -369,7 +379,7 @@ public class SubLine implements ApplesoftConstants
       byte b = buffer[ptr++];
       if (isToken (b))
         text.append (tokens[b & 0x7F]);
-      else if (b == Utility.ASCII_COMMA)    // end of call target
+      else if (b == ASCII_COMMA)              // end of call target
         break;
       else
         text.append ((char) b);
@@ -404,7 +414,7 @@ public class SubLine implements ApplesoftConstants
     List<Integer> lineNumbers = new ArrayList<> ();
     int start = ptr;
 
-    while (ptr < buffer.length && buffer[ptr] != 0 && buffer[ptr] != Utility.ASCII_COLON)
+    while (ptr < buffer.length && buffer[ptr] != 0 && buffer[ptr] != ASCII_COLON)
       ptr++;
 
     String s = new String (buffer, start, ptr - start);
@@ -554,17 +564,17 @@ public class SubLine implements ApplesoftConstants
     {
       switch (buffer[ptr])
       {
-        case Utility.ASCII_BACKSPACE:
+        case ASCII_BACKSPACE:
           if (text.length () > 0)
             text.deleteCharAt (text.length () - 1);
           break;
 
-        case Utility.ASCII_CR:
+        case ASCII_CR:
           text.append ("\n");
           break;
 
-        case Utility.ASCII_LF:
-          int indent = Utility.getIndent (text);
+        case ASCII_LF:
+          int indent = getIndent (text);
           text.append ("\n");
           for (int i = 0; i < indent; i++)
             text.append (" ");
@@ -583,7 +593,7 @@ public class SubLine implements ApplesoftConstants
   // ---------------------------------------------------------------------------------//
   {
     while (ptr < max)
-      if (buffer[ptr++] == Utility.ASCII_BACKSPACE)
+      if (buffer[ptr++] == ASCII_BACKSPACE)
         return true;
 
     return false;
@@ -608,7 +618,7 @@ public class SubLine implements ApplesoftConstants
   // ---------------------------------------------------------------------------------//
   {
     int len = length - 1;
-    if (buffer[startPtr + len] == Utility.ASCII_COLON || buffer[startPtr + len] == 0)
+    if (buffer[startPtr + len] == ASCII_COLON || buffer[startPtr + len] == 0)
       len--;
     byte[] buffer2 = new byte[len];
     System.arraycopy (buffer, startPtr + 1, buffer2, 0, buffer2.length);
@@ -704,10 +714,10 @@ public class SubLine implements ApplesoftConstants
         if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
           line.append (ApplesoftConstants.tokens[val] + " ");
       }
-      else if (Utility.isControlCharacter (b))
-        line.append (ApplesoftBasicProgram.basicPreferences.showCaret
-            ? "^" + (char) (b + 64) : "?");
-      else
+      //      else if (Utility.isControlCharacter (b))
+      //        line.append (ApplesoftBasicProgram.basicPreferences.showCaret
+      //            ? "^" + (char) (b + 64) : "?");
+      else if (!isControlCharacter (b))
         line.append ((char) b);
     }
 

@@ -328,9 +328,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         // Add the current text, then reset it
         String lineText = subline.getAlignedText (alignEqualsPos);
 
-        //        if (subline.is (TOKEN_REM) && basicPreferences.deleteExtraRemSpace)
-        //          lineText = lineText.replaceFirst ("REM  ", "REM ");
-
         if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
           lineText = lineText.replaceFirst ("DATA  ", "DATA ");
 

@@ -38,6 +38,7 @@ public class SubLine implements ApplesoftConstants
   String forVariable = "";
 
   int equalsPosition;               // used for aligning the equals sign
+  int endPosition;                // not sure yet
 
   String functionArgument;
   String functionName;
@@ -81,7 +82,7 @@ public class SubLine implements ApplesoftConstants
     }
     else
     {
-      ptr = startPtr;
+      //      ptr = startPtr;
       if (isDigit (firstByte))                   // split IF xx THEN nnn 
       {
         addXref (getLineNumber (buffer, startPtr), gotoLines);
@@ -325,6 +326,7 @@ public class SubLine implements ApplesoftConstants
           chunk = chunk.trim ();
           if (chunk.isEmpty ())
             continue;
+
           b = (byte) chunk.charAt (0);
           if (isPossibleNumber (b) || b == ASCII_MINUS)
           {
@@ -457,15 +459,20 @@ public class SubLine implements ApplesoftConstants
   private void setEqualsPosition ()
   // ---------------------------------------------------------------------------------//
   {
-    int p = startPtr;
-    int max = startPtr + length;
+    //    int p = startPtr;
+    //    int max = startPtr + length;
 
-    while (++p < max)
-      if (buffer[p] == TOKEN_EQUALS)
-      {
-        equalsPosition = toString ().indexOf ('=');           // use expanded line
-        break;
-      }
+    //    while (++p < max)
+    //      if (buffer[p] == TOKEN_EQUALS)
+    //      {
+    String expandedLine = toString ();
+    equalsPosition = expandedLine.indexOf ('=');
+    endPosition = expandedLine.length ();
+    if (expandedLine.endsWith (":"))
+      endPosition--;
+    //        break;
+    //      }
+    assert equalsPosition > 0;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -500,14 +507,13 @@ public class SubLine implements ApplesoftConstants
   boolean has (byte token)
   // ---------------------------------------------------------------------------------//
   {
-    int ptr = startPtr + 1;
+    int ptr = startPtr;
     int max = startPtr + length;
 
-    while (ptr < max)
-    {
-      if (buffer[ptr++] == token)
+    while (++ptr < max)
+      if (buffer[ptr] == token)
         return true;
-    }
+
     return false;
   }
 
@@ -614,6 +620,7 @@ public class SubLine implements ApplesoftConstants
     StringBuilder line = toStringBuilder ();      // get line
 
     // insert spaces before '=' until it lines up with the other assignment lines
+
     if (!is (TOKEN_REM))
       while (alignEqualsPos-- > equalsPosition)
         line.insert (equalsPosition, ' ');

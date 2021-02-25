@@ -304,7 +304,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         }
 
         // Are we joining REM lines with the previous subline?
-        if (!basicPreferences.splitRem && subline.isJoinableRem ())
+        if (joinableRem (subline))
         {
           // Join this REM statement to the previous line, so no indenting
           fullText.deleteCharAt (fullText.length () - 1);         // remove newline
@@ -781,8 +781,12 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     if (subline.equalsPosition == 0)             // if the line has no equals sign
       return 0;                                  // reset it
 
-    if (currentAlignPosition == 0)
-      currentAlignPosition = findHighest (subline);     // examine following sublines
+    if (currentAlignPosition == 0)               // examine following sublines
+    {
+      Alignment alignment = new Alignment (subline);
+      findHighest (subline, alignment);
+      currentAlignPosition = alignment.equalsPosition;
+    }
 
     return currentAlignPosition;
   }
@@ -790,11 +794,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   // The IF processing is so that any assignment that is being aligned doesn't continue
   // to the next full line (because the indentation has changed).
   // ---------------------------------------------------------------------------------//
-  private int findHighest (SubLine startSubline)
+  private void findHighest (SubLine startSubline, Alignment alignment)
   // ---------------------------------------------------------------------------------//
   {
     boolean started = false;
-    int highestAssign = startSubline.equalsPosition;
+    //    int highestAssign = startSubline.equalsPosition;
 
     outerLoop: for (int i = sourceLines.indexOf (startSubline.parent); i < sourceLines
         .size (); i++)
@@ -809,8 +813,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           if (subline.equalsPosition == 0 && !joinableRem (subline))
             break outerLoop;
 
-          if (subline.equalsPosition > highestAssign)
-            highestAssign = subline.equalsPosition;
+          //          if (subline.equalsPosition > highestAssign)
+          //            highestAssign = subline.equalsPosition;
+          if (subline.equalsPosition > 0)
+            alignment.check (subline);
         }
         else if (subline == startSubline)
           started = true;
@@ -822,7 +828,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         break;                         // don't continue with following SourceLine
     }
 
-    return highestAssign;
+    System.out.printf ("                                %d  %d%n",
+        alignment.equalsPosition, alignment.targetLength);
+    //    return highestAssign;
+    //    return alignment;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -1132,6 +1141,31 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       int lastLine = lines.get (lines.size () - 1);
       if (lastLine != lineNumber)
         lines.add (lineNumber);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private class Alignment
+  // ---------------------------------------------------------------------------------//
+  {
+    int equalsPosition;
+    int targetLength;
+
+    Alignment (SubLine subline)
+    {
+      check (subline);
+    }
+
+    void check (SubLine subline)
+    {
+      System.out.printf ("%-20s  %d %d%n", subline, subline.equalsPosition,
+          subline.endPosition - subline.equalsPosition);
+      if (equalsPosition < subline.equalsPosition)
+        equalsPosition = subline.equalsPosition;
+
+      int temp = subline.endPosition - subline.equalsPosition;
+      if (targetLength < temp)
+        targetLength = temp;
     }
   }
 }

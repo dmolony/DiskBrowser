@@ -154,7 +154,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem appleLineWrapItem =
       new JCheckBoxMenuItem ("Applesoft 40 column line wrap");
 
-  final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split remarks");
+  final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split REM");
   final JMenuItem splitDimItem = new JCheckBoxMenuItem ("Split DIM");
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align consecutive assign");
   //  final JMenuItem showBasicTargetsItem = new JCheckBoxMenuItem ("Show targets");

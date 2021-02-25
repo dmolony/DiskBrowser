@@ -457,21 +457,22 @@ public class SubLine implements ApplesoftConstants
   private void setEqualsPosition ()
   // ---------------------------------------------------------------------------------//
   {
-    int p = startPtr + 1;
+    int p = startPtr;
     int max = startPtr + length;
 
-    while (buffer[p] != TOKEN_EQUALS && p < max)
-      p++;
-
-    if (buffer[p] == TOKEN_EQUALS)
-      equalsPosition = toString ().indexOf ('=');           // use expanded line
+    while (++p < max)
+      if (buffer[p] == TOKEN_EQUALS)
+      {
+        equalsPosition = toString ().indexOf ('=');           // use expanded line
+        break;
+      }
   }
 
   // ---------------------------------------------------------------------------------//
   boolean isJoinableRem ()
   // ---------------------------------------------------------------------------------//
   {
-    return is (TOKEN_REM) && !isFirst ();
+    return is (TOKEN_REM) && isNotFirst ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -479,6 +480,13 @@ public class SubLine implements ApplesoftConstants
   // ---------------------------------------------------------------------------------//
   {
     return (parent.linePtr + 4) == startPtr;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  boolean isNotFirst ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return !isFirst ();
   }
 
   // ---------------------------------------------------------------------------------//

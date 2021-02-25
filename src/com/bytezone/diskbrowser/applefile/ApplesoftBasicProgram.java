@@ -49,13 +49,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private final Map<String, List<String>> uniqueSymbols = new TreeMap<> ();
   private final Map<String, List<String>> uniqueArrays = new TreeMap<> ();
 
-  final List<Integer> stringsLine = new ArrayList<> ();
-  final List<String> stringsText = new ArrayList<> ();
+  private final List<Integer> stringsLine = new ArrayList<> ();
+  private final List<String> stringsText = new ArrayList<> ();
 
   private final String formatLeft;
   private final String formatLineNumber;
   private final String formatRight;
-  final String formatCall;
+
   private final int maxDigits;
 
   // ---------------------------------------------------------------------------------//
@@ -74,15 +74,15 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       ptr += line.length;           // assumes lines are contiguous
     }
 
-    endPtr = ptr;
+    endPtr = ptr;                   // record where the end-of-program marker is
 
     longestVarName = getLongestName ();
+    maxDigits = getMaxDigits ();
+
+    // build format strings based on existing line numbers and variable names
     formatLeft = longestVarName > 7 ? "%-" + longestVarName + "." + longestVarName + "s  "
         : "%-7.7s  ";
     formatRight = formatLeft.replace ("-", "");
-    formatCall = longestVarName > 7 ? "%-" + longestVarName + "s  " : "%-7s  ";
-
-    maxDigits = getMaxDigits ();
     formatLineNumber = "%" + maxDigits + "d ";
   }
 
@@ -242,11 +242,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
     if ((cursor) >= RIGHT_MARGIN)
     {
-      if (cursor >= 40)         // already wrapped 
-        cursor -= 40;
-      else
-        cursor = LEFT_MARGIN;
-
+      cursor = cursor >= 40 ? cursor - 40 : LEFT_MARGIN;
       currentLine.append ("\n     ".substring (0, cursor + 1));
     }
 
@@ -353,16 +349,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         else
           text.append (lineText);
 
-        // Check for a wrappable PRINT or INPUT statement
-        // (see FROM MACHINE LANGUAGE TO BASIC on DOSToolkit2eB.dsk)
-        if (basicPreferences.wrapPrintAt > 0      // not currently used
-            && (subline.is (TOKEN_PRINT) || subline.is (TOKEN_INPUT))
-            && countChars (text, Utility.ASCII_QUOTE) == 2    // just start and end quotes
-            && countChars (text, Utility.ASCII_CARET) == 0)   // no control characters
-          wrapPrint (fullText, text, lineText);
-        else
-          fullText.append (text + NEWLINE);
-
+        fullText.append (text);
+        fullText.append (NEWLINE);
         text.setLength (0);
 
         // Calculate indent changes that take effect after the current subline
@@ -459,6 +447,17 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
     SourceLine lastLine = sourceLines.get (sourceLines.size () - 1);
     return (lastLine.lineNumber + "").length ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getLongestName ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int longestName = getLongestName (symbolLines, 0);
+    longestName = getLongestName (arrayLines, longestName);
+    longestName = getLongestName (functionLines, longestName);
+
+    return longestName;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -615,19 +614,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getLongestName ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int longestName = 0;
-
-    longestName = getLongestName (symbolLines, longestName);
-    longestName = getLongestName (arrayLines, longestName);
-    longestName = getLongestName (functionLines, longestName);
-
-    return longestName;
-  }
-
-  // ---------------------------------------------------------------------------------//
   private int getLongestName (Map<String, List<Integer>> map, int longestName)
   // ---------------------------------------------------------------------------------//
   {
@@ -658,6 +644,17 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     }
     else
       fullText.append (text + "\n");
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int countChars (StringBuilder text, byte ch)
+  // ---------------------------------------------------------------------------------//
+  {
+    int total = 0;
+    for (int i = 0; i < text.length (); i++)
+      if (text.charAt (i) == ch)
+        total++;
+    return total;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -775,30 +772,19 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     }
   }
 
-  // ---------------------------------------------------------------------------------//
-  private int countChars (StringBuilder text, byte ch)
-  // ---------------------------------------------------------------------------------//
-  {
-    int total = 0;
-    for (int i = 0; i < text.length (); i++)
-      if (text.charAt (i) == ch)
-        total++;
-    return total;
-  }
-
   // Decide whether the current subline needs to be aligned on its equals sign. If so,
   // and the column hasn't been calculated, read ahead to find the highest position.
   // ---------------------------------------------------------------------------------//
   private int alignEqualsPosition (SubLine subline, int currentAlignPosition)
   // ---------------------------------------------------------------------------------//
   {
-    if (subline.equalsPosition > 0)                   // does the line have an equals sign?
-    {
-      if (currentAlignPosition == 0)
-        currentAlignPosition = findHighest (subline); // examine following sublines
-      return currentAlignPosition;
-    }
-    return 0;                                         // reset it
+    if (subline.equalsPosition == 0)             // if the line has no equals sign
+      return 0;                                  // reset it
+
+    if (currentAlignPosition == 0)
+      currentAlignPosition = findHighest (subline);     // examine following sublines
+
+    return currentAlignPosition;
   }
 
   // The IF processing is so that any assignment that is being aligned doesn't continue
@@ -810,19 +796,18 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     boolean started = false;
     int highestAssign = startSubline.equalsPosition;
 
-    fast: for (SourceLine line : sourceLines)
+    outerLoop: for (int i = sourceLines.indexOf (startSubline.parent); i < sourceLines
+        .size (); i++)
     {
-      boolean inIf = false;
-      for (SubLine subline : line.sublines)
+      boolean precededByIf = false;
+      for (SubLine subline : sourceLines.get (i).sublines)
       {
         if (started)
         {
-          // Stop when we come to a line without an equals sign (except for non-split REMs).
-          // Lines that start with a REM always break.
-          if (subline.equalsPosition == 0
-              // && (splitRem || !subline.is (TOKEN_REM) || subline.isFirst ()))
-              && (basicPreferences.splitRem || !subline.isJoinableRem ()))
-            break fast; // of champions
+          // Stop when we come to a subline without an equals sign (joinable REMs
+          // can be ignored)
+          if (subline.equalsPosition == 0 && !joinableRem (subline))
+            break outerLoop;
 
           if (subline.equalsPosition > highestAssign)
             highestAssign = subline.equalsPosition;
@@ -830,12 +815,21 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         else if (subline == startSubline)
           started = true;
         else if (subline.is (TOKEN_IF))
-          inIf = true;
+          precededByIf = true;
       }
-      if (started && inIf)
-        break;
+
+      if (started && precededByIf)     // sublines of IF have now finished
+        break;                         // don't continue with following SourceLine
     }
+
     return highestAssign;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean joinableRem (SubLine subline)
+  // ---------------------------------------------------------------------------------//
+  {
+    return subline.isJoinableRem () && !basicPreferences.splitRem;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -888,7 +882,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
             buffer.length - ptr, programLoadAddress + ptr);
         for (String bytes : formattedHex.split (NEWLINE))
           text.append (String.format ("                 %s%n", bytes));
+      }
 
+      if (length > 1)
+      {
         // show the extra bytes as a disassembly
         byte[] extraBuffer = new byte[length];
         System.arraycopy (buffer, ptr, extraBuffer, 0, extraBuffer.length);
@@ -908,8 +905,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   {
     if (isHighBitSet (b))
       return ApplesoftConstants.tokens[b & 0x7F];
-    else if (isDigit (b) || isLetter (b))
+
+    if (isDigit (b) || isLetter (b))
       return "";
+
     return "*******";
   }
 
@@ -934,7 +933,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  int getLoadAddress ()
+  private int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
     return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (0) : 0;
@@ -1043,7 +1042,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  void checkVar (String var, int lineNumber, Map<String, List<Integer>> map,
+  private void checkVar (String var, int lineNumber, Map<String, List<Integer>> map,
       Map<String, List<String>> unique)
   // ---------------------------------------------------------------------------------//
   {
@@ -1067,7 +1066,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  void checkFunction (int sourceLine, String var)
+  private void checkFunction (int sourceLine, String var)
   // ---------------------------------------------------------------------------------//
   {
     List<Integer> lines = functionLines.get (var);

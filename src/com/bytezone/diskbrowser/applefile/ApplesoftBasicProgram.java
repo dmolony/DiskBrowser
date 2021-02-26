@@ -257,8 +257,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     boolean insertBlankLine = false;
 
     Stack<String> loopVariables = new Stack<> ();
+    Alignment alignment = new Alignment ();
 
-    int alignEqualsPos = 0;
     int baseOffset = 7;       // 5 digit line number + 2 spaces
 
     for (SourceLine line : sourceLines)
@@ -314,7 +314,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         {
           // Align assign statements if required
           if (basicPreferences.alignAssign)
-            alignEqualsPos = alignEqualsPosition (subline, alignEqualsPos);
+            alignEqualsPosition (subline, alignment);
 
           int column = indent * indentSize + baseOffset;
           while (text.length () < column)
@@ -322,7 +322,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         }
 
         // Add the current text, then reset it
-        String lineText = subline.getAlignedText (alignEqualsPos);
+        String lineText = subline.getAlignedText (alignment);
 
         if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
           lineText = lineText.replaceFirst ("DATA  ", "DATA ");
@@ -348,6 +348,9 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         }
         else
           text.append (lineText);
+
+        if (subline == alignment.lastSubLine)
+          alignment.reset ();
 
         fullText.append (text);
         fullText.append (NEWLINE);
@@ -375,11 +378,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         fullText.append (NEWLINE);
         insertBlankLine = false;
       }
-
-      // Reset alignment value if we just left an IF 
-      //     - the indentation will be different now
-      if (ifIndent > 0)
-        alignEqualsPos = 0;
     }
   }
 
@@ -520,7 +518,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         appendLineNumbers (fullText, String.format (formatLeft, symbol),
             map.get (symbol));
       else
-        appendLineNumbers (fullText, symbol + " ", map.get (symbol));
+        appendLineNumbers (fullText, symbol + "  ", map.get (symbol));
     }
   }
 
@@ -775,20 +773,17 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   // Decide whether the current subline needs to be aligned on its equals sign. If so,
   // and the column hasn't been calculated, read ahead to find the highest position.
   // ---------------------------------------------------------------------------------//
-  private int alignEqualsPosition (SubLine subline, int currentAlignPosition)
+  private void alignEqualsPosition (SubLine subline, Alignment alignment)
   // ---------------------------------------------------------------------------------//
   {
-    if (subline.equalsPosition == 0)             // if the line has no equals sign
-      return 0;                                  // reset it
-
-    if (currentAlignPosition == 0)               // examine following sublines
+    if (subline.equalsPosition == 0)
     {
-      Alignment alignment = new Alignment (subline);
-      findHighest (subline, alignment);
-      currentAlignPosition = alignment.equalsPosition;
+      alignment.reset ();
+      return;
     }
 
-    return currentAlignPosition;
+    if (alignment.equalsPosition == 0)
+      findHighest (subline, alignment);
   }
 
   // The IF processing is so that any assignment that is being aligned doesn't continue
@@ -798,7 +793,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   // ---------------------------------------------------------------------------------//
   {
     boolean started = false;
-    //    int highestAssign = startSubline.equalsPosition;
+    alignment.setFirst (startSubline);
 
     outerLoop: for (int i = sourceLines.indexOf (startSubline.parent); i < sourceLines
         .size (); i++)
@@ -813,8 +808,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
           if (subline.equalsPosition == 0 && !joinableRem (subline))
             break outerLoop;
 
-          //          if (subline.equalsPosition > highestAssign)
-          //            highestAssign = subline.equalsPosition;
           if (subline.equalsPosition > 0)
             alignment.check (subline);
         }
@@ -828,10 +821,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         break;                         // don't continue with following SourceLine
     }
 
-    System.out.printf ("                                %d  %d%n",
-        alignment.equalsPosition, alignment.targetLength);
-    //    return highestAssign;
-    //    return alignment;
+    //    System.out.printf ("                                %d  %d%n",
+    //        alignment.equalsPosition, alignment.targetLength);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -1145,27 +1136,40 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private class Alignment
+  class Alignment
   // ---------------------------------------------------------------------------------//
   {
     int equalsPosition;
     int targetLength;
+    SubLine firstSubLine;
+    SubLine lastSubLine;
 
-    Alignment (SubLine subline)
+    void reset ()
     {
+      firstSubLine = null;
+      equalsPosition = 0;
+      targetLength = 0;
+    }
+
+    void setFirst (SubLine subline)
+    {
+      reset ();
+      firstSubLine = subline;
       check (subline);
     }
 
     void check (SubLine subline)
     {
-      System.out.printf ("%-20s  %d %d%n", subline, subline.equalsPosition,
-          subline.endPosition - subline.equalsPosition);
+      //      System.out.printf ("%-20s  %d %d%n", subline, subline.equalsPosition,
+      //          subline.endPosition - subline.equalsPosition);
       if (equalsPosition < subline.equalsPosition)
         equalsPosition = subline.equalsPosition;
 
       int temp = subline.endPosition - subline.equalsPosition;
       if (targetLength < temp)
         targetLength = temp;
+
+      lastSubLine = subline;
     }
   }
 }

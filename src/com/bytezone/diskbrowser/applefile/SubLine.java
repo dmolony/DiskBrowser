@@ -22,6 +22,7 @@ import static com.bytezone.diskbrowser.utilities.Utility.isPossibleVariable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram.Alignment;
 import com.bytezone.diskbrowser.utilities.HexFormatter;;
 
 // -----------------------------------------------------------------------------------//
@@ -37,7 +38,7 @@ public class SubLine implements ApplesoftConstants
   String[] nextVariables;
   String forVariable = "";
 
-  int equalsPosition;               // used for aligning the equals sign
+  int equalsPosition;             // used for aligning the equals sign
   int endPosition;                // not sure yet
 
   String functionArgument;
@@ -82,13 +83,12 @@ public class SubLine implements ApplesoftConstants
     }
     else
     {
-      //      ptr = startPtr;
       if (isDigit (firstByte))                   // split IF xx THEN nnn 
       {
         addXref (getLineNumber (buffer, startPtr), gotoLines);
         return;
       }
-      else if (isLetter (firstByte))             // variable assignment
+      else if (isLetter (firstByte))             // variable name
         setEqualsPosition ();
       else if (isEndOfLine (firstByte))          // empty subline
         return;
@@ -455,24 +455,24 @@ public class SubLine implements ApplesoftConstants
   }
 
   // Record the position of the equals sign so it can be aligned with adjacent lines.
+  // Illegal lines could have a variable name with no equals sign.
   // ---------------------------------------------------------------------------------//
   private void setEqualsPosition ()
   // ---------------------------------------------------------------------------------//
   {
-    //    int p = startPtr;
-    //    int max = startPtr + length;
+    int p = startPtr;
+    int max = startPtr + length;
 
-    //    while (++p < max)
-    //      if (buffer[p] == TOKEN_EQUALS)
-    //      {
-    String expandedLine = toString ();
-    equalsPosition = expandedLine.indexOf ('=');
-    endPosition = expandedLine.length ();
-    if (expandedLine.endsWith (":"))
-      endPosition--;
-    //        break;
-    //      }
-    assert equalsPosition > 0;
+    while (++p < max)
+      if (buffer[p] == TOKEN_EQUALS)
+      {
+        String expandedLine = toString ();
+        equalsPosition = expandedLine.indexOf ('=');
+        endPosition = expandedLine.length ();
+        if (expandedLine.endsWith (":"))
+          endPosition--;
+        break;
+      }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -614,16 +614,24 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  public String getAlignedText (int alignEqualsPos)
+  public String getAlignedText (Alignment alignment)
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = toStringBuilder ();      // get line
 
-    // insert spaces before '=' until it lines up with the other assignment lines
+    if (alignment.equalsPosition == 0 || is (TOKEN_REM))
+      return line.toString ();
 
-    if (!is (TOKEN_REM))
-      while (alignEqualsPos-- > equalsPosition)
-        line.insert (equalsPosition, ' ');
+    int alignEqualsPos = alignment.equalsPosition;
+    int targetLength = endPosition - equalsPosition;
+
+    // insert spaces before '=' until it lines up with the other assignment lines
+    while (alignEqualsPos-- > equalsPosition)
+      line.insert (equalsPosition, ' ');
+
+    if (line.charAt (line.length () - 1) == ':')
+      while (targetLength++ <= alignment.targetLength)
+        line.append (" ");
 
     return line.toString ();
   }

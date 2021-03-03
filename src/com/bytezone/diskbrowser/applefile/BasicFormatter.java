@@ -16,7 +16,6 @@ public abstract class BasicFormatter implements ApplesoftConstants
   BasicPreferences basicPreferences;
   byte[] buffer;
   List<SourceLine> sourceLines;
-  int endPtr;
 
   // ---------------------------------------------------------------------------------//
   public BasicFormatter (ApplesoftBasicProgram program, BasicPreferences basicPreferences)
@@ -26,7 +25,6 @@ public abstract class BasicFormatter implements ApplesoftConstants
     this.basicPreferences = basicPreferences;
     this.buffer = program.getBuffer ();
     this.sourceLines = program.getSourceLines ();
-    this.endPtr = program.getEndPtr ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -37,20 +35,11 @@ public abstract class BasicFormatter implements ApplesoftConstants
   int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
-    //    return program.getLoadAddress ();
-    return getLoadAddress (buffer);
+    return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (0) : 0;
   }
 
   // ---------------------------------------------------------------------------------//
-  static int getLoadAddress (byte[] buffer)
-  // ---------------------------------------------------------------------------------//
-  {
-    return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (buffer, 0)
-        : 0;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private static int getLineLength (byte[] buffer, int ptr)
+  private int getLineLength (int ptr)
   // ---------------------------------------------------------------------------------//
   {
     int linkField = unsignedShort (buffer, ptr);

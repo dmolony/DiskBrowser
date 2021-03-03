@@ -11,12 +11,16 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class DebugBasicFormatter extends BasicFormatter
 // -----------------------------------------------------------------------------------//
 {
+  int endPtr;
+
   // ---------------------------------------------------------------------------------//
   public DebugBasicFormatter (ApplesoftBasicProgram program,
       BasicPreferences basicPreferences)
   // ---------------------------------------------------------------------------------//
   {
     super (program, basicPreferences);
+
+    endPtr = program.getEndPtr ();
   }
 
   // ---------------------------------------------------------------------------------//

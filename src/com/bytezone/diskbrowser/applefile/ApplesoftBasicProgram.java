@@ -16,6 +16,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private AppleBasicFormatter appleBasicFormatter;
   private DebugBasicFormatter debugBasicFormatter;
   private XrefFormatter xrefFormatter;
+  private HeaderFormatter headerFormatter;
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -38,6 +39,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     appleBasicFormatter = new AppleBasicFormatter (this, basicPreferences);
     debugBasicFormatter = new DebugBasicFormatter (this, basicPreferences);
     xrefFormatter = new XrefFormatter (this, basicPreferences);
+    headerFormatter = new HeaderFormatter (this, basicPreferences);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -48,7 +50,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     StringBuilder text = new StringBuilder ();
 
     if (basicPreferences.showHeader)
-      addHeader (text);
+      headerFormatter.format (text);
 
     if (showDebugText)
     {
@@ -92,15 +94,5 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   // ---------------------------------------------------------------------------------//
   {
     return endPtr;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void addHeader (StringBuilder pgm)
-  // ---------------------------------------------------------------------------------//
-  {
-    pgm.append ("Name    : " + name + "\n");
-    pgm.append (String.format ("Length  : $%04X (%<,d)%n", buffer.length));
-    pgm.append (String.format ("Load at : $%04X (%<,d)%n%n",
-        BasicFormatter.getLoadAddress (buffer)));
   }
 }

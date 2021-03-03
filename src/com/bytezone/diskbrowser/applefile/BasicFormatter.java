@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
+
 import java.util.List;
 
 import com.bytezone.diskbrowser.gui.BasicPreferences;
@@ -35,6 +37,33 @@ public abstract class BasicFormatter implements ApplesoftConstants
   int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
-    return program.getLoadAddress ();
+    //    return program.getLoadAddress ();
+    return getLoadAddress (buffer);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  static int getLoadAddress (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
+    return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (buffer, 0)
+        : 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static int getLineLength (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    int linkField = unsignedShort (buffer, ptr);
+    if (linkField == 0)
+      return 2;
+
+    ptr += 4;               // skip link field and line number
+    int length = 5;
+
+    while (ptr < buffer.length && buffer[ptr++] != 0)
+      length++;
+
+    assert length == ptr;
+    return length;
   }
 }

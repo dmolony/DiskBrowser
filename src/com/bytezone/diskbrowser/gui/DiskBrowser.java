@@ -41,6 +41,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   {
     super (windowTitle);
 
+    UIManager.put ("TabbedPane.foreground", Color.BLACK);   // java bug fix
+
     if (args.length > 0 && "-reset".equals (args[0]))
       new WindowState (prefs).clear ();
 

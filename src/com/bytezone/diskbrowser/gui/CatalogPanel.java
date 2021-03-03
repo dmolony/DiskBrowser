@@ -62,7 +62,7 @@ class CatalogPanel extends JTabbedPane
     this.redoHandler = redoHandler;
 
     setTabPlacement (SwingConstants.BOTTOM);
-    setPreferredSize (new Dimension (360, 802));          // width, height
+    setPreferredSize (new Dimension (360, 802));            // width, height
   }
 
   // ---------------------------------------------------------------------------------//

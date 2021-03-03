@@ -1,21 +1,13 @@
 package com.bytezone.diskbrowser.applefile;
 
-import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
-import static com.bytezone.diskbrowser.utilities.Utility.isDigit;
-import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
-import static com.bytezone.diskbrowser.utilities.Utility.isLetter;
 import static com.bytezone.diskbrowser.utilities.Utility.isPossibleNumber;
 import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -25,12 +17,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   private static final String underline =
       "----------------------------------------------------"
           + "----------------------------------------------";
-  private static final Pattern dimPattern =
-      Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9]+(,[0-9]+)*\\)[,:]?");
   private static final String NEWLINE = "\n";
-
-  private static final int LEFT_MARGIN = 5;
-  private static final int RIGHT_MARGIN = 33;
 
   private final List<SourceLine> sourceLines = new ArrayList<> ();
   private final int endPtr;
@@ -58,6 +45,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
   private final int maxDigits;
 
+  private UserBasicFormatter userBasicFormatter;
+  private AppleBasicFormatter appleBasicFormatter;
+  private DebugBasicFormatter debugBasicFormatter;
+
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
@@ -84,6 +75,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
         : "%-7.7s  ";
     formatRight = formatLeft.replace ("-", "");
     formatLineNumber = "%" + maxDigits + "d ";
+
+    userBasicFormatter = new UserBasicFormatter (this, basicPreferences);
+    appleBasicFormatter = new AppleBasicFormatter (this, basicPreferences);
+    debugBasicFormatter = new DebugBasicFormatter (this, basicPreferences);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -97,7 +92,10 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       addHeader (text);
 
     if (showDebugText)
-      return getDebugText (text);
+    {
+      debugBasicFormatter.format (text);
+      return Utility.rtrim (text);
+    }
 
     if (sourceLines.size () == 0)
     {
@@ -106,279 +104,14 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     }
 
     if (basicPreferences.formatApplesoft)
-      getUserFormat (text);
+      userBasicFormatter.format (text);
     else
-      getAppleFormat (text);
+      appleBasicFormatter.format (text);
 
     if (basicPreferences.showAllXref)
       addXref (text);
 
     return Utility.rtrim (text);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void getAppleFormat (StringBuilder fullText)
-  // ---------------------------------------------------------------------------------//
-  {
-    int loadAddress = getLoadAddress ();
-    int ptr = 0;
-    int linkField;
-
-    StringBuilder currentLine = new StringBuilder ();
-
-    while ((linkField = unsignedShort (buffer, ptr)) != 0)
-    {
-      int lineNumber = unsignedShort (buffer, ptr + 2);
-      currentLine.append (String.format (" %d ", lineNumber));
-      ptr += 4;
-
-      if (basicPreferences.appleLineWrap)
-        ptr = appendWithWrap (currentLine, ptr);
-      else
-        ptr = appendWithOutWrap (currentLine, ptr);
-
-      if (ptr != (linkField - loadAddress))
-      {
-        System.out.printf ("%s: ptr: %04X, nextLine: %04X%n", name, ptr + loadAddress,
-            linkField);
-        //        ptr = linkField - loadAddress;      // use this when tested
-      }
-
-      currentLine.append (NEWLINE);
-
-      fullText.append (currentLine);
-      currentLine.setLength (0);
-    }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int appendWithOutWrap (StringBuilder currentLine, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    byte b;
-
-    while ((b = buffer[ptr++]) != 0)
-      if (isHighBitSet (b))
-      {
-        String token = String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]);
-        currentLine.append (token);
-      }
-      else
-        switch (b)
-        {
-          case Utility.ASCII_CR:
-            currentLine.append (NEWLINE);
-            break;
-
-          case Utility.ASCII_BACKSPACE:
-            if (currentLine.length () > 0)
-              currentLine.deleteCharAt (currentLine.length () - 1);
-            break;
-
-          case Utility.ASCII_LF:
-            int indent = getIndent (currentLine);
-            currentLine.append ("\n");
-            for (int i = 0; i < indent; i++)
-              currentLine.append (" ");
-            break;
-
-          default:
-            currentLine.append ((char) b);
-        }
-
-    return ptr;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int appendWithWrap (StringBuilder currentLine, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    byte b;
-    int cursor = currentLine.length ();       // controls when to wrap
-
-    while ((b = buffer[ptr++]) != 0)
-      if (isHighBitSet (b))
-      {
-        String token = String.format (" %s ", ApplesoftConstants.tokens[b & 0x7F]);
-        currentLine.append (token);
-        cursor = incrementCursor (currentLine, cursor, token.length ());
-      }
-      else
-        switch (b)
-        {
-          case Utility.ASCII_CR:
-            currentLine.append (NEWLINE);
-            cursor = 0;
-            break;
-
-          case Utility.ASCII_BACKSPACE:
-            if (cursor > 0)
-            {
-              currentLine.deleteCharAt (currentLine.length () - 1);
-              --cursor;
-            }
-            break;
-
-          case Utility.ASCII_LF:
-            currentLine.append ("\n");
-            for (int i = 0; i < cursor; i++)
-              currentLine.append (" ");
-            break;
-
-          default:
-            currentLine.append ((char) b);
-            cursor = incrementCursor (currentLine, cursor, 1);
-        }
-
-    return ptr;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int incrementCursor (StringBuilder currentLine, int cursor, int size)
-  // ---------------------------------------------------------------------------------//
-  {
-    assert size <= 9;           // longest token possible (7 plus 2 spaces)
-    cursor += size;
-
-    if ((cursor) >= RIGHT_MARGIN)
-    {
-      cursor = cursor >= 40 ? cursor - 40 : LEFT_MARGIN;
-      currentLine.append ("\n     ".substring (0, cursor + 1));
-    }
-
-    return cursor;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void getUserFormat (StringBuilder fullText)
-  // ---------------------------------------------------------------------------------//
-  {
-    int indentSize = 2;
-    boolean insertBlankLine = false;
-
-    Stack<String> loopVariables = new Stack<> ();
-    Alignment alignment = new Alignment ();
-
-    int baseOffset = 7;       // 5 digit line number + 2 spaces
-
-    for (SourceLine line : sourceLines)
-    {
-      StringBuilder text = new StringBuilder (String.format ("%5d", (line.lineNumber)));
-
-      int indent = loopVariables.size ();   // each full line starts at the loop indent
-      int ifIndent = 0;                     // IF statement(s) limit back indentation by NEXT
-
-      for (SubLine subline : line.sublines)
-      {
-        // Allow empty statements (caused by a single colon)
-        if (subline.isEmpty ())
-          continue;
-
-        // A REM statement might conceal an assembler routine
-        // - see P.CREATE on Diags2E.DSK
-        if (subline.is (TOKEN_REM) && subline.containsToken ())
-        {
-          int address = getLoadAddress () + subline.startPtr + 1;  // skip the REM token
-          fullText.append (text + String.format ("REM - Inline assembler @ $%02X (%d)%n",
-              address, address));
-          String padding = "                         ".substring (0, text.length () + 2);
-          for (String asm : getRemAssembler (subline))
-            fullText.append (padding + asm + NEWLINE);
-          continue;
-        }
-
-        // Beagle Bros often have multiline REM statements
-        if (subline.is (TOKEN_REM) && basicPreferences.formatRem
-            && subline.containsControlChars ())
-        {
-          subline.addFormattedRem (text);
-          fullText.append (text + NEWLINE);
-          continue;
-        }
-
-        // Reduce the indent by each NEXT, but only as far as the IF indent allows
-        if (subline.is (TOKEN_NEXT))
-        {
-          popLoopVariables (loopVariables, subline);
-          indent = Math.max (ifIndent, loopVariables.size ());
-        }
-
-        // Are we joining REM lines with the previous subline?
-        if (joinableRem (subline))
-        {
-          // Join this REM statement to the previous line, so no indenting
-          fullText.deleteCharAt (fullText.length () - 1);         // remove newline
-          fullText.append (" ");
-        }
-        else    // ... otherwise do all the indenting
-        {
-          // Align assign statements if required
-          if (basicPreferences.alignAssign)
-            alignEqualsPosition (subline, alignment);
-
-          int column = indent * indentSize + baseOffset;
-          while (text.length () < column)
-            text.append (" ");
-        }
-
-        // Add the current text, then reset it
-        String lineText = subline.getAlignedText (alignment);
-
-        if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
-          lineText = lineText.replaceFirst ("DATA  ", "DATA ");
-
-        // Check for a wrappable REM/DATA/DIM statement
-        // (see SEA BATTLE on DISK283.DSK)
-        int inset = Math.max (text.length (), getIndent (fullText)) + 1;
-        if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
-        {
-          List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
-          addSplitLines (lines, text, inset);
-        }
-        else if (subline.is (TOKEN_DATA)
-            && lineText.length () > basicPreferences.wrapDataAt)
-        {
-          List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
-          addSplitLines (lines, text, inset);
-        }
-        else if (subline.is (TOKEN_DIM) && basicPreferences.splitDim)
-        {
-          List<String> lines = splitDim (lineText);
-          addSplitLines (lines, text, inset);
-        }
-        else
-          text.append (lineText);
-
-        if (subline == alignment.lastSubLine)
-          alignment.reset ();
-
-        fullText.append (text);
-        fullText.append (NEWLINE);
-        text.setLength (0);
-
-        // Calculate indent changes that take effect after the current subline
-        if (subline.is (TOKEN_IF))
-          ifIndent = ++indent;
-        else if (subline.is (TOKEN_FOR))
-        {
-          String latestLoopVar = loopVariables.size () > 0 ? loopVariables.peek () : "";
-          if (!subline.forVariable.equals (latestLoopVar))    // don't add repeated loop
-          {
-            loopVariables.push (subline.forVariable);
-            ++indent;
-          }
-        }
-        else if (basicPreferences.blankAfterReturn && subline.is (TOKEN_RETURN)
-            && subline.isFirst ())
-          insertBlankLine = true;
-      }
-
-      if (insertBlankLine)
-      {
-        fullText.append (NEWLINE);
-        insertBlankLine = false;
-      }
-    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -434,6 +167,27 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 
     if (basicPreferences.showCalls && !callLines.isEmpty ())
       showSymbolsLeftRight (fullText, callLines, "   CALL");
+  }
+
+  // ---------------------------------------------------------------------------------//
+  List<SourceLine> getSourceLines ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return sourceLines;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  byte[] getBuffer ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return buffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getEndPtr ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return endPtr;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -623,307 +377,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private void wrapPrint (StringBuilder fullText, StringBuilder text, String lineText)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<String> lines = splitPrint (lineText);
-    if (lines != null)
-    {
-      int offset = text.indexOf ("PRINT");
-      if (offset < 0)
-        offset = text.indexOf ("INPUT");
-      String fmt = "%-" + offset + "." + offset + "s%s%n";
-      String padding = text.substring (0, offset);
-      for (String s : lines)
-      {
-        fullText.append (String.format (fmt, padding, s));
-        padding = "";
-      }
-    }
-    else
-      fullText.append (text + "\n");
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int countChars (StringBuilder text, byte ch)
-  // ---------------------------------------------------------------------------------//
-  {
-    int total = 0;
-    for (int i = 0; i < text.length (); i++)
-      if (text.charAt (i) == ch)
-        total++;
-    return total;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private List<String> splitPrint (String line)
-  // ---------------------------------------------------------------------------------//
-  {
-    int first = line.indexOf ("\"") + 1;
-    int last = line.indexOf ("\"", first + 1) - 1;
-
-    if (first != 7 || (last - first) <= basicPreferences.wrapPrintAt)
-      return null;
-
-    int charsLeft = last - first + 1;
-
-    List<String> lines = new ArrayList<> ();
-    String padding = line.substring (0, 7);
-    line = line.substring (7);
-    String sub;
-    while (true)
-    {
-      if (line.length () >= basicPreferences.wrapPrintAt)
-      {
-        sub = line.substring (0, basicPreferences.wrapPrintAt);
-        line = line.substring (basicPreferences.wrapPrintAt);
-      }
-      else
-      {
-        sub = line;
-        line = "";
-      }
-
-      String subline = padding + sub;
-      charsLeft -= basicPreferences.wrapPrintAt;
-
-      if (charsLeft > 0)
-        lines.add (subline);
-      else
-      {
-        lines.add (subline + line);
-        break;
-      }
-      padding = "       ";
-    }
-
-    return lines;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private List<String> splitLine (String line, int wrapLength, char breakChar)
-  // ---------------------------------------------------------------------------------//
-  {
-    int spaceAt = 0;
-    while (spaceAt < line.length () && line.charAt (spaceAt) != ' ')
-      ++spaceAt;
-    String indent = spaceAt < 8 ? "        ".substring (0, spaceAt + 1) : "        ";
-
-    List<String> lines = new ArrayList<> ();
-
-    while (line.length () > wrapLength)
-    {
-      int breakAt = wrapLength - 1;
-      while (breakAt > spaceAt && line.charAt (breakAt) != breakChar)
-        --breakAt;
-
-      if (breakAt <= spaceAt)
-        break;
-
-      lines.add (line.substring (0, breakAt + 1));      // keep breakChar at end
-      line = indent + line.substring (breakAt + 1);
-    }
-
-    while (line.length () > wrapLength)                 // no breakChars found
-    {
-      lines.add (line.substring (0, wrapLength));
-      line = indent + line.substring (wrapLength);
-    }
-
-    lines.add (line);
-    return lines;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private List<String> splitDim (String line)
-  // ---------------------------------------------------------------------------------//
-  {
-    List<String> lines = new ArrayList<> ();
-
-    Matcher m = dimPattern.matcher (line);
-
-    while (m.find ())
-      lines.add ("    " + m.group ());
-
-    if (lines.size () > 0)
-      lines.set (0, "DIM " + lines.get (0).trim ());
-
-    return lines;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void addSplitLines (List<String> lines, StringBuilder text, int indent)
-  // ---------------------------------------------------------------------------------//
-  {
-    boolean first = true;
-
-    for (String line : lines)
-    {
-      if (first)
-      {
-        first = false;
-        text.append (line);
-      }
-      else
-        text.append (
-            "\n                                           ".substring (0, indent) + line);
-    }
-  }
-
-  // Decide whether the current subline needs to be aligned on its equals sign. If so,
-  // and the column hasn't been calculated, read ahead to find the highest position.
-  // ---------------------------------------------------------------------------------//
-  private void alignEqualsPosition (SubLine subline, Alignment alignment)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (subline.equalsPosition == 0)
-    {
-      alignment.reset ();
-      return;
-    }
-
-    if (alignment.equalsPosition == 0)
-      findHighest (subline, alignment);
-  }
-
-  // The IF processing is so that any assignment that is being aligned doesn't continue
-  // to the next full line (because the indentation has changed).
-  // ---------------------------------------------------------------------------------//
-  private void findHighest (SubLine startSubline, Alignment alignment)
-  // ---------------------------------------------------------------------------------//
-  {
-    boolean started = false;
-    alignment.setFirst (startSubline);
-
-    outerLoop: for (int i = sourceLines.indexOf (startSubline.parent); i < sourceLines
-        .size (); i++)
-    {
-      boolean precededByIf = false;
-      for (SubLine subline : sourceLines.get (i).sublines)
-      {
-        if (started)
-        {
-          // Stop when we come to a subline without an equals sign (joinable REMs
-          // can be ignored)
-          if (subline.equalsPosition == 0 && !joinableRem (subline))
-            break outerLoop;
-
-          if (subline.equalsPosition > 0)
-            alignment.check (subline);
-        }
-        else if (subline == startSubline)
-          started = true;
-        else if (subline.is (TOKEN_IF))
-          precededByIf = true;
-      }
-
-      if (started && precededByIf)     // sublines of IF have now finished
-        break;                         // don't continue with following SourceLine
-    }
-
-    //    System.out.printf ("                                %d  %d%n",
-    //        alignment.equalsPosition, alignment.targetLength);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private boolean joinableRem (SubLine subline)
-  // ---------------------------------------------------------------------------------//
-  {
-    return subline.isJoinableRem () && !basicPreferences.splitRem;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private String getDebugText (StringBuilder text)
-  // ---------------------------------------------------------------------------------//
-  {
-    int linkField = unsignedShort (buffer, 0);
-    int programLoadAddress = linkField - getLineLength (0);
-
-    for (SourceLine sourceLine : sourceLines)
-    {
-      text.append (String.format ("%5d            %s%n", sourceLine.lineNumber,
-          HexFormatter.formatNoHeader (buffer, sourceLine.linePtr, 4,
-              programLoadAddress + sourceLine.linePtr)));
-      for (SubLine subline : sourceLine.sublines)
-      {
-        String token = getDisplayToken (buffer[subline.startPtr]);
-        String formattedHex = HexFormatter.formatNoHeader (buffer, subline.startPtr,
-            subline.length, programLoadAddress + subline.startPtr);
-
-        for (String bytes : formattedHex.split (NEWLINE))
-        {
-          text.append (String.format ("        %-8s %s%n", token, bytes));
-          token = "";
-        }
-      }
-      text.append (NEWLINE);
-    }
-
-    // check for assembler routines after the basic code
-    if (endPtr < buffer.length)
-    {
-      int length = buffer.length - endPtr;
-      int ptr = endPtr;
-
-      if (length >= 2)
-      {
-        text.append ("                 ");
-        text.append (
-            HexFormatter.formatNoHeader (buffer, endPtr, 2, programLoadAddress + ptr));
-        text.append ("\n\n");
-        ptr += 2;
-        length -= 2;
-      }
-
-      if (length > 0)
-      {
-        // show the extra bytes as a hex dump
-        String formattedHex = HexFormatter.formatNoHeader (buffer, ptr,
-            buffer.length - ptr, programLoadAddress + ptr);
-        for (String bytes : formattedHex.split (NEWLINE))
-          text.append (String.format ("                 %s%n", bytes));
-      }
-
-      if (length > 1)
-      {
-        // show the extra bytes as a disassembly
-        byte[] extraBuffer = new byte[length];
-        System.arraycopy (buffer, ptr, extraBuffer, 0, extraBuffer.length);
-        AssemblerProgram assemblerProgram =
-            new AssemblerProgram ("extra", extraBuffer, programLoadAddress + ptr);
-        text.append ("\n");
-        text.append (assemblerProgram.getText ());
-      }
-    }
-
-    return Utility.rtrim (text);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private String getDisplayToken (byte b)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (isHighBitSet (b))
-      return ApplesoftConstants.tokens[b & 0x7F];
-
-    if (isDigit (b) || isLetter (b))
-      return "";
-
-    return "*******";
-  }
-
-  // A REM statement might conceal an assembler routine
-  // ---------------------------------------------------------------------------------//
-  private String[] getRemAssembler (SubLine subline)
-  // ---------------------------------------------------------------------------------//
-  {
-    AssemblerProgram program = new AssemblerProgram ("REM assembler",
-        subline.getBuffer (), getLoadAddress () + subline.startPtr + 1);
-
-    return program.getAssembler ().split ("\n");
-  }
-
-  // ---------------------------------------------------------------------------------//
   private void addHeader (StringBuilder pgm)
   // ---------------------------------------------------------------------------------//
   {
@@ -933,7 +386,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getLoadAddress ()
+  int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
     return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (0) : 0;
@@ -953,62 +406,8 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     while (ptr < buffer.length && buffer[ptr++] != 0)
       length++;
 
-    //    System.out.printf ("Length: %4d, Ptr: %4d%n", length, ptr);
     assert length == ptr;
     return length;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void popLoopVariables (Stack<String> loopVariables, SubLine subline)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (subline.nextVariables.length == 0)                    // naked NEXT
-    {
-      if (loopVariables.size () > 0)
-        loopVariables.pop ();
-    }
-    else
-      for (String variable : subline.nextVariables)           // e.g. NEXT X,Y,Z
-        while (loopVariables.size () > 0)
-          if (sameVariable (variable, loopVariables.pop ()))
-            break;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private boolean sameVariable (String v1, String v2)
-  // ---------------------------------------------------------------------------------//
-  {
-    return getUniqueName (v1).equals (getUniqueName (v2));
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void checkUniqueName (String symbol, Map<String, List<String>> map)
-  // ---------------------------------------------------------------------------------//
-  {
-    String uniqueName = getUniqueName (symbol);
-
-    List<String> usage = map.get (uniqueName);
-    if (usage == null)
-    {
-      usage = new ArrayList<> ();
-      map.put (uniqueName, usage);
-    }
-
-    if (!usage.contains (symbol))
-      usage.add (symbol);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private String getUniqueName (String symbol)
-  // ---------------------------------------------------------------------------------//
-  {
-    int ptr = symbol.length () - 1;
-
-    if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR             // string
-        || symbol.charAt (ptr) == Utility.ASCII_PERCENT)        // integer
-      ptr--;
-
-    return (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -1136,40 +535,33 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   }
 
   // ---------------------------------------------------------------------------------//
-  class Alignment
+  private void checkUniqueName (String symbol, Map<String, List<String>> map)
   // ---------------------------------------------------------------------------------//
   {
-    int equalsPosition;
-    int targetLength;
-    SubLine firstSubLine;
-    SubLine lastSubLine;
+    String uniqueName = getUniqueName (symbol);
 
-    void reset ()
+    List<String> usage = map.get (uniqueName);
+    if (usage == null)
     {
-      firstSubLine = null;
-      equalsPosition = 0;
-      targetLength = 0;
+      usage = new ArrayList<> ();
+      map.put (uniqueName, usage);
     }
 
-    void setFirst (SubLine subline)
-    {
-      reset ();
-      firstSubLine = subline;
-      check (subline);
-    }
+    if (!usage.contains (symbol))
+      usage.add (symbol);
+  }
 
-    void check (SubLine subline)
-    {
-      //      System.out.printf ("%-20s  %d %d%n", subline, subline.equalsPosition,
-      //          subline.endPosition - subline.equalsPosition);
-      if (equalsPosition < subline.equalsPosition)
-        equalsPosition = subline.equalsPosition;
+  // ---------------------------------------------------------------------------------//
+  private String getUniqueName (String symbolName)
+  // ---------------------------------------------------------------------------------//
+  {
+    int ptr = symbolName.length () - 1;
 
-      int temp = subline.endPosition - subline.equalsPosition;
-      if (targetLength < temp)
-        targetLength = temp;
+    if (symbolName.charAt (ptr) == Utility.ASCII_DOLLAR             // string
+        || symbolName.charAt (ptr) == Utility.ASCII_PERCENT)        // integer
+      ptr--;
 
-      lastSubLine = subline;
-    }
+    return (ptr <= 1) ? symbolName
+        : symbolName.substring (0, 2) + symbolName.substring (ptr + 1);
   }
 }

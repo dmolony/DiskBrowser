@@ -1,11 +1,13 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_BACKSPACE;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_CR;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_LF;
 import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
 import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
 import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 
 import com.bytezone.diskbrowser.gui.BasicPreferences;
-import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class AppleBasicFormatter extends BasicFormatter
@@ -73,16 +75,16 @@ public class AppleBasicFormatter extends BasicFormatter
       else
         switch (b)
         {
-          case Utility.ASCII_CR:
+          case ASCII_CR:
             currentLine.append (NEWLINE);
             break;
 
-          case Utility.ASCII_BACKSPACE:
+          case ASCII_BACKSPACE:
             if (currentLine.length () > 0)
               currentLine.deleteCharAt (currentLine.length () - 1);
             break;
 
-          case Utility.ASCII_LF:
+          case ASCII_LF:
             int indent = getIndent (currentLine);
             currentLine.append ("\n");
             for (int i = 0; i < indent; i++)
@@ -113,12 +115,12 @@ public class AppleBasicFormatter extends BasicFormatter
       else
         switch (b)
         {
-          case Utility.ASCII_CR:
+          case ASCII_CR:
             currentLine.append (NEWLINE);
             cursor = 0;
             break;
 
-          case Utility.ASCII_BACKSPACE:
+          case ASCII_BACKSPACE:
             if (cursor > 0)
             {
               currentLine.deleteCharAt (currentLine.length () - 1);
@@ -126,7 +128,7 @@ public class AppleBasicFormatter extends BasicFormatter
             }
             break;
 
-          case Utility.ASCII_LF:
+          case ASCII_LF:
             currentLine.append ("\n");
             for (int i = 0; i < cursor; i++)
               currentLine.append (" ");

@@ -10,13 +10,13 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 // -----------------------------------------------------------------------------------//
 {
   private final List<SourceLine> sourceLines = new ArrayList<> ();
-  private final int endPtr;
+  private int ptr;          // end-of-program marker
 
-  private UserBasicFormatter userBasicFormatter;
-  private AppleBasicFormatter appleBasicFormatter;
-  private DebugBasicFormatter debugBasicFormatter;
-  private XrefFormatter xrefFormatter;
-  private HeaderFormatter headerFormatter;
+  private final UserBasicFormatter userBasicFormatter;
+  private final AppleBasicFormatter appleBasicFormatter;
+  private final DebugBasicFormatter debugBasicFormatter;
+  private final XrefFormatter xrefFormatter;
+  private final HeaderFormatter headerFormatter;
 
   // ---------------------------------------------------------------------------------//
   public ApplesoftBasicProgram (String name, byte[] buffer)
@@ -24,16 +24,12 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   {
     super (name, buffer);
 
-    int ptr = 0;
-
     while (buffer[ptr + 1] != 0)    // msb of link field
     {
       SourceLine line = new SourceLine (this, buffer, ptr);
       sourceLines.add (line);
       ptr += line.length;           // assumes lines are contiguous
     }
-
-    endPtr = ptr;                   // record where the end-of-program marker is
 
     userBasicFormatter = new UserBasicFormatter (this, basicPreferences);
     appleBasicFormatter = new AppleBasicFormatter (this, basicPreferences);
@@ -93,6 +89,6 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
   int getEndPtr ()
   // ---------------------------------------------------------------------------------//
   {
-    return endPtr;
+    return ptr;
   }
 }

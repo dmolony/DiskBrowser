@@ -35,24 +35,22 @@ public abstract class BasicFormatter implements ApplesoftConstants
   int getLoadAddress ()
   // ---------------------------------------------------------------------------------//
   {
-    return (buffer.length > 1) ? unsignedShort (buffer, 0) - getLineLength (0) : 0;
+    return (buffer.length > 3) ? unsignedShort (buffer, 0) - getFirstLineLength () : 0;
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getLineLength (int ptr)
+  private int getFirstLineLength ()
   // ---------------------------------------------------------------------------------//
   {
-    int linkField = unsignedShort (buffer, ptr);
+    int linkField = unsignedShort (buffer, 0);
     if (linkField == 0)
       return 2;
 
-    ptr += 4;               // skip link field and line number
-    int length = 5;
+    int ptr = 4;               // skip link field and line number
 
     while (ptr < buffer.length && buffer[ptr++] != 0)
-      length++;
+      ;
 
-    assert length == ptr;
-    return length;
+    return ptr;
   }
 }

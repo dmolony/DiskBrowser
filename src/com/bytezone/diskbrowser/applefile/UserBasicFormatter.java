@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_DOLLAR;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_PERCENT;
 import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
 
 import java.util.ArrayList;
@@ -9,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bytezone.diskbrowser.gui.BasicPreferences;
-import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class UserBasicFormatter extends BasicFormatter
@@ -17,6 +18,9 @@ public class UserBasicFormatter extends BasicFormatter
 {
   private static final Pattern dimPattern =
       Pattern.compile ("[A-Z][A-Z0-9]*[$%]?\\([0-9]+(,[0-9]+)*\\)[,:]?");
+  private static final int INDENT_SIZE = 2;
+  private static final String EIGHT_SPACES = "        ";
+  private static final String FOUR_SPACES = "    ";
 
   // ---------------------------------------------------------------------------------//
   public UserBasicFormatter (ApplesoftBasicProgram program,
@@ -31,19 +35,17 @@ public class UserBasicFormatter extends BasicFormatter
   public void format (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
-    int indentSize = 2;
     boolean insertBlankLine = false;
+    int baseOffset = 7;       // 5 digit line number + 2 spaces
 
     Stack<String> loopVariables = new Stack<> ();
     Alignment alignment = new Alignment ();
-
-    int baseOffset = 7;       // 5 digit line number + 2 spaces
 
     for (SourceLine line : sourceLines)
     {
       StringBuilder text = new StringBuilder (String.format ("%5d", (line.lineNumber)));
 
-      int indent = loopVariables.size ();   // each full line starts at the loop indent
+      int indentLevel = loopVariables.size ();   // each full line starts at the loop indent
       int ifIndent = 0;                     // IF statement(s) limit back indentation by NEXT
 
       for (SubLine subline : line.sublines)
@@ -78,7 +80,7 @@ public class UserBasicFormatter extends BasicFormatter
         if (subline.is (TOKEN_NEXT))
         {
           popLoopVariables (loopVariables, subline);
-          indent = Math.max (ifIndent, loopVariables.size ());
+          indentLevel = Math.max (ifIndent, loopVariables.size ());
         }
 
         // Are we joining REM lines with the previous subline?
@@ -94,7 +96,7 @@ public class UserBasicFormatter extends BasicFormatter
           if (basicPreferences.alignAssign)
             alignEqualsPosition (subline, alignment);
 
-          int column = indent * indentSize + baseOffset;
+          int column = indentLevel * INDENT_SIZE + baseOffset;
           while (text.length () < column)
             text.append (" ");
         }
@@ -136,14 +138,14 @@ public class UserBasicFormatter extends BasicFormatter
 
         // Calculate indent changes that take effect after the current subline
         if (subline.is (TOKEN_IF))
-          ifIndent = ++indent;
+          ifIndent = ++indentLevel;
         else if (subline.is (TOKEN_FOR))
         {
           String latestLoopVar = loopVariables.size () > 0 ? loopVariables.peek () : "";
           if (!subline.forVariable.equals (latestLoopVar))    // don't add repeated loop
           {
             loopVariables.push (subline.forVariable);
-            ++indent;
+            ++indentLevel;
           }
         }
         else if (basicPreferences.blankAfterReturn && subline.is (TOKEN_RETURN)
@@ -166,7 +168,7 @@ public class UserBasicFormatter extends BasicFormatter
     int spaceAt = 0;
     while (spaceAt < line.length () && line.charAt (spaceAt) != ' ')
       ++spaceAt;
-    String indent = spaceAt < 8 ? "        ".substring (0, spaceAt + 1) : "        ";
+    String indent = spaceAt < 8 ? EIGHT_SPACES.substring (0, spaceAt + 1) : EIGHT_SPACES;
 
     List<String> lines = new ArrayList<> ();
 
@@ -202,7 +204,7 @@ public class UserBasicFormatter extends BasicFormatter
     Matcher m = dimPattern.matcher (line);
 
     while (m.find ())
-      lines.add ("    " + m.group ());
+      lines.add (FOUR_SPACES + m.group ());
 
     if (lines.size () > 0)
       lines.set (0, "DIM " + lines.get (0).trim ());
@@ -217,7 +219,6 @@ public class UserBasicFormatter extends BasicFormatter
     boolean first = true;
 
     for (String line : lines)
-    {
       if (first)
       {
         first = false;
@@ -226,7 +227,6 @@ public class UserBasicFormatter extends BasicFormatter
       else
         text.append (
             "\n                                           ".substring (0, indent) + line);
-    }
   }
 
   // Decide whether the current subline needs to be aligned on its equals sign. If so,
@@ -279,9 +279,6 @@ public class UserBasicFormatter extends BasicFormatter
       if (started && precededByIf)     // sublines of IF have now finished
         break;                         // don't continue with following SourceLine
     }
-
-    //    System.out.printf ("                                %d  %d%n",
-    //        alignment.equalsPosition, alignment.targetLength);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -320,8 +317,8 @@ public class UserBasicFormatter extends BasicFormatter
   {
     int ptr = symbol.length () - 1;
 
-    if (symbol.charAt (ptr) == Utility.ASCII_DOLLAR             // string
-        || symbol.charAt (ptr) == Utility.ASCII_PERCENT)        // integer
+    if (symbol.charAt (ptr) == ASCII_DOLLAR             // string
+        || symbol.charAt (ptr) == ASCII_PERCENT)        // integer
       ptr--;
 
     return (ptr <= 1) ? symbol : symbol.substring (0, 2) + symbol.substring (ptr + 1);
@@ -335,6 +332,6 @@ public class UserBasicFormatter extends BasicFormatter
     AssemblerProgram program = new AssemblerProgram ("REM assembler",
         subline.getBuffer (), getLoadAddress () + subline.startPtr + 1);
 
-    return program.getAssembler ().split ("\n");
+    return program.getAssembler ().split (NEWLINE);
   }
 }

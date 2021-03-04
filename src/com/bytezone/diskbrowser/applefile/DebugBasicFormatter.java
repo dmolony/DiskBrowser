@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_COLON;
 import static com.bytezone.diskbrowser.utilities.Utility.isDigit;
 import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
 import static com.bytezone.diskbrowser.utilities.Utility.isLetter;
@@ -96,7 +97,7 @@ public class DebugBasicFormatter extends BasicFormatter
     if (isHighBitSet (b))
       return ApplesoftConstants.tokens[b & 0x7F];
 
-    if (isDigit (b) || isLetter (b))
+    if (isDigit (b) || isLetter (b) || b == ASCII_COLON || b == 0)
       return "";
 
     return "*******";

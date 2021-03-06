@@ -53,21 +53,18 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_SPLIT_REMARKS = "splitRemarks";
   private static final String PREFS_SPLIT_DIM = "splitDim";
   private static final String PREFS_ALIGN_ASSIGN = "alignAssign";
-  //  private static final String PREFS_SHOW_TARGETS = "showTargets";
-  //  private static final String PREFS_ONLY_SHOW_TARGETS = "onlyShowTargets";
   private static final String PREFS_SHOW_CARET = "showCaret";
   private static final String PREFS_SHOW_THEN = "showThen";
-  private static final String PREFS_SHOW_XREF = "showXref";
-  private static final String PREFS_SHOW_CALLS = "showCalls";
-  private static final String PREFS_SHOW_SYMBOLS = "showSymbols";
-  private static final String PREFS_SHOW_CONSTANTS = "showConstants";
-  private static final String PREFS_SHOW_FUNCTIONS = "showFunctions";
-  private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
-  //  private static final String PREFS_LIST_STRINGS = "listStrings";
   private static final String PREFS_BLANK_AFTER_RETURN = "blankAfterReturn";
   private static final String PREFS_FORMAT_REM = "formatRem";
-  //  private static final String PREFS_DELETE_EXTRA_REM_SPACE = "deleteExtraRemSpace";
   private static final String PREFS_DELETE_EXTRA_DATA_SPACE = "deleteExtraDataSpace";
+
+  private static final String PREFS_SHOW_GOSUB_GOTO = "showXref";
+  private static final String PREFS_SHOW_CALLS = "showCalls";
+  private static final String PREFS_SHOW_SYMBOLS = "showSymbols";
+  private static final String PREFS_SHOW_FUNCTIONS = "showFunctions";
+  private static final String PREFS_SHOW_CONSTANTS = "showConstants";
+  private static final String PREFS_SHOW_DUPLICATE_SYMBOLS = "showDuplicateSymbols";
 
   private static final String PREFS_SHOW_ASSEMBLER_TARGETS = "showAssemblerTargets";
   private static final String PREFS_SHOW_ASSEMBLER_STRINGS = "showAssemblerStrings";
@@ -400,7 +397,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   // ---------------------------------------------------------------------------------//
   {
     basicPreferences.showHeader = showHeaderItem.isSelected ();
-    basicPreferences.formatApplesoft = showAllFormatItem.isSelected ();
+    basicPreferences.userFormat = showAllFormatItem.isSelected ();
     basicPreferences.showAllXref = showAllXrefItem.isSelected ();
 
     basicPreferences.appleLineWrap = appleLineWrapItem.isSelected ();
@@ -408,29 +405,25 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     basicPreferences.splitRem = splitRemarkItem.isSelected ();
     basicPreferences.splitDim = splitDimItem.isSelected ();
     basicPreferences.alignAssign = alignAssignItem.isSelected ();
-    //    basicPreferences.showTargets = showBasicTargetsItem.isSelected ();
-    //    basicPreferences.onlyShowTargetLineNumbers = onlyShowTargetLinesItem.isSelected ();
     basicPreferences.showCaret = showCaretItem.isSelected ();
     basicPreferences.showThen = showThenItem.isSelected ();
     basicPreferences.blankAfterReturn = blankAfterReturnItem.isSelected ();
     basicPreferences.formatRem = formatRemItem.isSelected ();
-    //    basicPreferences.deleteExtraRemSpace = deleteExtraRemSpace.isSelected ();
     basicPreferences.deleteExtraDataSpace = deleteExtraDataSpace.isSelected ();
 
-    basicPreferences.showXref = showXrefItem.isSelected ();
+    basicPreferences.showGosubGoto = showXrefItem.isSelected ();
     basicPreferences.showCalls = showCallsItem.isSelected ();
     basicPreferences.showSymbols = showSymbolsItem.isSelected ();
     basicPreferences.showFunctions = showFunctionsItem.isSelected ();
     basicPreferences.showConstants = showConstantsItem.isSelected ();
-    //    basicPreferences.listStrings = listStringsItem.isSelected ();
     basicPreferences.showDuplicateSymbols = showDuplicateSymbolsItem.isSelected ();
 
     BasicProgram.setBasicPreferences (basicPreferences);
 
     for (JMenuItem item : applesoftFormatItems)
-      item.setEnabled (basicPreferences.formatApplesoft);
+      item.setEnabled (basicPreferences.userFormat);
 
-    appleLineWrapItem.setEnabled (!basicPreferences.formatApplesoft);
+    appleLineWrapItem.setEnabled (!basicPreferences.userFormat);
 
     for (JMenuItem item : applesoftXrefItems)
       item.setEnabled (basicPreferences.showAllXref);
@@ -590,20 +583,17 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_XREF, showXrefItem.isSelected ());
+    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturnItem.isSelected ());
+    prefs.putBoolean (PREFS_FORMAT_REM, formatRemItem.isSelected ());
+    prefs.putBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, deleteExtraDataSpace.isSelected ());
+
+    prefs.putBoolean (PREFS_SHOW_GOSUB_GOTO, showXrefItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CALLS, showCallsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_SYMBOLS, showSymbolsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_FUNCTIONS, showFunctionsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_CONSTANTS, showConstantsItem.isSelected ());
     prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
         showDuplicateSymbolsItem.isSelected ());
-    //    prefs.putBoolean (PREFS_LIST_STRINGS, listStringsItem.isSelected ());
-    //    prefs.putBoolean (PREFS_SHOW_TARGETS, showBasicTargetsItem.isSelected ());
-    //    prefs.putBoolean (PREFS_ONLY_SHOW_TARGETS, onlyShowTargetLinesItem.isSelected ());
-    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturnItem.isSelected ());
-    prefs.putBoolean (PREFS_FORMAT_REM, formatRemItem.isSelected ());
-    //    prefs.putBoolean (PREFS_DELETE_EXTRA_REM_SPACE, deleteExtraRemSpace.isSelected ());
-    prefs.putBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, deleteExtraDataSpace.isSelected ());
 
     prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
         showAssemblerTargetsItem.isSelected ());
@@ -654,23 +644,18 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     alignAssignItem.setSelected (prefs.getBoolean (PREFS_ALIGN_ASSIGN, true));
     showCaretItem.setSelected (prefs.getBoolean (PREFS_SHOW_CARET, false));
     showThenItem.setSelected (prefs.getBoolean (PREFS_SHOW_THEN, true));
-    showXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_XREF, false));
+    blankAfterReturnItem.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
+    formatRemItem.setSelected (prefs.getBoolean (PREFS_FORMAT_REM, false));
+    deleteExtraDataSpace
+        .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, false));
+
+    showXrefItem.setSelected (prefs.getBoolean (PREFS_SHOW_GOSUB_GOTO, false));
     showCallsItem.setSelected (prefs.getBoolean (PREFS_SHOW_CALLS, false));
     showSymbolsItem.setSelected (prefs.getBoolean (PREFS_SHOW_SYMBOLS, false));
     showFunctionsItem.setSelected (prefs.getBoolean (PREFS_SHOW_FUNCTIONS, false));
     showConstantsItem.setSelected (prefs.getBoolean (PREFS_SHOW_CONSTANTS, false));
     showDuplicateSymbolsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS, false));
-    //    listStringsItem.setSelected (prefs.getBoolean (PREFS_LIST_STRINGS, false));
-    //    showBasicTargetsItem.setSelected (prefs.getBoolean (PREFS_SHOW_TARGETS, false));
-    //    onlyShowTargetLinesItem
-    //        .setSelected (prefs.getBoolean (PREFS_ONLY_SHOW_TARGETS, false));
-    blankAfterReturnItem.setSelected (prefs.getBoolean (PREFS_BLANK_AFTER_RETURN, false));
-    formatRemItem.setSelected (prefs.getBoolean (PREFS_FORMAT_REM, false));
-    //    deleteExtraRemSpace
-    //        .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_REM_SPACE, false));
-    deleteExtraDataSpace
-        .setSelected (prefs.getBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, false));
 
     showAssemblerTargetsItem
         .setSelected (prefs.getBoolean (PREFS_SHOW_ASSEMBLER_TARGETS, true));

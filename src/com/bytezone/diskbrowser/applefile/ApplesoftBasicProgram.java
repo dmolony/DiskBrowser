@@ -60,7 +60,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
       return text.toString ();
     }
 
-    if (basicPreferences.formatApplesoft)
+    if (basicPreferences.userFormat)
       userBasicFormatter.format (text);
     else
       appleBasicFormatter.format (text);

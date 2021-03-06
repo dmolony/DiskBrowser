@@ -5,23 +5,26 @@ public class BasicPreferences
 // -----------------------------------------------------------------------------------//
 {
   public boolean showHeader = true;
-  public boolean formatApplesoft = true;
+  public boolean userFormat = true;
   public boolean showAllXref = true;
+
   public boolean appleLineWrap = false;
+
   public boolean splitRem = false;
+  public boolean splitDim = false;
   public boolean alignAssign = true;
   public boolean showCaret = false;
   public boolean showThen = true;
   public boolean blankAfterReturn = false;
   public boolean formatRem = false;
   public boolean deleteExtraDataSpace = false;
-  public boolean showXref = false;
+
+  public boolean showGosubGoto = false;
   public boolean showCalls = false;
   public boolean showSymbols = false;
-  public boolean showConstants = false;
   public boolean showFunctions = false;
+  public boolean showConstants = false;
   public boolean showDuplicateSymbols = false;
-  public boolean splitDim = false;
 
   public int wrapPrintAt = 0;
   public int wrapRemAt = 80;
@@ -37,12 +40,12 @@ public class BasicPreferences
     text.append (String.format ("Split REM ................ %s%n", splitRem));
     text.append (String.format ("Align assign ............. %s%n", alignAssign));
     text.append (String.format ("Show header .............. %s%n", showHeader));
-    text.append (String.format ("Format applesoft ......... %s%n", formatApplesoft));
+    text.append (String.format ("User format .............. %s%n", userFormat));
     text.append (String.format ("Show All Xref ............ %s%n", showAllXref));
     text.append (String.format ("Apple line wrap .......... %s%n", appleLineWrap));
     text.append (String.format ("Show caret ............... %s%n", showCaret));
     text.append (String.format ("Show THEN ................ %s%n", showThen));
-    text.append (String.format ("Show GOTO/GOSUB .......... %s%n", showXref));
+    text.append (String.format ("Show GOTO/GOSUB .......... %s%n", showGosubGoto));
     text.append (String.format ("Show CALL ................ %s%n", showCalls));
     text.append (String.format ("Show symbols ............. %s%n", showSymbols));
     text.append (String.format ("Show constants ........... %s%n", showConstants));

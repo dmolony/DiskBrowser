@@ -134,7 +134,7 @@ public class XrefFormatter extends BasicFormatter
       }
     }
 
-    if (basicPreferences.showXref)
+    if (basicPreferences.showGosubGoto)
     {
       if (!gosubLines.isEmpty ())
         showSymbolsRight (fullText, gosubLines, "GOSUB");

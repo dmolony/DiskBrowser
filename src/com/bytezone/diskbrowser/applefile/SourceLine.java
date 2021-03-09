@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.applefile;
 
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_COLON;
+import static com.bytezone.diskbrowser.utilities.Utility.ASCII_QUOTE;
 import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class SourceLine implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
-  ApplesoftBasicProgram parent;
+  ApplesoftBasicProgram program;
   int linkField;
   int lineNumber;
   int linePtr;
@@ -21,17 +23,17 @@ public class SourceLine implements ApplesoftConstants
   List<SubLine> sublines = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  SourceLine (ApplesoftBasicProgram parent, byte[] buffer, int ptr)
+  SourceLine (ApplesoftBasicProgram program, byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    this.parent = parent;
+    this.program = program;
     this.buffer = buffer;
 
     linePtr = ptr;
     linkField = unsignedShort (buffer, ptr);
     lineNumber = unsignedShort (buffer, ptr + 2);
 
-    int startPtr = ptr += 4;              // skip link to next line and lineNumber
+    int startPtr = ptr += 4;              // skip link field and lineNumber
     boolean inString = false;             // can toggle
     boolean inRemark = false;             // can only go false -> true
     byte b;
@@ -43,7 +45,7 @@ public class SourceLine implements ApplesoftConstants
 
       if (inString)
       {
-        if (b == Utility.ASCII_QUOTE)           // terminate string
+        if (b == ASCII_QUOTE)             // terminate string
           inString = false;
         continue;
       }
@@ -51,36 +53,28 @@ public class SourceLine implements ApplesoftConstants
       switch (b)
       {
         // break IF statements into two sublines (allows for easier line indenting)
-        case ApplesoftConstants.TOKEN_IF:
-          // skip to THEN or GOTO - if not found then it's an error
+        case TOKEN_IF:
           while (buffer[ptr] != TOKEN_THEN && buffer[ptr] != TOKEN_GOTO
               && buffer[ptr] != 0)
             ptr++;
 
-          // keep THEN with the IF
-          if (buffer[ptr] == TOKEN_THEN)
+          if (buffer[ptr] == TOKEN_THEN)          // keep THEN with the IF
             ++ptr;
 
-          // create subline from the condition (plus THEN if it exists)
-          sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-          startPtr = ptr;
+          startPtr = addSubLine (startPtr, ptr);  // create subline from the condition 
           break;
 
-        // end of subline, so add it, advance startPtr and continue
-        case Utility.ASCII_COLON:
-          sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-          startPtr = ptr;
+        case ASCII_COLON:                         // end of subline
+          startPtr = addSubLine (startPtr, ptr);
           break;
 
         case TOKEN_REM:
-          if (ptr == startPtr + 1)
+          if (ptr == startPtr + 1)                // at start of line
             inRemark = true;
-          else
-          {     // REM appears mid-line (should follow a colon)
-            System.out.printf ("%5d %s%n", lineNumber, "mid-line REM token");
-            ptr--;            // point back to this REM
-            sublines.add (new SubLine (this, startPtr, ptr - startPtr));
-            startPtr = ptr;
+          else                                    //  mid-line - should be illegal
+          {
+            System.out.printf ("%s : %5d mid-line REM token%n", program.name, lineNumber);
+            startPtr = addSubLine (startPtr, --ptr);    // point back to the REM
           }
           break;
 
@@ -92,9 +86,14 @@ public class SourceLine implements ApplesoftConstants
 
     length = ptr - linePtr;
 
-    // add whatever is left after the last colon
-    // if no colon was found this is the entire line
-    int bytesLeft = ptr - startPtr;
-    sublines.add (new SubLine (this, startPtr, bytesLeft));
+    addSubLine (startPtr, ptr);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int addSubLine (int startPtr, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    sublines.add (new SubLine (this, startPtr, ptr - startPtr));
+    return ptr;
   }
 }

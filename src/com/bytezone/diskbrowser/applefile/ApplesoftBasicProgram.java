@@ -46,11 +46,11 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     StringBuilder text = new StringBuilder ();
 
     if (basicPreferences.showHeader)
-      headerFormatter.format (text);
+      headerFormatter.append (text);
 
     if (showDebugText)
     {
-      debugBasicFormatter.format (text);
+      debugBasicFormatter.append (text);
       return Utility.rtrim (text);
     }
 
@@ -61,12 +61,12 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
     }
 
     if (basicPreferences.userFormat)
-      userBasicFormatter.format (text);
+      userBasicFormatter.append (text);
     else
-      appleBasicFormatter.format (text);
+      appleBasicFormatter.append (text);
 
     if (basicPreferences.showAllXref)
-      xrefFormatter.format (text);
+      xrefFormatter.append (text);
 
     return Utility.rtrim (text);
   }

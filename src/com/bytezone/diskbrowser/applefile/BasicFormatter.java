@@ -28,7 +28,7 @@ public abstract class BasicFormatter implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  public abstract void format (StringBuilder fullText);
+  public abstract void append (StringBuilder fullText);
   // ---------------------------------------------------------------------------------//
 
   // ---------------------------------------------------------------------------------//

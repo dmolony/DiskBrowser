@@ -32,7 +32,7 @@ public class UserBasicFormatter extends BasicFormatter
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void format (StringBuilder fullText)
+  public void append (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     boolean insertBlankLine = false;
@@ -254,7 +254,7 @@ public class UserBasicFormatter extends BasicFormatter
     boolean started = false;
     alignment.setFirst (startSubline);
 
-    outerLoop: for (int i = sourceLines.indexOf (startSubline.parent); i < sourceLines
+    outerLoop: for (int i = sourceLines.indexOf (startSubline.sourceLine); i < sourceLines
         .size (); i++)
     {
       boolean precededByIf = false;

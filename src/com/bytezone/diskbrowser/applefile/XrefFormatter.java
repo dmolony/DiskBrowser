@@ -93,7 +93,7 @@ public class XrefFormatter extends BasicFormatter
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void format (StringBuilder fullText)
+  public void append (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     if (basicPreferences.showSymbols)

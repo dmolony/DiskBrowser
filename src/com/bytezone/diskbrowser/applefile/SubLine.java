@@ -27,7 +27,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;;
 public class SubLine implements ApplesoftConstants
 // -----------------------------------------------------------------------------------//
 {
-  SourceLine parent;
+  SourceLine sourceLine;
 
   byte[] buffer;
   int startPtr;
@@ -57,13 +57,13 @@ public class SubLine implements ApplesoftConstants
   private final List<String> stringsText = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  SubLine (SourceLine parent, int startPtr, int length)
+  SubLine (SourceLine sourceLine, int offset, int length)
   // ---------------------------------------------------------------------------------//
   {
-    this.parent = parent;
-    this.startPtr = startPtr;
+    this.sourceLine = sourceLine;
+    this.startPtr = offset;
     this.length = length;
-    this.buffer = parent.buffer;
+    this.buffer = sourceLine.buffer;
 
     int ptr = startPtr;
     byte firstByte = buffer[startPtr];
@@ -91,8 +91,9 @@ public class SubLine implements ApplesoftConstants
       else if (isEndOfLine (firstByte))          // empty subline
         return;
       else                                       // probably Beagle Bros 0D or 0A
-        System.out.printf ("%s unexpected bytes at line %5d:%n%s%n", parent.parent.name,
-            parent.lineNumber, HexFormatter.formatNoHeader (buffer, startPtr, length));
+        System.out.printf ("%s unexpected bytes at line %5d:%n%s%n",
+            sourceLine.program.name, sourceLine.lineNumber,
+            HexFormatter.formatNoHeader (buffer, startPtr, length));
     }
 
     String var = "";
@@ -102,11 +103,11 @@ public class SubLine implements ApplesoftConstants
     boolean inDefine = false;
     int stringPtr = 0;
 
-    int max = startPtr + length - 1;
-    while (isEndOfLine (buffer[max]))
-      --max;
+    int endOfLine = startPtr + length - 1;
+    while (isEndOfLine (buffer[endOfLine]))         // zero or colon
+      --endOfLine;
 
-    while (ptr <= max)
+    while (ptr <= endOfLine)
     {
       byte b = buffer[ptr++];
 
@@ -484,7 +485,7 @@ public class SubLine implements ApplesoftConstants
   boolean isFirst ()
   // ---------------------------------------------------------------------------------//
   {
-    return (parent.linePtr + 4) == startPtr;
+    return (sourceLine.linePtr + 4) == startPtr;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -564,7 +565,7 @@ public class SubLine implements ApplesoftConstants
       {
         // apple format uses left-justified line numbers so the length varies
         text.setLength (0);
-        text.append (String.format (" %d  REM ", parent.lineNumber));   // mimic apple
+        text.append (String.format (" %d  REM ", sourceLine.lineNumber));   // mimic apple
       }
       else
         text.append ("  REM ");

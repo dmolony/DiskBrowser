@@ -16,7 +16,7 @@ public class HeaderFormatter extends BasicFormatter
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void format (StringBuilder fullText)
+  public void append (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     fullText.append ("Name    : " + program.name + "\n");

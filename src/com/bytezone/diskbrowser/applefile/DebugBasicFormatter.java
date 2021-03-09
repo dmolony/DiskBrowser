@@ -26,7 +26,7 @@ public class DebugBasicFormatter extends BasicFormatter
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void format (StringBuilder text)
+  public void append (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
     int loadAddress = getLoadAddress ();

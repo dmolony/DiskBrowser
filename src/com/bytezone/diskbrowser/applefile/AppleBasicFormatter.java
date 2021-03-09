@@ -26,7 +26,7 @@ public class AppleBasicFormatter extends BasicFormatter
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void format (StringBuilder fullText)
+  public void append (StringBuilder fullText)
   // ---------------------------------------------------------------------------------//
   {
     int loadAddress = getLoadAddress ();
@@ -42,26 +42,22 @@ public class AppleBasicFormatter extends BasicFormatter
       ptr += 4;
 
       if (basicPreferences.appleLineWrap)
-        ptr = appendWithWrap (currentLine, ptr);
+        ptr = wrapLine (currentLine, ptr);
       else
-        ptr = appendWithOutWrap (currentLine, ptr);
+        ptr = flatLine (currentLine, ptr);
 
       if (ptr != (linkField - loadAddress))
-      {
         System.out.printf ("%s: ptr: %04X, nextLine: %04X%n", program.name,
             ptr + loadAddress, linkField);
-        //        ptr = linkField - loadAddress;      // use this when tested
-      }
 
       currentLine.append (NEWLINE);
-
       fullText.append (currentLine);
       currentLine.setLength (0);
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private int appendWithOutWrap (StringBuilder currentLine, int ptr)
+  private int flatLine (StringBuilder currentLine, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     byte b;
@@ -99,11 +95,11 @@ public class AppleBasicFormatter extends BasicFormatter
   }
 
   // ---------------------------------------------------------------------------------//
-  private int appendWithWrap (StringBuilder currentLine, int ptr)
+  private int wrapLine (StringBuilder currentLine, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     byte b;
-    int cursor = currentLine.length ();       // controls when to wrap
+    int cursor = currentLine.length ();
 
     while ((b = buffer[ptr++]) != 0)
       if (isHighBitSet (b))

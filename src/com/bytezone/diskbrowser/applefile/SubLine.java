@@ -37,7 +37,7 @@ public class SubLine implements ApplesoftConstants
   String forVariable = "";
 
   int equalsPosition;             // used for aligning the equals sign
-  int endPosition;                // not sure yet
+  int endPosition;                // not sure yet - possibly for aligning REMs
 
   String functionArgument;
   String functionName;

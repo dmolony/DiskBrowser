@@ -51,18 +51,17 @@ public class BasicTextFile extends TextFile
   public String getHexDump ()
   // ---------------------------------------------------------------------------------//
   {
-    if (buffers == null)
+    if (buffers == null || recordLength <= 1)
       return (super.getHexDump ());
 
     StringBuilder text = new StringBuilder ();
     for (TextBuffer tb : buffers)
-    {
       for (int i = 0, rec = 0; i < tb.buffer.length; i += tb.reclen, rec++)
       {
         text.append ("\nRecord #" + (tb.firstRecNo + rec) + "\n");
         text.append (HexFormatter.format (tb.buffer, i, tb.reclen) + "\n");
       }
-    }
+
     return text.toString ();
   }
 
@@ -89,13 +88,13 @@ public class BasicTextFile extends TextFile
 
     // check whether file is spread over multiple buffers
     if (buffers != null)
-      return treeFileText (text);       // calls knownLength()
+      return treeFileText (text);       // usually calls knownLength()
 
     // check whether the record length is known
-    if (recordLength == 0)
-      return unknownLength (text);
+    if (recordLength <= 0)
+      return unknownLength (text).toString ();
 
-    if (textPreferences.showTextOffsets)
+    if (textPreferences.showTextOffsets && recordLength > 1)
     {
       text.append ("    Offset  Record#  Text values\n");
       text.append (fullUnderline);
@@ -105,6 +104,7 @@ public class BasicTextFile extends TextFile
       text.append ("Text values\n");
       text.append (underline);
     }
+
     return knownLength (text, 0).toString ();
   }
 
@@ -112,6 +112,16 @@ public class BasicTextFile extends TextFile
   private String treeFileText (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
+    if (recordLength == 1)      // stupid length
+    {
+      for (TextBuffer textBuffer : buffers)
+      {
+        buffer = textBuffer.buffer;
+        text = unknownLength (text);
+      }
+      return text.toString ();
+    }
+
     if (textPreferences.showTextOffsets)
     {
       text.append ("    Offset  Record#  Text values\n");
@@ -123,10 +133,10 @@ public class BasicTextFile extends TextFile
       text.append (underline);
     }
 
-    for (TextBuffer tb : buffers)
+    for (TextBuffer textBuffer : buffers)
     {
-      buffer = tb.buffer;
-      text = knownLength (text, tb.firstRecNo);
+      buffer = textBuffer.buffer;
+      text = knownLength (text, textBuffer.firstRecNo);
     }
     return text.toString ();
   }
@@ -144,7 +154,7 @@ public class BasicTextFile extends TextFile
       }
 
       int len = buffer.length - ptr;
-      int bytes = len < recordLength ? len : recordLength;
+      int bytes = Math.min (len, recordLength);
 
       while (buffer[ptr + bytes - 1] == 0)
         bytes--;
@@ -170,7 +180,7 @@ public class BasicTextFile extends TextFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private String unknownLength (StringBuilder text)
+  private StringBuilder unknownLength (StringBuilder text)
   // ---------------------------------------------------------------------------------//
   {
     int nulls = 0;
@@ -188,8 +198,9 @@ public class BasicTextFile extends TextFile
       text.append (" Text values\n");
       text.append (underline);
     }
+
     if (buffer.length == 0)
-      return text.toString ();
+      return text;
 
     if (buffer[0] != 0 && textPreferences.showTextOffsets)
       text.append (String.format ("%,10d  ", ptr));
@@ -227,7 +238,7 @@ public class BasicTextFile extends TextFile
     else if (text.length () > 0 && text.charAt (text.length () - 1) == '\n')
       text.deleteCharAt (text.length () - 1);
 
-    return text.toString ();
+    return text;
   }
 
   // ---------------------------------------------------------------------------------//

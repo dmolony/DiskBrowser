@@ -46,6 +46,7 @@ public class TextBuffer
     StringBuilder text = new StringBuilder ();
 
     text.append ("Record length : " + reclen + "\n");
+    text.append ("Buffer length : " + buffer.length + "\n");
     text.append ("First record  : " + firstRecNo + "\n\n");
     text.append (HexFormatter.format (buffer, 0, buffer.length) + "\n");
 

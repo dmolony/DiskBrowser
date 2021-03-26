@@ -14,6 +14,7 @@ import com.bytezone.diskbrowser.applefile.ErrorMessageFile;
 import com.bytezone.diskbrowser.applefile.FontFile;
 import com.bytezone.diskbrowser.applefile.HiResImage;
 import com.bytezone.diskbrowser.applefile.IntegerBasicProgram;
+import com.bytezone.diskbrowser.applefile.MagicWindowText;
 import com.bytezone.diskbrowser.applefile.MerlinSource;
 import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PrintShopGraphic;
@@ -271,6 +272,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
               || name.endsWith (".SET") || name.startsWith ("ASCII."))
               && FontFile.isFont (exactBuffer))
             appleFile = new FontFile (name, exactBuffer, loadAddress);
+          else if (name.endsWith (".MW"))
+            appleFile = new MagicWindowText (name, exactBuffer);
           else if (ShapeTable.isShapeTable (exactBuffer))
             appleFile = new ShapeTable (name, exactBuffer);
           else if (name.endsWith (".S"))

@@ -86,8 +86,6 @@ public class DebugBasicFormatter extends BasicFormatter
         text.append (assemblerProgram.getText ());
       }
     }
-
-    //    return Utility.rtrim (text);
   }
 
   // ---------------------------------------------------------------------------------//

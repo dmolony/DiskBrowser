@@ -301,23 +301,13 @@ public abstract class HiResImage extends AbstractFile
         break;
 
       case ProdosConstants.FILE_TYPE_PIC:           // 0xC1
-        switch (auxType)
+        auxText = switch (auxType)
         {
-          case 0:
-          case 0x2000:
-          case 0x0042:
-          case 0x0043:
-            auxText = "Super Hi-res Screen Image";
-            break;
-          case 1:
-            auxText = "QuickDraw PICT File";
-            break;
-          case 2:
-            auxText = "Super Hi-Res 3200 color image";
-            break;
-          default:
-            auxText = "Unknown aux: " + auxType;
-        }
+          case 0, 0x2000, 0x0042, 0x0043 -> "Super Hi-res Screen Image";
+          case 1 -> "QuickDraw PICT File";
+          case 2 -> "Super Hi-Res 3200 color image";
+          default -> "Unknown aux: " + auxType;
+        };
     }
 
     if (!auxText.isEmpty ())

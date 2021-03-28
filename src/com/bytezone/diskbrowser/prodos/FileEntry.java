@@ -289,7 +289,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             file = new Selector (name, exactBuffer);
             break;
           }
-          // drop through
+
+          // drop through !!
+
         case FILE_TYPE_BINARY:
         case FILE_TYPE_RELOCATABLE:
         case FILE_TYPE_SYS:

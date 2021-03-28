@@ -1,5 +1,14 @@
 package com.bytezone.diskbrowser.dos;
 
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.AA;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.ApplesoftBasic;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.BB;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.Binary;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.IntegerBasic;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.Relocatable;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.SS;
+import static com.bytezone.diskbrowser.dos.DosDisk.FileType.Text;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,34 +72,25 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     int type = entryBuffer[2] & 0x7F;
     locked = (entryBuffer[2] & 0x80) != 0;
 
-    if (type == 0)
-      fileType = FileType.Text;
-    else if ((type == 0x01))
-      fileType = FileType.IntegerBasic;
-    else if ((type == 0x02))
-      fileType = FileType.ApplesoftBasic;
-    else if ((type < 0x08))
-      fileType = FileType.Binary;
-    else if ((type < 0x10))
-      fileType = FileType.SS;
-    else if ((type < 0x20))
-      fileType = FileType.Relocatable;
-    else if ((type < 0x40))
-      fileType = FileType.AA;
-    //    else if ((type == 0x40))          // Lisa
-    else
-      fileType = FileType.Binary;
-    //    else
-    //    {
-    //      System.out.println ("Unknown file type : " + type);
-    //    }
+    fileType = switch (type)
+    {
+      case 0x00 -> Text;
+      case 0x01 -> IntegerBasic;
+      case 0x02 -> ApplesoftBasic;
+      case 0x04 -> Binary;
+      case 0x08 -> SS;
+      case 0x10 -> Relocatable;
+      case 0x20 -> AA;
+      case 0x40 -> BB;
+      default -> Binary;        // should never happen
+    };
 
     if (dosDisk.getVersion () >= 0x41)
       lastModified = Utility.getDateTime (entryBuffer, 0x1B);
 
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
-    String base = String.format ("%s%s %03d ", (locked) ? "*" : " ", getFileType (),
-        reportedSize % 1000);
+    String base = String.format ("%s%s %03d ", locked ? "*" : " ", getFileType (),
+        reportedSize & 0xFF);
     catalogName = getName (base, entryBuffer);
     displayName = getDisplayName (entryBuffer);
   }

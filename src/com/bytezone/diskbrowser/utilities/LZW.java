@@ -125,7 +125,7 @@ class LZW
   }
 
   // ---------------------------------------------------------------------------------//
-  protected int width (int maximumValue)
+  int width (int maximumValue)
   // ---------------------------------------------------------------------------------//
   {
     return 32 - Integer.numberOfLeadingZeros (maximumValue);

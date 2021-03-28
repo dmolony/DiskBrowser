@@ -32,9 +32,11 @@ public class FontFile extends CharacterList
   {
     if (buffer.length % 8 != 0)
       return false;
+
     for (int i = 0; i < 8; i++)
       if (buffer[i] != 0 && buffer[i] != 0x7F)
         return false;
+
     return true;
   }
 

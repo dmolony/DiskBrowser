@@ -77,21 +77,14 @@ public class Selector extends AbstractFile
       labelLength = buffer[ptr] & 0xFF;
       label = new String (buffer, ptr + 1, labelLength);
       copyFlags = buffer[ptr + 15];
-      switch (copyFlags & 0xFF)
+
+      copyText = switch (copyFlags & 0xFF)
       {
-        case 0:
-          copyText = "First boot";
-          break;
-        case 0x80:
-          copyText = "First use";
-          break;
-        case 0xC0:
-          copyText = "Never";
-          break;
-        default:
-          copyText = "Unknown";
-          break;
-      }
+        case 0x00 -> "First boot";
+        case 0x80 -> "First use";
+        case 0xC0 -> "Never";
+        default -> "Unknown";
+      };
     }
   }
 

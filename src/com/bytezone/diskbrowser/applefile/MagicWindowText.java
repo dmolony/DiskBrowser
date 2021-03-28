@@ -12,6 +12,7 @@ public class MagicWindowText extends AbstractFile
     super (name, buffer);
   }
 
+  // this was copied from SimpleText, should probably combine them
   // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()

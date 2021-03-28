@@ -46,7 +46,7 @@ public class DosDisk extends AbstractFormattedDisk
 
   enum FileType
   {
-    Text, ApplesoftBasic, IntegerBasic, Binary, Relocatable, SS, AA, BB
+    Text, ApplesoftBasic, IntegerBasic, Binary, SS, Relocatable, AA, BB
   }
 
   // ---------------------------------------------------------------------------------//

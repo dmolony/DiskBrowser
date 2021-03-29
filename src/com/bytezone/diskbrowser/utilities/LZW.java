@@ -118,7 +118,7 @@ class LZW
     for (byte[] track : chunks)
       System.arraycopy (track, 0, buffer, trackNumber++ * TRACK_LENGTH, TRACK_LENGTH);
 
-    if (crc != NuFX.getCRC (buffer, crcBase))
+    if (crc != Utility.getCRC (buffer, crcBase))
       System.out.println ("\n*** LZW CRC mismatch ***");
 
     return buffer;

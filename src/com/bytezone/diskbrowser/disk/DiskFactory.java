@@ -152,7 +152,7 @@ public class DiskFactory
         System.out.println (" ** sdk **");
       try
       {
-        NuFX nuFX = new NuFX (file);
+        NuFX nuFX = new NuFX (file.toPath ());
         File tmp = File.createTempFile ("sdk", null);
         FileOutputStream fos = new FileOutputStream (tmp);
         fos.write (nuFX.getBuffer ());

@@ -40,6 +40,7 @@ class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
     JFileChooser fileChooser = new JFileChooser ();
     fileChooser.setDialogTitle ("Save sectors");
     fileChooser.setSelectedFile (new File ("saved-" + buffer.length + ".bin"));
+
     if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
     {
       File file = fileChooser.getSelectedFile ();

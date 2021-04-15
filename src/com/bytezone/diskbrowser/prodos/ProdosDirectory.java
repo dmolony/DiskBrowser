@@ -43,7 +43,7 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
   {
     StringBuffer text = new StringBuffer ();
     text.append ("Disk : " + parentFD.getDisplayPath () + newLine2);
-    for (int i = 0; i < buffer.length; i += 39)
+    for (int i = 0; i < buffer.length; i += ENTRY_SIZE)
     {
       int storageType = (buffer[i] & 0xF0) >> 4;
       if (storageType == 0)
@@ -56,20 +56,21 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
 
       switch (storageType)
       {
-        case ProdosConstants.VOLUME_HEADER:
-        case ProdosConstants.SUBDIRECTORY_HEADER:
-          text.append ("/" + filename + newLine2);
+        case VOLUME_HEADER:
+        case SUBDIRECTORY_HEADER:
+          String root = storageType == VOLUME_HEADER ? "/" : "";
+          text.append (root + filename + newLine2);
           text.append (" NAME           TYPE  BLOCKS  "
               + "MODIFIED         CREATED          ENDFILE SUBTYPE" + newLine2);
           break;
 
-        case ProdosConstants.FREE:
-        case ProdosConstants.SEEDLING:
-        case ProdosConstants.SAPLING:
-        case ProdosConstants.TREE:
-        case ProdosConstants.PASCAL_ON_PROFILE:
-        case ProdosConstants.GSOS_EXTENDED_FILE:
-        case ProdosConstants.SUBDIRECTORY:
+        case FREE:
+        case SEEDLING:
+        case SAPLING:
+        case TREE:
+        case PASCAL_ON_PROFILE:
+        case GSOS_EXTENDED_FILE:
+        case SUBDIRECTORY:
           int type = buffer[i + 16] & 0xFF;
           int blocks = Utility.intValue (buffer[i + 19], buffer[i + 20]);
 

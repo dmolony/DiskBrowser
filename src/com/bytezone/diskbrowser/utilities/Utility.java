@@ -34,7 +34,7 @@ public class Utility
   public static final byte ASCII_CARET = 0x5E;
 
   public static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
-      "2mg", "v2d", "d13", "sdk", "woz", "img", "dimg");
+      "2mg", "v2d", "d13", "sdk", "shk", "woz", "img", "dimg");
 
   // ---------------------------------------------------------------------------------//
   public static boolean test (Graphics2D g)
@@ -179,6 +179,25 @@ public class Utility
       val |= buffer[ptr + i] & 0xFF;
     }
     return val;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static String matchFlags (int flag, String[] chars)
+  // ---------------------------------------------------------------------------------//
+  {
+    int weight = (int) Math.pow (2, chars.length - 1);
+    StringBuilder text = new StringBuilder ();
+
+    for (int i = 0; i < chars.length; i++)
+    {
+      if ((flag & weight) != 0)
+        text.append (chars[i]);
+      else
+        text.append (".");
+      weight >>>= 1;
+    }
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -342,6 +361,17 @@ public class Utility
   }
 
   // ---------------------------------------------------------------------------------//
+  static boolean isMagic (byte[] buffer, int ptr, byte[] magic)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = 0; i < magic.length; i++)
+      if (buffer[ptr + i] != magic[i])
+        return false;
+
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------------//
   public static long getChecksumValue (File file)
   // ---------------------------------------------------------------------------------//
   {
@@ -366,10 +396,10 @@ public class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  protected static int getCRC (final byte[] buffer, int base)
+  protected static int getCRC (final byte[] buffer, int initialValue)
   // ---------------------------------------------------------------------------------//
   {
-    int crc = base;
+    int crc = initialValue;
     for (int j = 0; j < buffer.length; j++)
     {
       crc = ((crc >>> 8) | (crc << 8)) & 0xFFFF;
@@ -380,6 +410,7 @@ public class Utility
     }
 
     crc &= 0xFFFF;
+
     return crc;
   }
 

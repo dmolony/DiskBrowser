@@ -1,14 +1,26 @@
 package com.bytezone.diskbrowser.utilities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.bytezone.diskbrowser.prodos.ProdosConstants;
+
 // -----------------------------------------------------------------------------------//
 class Record
 // -----------------------------------------------------------------------------------//
 {
+  private static final byte[] NuFX = { 0x4E, (byte) 0xF5, 0x46, (byte) 0xD8 };
   private static String[] fileSystems =
       { "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
         "Macintosh MFS", "Lisa File System", "Apple CP/M", "", "MS-DOS", "High Sierra",
         "ISO 9660", "AppleShare" };
 
+  private static String[] storage = { "", "Seedling", "Sapling", "Tree", "", "Extended",
+                                      "", "", "", "", "", "", "", "Subdirectory" };
+
+  private static String[] accessChars = { "D", "R", "B", "", "", "I", "W", "R" };
+
+  //  private final BlockHeader blockHeader;
   private final int totThreads;
   private final int crc;
   private final char separator;
@@ -26,13 +38,18 @@ class Record
   private final int fileNameLength;
   private final String fileName;
 
+  final List<Thread> threads = new ArrayList<> ();
+
   // ---------------------------------------------------------------------------------//
   public Record (byte[] buffer, int dataPtr) throws FileFormatException
   // ---------------------------------------------------------------------------------//
   {
     // check for NuFX
-    if (!isNuFX (buffer, dataPtr))
+    if (!Utility.isMagic (buffer, dataPtr, NuFX))
       throw new FileFormatException ("NuFX not found");
+
+    //    blockHeader = new BlockHeader (buffer, dataPtr);
+    //    System.out.println (blockHeader);
 
     crc = Utility.getWord (buffer, dataPtr + 4);
     attributes = Utility.getWord (buffer, dataPtr + 6);
@@ -73,14 +90,14 @@ class Record
   }
 
   // ---------------------------------------------------------------------------------//
-  private boolean isNuFX (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (buffer[ptr] == 0x4E && buffer[ptr + 1] == (byte) 0xF5 && buffer[ptr + 2] == 0x46
-        && buffer[ptr + 3] == (byte) 0xD8)
-      return true;
-    return false;
-  }
+  //  private boolean isNuFX (byte[] buffer, int ptr)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    if (buffer[ptr] == 0x4E && buffer[ptr + 1] == (byte) 0xF5 && buffer[ptr + 2] == 0x46
+  //        && buffer[ptr + 3] == (byte) 0xD8)
+  //      return true;
+  //    return false;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   int getAttributes ()
@@ -104,11 +121,88 @@ class Record
   }
 
   // ---------------------------------------------------------------------------------//
+  boolean hasDisk ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasDisk ())
+        return true;
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  boolean hasFile ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFile ())
+        return true;
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  boolean hasFile (String fileName)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFile (fileName))
+        return true;
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  String getFileName ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFileName ())
+        return thread.getFileName ();
+
+    return "";
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getFileType ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return fileType;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getFileSize ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFile ())
+        return thread.getFileSize ();
+
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getUncompressedSize ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFile ())
+        return thread.getUncompressedEOF ();
+
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
+
+    String bits = "00000000" + Integer.toBinaryString (access & 0xFF);
+    bits = bits.substring (bits.length () - 8);
+    String decode = Utility.matchFlags (access, accessChars);
 
     text.append (String.format ("Header CRC ..... %,d  (%04X)%n", crc, crc));
     text.append (String.format ("Attributes ..... %d%n", attributes));
@@ -117,10 +211,21 @@ class Record
     text.append (String.format ("File sys id .... %d (%s)%n", fileSystemID,
         fileSystems[fileSystemID]));
     text.append (String.format ("Separator ...... %s%n", separator));
-    text.append (String.format ("Access ......... %,d%n", access));
-    text.append (String.format ("File type ...... %,d%n", fileType));
-    text.append (String.format ("Aux type ....... %,d%n", auxType));
-    text.append (String.format ("Stor type ...... %,d%n", storType));
+    text.append (String.format ("Access ......... %s  %s%n", bits, decode));
+    if (storType < 16)
+    {
+      text.append (String.format ("File type ...... %,d  %s%n", fileType,
+          ProdosConstants.fileTypes[fileType]));
+      text.append (String.format ("Aux type ....... %,d%n", auxType));
+      text.append (
+          String.format ("Stor type ...... %,d  %s%n", storType, storage[storType]));
+    }
+    else
+    {
+      text.append (String.format ("Zero ........... %,d%n", fileType));
+      text.append (String.format ("Total blocks ... %,d%n", auxType));
+      text.append (String.format ("Block size ..... %,d%n", storType));
+    }
     text.append (String.format ("Created ........ %s%n", created.format ()));
     text.append (String.format ("Modified ....... %s%n", modified.format ()));
     text.append (String.format ("Archived ....... %s%n", archived.format ()));

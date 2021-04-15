@@ -46,10 +46,10 @@ public class DiskFactory
   }
 
   // ---------------------------------------------------------------------------------//
-  public static FormattedDisk createDisk (String path)
+  public static FormattedDisk createDisk (String pathName)
   // ---------------------------------------------------------------------------------//
   {
-    FormattedDisk disk = create (path);
+    FormattedDisk disk = create (pathName);
     //    if (disk.getDisk ().getInterleave () > 0)
     //    {
     //      System.out.println (disk);
@@ -146,21 +146,48 @@ public class DiskFactory
       }
     }
 
-    if (suffix.equals ("sdk"))
+    if ("sdk".equals (suffix))                // shrinkit disk archive
     {
       if (debug)
         System.out.println (" ** sdk **");
       try
       {
         NuFX nuFX = new NuFX (file.toPath ());
-        File tmp = File.createTempFile ("sdk", null);
+        int totalDisks = nuFX.getTotalDisks ();
+        if (totalDisks == 0)
+          return null;
+        File tmp = File.createTempFile (suffix, null);
         FileOutputStream fos = new FileOutputStream (tmp);
-        fos.write (nuFX.getBuffer ());
+        fos.write (nuFX.getDiskBuffer ());
         fos.close ();
         tmp.deleteOnExit ();
         file = tmp;
         suffix = "dsk";
         compressed = true;
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace ();
+        return null;
+      }
+      catch (FileFormatException e)
+      {
+        return null;
+      }
+    }
+    else if ("shk".equals (suffix))           // shrinkit file archive
+    {
+      if (debug)
+        System.out.println (" ** shk **");
+
+      try
+      {
+        NuFX nuFX = new NuFX (file.toPath ());
+        int totalFiles = nuFX.getTotalFiles ();
+        //        System.out.printf ("Total files: %d%n", totalFiles);
+        if (totalFiles == 0)
+          return null;
+        nuFX.getDiskBuffer ();
       }
       catch (IOException e)
       {

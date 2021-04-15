@@ -138,7 +138,7 @@ public class ProdosDisk extends AbstractFormattedDisk
               sectorTypes[block] = currentSectorType;
             for (int i = 0; i < volumeDirectoryHeader.totalBitMapBlocks; i++)
               sectorTypes[volumeDirectoryHeader.bitMapBlock + i] = volumeMapSector;
-            parentNode.setUserObject (volumeDirectoryHeader);         // populate the empty volume node
+            parentNode.setUserObject (volumeDirectoryHeader); // populate the empty volume node
             localHeader = volumeDirectoryHeader;
             break;
 

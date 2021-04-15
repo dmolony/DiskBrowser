@@ -1,26 +1,32 @@
 package com.bytezone.diskbrowser.utilities;
 
 // -----------------------------------------------------------------------------------//
-class Header
+class MasterHeader
 // -----------------------------------------------------------------------------------//
 {
-  private final int totalRecords;
-  private final int version;
-  private final int eof;
+  private static final byte[] NuFile =
+      { 0x4E, (byte) 0xF5, 0x46, (byte) 0xE9, 0x6C, (byte) 0xE5 };
+  private static final byte[] BIN2 = { 0x0A, 0x47, 0x4C };
+
   private final int crc;
+  private final int totalRecords;
   private final DateTime created;
   private final DateTime modified;
+  private final int version;
+  private final int reserved;
+  private final int eof;
+
   boolean bin2;
 
   // ---------------------------------------------------------------------------------//
-  public Header (byte[] buffer) throws FileFormatException
+  public MasterHeader (byte[] buffer) throws FileFormatException
   // ---------------------------------------------------------------------------------//
   {
     int ptr = 0;
 
     while (true)
     {
-      if (isNuFile (buffer, ptr))
+      if (Utility.isMagic (buffer, ptr, NuFile))
         break;
 
       if (isBin2 (buffer, ptr))
@@ -38,7 +44,10 @@ class Header
     created = new DateTime (buffer, ptr + 12);
     modified = new DateTime (buffer, ptr + 20);
     version = Utility.getWord (buffer, ptr + 28);
+    reserved = Utility.getWord (buffer, ptr + 30);
     eof = Utility.getLong (buffer, ptr + 38);
+
+    assert reserved == 0;
 
     byte[] crcBuffer = new byte[40];
     System.arraycopy (buffer, ptr + 8, crcBuffer, 0, crcBuffer.length);
@@ -57,23 +66,12 @@ class Header
   }
 
   // ---------------------------------------------------------------------------------//
-  private boolean isNuFile (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (buffer[ptr] == 0x4E && buffer[ptr + 1] == (byte) 0xF5 && buffer[ptr + 2] == 0x46
-        && buffer[ptr + 3] == (byte) 0xE9 && buffer[ptr + 4] == 0x6C
-        && buffer[ptr + 5] == (byte) 0xE5)
-      return true;
-    return false;
-  }
-
-  // ---------------------------------------------------------------------------------//
   private boolean isBin2 (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    if (buffer[ptr] == 0x0A && buffer[ptr + 1] == 0x47 && buffer[ptr + 2] == 0x4C
-        && buffer[ptr + 18] == (byte) 0x02)
+    if (Utility.isMagic (buffer, ptr, BIN2) && buffer[ptr + 18] == (byte) 0x02)
       return true;
+
     return false;
   }
 

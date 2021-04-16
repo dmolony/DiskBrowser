@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.ENTRY_SIZE;
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
+import static com.bytezone.diskbrowser.utilities.Utility.readShort;
+import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 // -----------------------------------------------------------------------------------//
 public class SubdirectoryHeader extends DirectoryHeader
@@ -28,7 +30,7 @@ public class SubdirectoryHeader extends DirectoryHeader
   {
     super.read ();
 
-    parentPointer = ProdosDisk.readShort (buffer, ptr + 0x23);
+    parentPointer = readShort (buffer, ptr + 0x23);
     parentEntry = buffer[ptr + 0x25];
     parentEntryLength = buffer[ptr + 0x26];
   }
@@ -49,7 +51,7 @@ public class SubdirectoryHeader extends DirectoryHeader
     //    buffer[ptr + 0x15] = entriesPerBlock;
 
     // fields specific to subdirectory headers
-    ProdosDisk.writeShort (buffer, ptr + 0x23, parentPointer);
+    writeShort (buffer, ptr + 0x23, parentPointer);
     buffer[ptr + 0x25] = parentEntry;
     buffer[ptr + 0x26] = parentEntryLength;
   }

@@ -2,6 +2,12 @@ package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.BLOCK_SIZE;
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
+import static com.bytezone.diskbrowser.utilities.Utility.getAppleDate;
+import static com.bytezone.diskbrowser.utilities.Utility.putAppleDate;
+import static com.bytezone.diskbrowser.utilities.Utility.readShort;
+import static com.bytezone.diskbrowser.utilities.Utility.readTriple;
+import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
+import static com.bytezone.diskbrowser.utilities.Utility.writeTriple;
 
 import java.time.LocalDateTime;
 
@@ -55,18 +61,18 @@ public class FileEntry
       fileName = "";
 
     fileType = buffer[ptr + 0x10];
-    keyPointer = ProdosDisk.readShort (buffer, ptr + 0x11);
-    blocksUsed = ProdosDisk.readShort (buffer, ptr + 0x13);
-    eof = ProdosDisk.readTriple (buffer, ptr + 0x15);
-    creationDate = ProdosDisk.getAppleDate (buffer, ptr + 0x18);
+    keyPointer = readShort (buffer, ptr + 0x11);
+    blocksUsed = readShort (buffer, ptr + 0x13);
+    eof = readTriple (buffer, ptr + 0x15);
+    creationDate = getAppleDate (buffer, ptr + 0x18);
 
     version = buffer[ptr + 0x1C];
     minVersion = buffer[ptr + 0x1D];
     access = buffer[ptr + 0x1E];
 
-    auxType = ProdosDisk.readShort (buffer, ptr + 0x1F);
-    modifiedDate = ProdosDisk.getAppleDate (buffer, ptr + 0x21);
-    headerPointer = ProdosDisk.readShort (buffer, ptr + 0x25);
+    auxType = readShort (buffer, ptr + 0x1F);
+    modifiedDate = getAppleDate (buffer, ptr + 0x21);
+    headerPointer = readShort (buffer, ptr + 0x25);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -77,18 +83,18 @@ public class FileEntry
     System.arraycopy (fileName.getBytes (), 0, buffer, ptr + 1, fileName.length ());
 
     buffer[ptr + 0x10] = fileType;
-    ProdosDisk.writeShort (buffer, ptr + 0x11, keyPointer);
-    ProdosDisk.writeShort (buffer, ptr + 0x13, blocksUsed);
-    ProdosDisk.writeTriple (buffer, ptr + 0x15, eof);
-    ProdosDisk.putAppleDate (buffer, ptr + 0x18, creationDate);
+    writeShort (buffer, ptr + 0x11, keyPointer);
+    writeShort (buffer, ptr + 0x13, blocksUsed);
+    writeTriple (buffer, ptr + 0x15, eof);
+    putAppleDate (buffer, ptr + 0x18, creationDate);
 
     buffer[ptr + 0x1C] = version;
     buffer[ptr + 0x1D] = minVersion;
     buffer[ptr + 0x1E] = access;
 
-    ProdosDisk.writeShort (buffer, ptr + 0x1F, auxType);
-    ProdosDisk.putAppleDate (buffer, ptr + 0x21, modifiedDate);
-    ProdosDisk.writeShort (buffer, ptr + 0x25, headerPointer);
+    writeShort (buffer, ptr + 0x1F, auxType);
+    putAppleDate (buffer, ptr + 0x21, modifiedDate);
+    writeShort (buffer, ptr + 0x25, headerPointer);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -182,6 +182,84 @@ public class Utility
   }
 
   // ---------------------------------------------------------------------------------//
+  public static LocalDateTime getAppleDate (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
+  {
+    int yymmdd = readShort (buffer, offset);
+    if (yymmdd != 0)
+    {
+      int year = (yymmdd & 0xFE00) >> 9;
+      int month = (yymmdd & 0x01E0) >> 5;
+      int day = yymmdd & 0x001F;
+
+      int minute = buffer[offset + 2] & 0x3F;
+      int hour = buffer[offset + 3] & 0x1F;
+
+      if (year < 70)
+        year += 2000;
+      else
+        year += 1900;
+      return LocalDateTime.of (year, month - 1, day, hour, minute);
+    }
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static void putAppleDate (byte[] buffer, int offset, LocalDateTime date)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (date != null)
+    {
+      int year = date.getYear ();
+      int month = date.getMonthValue ();
+      int day = date.getDayOfMonth ();
+      int hour = date.getHour ();
+      int minute = date.getMinute ();
+
+      if (year < 2000)
+        year -= 1900;
+      else
+        year -= 2000;
+
+      int val1 = year << 9 | month << 5 | day;
+      writeShort (buffer, offset, val1);
+      buffer[offset + 2] = (byte) minute;
+      buffer[offset + 3] = (byte) hour;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static void writeShort (byte[] buffer, int ptr, int value)
+  // ---------------------------------------------------------------------------------//
+  {
+    buffer[ptr] = (byte) (value & 0xFF);
+    buffer[ptr + 1] = (byte) ((value & 0xFF00) >>> 8);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static void writeTriple (byte[] buffer, int ptr, int value)
+  // ---------------------------------------------------------------------------------//
+  {
+    buffer[ptr] = (byte) (value & 0xFF);
+    buffer[ptr + 1] = (byte) ((value & 0xFF00) >>> 8);
+    buffer[ptr + 2] = (byte) ((value & 0xFF0000) >>> 16);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static int readShort (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    return buffer[ptr] | buffer[ptr + 1] << 8;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static int readTriple (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    return buffer[ptr] | buffer[ptr + 1] << 8 | buffer[ptr + 2] << 16;
+  }
+
+  // ---------------------------------------------------------------------------------//
   public static String matchFlags (int flag, String[] chars)
   // ---------------------------------------------------------------------------------//
   {

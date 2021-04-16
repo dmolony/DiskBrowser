@@ -1,6 +1,10 @@
 package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.ENTRY_SIZE;
+import static com.bytezone.diskbrowser.utilities.Utility.getAppleDate;
+import static com.bytezone.diskbrowser.utilities.Utility.putAppleDate;
+import static com.bytezone.diskbrowser.utilities.Utility.readShort;
+import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 import java.time.LocalDateTime;
 
@@ -40,15 +44,13 @@ public class DirectoryHeader
     storageType = (byte) ((buffer[ptr] & 0xF0) >>> 4);
     int nameLength = buffer[ptr] & 0x0F;
     fileName = new String (buffer, ptr + 1, nameLength);
-    creationDate = ProdosDisk.getAppleDate (buffer, ptr + 0x18);
+    creationDate = getAppleDate (buffer, ptr + 0x18);
     version = buffer[ptr + 0x1C];
     minVersion = buffer[ptr + 0x1D];
     access = buffer[ptr + 0x1E];
     entryLength = buffer[ptr + 0x1F];
     entriesPerBlock = buffer[ptr + 0x20];
-    fileCount = ProdosDisk.readShort (buffer, ptr + 0x21);
-
-    //    System.out.println (this);
+    fileCount = readShort (buffer, ptr + 0x21);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -58,15 +60,13 @@ public class DirectoryHeader
     buffer[ptr] = (byte) ((storageType << 4) | fileName.length ());
     System.arraycopy (fileName.getBytes (), 0, buffer, ptr + 1, fileName.length ());
 
-    ProdosDisk.putAppleDate (buffer, ptr + 0x18, creationDate);
+    putAppleDate (buffer, ptr + 0x18, creationDate);
     buffer[ptr + 0x1C] = version;
     buffer[ptr + 0x1D] = minVersion;
     buffer[ptr + 0x1E] = access;
     buffer[ptr + 0x1F] = entryLength;
     buffer[ptr + 0x20] = entriesPerBlock;
-    ProdosDisk.writeShort (buffer, ptr + 0x21, fileCount);
-
-    //    System.out.println (this);
+    writeShort (buffer, ptr + 0x21, fileCount);
   }
 
   // ---------------------------------------------------------------------------------//

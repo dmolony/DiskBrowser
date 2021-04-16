@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
+import static com.bytezone.diskbrowser.utilities.Utility.readShort;
+import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 // -----------------------------------------------------------------------------------//
 public class VolumeDirectoryHeader extends DirectoryHeader
@@ -25,8 +27,8 @@ public class VolumeDirectoryHeader extends DirectoryHeader
   {
     super.read ();
 
-    bitMapPointer = ProdosDisk.readShort (buffer, ptr + 0x23);
-    totalBlocks = ProdosDisk.readShort (buffer, ptr + 0x25);
+    bitMapPointer = readShort (buffer, ptr + 0x23);
+    totalBlocks = readShort (buffer, ptr + 0x25);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -36,8 +38,8 @@ public class VolumeDirectoryHeader extends DirectoryHeader
   {
     super.write ();
 
-    ProdosDisk.writeShort (buffer, ptr + 0x23, bitMapPointer);
-    ProdosDisk.writeShort (buffer, ptr + 0x25, totalBlocks);
+    writeShort (buffer, ptr + 0x23, bitMapPointer);
+    writeShort (buffer, ptr + 0x25, totalBlocks);
   }
 
   // ---------------------------------------------------------------------------------//

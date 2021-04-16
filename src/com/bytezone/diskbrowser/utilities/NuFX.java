@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
+
 // -----------------------------------------------------------------------------------//
 public class NuFX
 // -----------------------------------------------------------------------------------//
@@ -24,13 +26,7 @@ public class NuFX
   // ---------------------------------------------------------------------------------//
   {
     buffer = Files.readAllBytes (path);
-    readBuffer ();
-  }
 
-  // ---------------------------------------------------------------------------------//
-  private void readBuffer ()
-  // ---------------------------------------------------------------------------------//
-  {
     masterHeader = new MasterHeader (buffer);
 
     int dataPtr = 48;
@@ -86,7 +82,37 @@ public class NuFX
     }
     else if (totalFiles > 0)
     {
-      listFiles ();
+      //      listFiles ();
+      try
+      {
+        ProdosDisk disk = new ProdosDisk (1600, "DISKBROWSER");
+        int count = 0;
+        for (Record record : records)
+        {
+          if (record.hasFile ())
+          {
+            String fileName = record.getFileName ();
+            int fileSize = record.getFileSize ();
+            int fileType = record.getFileType ();
+            int eof = record.getUncompressedSize ();
+            byte[] buffer = record.getData ();
+            System.out.printf ("%3d %-35s %,7d  %d  %,7d  %d%n", ++count, fileName,
+                fileSize, fileType, eof, buffer.length);
+            if (fileType == 4 && count > 10 && count < 16)
+            {
+              disk.addFile (fileName, fileType, buffer);
+            }
+          }
+        }
+
+        disk.close ();
+
+        return disk.getBuffer ();
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace ();
+      }
     }
 
     return null;

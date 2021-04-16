@@ -112,7 +112,7 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  FileEntry addFile (String path, int type)
+  public FileEntry addFile (String path, int type, byte[] dataBuffer)
   // ---------------------------------------------------------------------------------//
   {
     String[] subdirectories;
@@ -160,6 +160,8 @@ public class ProdosDisk
       fileEntry.headerPointer = catalogBlockNo;
       fileEntry.fileType = 4;                   // text
 
+      fileEntry.writeFile (dataBuffer);
+
       fileEntry.write ();
       updateFileCount (fileEntry.headerPointer);
 
@@ -167,6 +169,16 @@ public class ProdosDisk
     }
 
     return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void close ()
+  // ---------------------------------------------------------------------------------//
+  {
+    writeVolumeBitMap ();
+    volumeDirectoryHeader.write ();
+    for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
+      subdirectoryHeader.write ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -350,5 +362,12 @@ public class ProdosDisk
         val = 0;
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public byte[] getBuffer ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return buffer;
   }
 }

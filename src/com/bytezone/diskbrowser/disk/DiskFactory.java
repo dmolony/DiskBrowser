@@ -187,7 +187,15 @@ public class DiskFactory
         //        System.out.printf ("Total files: %d%n", totalFiles);
         if (totalFiles == 0)
           return null;
-        nuFX.getDiskBuffer ();
+
+        File tmp = File.createTempFile (suffix, null);
+        FileOutputStream fos = new FileOutputStream (tmp);
+        fos.write (nuFX.getDiskBuffer ());
+        fos.close ();
+        tmp.deleteOnExit ();
+        file = tmp;
+        suffix = "po";
+        compressed = true;
       }
       catch (IOException e)
       {

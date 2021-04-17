@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.prodos;
 
 import java.awt.Color;
-import java.text.DateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +29,9 @@ public class ProdosDisk extends AbstractFormattedDisk
 {
   static ProdosPreferences prodosPreferences;     // set by MenuHandler
 
-  final DateFormat df = DateFormat.getInstance ();
+  //  final DateFormat df = DateFormat.getInstance ();
+  static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
+  static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
 
   final SectorType dosSector = new SectorType ("Bootstrap Loader", Color.lightGray);
   final SectorType catalogSector = new SectorType ("Catalog", new Color (0, 200, 0));
@@ -338,7 +340,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     StringBuilder text = new StringBuilder ();
 
     String timeC = volumeDirectoryHeader.created == null ? ""
-        : df.format (volumeDirectoryHeader.created.getTime ());
+        : volumeDirectoryHeader.created.format (tf);
 
     text.append (String.format ("Disk name          : %s%n", getDisplayPath ()));
     text.append (String.format ("Volume name        : %s%n", volumeDirectoryHeader.name));

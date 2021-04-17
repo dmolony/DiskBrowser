@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.prodos;
 
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
@@ -15,8 +14,6 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
   private static final String NO_DATE = "<NO DATE>";
   private static final String newLine = String.format ("%n");
   private static final String newLine2 = newLine + newLine;
-  private static final SimpleDateFormat sdf = new SimpleDateFormat ("d-MMM-yy");
-  private static final SimpleDateFormat stf = new SimpleDateFormat ("H:mm");
 
   private final ProdosDisk parentFD;
   private final int totalBlocks;
@@ -74,14 +71,17 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
           int type = buffer[i + 16] & 0xFF;
           int blocks = Utility.intValue (buffer[i + 19], buffer[i + 20]);
 
-          GregorianCalendar created = HexFormatter.getAppleDate (buffer, i + 24);
-          String dateC = created == null ? NO_DATE
-              : sdf.format (created.getTime ()).toUpperCase ().replace (".", "");
-          String timeC = created == null ? "" : stf.format (created.getTime ());
-          GregorianCalendar modified = HexFormatter.getAppleDate (buffer, i + 33);
-          String dateM = modified == null ? NO_DATE
-              : sdf.format (modified.getTime ()).toUpperCase ().replace (".", "");
-          String timeM = modified == null ? "" : stf.format (modified.getTime ());
+          LocalDateTime createdDate = Utility.getAppleDate (buffer, i + 24);
+          LocalDateTime modifiedDate = Utility.getAppleDate (buffer, i + 33);
+
+          String dateC = createdDate == null ? NO_DATE
+              : createdDate.format (ProdosDisk.df).toUpperCase ();
+          String dateM = modifiedDate == null ? NO_DATE
+              : modifiedDate.format (ProdosDisk.df).toUpperCase ();
+
+          String timeC = createdDate == null ? "" : createdDate.format (ProdosDisk.tf);
+          String timeM = modifiedDate == null ? "" : modifiedDate.format (ProdosDisk.tf);
+
           int eof = Utility.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
           int fileType = buffer[i + 16] & 0xFF;
           locked = (buffer[i + 30] & 0xE0) == 0xE0 ? " " : "*";

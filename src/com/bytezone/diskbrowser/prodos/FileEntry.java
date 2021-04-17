@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.prodos;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
@@ -41,7 +41,6 @@ import com.bytezone.diskbrowser.appleworks.AppleworksSSFile;
 import com.bytezone.diskbrowser.appleworks.AppleworksWPFile;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // - Set sector types for each used sector
@@ -57,7 +56,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final int blocksUsed;
   private final int endOfFile;
   private final int auxType;
-  private final GregorianCalendar modified;
+  private final LocalDateTime modified;
   private final int headerPointer;
   private DataSource file;
   private final DiskAddress catalogBlock;
@@ -85,7 +84,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     endOfFile = Utility.intValue (entryBuffer[21], entryBuffer[22], entryBuffer[23]);
 
     auxType = Utility.unsignedShort (entryBuffer, 0x1F);
-    modified = HexFormatter.getAppleDate (entryBuffer, 0x21);
+    modified = Utility.getAppleDate (entryBuffer, 0x21);
     headerPointer = Utility.unsignedShort (entryBuffer, 0x25);
 
     switch (storageType)
@@ -781,8 +780,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType],
           blocksUsed, locked) + name;
 
-    String timeC = created == null ? "" : parentDisk.df.format (created.getTime ());
-    String timeF = modified == null ? "" : parentDisk.df.format (modified.getTime ());
+    String timeC = created == null ? "" : created.format (ProdosDisk.df);
+    String timeF = modified == null ? "" : modified.format (ProdosDisk.df);
 
     return String.format ("%s %s%-30s %3d %,10d %15s %15s",
         ProdosConstants.fileTypes[fileType], locked, parentDirectory.name + "/" + name,

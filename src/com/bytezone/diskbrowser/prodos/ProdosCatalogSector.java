@@ -11,7 +11,7 @@ import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY_HEADE
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.TREE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.VOLUME_HEADER;
 
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
 import com.bytezone.diskbrowser.disk.Disk;
@@ -105,17 +105,21 @@ class ProdosCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, offset + 17, 2, "Key pointer");
     addTextAndDecimal (text, buffer, offset + 19, 2, "Blocks used");
     addTextAndDecimal (text, buffer, offset + 21, 3, "EOF");
-    GregorianCalendar created = HexFormatter.getAppleDate (buffer, offset + 24);
-    String dateC = created == null ? "" : parent.df.format (created.getTime ());
+
+    LocalDateTime created = Utility.getAppleDate (buffer, offset + 24);
+    String dateC = created == null ? "" : created.format (ProdosDisk.df);
     addText (text, buffer, offset + 24, 4, "Creation date : " + dateC);
+
     addTextAndDecimal (text, buffer, offset + 28, 1, "Version");
     addText (text, buffer, offset + 29, 1, "Minimum version");
     addText (text, buffer, offset + 30, 1, "Access");
     addTextAndDecimal (text, buffer, offset + 31, 2,
         "Auxilliary type - " + getAuxilliaryText (fileType, auxType));
-    GregorianCalendar modified = HexFormatter.getAppleDate (buffer, offset + 33);
-    String dateM = modified == null ? "" : parent.df.format (modified.getTime ());
+
+    LocalDateTime modified = Utility.getAppleDate (buffer, offset + 33);
+    String dateM = modified == null ? "" : modified.format (ProdosDisk.df);
     addText (text, buffer, offset + 33, 4, "Modification date : " + dateM);
+
     addTextAndDecimal (text, buffer, offset + 37, 2, "Header pointer");
     return text.toString ();
   }
@@ -157,8 +161,8 @@ class ProdosCatalogSector extends AbstractSector
     StringBuilder text = new StringBuilder ();
 
     addText (text, buffer, offset + 20, 4, "Not used");
-    GregorianCalendar created = HexFormatter.getAppleDate (buffer, offset + 24);
-    String dateC = created == null ? "" : parent.df.format (created.getTime ());
+    LocalDateTime created = Utility.getAppleDate (buffer, offset + 24);
+    String dateC = created == null ? "" : created.format (ProdosDisk.df);
     addText (text, buffer, offset + 24, 4, "Creation date : " + dateC);
 
     addText (text, buffer, offset + 28, 1, "Prodos version");

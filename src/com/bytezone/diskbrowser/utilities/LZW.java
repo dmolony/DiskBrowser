@@ -15,7 +15,7 @@ class LZW
   protected byte runLengthChar;
   protected int crc;
   protected int crcBase;
-  int v3eof;
+  int v3eof;                      // LZW/2 calculates the crc sans padding
 
   private int buffer;            // one character buffer
   private int bitsLeft;          // unused bits left in buffer

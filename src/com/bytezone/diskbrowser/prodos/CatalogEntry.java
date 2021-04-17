@@ -1,7 +1,7 @@
 package com.bytezone.diskbrowser.prodos;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
@@ -9,6 +9,7 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 abstract class CatalogEntry implements AppleFileSource
@@ -18,7 +19,7 @@ abstract class CatalogEntry implements AppleFileSource
   DirectoryHeader parentDirectory;
   String name;
   int storageType;
-  GregorianCalendar created;
+  LocalDateTime created;
   int version;
   int minVersion;
   int access;
@@ -33,7 +34,7 @@ abstract class CatalogEntry implements AppleFileSource
     this.disk = parentDisk.getDisk ();
     name = HexFormatter.getString (entryBuffer, 1, entryBuffer[0] & 0x0F);
     storageType = (entryBuffer[0] & 0xF0) >> 4;
-    created = HexFormatter.getAppleDate (entryBuffer, 24);
+    created = Utility.getAppleDate (entryBuffer, 24);
     version = entryBuffer[28] & 0xFF;
     minVersion = entryBuffer[29] & 0xFF;
     access = entryBuffer[30] & 0xFF;
@@ -78,7 +79,7 @@ abstract class CatalogEntry implements AppleFileSource
     text.append (String.format ("Name .......... %s%n", name));
     text.append (String.format ("Storage type... %02X%n", storageType));
     text.append (String.format ("Created ....... %s%n",
-        created == null ? "" : parentDisk.df.format (created.getTime ())));
+        created == null ? "" : created.format (ProdosDisk.df)));
     text.append (String.format ("Version ....... %d%n", version));
 
     return text.toString ();

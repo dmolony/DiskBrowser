@@ -389,25 +389,25 @@ public class HexFormatter
   }
 
   // ---------------------------------------------------------------------------------//
-  public static GregorianCalendar getAppleDate (byte[] buffer, int offset)
-  // ---------------------------------------------------------------------------------//
-  {
-    int date = Utility.intValue (buffer[offset], buffer[offset + 1]);
-    if (date > 0)
-    {
-      int year = (date & 0xFE00) >> 9;
-      int month = (date & 0x01E0) >> 5;
-      int day = date & 0x001F;
-      int hour = buffer[offset + 3] & 0x1F;
-      int minute = buffer[offset + 2] & 0x3F;
-      if (year < 70)
-        year += 2000;
-      else
-        year += 1900;
-      return new GregorianCalendar (year, month - 1, day, hour, minute);
-    }
-    return null;
-  }
+  //  public static GregorianCalendar getAppleDate (byte[] buffer, int offset)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    int date = Utility.intValue (buffer[offset], buffer[offset + 1]);
+  //    if (date > 0)
+  //    {
+  //      int year = (date & 0xFE00) >> 9;
+  //      int month = (date & 0x01E0) >> 5;
+  //      int day = date & 0x001F;
+  //      int hour = buffer[offset + 3] & 0x1F;
+  //      int minute = buffer[offset + 2] & 0x3F;
+  //      if (year < 70)
+  //        year += 2000;
+  //      else
+  //        year += 1900;
+  //      return new GregorianCalendar (year, month - 1, day, hour, minute);
+  //    }
+  //    return null;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   public static GregorianCalendar getPascalDate (byte[] buffer, int offset)

@@ -33,7 +33,7 @@ public class ProdosDisk
   private Map<Integer, SubdirectoryHeader> subdirectoryHeaders = new HashMap<> ();
 
   // ---------------------------------------------------------------------------------//
-  public ProdosDisk (int blocks, String volumeName) throws IOException
+  public ProdosDisk (int blocks, String volumeName) throws IOException, DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     try (DataInputStream in = new DataInputStream (ProdosDisk.class.getClassLoader ()
@@ -63,7 +63,7 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  void createCatalog (String volumeName)
+  void createCatalog (String volumeName) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     // reserve two boot blocks
@@ -112,7 +112,8 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  public FileEntry addFile (String path, int type, byte[] dataBuffer)
+  public FileEntry addFile (String path, byte type, int auxType, LocalDateTime created,
+      LocalDateTime modified, byte[] dataBuffer) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     String[] subdirectories;
@@ -158,7 +159,10 @@ public class ProdosDisk
       fileEntry.version = 0x00;
       fileEntry.minVersion = 0x00;
       fileEntry.headerPointer = catalogBlockNo;
-      fileEntry.fileType = 4;                   // text
+      fileEntry.fileType = type;
+      fileEntry.auxType = auxType;
+      fileEntry.creationDate = created;
+      fileEntry.modifiedDate = modified;
 
       fileEntry.writeFile (dataBuffer);
 
@@ -221,7 +225,7 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private FileEntry createSubdirectory (int blockNo, String name)
+  private FileEntry createSubdirectory (int blockNo, String name) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     FileEntry fileEntry = findFreeSlot (blockNo);
@@ -281,10 +285,15 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  int allocateNextBlock ()
+  int allocateNextBlock () throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     int nextBlock = getFreeBlock ();
+    if (nextBlock < 0)
+    {
+      throw new DiskFullException ("Full");
+    }
+
     volumeBitMap.set (nextBlock, false);      // mark as unavailable
 
     return nextBlock;
@@ -298,7 +307,7 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private FileEntry findFreeSlot (int blockNo)
+  private FileEntry findFreeSlot (int blockNo) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     SubdirectoryHeader subdirectoryHeader = subdirectoryHeaders.get (blockNo);

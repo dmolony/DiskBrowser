@@ -195,12 +195,33 @@ public class Utility
       int minute = buffer[offset + 2] & 0x3F;
       int hour = buffer[offset + 3] & 0x1F;
 
+      if (month < 1 || month > 12)
+      {
+        System.out.printf ("Invalid month: %d%n", month);
+        return null;
+      }
+
+      if (hour > 23)
+      {
+        System.out.printf ("Invalid hour: %d%n", hour);
+        return null;
+      }
+
       if (year < 70)
         year += 2000;
       else
         year += 1900;
-      return LocalDateTime.of (year, month - 1, day, hour, minute);
+
+      try
+      {
+        return LocalDateTime.of (year, month - 1, day, hour, minute);
+      }
+      catch (DateTimeException e)
+      {
+        System.out.println ("Bad date/time");
+      }
     }
+
     return null;
   }
 
@@ -249,14 +270,15 @@ public class Utility
   public static int readShort (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    return buffer[ptr] | buffer[ptr + 1] << 8;
+    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8;
   }
 
   // ---------------------------------------------------------------------------------//
   public static int readTriple (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    return buffer[ptr] | buffer[ptr + 1] << 8 | buffer[ptr + 2] << 16;
+    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8
+        | (buffer[ptr + 2] & 0xFF) << 16;
   }
 
   // ---------------------------------------------------------------------------------//

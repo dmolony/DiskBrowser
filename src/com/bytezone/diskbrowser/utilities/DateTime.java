@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.utilities;
 
+import java.time.LocalDateTime;
+
 // -----------------------------------------------------------------------------------//
 class DateTime
 // -----------------------------------------------------------------------------------//
@@ -37,6 +39,14 @@ class DateTime
   {
     return String.format ("%02d:%02d:%02d %s %d %s %d", hour, minute, second,
         days[weekDay], day, months[month], year);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public LocalDateTime getLocalDateTime ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int adjustedYear = year + (year > 70 ? 1900 : 2000);
+    return LocalDateTime.of (adjustedYear, month + 1, day, hour, minute);
   }
 
   // ---------------------------------------------------------------------------------//

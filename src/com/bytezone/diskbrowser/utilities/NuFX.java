@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.prodos.write.DiskFullException;
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 
 // -----------------------------------------------------------------------------------//
@@ -55,11 +57,7 @@ public class NuFX
         dataPtr += thread.getCompressedEOF ();
 
         if (debug)
-        {
           System.out.printf ("Thread: %d%n%n%s%n%n", i, thread);
-          //          if (rec == 122 && thread.hasFile ())
-          //            System.out.println (HexFormatter.format (thread.getData ()));
-        }
       }
 
       if (record.hasFile ())
@@ -82,10 +80,9 @@ public class NuFX
     }
     else if (totalFiles > 0)
     {
-      //      listFiles ();
       try
       {
-        ProdosDisk disk = new ProdosDisk (1600, "DISKBROWSER");
+        ProdosDisk disk = new ProdosDisk (3200, "DISKBROWSER");
         int count = 0;
         for (Record record : records)
         {
@@ -93,15 +90,17 @@ public class NuFX
           {
             String fileName = record.getFileName ();
             int fileSize = record.getFileSize ();
-            int fileType = record.getFileType ();
+            byte fileType = (byte) record.getFileType ();
             int eof = record.getUncompressedSize ();
+            int auxType = record.getAuxType ();
+            LocalDateTime created = record.getCreated ();
+            LocalDateTime modified = record.getModified ();
             byte[] buffer = record.getData ();
-            System.out.printf ("%3d %-35s %,7d  %d  %,7d  %d%n", ++count, fileName,
-                fileSize, fileType, eof, buffer.length);
-            if (fileType == 4 && count > 10 && count < 16)
-            {
-              disk.addFile (fileName, fileType, buffer);
-            }
+
+            System.out.printf ("%3d %-35s %,7d  %02X  %,7d  %,7d  %,7d  %s  %s%n",
+                ++count, fileName, fileSize, fileType, eof, auxType, buffer.length,
+                created, modified);
+            disk.addFile (fileName, fileType, auxType, created, modified, buffer);
           }
         }
 
@@ -110,6 +109,10 @@ public class NuFX
         return disk.getBuffer ();
       }
       catch (IOException e)
+      {
+        e.printStackTrace ();
+      }
+      catch (DiskFullException e)
       {
         e.printStackTrace ();
       }
@@ -176,7 +179,7 @@ public class NuFX
   public static void main (String[] args) throws FileFormatException, IOException
   // ---------------------------------------------------------------------------------//
   {
-    File file = new File ("/Users/denismolony/Dropbox/Examples/SHK/Applenet20.shk");
+    File file = new File ("/Users/denismolony/Dropbox/Examples/SHK/DiversiCopy.3.1.shk");
 
     NuFX nufx = new NuFX (file.toPath ());
     System.out.println (nufx);

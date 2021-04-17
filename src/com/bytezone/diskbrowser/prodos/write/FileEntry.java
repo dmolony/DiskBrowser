@@ -98,7 +98,7 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
-  void writeFile (byte[] dataBuffer)
+  void writeFile (byte[] dataBuffer) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     this.eof = dataBuffer.length;
@@ -124,7 +124,7 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
-  void writeRecord (int recordNo, byte[] dataBuffer)
+  void writeRecord (int recordNo, byte[] dataBuffer) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     assert auxType > 0;           // record length
@@ -160,7 +160,7 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
-  int allocateNextBlock ()
+  int allocateNextBlock () throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     blocksUsed++;
@@ -168,7 +168,7 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
-  int getActualBlockNo (int logicalBlockNo)
+  int getActualBlockNo (int logicalBlockNo) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     int actualBlockNo = 0;
@@ -211,7 +211,7 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
-  void map (int logicalBlockNo, int actualBlockNo)
+  void map (int logicalBlockNo, int actualBlockNo) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     if (logicalBlockNo > 255)                         // potential TREE
@@ -280,7 +280,7 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
-  IndexBlock getIndexBlock (int position)
+  IndexBlock getIndexBlock (int position) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     IndexBlock indexBlock = masterIndexBlock.get (position);

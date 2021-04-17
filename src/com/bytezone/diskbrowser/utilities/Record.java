@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.utilities;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,7 +160,12 @@ class Record
   {
     for (Thread thread : threads)
       if (thread.hasFileName ())
+      {
+        String fileName = thread.getFileName ();
+        if (separator != '/')
+          return fileName.replace (separator, '/');
         return thread.getFileName ();
+      }
 
     return "";
   }
@@ -169,6 +175,31 @@ class Record
   // ---------------------------------------------------------------------------------//
   {
     return fileType;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getAuxType ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return auxType;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  LocalDateTime getCreated ()
+  // ---------------------------------------------------------------------------------//
+  {
+    if (created == null)
+      return null;
+    return created.getLocalDateTime ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  LocalDateTime getModified ()
+  // ---------------------------------------------------------------------------------//
+  {
+    if (modified == null)
+      return null;
+    return modified.getLocalDateTime ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -214,7 +245,7 @@ class Record
     bits = bits.substring (bits.length () - 8);
     String decode = Utility.matchFlags (access, accessChars);
 
-    text.append (String.format ("Header CRC ..... %,d  (%04X)%n", crc, crc));
+    text.append (String.format ("Header CRC ..... %,d  (%<04X)%n", crc));
     text.append (String.format ("Attributes ..... %d%n", attributes));
     text.append (String.format ("Version ........ %d%n", version));
     text.append (String.format ("Threads ........ %d%n", totThreads));

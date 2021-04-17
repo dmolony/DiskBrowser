@@ -24,6 +24,8 @@ public class NuFX
   private int totalDisks;
   private int totalBlocks;
 
+  private List<String> paths = new ArrayList<> ();
+
   // ---------------------------------------------------------------------------------//
   public NuFX (Path path) throws FileFormatException, IOException
   // ---------------------------------------------------------------------------------//
@@ -75,11 +77,44 @@ public class NuFX
         else if (blocks <= 256)               // sapling
           totalBlocks += blocks + 1;
         else                                  // tree
-          totalBlocks += blocks + (blocks / 256) + 1;
+          totalBlocks += blocks + (blocks / 256) + 2;
+        storePath (record.getFileName ());
       }
 
       if (record.hasDisk ())
         ++totalDisks;
+    }
+
+    if (false)
+    {
+      System.out.println ("Unique paths:");
+      if (paths.size () == 0)
+        System.out.println ("<none>");
+      for (String pathName : paths)
+        System.out.println (pathName);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void storePath (String fileName)
+  // ---------------------------------------------------------------------------------//
+  {
+    int pos = fileName.lastIndexOf ('/');
+    if (pos > 0)
+    {
+      String path = fileName.substring (0, pos);
+      for (int i = 0; i < paths.size (); i++)
+      {
+        String cmp = paths.get (i);
+        if (cmp.startsWith (path))        // longer path already there
+          return;
+        if (path.startsWith (cmp))
+        {
+          paths.set (i, path);            // replace shorter path with longer path
+          return;
+        }
+      }
+      paths.add (path);
     }
   }
 
@@ -99,7 +134,21 @@ public class NuFX
       int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
       //      System.out.printf ("Files require: %d blocks%n", totalBlocks);
 
-      for (int diskSize : diskSizes)
+      // choose Volume Name
+      String volumeName = "Disk.Browser";
+      int nameOffset = 0;
+      if (paths.size () == 1)
+      {
+        String onlyPath = paths.get (0);
+        int pos = onlyPath.indexOf ('/');
+        if (pos == -1)                                // no separators
+          volumeName = onlyPath;
+        else                                          // use first component
+          volumeName = onlyPath.substring (0, pos);
+        nameOffset = volumeName.length () + 1;
+      }
+
+      for (int diskSize : diskSizes)      // in case we choose a size that is too small
       {
         //        System.out.printf ("Checking %d %d%n", diskSize, totalBlocks);
         if (diskSize < (totalBlocks + 10))
@@ -107,7 +156,7 @@ public class NuFX
 
         try
         {
-          ProdosDisk disk = new ProdosDisk (diskSize, "DISK.BROWSER");
+          ProdosDisk disk = new ProdosDisk (diskSize, volumeName);
           int count = 0;
           for (Record record : records)
           {
@@ -122,7 +171,10 @@ public class NuFX
               LocalDateTime modified = record.getModified ();
               byte[] buffer = record.getData ();
 
-              if (false)
+              if (nameOffset > 0)         // remove volume name from path
+                fileName = fileName.substring (nameOffset);
+
+              if (true)
                 System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
                     fileName, fileType, auxType, eof, buffer.length, created, modified);
 

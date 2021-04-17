@@ -22,6 +22,7 @@ public class NuFX
   private final List<Record> records = new ArrayList<> ();
   private int totalFiles;
   private int totalDisks;
+  private int totalBlocks;
 
   // ---------------------------------------------------------------------------------//
   public NuFX (Path path) throws FileFormatException, IOException
@@ -41,6 +42,11 @@ public class NuFX
     for (int rec = 0; rec < masterHeader.getTotalRecords (); rec++)
     {
       Record record = new Record (buffer, dataPtr);
+      if (record.getFileSystemID () != 1)
+      {
+        System.out.println ("Not Prodos");
+        break;
+      }
       records.add (record);
 
       if (debug)
@@ -61,7 +67,17 @@ public class NuFX
       }
 
       if (record.hasFile ())
+      {
         ++totalFiles;
+        int blocks = (record.getFileSize () - 1) / 512 + 1;
+        if (blocks == 1)                      // seedling
+          totalBlocks += blocks;
+        else if (blocks <= 256)               // sapling
+          totalBlocks += blocks + 1;
+        else                                  // tree
+          totalBlocks += blocks + (blocks / 256) + 1;
+      }
+
       if (record.hasDisk ())
         ++totalDisks;
     }
@@ -80,41 +96,53 @@ public class NuFX
     }
     else if (totalFiles > 0)
     {
-      try
+      int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
+      //      System.out.printf ("Files require: %d blocks%n", totalBlocks);
+
+      for (int diskSize : diskSizes)
       {
-        ProdosDisk disk = new ProdosDisk (3200, "DISKBROWSER");
-        int count = 0;
-        for (Record record : records)
+        //        System.out.printf ("Checking %d %d%n", diskSize, totalBlocks);
+        if (diskSize < (totalBlocks + 10))
+          continue;
+
+        try
         {
-          if (record.hasFile ())
+          ProdosDisk disk = new ProdosDisk (diskSize, "DISK.BROWSER");
+          int count = 0;
+          for (Record record : records)
           {
-            String fileName = record.getFileName ();
-            int fileSize = record.getFileSize ();
-            byte fileType = (byte) record.getFileType ();
-            int eof = record.getUncompressedSize ();
-            int auxType = record.getAuxType ();
-            LocalDateTime created = record.getCreated ();
-            LocalDateTime modified = record.getModified ();
-            byte[] buffer = record.getData ();
+            if (record.hasFile ())
+            {
+              String fileName = record.getFileName ();
+              //              int fileSize = record.getFileSize ();
+              byte fileType = (byte) record.getFileType ();
+              int eof = record.getUncompressedSize ();
+              int auxType = record.getAuxType ();
+              LocalDateTime created = record.getCreated ();
+              LocalDateTime modified = record.getModified ();
+              byte[] buffer = record.getData ();
 
-            System.out.printf ("%3d %-35s %,7d  %02X  %,7d  %,7d  %,7d  %s  %s%n",
-                ++count, fileName, fileSize, fileType, eof, auxType, buffer.length,
-                created, modified);
-            disk.addFile (fileName, fileType, auxType, created, modified, buffer);
+              if (false)
+                System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
+                    fileName, fileType, auxType, eof, buffer.length, created, modified);
+
+              disk.addFile (fileName, fileType, auxType, created, modified, buffer);
+            }
           }
+
+          disk.close ();
+
+          return disk.getBuffer ();
         }
-
-        disk.close ();
-
-        return disk.getBuffer ();
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace ();
-      }
-      catch (DiskFullException e)
-      {
-        e.printStackTrace ();
+        catch (IOException e)
+        {
+          e.printStackTrace ();
+          return null;
+        }
+        catch (DiskFullException e)
+        {
+          System.out.println ("disk full: " + diskSize);    // go round again
+        }
       }
     }
 
@@ -149,6 +177,13 @@ public class NuFX
   }
 
   // ---------------------------------------------------------------------------------//
+  public int getTotalBlocks ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return totalBlocks;
+  }
+
+  // ---------------------------------------------------------------------------------//
   private void listFiles ()
   // ---------------------------------------------------------------------------------//
   {
@@ -179,7 +214,8 @@ public class NuFX
   public static void main (String[] args) throws FileFormatException, IOException
   // ---------------------------------------------------------------------------------//
   {
-    File file = new File ("/Users/denismolony/Dropbox/Examples/SHK/DiversiCopy.3.1.shk");
+    File file = new File (
+        "/Users/denismolony/Dropbox/Examples/SHK/Disk Disintegrator Deluxe 5.0_D1.SHK");
 
     NuFX nufx = new NuFX (file.toPath ());
     System.out.println (nufx);

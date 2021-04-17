@@ -146,55 +146,27 @@ public class DiskFactory
       }
     }
 
-    if ("sdk".equals (suffix))                // shrinkit disk archive
+    if ("sdk".equals (suffix) || "shk".equals (suffix))    // shrinkit disk/file archive
     {
       if (debug)
-        System.out.println (" ** sdk **");
+        System.out.println (" ** sdk/shk **");
       try
       {
         NuFX nuFX = new NuFX (file.toPath ());
-        int totalDisks = nuFX.getTotalDisks ();
-        if (totalDisks == 0)
+        if (nuFX.getTotalDisks () == 0 && nuFX.getTotalFiles () == 0)
           return null;
+
+        byte[] diskBuffer = nuFX.getDiskBuffer ();
+        if (diskBuffer == null)
+          return null;
+
         File tmp = File.createTempFile (suffix, null);
         FileOutputStream fos = new FileOutputStream (tmp);
-        fos.write (nuFX.getDiskBuffer ());
+        fos.write (diskBuffer);
         fos.close ();
         tmp.deleteOnExit ();
         file = tmp;
         suffix = "dsk";
-        compressed = true;
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace ();
-        return null;
-      }
-      catch (FileFormatException e)
-      {
-        return null;
-      }
-    }
-    else if ("shk".equals (suffix))           // shrinkit file archive
-    {
-      if (debug)
-        System.out.println (" ** shk **");
-
-      try
-      {
-        NuFX nuFX = new NuFX (file.toPath ());
-        int totalFiles = nuFX.getTotalFiles ();
-        //        System.out.printf ("Total files: %d%n", totalFiles);
-        if (totalFiles == 0)
-          return null;
-
-        File tmp = File.createTempFile (suffix, null);
-        FileOutputStream fos = new FileOutputStream (tmp);
-        fos.write (nuFX.getDiskBuffer ());
-        fos.close ();
-        tmp.deleteOnExit ();
-        file = tmp;
-        suffix = "po";
         compressed = true;
       }
       catch (IOException e)

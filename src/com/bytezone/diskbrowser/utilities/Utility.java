@@ -195,18 +195,6 @@ public class Utility
       int minute = buffer[offset + 2] & 0x3F;
       int hour = buffer[offset + 3] & 0x1F;
 
-      if (month < 1 || month > 12)
-      {
-        System.out.printf ("Invalid month: %d%n", month);
-        return null;
-      }
-
-      if (hour > 23)
-      {
-        System.out.printf ("Invalid hour: %d%n", hour);
-        return null;
-      }
-
       if (year < 70)
         year += 2000;
       else
@@ -214,11 +202,12 @@ public class Utility
 
       try
       {
-        return LocalDateTime.of (year, month - 1, day, hour, minute);
+        return LocalDateTime.of (year, month, day, hour, minute);
       }
       catch (DateTimeException e)
       {
-        System.out.println ("Bad date/time");
+        System.out.printf ("Bad date/time: %d %d %d %d %d %n", year, month, day, hour,
+            minute);
       }
     }
 

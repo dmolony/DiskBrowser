@@ -290,9 +290,7 @@ public class ProdosDisk
   {
     int nextBlock = getFreeBlock ();
     if (nextBlock < 0)
-    {
-      throw new DiskFullException ("Full");
-    }
+      throw new DiskFullException ("Disk Full");
 
     volumeBitMap.set (nextBlock, false);      // mark as unavailable
 

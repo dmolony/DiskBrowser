@@ -37,7 +37,7 @@ class Thread
         lzw = switch (header.threadFormat)
         {
           case 2 -> new LZW1 (data);
-          case 3 -> new LZW2 (data, header.threadCrc);
+          case 3 -> new LZW2 (data, header.threadCrc, header.uncompressedEOF);
           default -> null;                        // 1 = Huffman Squeeze
         };
 

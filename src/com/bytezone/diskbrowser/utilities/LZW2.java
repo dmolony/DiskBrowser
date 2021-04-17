@@ -11,7 +11,7 @@ class LZW2 extends LZW
   private int codeWord;
 
   // ---------------------------------------------------------------------------------//
-  public LZW2 (byte[] buffer, int crc)
+  public LZW2 (byte[] buffer, int crc, int eof)
   // ---------------------------------------------------------------------------------//
   {
     bytes = Objects.requireNonNull (buffer);
@@ -19,6 +19,7 @@ class LZW2 extends LZW
     this.crc = crc;
     crcBase = 0xFFFF;
     codeWord = 0;
+    v3eof = eof;
 
     volume = buffer[0] & 0xFF;
     runLengthChar = (byte) (buffer[1] & 0xFF);

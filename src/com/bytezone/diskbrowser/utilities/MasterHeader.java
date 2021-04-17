@@ -51,7 +51,7 @@ class MasterHeader
 
     byte[] crcBuffer = new byte[40];
     System.arraycopy (buffer, ptr + 8, crcBuffer, 0, crcBuffer.length);
-    if (crc != Utility.getCRC (crcBuffer, 0))
+    if (crc != Utility.getCRC (crcBuffer, crcBuffer.length, 0))
     {
       System.out.println ("***** Master CRC mismatch *****");
       throw new FileFormatException ("Master CRC failed");

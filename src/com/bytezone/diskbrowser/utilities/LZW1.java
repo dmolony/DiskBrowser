@@ -75,6 +75,7 @@ class LZW1 extends LZW
 
       prev = s;
     }
+
     return lzwBuffer;
   }
 

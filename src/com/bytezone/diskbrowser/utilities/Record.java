@@ -72,7 +72,7 @@ class Record
     byte[] crcBuffer = new byte[len + totThreads * 16];
     System.arraycopy (buffer, dataPtr + 6, crcBuffer, 0, crcBuffer.length);
 
-    if (crc != Utility.getCRC (crcBuffer, 0))
+    if (crc != Utility.getCRC (crcBuffer, crcBuffer.length, 0))
     {
       System.out.println ("***** Header CRC mismatch *****");
       throw new FileFormatException ("Header CRC failed");
@@ -255,9 +255,9 @@ class Record
     text.append (String.format ("Access ......... %s  %s%n", bits, decode));
     if (storType < 16)
     {
-      text.append (String.format ("File type ...... %,d  %s%n", fileType,
+      text.append (String.format ("File type ...... %02X     %s%n", fileType,
           ProdosConstants.fileTypes[fileType]));
-      text.append (String.format ("Aux type ....... %,d%n", auxType));
+      text.append (String.format ("Aux type ....... %,d  $%<04X%n", auxType));
       text.append (
           String.format ("Stor type ...... %,d  %s%n", storType, storage[storType]));
     }

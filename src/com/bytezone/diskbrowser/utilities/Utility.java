@@ -496,11 +496,11 @@ public class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  protected static int getCRC (final byte[] buffer, int initialValue)
+  protected static int getCRC (final byte[] buffer, int length, int initialValue)
   // ---------------------------------------------------------------------------------//
   {
     int crc = initialValue;
-    for (int j = 0; j < buffer.length; j++)
+    for (int j = 0; j < length; j++)
     {
       crc = ((crc >>> 8) | (crc << 8)) & 0xFFFF;
       crc ^= (buffer[j] & 0xFF);

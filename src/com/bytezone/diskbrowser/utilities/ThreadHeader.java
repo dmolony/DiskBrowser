@@ -17,6 +17,7 @@ class ThreadHeader
   final int threadClass;
   final int threadFormat;
   final int threadKind;
+
   final int threadCrc;
   final int uncompressedEOF;
   final int compressedEOF;
@@ -28,6 +29,7 @@ class ThreadHeader
     threadClass = Utility.getWord (buffer, offset);
     threadFormat = Utility.getWord (buffer, offset + 2);
     threadKind = Utility.getWord (buffer, offset + 4);
+
     threadCrc = Utility.getWord (buffer, offset + 6);
     uncompressedEOF = Utility.getLong (buffer, offset + 8);
     compressedEOF = Utility.getLong (buffer, offset + 12);
@@ -42,11 +44,11 @@ class ThreadHeader
 
     text.append (String.format ("  threadClass ....... %d  %s%n", threadClass,
         threadClassText[threadClass]));
-    text.append (
-        String.format ("  format ............ %d  %s%n", threadFormat, formatText[threadFormat]));
+    text.append (String.format ("  format ............ %d  %s%n", threadFormat,
+        formatText[threadFormat]));
     text.append (String.format ("  kind .............. %d  %s%n", threadKind,
         threadKindText[threadClass][threadKind]));
-    text.append (String.format ("  crc ............... %,d%n", threadCrc));
+    text.append (String.format ("  crc ............... %,d  (%<04X)%n", threadCrc));
     text.append (String.format ("  uncompressedEOF ... %,d%n", uncompressedEOF));
     text.append (String.format ("  compressedEOF ..... %,d  (%08X)", compressedEOF,
         compressedEOF));

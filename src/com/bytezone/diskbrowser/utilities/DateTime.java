@@ -46,6 +46,8 @@ class DateTime
   // ---------------------------------------------------------------------------------//
   {
     int adjustedYear = year + (year > 70 ? 1900 : 2000);
+    if (day < 1 || day > 31)
+      return null;
     return LocalDateTime.of (adjustedYear, month + 1, day, hour, minute);
   }
 

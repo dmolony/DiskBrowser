@@ -15,6 +15,7 @@ class LZW
   protected byte runLengthChar;
   protected int crc;
   protected int crcBase;
+  int v3eof;
 
   private int buffer;            // one character buffer
   private int bitsLeft;          // unused bits left in buffer
@@ -119,14 +120,17 @@ class LZW
   public byte[] getData ()
   // ---------------------------------------------------------------------------------//
   {
-    byte[] buffer = new byte[chunks.size () * TRACK_LENGTH];
+    byte[] buffer = new byte[getSize ()];
     int trackNumber = 0;
 
     for (byte[] track : chunks)
       System.arraycopy (track, 0, buffer, trackNumber++ * TRACK_LENGTH, TRACK_LENGTH);
 
-    if (crc != Utility.getCRC (buffer, crcBase))
-      System.out.println ("\n*** LZW CRC mismatch ***");
+    int length = v3eof != 0 ? v3eof : buffer.length;
+
+    int calculatedCrc = Utility.getCRC (buffer, length, crcBase);
+    if (crc != calculatedCrc)
+      System.out.printf ("%n*** LZW CRC mismatch ***  %04X  %04X%n", crc, calculatedCrc);
 
     return buffer;
   }

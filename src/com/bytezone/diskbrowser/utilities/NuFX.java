@@ -44,11 +44,6 @@ public class NuFX
     for (int rec = 0; rec < masterHeader.getTotalRecords (); rec++)
     {
       Record record = new Record (buffer, dataPtr);
-      //      if (record.getFileSystemID () != 1)
-      //      {
-      //        System.out.println ("Not Prodos: " + record.getFileSystemID ());
-      //        break;
-      //      }
       records.add (record);
 
       if (debug)
@@ -131,12 +126,11 @@ public class NuFX
     }
     else if (totalFiles > 0)
     {
-      int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
-      //      System.out.printf ("Files require: %d blocks%n", totalBlocks);
-
       // choose Volume Name
       String volumeName = "DiskBrowser";
       int nameOffset = 0;
+
+      // should check that files are all in prodos format
 
       if (paths.size () == 1)                         // exactly one directory path
       {
@@ -149,9 +143,9 @@ public class NuFX
         nameOffset = volumeName.length () + 1;        // skip volume name in all paths
       }
 
+      int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
       for (int diskSize : diskSizes)      // in case we choose a size that is too small
       {
-        //        System.out.printf ("Checking %d %d%n", diskSize, totalBlocks);
         if (diskSize < (totalBlocks + 10))
           continue;
 
@@ -198,19 +192,6 @@ public class NuFX
         }
       }
     }
-
-    return null;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public byte[] getFileBuffer (String fileName)
-  // ---------------------------------------------------------------------------------//
-  {
-    for (Record record : records)
-      if (record.hasFile (fileName))
-        for (Thread thread : record.threads)
-          if (thread.hasFile ())
-            return thread.getData ();
 
     return null;
   }

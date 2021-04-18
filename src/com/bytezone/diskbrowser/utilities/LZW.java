@@ -131,8 +131,8 @@ class LZW
     int calculatedCrc = Utility.getCRC (buffer, length, crcBase);
     if (crc != calculatedCrc)
     {
-      System.out.printf ("%n*** LZW CRC mismatch ***  %04X  %04X%n", crc, calculatedCrc);
-      //      throw new FileFormatException ("File CRC failed");
+      System.out.printf ("%n*** Thread CRC failed ***  %04X  %04X%n", crc, calculatedCrc);
+      //      throw new FileFormatException ("Thread CRC failed");
     }
 
     return buffer;

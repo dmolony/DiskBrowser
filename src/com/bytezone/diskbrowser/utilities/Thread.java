@@ -50,20 +50,20 @@ class Thread
 
     switch (threadFormat)
     {
-      case 0:                   // uncompressed
+      case 0:                         // uncompressed
         break;
-      case 1:                   // Huffman Squeeze
+      case 1:                         // Huffman Squeeze
         break;
-      case 2:                   // Dynamic LZW/1
+      case 2:                         // Dynamic LZW/1
         lzw = new LZW1 (data);
         break;
-      case 3:                   // Dynamic LZW/2
+      case 3:                         // Dynamic LZW/2
         int crcLength = threadKind == 1 ? 0 : uncompressedEOF;
         lzw = new LZW2 (data, threadCrc, crcLength);
         break;
-      case 4:                   // Unix 12-bit compress
+      case 4:                         // Unix 12-bit compress
         break;
-      case 5:                   // Unix 16-bit compress
+      case 5:                         // Unix 16-bit compress
         break;
     }
 
@@ -118,6 +118,7 @@ class Thread
             break;
 
           case 1:                       // undefined
+            break;
           case 2:                       // undefined
             break;
         }
@@ -223,5 +224,4 @@ class Thread
 
     return text.toString ();
   }
-
 }

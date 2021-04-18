@@ -70,8 +70,8 @@ class Record
 
     if (crc != Utility.getCRC (crcBuffer, crcBuffer.length, 0))
     {
-      System.out.println ("***** Header CRC mismatch *****");
-      throw new FileFormatException ("Header CRC failed");
+      System.out.println ("***** Record CRC mismatch *****");
+      throw new FileFormatException ("Record CRC failed");
     }
 
     if (fileNameLength > 0)
@@ -246,6 +246,7 @@ class Record
         fileSystems[fileSystemID]));
     text.append (String.format ("Separator ...... %s%n", separator));
     text.append (String.format ("Access ......... %s  %s%n", bits, decode));
+
     if (storType < 16)
     {
       text.append (String.format ("File type ...... %02X     %s%n", fileType,
@@ -260,6 +261,7 @@ class Record
       text.append (String.format ("Total blocks ... %,d%n", auxType));
       text.append (String.format ("Block size ..... %,d%n", storType));
     }
+
     text.append (String.format ("Created ........ %s%n", created.format ()));
     text.append (String.format ("Modified ....... %s%n", modified.format ()));
     text.append (String.format ("Archived ....... %s%n", archived.format ()));

@@ -21,7 +21,6 @@ class Record
 
   private static String[] accessChars = { "D", "R", "B", "", "", "I", "W", "R" };
 
-  //  private final BlockHeader blockHeader;
   private final int totThreads;
   private final int crc;
   private final char separator;
@@ -48,9 +47,6 @@ class Record
     // check for NuFX
     if (!Utility.isMagic (buffer, dataPtr, NuFX))
       throw new FileFormatException ("NuFX not found");
-
-    //    blockHeader = new BlockHeader (buffer, dataPtr);
-    //    System.out.println (blockHeader);
 
     crc = Utility.getWord (buffer, dataPtr + 4);
     attributes = Utility.getWord (buffer, dataPtr + 6);
@@ -89,16 +85,6 @@ class Record
     else
       fileName = "";
   }
-
-  // ---------------------------------------------------------------------------------//
-  //  private boolean isNuFX (byte[] buffer, int ptr)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    if (buffer[ptr] == 0x4E && buffer[ptr + 1] == (byte) 0xF5 && buffer[ptr + 2] == 0x46
-  //        && buffer[ptr + 3] == (byte) 0xD8)
-  //      return true;
-  //    return false;
-  //  }
 
   // ---------------------------------------------------------------------------------//
   int getAttributes ()

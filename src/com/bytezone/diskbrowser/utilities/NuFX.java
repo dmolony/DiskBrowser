@@ -135,9 +135,10 @@ public class NuFX
       //      System.out.printf ("Files require: %d blocks%n", totalBlocks);
 
       // choose Volume Name
-      String volumeName = "Disk.Browser";
+      String volumeName = "DiskBrowser";
       int nameOffset = 0;
-      if (paths.size () == 1)
+
+      if (paths.size () == 1)                         // exactly one directory path
       {
         String onlyPath = paths.get (0);
         int pos = onlyPath.indexOf ('/');
@@ -145,7 +146,7 @@ public class NuFX
           volumeName = onlyPath;
         else                                          // use first component
           volumeName = onlyPath.substring (0, pos);
-        nameOffset = volumeName.length () + 1;
+        nameOffset = volumeName.length () + 1;        // skip volume name in all paths
       }
 
       for (int diskSize : diskSizes)      // in case we choose a size that is too small

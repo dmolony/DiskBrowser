@@ -124,50 +124,37 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   {
     int totalBlocks = disk.getTotalBlocks ();
 
-    switch (totalBlocks)
+    Dimension newGridLayout = switch (totalBlocks)
     {
-      case 280:
-        gridLayout = new Dimension (8, 35);
-        break;
-
-      case 455:
-        gridLayout = new Dimension (13, 35);
-        break;
-
-      case 560:
-        gridLayout = new Dimension (16, 35);
-        break;
-
-      case 704:
-        gridLayout = new Dimension (16, 44);
-        break;
-
-      case 768:
-        gridLayout = new Dimension (16, 48);
-        break;
-
-      case 1600:
+      case 280 -> new Dimension (8, 35);
+      case 455 -> new Dimension (13, 35);
+      case 560 -> new Dimension (16, 35);
+      case 704 -> new Dimension (16, 44);
+      case 768 -> new Dimension (16, 48);
+      case 800 -> new Dimension (8, 100);
+      case 1600 ->
+      {
         if (disk.getBlocksPerTrack () == 32)
-          gridLayout = new Dimension (disk.getBlocksPerTrack (), disk.getTotalTracks ());
+          yield new Dimension (32, 50);
         else
-          gridLayout = new Dimension (16, 100);
-        break;
-
-      case 2048:
-        gridLayout = new Dimension (8, 256);
-        break;
-
-      default:
+          yield new Dimension (16, 100);
+      }
+      case 2048 -> new Dimension (8, 256);
+      case 3200 -> new Dimension (16, 200);
+      default ->
+      {
         int[] sizes = { 32, 20, 16, 8 };
         for (int size : sizes)
           if ((totalBlocks % size) == 0)
-          {
-            gridLayout = new Dimension (size, totalBlocks / size);
-            break;
-          }
-        if (gridLayout == null)
-          System.out.println ("Unusable total blocks : " + totalBlocks);
-    }
+            yield new Dimension (size, totalBlocks / size);
+        yield null;
+      }
+    };
+
+    if (newGridLayout == null)
+      System.out.println ("Unusable total blocks : " + totalBlocks);
+    else
+      gridLayout = newGridLayout;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -328,7 +315,6 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   {
     Enumeration<TreeNode> children = node.breadthFirstEnumeration ();
     if (children != null)
-    {
       while (children.hasMoreElements ())
       {
         DefaultMutableTreeNode childNode =
@@ -336,16 +322,15 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
         if (childNode.getUserObject ().toString ().indexOf (name) > 0)
           return childNode;
       }
-    }
+
     return null;
   }
-
-  // ---------------------------------------------------------------------------------//
 
   /*
    * These routines just hand back the information that was created above, and
    * added to by the subclass.
    */
+  // ---------------------------------------------------------------------------------//
   @Override
   public SectorType getSectorType (int block)
   // ---------------------------------------------------------------------------------//

@@ -49,9 +49,8 @@ class ThreadHeader
     text.append (String.format ("  kind .............. %d  %s%n", threadKind,
         threadKindText[threadClass][threadKind]));
     text.append (String.format ("  crc ............... %,d  (%<04X)%n", threadCrc));
-    text.append (String.format ("  uncompressedEOF ... %,d%n", uncompressedEOF));
-    text.append (String.format ("  compressedEOF ..... %,d  (%08X)", compressedEOF,
-        compressedEOF));
+    text.append (String.format ("  uncompressedEOF ... %,d  (%<08X)%n", uncompressedEOF));
+    text.append (String.format ("  compressedEOF ..... %,d  (%<08X)", compressedEOF));
     return text.toString ();
   }
 }

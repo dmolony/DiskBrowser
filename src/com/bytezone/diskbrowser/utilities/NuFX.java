@@ -44,11 +44,11 @@ public class NuFX
     for (int rec = 0; rec < masterHeader.getTotalRecords (); rec++)
     {
       Record record = new Record (buffer, dataPtr);
-      if (record.getFileSystemID () != 1)
-      {
-        System.out.println ("Not Prodos");
-        break;
-      }
+      //      if (record.getFileSystemID () != 1)
+      //      {
+      //        System.out.println ("Not Prodos: " + record.getFileSystemID ());
+      //        break;
+      //      }
       records.add (record);
 
       if (debug)
@@ -175,7 +175,7 @@ public class NuFX
               if (nameOffset > 0)         // remove volume name from path
                 fileName = fileName.substring (nameOffset);
 
-              if (true)
+              if (false)
                 System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
                     fileName, fileType, auxType, eof, buffer.length, created, modified);
 

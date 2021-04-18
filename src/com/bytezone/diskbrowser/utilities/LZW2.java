@@ -17,9 +17,10 @@ class LZW2 extends LZW
     bytes = Objects.requireNonNull (buffer);
 
     this.crc = crc;
+    this.v3eof = eof;
+
     crcBase = 0xFFFF;
     codeWord = 0;
-    v3eof = eof;
 
     volume = buffer[0] & 0xFF;
     runLengthChar = (byte) (buffer[1] & 0xFF);

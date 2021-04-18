@@ -532,7 +532,7 @@ public class DosDisk extends AbstractFormattedDisk
 
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format ("Disk : %s%n%n", getDisplayPath ()));
+    text.append (String.format ("File : %s%n%n", getDisplayPath ()));
     text.append ("L Typ Len  Name                            Addr"
         + "   Length         TS Data  Comment" + newLine);
     text.append (underline);

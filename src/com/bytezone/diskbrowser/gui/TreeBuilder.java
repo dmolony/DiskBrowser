@@ -107,18 +107,16 @@ class TreeBuilder
       System.out.println ("Failed to set the disk icon : " + iconName);
   }
 
-  /*
-   * Class used to control the text displayed by the JTree.
-   */
   // ---------------------------------------------------------------------------------//
   class FileNode implements DataSource   // why does it implement DataSource?
   // ---------------------------------------------------------------------------------//
   {
-    DefaultMutableTreeNode parentNode;
-    public final File file;
     private static final int MAX_NAME_LENGTH = 36;
     private static final int SUFFIX_LENGTH = 12;
     private static final int PREFIX_LENGTH = MAX_NAME_LENGTH - SUFFIX_LENGTH - 3;
+
+    DefaultMutableTreeNode parentNode;
+    public final File file;
     private FormattedDisk formattedDisk;
     int disks;
     boolean showDisks;

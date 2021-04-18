@@ -17,8 +17,8 @@ import javax.swing.tree.TreeNode;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.disk.DiskFactory;
-import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 
 // -----------------------------------------------------------------------------------//
@@ -59,7 +59,7 @@ class AppleDiskTab extends AbstractTab
   // ---------------------------------------------------------------------------------//
   {
     super (redoHandler, selector, font);
-    //    System.out.println ("File not found: " + lastFileUsed);
+
     create (disk);
 
     DefaultMutableTreeNode node = findNode (lastFileUsed);
@@ -101,7 +101,6 @@ class AppleDiskTab extends AbstractTab
   public void activate ()
   // ---------------------------------------------------------------------------------//
   {
-    //    System.out.println ("=========== Activating AppleDiskTab =============");
     eventHandler.redo = true;
     eventHandler.fireDiskSelectionEvent (disk);
     eventHandler.redo = false;

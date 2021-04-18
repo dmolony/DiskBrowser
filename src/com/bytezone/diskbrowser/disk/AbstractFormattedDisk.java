@@ -67,6 +67,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
      */
     sectorTypesList.add (emptySector);
     sectorTypesList.add (usedSector);
+
     /*
      * Hopefully every used sector will be changed by the subclass to something
      * sensible, but deleted files will always leave the sector as used/unknown
@@ -74,16 +75,22 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
      */
     setSectorTypes ();
     setGridLayout ();
+
     /*
      * Create the disk name as the root for the catalog tree. Subclasses will
      * have to append their catalog entries to this node.
      */
+    String name = getName ();
+    if (name.endsWith (".tmp"))
+      name = "tmp.dsk";
+
     DefaultAppleFileSource afs =
-        new DefaultAppleFileSource (getName (), disk.toString (), this);
+        new DefaultAppleFileSource (name, disk.toString (), this);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (afs);
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     catalogTree = new JTree (treeModel);
     treeModel.setAsksAllowsChildren (true); // allows empty nodes to appear as folders
+
     /*
      * Add an ActionListener to the disk in case the interleave or blocksize
      * changes
@@ -226,11 +233,13 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public String getDisplayPath ()
   // ---------------------------------------------------------------------------------//
   {
-    if (originalPath != null)
-      return originalPath.toString ();
+    //    if (originalPath != null)
+    //      return originalPath.toString ();
 
     String home = System.getProperty ("user.home");
-    String path = disk.getFile ().getAbsolutePath ();
+
+    String path = originalPath != null ? originalPath.toString ()
+        : disk.getFile ().getAbsolutePath ();
     if (path.startsWith (home))
       return "~" + path.substring (home.length ());
 

@@ -7,10 +7,6 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.Utility;
 
-/*
- * There is only one of these - it is always the first entry in the first block.
- * Every other entry will be either a SubDirectoryHeader or a FileEntry.
- */
 // -----------------------------------------------------------------------------------//
 class VolumeDirectoryHeader extends DirectoryHeader
 // -----------------------------------------------------------------------------------//

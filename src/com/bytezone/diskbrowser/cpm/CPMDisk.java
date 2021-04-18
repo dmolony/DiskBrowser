@@ -185,7 +185,7 @@ public class CPMDisk extends AbstractFormattedDisk
         "----  ---------  --- - -  --   --   --   --   ----------------------------"
             + "-------------------" + newLine;
     StringBuilder text = new StringBuilder ();
-    text.append (String.format ("Disk : %s%n%n", getDisplayPath ()));
+    text.append (String.format ("File : %s%n%n", getDisplayPath ()));
     text.append ("User  Name       Typ R S  Ex   S2   S1   RC   Blocks" + newLine);
     text.append (line);
 

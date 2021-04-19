@@ -24,13 +24,14 @@ public class NuFX
   private int totalDisks;
   private int totalBlocks;
 
-  private VolumeName volumeName = new VolumeName ();
+  private VolumeName volumeName;
 
   // ---------------------------------------------------------------------------------//
   public NuFX (Path path) throws FileFormatException, IOException
   // ---------------------------------------------------------------------------------//
   {
     buffer = Files.readAllBytes (path);
+    volumeName = new VolumeName (path);
 
     masterHeader = new MasterHeader (buffer);
 
@@ -82,8 +83,6 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
-
-    //    volumeName.info ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -212,6 +211,18 @@ public class NuFX
     private int nameOffset = 0;
 
     // -------------------------------------------------------------------------------//
+    VolumeName (Path path)
+    // -------------------------------------------------------------------------------//
+    {
+      volumeName = path.getFileName ().toString ();
+      int pos = volumeName.lastIndexOf ('.');
+      if (pos > 0)
+        volumeName = volumeName.substring (0, pos);
+      if (volumeName.length () > 15)
+        volumeName = volumeName.substring (0, 15);
+    }
+
+    // -------------------------------------------------------------------------------//
     private void storePath (String fileName)
     // -------------------------------------------------------------------------------//
     {
@@ -240,6 +251,9 @@ public class NuFX
     private String getVolumeName ()
     // -------------------------------------------------------------------------------//
     {
+      if (true)
+        return volumeName;
+
       if (rootContainsFiles)
         return volumeName;
 

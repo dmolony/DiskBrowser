@@ -1,5 +1,9 @@
 package com.bytezone.diskbrowser.prodos.write;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRIES_PER_BLOCK;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.FILE_TYPE_DIRECTORY;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY_HEADER;
 import static com.bytezone.diskbrowser.utilities.Utility.readShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
@@ -196,7 +200,7 @@ public class ProdosDisk
     {
       int offset = blockNo * BLOCK_SIZE;
       int ptr = offset + 4;
-      for (int i = 0; i < 13; i++)
+      for (int i = 0; i < ENTRIES_PER_BLOCK; i++)
       {
         int storageTypeNameLength = buffer[ptr] & 0xFF;
         if (storageTypeNameLength == 0)
@@ -209,7 +213,7 @@ public class ProdosDisk
           int nameLength = buffer[ptr] & 0x0F;
           int storageType = (buffer[ptr] & 0xF0) >>> 4;
 
-          if (storageType < 0x0E
+          if (storageType < SUBDIRECTORY_HEADER
               && fileName.equals (new String (buffer, ptr + 1, nameLength)))
           {
             FileEntry fileEntry = new FileEntry (this, buffer, ptr);
@@ -234,12 +238,12 @@ public class ProdosDisk
 
     if (fileEntry != null)
     {
-      fileEntry.storageType = 0x0D;                     // subdirectory
+      fileEntry.storageType = SUBDIRECTORY;
       fileEntry.fileName = name;
       fileEntry.keyPointer = allocateNextBlock ();
       fileEntry.blocksUsed = 1;
-      fileEntry.eof = 512;
-      fileEntry.fileType = 0x0F;                        // DIR
+      fileEntry.eof = BLOCK_SIZE;
+      fileEntry.fileType = FILE_TYPE_DIRECTORY;
       fileEntry.headerPointer = blockNo;
       fileEntry.creationDate = LocalDateTime.now ();
       fileEntry.modifiedDate = LocalDateTime.now ();
@@ -318,7 +322,7 @@ public class ProdosDisk
       int offset = blockNo * BLOCK_SIZE;
       int ptr = offset + 4;
 
-      for (int i = 0; i < 13; i++)
+      for (int i = 0; i < ENTRIES_PER_BLOCK; i++)
       {
         if (buffer[ptr] == 0)         // free slot
           return new FileEntry (this, buffer, ptr);

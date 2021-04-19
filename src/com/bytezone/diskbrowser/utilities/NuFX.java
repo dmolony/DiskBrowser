@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.prodos.write.DiskFullException;
+import com.bytezone.diskbrowser.prodos.write.FileEntry;
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 
 // -----------------------------------------------------------------------------------//
@@ -128,7 +129,13 @@ public class NuFX
                 System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
                     fileName, fileType, auxType, eof, buffer.length, created, modified);
 
-              disk.addFile (fileName, fileType, auxType, created, modified, buffer);
+              FileEntry fileEntry =
+                  disk.addFile (fileName, fileType, auxType, created, modified, buffer);
+              if (fileEntry == null)
+              {
+                System.out.printf ("File %s not added%n", fileName);
+                break;
+              }
             }
           }
 

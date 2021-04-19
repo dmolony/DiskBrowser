@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.utilities;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -220,6 +219,7 @@ public class NuFX
         volumeName = volumeName.substring (0, pos);
       if (volumeName.length () > 15)
         volumeName = volumeName.substring (0, 15);
+      volumeName = volumeName.replace (' ', '.');
     }
 
     // -------------------------------------------------------------------------------//
@@ -317,16 +317,5 @@ public class NuFX
       for (String pathName : paths)
         System.out.println (pathName);
     }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static void main (String[] args) throws FileFormatException, IOException
-  // ---------------------------------------------------------------------------------//
-  {
-    File file = new File (
-        "/Users/denismolony/Dropbox/Examples/SHK/Disk Disintegrator Deluxe 5.0_D1.SHK");
-
-    NuFX nufx = new NuFX (file.toPath ());
-    System.out.println (nufx);
   }
 }

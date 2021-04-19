@@ -146,6 +146,7 @@ public class ProdosDisk
     if (fileEntry != null)
     {
       System.out.println ("File already exists: " + path);
+      System.out.println (fileEntry);
       return null;          // throw something?
     }
 
@@ -206,9 +207,10 @@ public class ProdosDisk
         else
         {
           int nameLength = buffer[ptr] & 0x0F;
+          int storageType = (buffer[ptr] & 0xF0) >>> 4;
 
-          String entryName = new String (buffer, ptr + 1, nameLength);
-          if (entryName.equals (fileName))
+          if (storageType < 0x0E
+              && fileName.equals (new String (buffer, ptr + 1, nameLength)))
           {
             FileEntry fileEntry = new FileEntry (this, buffer, ptr);
             fileEntry.read ();
@@ -251,7 +253,7 @@ public class ProdosDisk
       subdirectoryHeader.fileName = name;
       subdirectoryHeader.creationDate = LocalDateTime.now ();
       subdirectoryHeader.fileCount = 0;
-      subdirectoryHeader.parentPointer = (byte) blockNo;
+      subdirectoryHeader.parentPointer = blockNo;
       subdirectoryHeader.parentEntry =
           (byte) (((fileEntry.ptr % BLOCK_SIZE) - 4) / ENTRY_SIZE + 1);
 

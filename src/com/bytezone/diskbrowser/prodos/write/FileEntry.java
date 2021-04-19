@@ -54,6 +54,7 @@ public class FileEntry
   // ---------------------------------------------------------------------------------//
   {
     storageType = (byte) ((buffer[ptr] & 0xF0) >>> 4);
+
     int nameLength = buffer[ptr] & 0x0F;
     if (nameLength > 0)
       fileName = new String (buffer, ptr + 1, nameLength);

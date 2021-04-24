@@ -120,6 +120,7 @@ public class ProdosDisk
       LocalDateTime modified, byte[] dataBuffer) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
+    // split the full path into an array of subdirectories and a file name
     String[] subdirectories;
     String fileName = "";
 
@@ -135,6 +136,7 @@ public class ProdosDisk
       fileName = path;
     }
 
+    // search for each subdirectory, create any that don't exist
     int catalogBlockNo = 2;
 
     for (int i = 0; i < subdirectories.length; i++)
@@ -146,6 +148,7 @@ public class ProdosDisk
       catalogBlockNo = fileEntry.keyPointer;
     }
 
+    // check that the file doesn't already exist
     FileEntry fileEntry = searchDirectory (catalogBlockNo, fileName);
     if (fileEntry != null)
     {
@@ -154,6 +157,7 @@ public class ProdosDisk
       return null;          // throw something?
     }
 
+    // create the file in the current catalog block
     fileEntry = findFreeSlot (catalogBlockNo);
 
     if (fileEntry != null)
@@ -312,8 +316,10 @@ public class ProdosDisk
   private FileEntry findFreeSlot (int blockNo) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
+    // get the subdirectory header before the blockNo possibly changes
     SubdirectoryHeader subdirectoryHeader = subdirectoryHeaders.get (blockNo);
-    int lastBlockNo = 0;
+
+    int lastBlockNo = 0;      // used for linking directory blocks
 
     do
     {
@@ -335,15 +341,18 @@ public class ProdosDisk
     // no free slots, so add a new catalog block
     blockNo = allocateNextBlock ();
 
-    // update file entry size
-    FileEntry fileEntry =
-        new FileEntry (this, buffer, subdirectoryHeader.parentPointer * BLOCK_SIZE
-            + (subdirectoryHeader.parentEntry - 1) * ENTRY_SIZE + 4);
-    fileEntry.read ();
-    fileEntry.blocksUsed++;
-    fileEntry.eof += BLOCK_SIZE;
-    fileEntry.modifiedDate = LocalDateTime.now ();
-    fileEntry.write ();
+    // update file entry size (if not the Volume Directory)
+    if (subdirectoryHeader != null)
+    {
+      FileEntry fileEntry =
+          new FileEntry (this, buffer, subdirectoryHeader.parentPointer * BLOCK_SIZE
+              + (subdirectoryHeader.parentEntry - 1) * ENTRY_SIZE + 4);
+      fileEntry.read ();
+      fileEntry.blocksUsed++;
+      fileEntry.eof += BLOCK_SIZE;
+      fileEntry.modifiedDate = LocalDateTime.now ();
+      fileEntry.write ();
+    }
 
     // update links
     int ptr = blockNo * BLOCK_SIZE;

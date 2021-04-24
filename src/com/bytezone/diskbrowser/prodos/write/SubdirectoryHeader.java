@@ -56,8 +56,6 @@ public class SubdirectoryHeader extends DirectoryHeader
     writeShort (buffer, ptr + 0x23, parentPointer);
     buffer[ptr + 0x25] = parentEntry;
     buffer[ptr + 0x26] = parentEntryLength;
-
-    assert parentPointer > 0;
   }
 
   // ---------------------------------------------------------------------------------//

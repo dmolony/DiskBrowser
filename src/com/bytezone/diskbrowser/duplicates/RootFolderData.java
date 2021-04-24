@@ -66,7 +66,7 @@ public class RootFolderData implements RootDirectoryChangeListener
     btnOK = new JButton ("OK");
 
     progressPanel = new ProgressPanel ();
-    progressPanel.setPreferredSize (new Dimension (560, 340));
+    progressPanel.setPreferredSize (new Dimension (560, 380));
 
     dialogTotals = new JFrame ("Disk Totals");
     dialogTotals.add (progressPanel, BorderLayout.CENTER);

@@ -125,7 +125,7 @@ public class NuFX
               LocalDateTime modified = record.getModified ();
               byte[] buffer = record.getData ();
 
-              if (false)
+              if (debug)
                 System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
                     fileName, fileType, auxType, eof, buffer.length, created, modified);
 
@@ -258,8 +258,8 @@ public class NuFX
     private String getVolumeName ()
     // -------------------------------------------------------------------------------//
     {
-      if (true)
-        return volumeName;
+      //      if (true)
+      //        return volumeName;
 
       if (rootContainsFiles)
         return volumeName;
@@ -270,7 +270,6 @@ public class NuFX
         if (pos > 0)
         {
           String firstPath = paths.get (0).substring (0, pos + 1);
-          System.out.println (firstPath);
 
           boolean allSame = true;
           for (String pathName : paths)

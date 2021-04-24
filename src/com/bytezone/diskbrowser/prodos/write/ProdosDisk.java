@@ -159,8 +159,6 @@ public class ProdosDisk
     if (fileEntry != null)
     {
       fileEntry.fileName = fileName;
-      fileEntry.creationDate = LocalDateTime.now ();
-      fileEntry.modifiedDate = LocalDateTime.now ();
       fileEntry.version = 0x00;
       fileEntry.minVersion = 0x00;
       fileEntry.headerPointer = catalogBlockNo;
@@ -257,7 +255,7 @@ public class ProdosDisk
       subdirectoryHeader.fileName = name;
       subdirectoryHeader.creationDate = LocalDateTime.now ();
       subdirectoryHeader.fileCount = 0;
-      subdirectoryHeader.parentPointer = blockNo;
+      subdirectoryHeader.parentPointer = fileEntry.ptr / BLOCK_SIZE;
       subdirectoryHeader.parentEntry =
           (byte) (((fileEntry.ptr % BLOCK_SIZE) - 4) / ENTRY_SIZE + 1);
 

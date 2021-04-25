@@ -1,9 +1,12 @@
 package com.bytezone.diskbrowser.prodos.write;
 
-import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.ENTRY_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
 import static com.bytezone.diskbrowser.utilities.Utility.readShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
+
+import java.time.LocalDateTime;
 
 // -----------------------------------------------------------------------------------//
 public class SubdirectoryHeader extends DirectoryHeader
@@ -21,6 +24,19 @@ public class SubdirectoryHeader extends DirectoryHeader
 
     storageType = (byte) 0x0E;
     access = (byte) 0xC3;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void updateParentFileEntry ()
+  // ---------------------------------------------------------------------------------//
+  {
+    FileEntry fileEntry = new FileEntry (disk, buffer,
+        parentPointer * BLOCK_SIZE + (parentEntry - 1) * ENTRY_SIZE + 4);
+    fileEntry.read ();
+    fileEntry.blocksUsed++;
+    fileEntry.eof += BLOCK_SIZE;
+    fileEntry.modifiedDate = LocalDateTime.now ();
+    fileEntry.write ();
   }
 
   // ---------------------------------------------------------------------------------//

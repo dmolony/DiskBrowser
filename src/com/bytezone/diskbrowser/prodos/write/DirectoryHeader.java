@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.prodos.write;
 
-import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.ENTRY_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRIES_PER_BLOCK;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
 import static com.bytezone.diskbrowser.utilities.Utility.getAppleDate;
 import static com.bytezone.diskbrowser.utilities.Utility.putAppleDate;
 import static com.bytezone.diskbrowser.utilities.Utility.readShort;
@@ -12,8 +14,6 @@ import java.time.LocalDateTime;
 public class DirectoryHeader
 // -----------------------------------------------------------------------------------//
 {
-  static final int BLOCK_SIZE = 512;
-
   ProdosDisk disk;
   byte[] buffer;
   int ptr;
@@ -25,7 +25,7 @@ public class DirectoryHeader
   byte minVersion = 0x00;
   byte access = (byte) 0xE3;
   byte entryLength = ENTRY_SIZE;
-  byte entriesPerBlock = 0x0D;
+  byte entriesPerBlock = ENTRIES_PER_BLOCK;
   int fileCount;
 
   // ---------------------------------------------------------------------------------//
@@ -44,6 +44,7 @@ public class DirectoryHeader
     storageType = (byte) ((buffer[ptr] & 0xF0) >>> 4);
     int nameLength = buffer[ptr] & 0x0F;
     fileName = new String (buffer, ptr + 1, nameLength);
+
     creationDate = getAppleDate (buffer, ptr + 0x18);
     version = buffer[ptr + 0x1C];
     minVersion = buffer[ptr + 0x1D];

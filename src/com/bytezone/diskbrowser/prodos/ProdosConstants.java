@@ -88,6 +88,7 @@ public interface ProdosConstants
                                "CMD", "OVL", "UD2", "UD3", "UD4", "BAT", "UD6", "UD7", //
                                "PRG", "P16", "INT", "IVR", "BAS", "VAR", "REL", "SYS" };
 
+  static int BLOCK_SIZE = 0x200;
   static int ENTRY_SIZE = 0x27;
   static int ENTRIES_PER_BLOCK = 0x0D;
   static int BLOCK_ENTRY_SIZE = ENTRY_SIZE * ENTRIES_PER_BLOCK;

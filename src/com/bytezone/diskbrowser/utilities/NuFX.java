@@ -10,6 +10,7 @@ import java.util.List;
 import com.bytezone.diskbrowser.prodos.write.DiskFullException;
 import com.bytezone.diskbrowser.prodos.write.FileEntry;
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
+import com.bytezone.diskbrowser.prodos.write.VolumeCatalogFullException;
 
 // -----------------------------------------------------------------------------------//
 public class NuFX
@@ -151,6 +152,11 @@ public class NuFX
         catch (DiskFullException e)
         {
           System.out.println ("disk full: " + diskSize);    // go round again
+        }
+        catch (VolumeCatalogFullException e)
+        {
+          e.printStackTrace ();
+          return null;
         }
       }
     }

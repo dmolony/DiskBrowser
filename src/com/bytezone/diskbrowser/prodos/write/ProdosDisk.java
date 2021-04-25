@@ -1,6 +1,8 @@
 package com.bytezone.diskbrowser.prodos.write;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRIES_PER_BLOCK;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.FILE_TYPE_DIRECTORY;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY_HEADER;
@@ -20,9 +22,9 @@ public class ProdosDisk
 {
   static final String UNDERLINE = "------------------------------------------------\n";
 
-  static final int BLOCK_SIZE = 512;
+  //  static final int BLOCK_SIZE = 512;
   private static final int CATALOG_SIZE = 4;
-  static final int ENTRY_SIZE = 0x27;
+  //  static final int ENTRY_SIZE = 0x27;
   private static final int BITS_PER_BLOCK = 8 * BLOCK_SIZE;
   static final String[] storageTypes =
       { "Deleted", "Seedling", "Sapling", "Tree", "", "", "", "", "", "", "", "", "",
@@ -117,7 +119,8 @@ public class ProdosDisk
 
   // ---------------------------------------------------------------------------------//
   public FileEntry addFile (String path, byte type, int auxType, LocalDateTime created,
-      LocalDateTime modified, byte[] dataBuffer) throws DiskFullException
+      LocalDateTime modified, byte[] dataBuffer)
+      throws DiskFullException, VolumeCatalogFullException
   // ---------------------------------------------------------------------------------//
   {
     // split the full path into an array of subdirectories and a file name
@@ -233,7 +236,8 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private FileEntry createSubdirectory (int blockNo, String name) throws DiskFullException
+  private FileEntry createSubdirectory (int blockNo, String name)
+      throws DiskFullException, VolumeCatalogFullException
   // ---------------------------------------------------------------------------------//
   {
     FileEntry fileEntry = findFreeSlot (blockNo);
@@ -296,7 +300,7 @@ public class ProdosDisk
   int allocateNextBlock () throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
-    int nextBlock = getFreeBlock ();
+    int nextBlock = volumeBitMap.nextSetBit (0);
     if (nextBlock < 0)
       throw new DiskFullException ("Disk Full");
 
@@ -306,17 +310,15 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getFreeBlock ()
+  private FileEntry findFreeSlot (int blockNo)
+      throws DiskFullException, VolumeCatalogFullException
   // ---------------------------------------------------------------------------------//
   {
-    return volumeBitMap.nextSetBit (0);
-  }
+    // check for Volume Directory Header full
+    if (blockNo == 2 && volumeDirectoryHeader.fileCount == 51)
+      throw new VolumeCatalogFullException ("Volume Directory is full");   // stupid
 
-  // ---------------------------------------------------------------------------------//
-  private FileEntry findFreeSlot (int blockNo) throws DiskFullException
-  // ---------------------------------------------------------------------------------//
-  {
-    // get the subdirectory header before the blockNo possibly changes
+    // get the subdirectory header before the blockNo can change
     SubdirectoryHeader subdirectoryHeader = subdirectoryHeaders.get (blockNo);
 
     int lastBlockNo = 0;      // used for linking directory blocks
@@ -338,26 +340,19 @@ public class ProdosDisk
       blockNo = readShort (buffer, offset + 2);      // next block
     } while (blockNo > 0);
 
+    if (subdirectoryHeader == null)         // this should be impossible
+      throw new VolumeCatalogFullException ("Volume Directory is full");
+
     // no free slots, so add a new catalog block
     blockNo = allocateNextBlock ();
-
-    // update file entry size (if not the Volume Directory)
-    if (subdirectoryHeader != null)
-    {
-      FileEntry fileEntry =
-          new FileEntry (this, buffer, subdirectoryHeader.parentPointer * BLOCK_SIZE
-              + (subdirectoryHeader.parentEntry - 1) * ENTRY_SIZE + 4);
-      fileEntry.read ();
-      fileEntry.blocksUsed++;
-      fileEntry.eof += BLOCK_SIZE;
-      fileEntry.modifiedDate = LocalDateTime.now ();
-      fileEntry.write ();
-    }
 
     // update links
     int ptr = blockNo * BLOCK_SIZE;
     writeShort (buffer, lastBlockNo * BLOCK_SIZE + 2, blockNo);   // point to next block
     writeShort (buffer, ptr, lastBlockNo);                        // point to previous block
+
+    // update parent's file entry size (this is the subdirectory file entry
+    subdirectoryHeader.updateParentFileEntry ();
 
     return new FileEntry (this, buffer, ptr + 4);      // first slot in new block
   }

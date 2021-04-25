@@ -15,16 +15,19 @@ import com.bytezone.diskbrowser.utilities.Utility;
 abstract class CatalogEntry implements AppleFileSource
 // -----------------------------------------------------------------------------------//
 {
+  Disk disk;
   ProdosDisk parentDisk;
-  DirectoryHeader parentDirectory;
+
   String name;
   int storageType;
+
   LocalDateTime created;
   int version;
   int minVersion;
   int access;
+
   List<DiskAddress> dataBlocks = new ArrayList<> ();
-  Disk disk;
+  DirectoryHeader parentDirectory;
 
   // ---------------------------------------------------------------------------------//
   CatalogEntry (ProdosDisk parentDisk, byte[] entryBuffer)
@@ -32,8 +35,10 @@ abstract class CatalogEntry implements AppleFileSource
   {
     this.parentDisk = parentDisk;
     this.disk = parentDisk.getDisk ();
+
     name = HexFormatter.getString (entryBuffer, 1, entryBuffer[0] & 0x0F);
     storageType = (entryBuffer[0] & 0xF0) >> 4;
+
     created = Utility.getAppleDate (entryBuffer, 24);
     version = entryBuffer[28] & 0xFF;
     minVersion = entryBuffer[29] & 0xFF;
@@ -63,8 +68,8 @@ abstract class CatalogEntry implements AppleFileSource
   public boolean contains (DiskAddress da)
   // ---------------------------------------------------------------------------------//
   {
-    for (DiskAddress sector : dataBlocks)
-      if (sector.matches (da))
+    for (DiskAddress diskAddress : dataBlocks)
+      if (diskAddress.matches (da))
         return true;
     return false;
   }

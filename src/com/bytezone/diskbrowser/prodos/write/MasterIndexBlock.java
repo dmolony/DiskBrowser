@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.prodos.write;
 
-import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.BLOCK_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
 
 // -----------------------------------------------------------------------------------//
 public class MasterIndexBlock

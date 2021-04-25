@@ -53,7 +53,7 @@ public class VolumeDirectoryHeader extends DirectoryHeader
     text.append ("Volume Directory Header\n");
     text.append (UNDERLINE);
     text.append (super.toString ());
-    text.append (String.format ("Bitmap pointer ... %d%n", bitMapPointer));
+    text.append (String.format ("Bitmap pointer ... %02X%n", bitMapPointer));
     text.append (String.format ("Total blocks ..... %d%n", totalBlocks));
     text.append (UNDERLINE);
 

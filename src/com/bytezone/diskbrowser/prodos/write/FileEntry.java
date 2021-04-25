@@ -1,6 +1,10 @@
 package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SAPLING;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.SEEDLING;
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.TREE;
 import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
 import static com.bytezone.diskbrowser.utilities.Utility.getAppleDate;
 import static com.bytezone.diskbrowser.utilities.Utility.putAppleDate;
@@ -15,13 +19,9 @@ import java.time.LocalDateTime;
 public class FileEntry
 // -----------------------------------------------------------------------------------//
 {
-  private static final int SEEDLING = 0x01;
-  private static final int SAPLING = 0x02;
-  private static final int TREE = 0x03;
-
-  ProdosDisk disk;
-  byte[] buffer;
-  int ptr;
+  private final ProdosDisk disk;
+  private final byte[] buffer;
+  private final int ptr;
 
   String fileName;
   byte storageType;
@@ -47,6 +47,20 @@ public class FileEntry
     this.disk = disk;
     this.buffer = buffer;
     this.ptr = ptr;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getBlockNo ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return ptr / BLOCK_SIZE;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getEntryNo ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return (((ptr % BLOCK_SIZE) - 4) / ENTRY_SIZE + 1);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -307,8 +321,8 @@ public class FileEntry
     text.append (UNDERLINE);
     int blockNo = ptr / BLOCK_SIZE;
     text.append (String.format ("Block ............ %04X%n", blockNo));
-    text.append (String.format ("Entry ............ %02X%n",
-        (ptr - blockNo * BLOCK_SIZE - 4) / 39));
+    text.append (
+        String.format ("Entry ............ %02X%n", ((ptr % BLOCK_SIZE) - 4) / 39 + 1));
     text.append (String.format ("Storage type ..... %02X  %s%n", storageType,
         ProdosDisk.storageTypes[storageType]));
     text.append (String.format ("Name length ...... %02X%n", fileName.length ()));

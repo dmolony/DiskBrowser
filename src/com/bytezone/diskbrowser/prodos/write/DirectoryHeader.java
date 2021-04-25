@@ -79,8 +79,8 @@ public class DirectoryHeader
 
     int blockNo = ptr / BLOCK_SIZE;
     text.append (String.format ("Block ............ %04X%n", blockNo));
-    text.append (String.format ("Entry ............ %02X%n",
-        (ptr - blockNo * BLOCK_SIZE - 4) / 39));
+    text.append (
+        String.format ("Entry ............ %02X%n", ((ptr % BLOCK_SIZE) - 4) / 39 + 1));
 
     text.append (String.format ("Storage type ..... %02X  %s%n", storageType,
         ProdosDisk.storageTypes[storageType]));

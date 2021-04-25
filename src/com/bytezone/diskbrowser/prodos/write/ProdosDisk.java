@@ -22,10 +22,9 @@ public class ProdosDisk
 {
   static final String UNDERLINE = "------------------------------------------------\n";
 
-  //  static final int BLOCK_SIZE = 512;
   private static final int CATALOG_SIZE = 4;
-  //  static final int ENTRY_SIZE = 0x27;
   private static final int BITS_PER_BLOCK = 8 * BLOCK_SIZE;
+
   static final String[] storageTypes =
       { "Deleted", "Seedling", "Sapling", "Tree", "", "", "", "", "", "", "", "", "",
         "Subdirectory", "Subdirectory Header", "Volume Directory Header" };
@@ -125,7 +124,7 @@ public class ProdosDisk
   {
     // split the full path into an array of subdirectories and a file name
     String[] subdirectories;
-    String fileName = "";
+    String fileName;
 
     int pos = path.lastIndexOf ('/');
     if (pos > 0)
@@ -160,7 +159,7 @@ public class ProdosDisk
       return null;          // throw something?
     }
 
-    // create the file in the current catalog block
+    // create a file entry in the current catalog block
     fileEntry = findFreeSlot (catalogBlockNo);
 
     if (fileEntry != null)
@@ -168,7 +167,7 @@ public class ProdosDisk
       fileEntry.fileName = fileName;
       fileEntry.version = 0x00;
       fileEntry.minVersion = 0x00;
-      fileEntry.headerPointer = catalogBlockNo;
+      fileEntry.headerPointer = catalogBlockNo;     // block containing catalog header
       fileEntry.fileType = type;
       fileEntry.auxType = auxType;
       fileEntry.creationDate = created;
@@ -182,7 +181,7 @@ public class ProdosDisk
       return fileEntry;
     }
 
-    return null;
+    return null;        // should be impossible
   }
 
   // ---------------------------------------------------------------------------------//
@@ -193,6 +192,8 @@ public class ProdosDisk
     volumeDirectoryHeader.write ();
     for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
       subdirectoryHeader.write ();
+
+    System.out.println (this);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -240,43 +241,42 @@ public class ProdosDisk
       throws DiskFullException, VolumeCatalogFullException
   // ---------------------------------------------------------------------------------//
   {
+    // this will return a new, empty file entry, or throw an exception
     FileEntry fileEntry = findFreeSlot (blockNo);
 
-    if (fileEntry != null)
+    if (fileEntry == null)        // should be impossible
     {
-      fileEntry.storageType = SUBDIRECTORY;
-      fileEntry.fileName = name;
-      fileEntry.keyPointer = allocateNextBlock ();
-      fileEntry.blocksUsed = 1;
-      fileEntry.eof = BLOCK_SIZE;
-      fileEntry.fileType = FILE_TYPE_DIRECTORY;
-      fileEntry.headerPointer = blockNo;
-      fileEntry.creationDate = LocalDateTime.now ();
-      fileEntry.modifiedDate = LocalDateTime.now ();
-
-      fileEntry.write ();
-
-      updateFileCount (fileEntry.headerPointer);
-
-      SubdirectoryHeader subdirectoryHeader =
-          new SubdirectoryHeader (this, buffer, fileEntry.keyPointer * BLOCK_SIZE + 4);
-      subdirectoryHeader.fileName = name;
-      subdirectoryHeader.creationDate = LocalDateTime.now ();
-      subdirectoryHeader.fileCount = 0;
-      subdirectoryHeader.parentPointer = fileEntry.ptr / BLOCK_SIZE;
-      subdirectoryHeader.parentEntry =
-          (byte) (((fileEntry.ptr % BLOCK_SIZE) - 4) / ENTRY_SIZE + 1);
-
-      subdirectoryHeader.write ();
-
-      subdirectoryHeaders.put (fileEntry.keyPointer, subdirectoryHeader);
-
-      return fileEntry;
+      System.out.println ("failed");
+      return null;
     }
 
-    System.out.println ("failed");
+    fileEntry.storageType = SUBDIRECTORY;
+    fileEntry.fileName = name;
+    fileEntry.keyPointer = allocateNextBlock (); // allocate block for the subdirectory header
+    fileEntry.blocksUsed = 1;
+    fileEntry.eof = BLOCK_SIZE;
+    fileEntry.fileType = FILE_TYPE_DIRECTORY;
+    fileEntry.headerPointer = blockNo;
+    fileEntry.creationDate = LocalDateTime.now ();
+    fileEntry.modifiedDate = LocalDateTime.now ();
 
-    return null;          // no empty slots found
+    fileEntry.write ();
+
+    updateFileCount (fileEntry.headerPointer);
+
+    SubdirectoryHeader subdirectoryHeader =
+        new SubdirectoryHeader (this, buffer, fileEntry.keyPointer * BLOCK_SIZE + 4);
+
+    subdirectoryHeader.fileName = name;
+    subdirectoryHeader.creationDate = LocalDateTime.now ();
+    subdirectoryHeader.fileCount = 0;
+    subdirectoryHeader.setParentDetails (fileEntry);
+
+    subdirectoryHeader.write ();
+
+    subdirectoryHeaders.put (fileEntry.keyPointer, subdirectoryHeader);
+
+    return fileEntry;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -384,5 +384,26 @@ public class ProdosDisk
   // ---------------------------------------------------------------------------------//
   {
     return buffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append (volumeDirectoryHeader);
+    text.append ("\n");
+
+    for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
+    {
+      text.append (subdirectoryHeader);
+      text.append ("\n");
+      text.append (subdirectoryHeader.getParentFileEntry ());
+      text.append ("\n");
+    }
+
+    return text.toString ();
   }
 }

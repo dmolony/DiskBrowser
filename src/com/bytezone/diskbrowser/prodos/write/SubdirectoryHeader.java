@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 public class SubdirectoryHeader extends DirectoryHeader
 // -----------------------------------------------------------------------------------//
 {
-  int parentPointer;
-  byte parentEntry;
-  byte parentEntryLength = ENTRY_SIZE;
+  private int parentPointer;
+  private byte parentEntry;
+  private byte parentEntryLength;
 
   // ---------------------------------------------------------------------------------//
   public SubdirectoryHeader (ProdosDisk disk, byte[] buffer, int ptr)
@@ -27,12 +27,30 @@ public class SubdirectoryHeader extends DirectoryHeader
   }
 
   // ---------------------------------------------------------------------------------//
-  void updateParentFileEntry ()
+  void setParentDetails (FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
+  {
+    parentPointer = fileEntry.getBlockNo ();
+    parentEntry = (byte) fileEntry.getEntryNo ();
+    parentEntryLength = ENTRY_SIZE;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  FileEntry getParentFileEntry ()
   // ---------------------------------------------------------------------------------//
   {
     FileEntry fileEntry = new FileEntry (disk, buffer,
         parentPointer * BLOCK_SIZE + (parentEntry - 1) * ENTRY_SIZE + 4);
     fileEntry.read ();
+
+    return fileEntry;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void updateParentFileEntry ()
+  // ---------------------------------------------------------------------------------//
+  {
+    FileEntry fileEntry = getParentFileEntry ();
     fileEntry.blocksUsed++;
     fileEntry.eof += BLOCK_SIZE;
     fileEntry.modifiedDate = LocalDateTime.now ();
@@ -85,7 +103,7 @@ public class SubdirectoryHeader extends DirectoryHeader
     text.append ("Subdirectory Header\n");
     text.append (UNDERLINE);
     text.append (super.toString ());
-    text.append (String.format ("Parent pointer ... %d%n", parentPointer));
+    text.append (String.format ("Parent pointer ... %04X%n", parentPointer));
     text.append (String.format ("Parent entry ..... %02X%n", parentEntry));
     text.append (String.format ("PE length ........ %02X%n", parentEntryLength));
     text.append (UNDERLINE);

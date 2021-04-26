@@ -144,6 +144,9 @@ class Record
   String getFileName ()
   // ---------------------------------------------------------------------------------//
   {
+    if (fileNameLength > 0)                 // probably version 0
+      return fileName;
+
     for (Thread thread : threads)
       if (thread.hasFileName ())
       {

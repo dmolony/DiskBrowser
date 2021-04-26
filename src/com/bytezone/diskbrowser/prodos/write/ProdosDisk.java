@@ -12,9 +12,12 @@ import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 // -----------------------------------------------------------------------------------//
 public class ProdosDisk
@@ -36,6 +39,7 @@ public class ProdosDisk
 
   private VolumeDirectoryHeader volumeDirectoryHeader;
   private Map<Integer, SubdirectoryHeader> subdirectoryHeaders = new HashMap<> ();
+  private List<String> paths = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public ProdosDisk (int blocks, String volumeName) throws IOException, DiskFullException
@@ -122,6 +126,10 @@ public class ProdosDisk
       throws DiskFullException, VolumeCatalogFullException
   // ---------------------------------------------------------------------------------//
   {
+    // save path for verification
+    paths.add (path);
+    System.out.printf ("Path: %s%n", path);
+
     // split the full path into an array of subdirectories and a file name
     String[] subdirectories;
     String fileName;
@@ -141,21 +149,25 @@ public class ProdosDisk
     // search for each subdirectory, create any that don't exist
     int catalogBlockNo = 2;
 
+    FileEntry fileEntry = null;
     for (int i = 0; i < subdirectories.length; i++)
     {
-      FileEntry fileEntry = searchDirectory (catalogBlockNo, subdirectories[i]);
-      if (fileEntry == null)
+      Optional<FileEntry> fileEntryOpt =
+          searchDirectory (catalogBlockNo, subdirectories[i]);
+      if (fileEntryOpt.isEmpty ())
         fileEntry = createSubdirectory (catalogBlockNo, subdirectories[i]);
+      else
+        fileEntry = fileEntryOpt.get ();
 
       catalogBlockNo = fileEntry.keyPointer;
     }
 
     // check that the file doesn't already exist
-    FileEntry fileEntry = searchDirectory (catalogBlockNo, fileName);
-    if (fileEntry != null)
+    Optional<FileEntry> fileEntryOpt = searchDirectory (catalogBlockNo, fileName);
+    if (fileEntryOpt.isPresent ())
     {
       System.out.println ("File already exists: " + path);
-      System.out.println (fileEntry);
+      System.out.println (fileEntryOpt.get ());
       return null;          // throw something?
     }
 
@@ -185,6 +197,66 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
+  private boolean verify (String path)
+  // ---------------------------------------------------------------------------------//
+  {
+    // split the full path into an array of subdirectories and a file name
+    String[] subdirectories;
+    String fileName;
+
+    int pos = path.lastIndexOf ('/');
+    if (pos > 0)
+    {
+      subdirectories = path.substring (0, pos).split ("/");
+      fileName = path.substring (pos + 1);
+    }
+    else
+    {
+      subdirectories = new String[0];
+      fileName = path;
+    }
+
+    // search for each subdirectory, fail any that don't exist
+    int catalogBlockNo = 2;
+
+    FileEntry fileEntry = null;
+    for (int i = 0; i < subdirectories.length; i++)
+    {
+      Optional<FileEntry> fileEntryOpt =
+          searchDirectory (catalogBlockNo, subdirectories[i]);
+      if (fileEntryOpt.isEmpty ())
+      {
+        System.out.println ("path doesn't exist");
+        return false;
+      }
+
+      fileEntry = fileEntryOpt.get ();
+
+      catalogBlockNo = fileEntry.keyPointer;
+    }
+
+    // check that the file already exists
+    Optional<FileEntry> fileEntryOpt = searchDirectory (catalogBlockNo, fileName);
+    if (fileEntryOpt.isPresent ())
+      return true;
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void verify ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
+    {
+      System.out.printf ("%-35s%n", subdirectoryHeader.fileName);
+      FileEntry fileEntry = subdirectoryHeader.getParentFileEntry ();
+      if (!fileEntry.fileName.equals (subdirectoryHeader.fileName))
+        System.out.println ("fail");
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
   public void close ()
   // ---------------------------------------------------------------------------------//
   {
@@ -193,11 +265,24 @@ public class ProdosDisk
     for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
       subdirectoryHeader.write ();
 
-    System.out.println (this);
+    if (false)
+    {
+      System.out.printf ("Verifying %s files%n", paths.size ());
+      for (String path : paths)
+      {
+        System.out.printf ("%-35s  ", path);
+        if (!verify (path))
+          System.out.println ("fail");
+        else
+          System.out.println ("pass");
+      }
+      System.out.println ();
+    }
+    verify ();
   }
 
   // ---------------------------------------------------------------------------------//
-  private FileEntry searchDirectory (int blockNo, String fileName)
+  private Optional<FileEntry> searchDirectory (int blockNo, String fileName)
   // ---------------------------------------------------------------------------------//
   {
     int emptySlotPtr = 0;
@@ -224,7 +309,7 @@ public class ProdosDisk
           {
             FileEntry fileEntry = new FileEntry (this, buffer, ptr);
             fileEntry.read ();
-            return fileEntry;
+            return Optional.of (fileEntry);
           }
         }
 
@@ -233,7 +318,7 @@ public class ProdosDisk
       blockNo = readShort (buffer, offset + 2);
     } while (blockNo > 0);
 
-    return null;
+    return Optional.empty ();
   }
 
   // ---------------------------------------------------------------------------------//

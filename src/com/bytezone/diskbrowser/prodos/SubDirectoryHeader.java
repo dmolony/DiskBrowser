@@ -4,22 +4,27 @@ import java.util.List;
 
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
-import com.bytezone.diskbrowser.utilities.Utility;
+import com.bytezone.diskbrowser.utilities.Utility;;
 
 // -----------------------------------------------------------------------------------//
-class SubDirectoryHeader extends DirectoryHeader
+public class SubDirectoryHeader extends DirectoryHeader
 // -----------------------------------------------------------------------------------//
 {
   private final int parentPointer;
   private final int parentSequence;
   private final int parentSize;
 
+  private final int blockNo;
+
   // ---------------------------------------------------------------------------------//
-  SubDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer, FileEntry parent)
+  SubDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer, FileEntry parent,
+      int blockNo)
   // ---------------------------------------------------------------------------------//
   {
-    super (parentDisk, entryBuffer);
+    super (parentDisk, entryBuffer, blockNo, 1);
+
     this.parentDirectory = parent.parentDirectory;
+    this.blockNo = blockNo;
 
     parentPointer = Utility.intValue (entryBuffer[35], entryBuffer[36]);
     parentSequence = entryBuffer[37] & 0xFF;
@@ -44,6 +49,22 @@ class SubDirectoryHeader extends DirectoryHeader
   // ---------------------------------------------------------------------------------//
   {
     return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public int getBlockNo ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return blockNo;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String getText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%s  %04X:%02X", super.getText (), parentPointer,
+        parentSequence);
   }
 
   // ---------------------------------------------------------------------------------//

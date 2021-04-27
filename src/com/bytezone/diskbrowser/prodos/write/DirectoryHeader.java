@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class DirectoryHeader
 // -----------------------------------------------------------------------------------//
 {
+  static final String UNDERLINE = "--------------------------------------------";
   ProdosDisk disk;
   byte[] buffer;
   int ptr;
@@ -68,6 +69,49 @@ public class DirectoryHeader
     buffer[ptr + 0x1F] = entryLength;
     buffer[ptr + 0x20] = entriesPerBlock;
     writeShort (buffer, ptr + 0x21, fileCount);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void list ()
+  // ---------------------------------------------------------------------------------//
+  {
+    System.out.println (UNDERLINE);
+    System.out.println (toText ());
+    System.out.println (UNDERLINE);
+
+    int blockNo = ptr / BLOCK_SIZE;
+
+    do
+    {
+      int offset = blockNo * BLOCK_SIZE;
+      int ptr = offset + 4;
+      for (int i = 0; i < ENTRIES_PER_BLOCK; i++)
+      {
+        int storageType = (buffer[ptr] & 0xF0) >>> 4;
+        int nameLength = buffer[ptr] & 0x0F;
+        if (nameLength != 0 && storageType < 0x0E)
+        {
+          FileEntry fileEntry = new FileEntry (disk, buffer, ptr);
+          fileEntry.read ();
+          System.out.println (fileEntry.toText ());
+        }
+
+        ptr += ENTRY_SIZE;
+      }
+      blockNo = readShort (buffer, offset + 2);
+    } while (blockNo > 0);
+    System.out.println ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  String toText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int block = ptr / BLOCK_SIZE;
+    int entry = ((ptr % BLOCK_SIZE) - 4) / 39 + 1;
+
+    return String.format ("%04X:%02X %-15s %02X %04X", block, entry, fileName,
+        storageType, fileCount);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -47,7 +47,9 @@ class MasterHeader
     reserved = Utility.getWord (buffer, ptr + 30);
     eof = Utility.getLong (buffer, ptr + 38);
 
-    assert reserved == 0;
+    //    assert reserved == 0;
+    //    if (reserved != 0)
+    //      System.out.printf ("Reserved for zero, actual: %02X%n", reserved);
 
     byte[] crcBuffer = new byte[40];
     System.arraycopy (buffer, ptr + 8, crcBuffer, 0, crcBuffer.length);
@@ -87,6 +89,7 @@ class MasterHeader
     text.append (String.format ("Created ........ %s%n", created.format ()));
     text.append (String.format ("Modified ....... %s%n", modified.format ()));
     text.append (String.format ("Version ........ %,d%n", version));
+    text.append (String.format ("Reserved ....... %016X%n", reserved));
     text.append (String.format ("Master EOF ..... %,d", eof));
 
     return text.toString ();

@@ -169,13 +169,9 @@ public class DiskFactory
         suffix = "dsk";
         compressed = true;
       }
-      catch (IOException e)
+      catch (Exception e)
       {
         e.printStackTrace ();
-        return null;
-      }
-      catch (FileFormatException e)
-      {
         return null;
       }
     }

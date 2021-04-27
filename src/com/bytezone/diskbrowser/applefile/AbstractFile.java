@@ -106,7 +106,6 @@ public abstract class AbstractFile implements DataSource
   public JComponent getComponent ()
   // ---------------------------------------------------------------------------------//
   {
-    JPanel panel = new JPanel ();
-    return panel;
+    return new JPanel ();
   }
 }

@@ -28,6 +28,7 @@ import com.bytezone.diskbrowser.applefile.MerlinSource;
 import com.bytezone.diskbrowser.applefile.ObjectModule;
 import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PascalArea;
+import com.bytezone.diskbrowser.applefile.ProdosDirectory;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
@@ -69,10 +70,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
   // ---------------------------------------------------------------------------------//
   FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
-      int parentBlock)
+      int parentBlock, int entryNo)
   // ---------------------------------------------------------------------------------//
   {
-    super (fDisk, entryBuffer);
+    super (fDisk, entryBuffer, parentBlock, entryNo);
 
     assert parent != null;
     this.parentDirectory = parent;
@@ -547,6 +548,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       file = new ErrorMessageFile (name, buffer, e);
       e.printStackTrace ();
     }
+
     return file;
   }
 

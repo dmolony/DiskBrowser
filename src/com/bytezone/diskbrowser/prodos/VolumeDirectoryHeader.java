@@ -1,14 +1,17 @@
 package com.bytezone.diskbrowser.prodos;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.ProdosDirectory;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-class VolumeDirectoryHeader extends DirectoryHeader
+public class VolumeDirectoryHeader extends DirectoryHeader
 // -----------------------------------------------------------------------------------//
 {
   protected final int bitMapBlock;
@@ -21,15 +24,12 @@ class VolumeDirectoryHeader extends DirectoryHeader
   VolumeDirectoryHeader (ProdosDisk parentDisk, byte[] entryBuffer)
   // ---------------------------------------------------------------------------------//
   {
-    super (parentDisk, entryBuffer);
+    super (parentDisk, entryBuffer, 2, 1);
 
     bitMapBlock = Utility.unsignedShort (entryBuffer, 35);
     totalBlocks = Utility.unsignedShort (entryBuffer, 37);
 
-    //    if (totalBlocks == 0xFFFF || totalBlocks == 0x7FFF)
-    //      totalBlocks = (int) disk.getFile ().length () / 4096 * 8;// ignore extra bytes
-
-    totalBitMapBlocks = (totalBlocks - 1) / 512 + 1;
+    totalBitMapBlocks = (totalBlocks - 1) / BLOCK_SIZE + 1;
 
     int block = 2;
     do
@@ -90,7 +90,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
     {
       byte[] buf = disk.readBlock (block);
       blockList.add (buf);
-      block = Utility.intValue (buf[2], buf[3]); // next block
+      block = Utility.intValue (buf[2], buf[3]);              // next block
     } while (block > 0);
 
     byte[] fullBuffer = new byte[blockList.size () * 507];
@@ -100,6 +100,7 @@ class VolumeDirectoryHeader extends DirectoryHeader
       System.arraycopy (bfr, 4, fullBuffer, offset, 507);
       offset += 507;
     }
+
     return new ProdosDirectory (parentDisk, name, fullBuffer, totalBlocks, freeBlocks,
         usedBlocks);
   }
@@ -112,6 +113,14 @@ class VolumeDirectoryHeader extends DirectoryHeader
     List<DiskAddress> sectors = new ArrayList<> ();
     sectors.addAll (dataBlocks);
     return sectors;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String getText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%s  %04X %02X", super.getText (), totalBlocks, bitMapBlock);
   }
 
   // ---------------------------------------------------------------------------------//

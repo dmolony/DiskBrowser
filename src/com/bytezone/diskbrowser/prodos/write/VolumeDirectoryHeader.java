@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.prodos.write;
 
-import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
 import static com.bytezone.diskbrowser.utilities.Utility.readShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
@@ -40,6 +39,14 @@ public class VolumeDirectoryHeader extends DirectoryHeader
 
     writeShort (buffer, ptr + 0x23, bitMapPointer);
     writeShort (buffer, ptr + 0x25, totalBlocks);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  String toText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%-29s %04X %04X", super.toText (), totalBlocks, bitMapPointer);
   }
 
   // ---------------------------------------------------------------------------------//

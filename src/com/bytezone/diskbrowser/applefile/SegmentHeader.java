@@ -37,6 +37,8 @@ public class SegmentHeader
   String loadname;
   String segname;
 
+  boolean debug = false;
+
   // ---------------------------------------------------------------------------------//
   public SegmentHeader (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
@@ -79,7 +81,8 @@ public class SegmentHeader
     else
       segname = "not finished";
 
-    System.out.println (this);
+    if (debug)
+      System.out.println (this);
 
     int ptr = offset + dispdata;
     while (true)
@@ -89,25 +92,33 @@ public class SegmentHeader
 
       if (recType > 0 && recType <= 0xDF)
       {
-        System.out.printf ("Const: %02X%n", recType);
-        System.out.println (HexFormatter.format (buffer, ptr, recType + 1, ptr));
+        if (debug)
+        {
+          System.out.printf ("Const: %02X%n", recType);
+          System.out.println (HexFormatter.format (buffer, ptr, recType + 1, ptr));
+        }
         ptr += recType + 1;
         continue;
       }
 
-      System.out.printf ("%02X ", recType);
+      if (debug)
+        System.out.printf ("%02X ", recType);
+
       switch (recType)
       {
         case 0x00:        // END
-          System.out.println ("END");
+          if (debug)
+            System.out.println ("END");
           break;
 
         case 0xE0:        // ALIGN
-          System.out.printf ("ALIGN:%n");
+          if (debug)
+            System.out.printf ("ALIGN:%n");
           break;
 
         case 0xE1:        // ORG
-          System.out.printf ("ORG:%n");
+          if (debug)
+            System.out.printf ("ORG:%n");
           break;
 
         case 0xE2:        // RELOC
@@ -115,8 +126,9 @@ public class SegmentHeader
           int bitShift = buffer[ptr + 2] & 0xFF;
           int segmentOffset = Utility.getLong (buffer, ptr + 3);
           int value = Utility.getLong (buffer, ptr + 7);
-          System.out.printf ("RELOC: %02X %02X %08X %08X%n", bytesRelocated, bitShift,
-              segmentOffset, value);
+          if (debug)
+            System.out.printf ("RELOC: %02X %02X %08X %08X%n", bytesRelocated, bitShift,
+                segmentOffset, value);
           ptr += 11;
           continue;
 
@@ -127,72 +139,88 @@ public class SegmentHeader
           int fileNo = Utility.getWord (buffer, ptr + 7);
           int segNo = Utility.getWord (buffer, ptr + 9);
           int subroutineOffset = Utility.getLong (buffer, ptr + 11);
-          System.out.printf ("INTERSEG: %02X %02X %08X %04X %04X %08X%n", count1, count2,
-              operandOffset, fileNo, segNo, subroutineOffset);
+          if (debug)
+            System.out.printf ("INTERSEG: %02X %02X %08X %04X %04X %08X%n", count1,
+                count2, operandOffset, fileNo, segNo, subroutineOffset);
           ptr += 15;
           break;
 
         case 0xE4:        // USING
-          System.out.printf ("USING:%n");
+          if (debug)
+            System.out.printf ("USING:%n");
           break;
 
         case 0xE5:        // STRONG
-          System.out.printf ("STRONG:%n");
+          if (debug)
+            System.out.printf ("STRONG:%n");
           break;
 
         case 0xE6:        // GLOBAL
-          System.out.printf ("GLOBAL:%n");
+          if (debug)
+            System.out.printf ("GLOBAL:%n");
           break;
 
         case 0xE7:        // GEQU
-          System.out.printf ("GEQU:%n");
+          if (debug)
+            System.out.printf ("GEQU:%n");
           break;
 
         case 0xE8:        // MEM
-          System.out.printf ("MEM:%n");
+          if (debug)
+            System.out.printf ("MEM:%n");
           break;
 
         case 0xEB:        // EXPR
-          System.out.printf ("EXPR:%n");
+          if (debug)
+            System.out.printf ("EXPR:%n");
           break;
 
         case 0xEC:        // ZEXPR
-          System.out.printf ("ZEXPR:%n");
+          if (debug)
+            System.out.printf ("ZEXPR:%n");
           break;
 
         case 0xED:        // BEXPR
-          System.out.printf ("BEXPR:%n");
+          if (debug)
+            System.out.printf ("BEXPR:%n");
           break;
 
         case 0xEE:        // RELEXPR
-          System.out.printf ("RELEXPR:%n");
+          if (debug)
+            System.out.printf ("RELEXPR:%n");
           break;
 
         case 0xEF:        // LOCAL
-          System.out.printf ("LOCAL:%n");
+          if (debug)
+            System.out.printf ("LOCAL:%n");
           break;
 
         case 0xF0:        // EQU
           String label = HexFormatter.getPascalString (buffer, ptr + 1);
-          System.out.printf ("EQU: %s%n", label);
+          if (debug)
+            System.out.printf ("EQU: %s%n", label);
           break;
 
         case 0xF1:        // DS
-          System.out.printf ("DS:%n");
+          if (debug)
+            System.out.printf ("DS:%n");
           break;
 
         case 0xF2:        // LCONST
           int constLength = Utility.getLong (buffer, ptr + 1);
-          System.out.printf ("Const: %04X%n", constLength);
+          if (debug)
+            System.out.printf ("Const: %04X%n", constLength);
           ptr += constLength + 5;
           continue;
 
         case 0xF3:        // LEXPR
-          System.out.printf ("LEXPR:%n");
+          if (debug)
+            System.out.printf ("LEXPR:%n");
           break;
 
         case 0xF4:        // ENTRY
-          System.out.printf ("ENTRY:%n");
+          if (debug)
+            System.out.printf ("ENTRY:%n");
           break;
 
         case 0xF5:        // cRELOC
@@ -200,8 +228,9 @@ public class SegmentHeader
           int cBitShift = buffer[ptr + 2] & 0xFF;
           int cSegmentOffset = Utility.getWord (buffer, ptr + 3);
           int cValue = Utility.getWord (buffer, ptr + 5);
-          System.out.printf ("cRELOC: %02X %02X %08X %08X%n", cBytesRelocated, cBitShift,
-              cSegmentOffset, cValue);
+          if (debug)
+            System.out.printf ("cRELOC: %02X %02X %08X %08X%n", cBytesRelocated,
+                cBitShift, cSegmentOffset, cValue);
           ptr += 7;
           continue;
 
@@ -211,15 +240,17 @@ public class SegmentHeader
           int cOperandOffset = Utility.getWord (buffer, ptr + 3);
           int cSegNo = buffer[ptr + 5] & 0xFF;
           int cSubroutineOffset = Utility.getWord (buffer, ptr + 6);
-          System.out.printf ("cINTERSEG: %02X %02X %04X %02X %04X%n", cCount1, cCount2,
-              cOperandOffset, cSegNo, cSubroutineOffset);
+          if (debug)
+            System.out.printf ("cINTERSEG: %02X %02X %04X %02X %04X%n", cCount1, cCount2,
+                cOperandOffset, cSegNo, cSubroutineOffset);
           ptr += 8;
           continue;
 
         case 0xF7:        // SUPER
           int superLength = Utility.getLong (buffer, ptr + 1);
           int recordType = buffer[ptr + 5] & 0xFF;
-          System.out.printf ("Super type %02X%n", recordType);
+          if (debug)
+            System.out.printf ("Super type %02X%n", recordType);
           ptr += superLength + 5;
           continue;
 
@@ -228,7 +259,8 @@ public class SegmentHeader
           break;
       }
 
-      System.out.println ();
+      if (debug)
+        System.out.println ();
       break;
     }
   }
@@ -258,33 +290,18 @@ public class SegmentHeader
     kindPrivate = (segAttr & 0x40) != 0;
     kindStatic = (segAttr & 0x80) == 0;
 
-    switch (segType)
+    kindWhereText = switch (segType)
     {
-      case 0:
-        kindWhereText = "Code Segment";
-        break;
-      case 1:
-        kindWhereText = "Data Segment";
-        break;
-      case 2:
-        kindWhereText = "Jump Table Segment";
-        break;
-      case 4:
-        kindWhereText = "Pathname Segment";
-        break;
-      case 8:
-        kindWhereText = "Library Dictionary Segment";
-        break;
-      case 0x10:
-        kindWhereText = "Initialization Segment";
-        break;
-      case 0x11:
-        kindWhereText = "Absolute Bank Segment";
-        break;
-      case 0x12:
-        kindWhereText = "Direct Page / Stack Segment";
-        break;
-    }
+      case 0x00 -> "Code Segment";
+      case 0x01 -> "Data Segment";
+      case 0x02 -> "Jump Table Segment";
+      case 0x04 -> "Pathname Segment";
+      case 0x08 -> "Library Dictionary Segment";
+      case 0x10 -> "Initialization Segment";
+      case 0x11 -> "Absolute Bank Segment";
+      case 0x12 -> "Direct Page / Stack Segment";
+      default -> "Unknown";
+    };
   }
 
   // ---------------------------------------------------------------------------------//

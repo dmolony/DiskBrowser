@@ -18,6 +18,9 @@ abstract class CatalogEntry implements AppleFileSource
   Disk disk;
   ProdosDisk parentDisk;
 
+  int blockNo;
+  int entryNo;
+
   String name;
   int storageType;
 
@@ -30,11 +33,13 @@ abstract class CatalogEntry implements AppleFileSource
   DirectoryHeader parentDirectory;
 
   // ---------------------------------------------------------------------------------//
-  CatalogEntry (ProdosDisk parentDisk, byte[] entryBuffer)
+  CatalogEntry (ProdosDisk parentDisk, byte[] entryBuffer, int blockNo, int entryNo)
   // ---------------------------------------------------------------------------------//
   {
     this.parentDisk = parentDisk;
     this.disk = parentDisk.getDisk ();
+    this.blockNo = blockNo;
+    this.entryNo = entryNo;
 
     name = HexFormatter.getString (entryBuffer, 1, entryBuffer[0] & 0x0F);
     storageType = (entryBuffer[0] & 0xF0) >> 4;
@@ -43,6 +48,20 @@ abstract class CatalogEntry implements AppleFileSource
     version = entryBuffer[28] & 0xFF;
     minVersion = entryBuffer[29] & 0xFF;
     access = entryBuffer[30] & 0xFF;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public String getName ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return name;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public String getText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%04X:%02X  %-15s  %02X", blockNo, entryNo, name, storageType);
   }
 
   // ---------------------------------------------------------------------------------//

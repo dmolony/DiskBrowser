@@ -2,7 +2,6 @@ package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
-import static com.bytezone.diskbrowser.prodos.write.ProdosDisk.UNDERLINE;
 import static com.bytezone.diskbrowser.utilities.Utility.readShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
@@ -90,6 +89,14 @@ public class SubdirectoryHeader extends DirectoryHeader
     writeShort (buffer, ptr + 0x23, parentPointer);
     buffer[ptr + 0x25] = parentEntry;
     buffer[ptr + 0x26] = parentEntryLength;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  String toText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%s %04X:%02X", super.toText (), parentPointer, parentEntry);
   }
 
   // ---------------------------------------------------------------------------------//

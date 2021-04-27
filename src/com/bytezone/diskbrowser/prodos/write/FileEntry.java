@@ -310,6 +310,17 @@ public class FileEntry
   }
 
   // ---------------------------------------------------------------------------------//
+  String toText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    int block = ptr / BLOCK_SIZE;
+    int entry = ((ptr % BLOCK_SIZE) - 4) / 39 + 1;
+
+    return String.format ("%04X:%02X %-15s %02X %04X %02X %04X %04X", block, entry,
+        fileName, storageType, blocksUsed, fileType, keyPointer, headerPointer);
+  }
+
+  // ---------------------------------------------------------------------------------//
   @Override
   public String toString ()
   // ---------------------------------------------------------------------------------//

@@ -44,7 +44,8 @@ class LZW2 extends LZW
         setBuffer (buffer, ptr);            // prepare to read n-bit integers
         byte[] lzwBuffer = undoLZW (rleLength);
 
-        assert (chunkLength - 4) == bytesRead ();
+        if ((chunkLength - 4) != bytesRead ())
+          System.out.printf ("Invalid chunk length%n");
 
         if (rleLength == TRACK_LENGTH)      // no run length encoding
           chunks.add (lzwBuffer);

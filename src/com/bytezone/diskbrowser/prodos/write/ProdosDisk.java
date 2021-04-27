@@ -14,10 +14,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 // -----------------------------------------------------------------------------------//
 public class ProdosDisk
@@ -38,7 +38,7 @@ public class ProdosDisk
   private final byte[] bootSector = new byte[BLOCK_SIZE];
 
   private VolumeDirectoryHeader volumeDirectoryHeader;
-  private Map<Integer, SubdirectoryHeader> subdirectoryHeaders = new HashMap<> ();
+  private Map<Integer, SubdirectoryHeader> subdirectoryHeaders = new TreeMap<> ();
   private List<String> paths = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
@@ -126,9 +126,11 @@ public class ProdosDisk
       throws DiskFullException, VolumeCatalogFullException
   // ---------------------------------------------------------------------------------//
   {
+    if (path.isBlank ())
+      throw new IllegalArgumentException ("Path is empty");
+
     // save path for verification
     paths.add (path);
-    System.out.printf ("Path: %s%n", path);
 
     // split the full path into an array of subdirectories and a file name
     String[] subdirectories;
@@ -249,11 +251,21 @@ public class ProdosDisk
   {
     for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
     {
-      System.out.printf ("%-35s%n", subdirectoryHeader.fileName);
+      //      System.out.printf ("%-35s%n", subdirectoryHeader.fileName);
       FileEntry fileEntry = subdirectoryHeader.getParentFileEntry ();
       if (!fileEntry.fileName.equals (subdirectoryHeader.fileName))
-        System.out.println ("fail");
+        System.out.printf ("fail: %s%n", subdirectoryHeader.fileName);
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void display ()
+  // ---------------------------------------------------------------------------------//
+  {
+    volumeDirectoryHeader.list ();
+
+    for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
+      subdirectoryHeader.list ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -278,7 +290,8 @@ public class ProdosDisk
       }
       System.out.println ();
     }
-    verify ();
+    //    verify ();
+    //    display ();
   }
 
   // ---------------------------------------------------------------------------------//

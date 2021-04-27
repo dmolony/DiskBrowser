@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.prodos;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
+
 import java.awt.Color;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,7 +31,6 @@ public class ProdosDisk extends AbstractFormattedDisk
 {
   static ProdosPreferences prodosPreferences;     // set by MenuHandler
 
-  //  final DateFormat df = DateFormat.getInstance ();
   static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
   static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
 
@@ -119,7 +120,7 @@ public class ProdosDisk extends AbstractFormattedDisk
         sectorTypes[block] = currentSectorType;
 
       int max = disk.getBlockSize () - ProdosConstants.ENTRY_SIZE;
-      for (int ptr = 4; ptr < max; ptr += ProdosConstants.ENTRY_SIZE)
+      for (int ptr = 4, entryNo = 0; ptr < max; ptr += ENTRY_SIZE, entryNo++)
       {
         int storageType = (sectorBuffer[ptr] & 0xF0) >> 4;
         if (storageType == 0)                                   // deleted or unused
@@ -145,7 +146,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             break;
 
           case ProdosConstants.SUBDIRECTORY_HEADER:
-            localHeader = new SubDirectoryHeader (this, entry, parent);
+            localHeader = new SubDirectoryHeader (this, entry, parent, block);
             headerEntries.add (localHeader);
             currentSectorType = subcatalogSector;
             if (!disk.isBlockEmpty (block))
@@ -153,7 +154,8 @@ public class ProdosDisk extends AbstractFormattedDisk
             break;
 
           case ProdosConstants.SUBDIRECTORY:
-            FileEntry fileEntry = new FileEntry (this, entry, localHeader, block);
+            FileEntry fileEntry =
+                new FileEntry (this, entry, localHeader, block, entryNo);
             fileEntries.add (fileEntry);
             DefaultMutableTreeNode directoryNode = new DefaultMutableTreeNode (fileEntry);
             directoryNode.setAllowsChildren (true);
@@ -166,7 +168,7 @@ public class ProdosDisk extends AbstractFormattedDisk
           case ProdosConstants.TREE:
           case ProdosConstants.PASCAL_ON_PROFILE:
           case ProdosConstants.GSOS_EXTENDED_FILE:
-            fileEntry = new FileEntry (this, entry, localHeader, block);
+            fileEntry = new FileEntry (this, entry, localHeader, block, entryNo);
             fileEntries.add (fileEntry);
             DefaultMutableTreeNode node = new DefaultMutableTreeNode (fileEntry);
             node.setAllowsChildren (false);
@@ -199,13 +201,6 @@ public class ProdosDisk extends AbstractFormattedDisk
       }
     }
   }
-
-  // ---------------------------------------------------------------------------------//
-  //  public boolean isReservedAddress (int blockNo)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    return false;
-  //  }
 
   // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk)
@@ -243,6 +238,13 @@ public class ProdosDisk extends AbstractFormattedDisk
   }
 
   // ---------------------------------------------------------------------------------//
+  public List<DirectoryHeader> getDirectoryHeaders ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return headerEntries;
+  }
+
+  // ---------------------------------------------------------------------------------//
   VolumeDirectoryHeader getVolumeDirectoryHeader ()
   // ---------------------------------------------------------------------------------//
   {
@@ -255,6 +257,7 @@ public class ProdosDisk extends AbstractFormattedDisk
   {
     if (fileNo == 0)
       return volumeDirectoryHeader.getDataSource ();
+
     return fileEntries.get (fileNo - 1).getDataSource ();
   }
 

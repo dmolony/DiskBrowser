@@ -118,6 +118,12 @@ public class NuFX
             if (record.hasFile ())
             {
               String fileName = volumeName.convert (record.getFileName ());
+              if (!record.isValidFileSystem ())
+              {
+                System.out.printf ("File %s is file system %s%n", fileName,
+                    record.getFileSystemName ());
+                continue;
+              }
               //              int fileSize = record.getFileSize ();
               byte fileType = (byte) record.getFileType ();
               int eof = record.getUncompressedSize ();

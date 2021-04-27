@@ -1,19 +1,25 @@
-package com.bytezone.diskbrowser.prodos;
+package com.bytezone.diskbrowser.applefile;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.prodos.DirectoryHeader;
+import com.bytezone.diskbrowser.prodos.ProdosConstants;
+import com.bytezone.diskbrowser.prodos.ProdosDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-class ProdosDirectory extends AbstractFile implements ProdosConstants
+public class ProdosDirectory extends AbstractFile implements ProdosConstants
 // -----------------------------------------------------------------------------------//
 {
+  static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
+  static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
+  static final String UNDERLINE = "--------------------------------------------------\n";
+
   private static final String NO_DATE = "<NO DATE>";
-  private static final String newLine = String.format ("%n");
-  private static final String newLine2 = newLine + newLine;
 
   private final ProdosDisk parentFD;
   private final int totalBlocks;
@@ -21,8 +27,8 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
   private final int usedBlocks;
 
   // ---------------------------------------------------------------------------------//
-  ProdosDirectory (FormattedDisk parent, String name, byte[] buffer, int totalBlocks,
-      int freeBlocks, int usedBlocks)
+  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer,
+      int totalBlocks, int freeBlocks, int usedBlocks)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
@@ -38,8 +44,38 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuffer text = new StringBuffer ();
-    text.append ("File : " + parentFD.getDisplayPath () + newLine2);
+    if (showDebugText)
+      return getDebugText ();
+    else
+      return getDirectoryText ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String getDebugText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    List<DirectoryHeader> directoryHeaders = parentFD.getDirectoryHeaders ();
+    StringBuilder text = new StringBuilder ();
+
+    for (DirectoryHeader directoryHeader : directoryHeaders)
+    {
+      text.append (UNDERLINE);
+      text.append (directoryHeader.getText ());
+      text.append ("\n");
+      text.append (UNDERLINE);
+      directoryHeader.listFileEntries (text);
+    }
+
+    return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String getDirectoryText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append ("File : " + parentFD.getDisplayPath () + "\n\n");
     for (int i = 0; i < buffer.length; i += ENTRY_SIZE)
     {
       int storageType = (buffer[i] & 0xF0) >> 4;
@@ -56,9 +92,9 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
         case VOLUME_HEADER:
         case SUBDIRECTORY_HEADER:
           String root = storageType == VOLUME_HEADER ? "/" : "";
-          text.append (root + filename + newLine2);
+          text.append (root + filename + "\n\n");
           text.append (" NAME           TYPE  BLOCKS  "
-              + "MODIFIED         CREATED          ENDFILE SUBTYPE" + newLine2);
+              + "MODIFIED         CREATED          ENDFILE SUBTYPE" + "\n\n");
           break;
 
         case FREE:
@@ -74,13 +110,13 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
           LocalDateTime createdDate = Utility.getAppleDate (buffer, i + 24);
           LocalDateTime modifiedDate = Utility.getAppleDate (buffer, i + 33);
 
-          String dateC = createdDate == null ? NO_DATE
-              : createdDate.format (ProdosDisk.df).toUpperCase ();
-          String dateM = modifiedDate == null ? NO_DATE
-              : modifiedDate.format (ProdosDisk.df).toUpperCase ();
+          String dateC =
+              createdDate == null ? NO_DATE : createdDate.format (df).toUpperCase ();
+          String dateM =
+              modifiedDate == null ? NO_DATE : modifiedDate.format (df).toUpperCase ();
 
-          String timeC = createdDate == null ? "" : createdDate.format (ProdosDisk.tf);
-          String timeM = modifiedDate == null ? "" : modifiedDate.format (ProdosDisk.tf);
+          String timeC = createdDate == null ? "" : createdDate.format (tf);
+          String timeM = modifiedDate == null ? "" : modifiedDate.format (tf);
 
           int eof = Utility.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
           int fileType = buffer[i + 16] & 0xFF;
@@ -102,7 +138,7 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
               break;
 
             case FILE_TYPE_AWP:
-              aux = Utility.intValue (buffer[i + 32], buffer[i + 31]); // backwards!
+              aux = Utility.intValue (buffer[i + 32], buffer[i + 31]);      // backwards!
               if (aux != 0)
                 filename = convert (filename, aux);
               break;
@@ -117,12 +153,14 @@ class ProdosDirectory extends AbstractFile implements ProdosConstants
           break;
 
         default:
-          text.append (" <Unknown strage type : " + storageType + newLine);
+          text.append (" <Unknown strage type : " + storageType + "\n");
       }
     }
+
     text.append (
         String.format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
             freeBlocks, usedBlocks, totalBlocks));
+
     return text.toString ();
   }
 

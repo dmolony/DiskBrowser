@@ -52,7 +52,8 @@ class Thread
     {
       case 0:                         // uncompressed
         break;
-      case 1:                         // Huffman Squeeze
+      case 1:                         // Huffman Squeeze - see archivers folder
+        System.out.printf ("Huffman squeeze");
         break;
       case 2:                         // Dynamic LZW/1
         lzw = new LZW1 (data);

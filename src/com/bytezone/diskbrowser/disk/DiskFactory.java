@@ -31,6 +31,9 @@ public class DiskFactory
 // -----------------------------------------------------------------------------------//
 {
   private static boolean debug = false;
+  private static final int DISK_800K = 819200;
+  private static final int DISK_143K = 143360;
+  private static final int DISK_116K = 116480;
 
   // ---------------------------------------------------------------------------------//
   private DiskFactory ()
@@ -98,7 +101,7 @@ public class DiskFactory
       }
       catch (IOException e)  // can get EOFException: Unexpected end of ZLIB input stream
       {
-        e.printStackTrace ();
+        System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
         return null;
       }
     }
@@ -141,15 +144,16 @@ public class DiskFactory
       }
       catch (IOException e)
       {
-        e.printStackTrace ();
+        System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
         return null;
       }
     }
 
-    if ("sdk".equals (suffix) || "shk".equals (suffix))    // shrinkit disk/file archive
+    if ("sdk".equals (suffix) || "shk".equals (suffix)  // shrinkit disk/file archive
+        || "bxy".equals (suffix))
     {
       if (debug)
-        System.out.println (" ** sdk/shk **");
+        System.out.println (" ** sdk/shk/bxy **");
       try
       {
         NuFX nuFX = new NuFX (file.toPath ());
@@ -171,7 +175,7 @@ public class DiskFactory
       }
       catch (Exception e)
       {
-        e.printStackTrace ();
+        System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
         return null;
       }
     }
@@ -224,7 +228,7 @@ public class DiskFactory
 
     // Toolkit.do = 143488
     if (((suffix.equals ("po") || suffix.equals ("dsk") || suffix.equals ("do"))
-        && file.length () > 143360))
+        && file.length () > DISK_143K))
     {
       if (file.length () < 143500)        // slightly bigger than a floppy
       {
@@ -245,13 +249,13 @@ public class DiskFactory
         return disk;
       }
 
-      if (file.length () == 819200)         // 800K 3.5"
+      if (file.length () == DISK_800K)         // 800K 3.5"
       {
         if (debug)
           System.out.println ("UniDos ?");
         // 2 x 400k disk images
         AppleDisk appleDisk1 = new AppleDisk (file, 50, 32);
-        AppleDisk appleDisk2 = new AppleDisk (file, 50, 32, (int) (file.length () / 2));
+        AppleDisk appleDisk2 = new AppleDisk (file, 50, 32, 0x64000);
         disk = checkUnidos (appleDisk1, 1);
         disk2 = checkUnidos (appleDisk2, 2);
         if (disk != null && disk2 != null)
@@ -351,7 +355,7 @@ public class DiskFactory
 
     long length = file.length ();
 
-    if (length == 116480)           // 13 sector disk
+    if (length == DISK_116K)           // 13 sector floppy disk
     {
       if (debug)
         System.out.println (" ** 13 sector **");
@@ -363,7 +367,7 @@ public class DiskFactory
       return disk == null ? new DataDisk (appleDisk) : disk;
     }
 
-    if (length != 143360)
+    if (length != DISK_143K)          // 16 sector floppy disk
     {
       System.out.printf ("%s: invalid file length : %,d%n", file.getName (),
           file.length ());

@@ -251,7 +251,6 @@ public class ProdosDisk
   {
     for (SubdirectoryHeader subdirectoryHeader : subdirectoryHeaders.values ())
     {
-      //      System.out.printf ("%-35s%n", subdirectoryHeader.fileName);
       FileEntry fileEntry = subdirectoryHeader.getParentFileEntry ();
       if (!fileEntry.fileName.equals (subdirectoryHeader.fileName))
         System.out.printf ("fail: %s%n", subdirectoryHeader.fileName);

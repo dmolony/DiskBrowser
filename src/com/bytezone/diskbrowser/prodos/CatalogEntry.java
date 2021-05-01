@@ -15,6 +15,8 @@ import com.bytezone.diskbrowser.utilities.Utility;
 abstract class CatalogEntry implements AppleFileSource
 // -----------------------------------------------------------------------------------//
 {
+  static String[] storageTypes = { "Del", "Sdl", "Sap", "Tre", "", "", "", "", "", "", "",
+                                   "", "", "DIR", "SDH", "VDH" };
   Disk disk;
   ProdosDisk parentDisk;
 
@@ -61,7 +63,8 @@ abstract class CatalogEntry implements AppleFileSource
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    return String.format ("%04X:%02X  %-15s  %02X", blockNo, entryNo, name, storageType);
+    return String.format ("%04X:%02X  %-15s  %s", blockNo, entryNo, name,
+        storageTypes[storageType]);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -31,8 +31,6 @@ class Thread
   private boolean hasFile;
   private boolean hasFileName;
 
-  private int fileSize;
-
   // ---------------------------------------------------------------------------------//
   public Thread (byte[] buffer, int offset, int dataOffset)
   // ---------------------------------------------------------------------------------//
@@ -99,7 +97,6 @@ class Thread
         {
           case 0:                     // data fork of file
             hasFile = true;
-            fileSize = lzw != null ? lzw.getSize () : uncompressedEOF;
             break;
           case 1:                     // disk image
             hasDisk = true;
@@ -113,14 +110,14 @@ class Thread
       case 3:
         switch (threadKind)
         {
-          case 0:                       // filename
+          case 0:                     // filename
             hasFileName = true;
             fileName = new String (data, 0, uncompressedEOF);
             break;
 
-          case 1:                       // undefined
+          case 1:                     // undefined
             break;
-          case 2:                       // undefined
+          case 2:                     // undefined
             break;
         }
         break;
@@ -193,7 +190,7 @@ class Thread
   int getFileSize ()
   // ---------------------------------------------------------------------------------//
   {
-    return fileSize;
+    return lzw != null ? lzw.getSize () : uncompressedEOF;
   }
 
   // ---------------------------------------------------------------------------------//

@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.utilities;
 
-import java.util.Objects;
-
 // -----------------------------------------------------------------------------------//
 class LZW2 extends LZW
 // -----------------------------------------------------------------------------------//
@@ -14,7 +12,7 @@ class LZW2 extends LZW
   public LZW2 (byte[] buffer, int crc, int eof)
   // ---------------------------------------------------------------------------------//
   {
-    bytes = Objects.requireNonNull (buffer);
+    super (buffer);
 
     this.crc = crc;
     this.v3eof = eof;
@@ -26,7 +24,7 @@ class LZW2 extends LZW
     runLengthChar = (byte) (buffer[1] & 0xFF);
     int ptr = 2;
 
-    while (ptr < buffer.length - 1)         // what is in the last byte?
+    while (ptr < buffer.length - 1)
     {
       int rleLength = Utility.getWord (buffer, ptr);
       boolean lzwPerformed = (rleLength & 0x8000) != 0;
@@ -41,7 +39,7 @@ class LZW2 extends LZW
         int chunkLength = Utility.getWord (buffer, ptr);
         ptr += 2;
 
-        setBuffer (buffer, ptr);            // prepare to read n-bit integers
+        setBuffer (ptr);                    // prepare to read n-bit integers
         byte[] lzwBuffer = undoLZW (rleLength);
 
         if ((chunkLength - 4) != bytesRead ())
@@ -75,7 +73,7 @@ class LZW2 extends LZW
   }
 
   // ---------------------------------------------------------------------------------//
-  protected byte[] undoLZW (int rleLength)
+  byte[] undoLZW (int rleLength)
   // ---------------------------------------------------------------------------------//
   {
     byte[] lzwBuffer = new byte[rleLength];      // must fill this array from buffer

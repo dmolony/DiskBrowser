@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.prodos;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public abstract class DirectoryHeader extends CatalogEntry
+public abstract class DirectoryHeader extends CatalogEntry implements ProdosConstants
 // -----------------------------------------------------------------------------------//
 {
   final int entryLength;
@@ -51,9 +51,9 @@ public abstract class DirectoryHeader extends CatalogEntry
           int fileType = buffer[ptr + 0x10] & 0xFF;
           int keyPointer = Utility.intValue (buffer[ptr + 0x11], buffer[ptr + 0x12]);
           int headerPointer = Utility.intValue (buffer[ptr + 0x25], buffer[ptr + 0x26]);
-          text.append (String.format ("%04X:%02X  %-15s  %02X  %04X  %02X  %04X  %04X%n",
-              blockNo, entryNo, name, storageType, blocksUsed, fileType, keyPointer,
-              headerPointer));
+          text.append (String.format ("%04X:%02X  %-15s  %s  %04X  %s  %04X  %04X%n",
+              blockNo, entryNo, name, storageTypes[storageType], blocksUsed,
+              fileTypes[fileType], keyPointer, headerPointer));
         }
         ptr += 0x27;
         ++entryNo;

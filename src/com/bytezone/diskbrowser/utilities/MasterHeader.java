@@ -17,6 +17,7 @@ class MasterHeader
   private final int eof;
 
   boolean bin2;
+  Binary2Header binary2Header;
 
   // ---------------------------------------------------------------------------------//
   public MasterHeader (byte[] buffer) throws FileFormatException
@@ -31,6 +32,8 @@ class MasterHeader
 
       if (isBin2 (buffer, ptr))
       {
+        binary2Header = new Binary2Header (buffer);
+        System.out.println (binary2Header);
         ptr += 128;
         bin2 = true;
         continue;

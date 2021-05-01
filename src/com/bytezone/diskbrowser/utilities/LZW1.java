@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.utilities;
 
-import java.util.Objects;
-
 // -----------------------------------------------------------------------------------//
 class LZW1 extends LZW
 // -----------------------------------------------------------------------------------//
@@ -10,7 +8,7 @@ class LZW1 extends LZW
   public LZW1 (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    bytes = Objects.requireNonNull (buffer);
+    super (buffer);
 
     crc = Utility.getWord (buffer, 0);
     crcBase = 0;
@@ -19,15 +17,15 @@ class LZW1 extends LZW
     runLengthChar = (byte) (buffer[3] & 0xFF);
     int ptr = 4;
 
-    while (ptr < buffer.length - 1)          // what is in the last byte?
+    while (ptr < buffer.length - 2)
     {
       int rleLength = Utility.getWord (buffer, ptr);
-      int lzwPerformed = buffer[ptr + 2] & 0xFF;
+      boolean lzwPerformed = (buffer[ptr + 2] & 0xFF) != 0;
       ptr += 3;
 
-      if (lzwPerformed != 0)
+      if (lzwPerformed)
       {
-        setBuffer (buffer, ptr);            // prepare to read n-bit integers
+        setBuffer (ptr);                    // prepare to read n-bit integers
         byte[] lzwBuffer = undoLZW (rleLength);
 
         if (rleLength == TRACK_LENGTH)      // no run length encoding
@@ -54,11 +52,12 @@ class LZW1 extends LZW
   }
 
   // ---------------------------------------------------------------------------------//
-  protected byte[] undoLZW (int rleLength)
+  byte[] undoLZW (int rleLength)
   // ---------------------------------------------------------------------------------//
   {
     byte[] lzwBuffer = new byte[rleLength];       // must fill this array from input
     int ptr = 0;
+
     int nextEntry = 0x100;                        // always start with a fresh table
     String prev = "";
 

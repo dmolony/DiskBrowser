@@ -18,7 +18,7 @@ public class NuFX
 {
   private MasterHeader masterHeader;
   private final byte[] buffer;
-  private final boolean debug = false;
+  private final boolean debug = true;
 
   private final List<Record> records = new ArrayList<> ();
   private int totalFiles;

@@ -17,7 +17,8 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
 {
   static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
   static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
-  static final String UNDERLINE = "--------------------------------------------------\n";
+  static final String UNDERLINE =
+      "----------------------------------------------------\n";
 
   private static final String NO_DATE = "<NO DATE>";
 

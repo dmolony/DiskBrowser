@@ -1,0 +1,27 @@
+Format                          |Filename
+                                |Suffix
+                                |      |[C]reates and
+                                |      |Unpacks, or
+                                |      |[U]npacks Only
+                                |      |   |
+                                |      |   |Computer(s) Which
+                                |      |   |Use This Format
+--------------------------------|------|---|--------------------------
+NuFX . . . . . . . . . . . . . .| .SHK | C | Apple II
+NuFX in Binary II . . . . . . . | .BXY | C | Apple II
+Binary II . . . . . . . . . . . | .BNY | U | Apple II
+Binary II in Binary II. . . . . | .BNY | U | Apple II
+ACU (Used on America Online) . .| .ACU | U | Apple II
+ACU in Binary II . . . . . . . .|  --  | U | Apple II
+ALU in TEXT .(filetypes) . . . .|  --  | U | Apple II
+SQ (BLU) . . . . . . . . . . .  | .QQ  | U | Apple II
+SQ in Binary II (BLU) . . . . . | .BQY | U | Apple II
+AppleSingle . . . . . . . . . . |  --  | C | Apple II
+AppleSingle in Binary II . . .  |  --  | U | Apple II
+StuffIt . . . . . . . . . . . . | .SIT | U | Macintosh
+StuffIt in MacBinary I or II. . | .SIT | U | Macintosh
+StuffIt from America Online . . | .SIT | U | Macintosh
+Zoo . . . . . . . . . . . . . . | .ZOO | U | IBM PC, Amiga, Atari ST,
+                                |      |   | Unix systems
+ARC . . . . . . . . . . . . . . | .ARC | U | IBM PC, Amiga, Atari ST
+Compress . . . . . . . . . . .  | .Z   | U | Unix Systems

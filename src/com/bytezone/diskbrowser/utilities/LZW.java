@@ -2,27 +2,29 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // -----------------------------------------------------------------------------------//
 class LZW
 // -----------------------------------------------------------------------------------//
 {
-  static protected final String[] st = new String[0x1000];
-  static protected final int TRACK_LENGTH = 0x1000;
+  static final String[] st = new String[0x1000];
+  static final int TRACK_LENGTH = 0x1000;
 
-  protected final List<byte[]> chunks = new ArrayList<> ();
-  protected int volume;
-  protected byte runLengthChar;
-  protected int crc;
-  protected int crcBase;
+  final List<byte[]> chunks = new ArrayList<> ();
+  int volume;
+  byte runLengthChar;
+
+  int crc;
+  int crcBase;
   int v3eof;                     // LZW/2 calculates the crc sans padding
 
-  private int buffer;            // one character buffer
+  private int byteBuffer;        // one character buffer
   private int bitsLeft;          // unused bits left in buffer
 
   private int ptr;
   private int startPtr;
-  protected byte[] bytes;
+  byte[] bytes;
 
   // ---------------------------------------------------------------------------------//
   static
@@ -33,39 +35,25 @@ class LZW
   }
 
   // ---------------------------------------------------------------------------------//
-  public void setBuffer (byte[] buffer, int ptr)
+  LZW (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    bytes = buffer;
+    bytes = Objects.requireNonNull (buffer);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void setBuffer (int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
     startPtr = this.ptr = ptr;
     bitsLeft = 0;
   }
 
   // ---------------------------------------------------------------------------------//
-  public int bytesRead ()
+  int bytesRead ()
   // ---------------------------------------------------------------------------------//
   {
     return ptr - startPtr;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void fillBuffer ()
-  // ---------------------------------------------------------------------------------//
-  {
-    buffer = bytes[ptr++] & 0xFF;
-    bitsLeft = 8;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private boolean readBoolean ()
-  // ---------------------------------------------------------------------------------//
-  {
-    if (bitsLeft == 0)
-      fillBuffer ();
-
-    bitsLeft--;
-    boolean bit = ((buffer << bitsLeft) & 0x80) == 0x80;
-    return bit;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -81,6 +69,22 @@ class LZW
         x |= weight;
 
     return x;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean readBoolean ()
+  // ---------------------------------------------------------------------------------//
+  {
+    if (bitsLeft == 0)
+    {
+      byteBuffer = bytes[ptr++] & 0xFF;
+      bitsLeft = 8;
+    }
+
+    bitsLeft--;
+    boolean bit = ((byteBuffer << bitsLeft) & 0x80) == 0x80;
+
+    return bit;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -110,14 +114,14 @@ class LZW
   }
 
   // ---------------------------------------------------------------------------------//
-  public int getSize ()
+  int getSize ()
   // ---------------------------------------------------------------------------------//
   {
     return chunks.size () * TRACK_LENGTH;
   }
 
   // ---------------------------------------------------------------------------------//
-  public byte[] getData ()
+  byte[] getData ()
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = new byte[getSize ()];

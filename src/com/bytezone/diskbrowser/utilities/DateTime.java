@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.utilities;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 // -----------------------------------------------------------------------------------//
 class DateTime
@@ -10,6 +11,8 @@ class DateTime
                                      "Aug", "Sep", "Oct", "Nov", "Dec" };
   private static String[] days = { "", "Sunday", "Monday", "Tuesday", "Wednesday",
                                    "Thursday", "Friday", "Saturday" };
+  private static final DateTimeFormatter dtf =
+      DateTimeFormatter.ofPattern ("dd-LLL-yy HH:mm");
 
   private final int second;
   private final int minute;
@@ -39,6 +42,14 @@ class DateTime
   {
     return String.format ("%02d:%02d:%02d %s %d %s %d", hour, minute, second,
         days[weekDay], day, months[month], year);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public String format2 ()
+  // ---------------------------------------------------------------------------------//
+  {
+    LocalDateTime dateTime = getLocalDateTime ();
+    return dateTime == null ? "" : getLocalDateTime ().format (dtf);
   }
 
   // ---------------------------------------------------------------------------------//

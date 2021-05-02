@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 // -----------------------------------------------------------------------------------//
-class LZW
+abstract class LZW
 // -----------------------------------------------------------------------------------//
 {
   static final String[] st = new String[0x1000];
@@ -24,7 +24,9 @@ class LZW
 
   private int ptr;
   private int startPtr;
-  byte[] bytes;
+  byte[] buffer;
+
+  boolean unpacked;
 
   // ---------------------------------------------------------------------------------//
   static
@@ -38,8 +40,12 @@ class LZW
   LZW (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    bytes = Objects.requireNonNull (buffer);
+    this.buffer = Objects.requireNonNull (buffer);
   }
+
+  // ---------------------------------------------------------------------------------//
+  abstract void unpack ();
+  // ---------------------------------------------------------------------------------//
 
   // ---------------------------------------------------------------------------------//
   void setBuffer (int ptr)
@@ -77,7 +83,7 @@ class LZW
   {
     if (bitsLeft == 0)
     {
-      byteBuffer = bytes[ptr++] & 0xFF;
+      byteBuffer = buffer[ptr++] & 0xFF;
       bitsLeft = 8;
     }
 
@@ -117,6 +123,11 @@ class LZW
   int getSize ()
   // ---------------------------------------------------------------------------------//
   {
+    if (!unpacked)
+    {
+      unpack ();
+      unpacked = true;
+    }
     return chunks.size () * TRACK_LENGTH;
   }
 
@@ -124,6 +135,12 @@ class LZW
   byte[] getData ()
   // ---------------------------------------------------------------------------------//
   {
+    if (!unpacked)
+    {
+      unpack ();
+      unpacked = true;
+    }
+
     byte[] buffer = new byte[getSize ()];
     int trackNumber = 0;
 

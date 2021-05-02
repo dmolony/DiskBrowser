@@ -1,10 +1,10 @@
 package com.bytezone.diskbrowser.utilities;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.fileTypes;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.bytezone.diskbrowser.prodos.ProdosConstants;
 
 // -----------------------------------------------------------------------------------//
 class Record
@@ -20,6 +20,7 @@ class Record
                                       "", "", "", "", "", "", "", "Subdirectory" };
 
   private static String[] accessChars = { "D", "R", "B", "", "", "I", "W", "R" };
+  private static String threadFormats[] = { "unc", "sq ", "lz1", "lz2", "", "" };
 
   private final int totThreads;
   private final int crc;
@@ -224,12 +225,34 @@ class Record
   }
 
   // ---------------------------------------------------------------------------------//
+  int getThreadFormat ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFile ())
+        return thread.threadFormat;
+
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
   int getUncompressedSize ()
   // ---------------------------------------------------------------------------------//
   {
     for (Thread thread : threads)
       if (thread.hasFile ())
         return thread.getUncompressedEOF ();
+
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  int getCompressedSize ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasFile ())
+        return thread.getCompressedEOF ();
 
     return 0;
   }
@@ -242,6 +265,16 @@ class Record
       if (thread.hasFile ())
         return thread.getData ();
     return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  String getLine ()
+  // ---------------------------------------------------------------------------------//
+  {
+    float pct = getCompressedSize () * 100 / getUncompressedSize ();
+    return String.format ("%-27.27s %s  $%04X  %-15s  %s  %3.0f%%   %7d", getFileName (),
+        fileTypes[fileType], auxType, created.format2 (),
+        threadFormats[getThreadFormat ()], pct, getUncompressedSize ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -267,7 +300,7 @@ class Record
     if (storType < 16)
     {
       text.append (String.format ("File type ...... %02X     %s%n", fileType,
-          ProdosConstants.fileTypes[fileType]));
+          fileTypes[fileType]));
       text.append (String.format ("Aux type ....... %,d  $%<04X%n", auxType));
       text.append (
           String.format ("Stor type ...... %,d  %s%n", storType, storage[storType]));

@@ -71,16 +71,6 @@ public class NuFX
       if (record.hasFile ())
       {
         ++totalFiles;
-
-        // note: total blocks does not include subdirectory blocks
-        //        int blocks = (record.getFileSize () - 1) / 512 + 1;
-        //        if (blocks == 1)                      // seedling
-        //          totalBlocks += blocks;
-        //        else if (blocks <= 256)               // sapling
-        //          totalBlocks += blocks + 1;
-        //        else                                  // tree
-        //          totalBlocks += blocks + (blocks / 256) + 2;
-
         volumeName.storePath (record.getFileName ());
       }
 

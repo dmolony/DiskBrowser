@@ -175,6 +175,7 @@ public class DiskFactory
       }
       catch (Exception e)
       {
+        System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
         return null;
       }

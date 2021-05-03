@@ -187,7 +187,13 @@ public class ProdosDisk
       fileEntry.creationDate = created;
       fileEntry.modifiedDate = modified;
 
-      fileEntry.writeFile (dataBuffer);
+      FileWriter fileWriter = new FileWriter (this, buffer);
+      fileWriter.writeFile (dataBuffer, dataBuffer.length);
+
+      fileEntry.storageType = fileWriter.storageType;
+      fileEntry.keyPointer = fileWriter.keyPointer;
+      fileEntry.blocksUsed = fileWriter.blocksUsed;
+      fileEntry.eof = fileWriter.eof;
 
       fileEntry.write ();
       updateFileCount (fileEntry.headerPointer);
@@ -196,6 +202,31 @@ public class ProdosDisk
     }
 
     return null;        // should be impossible
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void addResourceFork (FileEntry fileEntry, byte[] dataBuffer, int eof)
+      throws DiskFullException
+  // ---------------------------------------------------------------------------------//
+  {
+    FileWriter fileWriter = new FileWriter (this, buffer);      // create dummy FileEntry
+    fileWriter.writeFile (dataBuffer, eof);
+
+    int blockNo = allocateNextBlock ();
+
+    ExtendedKeyBlock extendedKeyBlock =
+        new ExtendedKeyBlock (this, buffer, blockNo * BLOCK_SIZE);
+
+    extendedKeyBlock.addMiniEntry (1, fileEntry.storageType, fileEntry.keyPointer,
+        fileEntry.blocksUsed, fileEntry.eof);
+    extendedKeyBlock.addMiniEntry (2, fileWriter.storageType, fileWriter.keyPointer,
+        fileWriter.blocksUsed, fileWriter.eof);
+
+    fileEntry.keyPointer = blockNo;           // extended key block
+    fileEntry.storageType = 0x05;             // extended
+
+    fileEntry.write ();
+    extendedKeyBlock.write ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -392,6 +423,16 @@ public class ProdosDisk
       subdirectoryHeader.write ();
     }
   }
+
+  // ---------------------------------------------------------------------------------//
+  //  private int createExtendedKeyBlock (FileEntry fileEntry) throws DiskFullException
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    int blockNo = allocateNextBlock ();
+  //    ExtendedKeyBlock extendedKeyBlock = new ExtendedKeyBlock (blockNo);
+  //
+  //    return blockNo;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   int allocateNextBlock () throws DiskFullException

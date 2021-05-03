@@ -77,6 +77,7 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
+
     printSummary ();
   }
 
@@ -96,14 +97,17 @@ public class NuFX
 
     for (Record record : records)
     {
-      System.out.printf (" %s%n", record.getLine ());
+      System.out.println (record.getLine ());
       totalUncompressedSize += record.getUncompressedSize ();
       totalCompressedSize += record.getCompressedSize ();
     }
     System.out.println (UNDERLINE);
-    System.out.printf (" Uncomp:%7d  Comp:%7d  %%of orig:%3.0f%%%n",
-        totalUncompressedSize, totalCompressedSize,
-        (float) (totalCompressedSize * 100 / totalUncompressedSize));
+
+    float pct = 0;
+    if (totalUncompressedSize > 0)
+      pct = totalCompressedSize * 100 / totalUncompressedSize;
+    System.out.printf (" Uncomp:%7d  Comp:%7d  %%of orig:%3.0f%%%n%n",
+        totalUncompressedSize, totalCompressedSize, pct);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -116,7 +120,7 @@ public class NuFX
       if (record.hasFile ())
       {
         // note: total blocks does not include subdirectory blocks
-        int blocks = (record.getFileSize () - 1) / 512 + 1;
+        int blocks = (record.getUncompressedSize () - 1) / 512 + 1;
         if (blocks == 1)                      // seedling
           totalBlocks += blocks;
         else if (blocks <= 256)               // sapling
@@ -132,6 +136,8 @@ public class NuFX
   {
     if (totalDisks > 0)
     {
+      if (debug)
+        System.out.println ("Reading disk");
       for (Record record : records)
         for (Thread thread : record.threads)
           if (thread.hasDisk ())
@@ -140,8 +146,8 @@ public class NuFX
 
     if (totalFiles > 0)
     {
-      // should check that files are all in prodos format
-
+      if (debug)
+        System.out.println ("Reading files");
       calculateTotalBlocks ();
       int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
       for (int diskSize : diskSizes)      // in case we choose a size that is too small
@@ -184,6 +190,12 @@ public class NuFX
                 System.out.printf ("File %s not added%n", fileName);
                 break;
               }
+
+              if (record.hasResource ())
+              {
+                buffer = record.getResourceData ();
+                System.out.println (HexFormatter.format (buffer));
+              }
             }
           }
 
@@ -191,16 +203,16 @@ public class NuFX
 
           return disk.getBuffer ();
         }
-        catch (IOException e)
-        {
-          e.printStackTrace ();
-          return null;
-        }
         catch (DiskFullException e)
         {
           System.out.println ("disk full: " + diskSize);    // go round again
         }
         catch (VolumeCatalogFullException e)
+        {
+          e.printStackTrace ();
+          return null;
+        }
+        catch (IOException e)
         {
           e.printStackTrace ();
           return null;

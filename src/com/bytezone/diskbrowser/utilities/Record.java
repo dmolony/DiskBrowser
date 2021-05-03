@@ -149,6 +149,17 @@ class Record
   }
 
   // ---------------------------------------------------------------------------------//
+  boolean hasResource ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasResource ())
+        return true;
+
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------------//
   String getFileName ()
   // ---------------------------------------------------------------------------------//
   {
@@ -200,6 +211,15 @@ class Record
   }
 
   // ---------------------------------------------------------------------------------//
+  LocalDateTime getArchived ()
+  // ---------------------------------------------------------------------------------//
+  {
+    if (archived == null)
+      return null;
+    return archived.getLocalDateTime ();
+  }
+
+  // ---------------------------------------------------------------------------------//
   int getFileSystemID ()
   // ---------------------------------------------------------------------------------//
   {
@@ -239,22 +259,26 @@ class Record
   int getUncompressedSize ()
   // ---------------------------------------------------------------------------------//
   {
-    for (Thread thread : threads)
-      if (thread.hasFile ())
-        return thread.getUncompressedEOF ();
+    int size = 0;
 
-    return 0;
+    for (Thread thread : threads)
+      if (thread.hasFile () || thread.hasResource ())
+        size += thread.getUncompressedEOF ();
+
+    return size;
   }
 
   // ---------------------------------------------------------------------------------//
   int getCompressedSize ()
   // ---------------------------------------------------------------------------------//
   {
-    for (Thread thread : threads)
-      if (thread.hasFile ())
-        return thread.getCompressedEOF ();
+    int size = 0;
 
-    return 0;
+    for (Thread thread : threads)
+      if (thread.hasFile () || thread.hasResource ())
+        size += thread.getCompressedEOF ();
+
+    return size;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -264,6 +288,18 @@ class Record
     for (Thread thread : threads)
       if (thread.hasFile ())
         return thread.getData ();
+
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  byte[] getResourceData ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (Thread thread : threads)
+      if (thread.hasResource ())
+        return thread.getData ();
+
     return null;
   }
 
@@ -271,9 +307,17 @@ class Record
   String getLine ()
   // ---------------------------------------------------------------------------------//
   {
-    float pct = getCompressedSize () * 100 / getUncompressedSize ();
-    return String.format ("%-27.27s %s  $%04X  %-15s  %s  %3.0f%%   %7d", getFileName (),
-        fileTypes[fileType], auxType, created.format2 (),
+    float pct = 0;
+    if (getUncompressedSize () > 0)
+      pct = getCompressedSize () * 100 / getUncompressedSize ();
+    String lockedFlag = (access | 0xC3) == 1 ? "+" : " ";
+    String forkedFlag = hasResource () ? "+" : " ";
+    String name = getFileName ();
+    if (name.length () > 27)
+      name = ".." + name.substring (name.length () - 25);
+
+    return String.format ("%s%-27.27s %s%s $%04X  %-15s  %s  %3.0f%%   %7d", lockedFlag,
+        name, fileTypes[fileType], forkedFlag, auxType, archived.format2 (),
         threadFormats[getThreadFormat ()], pct, getUncompressedSize ());
   }
 

@@ -29,6 +29,7 @@ class Thread
 
   private boolean hasDisk;
   private boolean hasFile;
+  private boolean hasResource;
   private boolean hasFileName;
 
   // ---------------------------------------------------------------------------------//
@@ -102,6 +103,7 @@ class Thread
             hasDisk = true;
             break;
           case 2:                     // resource fork of file
+            hasResource = true;
             break;
         }
 
@@ -173,6 +175,13 @@ class Thread
   }
 
   // ---------------------------------------------------------------------------------//
+  public boolean hasResource ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return hasResource;
+  }
+
+  // ---------------------------------------------------------------------------------//
   public boolean hasFileName ()
   // ---------------------------------------------------------------------------------//
   {
@@ -190,7 +199,11 @@ class Thread
   int getFileSize ()
   // ---------------------------------------------------------------------------------//
   {
+    if (lzw != null)
+      System.out.printf ("%04X v %04X v %04X%n", compressedEOF, uncompressedEOF,
+          lzw.getSize ());
     return lzw != null ? lzw.getSize () : uncompressedEOF;
+    //    return uncompressedEOF;
   }
 
   // ---------------------------------------------------------------------------------//

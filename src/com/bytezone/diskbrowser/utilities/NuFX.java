@@ -138,6 +138,7 @@ public class NuFX
     {
       if (debug)
         System.out.println ("Reading disk");
+
       for (Record record : records)
         for (Thread thread : record.threads)
           if (thread.hasDisk ())
@@ -148,6 +149,7 @@ public class NuFX
     {
       if (debug)
         System.out.println ("Reading files");
+
       calculateTotalBlocks ();
       int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
       for (int diskSize : diskSizes)      // in case we choose a size that is too small
@@ -194,7 +196,8 @@ public class NuFX
               if (record.hasResource ())
               {
                 buffer = record.getResourceData ();
-                System.out.println (HexFormatter.format (buffer));
+                //                System.out.println (HexFormatter.format (buffer));
+                disk.addResourceFork (fileEntry, buffer, buffer.length);
               }
             }
           }

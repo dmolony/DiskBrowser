@@ -209,10 +209,10 @@ public class ProdosDisk
       throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
+    int blockNo = allocateNextBlock ();                 // allocate extended key block
+
     FileWriter fileWriter = new FileWriter (this);      // create resource fork
     fileWriter.writeFile (dataBuffer, eof);
-
-    int blockNo = allocateNextBlock ();
 
     ExtendedKeyBlock extendedKeyBlock = new ExtendedKeyBlock (this, blockNo * BLOCK_SIZE);
 
@@ -223,6 +223,9 @@ public class ProdosDisk
 
     fileEntry.keyPointer = blockNo;           // extended key block
     fileEntry.storageType = 0x05;             // extended
+    fileEntry.blocksUsed += fileWriter.blocksUsed + 1;
+
+    // fileEntry.eof ??
 
     fileEntry.write ();
     extendedKeyBlock.write ();

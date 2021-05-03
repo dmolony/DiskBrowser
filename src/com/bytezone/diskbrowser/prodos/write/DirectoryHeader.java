@@ -30,11 +30,11 @@ public class DirectoryHeader
   int fileCount;
 
   // ---------------------------------------------------------------------------------//
-  public DirectoryHeader (ProdosDisk disk, byte[] buffer, int ptr)
+  public DirectoryHeader (ProdosDisk disk, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
-    this.buffer = buffer;
+    this.buffer = disk.getBuffer ();
     this.ptr = ptr;
   }
 
@@ -91,7 +91,7 @@ public class DirectoryHeader
         int nameLength = buffer[ptr] & 0x0F;
         if (nameLength != 0 && storageType < 0x0E)
         {
-          FileEntry fileEntry = new FileEntry (disk, buffer, ptr);
+          FileEntry fileEntry = new FileEntry (disk, ptr);
           fileEntry.read ();
           System.out.println (fileEntry.toText ());
         }

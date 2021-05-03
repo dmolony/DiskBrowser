@@ -97,7 +97,7 @@ public class ProdosDisk
 
       if (i == 0)
       {
-        volumeDirectoryHeader = new VolumeDirectoryHeader (this, buffer, ptr + 4);
+        volumeDirectoryHeader = new VolumeDirectoryHeader (this, ptr + 4);
         volumeDirectoryHeader.fileName = volumeName;
         volumeDirectoryHeader.totalBlocks = maxBlocks;
         volumeDirectoryHeader.creationDate = LocalDateTime.now ();
@@ -187,7 +187,7 @@ public class ProdosDisk
       fileEntry.creationDate = created;
       fileEntry.modifiedDate = modified;
 
-      FileWriter fileWriter = new FileWriter (this, buffer);
+      FileWriter fileWriter = new FileWriter (this);
       fileWriter.writeFile (dataBuffer, dataBuffer.length);
 
       fileEntry.storageType = fileWriter.storageType;
@@ -209,13 +209,12 @@ public class ProdosDisk
       throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
-    FileWriter fileWriter = new FileWriter (this, buffer);      // create dummy FileEntry
+    FileWriter fileWriter = new FileWriter (this);      // create resource fork
     fileWriter.writeFile (dataBuffer, eof);
 
     int blockNo = allocateNextBlock ();
 
-    ExtendedKeyBlock extendedKeyBlock =
-        new ExtendedKeyBlock (this, buffer, blockNo * BLOCK_SIZE);
+    ExtendedKeyBlock extendedKeyBlock = new ExtendedKeyBlock (this, blockNo * BLOCK_SIZE);
 
     extendedKeyBlock.addMiniEntry (1, fileEntry.storageType, fileEntry.keyPointer,
         fileEntry.blocksUsed, fileEntry.eof);
@@ -350,7 +349,7 @@ public class ProdosDisk
           if (storageType < SUBDIRECTORY_HEADER
               && fileName.equals (new String (buffer, ptr + 1, nameLength)))
           {
-            FileEntry fileEntry = new FileEntry (this, buffer, ptr);
+            FileEntry fileEntry = new FileEntry (this, ptr);
             fileEntry.read ();
             return Optional.of (fileEntry);
           }
@@ -393,7 +392,7 @@ public class ProdosDisk
     updateFileCount (fileEntry.headerPointer);
 
     SubdirectoryHeader subdirectoryHeader =
-        new SubdirectoryHeader (this, buffer, fileEntry.keyPointer * BLOCK_SIZE + 4);
+        new SubdirectoryHeader (this, fileEntry.keyPointer * BLOCK_SIZE + 4);
 
     subdirectoryHeader.fileName = name;
     subdirectoryHeader.creationDate = LocalDateTime.now ();
@@ -423,16 +422,6 @@ public class ProdosDisk
       subdirectoryHeader.write ();
     }
   }
-
-  // ---------------------------------------------------------------------------------//
-  //  private int createExtendedKeyBlock (FileEntry fileEntry) throws DiskFullException
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    int blockNo = allocateNextBlock ();
-  //    ExtendedKeyBlock extendedKeyBlock = new ExtendedKeyBlock (blockNo);
-  //
-  //    return blockNo;
-  //  }
 
   // ---------------------------------------------------------------------------------//
   int allocateNextBlock () throws DiskFullException
@@ -469,7 +458,7 @@ public class ProdosDisk
       for (int i = 0; i < ENTRIES_PER_BLOCK; i++)
       {
         if (buffer[ptr] == 0)         // free slot
-          return new FileEntry (this, buffer, ptr);
+          return new FileEntry (this, ptr);
 
         ptr += ENTRY_SIZE;
       }
@@ -492,7 +481,7 @@ public class ProdosDisk
     // update parent's file entry size (this is the subdirectory file entry
     subdirectoryHeader.updateParentFileEntry ();
 
-    return new FileEntry (this, buffer, ptr + 4);      // first slot in new block
+    return new FileEntry (this, ptr + 4);      // first slot in new block
   }
 
   // ---------------------------------------------------------------------------------//

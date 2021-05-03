@@ -7,20 +7,16 @@ public class ExtendedKeyBlock
 // -----------------------------------------------------------------------------------//
 {
   private final ProdosDisk disk;
-  private final byte[] buffer;
   private final int ptr;
-
-  //  int blockNo;
 
   MiniEntry dataFork;
   MiniEntry resourceFork;
 
   // ---------------------------------------------------------------------------------//
-  public ExtendedKeyBlock (ProdosDisk disk, byte[] buffer, int ptr)
+  public ExtendedKeyBlock (ProdosDisk disk, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
-    this.buffer = buffer;
     this.ptr = ptr;
   }
 
@@ -52,10 +48,10 @@ public class ExtendedKeyBlock
   // ---------------------------------------------------------------------------------//
   {
     if (dataFork != null)                     // else zero buffer??
-      dataFork.write (buffer, ptr);
+      dataFork.write (disk.getBuffer (), ptr);
 
     if (resourceFork != null)
-      resourceFork.write (buffer, ptr + 0x100);
+      resourceFork.write (disk.getBuffer (), ptr + 0x100);
   }
 
   // ---------------------------------------------------------------------------------//

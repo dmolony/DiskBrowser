@@ -11,10 +11,10 @@ public class VolumeDirectoryHeader extends DirectoryHeader
   int totalBlocks;
 
   // ---------------------------------------------------------------------------------//
-  public VolumeDirectoryHeader (ProdosDisk disk, byte[] buffer, int ptr)
+  public VolumeDirectoryHeader (ProdosDisk disk, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    super (disk, buffer, ptr);
+    super (disk, ptr);
 
     storageType = (byte) 0x0F;
   }

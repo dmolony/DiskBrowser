@@ -16,10 +16,10 @@ public class SubdirectoryHeader extends DirectoryHeader
   private byte parentEntryLength;
 
   // ---------------------------------------------------------------------------------//
-  public SubdirectoryHeader (ProdosDisk disk, byte[] buffer, int ptr)
+  public SubdirectoryHeader (ProdosDisk disk, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    super (disk, buffer, ptr);
+    super (disk, ptr);
 
     storageType = (byte) 0x0E;
     access = (byte) 0xC3;
@@ -38,7 +38,7 @@ public class SubdirectoryHeader extends DirectoryHeader
   FileEntry getParentFileEntry ()
   // ---------------------------------------------------------------------------------//
   {
-    FileEntry fileEntry = new FileEntry (disk, buffer,
+    FileEntry fileEntry = new FileEntry (disk,
         parentPointer * BLOCK_SIZE + (parentEntry - 1) * ENTRY_SIZE + 4);
     fileEntry.read ();
 

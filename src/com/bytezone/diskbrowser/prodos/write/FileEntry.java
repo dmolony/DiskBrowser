@@ -35,11 +35,11 @@ public class FileEntry
   int headerPointer;
 
   // ---------------------------------------------------------------------------------//
-  public FileEntry (ProdosDisk disk, byte[] buffer, int ptr)
+  public FileEntry (ProdosDisk disk, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
-    this.buffer = buffer;
+    this.buffer = disk.getBuffer ();
     this.ptr = ptr;
   }
 

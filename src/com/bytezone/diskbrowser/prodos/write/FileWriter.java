@@ -21,11 +21,11 @@ public class FileWriter
   int eof;
 
   // ---------------------------------------------------------------------------------//
-  FileWriter (ProdosDisk disk, byte[] buffer)
+  FileWriter (ProdosDisk disk)
   // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
-    this.buffer = buffer;
+    this.buffer = disk.getBuffer ();
   }
 
   // ---------------------------------------------------------------------------------//

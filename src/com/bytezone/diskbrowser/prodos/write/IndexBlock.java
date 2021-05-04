@@ -18,7 +18,7 @@ public class IndexBlock
   }
 
   // ---------------------------------------------------------------------------------//
-  void set (int position, int actualBlockNo)
+  void setPosition (int position, int actualBlockNo)
   // ---------------------------------------------------------------------------------//
   {
     if (blocks[position] == 0)

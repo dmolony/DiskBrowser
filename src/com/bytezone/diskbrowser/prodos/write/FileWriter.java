@@ -10,7 +10,6 @@ public class FileWriter
 // -----------------------------------------------------------------------------------//
 {
   private final ProdosDisk disk;
-  private final byte[] buffer;
 
   private IndexBlock indexBlock = null;
   private MasterIndexBlock masterIndexBlock = null;
@@ -25,7 +24,6 @@ public class FileWriter
   // ---------------------------------------------------------------------------------//
   {
     this.disk = disk;
-    this.buffer = disk.getBuffer ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -45,7 +43,7 @@ public class FileWriter
       int bufferPtr = actualBlockNo * BLOCK_SIZE;
       int tfr = Math.min (remaining, BLOCK_SIZE);
 
-      System.arraycopy (dataBuffer, dataPtr, buffer, bufferPtr, tfr);
+      System.arraycopy (dataBuffer, dataPtr, disk.getBuffer (), bufferPtr, tfr);
 
       dataPtr += BLOCK_SIZE;
       remaining -= BLOCK_SIZE;
@@ -78,7 +76,7 @@ public class FileWriter
       int actualBlockNo = getActualBlockNo (logicalBlockNo);
       int bufferPtr = actualBlockNo * BLOCK_SIZE + blockOffset;
 
-      System.arraycopy (dataBuffer, dataPtr, buffer, bufferPtr, tfr);
+      System.arraycopy (dataBuffer, dataPtr, disk.getBuffer (), bufferPtr, tfr);
 
       destPtr += tfr;
       dataPtr += tfr;
@@ -134,9 +132,9 @@ public class FileWriter
   // ---------------------------------------------------------------------------------//
   {
     if (storageType == TREE)
-      masterIndexBlock.write (buffer);
+      masterIndexBlock.write (disk.getBuffer ());
     else if (storageType == SAPLING)
-      indexBlock.write (buffer);
+      indexBlock.write (disk.getBuffer ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -156,7 +154,7 @@ public class FileWriter
         else if (storageType == SEEDLING)             // seedling -> sapling -> tree
         {
           indexBlock = new IndexBlock (allocateNextBlock ());
-          indexBlock.set (0, keyPointer);
+          indexBlock.setPosition (0, keyPointer);
           masterIndexBlock.set (0, indexBlock);
         }
 
@@ -165,38 +163,39 @@ public class FileWriter
         indexBlock = null;
       }
 
-      getIndexBlock (logicalBlockNo / 256).set (logicalBlockNo % 256, actualBlockNo);
+      getIndexBlock (logicalBlockNo / 0x100).setPosition (logicalBlockNo % 0x100,
+          actualBlockNo);
     }
     else if (logicalBlockNo > 0)                      // potential SAPLING
     {
       if (storageType == TREE)                        // already a tree
       {
-        getIndexBlock (0).set (logicalBlockNo, actualBlockNo);
+        getIndexBlock (0).setPosition (logicalBlockNo, actualBlockNo);
       }
       else if (storageType == SAPLING)                // already a sapling
       {
-        indexBlock.set (logicalBlockNo, actualBlockNo);
+        indexBlock.setPosition (logicalBlockNo, actualBlockNo);
       }
       else                                            // new file or already a seedling
       {
         indexBlock = new IndexBlock (allocateNextBlock ());
         if (storageType == SEEDLING)                  // seedling -> sapling
-          indexBlock.set (0, keyPointer);
+          indexBlock.setPosition (0, keyPointer);
 
         keyPointer = indexBlock.blockNo;
         storageType = SAPLING;
-        indexBlock.set (logicalBlockNo, actualBlockNo);
+        indexBlock.setPosition (logicalBlockNo, actualBlockNo);
       }
     }
     else if (logicalBlockNo == 0)                     // potential SEEDLING
     {
       if (storageType == TREE)                        // already a tree
       {
-        getIndexBlock (0).set (0, actualBlockNo);
+        getIndexBlock (0).setPosition (0, actualBlockNo);
       }
       else if (storageType == SAPLING)                // already a sapling
       {
-        indexBlock.set (0, actualBlockNo);
+        indexBlock.setPosition (0, actualBlockNo);
       }
       else
       {

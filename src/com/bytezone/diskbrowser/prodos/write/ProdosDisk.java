@@ -122,8 +122,8 @@ public class ProdosDisk
 
   // ---------------------------------------------------------------------------------//
   public FileEntry addFile (String path, byte type, int auxType, LocalDateTime created,
-      LocalDateTime modified, byte[] dataBuffer)
-      throws DiskFullException, VolumeCatalogFullException
+      LocalDateTime modified, byte[] fileBuffer, int eof)
+      throws DiskFullException, VolumeCatalogFullException, FileAlreadyExistsException
   // ---------------------------------------------------------------------------------//
   {
     if (path.isBlank ())
@@ -170,7 +170,7 @@ public class ProdosDisk
     {
       System.out.println ("File already exists: " + path);
       System.out.println (fileEntryOpt.get ());
-      return null;          // throw something?
+      throw new FileAlreadyExistsException (fileName);
     }
 
     // create a file entry in the current catalog block
@@ -188,7 +188,7 @@ public class ProdosDisk
       fileEntry.modifiedDate = modified;
 
       FileWriter fileWriter = new FileWriter (this);
-      fileWriter.writeFile (dataBuffer, dataBuffer.length);
+      fileWriter.writeFile (fileBuffer, eof);
 
       fileEntry.storageType = fileWriter.storageType;
       fileEntry.keyPointer = fileWriter.keyPointer;
@@ -197,22 +197,20 @@ public class ProdosDisk
 
       fileEntry.write ();
       updateFileCount (fileEntry.headerPointer);
-
-      return fileEntry;
     }
 
-    return null;        // should be impossible
+    return fileEntry;
   }
 
   // ---------------------------------------------------------------------------------//
-  public void addResourceFork (FileEntry fileEntry, byte[] dataBuffer, int eof)
+  public void addResourceFork (FileEntry fileEntry, byte[] fileBuffer, int eof)
       throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     int blockNo = allocateNextBlock ();                 // allocate extended key block
 
     FileWriter fileWriter = new FileWriter (this);      // create resource fork
-    fileWriter.writeFile (dataBuffer, eof);
+    fileWriter.writeFile (fileBuffer, eof);
 
     ExtendedKeyBlock extendedKeyBlock = new ExtendedKeyBlock (this, blockNo * BLOCK_SIZE);
 

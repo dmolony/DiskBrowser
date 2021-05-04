@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.prodos.write.DiskFullException;
+import com.bytezone.diskbrowser.prodos.write.FileAlreadyExistsException;
 import com.bytezone.diskbrowser.prodos.write.FileEntry;
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 import com.bytezone.diskbrowser.prodos.write.VolumeCatalogFullException;
@@ -167,12 +168,14 @@ public class NuFX
             if (record.hasFile ())
             {
               String fileName = volumeName.convert (record.getFileName ());
+
               if (!record.isValidFileSystem ())
               {
                 System.out.printf ("File %s is file system %s%n", fileName,
                     record.getFileSystemName ());
                 continue;
               }
+
               //              int fileSize = record.getFileSize ();
               byte fileType = (byte) record.getFileType ();
               int eof = record.getUncompressedSize ();
@@ -185,9 +188,13 @@ public class NuFX
                 System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
                     fileName, fileType, auxType, eof, buffer.length, created, modified);
 
-              FileEntry fileEntry =
-                  disk.addFile (fileName, fileType, auxType, created, modified, buffer);
-              if (fileEntry == null)
+              FileEntry fileEntry;
+              try
+              {
+                fileEntry = disk.addFile (fileName, fileType, auxType, created, modified,
+                    buffer, eof);
+              }
+              catch (FileAlreadyExistsException e)
               {
                 System.out.printf ("File %s not added%n", fileName);
                 break;
@@ -196,7 +203,6 @@ public class NuFX
               if (record.hasResource ())
               {
                 buffer = record.getResourceData ();
-                //                System.out.println (HexFormatter.format (buffer));
                 disk.addResourceFork (fileEntry, buffer, buffer.length);
               }
             }

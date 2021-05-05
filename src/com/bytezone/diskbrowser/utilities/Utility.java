@@ -453,6 +453,9 @@ public class Utility
   static boolean isMagic (byte[] buffer, int ptr, byte[] magic)
   // ---------------------------------------------------------------------------------//
   {
+    if (ptr + magic.length >= buffer.length)
+      return false;
+
     for (int i = 0; i < magic.length; i++)
       if (buffer[ptr + i] != magic[i])
         return false;

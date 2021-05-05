@@ -24,6 +24,9 @@ public class Prefix2mg
   int creatorOffset;
   int creatorLength;
 
+  boolean flagsLocked;
+  int flagsVolume;
+
   // ---------------------------------------------------------------------------------//
   public Prefix2mg (byte[] buffer)
   // ---------------------------------------------------------------------------------//
@@ -42,6 +45,12 @@ public class Prefix2mg
     creatorOffset = Utility.getLong (buffer, 0x28);
     creatorLength = Utility.getLong (buffer, 0x2C);
 
+    flagsLocked = (flags & 0x80000000) != 0;
+    if ((flags & 0x0100) != 0)
+      flagsVolume = flags & 0xFF;
+    if (format == 0 && flagsVolume == 0)
+      flagsVolume = 254;
+
     // see /Asimov disks/images/gs/os/prodos16/ProDOS 16v1_3.2mg
     System.out.println (this);
   }
@@ -59,6 +68,8 @@ public class Prefix2mg
     text.append (String.format ("Version        : %d%n", version));
     text.append (String.format ("Format         : %02X%n", format));
     text.append (String.format ("Flags          : %,d%n", flags));
+    text.append (String.format ("Locked         : %s%n", flagsLocked));
+    text.append (String.format ("DOS Volume     : %,d%n", flagsVolume));
     text.append (String.format ("Blocks         : %,d%n", blocks));
     text.append (String.format ("Offset         : %,d%n", offset));
     text.append (String.format ("Length         : %08X (%<,d)%n", length));

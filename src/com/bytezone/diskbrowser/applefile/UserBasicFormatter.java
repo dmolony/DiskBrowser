@@ -258,6 +258,7 @@ public class UserBasicFormatter extends BasicFormatter
         .size (); i++)
     {
       boolean precededByIf = false;
+
       for (SubLine subline : sourceLines.get (i).sublines)
       {
         if (started)

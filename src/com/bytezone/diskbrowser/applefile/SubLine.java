@@ -465,7 +465,8 @@ public class SubLine implements ApplesoftConstants
     while (++p < max)
       if (buffer[p] == TOKEN_EQUALS)
       {
-        String expandedLine = toString ();
+        //        String expandedLine = toString ();
+        String expandedLine = Alignment.toStringBuilder (this).toString ();
         equalsPosition = expandedLine.indexOf ('=');
         endPosition = expandedLine.length ();
         if (expandedLine.endsWith (":"))

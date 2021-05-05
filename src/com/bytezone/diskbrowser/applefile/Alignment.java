@@ -59,18 +59,18 @@ class Alignment implements ApplesoftConstants
     int targetLength = subline.endPosition - equalsPosition;
 
     // insert spaces before '=' until it lines up with the other assignment lines
-    while (alignEqualsPos-- > equalsPosition)
-      line.insert (equalsPosition, ' ');
+    while (alignEqualsPos-- > subline.equalsPosition)
+      line.insert (subline.equalsPosition, ' ');
 
     if (line.charAt (line.length () - 1) == ':')
-      while (targetLength++ <= targetLength)
+      while (targetLength++ <= this.targetLength)
         line.append (" ");
 
     return line.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
-  private StringBuilder toStringBuilder (SubLine subline)
+  static StringBuilder toStringBuilder (SubLine subline)
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder ();
@@ -102,5 +102,22 @@ class Alignment implements ApplesoftConstants
     }
 
     return line;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    text.append (String.format ("Equals position ..... %d%n", equalsPosition));
+    text.append (String.format ("Target length ....... %d%n", targetLength));
+    text.append (
+        String.format ("First subline ....... %s%n", toStringBuilder (firstSubLine)));
+    text.append (
+        String.format ("Last subline ........ %s", toStringBuilder (lastSubLine)));
+
+    return text.toString ();
   }
 }

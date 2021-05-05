@@ -151,20 +151,7 @@ public class ProdosDisk
     }
 
     // search for each subdirectory, create any that don't exist
-    int catalogBlockNo = 2;
-
-    FileEntry fileEntry = null;
-    for (int i = 0; i < subdirectories.length; i++)
-    {
-      Optional<FileEntry> fileEntryOpt =
-          searchDirectory (catalogBlockNo, subdirectories[i]);
-      if (fileEntryOpt.isEmpty ())
-        fileEntry = createSubdirectory (catalogBlockNo, subdirectories[i]);
-      else
-        fileEntry = fileEntryOpt.get ();
-
-      catalogBlockNo = fileEntry.keyPointer;
-    }
+    int catalogBlockNo = createPath (subdirectories);
 
     // check that the file doesn't already exist
     Optional<FileEntry> fileEntryOpt = searchDirectory (catalogBlockNo, fileName);
@@ -176,7 +163,7 @@ public class ProdosDisk
     }
 
     // create a file entry in the current catalog block
-    fileEntry = findFreeSlot (catalogBlockNo);
+    FileEntry fileEntry = findFreeSlot (catalogBlockNo);
 
     if (fileEntry != null)
     {
@@ -202,6 +189,30 @@ public class ProdosDisk
     }
 
     return fileEntry;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int createPath (String[] subdirectories)
+      throws DiskFullException, VolumeCatalogFullException
+  // ---------------------------------------------------------------------------------//
+  {
+    // search for each subdirectory, create any that don't exist
+    int catalogBlockNo = 2;
+
+    FileEntry fileEntry = null;
+    for (int i = 0; i < subdirectories.length; i++)
+    {
+      Optional<FileEntry> fileEntryOpt =
+          searchDirectory (catalogBlockNo, subdirectories[i]);
+      if (fileEntryOpt.isEmpty ())
+        fileEntry = createSubdirectory (catalogBlockNo, subdirectories[i]);
+      else
+        fileEntry = fileEntryOpt.get ();
+
+      catalogBlockNo = fileEntry.keyPointer;
+    }
+
+    return catalogBlockNo;
   }
 
   // ---------------------------------------------------------------------------------//

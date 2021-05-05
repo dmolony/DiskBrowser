@@ -222,8 +222,7 @@ public class ProdosDisk
     fileEntry.keyPointer = blockNo;           // extended key block
     fileEntry.storageType = 0x05;             // extended
     fileEntry.blocksUsed += fileWriter.blocksUsed + 1;
-
-    // fileEntry.eof ??
+    fileEntry.eof = BLOCK_SIZE;
 
     fileEntry.write ();
     extendedKeyBlock.write ();

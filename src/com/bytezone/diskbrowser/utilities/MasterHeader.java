@@ -29,6 +29,13 @@ class MasterHeader
     {
       if (Utility.isMagic (buffer, ptr, NuFile))
         break;
+      if (Utility.isMagic (buffer, 0x2000, NuFile))
+      {
+        System.out.println ("found it");
+        ptr = 0x2000;
+        bin2 = true;
+        break;
+      }
 
       if (isBin2 (buffer, ptr))
       {

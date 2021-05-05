@@ -7,13 +7,22 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class Prefix2mg
 // -----------------------------------------------------------------------------------//
 {
+  String[] creators = { "!nfc", "B2TR", "CTKG", "CdrP", "ShIm", "WOOF", "XGS!" };
+  String[] images = { "Dos3.3", "Prodos", "Nibbized" };
+
   String prefix;
   String creator;
   int headerSize;
   int version;
-  byte format;
-  int diskData;
+  int format;
+  int flags;
+  int length;
   int blocks;
+  int offset;
+  int commentOffset;
+  int commentLength;
+  int creatorOffset;
+  int creatorLength;
 
   // ---------------------------------------------------------------------------------//
   public Prefix2mg (byte[] buffer)
@@ -21,14 +30,20 @@ public class Prefix2mg
   {
     prefix = new String (buffer, 0, 4);
     creator = new String (buffer, 4, 4);
-    headerSize = Utility.getWord (buffer, 8);
-    version = Utility.getWord (buffer, 10);
-    format = buffer[12];
-
-    diskData = Utility.getLong (buffer, 28);
-    blocks = Utility.intValue (buffer[20], buffer[21]);       // 1600
+    headerSize = Utility.getWord (buffer, 0x08);
+    version = Utility.getWord (buffer, 0x0A);
+    format = Utility.getLong (buffer, 0x0C);
+    flags = Utility.getLong (buffer, 0x10);
+    blocks = Utility.getLong (buffer, 0x14);       // 1600
+    offset = Utility.getLong (buffer, 0x18);
+    length = Utility.getLong (buffer, 0x1C);
+    commentOffset = Utility.getLong (buffer, 0x20);
+    commentLength = Utility.getLong (buffer, 0x24);
+    creatorOffset = Utility.getLong (buffer, 0x28);
+    creatorLength = Utility.getLong (buffer, 0x2C);
 
     // see /Asimov disks/images/gs/os/prodos16/ProDOS 16v1_3.2mg
+    System.out.println (this);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -38,14 +53,19 @@ public class Prefix2mg
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format ("Prefix    : %s%n", prefix));
-    text.append (String.format ("Creator   : %s%n", creator));
-    text.append (String.format ("Header    : %d%n", headerSize));
-    text.append (String.format ("Version   : %d%n", version));
-    text.append (String.format ("Format    : %02X%n", format));
-
-    text.append (String.format ("Data size : %08X (%<,d)%n", diskData));
-    text.append (String.format ("Blocks    : %,d%n", blocks));
+    text.append (String.format ("Prefix         : %s%n", prefix));
+    text.append (String.format ("Creator        : %s%n", creator));
+    text.append (String.format ("Header         : %d%n", headerSize));
+    text.append (String.format ("Version        : %d%n", version));
+    text.append (String.format ("Format         : %02X%n", format));
+    text.append (String.format ("Flags          : %,d%n", flags));
+    text.append (String.format ("Blocks         : %,d%n", blocks));
+    text.append (String.format ("Offset         : %,d%n", offset));
+    text.append (String.format ("Length         : %08X (%<,d)%n", length));
+    text.append (String.format ("Comment Offset : %,d%n", commentOffset));
+    text.append (String.format ("Comment Length : %08X (%<,d)%n", commentLength));
+    text.append (String.format ("Creator Offset : %,d%n", creatorOffset));
+    text.append (String.format ("Creator Length : %08X (%<,d)", creatorLength));
 
     return text.toString ();
   }

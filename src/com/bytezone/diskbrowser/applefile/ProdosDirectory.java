@@ -148,9 +148,10 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
               subType = "";
           }
 
-          text.append (String.format ("%s%-15s %3s   %5d  %9s %5s  %9s %5s %8d %7s%n",
-              locked, filename, ProdosConstants.fileTypes[type], blocks, dateM, timeM,
-              dateC, timeC, eof, subType));
+          String forkFlag = storageType == 5 ? "+" : " ";
+          text.append (String.format ("%s%-15s %3s%s  %5d  %9s %5s  %9s %5s %8d %7s%n",
+              locked, filename, ProdosConstants.fileTypes[type], forkFlag, blocks, dateM,
+              timeM, dateC, timeC, eof, subType));
           break;
 
         default:

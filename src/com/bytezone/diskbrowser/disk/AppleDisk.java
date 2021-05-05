@@ -121,8 +121,8 @@ public class AppleDisk implements Disk
         if (debug)
           System.out.println (prefix2mg);
 
-        if (prefix2mg.diskData > 0)
-          this.blocks = prefix2mg.diskData / 4096 * 8;    // reduce blocks to a multiple of 8
+        if (prefix2mg.length > 0)
+          this.blocks = prefix2mg.length / 4096 * 8;    // reduce blocks to a multiple of 8
 
         this.sectorSize = 512;
         this.trackSize = 8 * sectorSize;

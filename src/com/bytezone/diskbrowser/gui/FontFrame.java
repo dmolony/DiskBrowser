@@ -130,14 +130,17 @@ public class FontFrame extends JFrame
   {
     String fonts[] =
         GraphicsEnvironment.getLocalGraphicsEnvironment ().getAvailableFontFamilyNames ();
+    //    for (String font : fonts)
+    //      System.out.println (font);
     String pf[] =
-        { "Andale Mono", "Anonymous Pro", "Anonymous Pro Minus", "Apple2Forever",
-          "Apple2Forever80", "Consolas", "Bitstream Vera Sans Mono", "Consolas",
-          "Courier", "Courier New", "DejaVu Sans Mono", "Envy Code R", "Inconsolata",
-          "Input Mono", "Input Mono Narrow", "Iosevka", "Lucida Sans Typewriter",
-          "Luculent", "Menlo", "Monaco", "monofur", "Monospaced", "Nimbus Mono L",
-          "PCMyungjo", "PR Number 3", "Pragmata", "Print Char 21", "ProFont", "ProFontX",
-          "Proggy", "PT Mono", "Source Code Pro", "Ubuntu Mono" };
+        { "Andale Mono", "Anonymous Pro", "Anonymous Pro Minus", "Apple II Display Pro",
+          "Apple II Pro", "Apple2Forever", "Apple2Forever80", "Bitstream Vera Sans Mono",
+          "Consolas", "Courier", "Courier New", "DejaVu Sans Mono", "Envy Code R",
+          "Inconsolata", "Input Mono", "Input Mono Narrow", "Iosevka",
+          "Lucida Sans Typewriter", "Luculent", "Menlo", "Monaco", "monofur",
+          "Monospaced", "Nimbus Mono L", "PCMyungjo", "PR Number 3", "Pragmata",
+          "Print Char 21", "ProFont", "ProFontX", "Proggy", "PT Mono", "Source Code Pro",
+          "Ubuntu Mono" };
 
     DefaultListModel<String> lm = (DefaultListModel<String>) fontList.getModel ();
 

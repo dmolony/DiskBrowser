@@ -30,23 +30,23 @@ public class FileWriter
   void writeFile (byte[] dataBuffer, int eof) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
-    this.eof = eof;
+    this.eof = Math.min (eof, dataBuffer.length);
 
     int dataPtr = 0;
-    int remaining = eof;
+    int remaining = this.eof;
 
-    while (dataPtr < eof)
+    while (dataPtr < this.eof)
     {
       int actualBlockNo = allocateNextBlock ();
       map (dataPtr / BLOCK_SIZE, actualBlockNo);
 
       int bufferPtr = actualBlockNo * BLOCK_SIZE;
-      int tfr = Math.min (remaining, BLOCK_SIZE);
+      int transfer = Math.min (remaining, BLOCK_SIZE);
 
-      System.arraycopy (dataBuffer, dataPtr, disk.getBuffer (), bufferPtr, tfr);
+      System.arraycopy (dataBuffer, dataPtr, disk.getBuffer (), bufferPtr, transfer);
 
-      dataPtr += BLOCK_SIZE;
-      remaining -= BLOCK_SIZE;
+      dataPtr += transfer;
+      remaining -= transfer;
     }
 
     writeIndices ();
@@ -103,13 +103,13 @@ public class FileWriter
     switch (storageType)
     {
       case TREE:
-        actualBlockNo =
-            masterIndexBlock.get (logicalBlockNo / 256).get (logicalBlockNo % 256);
+        actualBlockNo = masterIndexBlock.get (logicalBlockNo / 0x100)
+            .getPosition (logicalBlockNo % 0x100);
         break;
 
       case SAPLING:
-        if (logicalBlockNo < 256)
-          actualBlockNo = indexBlock.get (logicalBlockNo);
+        if (logicalBlockNo < 0x100)
+          actualBlockNo = indexBlock.getPosition (logicalBlockNo);
         break;
 
       case SEEDLING:
@@ -141,7 +141,7 @@ public class FileWriter
   private void map (int logicalBlockNo, int actualBlockNo) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
-    if (logicalBlockNo > 255)                         // potential TREE
+    if (logicalBlockNo >= 0x100)                       // potential TREE
     {
       if (storageType != TREE)
       {
@@ -204,7 +204,7 @@ public class FileWriter
       }
     }
     else
-      System.out.println ("Error");
+      System.out.println ("Error: " + logicalBlockNo);
   }
 
   // ---------------------------------------------------------------------------------//

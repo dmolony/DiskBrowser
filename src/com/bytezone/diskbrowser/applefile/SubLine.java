@@ -12,6 +12,7 @@ import static com.bytezone.diskbrowser.utilities.Utility.ASCII_PERCENT;
 import static com.bytezone.diskbrowser.utilities.Utility.ASCII_QUOTE;
 import static com.bytezone.diskbrowser.utilities.Utility.ASCII_RIGHT_BRACKET;
 import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
+import static com.bytezone.diskbrowser.utilities.Utility.isControlCharacter;
 import static com.bytezone.diskbrowser.utilities.Utility.isDigit;
 import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
 import static com.bytezone.diskbrowser.utilities.Utility.isLetter;
@@ -465,8 +466,7 @@ public class SubLine implements ApplesoftConstants
     while (++p < max)
       if (buffer[p] == TOKEN_EQUALS)
       {
-        //        String expandedLine = toString ();
-        String expandedLine = Alignment.toStringBuilder (this).toString ();
+        String expandedLine = toString ();
         equalsPosition = expandedLine.indexOf ('=');
         endPosition = expandedLine.length ();
         if (expandedLine.endsWith (":"))
@@ -614,29 +614,6 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  //  public String getAlignedText (ApplesoftFormatter alignment)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    StringBuilder line = toStringBuilder ();      // get line
-  //
-  //    if (alignment.equalsPosition == 0 || is (TOKEN_REM))
-  //      return line.toString ();
-  //
-  //    int alignEqualsPos = alignment.equalsPosition;
-  //    int targetLength = endPosition - equalsPosition;
-  //
-  //    // insert spaces before '=' until it lines up with the other assignment lines
-  //    while (alignEqualsPos-- > equalsPosition)
-  //      line.insert (equalsPosition, ' ');
-  //
-  //    if (line.charAt (line.length () - 1) == ':')
-  //      while (targetLength++ <= alignment.targetLength)
-  //        line.append (" ");
-  //
-  //    return line.toString ();
-  //  }
-
-  // ---------------------------------------------------------------------------------//
   public byte[] getBuffer ()
   // ---------------------------------------------------------------------------------//
   {
@@ -713,45 +690,45 @@ public class SubLine implements ApplesoftConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  //  private StringBuilder toStringBuilder ()
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    StringBuilder line = new StringBuilder ();
-  //
-  //    // All sublines end with 0 or : except IF lines that are split into two
-  //    int max = startPtr + length - 1;
-  //    if (buffer[max] == 0)
-  //      --max;
-  //
-  //    if (isImpliedGoto () && !ApplesoftBasicProgram.basicPreferences.showThen)
-  //      line.append ("GOTO ");
-  //
-  //    for (int p = startPtr; p <= max; p++)
-  //    {
-  //      byte b = buffer[p];
-  //      if (isToken (b))
-  //      {
-  //        if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
-  //          line.append (' ');
-  //        int val = b & 0x7F;
-  //        if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
-  //          line.append (ApplesoftConstants.tokens[val] + " ");
-  //      }
-  //      //      else if (Utility.isControlCharacter (b))
-  //      //        line.append (ApplesoftBasicProgram.basicPreferences.showCaret
-  //      //            ? "^" + (char) (b + 64) : "?");
-  //      else if (!isControlCharacter (b))
-  //        line.append ((char) b);
-  //    }
-  //
-  //    return line;
-  //  }
+  StringBuilder toStringBuilder ()
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder line = new StringBuilder ();
+
+    // All sublines end with 0 or : except IF lines that are split into two
+    int max = startPtr + length - 1;
+    if (buffer[max] == 0)
+      --max;
+
+    if (isImpliedGoto () && !ApplesoftBasicProgram.basicPreferences.showThen)
+      line.append ("GOTO ");
+
+    for (int p = startPtr; p <= max; p++)
+    {
+      byte b = buffer[p];
+      if (isToken (b))
+      {
+        if (line.length () > 0 && line.charAt (line.length () - 1) != ' ')
+          line.append (' ');
+        int val = b & 0x7F;
+        if (b != TOKEN_THEN || ApplesoftBasicProgram.basicPreferences.showThen)
+          line.append (ApplesoftConstants.tokens[val] + " ");
+      }
+      //      else if (Utility.isControlCharacter (b))
+      //        line.append (ApplesoftBasicProgram.basicPreferences.showCaret
+      //            ? "^" + (char) (b + 64) : "?");
+      else if (!isControlCharacter (b))
+        line.append ((char) b);
+    }
+
+    return line;
+  }
 
   // ---------------------------------------------------------------------------------//
-  //  @Override
-  //  public String toString ()
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    return toStringBuilder ().toString ();
-  //  }
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return toStringBuilder ().toString ();
+  }
 }

@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import com.bytezone.diskbrowser.prodos.write.ExtendedKeyBlock.ForkType;
+
 // -----------------------------------------------------------------------------------//
 public class ProdosDisk
 // -----------------------------------------------------------------------------------//
@@ -214,13 +216,11 @@ public class ProdosDisk
 
     ExtendedKeyBlock extendedKeyBlock = new ExtendedKeyBlock (this, blockNo * BLOCK_SIZE);
 
-    extendedKeyBlock.addMiniEntry (1, fileEntry.storageType, fileEntry.keyPointer,
-        fileEntry.blocksUsed, fileEntry.eof);
-    extendedKeyBlock.addMiniEntry (2, fileWriter.storageType, fileWriter.keyPointer,
-        fileWriter.blocksUsed, fileWriter.eof);
+    extendedKeyBlock.addMiniEntry (ForkType.DATA, fileEntry);
+    extendedKeyBlock.addMiniEntry (ForkType.RESOURCE, fileWriter);
 
-    fileEntry.keyPointer = blockNo;           // extended key block
-    fileEntry.storageType = 0x05;             // extended
+    fileEntry.keyPointer = blockNo;                     // extended key block
+    fileEntry.storageType = 0x05;                       // extended
     fileEntry.blocksUsed += fileWriter.blocksUsed + 1;
     fileEntry.eof = BLOCK_SIZE;
 

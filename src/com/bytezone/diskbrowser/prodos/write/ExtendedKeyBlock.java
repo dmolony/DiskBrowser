@@ -9,8 +9,13 @@ public class ExtendedKeyBlock
   private final ProdosDisk disk;
   private final int ptr;
 
-  MiniEntry dataFork;
-  MiniEntry resourceFork;
+  private MiniEntry dataFork;
+  private MiniEntry resourceFork;
+
+  enum ForkType
+  {
+    DATA, RESOURCE;
+  }
 
   // ---------------------------------------------------------------------------------//
   public ExtendedKeyBlock (ProdosDisk disk, int ptr)
@@ -21,15 +26,30 @@ public class ExtendedKeyBlock
   }
 
   // ---------------------------------------------------------------------------------//
-  void addMiniEntry (int type, byte storageType, int keyBlock, int blocksUsed, int eof)
+  void addMiniEntry (ForkType type, FileEntry fileEntry)
   // ---------------------------------------------------------------------------------//
   {
-    MiniEntry miniEntry = new MiniEntry (storageType, keyBlock, blocksUsed, eof);
+    addMiniEntry (type, fileEntry.storageType, fileEntry.keyPointer, fileEntry.blocksUsed,
+        fileEntry.eof);
+  }
 
-    if (type == 1)                  // enum??
-      dataFork = miniEntry;
+  // ---------------------------------------------------------------------------------//
+  void addMiniEntry (ForkType type, FileWriter fileWriter)
+  // ---------------------------------------------------------------------------------//
+  {
+    addMiniEntry (type, fileWriter.storageType, fileWriter.keyPointer,
+        fileWriter.blocksUsed, fileWriter.eof);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addMiniEntry (ForkType type, byte storageType, int keyPointer,
+      int blocksUsed, int eof)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (type == ForkType.DATA)
+      dataFork = new MiniEntry (storageType, keyPointer, blocksUsed, eof);
     else
-      resourceFork = miniEntry;
+      resourceFork = new MiniEntry (storageType, keyPointer, blocksUsed, eof);
   }
 
   // ---------------------------------------------------------------------------------//

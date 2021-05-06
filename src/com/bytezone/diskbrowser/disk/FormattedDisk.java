@@ -82,6 +82,3 @@ public interface FormattedDisk
 
   public String getName ();
 }
-
-// getFileTypeList ()
-// getFiles (FileType type)

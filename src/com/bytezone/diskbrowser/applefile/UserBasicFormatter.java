@@ -21,6 +21,8 @@ public class UserBasicFormatter extends BasicFormatter
   private static final int INDENT_SIZE = 2;
   private static final String EIGHT_SPACES = "        ";
   private static final String FOUR_SPACES = "    ";
+  private static boolean FORCE = true;
+  private static boolean NO_FORCE = false;
 
   // ---------------------------------------------------------------------------------//
   public UserBasicFormatter (ApplesoftBasicProgram program,
@@ -112,13 +114,22 @@ public class UserBasicFormatter extends BasicFormatter
         int inset = Math.max (text.length (), getIndent (fullText)) + 1;
         if (subline.is (TOKEN_REM) && lineText.length () > basicPreferences.wrapRemAt)
         {
-          List<String> lines = splitLine (lineText, basicPreferences.wrapRemAt, ' ');
+          List<String> lines =
+              splitLine (lineText, basicPreferences.wrapRemAt, ' ', FORCE);
           addSplitLines (lines, text, inset);
         }
         else if (subline.is (TOKEN_DATA)
             && lineText.length () > basicPreferences.wrapDataAt)
         {
-          List<String> lines = splitLine (lineText, basicPreferences.wrapDataAt, ',');
+          List<String> lines =
+              splitLine (lineText, basicPreferences.wrapDataAt, ',', FORCE);
+          addSplitLines (lines, text, inset);
+        }
+        else if (subline.is (TOKEN_PRINT)
+            && lineText.length () > basicPreferences.wrapPrintAt)
+        {
+          List<String> lines =
+              splitLine (lineText, basicPreferences.wrapDataAt, ';', NO_FORCE);
           addSplitLines (lines, text, inset);
         }
         else if (subline.is (TOKEN_DIM) && basicPreferences.splitDim)
@@ -162,7 +173,8 @@ public class UserBasicFormatter extends BasicFormatter
   }
 
   // ---------------------------------------------------------------------------------//
-  private List<String> splitLine (String line, int wrapLength, char breakChar)
+  private List<String> splitLine (String line, int wrapLength, char breakChar,
+      boolean force)
   // ---------------------------------------------------------------------------------//
   {
     int spaceAt = 0;
@@ -182,14 +194,15 @@ public class UserBasicFormatter extends BasicFormatter
         break;
 
       lines.add (line.substring (0, breakAt + 1));      // keep breakChar at end
-      line = indent + line.substring (breakAt + 1);
+      line = indent + line.substring (breakAt + 1).trim ();
     }
 
-    while (line.length () > wrapLength)                 // no breakChars found
-    {
-      lines.add (line.substring (0, wrapLength));
-      line = indent + line.substring (wrapLength);
-    }
+    if (force)
+      while (line.length () > wrapLength)                 // no breakChars found
+      {
+        lines.add (line.substring (0, wrapLength));
+        line = indent + line.substring (wrapLength);
+      }
 
     lines.add (line);
     return lines;

@@ -29,6 +29,8 @@ class MasterHeader
     {
       if (Utility.isMagic (buffer, ptr, NuFile))
         break;
+
+      // internet.shk has 0x2000 bytes of text at the start
       //      if (Utility.isMagic (buffer, 0x2000, NuFile))
       //      {
       //        System.out.println ("found it");

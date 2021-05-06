@@ -26,7 +26,7 @@ public class BasicPreferences
   public boolean showConstants = false;
   public boolean showDuplicateSymbols = false;
 
-  public int wrapPrintAt = 0;
+  public int wrapPrintAt = 80;
   public int wrapRemAt = 80;
   public int wrapDataAt = 80;
 

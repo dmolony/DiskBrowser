@@ -6,7 +6,10 @@ import java.time.LocalDateTime;
 public class Binary2Header
 // -----------------------------------------------------------------------------------//
 {
-  static String[] osTypes = { "Prodos", "DOS 3.3", "Pascal", "CPM", "MS-DOS" };
+  static String[] osTypes =
+      { "Prodos", "DOS 3.3", "Reserved", "DOS 3.2 or 3.1", "Pascal", "Macintosh MFS",
+        "Macintosh HFS", "Lisa", "CPM", "Reserved", "MS-DOS", "High Sierra (CD-ROM)",
+        "ISO 9660 (CD-ROM)", "AppleShare" };
 
   int accessCode;
   int fileType;

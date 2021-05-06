@@ -18,6 +18,7 @@ import com.bytezone.diskbrowser.nib.NibFile;
 import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.NuFX;
 
 // -----------------------------------------------------------------------------------//
 public class AppleDisk implements Disk
@@ -37,6 +38,7 @@ public class AppleDisk implements Disk
 
   private final int trackSize;            // 4096
   public int sectorSize;                  // 256 or 512
+  private NuFX nuFX;
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
@@ -230,6 +232,15 @@ public class AppleDisk implements Disk
     blocks = 560;
     hasData = new boolean[blocks];
     checkSectorsForData ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public AppleDisk (File file, int tracks, int sectors, NuFX nufx)
+      throws FileFormatException
+  // ---------------------------------------------------------------------------------//
+  {
+    this (file, tracks, sectors);
+    this.nuFX = nufx;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -729,6 +740,12 @@ public class AppleDisk implements Disk
     {
       text.append ("\n\n");
       text.append (wozFile);
+    }
+
+    if (nuFX != null)
+    {
+      text.append ("\n\n");
+      text.append (nuFX);
     }
 
     return text.toString ();

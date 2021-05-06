@@ -61,7 +61,6 @@ public class DefaultDataSource implements DataSource
   public JComponent getComponent ()
   // ---------------------------------------------------------------------------------//
   {
-    System.out.println ("In DefaultDataSource.getComponent()");
     JPanel panel = new JPanel ();
     return panel;
   }

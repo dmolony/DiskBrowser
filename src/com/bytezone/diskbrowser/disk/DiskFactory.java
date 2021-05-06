@@ -35,6 +35,8 @@ public class DiskFactory
   private static final int DISK_143K = 143360;
   private static final int DISK_116K = 116480;
 
+  private static NuFX nuFX;
+
   // ---------------------------------------------------------------------------------//
   private DiskFactory ()
   // ---------------------------------------------------------------------------------//
@@ -143,7 +145,7 @@ public class DiskFactory
         System.out.println (" ** sdk/shk/bxy **");
       try
       {
-        NuFX nuFX = new NuFX (file.toPath ());
+        nuFX = new NuFX (file.toPath ());
         if (nuFX.getTotalDisks () == 0 && nuFX.getTotalFiles () == 0)
           return null;
 
@@ -364,7 +366,12 @@ public class DiskFactory
     }
 
     AppleDisk appleDisk256 = new AppleDisk (file, 35, 16);
-    AppleDisk appleDisk512 = new AppleDisk (file, 35, 8);
+    AppleDisk appleDisk512;
+
+    if (nuFX == null)
+      appleDisk512 = new AppleDisk (file, 35, 8);
+    else
+      appleDisk512 = new AppleDisk (file, 35, 8, nuFX);
 
     if (true)
     {
@@ -634,7 +641,12 @@ public class DiskFactory
       {
         System.out.println ("*** extended ***");     // System Addons.hdv
       }
-      AppleDisk disk = new AppleDisk (file, tracks, 8);
+      AppleDisk disk;
+      if (nuFX == null)
+        disk = new AppleDisk (file, tracks, 8);
+      else
+        disk = new AppleDisk (file, tracks, 8, nuFX);
+
       if (ProdosDisk.isCorrectFormat (disk))
       {
         if (debug)

@@ -78,37 +78,6 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
-
-    //    printSummary ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  void printSummary ()
-  // ---------------------------------------------------------------------------------//
-  {
-    System.out.printf (" %s   Created:%s   Mod:%s     Recs:%5d%n%n",
-        volumeName.getFileName (), masterHeader.getCreated2 (),
-        masterHeader.getModified2 (), masterHeader.getTotalRecords ());
-    System.out.println (" Name                        Type Auxtyp Archived"
-        + "         Fmat Size Un-Length");
-    System.out.println (UNDERLINE);
-
-    int totalUncompressedSize = 0;
-    int totalCompressedSize = 0;
-
-    for (Record record : records)
-    {
-      System.out.println (record.getLine ());
-      totalUncompressedSize += record.getUncompressedSize ();
-      totalCompressedSize += record.getCompressedSize ();
-    }
-    System.out.println (UNDERLINE);
-
-    float pct = 0;
-    if (totalUncompressedSize > 0)
-      pct = totalCompressedSize * 100 / totalUncompressedSize;
-    System.out.printf (" Uncomp:%7d  Comp:%7d  %%of orig:%3.0f%%%n%n",
-        totalUncompressedSize, totalCompressedSize, pct);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -274,12 +243,35 @@ public class NuFX
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    for (Record record : records)
-      for (Thread thread : record.threads)
-        if (thread.hasDisk ())
-          return thread.toString ();
+    StringBuilder text = new StringBuilder ();
 
-    return "no disk";
+    text.append (String.format (" %s   Created:%s   Mod:%s     Recs:%5d%n%n",
+        volumeName.getFileName (), masterHeader.getCreated2 (),
+        masterHeader.getModified2 (), masterHeader.getTotalRecords ()));
+
+    text.append (" Name                        Type Auxtyp Archived"
+        + "         Fmat Size Un-Length\n");
+
+    text.append (String.format ("%s%n", UNDERLINE));
+
+    int totalUncompressedSize = 0;
+    int totalCompressedSize = 0;
+
+    for (Record record : records)
+    {
+      text.append (String.format ("%s%n", record.getLine ()));
+      totalUncompressedSize += record.getUncompressedSize ();
+      totalCompressedSize += record.getCompressedSize ();
+    }
+    text.append (String.format ("%s%n", UNDERLINE));
+
+    float pct = 0;
+    if (totalUncompressedSize > 0)
+      pct = totalCompressedSize * 100 / totalUncompressedSize;
+    text.append (String.format (" Uncomp:%7d  Comp:%7d  %%of orig:%3.0f%%%n%n",
+        totalUncompressedSize, totalCompressedSize, pct));
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -343,9 +335,6 @@ public class NuFX
     private String getVolumeName ()
     // -------------------------------------------------------------------------------//
     {
-      //      if (true)
-      //        return volumeName;
-
       if (rootContainsFiles)
         return volumeName;
 

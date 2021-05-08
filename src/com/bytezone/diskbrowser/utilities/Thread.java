@@ -14,6 +14,10 @@ class Thread
         { "data fork", "disk image", "resource fork" },
         { "filename", "undefined", "undefined" } };
 
+  private static final int DATA_FORK = 0;
+  private static final int DISK_IMAGE = 1;
+  private static final int RESOURCEFORK = 2;
+
   final int threadClass;
   final int threadFormat;
   final int threadKind;
@@ -96,13 +100,13 @@ class Thread
       case 2:
         switch (threadKind)
         {
-          case 0:                     // data fork of file
+          case DATA_FORK:
             hasFile = true;
             break;
-          case 1:                     // disk image
+          case DISK_IMAGE:
             hasDisk = true;
             break;
-          case 2:                     // resource fork of file
+          case RESOURCEFORK:
             hasResource = true;
             break;
         }
@@ -195,13 +199,14 @@ class Thread
     return fileName;
   }
 
+  // Called by Record.getFileSize()
   // ---------------------------------------------------------------------------------//
   int getFileSize ()
   // ---------------------------------------------------------------------------------//
   {
-    if (lzw != null)
-      System.out.printf ("%04X v %04X v %04X%n", compressedEOF, uncompressedEOF,
-          lzw.getSize ());
+    //    if (lzw != null)
+    //      System.out.printf ("%04X v %04X v %04X%n", compressedEOF, uncompressedEOF,
+    //          lzw.getSize ());
     return lzw != null ? lzw.getSize () : uncompressedEOF;
     //    return uncompressedEOF;
   }

@@ -233,6 +233,7 @@ class Record
     return fileSystems[fileSystemID];
   }
 
+  // Called by NuFX.listFiles()
   // ---------------------------------------------------------------------------------//
   int getFileSize ()
   // ---------------------------------------------------------------------------------//
@@ -249,7 +250,7 @@ class Record
   // ---------------------------------------------------------------------------------//
   {
     for (Thread thread : threads)
-      if (thread.hasFile ())
+      if (thread.hasFile () || thread.hasDisk ())
         return thread.threadFormat;
 
     return 0;
@@ -259,10 +260,13 @@ class Record
   int getUncompressedSize ()
   // ---------------------------------------------------------------------------------//
   {
+    if (hasDisk ())
+      return auxType * storType;
+
     int size = 0;
 
     for (Thread thread : threads)
-      if (thread.hasFile () || thread.hasResource ())
+      if (thread.hasFile () || thread.hasResource () || thread.hasDisk ())
         size += thread.getUncompressedEOF ();
 
     return size;
@@ -275,7 +279,7 @@ class Record
     int size = 0;
 
     for (Thread thread : threads)
-      if (thread.hasFile () || thread.hasResource ())
+      if (thread.hasFile () || thread.hasResource () || thread.hasDisk ())
         size += thread.getCompressedEOF ();
 
     return size;
@@ -307,14 +311,21 @@ class Record
   String getLine ()
   // ---------------------------------------------------------------------------------//
   {
-    float pct = 0;
-    if (getUncompressedSize () > 0)
-      pct = getCompressedSize () * 100 / getUncompressedSize ();
-    String lockedFlag = (access | 0xC3) == 1 ? "+" : " ";
-    String forkedFlag = hasResource () ? "+" : " ";
     String name = getFileName ();
     if (name.length () > 27)
       name = ".." + name.substring (name.length () - 25);
+
+    float pct = 100;
+    if (getUncompressedSize () > 0)
+      pct = getCompressedSize () * 100 / getUncompressedSize ();
+
+    String lockedFlag = (access | 0xC3) == 1 ? "+" : " ";
+    String forkedFlag = hasResource () ? "+" : " ";
+
+    if (hasDisk ())
+      return String.format ("%s%-27.27s %-4s %-6s %-15s  %s  %3.0f%%   %7d", lockedFlag,
+          name, "Disk", (getUncompressedSize () / 1024) + "k", archived.format2 (),
+          threadFormats[getThreadFormat ()], pct, getUncompressedSize ());
 
     return String.format ("%s%-27.27s %s%s $%04X  %-15s  %s  %3.0f%%   %7d", lockedFlag,
         name, fileTypes[fileType], forkedFlag, auxType, archived.format2 (),

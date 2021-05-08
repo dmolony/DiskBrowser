@@ -34,7 +34,7 @@ public class Utility
   public static final byte ASCII_CARET = 0x5E;
 
   public static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
-      "2mg", "v2d", "d13", "sdk", "shk", "bxy", "woz", "img", "dimg");
+      "2mg", "v2d", "d13", "sdk", "shk", "bxy", "bny", "woz", "img", "dimg");
 
   // ---------------------------------------------------------------------------------//
   public static boolean test (Graphics2D g)

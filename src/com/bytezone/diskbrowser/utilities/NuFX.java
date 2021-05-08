@@ -1,5 +1,7 @@
 package com.bytezone.diskbrowser.utilities;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +24,7 @@ public class NuFX
           + "-----------------------";
   private MasterHeader masterHeader;
   private final byte[] buffer;
-  private final boolean debug = false;
+  private final boolean debug = true;
 
   private final List<Record> records = new ArrayList<> ();
   private int totalFiles;
@@ -78,25 +80,26 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
+    listFiles ();
   }
 
   // ---------------------------------------------------------------------------------//
-  private void calculateTotalBlocks ()
+  private void calculateTotalBlocks ()        // not exact
   // ---------------------------------------------------------------------------------//
   {
     totalBlocks = 0;
 
     for (Record record : records)
-      if (record.hasFile ())
+      if (record.hasFile () || record.hasResource ())
       {
         // note: total blocks does not include subdirectory blocks
-        int blocks = (record.getUncompressedSize () - 1) / 512 + 1;
+        int blocks = (record.getUncompressedSize () - 1) / BLOCK_SIZE + 1;
         if (blocks == 1)                      // seedling
           totalBlocks += blocks;
-        else if (blocks <= 256)               // sapling
+        else if (blocks <= 0x100)               // sapling
           totalBlocks += blocks + 1;
         else                                  // tree
-          totalBlocks += blocks + (blocks / 256) + 2;
+          totalBlocks += blocks + (blocks / 0x100) + 2;
       }
   }
 
@@ -231,7 +234,7 @@ public class NuFX
     {
       if (record.hasFile ())
       {
-        System.out.printf ("%3d %-35s %,7d  %d  %,7d%n", count, record.getFileName (),
+        System.out.printf ("%3d %-35s %,7d  %02X  %,7d%n", count, record.getFileName (),
             record.getFileSize (), record.getFileType (), record.getUncompressedSize ());
       }
       count++;
@@ -245,7 +248,7 @@ public class NuFX
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format (" %s   Created:%s   Mod:%s     Recs:%5d%n%n",
+    text.append (String.format (" %-15.15s Created:%-17s Mod:%-17s   Recs:%5d%n%n",
         volumeName.getFileName (), masterHeader.getCreated2 (),
         masterHeader.getModified2 (), masterHeader.getTotalRecords ()));
 
@@ -259,9 +262,16 @@ public class NuFX
 
     for (Record record : records)
     {
-      text.append (String.format ("%s%n", record.getLine ()));
-      totalUncompressedSize += record.getUncompressedSize ();
-      totalCompressedSize += record.getCompressedSize ();
+      //      if (record.hasDisk ())
+      //      {
+      //
+      //      }
+      //      else
+      {
+        text.append (String.format ("%s%n", record.getLine ()));
+        totalUncompressedSize += record.getUncompressedSize ();
+        totalCompressedSize += record.getCompressedSize ();
+      }
     }
     text.append (String.format ("%s%n", UNDERLINE));
 

@@ -139,7 +139,7 @@ public class DiskFactory
     }
 
     if ("sdk".equals (suffix) || "shk".equals (suffix)  // shrinkit disk/file archive
-        || "bxy".equals (suffix))
+        || "bxy".equals (suffix) || "bny".equals (suffix))
     {
       if (debug)
         System.out.println (" ** sdk/shk/bxy **");

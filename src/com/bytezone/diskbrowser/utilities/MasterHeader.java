@@ -41,7 +41,7 @@ class MasterHeader
 
       if (isBin2 (buffer, ptr))
       {
-        binary2Header = new Binary2Header (buffer);
+        binary2Header = new Binary2Header (buffer, 0);
         ptr += 128;
         bin2 = true;
         continue;

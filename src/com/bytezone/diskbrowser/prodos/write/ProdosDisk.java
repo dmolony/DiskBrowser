@@ -30,7 +30,7 @@ public class ProdosDisk
   private static final int CATALOG_SIZE = 4;
   private static final int BITS_PER_BLOCK = 8 * BLOCK_SIZE;
 
-  static final String[] storageTypes =
+  public static final String[] storageTypes =
       { "Deleted", "Seedling", "Sapling", "Tree", "", "", "", "", "", "", "", "", "",
         "Subdirectory", "Subdirectory Header", "Volume Directory Header" };
 
@@ -74,7 +74,7 @@ public class ProdosDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  void createCatalog (String volumeName) throws DiskFullException
+  private void createCatalog (String volumeName) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
     // reserve two boot blocks

@@ -24,7 +24,7 @@ public class NuFX
           + "-----------------------";
   private MasterHeader masterHeader;
   private final byte[] buffer;
-  private final boolean debug = true;
+  private final boolean debug = false;
 
   private final List<Record> records = new ArrayList<> ();
   private int totalFiles;
@@ -80,7 +80,8 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
-    listFiles ();
+
+    //    listFiles ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -262,17 +263,11 @@ public class NuFX
 
     for (Record record : records)
     {
-      //      if (record.hasDisk ())
-      //      {
-      //
-      //      }
-      //      else
-      {
-        text.append (String.format ("%s%n", record.getLine ()));
-        totalUncompressedSize += record.getUncompressedSize ();
-        totalCompressedSize += record.getCompressedSize ();
-      }
+      text.append (String.format ("%s%n", record.getLine ()));
+      totalUncompressedSize += record.getUncompressedSize ();
+      totalCompressedSize += record.getCompressedSize ();
     }
+
     text.append (String.format ("%s%n", UNDERLINE));
 
     float pct = 0;

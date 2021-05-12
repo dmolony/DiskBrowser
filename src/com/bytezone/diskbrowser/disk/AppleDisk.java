@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.nib.NibFile;
 import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
+import com.bytezone.diskbrowser.utilities.Binary2;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.NuFX;
 
@@ -38,7 +38,10 @@ public class AppleDisk implements Disk
 
   private final int trackSize;            // 4096
   public int sectorSize;                  // 256 or 512
+
   private NuFX nuFX;
+  private Binary2 bin2;
+  private WozFile wozFile;
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
@@ -84,8 +87,6 @@ public class AppleDisk implements Disk
 
   private ActionListener actionListenerList;
   private List<DiskAddress> blockList;
-
-  private WozFile wozFile;
 
   private final boolean debug = false;
 
@@ -235,12 +236,17 @@ public class AppleDisk implements Disk
   }
 
   // ---------------------------------------------------------------------------------//
-  public AppleDisk (File file, int tracks, int sectors, NuFX nufx)
-      throws FileFormatException
+  void setNuFX (NuFX nufx)
   // ---------------------------------------------------------------------------------//
   {
-    this (file, tracks, sectors);
     this.nuFX = nufx;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void setBinary2 (Binary2 bin2)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.bin2 = bin2;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -249,6 +255,7 @@ public class AppleDisk implements Disk
   {
     this.tracks = tracks;
     this.sectors = sectors;
+
     file = disk.file;
     diskBuffer = disk.getDiskBuffer ();
 
@@ -708,11 +715,11 @@ public class AppleDisk implements Disk
   }
 
   // ---------------------------------------------------------------------------------//
-  public AppleFileSource getDetails ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return new DefaultAppleFileSource (toString (), file.getName (), null);
-  }
+  //  private AppleFileSource getDetails ()
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    return new DefaultAppleFileSource (toString (), file.getName (), null);
+  //  }
 
   // ---------------------------------------------------------------------------------//
   @Override
@@ -741,11 +748,15 @@ public class AppleDisk implements Disk
       text.append ("\n\n");
       text.append (wozFile);
     }
-
-    if (nuFX != null)
+    else if (nuFX != null)
     {
       text.append ("\n\n");
       text.append (nuFX);
+    }
+    else if (bin2 != null)
+    {
+      text.append ("\n\n");
+      text.append (bin2);
     }
 
     return text.toString ();

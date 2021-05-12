@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.utilities;
 
 import java.time.LocalDateTime;
 
+import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
+
 // -----------------------------------------------------------------------------------//
 public class Binary2Header
 // -----------------------------------------------------------------------------------//
@@ -11,8 +13,11 @@ public class Binary2Header
         "Macintosh HFS", "Lisa", "CPM", "Reserved", "MS-DOS", "High Sierra (CD-ROM)",
         "ISO 9660 (CD-ROM)", "AppleShare" };
 
+  int ptr;
+  byte[] buffer;
+
   int accessCode;
-  int fileType;
+  byte fileType;
   int auxType;
   int storageType;
   int totalBlocks;
@@ -40,35 +45,45 @@ public class Binary2Header
   boolean sparsePacked;
 
   // ---------------------------------------------------------------------------------//
-  public Binary2Header (byte[] buffer)
+  public Binary2Header (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    accessCode = buffer[3] & 0xFF;
-    fileType = buffer[4] & 0xFF;
-    auxType = Utility.readShort (buffer, 5);
-    storageType = buffer[7] & 0xFF;
-    totalBlocks = Utility.readShort (buffer, 8);
-    modified = Utility.getAppleDate (buffer, 10);
-    created = Utility.getAppleDate (buffer, 14);
-    id = buffer[18] & 0xFF;
-    eof = Utility.readTriple (buffer, 20);
-    fileName = HexFormatter.getPascalString (buffer, 23);
-    prodos16accessCode = buffer[111] & 0xFF;
-    prodos16fileType = buffer[112] & 0xFF;
+    this.ptr = ptr;
+    this.buffer = buffer;
+
+    accessCode = buffer[ptr + 3] & 0xFF;
+    fileType = buffer[ptr + 4];
+    auxType = Utility.readShort (buffer, ptr + 5);
+    storageType = buffer[ptr + 7] & 0xFF;
+    totalBlocks = Utility.readShort (buffer, ptr + 8);
+    modified = Utility.getAppleDate (buffer, ptr + 10);
+    created = Utility.getAppleDate (buffer, ptr + 14);
+    id = buffer[ptr + 18] & 0xFF;
+    eof = Utility.readTriple (buffer, ptr + 20);
+    fileName = HexFormatter.getPascalString (buffer, ptr + 23);
+    prodos16accessCode = buffer[ptr + 111] & 0xFF;
+    prodos16fileType = buffer[ptr + 112] & 0xFF;
     prodos16storageType = buffer[113] & 0xFF;
-    prodos16totalBlocks = Utility.readShort (buffer, 114);
-    prodos16eof = buffer[116] & 0xFF;
-    diskSpaceRequired = Utility.getLong (buffer, 117);
-    osType = buffer[121] & 0xFF;
-    nativeFileType = Utility.readShort (buffer, 122);
-    phantomFileFlag = buffer[124] & 0xFF;
-    dataFlags = buffer[125] & 0xFF;
-    version = buffer[126] & 0xFF;
-    filesToFollow = buffer[127] & 0xFF;
+    prodos16totalBlocks = Utility.readShort (buffer, ptr + 114);
+    prodos16eof = buffer[ptr + 116] & 0xFF;
+    diskSpaceRequired = Utility.getLong (buffer, ptr + 117);
+    osType = buffer[ptr + 121] & 0xFF;
+    nativeFileType = Utility.readShort (buffer, ptr + 122);
+    phantomFileFlag = buffer[ptr + 124] & 0xFF;
+    dataFlags = buffer[ptr + 125] & 0xFF;
+    version = buffer[ptr + 126] & 0xFF;
+    filesToFollow = buffer[ptr + 127] & 0xFF;
 
     compressed = (dataFlags & 0x80) != 0;
     encrypted = (dataFlags & 0x40) != 0;
     sparsePacked = (dataFlags & 0x01) != 0;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public String getLine ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%s                       ", fileName);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -81,7 +96,8 @@ public class Binary2Header
     text.append (String.format ("Access ................ %02X%n", accessCode));
     text.append (String.format ("File type ............. %02X%n", fileType));
     text.append (String.format ("Aux type .............. %04X%n", auxType));
-    text.append (String.format ("Storage type .......... %02X%n", storageType));
+    text.append (String.format ("Storage type .......... %02X  %s%n", storageType,
+        ProdosDisk.storageTypes[storageType]));
     text.append (String.format ("Total blocks .......... %04X  %<,d%n", totalBlocks));
     text.append (String.format ("Modified .............. %s%n", modified));
     text.append (String.format ("Created ............... %s%n", created));

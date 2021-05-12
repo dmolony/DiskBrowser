@@ -14,12 +14,20 @@ public class DefaultDataSource implements DataSource
 {
   public String text;
   byte[] buffer;
+  Object textSource;
 
   // ---------------------------------------------------------------------------------//
   public DefaultDataSource (String text)
   // ---------------------------------------------------------------------------------//
   {
     this.text = text;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public DefaultDataSource (Object textSource)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.textSource = textSource;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -53,7 +61,7 @@ public class DefaultDataSource implements DataSource
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    return text;
+    return textSource == null ? text : textSource.toString ();
   }
 
   // ---------------------------------------------------------------------------------//

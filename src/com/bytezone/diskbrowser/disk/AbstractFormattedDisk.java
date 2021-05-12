@@ -85,7 +85,8 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
       name = "tmp.dsk";
 
     DefaultAppleFileSource afs =
-        new DefaultAppleFileSource (name, disk.toString (), this);
+        //        new DefaultAppleFileSource (name, disk.toString (), this);
+        new DefaultAppleFileSource (name, new DefaultDataSource (disk), this);
     DefaultMutableTreeNode root = new DefaultMutableTreeNode (afs);
     DefaultTreeModel treeModel = new DefaultTreeModel (root);
     catalogTree = new JTree (treeModel);

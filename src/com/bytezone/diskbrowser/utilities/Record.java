@@ -196,27 +196,21 @@ class Record
   LocalDateTime getCreated ()
   // ---------------------------------------------------------------------------------//
   {
-    if (created == null)
-      return null;
-    return created.getLocalDateTime ();
+    return created == null ? null : created.getLocalDateTime ();
   }
 
   // ---------------------------------------------------------------------------------//
   LocalDateTime getModified ()
   // ---------------------------------------------------------------------------------//
   {
-    if (modified == null)
-      return null;
-    return modified.getLocalDateTime ();
+    return modified == null ? null : modified.getLocalDateTime ();
   }
 
   // ---------------------------------------------------------------------------------//
   LocalDateTime getArchived ()
   // ---------------------------------------------------------------------------------//
   {
-    if (archived == null)
-      return null;
-    return archived.getLocalDateTime ();
+    return archived == null ? null : archived.getLocalDateTime ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -347,8 +341,8 @@ class Record
     text.append (String.format ("Attributes ..... %d%n", attributes));
     text.append (String.format ("Version ........ %d%n", version));
     text.append (String.format ("Threads ........ %d%n", totThreads));
-    text.append (String.format ("File sys id .... %d (%s)%n", fileSystemID,
-        fileSystems[fileSystemID]));
+    text.append (
+        String.format ("File sys id .... %d (%s)%n", fileSystemID, getFileSystemName ()));
     text.append (String.format ("Separator ...... %s%n", separator));
     text.append (String.format ("Access ......... %s  %s%n", bits, decode));
 

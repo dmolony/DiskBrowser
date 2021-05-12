@@ -20,6 +20,7 @@ import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
+import com.bytezone.diskbrowser.utilities.Binary2;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.NuFX;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -36,6 +37,7 @@ public class DiskFactory
   private static final int DISK_116K = 116480;
 
   private static NuFX nuFX;
+  private static Binary2 binary2;
 
   // ---------------------------------------------------------------------------------//
   private DiskFactory ()
@@ -139,7 +141,7 @@ public class DiskFactory
     }
 
     if ("sdk".equals (suffix) || "shk".equals (suffix)  // shrinkit disk/file archive
-        || "bxy".equals (suffix) || "bny".equals (suffix))
+        || "bxy".equals (suffix))
     {
       if (debug)
         System.out.println (" ** sdk/shk/bxy **");
@@ -157,6 +159,33 @@ public class DiskFactory
         FileOutputStream fos = new FileOutputStream (tmp);
         fos.write (diskBuffer);
         fos.close ();
+        tmp.deleteOnExit ();
+        file = tmp;
+        suffix = "dsk";
+        compressed = true;
+      }
+      catch (Exception e)
+      {
+        //        e.printStackTrace ();
+        System.out.println (e.getMessage ());
+        System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
+        return null;
+      }
+    }
+    else if ("bny".equals (suffix))
+    {
+      if (debug)
+        System.out.println (" ** bny **");
+      try
+      {
+        binary2 = new Binary2 (file.toPath ());
+        byte[] diskBuffer = binary2.getDiskBuffer ();
+
+        File tmp = File.createTempFile (suffix, null);
+        FileOutputStream fos = new FileOutputStream (tmp);
+        fos.write (diskBuffer);
+        fos.close ();
+
         tmp.deleteOnExit ();
         file = tmp;
         suffix = "dsk";
@@ -226,7 +255,7 @@ public class DiskFactory
         System.out.println ("File length is wrong: " + file.length ());
         disk = checkDos (new AppleDisk (file, 35, 16));
         if (disk != null)
-          return disk;
+          return check (disk);
       }
 
       if (debug)
@@ -237,7 +266,7 @@ public class DiskFactory
       {
         if (compressed)
           disk.setOriginalPath (originalPath);
-        return disk;
+        return check (disk);
       }
 
       if (file.length () == DISK_800K)         // 800K 3.5"
@@ -368,10 +397,12 @@ public class DiskFactory
     AppleDisk appleDisk256 = new AppleDisk (file, 35, 16);
     AppleDisk appleDisk512;
 
-    if (nuFX == null)
-      appleDisk512 = new AppleDisk (file, 35, 8);
-    else
-      appleDisk512 = new AppleDisk (file, 35, 8, nuFX);
+    //    if (nuFX != null)
+    //      appleDisk512 = new AppleDisk (file, 35, 8, nuFX);
+    //    else if (binary2 != null)
+    //      appleDisk512 = new AppleDisk (file, 35, 8, binary2);
+    //    else
+    appleDisk512 = new AppleDisk (file, 35, 8);
 
     if (true)
     {
@@ -456,7 +487,7 @@ public class DiskFactory
       {
         if (compressed)
           disk.setOriginalPath (originalPath);
-        return disk;
+        return check (disk);
       }
 
       // empty boot sector
@@ -531,6 +562,21 @@ public class DiskFactory
 
     if (disk != null && compressed)
       disk.setOriginalPath (originalPath);
+
+    return check (disk);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static FormattedDisk check (FormattedDisk disk)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (disk.getDisk ()instanceof AppleDisk appleDisk)
+    {
+      if (nuFX != null)
+        appleDisk.setNuFX (nuFX);
+      else if (binary2 != null)
+        appleDisk.setBinary2 (binary2);
+    }
 
     return disk;
   }
@@ -642,10 +688,10 @@ public class DiskFactory
         System.out.println ("*** extended ***");     // System Addons.hdv
       }
       AppleDisk disk;
-      if (nuFX == null)
-        disk = new AppleDisk (file, tracks, 8);
-      else
-        disk = new AppleDisk (file, tracks, 8, nuFX);
+      //      if (nuFX == null)
+      disk = new AppleDisk (file, tracks, 8);
+      //      else
+      //        disk = new AppleDisk (file, tracks, 8, nuFX);
 
       if (ProdosDisk.isCorrectFormat (disk))
       {

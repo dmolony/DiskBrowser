@@ -395,14 +395,7 @@ public class DiskFactory
     }
 
     AppleDisk appleDisk256 = new AppleDisk (file, 35, 16);
-    AppleDisk appleDisk512;
-
-    //    if (nuFX != null)
-    //      appleDisk512 = new AppleDisk (file, 35, 8, nuFX);
-    //    else if (binary2 != null)
-    //      appleDisk512 = new AppleDisk (file, 35, 8, binary2);
-    //    else
-    appleDisk512 = new AppleDisk (file, 35, 8);
+    AppleDisk appleDisk512 = new AppleDisk (file, 35, 8);
 
     if (true)
     {

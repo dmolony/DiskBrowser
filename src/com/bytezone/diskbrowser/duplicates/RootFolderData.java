@@ -154,7 +154,7 @@ public class RootFolderData implements RootDirectoryChangeListener
   private void clear ()
   // ---------------------------------------------------------------------------------//
   {
-    typeTotals = new int[4][Utility.suffixes.size ()];
+    typeTotals = new int[4][Utility.getTotalSuffixes ()];
     totalDisks = 0;
     totalFolders = 0;
 
@@ -256,7 +256,7 @@ public class RootFolderData implements RootDirectoryChangeListener
     System.out.println (line);
     for (int i = 0; i < typeTotals[0].length; i++)
     {
-      System.out.printf ("%14.14s  ", Utility.suffixes.get (i) + " ...........");
+      System.out.printf ("%14.14s  ", Utility.getSuffix (i) + " ...........");
       for (int j = 0; j < typeTotals.length; j++)
       {
         System.out.printf ("%,7d  ", typeTotals[j][i]);
@@ -328,7 +328,7 @@ public class RootFolderData implements RootDirectoryChangeListener
       for (int i = 0; i < typeTotals[0].length; i++)
       {
         line = String.format ("%14.14s  %,7d  %,7d  %,7d  %,7d",
-            Utility.suffixes.get (i) + " ...........", typeTotals[0][i], typeTotals[1][i],
+            Utility.getSuffix (i) + " ...........", typeTotals[0][i], typeTotals[1][i],
             typeTotals[2][i], typeTotals[3][i]);
         g.drawString (line, x, y);
         for (int j = 0; j < typeTotals.length; j++)

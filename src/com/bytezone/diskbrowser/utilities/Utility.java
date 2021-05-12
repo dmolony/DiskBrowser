@@ -14,7 +14,7 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 // -----------------------------------------------------------------------------------//
-public class Utility
+public final class Utility
 // -----------------------------------------------------------------------------------//
 {
   public static final byte ASCII_BACKSPACE = 0x08;
@@ -33,8 +33,29 @@ public class Utility
   public static final byte ASCII_EQUALS = 0x3D;
   public static final byte ASCII_CARET = 0x5E;
 
-  public static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
+  private static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
       "2mg", "v2d", "d13", "sdk", "shk", "bxy", "bny", "woz", "img", "dimg");
+
+  // ---------------------------------------------------------------------------------//
+  private Utility ()
+  // ---------------------------------------------------------------------------------//
+  {
+
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static int getTotalSuffixes ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return suffixes.size ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static String getSuffix (int index)
+  // ---------------------------------------------------------------------------------//
+  {
+    return suffixes.get (index);
+  }
 
   // ---------------------------------------------------------------------------------//
   public static boolean test (Graphics2D g)

@@ -188,11 +188,11 @@ public class DisksWindow extends JFrame
       }
     });
 
-    for (int i = 0; i < Utility.suffixes.size (); i++)
+    for (int i = 0; i < Utility.getTotalSuffixes (); i++)
     {
       int total = rootFolderData.getTotalType (i);
       JCheckBox btn =
-          new JCheckBox (String.format ("%s (%,d)", Utility.suffixes.get (i), total));
+          new JCheckBox (String.format ("%s (%,d)", Utility.getSuffix (i), total));
       topPanel.add (btn);
       boxes.add (btn);
 

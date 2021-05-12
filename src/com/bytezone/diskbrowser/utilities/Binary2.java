@@ -73,11 +73,12 @@ public class Binary2
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format (" %-15.15s                              Recs:%5d%n%n",
+    text.append (String.format (
+        " %-15.15s                                                  Files:%5d%n%n",
         fileName, headers.size ()));
 
-    text.append (" Name                        Type Auxtyp Modified"
-        + "         Fmat      Length\n");
+    text.append (" Name                              Type Auxtyp Modified"
+        + "         Fmat   Length\n");
 
     text.append (String.format ("%s%n", UNDERLINE));
 

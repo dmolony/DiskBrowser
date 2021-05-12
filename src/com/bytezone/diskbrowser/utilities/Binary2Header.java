@@ -1,6 +1,9 @@
 package com.bytezone.diskbrowser.utilities;
 
+import static com.bytezone.diskbrowser.prodos.ProdosConstants.fileTypes;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 
@@ -8,6 +11,7 @@ import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 public class Binary2Header
 // -----------------------------------------------------------------------------------//
 {
+  static DateTimeFormatter formatter = DateTimeFormatter.ofPattern ("dd-LLL-yy HH:mm");
   static String[] osTypes =
       { "Prodos", "DOS 3.3", "Reserved", "DOS 3.2 or 3.1", "Pascal", "Macintosh MFS",
         "Macintosh HFS", "Lisa", "CPM", "Reserved", "MS-DOS", "High Sierra (CD-ROM)",
@@ -83,7 +87,8 @@ public class Binary2Header
   public String getLine ()
   // ---------------------------------------------------------------------------------//
   {
-    return String.format ("%s                       ", fileName);
+    return String.format (" %-33s %3s  $%04X  %s  unc   %7d", fileName,
+        fileTypes[fileType], auxType, modified.format (formatter), eof);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -19,6 +19,7 @@ import com.bytezone.diskbrowser.nib.WozFile;
 import com.bytezone.diskbrowser.utilities.Binary2;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
 import com.bytezone.diskbrowser.utilities.NuFX;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class AppleDisk implements Disk
@@ -42,6 +43,8 @@ public class AppleDisk implements Disk
   private NuFX nuFX;
   private Binary2 bin2;
   private WozFile wozFile;
+  private PrefixDiskCopy prefixDiskCopy;
+  private Prefix2mg prefix2mg;
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
@@ -119,7 +122,7 @@ public class AppleDisk implements Disk
     {
       if ("2IMG".equals (prefix))
       {
-        Prefix2mg prefix2mg = new Prefix2mg (buffer);
+        prefix2mg = new Prefix2mg (buffer);
         if (debug)
           System.out.println (prefix2mg);
 
@@ -145,7 +148,7 @@ public class AppleDisk implements Disk
     }
     else if ("img".equals (suffix) || "dimg".equals (suffix))
     {
-      PrefixDiskCopy prefixDiskCopy = new PrefixDiskCopy (buffer);
+      prefixDiskCopy = new PrefixDiskCopy (buffer);
 
       blocks = prefixDiskCopy.getBlocks ();
       this.sectorSize = 512;
@@ -741,25 +744,20 @@ public class AppleDisk implements Disk
     text.append (String.format ("Blocks............... %,d%n", blocks));
     text.append (String.format ("Track size........... %,d%n", trackSize));
     text.append (String.format ("Sector size.......... %d%n", sectorSize));
-    text.append (String.format ("Interleave........... %d", interleave));
+    text.append (String.format ("Interleave........... %d%n%n", interleave));
 
     if (wozFile != null)
-    {
-      text.append ("\n\n");
       text.append (wozFile);
-    }
     else if (nuFX != null)
-    {
-      text.append ("\n\n");
       text.append (nuFX);
-    }
     else if (bin2 != null)
-    {
-      text.append ("\n\n");
       text.append (bin2);
-    }
+    else if (prefixDiskCopy != null)
+      text.append (prefixDiskCopy);
+    else if (prefix2mg != null)
+      text.append (prefix2mg);
 
-    return text.toString ();
+    return Utility.rtrim (text).toString ();
   }
 
   // ---------------------------------------------------------------------------------//

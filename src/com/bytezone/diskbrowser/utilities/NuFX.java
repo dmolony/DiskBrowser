@@ -155,7 +155,17 @@ public class NuFX
               int auxType = record.getAuxType ();
               LocalDateTime created = record.getCreated ();
               LocalDateTime modified = record.getModified ();
-              byte[] buffer = record.getData ();
+              byte[] buffer;
+              try
+              {
+                buffer = record.getData ();
+              }
+              catch (Exception e)
+              {
+                System.out.println (e.getMessage ());
+                System.out.printf ("Failed to unpack: %s%n", fileName);
+                continue;
+              }
 
               if (debug)
                 System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
@@ -175,7 +185,16 @@ public class NuFX
 
               if (record.hasResource ())
               {
-                buffer = record.getResourceData ();
+                try
+                {
+                  buffer = record.getResourceData ();
+                }
+                catch (Exception e)
+                {
+                  System.out.println (e.getMessage ());
+                  System.out.printf ("Failed to unpack resource fork: %s%n", fileName);
+                  continue;
+                }
                 disk.addResourceFork (fileEntry, buffer, buffer.length);
               }
             }

@@ -140,8 +140,9 @@ public class DiskFactory
       }
     }
 
-    if ("sdk".equals (suffix) || "shk".equals (suffix)  // shrinkit disk/file archive
-        || "bxy".equals (suffix))
+    if ("sdk".equals (suffix)         // NuFX disk
+        || "shk".equals (suffix)      // NuFX files or disk
+        || "bxy".equals (suffix))     // NuFX in Binary2
     {
       if (debug)
         System.out.println (" ** sdk/shk/bxy **");
@@ -169,10 +170,11 @@ public class DiskFactory
         //        e.printStackTrace ();
         System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
+        System.out.println (nuFX);
         return null;
       }
     }
-    else if ("bny".equals (suffix))
+    else if ("bny".equals (suffix))     // Binary2 uncompressed files
     {
       if (debug)
         System.out.println (" ** bny **");
@@ -196,6 +198,7 @@ public class DiskFactory
         //        e.printStackTrace ();
         System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
+        System.out.println (binary2);
         return null;
       }
     }

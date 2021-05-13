@@ -38,13 +38,22 @@ class MasterHeader
       //        bin2 = true;
       //        break;
       //      }
-
       if (isBin2 (buffer, ptr))
       {
         binary2Header = new Binary2Header (buffer, 0);
-        ptr += 128;
-        bin2 = true;
-        continue;
+        if (binary2Header.fileType == (byte) 0xE0
+            && (binary2Header.auxType == 0x8000 || binary2Header.auxType == 0x8002))
+        {
+          ptr += 128;
+          bin2 = true;
+          continue;
+        }
+        else
+        {
+          System.out.printf ("Not NuFX: %02X  %04X%n", binary2Header.fileType,
+              binary2Header.auxType);
+          System.out.println (binary2Header);
+        }
       }
 
       throw new FileFormatException ("NuFile not found");

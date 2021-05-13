@@ -26,6 +26,7 @@ public class ProdosDisk
 // -----------------------------------------------------------------------------------//
 {
   static final String UNDERLINE = "------------------------------------------------\n";
+  static final String message = "DiskBrowser";
 
   private static final int CATALOG_SIZE = 4;
   private static final int BITS_PER_BLOCK = 8 * BLOCK_SIZE;
@@ -82,6 +83,7 @@ public class ProdosDisk
     allocateNextBlock ();
 
     System.arraycopy (bootSector, 0, buffer, 0, 512);
+    System.arraycopy (message.getBytes (), 0, buffer, 768, message.length ());
 
     // write 4 catalog blocks
     for (int i = 0, prevBlockNo = 0; i < CATALOG_SIZE; i++)

@@ -98,6 +98,7 @@ public class Binary2Header
   {
     StringBuilder text = new StringBuilder ();
 
+    text.append ("Binary2 Header\n==============\n");
     text.append (String.format ("Access ................ %02X%n", accessCode));
     text.append (String.format ("File type ............. %02X%n", fileType));
     text.append (String.format ("Aux type .............. %04X%n", auxType));

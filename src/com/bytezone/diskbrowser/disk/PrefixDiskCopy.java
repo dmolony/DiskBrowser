@@ -31,7 +31,7 @@ public class PrefixDiskCopy
     tagChecksum = Utility.getLongBigEndian (buffer, 0x4C);
     diskFormat = buffer[0x50] & 0xFF;
     format = buffer[0x51] & 0xFF;
-    id = Utility.getWordBigEndian (buffer, 0x52);
+    id = Utility.getShortBigEndian (buffer, 0x52);
   }
 
   // ---------------------------------------------------------------------------------//

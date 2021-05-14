@@ -153,17 +153,17 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  public static int getWordBigEndian (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int val = 0;
-    for (int i = 0; i < 2; i++)
-    {
-      val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
-    }
-    return val;
-  }
+  //  public static int getWordBigEndian (byte[] buffer, int ptr)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    int val = 0;
+  //    for (int i = 0; i < 2; i++)
+  //    {
+  //      val <<= 8;
+  //      val += buffer[ptr + i] & 0xFF;
+  //    }
+  //    return val;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   public static int unsignedShort (byte[] buffer, int ptr)

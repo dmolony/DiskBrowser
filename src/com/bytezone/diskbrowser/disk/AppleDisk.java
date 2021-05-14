@@ -736,15 +736,15 @@ public class AppleDisk implements Disk
     if (path.startsWith (home))
       path = "~" + path.substring (home.length ());
 
-    text.append (String.format ("Path................. %s%n", path));
-    text.append (String.format ("File name............ %s%n", file.getName ()));
-    text.append (String.format ("File size............ %,d%n", file.length ()));
-    text.append (String.format ("Tracks............... %d%n", tracks));
-    text.append (String.format ("Sectors.............. %d%n", sectors));
-    text.append (String.format ("Blocks............... %,d%n", blocks));
-    text.append (String.format ("Track size........... %,d%n", trackSize));
-    text.append (String.format ("Sector size.......... %d%n", sectorSize));
-    text.append (String.format ("Interleave........... %d%n%n", interleave));
+    text.append (String.format ("Path ......... %s%n", path));
+    text.append (String.format ("File name .... %s%n", file.getName ()));
+    text.append (String.format ("File size .... %,d%n", file.length ()));
+    text.append (String.format ("Tracks ....... %d%n", tracks));
+    text.append (String.format ("Sectors ...... %d%n", sectors));
+    text.append (String.format ("Blocks ....... %,d%n", blocks));
+    text.append (String.format ("Track size ... %,d%n", trackSize));
+    text.append (String.format ("Sector size .. %d%n", sectorSize));
+    text.append (String.format ("Interleave ... %d%n%n", interleave));
 
     if (wozFile != null)
       text.append (wozFile);

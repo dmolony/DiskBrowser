@@ -57,9 +57,9 @@ public class Binary2Header
 
     accessCode = buffer[ptr + 3] & 0xFF;
     fileType = buffer[ptr + 4];
-    auxType = Utility.readShort (buffer, ptr + 5);
+    auxType = Utility.unsignedShort (buffer, ptr + 5);
     storageType = buffer[ptr + 7] & 0xFF;
-    totalBlocks = Utility.readShort (buffer, ptr + 8);
+    totalBlocks = Utility.unsignedShort (buffer, ptr + 8);
     modified = Utility.getAppleDate (buffer, ptr + 10);
     created = Utility.getAppleDate (buffer, ptr + 14);
     id = buffer[ptr + 18] & 0xFF;
@@ -68,11 +68,11 @@ public class Binary2Header
     prodos16accessCode = buffer[ptr + 111] & 0xFF;
     prodos16fileType = buffer[ptr + 112] & 0xFF;
     prodos16storageType = buffer[113] & 0xFF;
-    prodos16totalBlocks = Utility.readShort (buffer, ptr + 114);
+    prodos16totalBlocks = Utility.unsignedShort (buffer, ptr + 114);
     prodos16eof = buffer[ptr + 116] & 0xFF;
     diskSpaceRequired = Utility.getLong (buffer, ptr + 117);
     osType = buffer[ptr + 121] & 0xFF;
-    nativeFileType = Utility.readShort (buffer, ptr + 122);
+    nativeFileType = Utility.unsignedShort (buffer, ptr + 122);
     phantomFileFlag = buffer[ptr + 124] & 0xFF;
     dataFlags = buffer[ptr + 125] & 0xFF;
     version = buffer[ptr + 126] & 0xFF;

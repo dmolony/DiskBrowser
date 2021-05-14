@@ -93,7 +93,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       case SEEDLING:
       case SAPLING:
       case TREE:
-        addDataBlocks (storageType, keyPtr);
+        addDataBlocks (storageType, keyPtr, dataBlocks);
         break;
 
       case GSOS_EXTENDED_FILE:
@@ -119,7 +119,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           dataBlocks.add (disk.getDiskAddress (i));
           parentDisk.setSectorType (i, parentDisk.dataSector);
         }
-        //        System.out.println ("PASCAL on PROFILE: " + name);    // PDUCSD12.PO
         break;
 
       default:
@@ -141,13 +140,17 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     {
       int storageType = buffer2[i] & 0x0F;
       int keyBlock = Utility.unsignedShort (buffer2, i + 1);
-      int eof = Utility.intValue (buffer2[i + 3], buffer2[i + 4], buffer2[i + 5]);
-      addDataBlocks (storageType, keyBlock);
+      int eof = Utility.readTriple (buffer2, i + 3);
+
+      if (i < 256)
+        addDataBlocks (storageType, keyBlock, dataBlocks);
+      else
+        addDataBlocks (storageType, keyBlock, resourceBlocks);
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addDataBlocks (int storageType, int keyPtr)
+  private void addDataBlocks (int storageType, int keyPtr, List<DiskAddress> dataBlocks)
   // ---------------------------------------------------------------------------------//
   {
     DiskAddress emptyDiskAddress = disk.getDiskAddress (0);
@@ -272,7 +275,6 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
     byte[] buffer = getBuffer ();
     byte[] exactBuffer = getExactBuffer (buffer);
-    //    System.out.printf ("Name: %s, EOF: %04X%n", name, endOfFile);
 
     try
     {
@@ -735,8 +737,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     sectors.add (catalogBlock);
     if (masterIndexBlock != null)
       sectors.add (masterIndexBlock);
+
     sectors.addAll (indexBlocks);
     sectors.addAll (dataBlocks);
+    sectors.addAll (resourceBlocks);
 
     return sectors;
   }
@@ -748,12 +752,19 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   {
     if (da == null)
       return false;
+
     if (da.equals (masterIndexBlock))
       return true;
+
     for (DiskAddress block : indexBlocks)
       if (da.matches (block))
         return true;
+
     for (DiskAddress block : dataBlocks)
+      if (da.matches (block))
+        return true;
+
+    for (DiskAddress block : resourceBlocks)
       if (da.matches (block))
         return true;
 

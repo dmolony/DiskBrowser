@@ -250,14 +250,14 @@ public class InfocomDisk extends AbstractFormattedDisk
     byte[] buffer = disk.readBlock (3, 0);
 
     int version = buffer[0] & 0xFF;
-    int highMemory = Utility.intValue (buffer[5], buffer[4]);
-    int programCounter = Utility.intValue (buffer[7], buffer[6]);
-    int dictionary = Utility.intValue (buffer[9], buffer[8]);
-    int objectTable = Utility.intValue (buffer[11], buffer[10]);
-    int globals = Utility.intValue (buffer[13], buffer[12]);
-    int staticMemory = Utility.intValue (buffer[15], buffer[14]);
-    int abbreviationsTable = Utility.intValue (buffer[25], buffer[24]);
-    int fileLength = Utility.intValue (buffer[27], buffer[26]);
+    int highMemory = Utility.getShortBigEndian (buffer, 4);
+    int programCounter = Utility.getShortBigEndian (buffer, 6);
+    int dictionary = Utility.getShortBigEndian (buffer, 8);
+    int objectTable = Utility.getShortBigEndian (buffer, 10);
+    int globals = Utility.getShortBigEndian (buffer, 12);
+    int staticMemory = Utility.getShortBigEndian (buffer, 14);
+    int abbreviationsTable = Utility.getShortBigEndian (buffer, 24);
+    int fileLength = Utility.getShortBigEndian (buffer, 26);
 
     if (false)
     {

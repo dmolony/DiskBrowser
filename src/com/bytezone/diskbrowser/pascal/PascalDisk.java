@@ -168,8 +168,8 @@ public class PascalDisk extends AbstractFormattedDisk
       System.out.println ("Name ok : " + name);
     }
 
-    int from = Utility.intValue (buffer[0], buffer[1]);
-    int to = Utility.intValue (buffer[2], buffer[3]);
+    int from = Utility.unsignedShort (buffer, 0);
+    int to = Utility.unsignedShort (buffer, 2);
     if (from != 0 || to != 6)
     {
       if (debug)
@@ -177,7 +177,7 @@ public class PascalDisk extends AbstractFormattedDisk
       return false;                         // will only work for floppies!
     }
 
-    int blocks = Utility.intValue (buffer[14], buffer[15]);
+    int blocks = Utility.unsignedShort (buffer, 14);
     if (blocks != 280 && blocks != 1600)
     {
       if (debug)
@@ -190,7 +190,7 @@ public class PascalDisk extends AbstractFormattedDisk
       addresses.add (disk.getDiskAddress (i));
     buffer = disk.readBlocks (addresses);
 
-    int files = Utility.intValue (buffer[16], buffer[17]);
+    int files = Utility.unsignedShort (buffer, 16);
     if (files < 0 || files > 77)
     {
       if (debug)
@@ -204,9 +204,9 @@ public class PascalDisk extends AbstractFormattedDisk
     for (int i = 1; i <= files; i++)
     {
       int ptr = i * 26;
-      int firstBlock = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
-      int lastBlock = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
-      int kind = Utility.intValue (buffer[ptr + 4], buffer[ptr + 5]);
+      int firstBlock = Utility.unsignedShort (buffer, ptr);
+      int lastBlock = Utility.unsignedShort (buffer, ptr + 2);
+      int kind = Utility.unsignedShort (buffer, ptr + 4);
       if (lastBlock < firstBlock)
         return false;
       if (kind == 0)
@@ -214,7 +214,7 @@ public class PascalDisk extends AbstractFormattedDisk
       nameLength = buffer[ptr + 6] & 0xFF;
       if (nameLength < 1 || nameLength > 15)
         return false;
-      int lastByte = Utility.intValue (buffer[ptr + 22], buffer[ptr + 23]);
+      int lastByte = Utility.unsignedShort (buffer, ptr + 22);
       GregorianCalendar date = HexFormatter.getPascalDate (buffer, 24);
       if (debug)
         System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,

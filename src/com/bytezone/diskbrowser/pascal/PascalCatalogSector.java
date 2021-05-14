@@ -50,7 +50,7 @@ class PascalCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, 22, 4, "Reserved");
 
     int ptr = PascalDisk.CATALOG_ENTRY_SIZE;
-    int totalFiles = Utility.intValue (buffer[16], buffer[17]);
+    int totalFiles = Utility.unsignedShort (buffer, 16);
 
     while (ptr < buffer.length && totalFiles > 0)
     {

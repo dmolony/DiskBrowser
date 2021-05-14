@@ -18,8 +18,8 @@ class VolumeEntry extends CatalogEntry
   {
     super (parent, buffer);
 
-    totalBlocks = Utility.intValue (buffer[14], buffer[15]);         // 280
-    totalFiles = Utility.intValue (buffer[16], buffer[17]);
+    totalBlocks = Utility.unsignedShort (buffer, 14);         // 280
+    totalFiles = Utility.unsignedShort (buffer, 16);
     date = HexFormatter.getPascalDate (buffer, 20);                       // 2 bytes
   }
 

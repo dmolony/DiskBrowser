@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.prodos.write;
 
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
-import static com.bytezone.diskbrowser.utilities.Utility.readShort;
+import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 import java.time.LocalDateTime;
@@ -63,7 +63,7 @@ public class SubdirectoryHeader extends DirectoryHeader
   {
     super.read ();
 
-    parentPointer = readShort (buffer, ptr + 0x23);
+    parentPointer = unsignedShort (buffer, ptr + 0x23);
     parentEntry = buffer[ptr + 0x25];
     parentEntryLength = buffer[ptr + 0x26];
 

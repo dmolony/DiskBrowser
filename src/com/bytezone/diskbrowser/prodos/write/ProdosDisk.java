@@ -6,7 +6,7 @@ import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.FILE_TYPE_DIRECTORY;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.SUBDIRECTORY_HEADER;
-import static com.bytezone.diskbrowser.utilities.Utility.readShort;
+import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 import java.io.DataInputStream;
@@ -370,7 +370,7 @@ public class ProdosDisk
 
         ptr += ENTRY_SIZE;
       }
-      blockNo = readShort (buffer, offset + 2);
+      blockNo = unsignedShort (buffer, offset + 2);
     } while (blockNo > 0);
 
     return Optional.empty ();
@@ -477,7 +477,7 @@ public class ProdosDisk
       }
 
       lastBlockNo = blockNo;
-      blockNo = readShort (buffer, offset + 2);      // next block
+      blockNo = unsignedShort (buffer, offset + 2);      // next block
     } while (blockNo > 0);
 
     if (subdirectoryHeader == null)         // this should be impossible

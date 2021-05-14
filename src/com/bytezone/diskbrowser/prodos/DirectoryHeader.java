@@ -18,7 +18,7 @@ public abstract class DirectoryHeader extends CatalogEntry implements ProdosCons
 
     entryLength = entryBuffer[31] & 0xFF;
     entriesPerBlock = entryBuffer[32] & 0xFF;
-    fileCount = Utility.intValue (entryBuffer[33], entryBuffer[34]);
+    fileCount = Utility.unsignedShort (entryBuffer, 33);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -47,10 +47,10 @@ public abstract class DirectoryHeader extends CatalogEntry implements ProdosCons
         if (nameLength > 0 && storageType < 0x0E)
         {
           String name = new String (buffer, ptr + 1, nameLength);
-          int blocksUsed = Utility.intValue (buffer[ptr + 0x13], buffer[ptr + 0x14]);
+          int blocksUsed = Utility.unsignedShort (buffer, ptr + 0x13);
           int fileType = buffer[ptr + 0x10] & 0xFF;
-          int keyPointer = Utility.intValue (buffer[ptr + 0x11], buffer[ptr + 0x12]);
-          int headerPointer = Utility.intValue (buffer[ptr + 0x25], buffer[ptr + 0x26]);
+          int keyPointer = Utility.unsignedShort (buffer, ptr + 0x11);
+          int headerPointer = Utility.unsignedShort (buffer, ptr + 0x25);
           text.append (String.format ("%04X:%02X  %-15s  %s  %04X  %s  %04X  %04X%n",
               blockNo, entryNo, name, storageTypes[storageType], blocksUsed,
               fileTypes[fileType], keyPointer, headerPointer));
@@ -59,7 +59,7 @@ public abstract class DirectoryHeader extends CatalogEntry implements ProdosCons
         ++entryNo;
       }
 
-      blockNo = Utility.intValue (buffer[2], buffer[3]);
+      blockNo = Utility.unsignedShort (buffer, 2);
     } while (blockNo != 0);
   }
 }

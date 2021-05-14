@@ -106,7 +106,7 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
         case GSOS_EXTENDED_FILE:
         case SUBDIRECTORY:
           int type = buffer[i + 16] & 0xFF;
-          int blocks = Utility.intValue (buffer[i + 19], buffer[i + 20]);
+          int blocks = Utility.unsignedShort (buffer, i + 19);
 
           LocalDateTime createdDate = Utility.getAppleDate (buffer, i + 24);
           LocalDateTime modifiedDate = Utility.getAppleDate (buffer, i + 33);
@@ -126,7 +126,7 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
           switch (fileType)
           {
             case FILE_TYPE_TEXT:
-              int aux = Utility.intValue (buffer[i + 31], buffer[i + 32]);
+              int aux = Utility.unsignedShort (buffer, i + 31);
               subType = String.format ("R=%5d", aux);
               break;
 
@@ -134,7 +134,7 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
             case FILE_TYPE_PNT:
             case FILE_TYPE_PIC:
             case FILE_TYPE_FOT:
-              aux = Utility.intValue (buffer[i + 31], buffer[i + 32]);
+              aux = Utility.unsignedShort (buffer, i + 31);
               subType = String.format ("A=$%4X", aux);
               break;
 

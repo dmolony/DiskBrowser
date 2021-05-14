@@ -131,12 +131,12 @@ class CatalogEntry extends AbstractCatalogEntry
       {
         case IntegerBasic:
         case ApplesoftBasic:
-          length = Utility.intValue (buffer[0], buffer[1]);
+          length = Utility.unsignedShort (buffer, 0);
           break;
 
         default:
-          address = Utility.intValue (buffer[0], buffer[1]);
-          length = Utility.intValue (buffer[2], buffer[3]);
+          address = Utility.unsignedShort (buffer, 0);
+          length = Utility.unsignedShort (buffer, 2);
       }
     }
   }

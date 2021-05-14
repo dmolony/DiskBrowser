@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.prodos;
 
-import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +88,7 @@ public class VolumeDirectoryHeader extends DirectoryHeader
     {
       byte[] buf = disk.readBlock (block);
       blockList.add (buf);
-      block = Utility.intValue (buf[2], buf[3]);              // next block
+      block = Utility.unsignedShort (buf, 2);              // next block
     } while (block > 0);
 
     byte[] fullBuffer = new byte[blockList.size () * 507];

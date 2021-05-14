@@ -123,7 +123,7 @@ class Header
     text.append ("\n");
     while (ptr < 512)
     {
-      int value = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
+      int value = Utility.unsignedShort (buffer, ptr);
       text.append (String.format ("%04X  %,6d%n", value, value));
       ptr += 2;
     }

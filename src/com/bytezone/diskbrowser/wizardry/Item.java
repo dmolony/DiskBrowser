@@ -25,9 +25,8 @@ class Item extends AbstractFile implements Comparable<Item>
     super (name, buffer);
     itemID = counter++;
     type = buffer[32];
-    cost = Utility.intValue (buffer[44], buffer[45])
-        + Utility.intValue (buffer[46], buffer[47]) * 10000
-        + Utility.intValue (buffer[48], buffer[49]) * 100000000L;
+    cost = Utility.unsignedShort (buffer, 44) + Utility.unsignedShort (buffer, 46) * 10000
+        + Utility.unsignedShort (buffer, 48) * 100000000L;
     genericName = HexFormatter.getPascalString (buffer, 16);
     damage = new Dice (buffer, 66);
     armourClass = buffer[62];
@@ -96,7 +95,7 @@ class Item extends AbstractFile implements Comparable<Item>
     if (buffer[50] == -1 && buffer[51] == -1)
       return -1;
 
-    return Utility.intValue (buffer[50], buffer[51]);
+    return Utility.unsignedShort (buffer, 50);
   }
 
   // ---------------------------------------------------------------------------------//

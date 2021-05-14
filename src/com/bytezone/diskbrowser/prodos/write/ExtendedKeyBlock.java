@@ -105,8 +105,8 @@ public class ExtendedKeyBlock
     // -------------------------------------------------------------------------------//
     {
       storageType = buffer[ptr];
-      keyBlock = Utility.readShort (buffer, ptr + 1);
-      blocksUsed = Utility.readShort (buffer, ptr + 3);
+      keyBlock = Utility.unsignedShort (buffer, ptr + 1);
+      blocksUsed = Utility.unsignedShort (buffer, ptr + 3);
       eof = Utility.readTriple (buffer, ptr + 5);
     }
 

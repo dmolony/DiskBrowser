@@ -43,14 +43,12 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     //    this.blockOffset = blockOffset;
     //    this.relocator = relocator;
 
-    this.blockNo = Utility.intValue (fullBuffer[seq * 4], fullBuffer[seq * 4 + 1]);
-    this.size = Utility.intValue (fullBuffer[seq * 4 + 2], fullBuffer[seq * 4 + 3]);
+    this.blockNo = Utility.unsignedShort (fullBuffer, seq * 4);
+    this.size = Utility.unsignedShort (fullBuffer, seq * 4 + 2);
 
-    segKind =
-        Utility.intValue (fullBuffer[0xC0 + seq * 2], fullBuffer[0xC0 + seq * 2 + 1]);
+    segKind = Utility.unsignedShort (fullBuffer, 0xC0 + seq * 2);
 
-    textAddress =
-        Utility.intValue (fullBuffer[0xE0 + seq * 2], fullBuffer[0xE0 + seq * 2 + 1]);
+    textAddress = Utility.unsignedShort (fullBuffer, 0xE0 + seq * 2);
 
     // segment 1 is the main segment, 2-6 are used by the system, and 7
     // onwards is for the program
@@ -65,10 +63,8 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     version = (flags & 0xD0) >> 5;
 
-    intrinsSegs1 =
-        Utility.intValue (fullBuffer[0x120 + seq * 4], fullBuffer[0x120 + seq * 4 + 1]);
-    intrinsSegs2 = Utility.intValue (fullBuffer[0x120 + seq * 4 + 2],
-        fullBuffer[0x120 + seq * 4 + 3]);
+    intrinsSegs1 = Utility.unsignedShort (fullBuffer, 0x120 + seq * 4);
+    intrinsSegs2 = Utility.unsignedShort (fullBuffer, 0x120 + seq * 4 + 2);
 
     int offset = blockNo * 512;
 

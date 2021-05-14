@@ -439,9 +439,8 @@ class MazeLevel extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     int x = b * 2;
-    return new MazeAddress (Utility.intValue (buffer[768 + x], buffer[769 + x]),
-        Utility.intValue (buffer[800 + x], buffer[801 + x]),
-        Utility.intValue (buffer[832 + x], buffer[833 + x]));
+    return new MazeAddress (Utility.unsignedShort (buffer, 768 + x),
+        Utility.unsignedShort (buffer, 800 + x), Utility.unsignedShort (buffer, 832 + x));
   }
 
   // ---------------------------------------------------------------------------------//

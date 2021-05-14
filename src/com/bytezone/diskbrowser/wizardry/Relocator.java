@@ -25,7 +25,7 @@ public class Relocator extends AbstractFile
   {
     super (name, buffer);
 
-    checkByte = Utility.intValue (buffer[0], buffer[1]);
+    checkByte = Utility.unsignedShort (buffer, 0);
 
     int ptr = 2;            // skip checkByte
 
@@ -169,7 +169,7 @@ public class Relocator extends AbstractFile
 
     public DiskRecord (byte[] buffer, int ptr)
     {
-      diskNumber = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
+      diskNumber = Utility.unsignedShort (buffer, ptr);
       totDiskSegments = Utility.intValue (buffer[ptr + 2], buffer[ptr + 4]);
 
       ptr += 4;
@@ -224,9 +224,9 @@ public class Relocator extends AbstractFile
 
     public DiskSegment (byte[] buffer, int ptr)
     {
-      logicalBlock = Utility.intValue (buffer[ptr], buffer[ptr + 1]);
-      physicalBlock = Utility.intValue (buffer[ptr + 2], buffer[ptr + 3]);
-      segmentLength = Utility.intValue (buffer[ptr + 4], buffer[ptr + 5]);
+      logicalBlock = Utility.unsignedShort (buffer, ptr);
+      physicalBlock = Utility.unsignedShort (buffer, ptr + 2);
+      segmentLength = Utility.unsignedShort (buffer, ptr + 4);
     }
 
     @Override

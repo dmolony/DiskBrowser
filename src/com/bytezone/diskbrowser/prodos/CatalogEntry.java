@@ -32,6 +32,8 @@ abstract class CatalogEntry implements AppleFileSource
   int access;
 
   List<DiskAddress> dataBlocks = new ArrayList<> ();
+  List<DiskAddress> resourceBlocks = new ArrayList<> ();
+
   DirectoryHeader parentDirectory;
 
   // ---------------------------------------------------------------------------------//
@@ -93,6 +95,11 @@ abstract class CatalogEntry implements AppleFileSource
     for (DiskAddress diskAddress : dataBlocks)
       if (diskAddress.matches (da))
         return true;
+
+    for (DiskAddress diskAddress : resourceBlocks)
+      if (diskAddress.matches (da))
+        return true;
+
     return false;
   }
 

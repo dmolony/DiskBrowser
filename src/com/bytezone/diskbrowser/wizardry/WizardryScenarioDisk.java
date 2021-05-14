@@ -137,7 +137,7 @@ public class WizardryScenarioDisk extends PascalDisk
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readBlock (2);
-    int totalFiles = Utility.intValue (buffer[16], buffer[17]);
+    int totalFiles = Utility.unsignedShort (buffer, 16);
     if (totalFiles != 3)
       return false;
 

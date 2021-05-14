@@ -206,7 +206,8 @@ public final class Utility
   public static LocalDateTime getAppleDate (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    int yymmdd = readShort (buffer, offset);
+    //    int yymmdd = readShort (buffer, offset);
+    int yymmdd = unsignedShort (buffer, offset);
     if (yymmdd != 0)
     {
       int year = (yymmdd & 0xFE00) >> 9;
@@ -277,11 +278,11 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  public static int readShort (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8;
-  }
+  //  public static int readShort (byte[] buffer, int ptr)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   public static int readTriple (byte[] buffer, int ptr)

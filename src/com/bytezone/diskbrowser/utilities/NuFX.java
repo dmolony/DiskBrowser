@@ -119,108 +119,106 @@ public class NuFX
             return thread.getData ();
     }
 
-    if (totalFiles > 0)
+    if (totalFiles == 0)
+      return null;
+
+    if (debug)
+      System.out.println ("Reading files");
+
+    calculateTotalBlocks ();
+    int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
+    for (int diskSize : diskSizes)      // in case we choose a size that is too small
     {
-      if (debug)
-        System.out.println ("Reading files");
+      if (diskSize < (totalBlocks + 10))
+        continue;
 
-      calculateTotalBlocks ();
-      int[] diskSizes = { 280, 800, 1600, 3200, 6400, 65536 };
-      for (int diskSize : diskSizes)      // in case we choose a size that is too small
+      try
       {
-        if (diskSize < (totalBlocks + 10))
-          continue;
+        ProdosDisk disk = new ProdosDisk (diskSize, volumeName.getVolumeName ());
+        int count = 0;
 
-        try
+        for (Record record : records)
         {
-          ProdosDisk disk = new ProdosDisk (diskSize, volumeName.getVolumeName ());
-          int count = 0;
-
-          for (Record record : records)
+          if (record.hasFile ())
           {
-            if (record.hasFile ())
+            String fileName = volumeName.convert (record.getFileName ());
+
+            if (!record.isValidFileSystem ())
             {
-              String fileName = volumeName.convert (record.getFileName ());
+              System.out.printf ("File %s is file system %s%n", fileName,
+                  record.getFileSystemName ());
+              continue;
+            }
 
-              if (!record.isValidFileSystem ())
-              {
-                System.out.printf ("File %s is file system %s%n", fileName,
-                    record.getFileSystemName ());
-                continue;
-              }
+            //              int fileSize = record.getFileSize ();
+            byte fileType = (byte) record.getFileType ();
+            int eof = record.getUncompressedSize ();
+            int auxType = record.getAuxType ();
+            LocalDateTime created = record.getCreated ();
+            LocalDateTime modified = record.getModified ();
+            byte[] buffer;
+            try
+            {
+              buffer = record.getData ();
+            }
+            catch (Exception e)
+            {
+              System.out.println (e.getMessage ());
+              System.out.printf ("Failed to unpack: %s%n", fileName);
+              continue;
+            }
 
-              //              int fileSize = record.getFileSize ();
-              byte fileType = (byte) record.getFileType ();
-              int eof = record.getUncompressedSize ();
-              int auxType = record.getAuxType ();
-              LocalDateTime created = record.getCreated ();
-              LocalDateTime modified = record.getModified ();
-              byte[] buffer;
+            if (debug)
+              System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
+                  fileName, fileType, auxType, eof, buffer.length, created, modified);
+
+            FileEntry fileEntry;
+            try
+            {
+              fileEntry = disk.addFile (fileName, fileType, auxType, created, modified,
+                  buffer, eof);
+            }
+            catch (FileAlreadyExistsException e)
+            {
+              System.out.printf ("File %s not added%n", fileName);
+              break;
+            }
+
+            if (record.hasResource ())
+            {
               try
               {
-                buffer = record.getData ();
+                buffer = record.getResourceData ();
+                disk.addResourceFork (fileEntry, buffer, buffer.length);
               }
               catch (Exception e)
               {
                 System.out.println (e.getMessage ());
-                System.out.printf ("Failed to unpack: %s%n", fileName);
-                continue;
-              }
-
-              if (debug)
-                System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
-                    fileName, fileType, auxType, eof, buffer.length, created, modified);
-
-              FileEntry fileEntry;
-              try
-              {
-                fileEntry = disk.addFile (fileName, fileType, auxType, created, modified,
-                    buffer, eof);
-              }
-              catch (FileAlreadyExistsException e)
-              {
-                System.out.printf ("File %s not added%n", fileName);
-                break;
-              }
-
-              if (record.hasResource ())
-              {
-                try
-                {
-                  buffer = record.getResourceData ();
-                }
-                catch (Exception e)
-                {
-                  System.out.println (e.getMessage ());
-                  System.out.printf ("Failed to unpack resource fork: %s%n", fileName);
-                  continue;
-                }
-                disk.addResourceFork (fileEntry, buffer, buffer.length);
+                System.out.printf ("Failed to unpack resource fork: %s%n", fileName);
               }
             }
           }
+        }
 
-          disk.close ();
+        disk.close ();
 
-          return disk.getBuffer ();
-        }
-        catch (DiskFullException e)
-        {
-          System.out.println ("disk full: " + diskSize);    // go round again
-        }
-        catch (VolumeCatalogFullException e)
-        {
-          e.printStackTrace ();
-          return null;
-        }
-        catch (IOException e)
-        {
-          e.printStackTrace ();
-          return null;
-        }
+        return disk.getBuffer ();
+      }
+      catch (DiskFullException e)
+      {
+        System.out.println ("disk full: " + diskSize);    // go round again
+      }
+      catch (VolumeCatalogFullException e)
+      {
+        e.printStackTrace ();
+        return null;
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace ();
+        return null;
       }
     }
-
     return null;
   }
 
@@ -243,22 +241,6 @@ public class NuFX
   // ---------------------------------------------------------------------------------//
   {
     return totalBlocks;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private void listFiles ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int count = 0;
-    for (Record record : records)
-    {
-      if (record.hasFile ())
-      {
-        System.out.printf ("%3d %-35s %,7d  %02X  %,7d%n", count, record.getFileName (),
-            record.getFileSize (), record.getFileType (), record.getUncompressedSize ());
-      }
-      count++;
-    }
   }
 
   // ---------------------------------------------------------------------------------//

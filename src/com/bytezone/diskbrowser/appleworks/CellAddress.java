@@ -14,7 +14,7 @@ class CellAddress
   // ---------------------------------------------------------------------------------//
   {
     colRef = buffer[offset];
-    rowRef = Utility.intValue (buffer[offset + 1], buffer[offset + 2]);
+    rowRef = Utility.unsignedShort (buffer, offset + 1);
   }
 
   // ---------------------------------------------------------------------------------//

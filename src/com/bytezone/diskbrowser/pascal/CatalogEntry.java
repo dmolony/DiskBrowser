@@ -32,11 +32,11 @@ abstract class CatalogEntry implements AppleFileSource
   {
     this.parent = parent;
 
-    firstBlock = Utility.intValue (buffer[0], buffer[1]);
-    lastBlock = Utility.intValue (buffer[2], buffer[3]);
+    firstBlock = Utility.unsignedShort (buffer, 0);
+    lastBlock = Utility.unsignedShort (buffer, 2);
     fileType = buffer[4] & 0xFF;
     name = HexFormatter.getPascalString (buffer, 6);
-    bytesUsedInLastBlock = Utility.intValue (buffer[16], buffer[17]);
+    bytesUsedInLastBlock = Utility.unsignedShort (buffer, 16);
 
     Disk disk = parent.getDisk ();
     int max = Math.min (lastBlock, disk.getTotalBlocks ());

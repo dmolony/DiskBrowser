@@ -79,10 +79,8 @@ public class PascalCodeStatement implements PascalConstants
             int min = ptr + padding + 7;
             int max = min + (p2 - p1) * 2;
             for (int i = min; i <= max; i += 2)
-            {
-              jumps.add (
-                  new Jump (i, i - Utility.intValue (buffer[i], buffer[i + 1]), v++));
-            }
+              jumps.add (new Jump (i, i - Utility.unsignedShort (buffer, i), v++));
+
             break;
 
           // UB, <block> - word aligned

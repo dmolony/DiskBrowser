@@ -52,7 +52,7 @@ public class Prefix2mg
       flagsVolume = 254;
 
     // see /Asimov disks/images/gs/os/prodos16/ProDOS 16v1_3.2mg
-    System.out.println (this);
+    //    System.out.println (this);
   }
 
   // ---------------------------------------------------------------------------------//

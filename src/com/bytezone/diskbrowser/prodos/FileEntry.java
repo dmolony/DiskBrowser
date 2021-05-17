@@ -30,6 +30,7 @@ import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PascalArea;
 import com.bytezone.diskbrowser.applefile.ProdosDirectory;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
+import com.bytezone.diskbrowser.applefile.ResourceFork;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.applefile.Selector;
@@ -147,6 +148,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       else
         addDataBlocks (storageType, keyBlock, resourceBlocks);
     }
+
+    ResourceFork fork = new ResourceFork (disk.readBlocks (resourceBlocks));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -672,7 +675,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         return fullBuffer;
 
       case GSOS_EXTENDED_FILE:
-        return disk.readBlocks (dataBlocks);   // data and resource forks concatenated
+        return disk.readBlocks (dataBlocks);
 
       case PASCAL_ON_PROFILE:
         return disk.readBlocks (dataBlocks);

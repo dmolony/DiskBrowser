@@ -13,13 +13,13 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveSingleFileAction extends DefaultAction
+class SaveFileAction extends DefaultAction
 //-----------------------------------------------------------------------------------//
 {
   AppleFileSource appleFileSource;
 
   // ---------------------------------------------------------------------------------//
-  SaveSingleFileAction ()
+  SaveFileAction ()
   // ---------------------------------------------------------------------------------//
   {
     super ("Save file...", "Save currently selected file");

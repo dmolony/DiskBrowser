@@ -79,7 +79,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   FormattedDisk currentDisk;
   private final SaveDiskAction saveDiskAction = new SaveDiskAction ();
-  private final SaveSingleFileAction saveFileAction = new SaveSingleFileAction ();
+  private final SaveFileAction saveFileAction = new SaveFileAction ();
   final SaveSectorsAction saveSectorsAction = new SaveSectorsAction ();
 
   private final BasicPreferences basicPreferences = new BasicPreferences ();

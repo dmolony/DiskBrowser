@@ -10,10 +10,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
-import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveFileAction extends DefaultAction implements FileSelectionListener
+class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
 //-----------------------------------------------------------------------------------//
 {
   AppleFileSource appleFileSource;
@@ -32,12 +31,16 @@ class SaveFileAction extends DefaultAction implements FileSelectionListener
   {
     if (appleFileSource == null)
     {
-      System.out.println ("No data source");
+      JOptionPane.showMessageDialog (null, "No file selected");
       return;
     }
 
-    JFileChooser fileChooser = new JFileChooser ();
-    fileChooser.setDialogTitle ("Save File");
+    if (fileChooser == null)
+    {
+      fileChooser = new JFileChooser ();
+      fileChooser.setDialogTitle ("Save File");
+    }
+
     fileChooser.setSelectedFile (new File (appleFileSource.getUniqueName () + ".bin"));
 
     if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
@@ -52,6 +55,7 @@ class SaveFileAction extends DefaultAction implements FileSelectionListener
       catch (IOException e)
       {
         e.printStackTrace ();
+        JOptionPane.showMessageDialog (null, "File failed to save");
       }
     }
   }

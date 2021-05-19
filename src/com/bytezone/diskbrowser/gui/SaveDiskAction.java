@@ -9,10 +9,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import com.bytezone.diskbrowser.disk.FormattedDisk;
-import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveDiskAction extends DefaultAction implements DiskSelectionListener
+class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
 // -----------------------------------------------------------------------------------//
 {
   FormattedDisk disk;
@@ -31,14 +30,18 @@ class SaveDiskAction extends DefaultAction implements DiskSelectionListener
   {
     if (disk == null)
     {
-      System.out.println ("No disk");
+      JOptionPane.showMessageDialog (null, "No disk selected");
       return;
     }
 
-    JFileChooser fileChooser = new JFileChooser ();
-    fileChooser.setDialogTitle ("Save converted disk");
-    String name = disk.getName ();
-    fileChooser.setSelectedFile (new File (name + ".dsk"));
+    if (fileChooser == null)
+    {
+      fileChooser = new JFileChooser ();
+      fileChooser.setDialogTitle ("Save converted disk");
+    }
+
+    fileChooser.setSelectedFile (new File (disk.getName () + ".dsk"));
+
     if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
     {
       File file = fileChooser.getSelectedFile ();
@@ -50,6 +53,7 @@ class SaveDiskAction extends DefaultAction implements DiskSelectionListener
       catch (IOException e)
       {
         e.printStackTrace ();
+        JOptionPane.showMessageDialog (null, "Disk failed to save");
       }
     }
   }

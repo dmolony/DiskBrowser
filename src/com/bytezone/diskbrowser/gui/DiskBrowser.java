@@ -103,11 +103,13 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     catalogPanel.addDiskSelectionListener (diskLayoutPanel);
     catalogPanel.addDiskSelectionListener (redoHandler);
     catalogPanel.addDiskSelectionListener (menuHandler);
+    catalogPanel.addDiskSelectionListener (menuHandler.saveDiskAction);
 
     catalogPanel.addFileSelectionListener (dataPanel);
     catalogPanel.addFileSelectionListener (diskLayoutPanel);
     catalogPanel.addFileSelectionListener (redoHandler);
     catalogPanel.addFileSelectionListener (menuHandler);
+    catalogPanel.addFileSelectionListener (menuHandler.saveFileAction);
 
     catalogPanel.addFileNodeSelectionListener (dataPanel);
     catalogPanel.addFileNodeSelectionListener (redoHandler);
@@ -115,7 +117,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     diskLayoutPanel.addSectorSelectionListener (dataPanel);
     diskLayoutPanel.addSectorSelectionListener (redoHandler);
     diskLayoutPanel.addSectorSelectionListener (catalogPanel);
-    diskLayoutPanel.addSectorSelectionListener (menuHandler);
     diskLayoutPanel.addSectorSelectionListener (menuHandler.saveSectorsAction);
 
     duplicateAction.addTableSelectionListener (catalogPanel);

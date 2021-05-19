@@ -32,8 +32,7 @@ import com.bytezone.diskbrowser.prodos.ProdosDisk;
 import com.bytezone.diskbrowser.utilities.EnvironmentAction;
 
 // -----------------------------------------------------------------------------------//
-class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitListener,
-    SectorSelectionListener
+class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitListener
 // -----------------------------------------------------------------------------------//
 {
   static final String PREFS_LINE_WRAP = "line wrap";
@@ -78,8 +77,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
-  private final SaveDiskAction saveDiskAction = new SaveDiskAction ();
-  private final SaveFileAction saveFileAction = new SaveFileAction ();
+  final SaveDiskAction saveDiskAction = new SaveDiskAction ();
+  final SaveFileAction saveFileAction = new SaveFileAction ();
   final SaveSectorsAction saveSectorsAction = new SaveSectorsAction ();
 
   private final BasicPreferences basicPreferences = new BasicPreferences ();
@@ -156,16 +155,11 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem splitRemarkItem = new JCheckBoxMenuItem ("Split REM");
   final JMenuItem splitDimItem = new JCheckBoxMenuItem ("Split DIM");
   final JMenuItem alignAssignItem = new JCheckBoxMenuItem ("Align consecutive assign");
-  //  final JMenuItem showBasicTargetsItem = new JCheckBoxMenuItem ("Show targets");
-  //  final JMenuItem onlyShowTargetLinesItem =
-  //      new JCheckBoxMenuItem ("Only show target line numbers");
   final JMenuItem showCaretItem = new JCheckBoxMenuItem ("Show caret");
   final JMenuItem showThenItem = new JCheckBoxMenuItem ("Show THEN after IF");
   final JMenuItem blankAfterReturnItem =
       new JCheckBoxMenuItem ("Blank line after RETURN");
   final JMenuItem formatRemItem = new JCheckBoxMenuItem ("Allow formatted REM");
-  //  final JMenuItem deleteExtraRemSpace =
-  //      new JCheckBoxMenuItem ("Delete extra REM space");
   final JMenuItem deleteExtraDataSpace =
       new JCheckBoxMenuItem ("Delete extra DATA space");
 
@@ -176,7 +170,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showConstantsItem = new JCheckBoxMenuItem ("List constants");
   final JMenuItem showDuplicateSymbolsItem =
       new JCheckBoxMenuItem ("List duplicate variables");
-  //  final JMenuItem listStringsItem = new JCheckBoxMenuItem ("List strings");
 
   // Assembler menu items
   final JMenuItem showAssemblerTargetsItem = new JCheckBoxMenuItem ("Show targets");
@@ -207,16 +200,18 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     menuBar.add (helpMenu);
 
     fileMenu.add (rootItem);
-    fileMenu.addSeparator ();
     fileMenu.add (refreshTreeItem);
+
+    fileMenu.addSeparator ();
     fileMenu.add (saveDiskItem);
     fileMenu.add (saveFileItem);
     fileMenu.add (saveSectorsItem);
+    fileMenu.addSeparator ();
 
     addLauncherMenu ();
 
     fileMenu.add (printItem);
-    fileMenu.addSeparator ();
+    //    fileMenu.addSeparator ();
     fileMenu.add (closeTabItem);
 
     JMenuItem fontItem = new JMenuItem (fontAction);
@@ -722,8 +717,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       currentDisk = event.appleFileSource.getFormattedDisk ();
       adjustMenus (currentDisk);
     }
-
-    saveFileAction.setFile (event.appleFileSource);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -770,16 +763,5 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       ((InterleaveAction) interleave2Item.getAction ()).setDisk (currentDisk);
       ((InterleaveAction) interleave3Item.getAction ()).setDisk (currentDisk);
     }
-
-    saveDiskItem.setEnabled (disk.isTempDisk ());
-    saveDiskAction.setDisk (disk);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  public void sectorSelected (SectorSelectedEvent event)
-  // ---------------------------------------------------------------------------------//
-  {
-    //    List<DiskAddress> sectors = event.getSectors ();
   }
 }

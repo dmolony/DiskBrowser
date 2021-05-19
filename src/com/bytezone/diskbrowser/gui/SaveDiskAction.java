@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveDiskAction extends DefaultAction
+class SaveDiskAction extends DefaultAction implements DiskSelectionListener
 // -----------------------------------------------------------------------------------//
 {
   FormattedDisk disk;
@@ -55,10 +55,11 @@ class SaveDiskAction extends DefaultAction
   }
 
   // ---------------------------------------------------------------------------------//
-  void setDisk (FormattedDisk disk)
+  @Override
+  public void diskSelected (DiskSelectedEvent event)
   // ---------------------------------------------------------------------------------//
   {
-    this.disk = disk;
-    this.setEnabled (true);
+    this.disk = event.getFormattedDisk ();
+    setEnabled (disk.isTempDisk ());
   }
 }

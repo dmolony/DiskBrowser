@@ -13,7 +13,7 @@ import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveFileAction extends DefaultAction
+class SaveFileAction extends DefaultAction implements FileSelectionListener
 //-----------------------------------------------------------------------------------//
 {
   AppleFileSource appleFileSource;
@@ -57,9 +57,10 @@ class SaveFileAction extends DefaultAction
   }
 
   // ---------------------------------------------------------------------------------//
-  void setFile (AppleFileSource dataSource)
+  @Override
+  public void fileSelected (FileSelectedEvent event)
   // ---------------------------------------------------------------------------------//
   {
-    this.appleFileSource = dataSource;
+    this.appleFileSource = event.appleFileSource;
   }
 }

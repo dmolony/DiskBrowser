@@ -36,7 +36,7 @@ public class PascalProcedure
     this.buffer = buffer;
     this.slot = slot;
     int p = buffer.length - 2 - slot * 2;
-    offset = Utility.unsignedShort (buffer, p);
+    offset = Utility.getShort (buffer, p);
     procOffset = p - offset;
     valid = procOffset > 0;
 
@@ -44,10 +44,10 @@ public class PascalProcedure
     {
       procedureNo = buffer[procOffset] & 0xFF;
       procLevel = buffer[procOffset + 1] & 0xFF;
-      codeStart = Utility.unsignedShort (buffer, procOffset - 2);
-      codeEnd = Utility.unsignedShort (buffer, procOffset - 4);
-      parmSize = Utility.unsignedShort (buffer, procOffset - 6);
-      dataSize = Utility.unsignedShort (buffer, procOffset - 8);
+      codeStart = Utility.getShort (buffer, procOffset - 2);
+      codeEnd = Utility.getShort (buffer, procOffset - 4);
+      parmSize = Utility.getShort (buffer, procOffset - 6);
+      dataSize = Utility.getShort (buffer, procOffset - 8);
     }
   }
 

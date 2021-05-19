@@ -128,7 +128,7 @@ public class ShapeTable extends AbstractFile
         return false;
 
       // check index points inside the file
-      int offset = Utility.unsignedShort (buffer, ptr);
+      int offset = Utility.getShort (buffer, ptr);
       if (offset == 0 || offset >= buffer.length)
         return false;
 

@@ -27,7 +27,7 @@ public class SHRPictureFile1 extends HiResImage
     int ptr = 0;
     while (ptr < buffer.length)
     {
-      int len = Utility.unsignedLong (buffer, ptr);
+      int len = Utility.getLong (buffer, ptr);
       if (len == 0 || len > buffer.length)
       {
         System.out.printf ("Block length: %d%n", len);
@@ -232,7 +232,7 @@ public class SHRPictureFile1 extends HiResImage
       super (kind, data);
 
       int ptr = 5 + kind.length ();
-      numColorTables = Utility.unsignedShort (data, ptr);
+      numColorTables = Utility.getShort (data, ptr);
 
       ptr += 2;
       colorTables = new ColorTable[numColorTables];
@@ -286,9 +286,9 @@ public class SHRPictureFile1 extends HiResImage
       super (kind, data);
 
       int ptr = 5 + kind.length ();
-      masterMode = Utility.unsignedShort (data, ptr);
-      pixelsPerScanLine = Utility.unsignedShort (data, ptr + 2);
-      numColorTables = Utility.unsignedShort (data, ptr + 4);
+      masterMode = Utility.getShort (data, ptr);
+      pixelsPerScanLine = Utility.getShort (data, ptr + 2);
+      numColorTables = Utility.getShort (data, ptr + 4);
       mode640 = (masterMode & 0x80) != 0;
 
       ptr += 6;
@@ -299,7 +299,7 @@ public class SHRPictureFile1 extends HiResImage
         ptr += 32;
       }
 
-      numScanLines = Utility.unsignedShort (data, ptr);
+      numScanLines = Utility.getShort (data, ptr);
       ptr += 2;
 
       scanLineDirectory = new DirEntry[numScanLines];

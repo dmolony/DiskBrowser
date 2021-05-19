@@ -136,7 +136,7 @@ public class BasicProgramGS extends BasicProgram
       ptr += labelLength;
 
       int lineLength = buffer[ptr] & 0xFF;
-      lineNumber = Utility.unsignedShort (buffer, ptr + 1);
+      lineNumber = Utility.getShort (buffer, ptr + 1);
       length = labelLength + lineLength;
 
       if (lineNumber == 0)

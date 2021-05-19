@@ -49,21 +49,21 @@ class Record
     if (!Utility.isMagic (buffer, dataPtr, NuFX))
       throw new FileFormatException ("NuFX not found");
 
-    crc = Utility.getWord (buffer, dataPtr + 4);
-    attributes = Utility.getWord (buffer, dataPtr + 6);
-    version = Utility.getWord (buffer, dataPtr + 8);
+    crc = Utility.getShort (buffer, dataPtr + 4);
+    attributes = Utility.getShort (buffer, dataPtr + 6);
+    version = Utility.getShort (buffer, dataPtr + 8);
     totThreads = Utility.getLong (buffer, dataPtr + 10);
-    fileSystemID = Utility.getWord (buffer, dataPtr + 14);
+    fileSystemID = Utility.getShort (buffer, dataPtr + 14);
     separator = (char) (buffer[dataPtr + 16] & 0x00FF);
     access = Utility.getLong (buffer, dataPtr + 18);
     fileType = Utility.getLong (buffer, dataPtr + 22);
     auxType = Utility.getLong (buffer, dataPtr + 26);
-    storType = Utility.getWord (buffer, dataPtr + 30);
+    storType = Utility.getShort (buffer, dataPtr + 30);
     created = new DateTime (buffer, dataPtr + 32);
     modified = new DateTime (buffer, dataPtr + 40);
     archived = new DateTime (buffer, dataPtr + 48);
-    optionSize = Utility.getWord (buffer, dataPtr + 56);
-    fileNameLength = Utility.getWord (buffer, dataPtr + attributes - 2);
+    optionSize = Utility.getShort (buffer, dataPtr + 56);
+    fileNameLength = Utility.getShort (buffer, dataPtr + attributes - 2);
 
     int len = attributes + fileNameLength - 6;
     byte[] crcBuffer = new byte[len + totThreads * 16];

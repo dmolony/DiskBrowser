@@ -180,7 +180,7 @@ public class ProdosDisk extends AbstractFormattedDisk
             System.out.println (HexFormatter.format (entry, 0, entry.length));
         }
       }
-      block = Utility.unsignedShort (sectorBuffer, 2);
+      block = Utility.getShort (sectorBuffer, 2);
     } while (block > 0);
 
     // link double hi-res files
@@ -230,7 +230,7 @@ public class ProdosDisk extends AbstractFormattedDisk
     if (buffer[0x23] != 0x27 || buffer[0x24] != 0x0D)
       return false;
 
-    int bitMapBlock = Utility.unsignedShort (buffer, 0x27);
+    int bitMapBlock = Utility.getShort (buffer, 0x27);
     if (bitMapBlock < 3 || bitMapBlock > 10)
       return false;
 

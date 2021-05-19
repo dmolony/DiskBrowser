@@ -4,8 +4,8 @@ import static com.bytezone.diskbrowser.utilities.Utility.ASCII_BACKSPACE;
 import static com.bytezone.diskbrowser.utilities.Utility.ASCII_CR;
 import static com.bytezone.diskbrowser.utilities.Utility.ASCII_LF;
 import static com.bytezone.diskbrowser.utilities.Utility.getIndent;
+import static com.bytezone.diskbrowser.utilities.Utility.getShort;
 import static com.bytezone.diskbrowser.utilities.Utility.isHighBitSet;
-import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 
 import com.bytezone.diskbrowser.gui.BasicPreferences;
 
@@ -37,9 +37,9 @@ public class AppleBasicFormatter extends BasicFormatter
     LineFormatter formatter =
         basicPreferences.appleLineWrap ? wrapFormatter : flatFormatter;
 
-    while ((linkField = unsignedShort (buffer, ptr)) != 0)
+    while ((linkField = getShort (buffer, ptr)) != 0)
     {
-      int lineNumber = unsignedShort (buffer, ptr + 2);
+      int lineNumber = getShort (buffer, ptr + 2);
       currentLine.append (String.format (" %d ", lineNumber));
       ptr += 4;
 

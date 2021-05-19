@@ -39,7 +39,7 @@ class Shape
     int row = startRow;
     int col = startCol;
 
-    offset = Utility.unsignedShort (buffer, index * 2 + 2);
+    offset = Utility.getShort (buffer, index * 2 + 2);
 
     int ptr = offset;
     while (ptr < buffer.length)

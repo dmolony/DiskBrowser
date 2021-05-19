@@ -1,6 +1,6 @@
 package com.bytezone.diskbrowser.prodos.write;
 
-import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
+import static com.bytezone.diskbrowser.utilities.Utility.getShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 // -----------------------------------------------------------------------------------//
@@ -26,8 +26,8 @@ public class VolumeDirectoryHeader extends DirectoryHeader
   {
     super.read ();
 
-    bitMapPointer = unsignedShort (buffer, ptr + 0x23);
-    totalBlocks = unsignedShort (buffer, ptr + 0x25);
+    bitMapPointer = getShort (buffer, ptr + 0x23);
+    totalBlocks = getShort (buffer, ptr + 0x25);
   }
 
   // ---------------------------------------------------------------------------------//

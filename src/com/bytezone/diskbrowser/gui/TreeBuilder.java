@@ -108,7 +108,7 @@ class TreeBuilder
   }
 
   // ---------------------------------------------------------------------------------//
-  class FileNode implements DataSource   // why does it implement DataSource?
+  class FileNode implements DataSource
   // ---------------------------------------------------------------------------------//
   {
     private static final int MAX_NAME_LENGTH = 36;
@@ -249,6 +249,14 @@ class TreeBuilder
     @Override
     public BufferedImage getImage ()
     // -------------------------------------------------------------------------------//
+    {
+      return null;
+    }
+
+    // ---------------------------------------------------------------------------------//
+    @Override
+    public byte[] getBuffer ()
+    // ---------------------------------------------------------------------------------//
     {
       return null;
     }

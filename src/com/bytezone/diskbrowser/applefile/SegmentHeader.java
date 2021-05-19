@@ -54,20 +54,20 @@ public class SegmentHeader
     version = buffer[offset + 15] & 0xFF;
 
     banksize = Utility.getLong (buffer, offset + 16);
-    kind2 = Utility.getWord (buffer, offset + 20);
-    unused = Utility.getWord (buffer, offset + 22);
+    kind2 = Utility.getShort (buffer, offset + 20);
+    unused = Utility.getShort (buffer, offset + 22);
     org = Utility.getLong (buffer, offset + 24);
     align = Utility.getLong (buffer, offset + 28);
 
     numsex = buffer[offset + 32] & 0xFF;
     lcbank = buffer[offset + 33] & 0xFF;
 
-    segnum = Utility.getWord (buffer, offset + 34);
+    segnum = Utility.getShort (buffer, offset + 34);
 
     entry = Utility.getLong (buffer, offset + 36);
 
-    dispname = Utility.getWord (buffer, offset + 40);
-    dispdata = Utility.getWord (buffer, offset + 42);
+    dispname = Utility.getShort (buffer, offset + 40);
+    dispdata = Utility.getShort (buffer, offset + 42);
 
     decodeKind ();
 
@@ -136,8 +136,8 @@ public class SegmentHeader
           int count1 = buffer[ptr + 1] & 0xFF;
           int count2 = buffer[ptr + 2] & 0xFF;
           int operandOffset = Utility.getLong (buffer, ptr + 3);
-          int fileNo = Utility.getWord (buffer, ptr + 7);
-          int segNo = Utility.getWord (buffer, ptr + 9);
+          int fileNo = Utility.getShort (buffer, ptr + 7);
+          int segNo = Utility.getShort (buffer, ptr + 9);
           int subroutineOffset = Utility.getLong (buffer, ptr + 11);
           if (debug)
             System.out.printf ("INTERSEG: %02X %02X %08X %04X %04X %08X%n", count1,
@@ -226,8 +226,8 @@ public class SegmentHeader
         case 0xF5:        // cRELOC
           int cBytesRelocated = buffer[ptr + 1] & 0xFF;
           int cBitShift = buffer[ptr + 2] & 0xFF;
-          int cSegmentOffset = Utility.getWord (buffer, ptr + 3);
-          int cValue = Utility.getWord (buffer, ptr + 5);
+          int cSegmentOffset = Utility.getShort (buffer, ptr + 3);
+          int cValue = Utility.getShort (buffer, ptr + 5);
           if (debug)
             System.out.printf ("cRELOC: %02X %02X %08X %08X%n", cBytesRelocated,
                 cBitShift, cSegmentOffset, cValue);
@@ -237,9 +237,9 @@ public class SegmentHeader
         case 0xF6:        // cINTERSEG
           int cCount1 = buffer[ptr + 1] & 0xFF;
           int cCount2 = buffer[ptr + 2] & 0xFF;
-          int cOperandOffset = Utility.getWord (buffer, ptr + 3);
+          int cOperandOffset = Utility.getShort (buffer, ptr + 3);
           int cSegNo = buffer[ptr + 5] & 0xFF;
-          int cSubroutineOffset = Utility.getWord (buffer, ptr + 6);
+          int cSubroutineOffset = Utility.getShort (buffer, ptr + 6);
           if (debug)
             System.out.printf ("cINTERSEG: %02X %02X %04X %02X %04X%n", cCount1, cCount2,
                 cOperandOffset, cSegNo, cSubroutineOffset);

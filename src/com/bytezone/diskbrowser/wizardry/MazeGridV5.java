@@ -152,7 +152,7 @@ class MazeGridV5 extends AbstractFile
     text.append ("\n");
     for (int i = 0; i < 176; i += 2)
     {
-      int msg = Utility.getWord (buffer, 0x540 + i);
+      int msg = Utility.getShort (buffer, 0x540 + i);
       text.append (String.format ("%05X  %04X  %04X", 0x540 + i, i / 2, msg));
       if (msg >= 700)
       {
@@ -178,7 +178,7 @@ class MazeGridV5 extends AbstractFile
     {
       for (int i = 0; i < 176; i += 2)
       {
-        int msg = Utility.getWord (buffer, 0x540 + i);
+        int msg = Utility.getShort (buffer, 0x540 + i);
         if (msg >= 15000)
         {
           List<String> messages = messageBlock.getMessageLines (msg);

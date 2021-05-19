@@ -97,20 +97,20 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  public static int getLong (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    return getWord (buffer, ptr) + getWord (buffer, ptr + 2) * 0x10000;
-  }
+  //  public static int getLong (byte[] buffer, int ptr)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    return getWord (buffer, ptr) + getWord (buffer, ptr + 2) * 0x10000;
+  //  }
 
   // ---------------------------------------------------------------------------------//
-  public static int getWord (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int a = (buffer[ptr + 1] & 0xFF) << 8;
-    int b = buffer[ptr] & 0xFF;
-    return a + b;
-  }
+  //  public static int getWord (byte[] buffer, int ptr)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    int a = (buffer[ptr + 1] & 0xFF) << 8;
+  //    int b = buffer[ptr] & 0xFF;
+  //    return a + b;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   public static int intValue (byte b1, byte b2)
@@ -127,9 +127,15 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  public static int unsignedLong (byte[] buffer, int ptr)
+  public static int getLong (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
+    if (ptr >= buffer.length)
+    {
+      System.out.printf ("Index out of range (getLong): %08X%n", ptr);
+      return 0;
+    }
+
     int val = 0;
     for (int i = 3; i >= 0; i--)
     {
@@ -166,14 +172,15 @@ public final class Utility
   //  }
 
   // ---------------------------------------------------------------------------------//
-  public static int unsignedShort (byte[] buffer, int ptr)
+  public static int getShort (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     if (ptr >= buffer.length)
     {
-      System.out.println ("Index out of range (unsigned short): " + ptr);
+      System.out.printf ("Index out of range (getShort): %04X%n", ptr);
       return 0;
     }
+
     return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
   }
 
@@ -207,7 +214,7 @@ public final class Utility
   // ---------------------------------------------------------------------------------//
   {
     //    int yymmdd = readShort (buffer, offset);
-    int yymmdd = unsignedShort (buffer, offset);
+    int yymmdd = getShort (buffer, offset);
     if (yymmdd != 0)
     {
       int year = (yymmdd & 0xFE00) >> 9;

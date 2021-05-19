@@ -25,7 +25,7 @@ public class AppleworksSSFile extends AbstractFile
     int ptr = header.ssMinVers == 0 ? 300 : 302;
     while (ptr < buffer.length)
     {
-      int length = Utility.unsignedShort (buffer, ptr);
+      int length = Utility.getShort (buffer, ptr);
 
       if (length == 0xFFFF)
         break;
@@ -103,7 +103,7 @@ public class AppleworksSSFile extends AbstractFile
 
       calcOrder = (char) buffer[131];
       calcFrequency = (char) buffer[132];
-      lastRow = Utility.unsignedShort (buffer, 133);
+      lastRow = Utility.getShort (buffer, 133);
       lastColumn = buffer[135] & 0xFF;
       windowLayout = (char) buffer[136];
       windowSynch = buffer[137] != 0;
@@ -204,15 +204,15 @@ public class AppleworksSSFile extends AbstractFile
 
       r1 = buffer[offset + 3] & 0xFF;
       c1 = buffer[offset + 4] & 0xFF;
-      r2 = Utility.unsignedShort (buffer, offset + 5);
+      r2 = Utility.getShort (buffer, offset + 5);
       c2 = buffer[offset + 7] & 0xFF;
-      r3 = Utility.unsignedShort (buffer, offset + 8);
+      r3 = Utility.getShort (buffer, offset + 8);
       c3 = buffer[offset + 10] & 0xFF;
-      r4 = Utility.unsignedShort (buffer, offset + 11);
+      r4 = Utility.getShort (buffer, offset + 11);
       c4 = buffer[offset + 13] & 0xFF;
       r5 = buffer[offset + 14] & 0xFF;
       c5 = buffer[offset + 15] & 0xFF;
-      r6 = Utility.unsignedShort (buffer, offset + 16);
+      r6 = Utility.getShort (buffer, offset + 16);
       c6 = buffer[offset + 18] & 0xFF;
       r7 = buffer[offset + 19] & 0xFF;
       c7 = buffer[offset + 20] & 0xFF;
@@ -265,7 +265,7 @@ public class AppleworksSSFile extends AbstractFile
 
     public Row (int ptr)
     {
-      rowNumber = Utility.unsignedShort (buffer, ptr);
+      rowNumber = Utility.getShort (buffer, ptr);
       ptr += 2;                                   // first control byte
 
       int column = 0;

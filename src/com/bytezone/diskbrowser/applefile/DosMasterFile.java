@@ -44,22 +44,22 @@ public class DosMasterFile extends AbstractFile
     System.out.print ("\nFirst Block : ");
     for (int i = 0; i < 16; i += 2)
     {
-      System.out.printf ("%04X  ", Utility.unsignedShort (buffer, 0x40 + i));
+      System.out.printf ("%04X  ", Utility.getShort (buffer, 0x40 + i));
       if (i % 4 == 2)
         System.out.print (": ");
     }
 
     System.out.print ("\nLast Block  : ");
     for (int i = 0; i < 8; i += 2)
-      System.out.printf ("%04X        : ", Utility.unsignedShort (buffer, 0x50 + i));
+      System.out.printf ("%04X        : ", Utility.getShort (buffer, 0x50 + i));
 
     System.out.print ("\nImage Size  : ");
     for (int i = 0; i < 8; i += 2)
-      System.out.printf ("%04X        : ", Utility.unsignedShort (buffer, 0x58 + i));
+      System.out.printf ("%04X        : ", Utility.getShort (buffer, 0x58 + i));
 
     System.out.print ("\nAddress     : ");
     for (int i = 0; i < 8; i += 2)
-      System.out.printf ("%04X        : ", Utility.unsignedShort (buffer, 0x60 + i));
+      System.out.printf ("%04X        : ", Utility.getShort (buffer, 0x60 + i));
 
     System.out.println ();
     System.out.println ();
@@ -75,12 +75,12 @@ public class DosMasterFile extends AbstractFile
 
       int slot = (slotDrive & 0x70) >>> 4;
       int drive = ((slotDrive & 0x80) >>> 7) + 1;
-      int firstBlock = Utility.unsignedShort (buffer, 0x40 + i * 2);      // of first volume
+      int firstBlock = Utility.getShort (buffer, 0x40 + i * 2);      // of first volume
 
       int skip = i / 2 * 2;      // 0, 0, 2, 2, 4, 4, 6, 6 - same for both drives
 
-      int lastBlock = Utility.unsignedShort (buffer, 0x50 + skip);        // of last volume
-      int volSize = Utility.unsignedShort (buffer, 0x58 + skip);
+      int lastBlock = Utility.getShort (buffer, 0x50 + skip);        // of last volume
+      int volSize = Utility.getShort (buffer, 0x58 + skip);
 
       int originalFirstBlock = firstBlock;
       if (firstBlock > lastBlock)        // WTF?
@@ -176,9 +176,9 @@ public class DosMasterFile extends AbstractFile
       text.append (String.format ("Slot %d, Drive %d has", s / 16, dr + 1));
 
       int ptr = v0 + 2 * d0 + 2 * dr;
-      int st = Utility.unsignedShort (buffer, ptr);             // start block of first volume
-      int v = Utility.unsignedShort (buffer, size + d0);        // end block of last volume
-      int sz = Utility.unsignedShort (buffer, vsiz + d0);       // blocks per volume
+      int st = Utility.getShort (buffer, ptr);             // start block of first volume
+      int v = Utility.getShort (buffer, size + d0);        // end block of last volume
+      int sz = Utility.getShort (buffer, vsiz + d0);       // blocks per volume
 
       if (st > v)
         st -= 16 * 4096;

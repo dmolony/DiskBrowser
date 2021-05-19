@@ -84,7 +84,7 @@ public class ExoBuffer
       return false;
     }
 
-    int address = Utility.unsignedShort (buffer, buffer.length - 2);
+    int address = Utility.getShort (buffer, buffer.length - 2);
 
     if (address != 0x6000 && address != 0x8000 && address != 0xA000)
     {

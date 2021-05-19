@@ -72,37 +72,37 @@ public class QuickDrawFont extends CharacterList
 
     int ptr = nameLength + 1;         // start of header record
 
-    headerSize = Utility.unsignedShort (buffer, ptr);
+    headerSize = Utility.getShort (buffer, ptr);
     fontDefinitionOffset = nameLength + 1 + headerSize * 2;
 
-    fontFamily = Utility.unsignedShort (buffer, ptr + 2);
-    fontStyle = Utility.unsignedShort (buffer, ptr + 4);
-    fontSize = Utility.unsignedShort (buffer, ptr + 6);
+    fontFamily = Utility.getShort (buffer, ptr + 2);
+    fontStyle = Utility.getShort (buffer, ptr + 4);
+    fontSize = Utility.getShort (buffer, ptr + 6);
     versionMajor = buffer[ptr + 8] & 0xFF;
     versionMinor = buffer[ptr + 9] & 0xFF;
-    extent = Utility.unsignedShort (buffer, ptr + 10);
+    extent = Utility.getShort (buffer, ptr + 10);
 
     ptr = fontDefinitionOffset;
 
-    fontType = Utility.unsignedShort (buffer, ptr);
-    firstChar = Utility.unsignedShort (buffer, ptr + 2);
-    lastChar = Utility.unsignedShort (buffer, ptr + 4);
-    widMax = Utility.unsignedShort (buffer, ptr + 6);
+    fontType = Utility.getShort (buffer, ptr);
+    firstChar = Utility.getShort (buffer, ptr + 2);
+    lastChar = Utility.getShort (buffer, ptr + 4);
+    widMax = Utility.getShort (buffer, ptr + 6);
     kernMax = Utility.signedShort (buffer, ptr + 8);
     nDescent = Utility.signedShort (buffer, ptr + 10);
-    fRectWidth = Utility.unsignedShort (buffer, ptr + 12);
-    fRectHeight = Utility.unsignedShort (buffer, ptr + 14);
+    fRectWidth = Utility.getShort (buffer, ptr + 12);
+    fRectHeight = Utility.getShort (buffer, ptr + 14);
 
-    owTLoc = Utility.unsignedShort (buffer, ptr + 16);
+    owTLoc = Utility.getShort (buffer, ptr + 16);
 
     offsetWidthTableOffset = (ptr + 16) + owTLoc * 2;
     locationTableOffset = offsetWidthTableOffset - (lastChar - firstChar + 3) * 2;
     bitImageOffset = ptr + 26;
 
-    ascent = Utility.unsignedShort (buffer, ptr + 18);
-    descent = Utility.unsignedShort (buffer, ptr + 20);
-    leading = Utility.unsignedShort (buffer, ptr + 22);
-    rowWords = Utility.unsignedShort (buffer, ptr + 24);
+    ascent = Utility.getShort (buffer, ptr + 18);
+    descent = Utility.getShort (buffer, ptr + 20);
+    leading = Utility.getShort (buffer, ptr + 22);
+    rowWords = Utility.getShort (buffer, ptr + 24);
 
     totalCharacters = lastChar - firstChar + 2;       // includes 'missing' character
 
@@ -151,12 +151,12 @@ public class QuickDrawFont extends CharacterList
     for (int i = 0, max = totalCharacters + 1; i < max; i++)
     {
       // index into the strike
-      int location = Utility.unsignedShort (buffer, locationTableOffset + i * 2);
+      int location = Utility.getShort (buffer, locationTableOffset + i * 2);
 
       int j = i + 1;      // next character
       if (j < max)
       {
-        int nextLocation = Utility.unsignedShort (buffer, locationTableOffset + j * 2);
+        int nextLocation = Utility.getShort (buffer, locationTableOffset + j * 2);
         int pixelWidth = nextLocation - location;
 
         if (pixelWidth > 0)
@@ -259,9 +259,8 @@ public class QuickDrawFont extends CharacterList
       if (offset == 255 && width == 255)
         continue;
 
-      int location = Utility.unsignedShort (buffer, locationTableOffset + i * 2);
-      int nextLocation =
-          Utility.unsignedShort (buffer, locationTableOffset + (i + 1) * 2);
+      int location = Utility.getShort (buffer, locationTableOffset + i * 2);
+      int nextLocation = Utility.getShort (buffer, locationTableOffset + (i + 1) * 2);
       int pixelWidth = nextLocation - location;
 
       text.append (String.format (

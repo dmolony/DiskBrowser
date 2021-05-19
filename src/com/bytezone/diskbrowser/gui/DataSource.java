@@ -17,4 +17,6 @@ public interface DataSource
   public BufferedImage getImage ();
 
   public JComponent getComponent ();
+
+  public byte[] getBuffer ();
 }

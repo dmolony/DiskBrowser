@@ -29,16 +29,16 @@ public class IconFile extends AbstractFile implements ProdosConstants
   {
     super (name, buffer);
 
-    iBlkNext = Utility.unsignedLong (buffer, 0);
-    iBlkID = Utility.unsignedShort (buffer, 4);
-    iBlkPath = Utility.unsignedLong (buffer, 6);
+    iBlkNext = Utility.getLong (buffer, 0);
+    iBlkID = Utility.getShort (buffer, 4);
+    iBlkPath = Utility.getLong (buffer, 6);
     iBlkName = HexFormatter.getHexString (buffer, 10, 16);
 
     int ptr = 26;
 
     while (true)
     {
-      int dataLen = Utility.unsignedShort (buffer, ptr);
+      int dataLen = Utility.getShort (buffer, ptr);
       if (dataLen == 0 || (dataLen + ptr) > buffer.length)
         break;
 
@@ -131,7 +131,7 @@ public class IconFile extends AbstractFile implements ProdosConstants
     public Icon (byte[] fullBuffer, int ptr)
     // -------------------------------------------------------------------------------//
     {
-      iDataLen = Utility.unsignedShort (fullBuffer, ptr);
+      iDataLen = Utility.getShort (fullBuffer, ptr);
 
       buffer = new byte[iDataLen];
       System.arraycopy (fullBuffer, ptr, buffer, 0, buffer.length);
@@ -142,8 +142,8 @@ public class IconFile extends AbstractFile implements ProdosConstants
       len = buffer[66] & 0xFF;
       dataName = new String (buffer, 67, len);
 
-      iDataType = Utility.unsignedShort (buffer, 82);
-      iDataAux = Utility.unsignedShort (buffer, 84);
+      iDataType = Utility.getShort (buffer, 82);
+      iDataAux = Utility.getShort (buffer, 84);
 
       if (debug)
       {
@@ -200,10 +200,10 @@ public class IconFile extends AbstractFile implements ProdosConstants
     public Image (byte[] buffer, int ptr) throws InvalidImageException
     // -------------------------------------------------------------------------------//
     {
-      iconType = Utility.unsignedShort (buffer, ptr);
-      iconSize = Utility.unsignedShort (buffer, ptr + 2);
-      iconHeight = Utility.unsignedShort (buffer, ptr + 4);
-      iconWidth = Utility.unsignedShort (buffer, ptr + 6);
+      iconType = Utility.getShort (buffer, ptr);
+      iconSize = Utility.getShort (buffer, ptr + 2);
+      iconHeight = Utility.getShort (buffer, ptr + 4);
+      iconWidth = Utility.getShort (buffer, ptr + 6);
 
       if (debug)
       {

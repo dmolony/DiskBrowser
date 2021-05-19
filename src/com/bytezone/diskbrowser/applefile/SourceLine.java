@@ -2,7 +2,7 @@ package com.bytezone.diskbrowser.applefile;
 
 import static com.bytezone.diskbrowser.utilities.Utility.ASCII_COLON;
 import static com.bytezone.diskbrowser.utilities.Utility.ASCII_QUOTE;
-import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
+import static com.bytezone.diskbrowser.utilities.Utility.getShort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ public class SourceLine implements ApplesoftConstants
     this.buffer = buffer;
 
     linePtr = ptr;
-    linkField = unsignedShort (buffer, ptr);
-    lineNumber = unsignedShort (buffer, ptr + 2);
+    linkField = getShort (buffer, ptr);
+    lineNumber = getShort (buffer, ptr + 2);
 
     int startPtr = ptr += 4;              // skip link field and lineNumber
     boolean inString = false;             // can toggle

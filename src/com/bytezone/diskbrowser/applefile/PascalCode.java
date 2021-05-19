@@ -47,7 +47,7 @@ public class PascalCode extends AbstractFile
     for (int i = 0; i < 16; i++)
     {
       String codeName = HexFormatter.getString (buffer, 0x40 + i * 8, 8).trim ();
-      int size = Utility.unsignedShort (buffer, i * 4 + 2);
+      int size = Utility.getShort (buffer, i * 4 + 2);
       if (codeName.length () == 0 && size > 0)
         codeName = "<NULL" + ++nonameCounter + ">";
       if (size > 0)

@@ -24,8 +24,8 @@ public class VolumeDirectoryHeader extends DirectoryHeader
   {
     super (parentDisk, entryBuffer, 2, 1);
 
-    bitMapBlock = Utility.unsignedShort (entryBuffer, 35);
-    totalBlocks = Utility.unsignedShort (entryBuffer, 37);
+    bitMapBlock = Utility.getShort (entryBuffer, 35);
+    totalBlocks = Utility.getShort (entryBuffer, 37);
 
     totalBitMapBlocks = (totalBlocks - 1) / BLOCK_SIZE + 1;
 
@@ -34,7 +34,7 @@ public class VolumeDirectoryHeader extends DirectoryHeader
     {
       dataBlocks.add (disk.getDiskAddress (block));
       byte[] buffer = disk.readBlock (block);
-      block = Utility.unsignedShort (buffer, 2);
+      block = Utility.getShort (buffer, 2);
     } while (block > 0);
 
     // convert the Free Sector Table
@@ -88,7 +88,7 @@ public class VolumeDirectoryHeader extends DirectoryHeader
     {
       byte[] buf = disk.readBlock (block);
       blockList.add (buf);
-      block = Utility.unsignedShort (buf, 2);              // next block
+      block = Utility.getShort (buf, 2);              // next block
     } while (block > 0);
 
     byte[] fullBuffer = new byte[blockList.size () * 507];

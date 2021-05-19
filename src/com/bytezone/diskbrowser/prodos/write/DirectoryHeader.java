@@ -4,8 +4,8 @@ import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRIES_PER_BLOCK;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.ENTRY_SIZE;
 import static com.bytezone.diskbrowser.utilities.Utility.getAppleDate;
+import static com.bytezone.diskbrowser.utilities.Utility.getShort;
 import static com.bytezone.diskbrowser.utilities.Utility.putAppleDate;
-import static com.bytezone.diskbrowser.utilities.Utility.unsignedShort;
 import static com.bytezone.diskbrowser.utilities.Utility.writeShort;
 
 import java.time.LocalDateTime;
@@ -52,7 +52,7 @@ public class DirectoryHeader
     access = buffer[ptr + 0x1E];
     entryLength = buffer[ptr + 0x1F];
     entriesPerBlock = buffer[ptr + 0x20];
-    fileCount = unsignedShort (buffer, ptr + 0x21);
+    fileCount = getShort (buffer, ptr + 0x21);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -98,7 +98,7 @@ public class DirectoryHeader
 
         ptr += ENTRY_SIZE;
       }
-      blockNo = unsignedShort (buffer, offset + 2);
+      blockNo = getShort (buffer, offset + 2);
     } while (blockNo > 0);
     System.out.println ();
   }

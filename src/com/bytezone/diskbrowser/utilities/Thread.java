@@ -40,11 +40,11 @@ class Thread
   public Thread (byte[] buffer, int offset, int dataOffset)
   // ---------------------------------------------------------------------------------//
   {
-    threadClass = Utility.getWord (buffer, offset);
-    threadFormat = Utility.getWord (buffer, offset + 2);
-    threadKind = Utility.getWord (buffer, offset + 4);
+    threadClass = Utility.getShort (buffer, offset);
+    threadFormat = Utility.getShort (buffer, offset + 2);
+    threadKind = Utility.getShort (buffer, offset + 4);
 
-    threadCrc = Utility.getWord (buffer, offset + 6);
+    threadCrc = Utility.getShort (buffer, offset + 6);
     uncompressedEOF = Utility.getLong (buffer, offset + 8);
     compressedEOF = Utility.getLong (buffer, offset + 12);
 

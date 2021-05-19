@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.applefile.ApplesoftBasicProgram;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.applefile.BasicProgramGS;
@@ -30,7 +31,6 @@ import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PascalArea;
 import com.bytezone.diskbrowser.applefile.ProdosDirectory;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
-import com.bytezone.diskbrowser.applefile.ResourceFork;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.applefile.Selector;
@@ -62,6 +62,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private final int headerPointer;
   private DataSource file;
   private final DiskAddress catalogBlock;
+  private ResourceFork resourceFork;
 
   private DiskAddress masterIndexBlock;
   private final List<DiskAddress> indexBlocks = new ArrayList<> ();
@@ -81,13 +82,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     this.catalogBlock = this.disk.getDiskAddress (parentBlock);
 
     fileType = entryBuffer[0x10] & 0xFF;
-    keyPtr = Utility.unsignedShort (entryBuffer, 0x11);
-    blocksUsed = Utility.unsignedShort (entryBuffer, 0x13);
+    keyPtr = Utility.getShort (entryBuffer, 0x11);
+    blocksUsed = Utility.getShort (entryBuffer, 0x13);
     endOfFile = Utility.intValue (entryBuffer[21], entryBuffer[22], entryBuffer[23]);
 
-    auxType = Utility.unsignedShort (entryBuffer, 0x1F);
+    auxType = Utility.getShort (entryBuffer, 0x1F);
     modified = Utility.getAppleDate (entryBuffer, 0x21);
-    headerPointer = Utility.unsignedShort (entryBuffer, 0x25);
+    headerPointer = Utility.getShort (entryBuffer, 0x25);
 
     switch (storageType)
     {
@@ -110,7 +111,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
             break;
           dataBlocks.add (diskAddress);
           byte[] buffer = disk.readBlock (block);
-          block = Utility.unsignedShort (buffer, 2);
+          block = Utility.getShort (buffer, 2);
         } while (block > 0);
         break;
 
@@ -140,7 +141,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     for (int i = 0; i < 512; i += 256)
     {
       int storageType = buffer2[i] & 0x0F;
-      int keyBlock = Utility.unsignedShort (buffer2, i + 1);
+      int keyBlock = Utility.getShort (buffer2, i + 1);
       int eof = Utility.readTriple (buffer2, i + 3);
 
       if (i < 256)
@@ -149,7 +150,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         addDataBlocks (storageType, keyBlock, resourceBlocks);
     }
 
-    ResourceFork fork = new ResourceFork (disk.readBlocks (resourceBlocks));
+    resourceFork = new ResourceFork (disk.readBlocks (resourceBlocks));
+
+    if (!resourceFork.isValid ())
+      System.out.printf ("Invalid Resource Fork: %s%n", name);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -553,6 +557,9 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       file = new ErrorMessageFile (name, buffer, e);
       e.printStackTrace ();
     }
+
+    if (resourceFork != null)
+      ((AbstractFile) file).setResourceFork (resourceFork);
 
     return file;
   }

@@ -9,20 +9,20 @@ import java.nio.file.StandardOpenOption;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import com.bytezone.diskbrowser.applefile.AppleFileSource;
 import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
-// -----------------------------------------------------------------------------------//
+class SaveSingleFileAction extends DefaultAction
+//-----------------------------------------------------------------------------------//
 {
-  SectorSelectedEvent event;
+  AppleFileSource appleFileSource;
 
   // ---------------------------------------------------------------------------------//
-  SaveSectorsAction ()
+  SaveSingleFileAction ()
   // ---------------------------------------------------------------------------------//
   {
-    super ("Save sectors...", "Save currently selected sectors");
-    this.setEnabled (false);
+    super ("Save file...", "Save currently selected file");
   }
 
   // ---------------------------------------------------------------------------------//
@@ -30,23 +30,23 @@ class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
   public void actionPerformed (ActionEvent evt)
   // ---------------------------------------------------------------------------------//
   {
-    if (event == null)
+    if (appleFileSource == null)
     {
-      System.out.println ("No sectors");
+      System.out.println ("No data source");
       return;
     }
-    byte[] buffer = event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
 
     JFileChooser fileChooser = new JFileChooser ();
-    fileChooser.setDialogTitle ("Save sectors");
-    fileChooser.setSelectedFile (new File ("saved-" + buffer.length + ".bin"));
+    fileChooser.setDialogTitle ("Save File");
+    fileChooser.setSelectedFile (new File (appleFileSource.getUniqueName () + ".bin"));
 
     if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
     {
       File file = fileChooser.getSelectedFile ();
       try
       {
-        Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
+        Files.write (file.toPath (), appleFileSource.getDataSource ().getBuffer (),
+            StandardOpenOption.CREATE_NEW);
         JOptionPane.showMessageDialog (null, "File saved");
       }
       catch (IOException e)
@@ -57,11 +57,9 @@ class SaveSectorsAction extends DefaultAction implements SectorSelectionListener
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
-  public void sectorSelected (SectorSelectedEvent event)
+  void setFile (AppleFileSource dataSource)
   // ---------------------------------------------------------------------------------//
   {
-    this.event = event;
-    this.setEnabled (true);
+    this.appleFileSource = dataSource;
   }
 }

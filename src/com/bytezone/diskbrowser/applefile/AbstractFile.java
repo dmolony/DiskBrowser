@@ -6,6 +6,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.prodos.ResourceFork;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
@@ -19,6 +20,7 @@ public abstract class AbstractFile implements DataSource
   protected AssemblerProgram assembler;
   protected BufferedImage image;
   protected int loadAddress;
+  ResourceFork resourceFork;
 
   // ---------------------------------------------------------------------------------//
   public AbstractFile (String name, byte[] buffer)
@@ -37,10 +39,25 @@ public abstract class AbstractFile implements DataSource
   }
 
   // ---------------------------------------------------------------------------------//
+  @Override
+  public byte[] getBuffer ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return buffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
   public static void setDefaultDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {
     showDebugText = value;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void setResourceFork (ResourceFork resourceFork)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.resourceFork = resourceFork;
   }
 
   // ---------------------------------------------------------------------------------//

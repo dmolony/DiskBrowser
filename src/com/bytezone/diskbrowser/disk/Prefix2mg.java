@@ -33,8 +33,8 @@ public class Prefix2mg
   {
     prefix = new String (buffer, 0, 4);
     creator = new String (buffer, 4, 4);
-    headerSize = Utility.getWord (buffer, 0x08);
-    version = Utility.getWord (buffer, 0x0A);
+    headerSize = Utility.getShort (buffer, 0x08);
+    version = Utility.getShort (buffer, 0x0A);
     format = Utility.getLong (buffer, 0x0C);
     flags = Utility.getLong (buffer, 0x10);
     blocks = Utility.getLong (buffer, 0x14);       // 1600

@@ -23,7 +23,7 @@ class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.Monster
 
     int p = 0;
     int nextBlock = buffer[p] & 0xFF;
-    int nextOffset = Utility.getWord (buffer, 256);
+    int nextOffset = Utility.getShort (buffer, 256);
 
     Monster monster = new Monster (p + 1);
     monsters.add (monster);
@@ -39,12 +39,12 @@ class Wiz5Monsters extends AbstractFile implements Iterable<Wiz5Monsters.Monster
       if (buffer[ndx] != (byte) 0)
       {
         nextBlock = buffer[ndx] & 0xFF;
-        nextOffset = Utility.getWord (buffer, ndx + 1);
+        nextOffset = Utility.getShort (buffer, ndx + 1);
       }
       else
       {
         nextBlock = buffer[++p] & 0xFF;
-        nextOffset = Utility.getWord (buffer, p * 2 + 256);
+        nextOffset = Utility.getShort (buffer, p * 2 + 256);
         createMonster = true;
       }
 

@@ -99,10 +99,10 @@ public class SHRPictureFile2 extends HiResImage
         unpack (buffer, 0, buffer.length, newBuffer, 0);
         buffer = newBuffer;
 
-        int mode = Utility.unsignedShort (this.buffer, 0);
-        int rect1 = Utility.unsignedLong (this.buffer, 2);
-        int rect2 = Utility.unsignedLong (this.buffer, 6);
-        int version = Utility.unsignedShort (this.buffer, 10);    // $8211
+        int mode = Utility.getShort (this.buffer, 0);
+        int rect1 = Utility.getLong (this.buffer, 2);
+        int rect2 = Utility.getLong (this.buffer, 6);
+        int version = Utility.getShort (this.buffer, 10);    // $8211
 
         break;
 
@@ -154,13 +154,13 @@ public class SHRPictureFile2 extends HiResImage
   private void doAnimation ()
   // ---------------------------------------------------------------------------------//
   {
-    //    int len = HexFormatter.unsignedLong (buffer, 0x8000);
-    delay = Utility.unsignedLong (buffer, 0x8004);
+    //    int len = HexFormatter.getLong (buffer, 0x8000);
+    delay = Utility.getLong (buffer, 0x8004);
     if (delay > 60)
       delay = 10;
     delay = delay * 1000 / 60;
 
-    //    int offset = HexFormatter.unsignedLong (buffer, 0x8008);
+    //    int offset = HexFormatter.getLong (buffer, 0x8008);
     //    int blockLen = eof - 0x8008;
 
     //    System.out.printf ("Delay: %,d%n", delay);
@@ -173,7 +173,7 @@ public class SHRPictureFile2 extends HiResImage
     int start = ptr;
     while (ptr < buffer.length)
     {
-      int off = Utility.unsignedShort (buffer, ptr);
+      int off = Utility.getShort (buffer, ptr);
 
       ptr += 4;
       if (off == 0)
@@ -299,7 +299,7 @@ public class SHRPictureFile2 extends HiResImage
 
     while (true)
     {
-      int offset = Utility.unsignedShort (buffer, ptr);
+      int offset = Utility.getShort (buffer, ptr);
       if (offset == 0)
         break;
 

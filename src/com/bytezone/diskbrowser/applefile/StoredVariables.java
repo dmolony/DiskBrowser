@@ -26,10 +26,10 @@ public class StoredVariables extends AbstractFile
     int strPtr = buffer.length;
 
     text.append ("File length  : " + HexFormatter.format4 (buffer.length));
-    int totalLength = Utility.unsignedShort (buffer, 0);
+    int totalLength = Utility.getShort (buffer, 0);
     text.append ("\nTotal length : " + HexFormatter.format4 (totalLength));
 
-    int varLength = Utility.unsignedShort (buffer, 2);
+    int varLength = Utility.getShort (buffer, 2);
     text.append ("\nVar length   : " + HexFormatter.format4 (varLength));
     text.append ("\n\n");
 
@@ -133,7 +133,7 @@ public class StoredVariables extends AbstractFile
     {
       String variableName = getVariableName (buffer[ptr], buffer[ptr + 1]);
       text.append ("\n");
-      int offset = Utility.unsignedShort (buffer, ptr + 2);
+      int offset = Utility.getShort (buffer, ptr + 2);
       int dimensions = buffer[ptr + 4] & 0xFF;
       int[] dimensionSizes = new int[dimensions];
       int totalElements = 0;
@@ -212,10 +212,10 @@ public class StoredVariables extends AbstractFile
     StringBuffer text = new StringBuffer ();
 
     text.append ("File length  : " + HexFormatter.format4 (buffer.length));
-    int totalLength = Utility.unsignedShort (buffer, 0);
+    int totalLength = Utility.getShort (buffer, 0);
     text.append ("\nTotal length : " + HexFormatter.format4 (totalLength));
 
-    int varLength = Utility.unsignedShort (buffer, 2);
+    int varLength = Utility.getShort (buffer, 2);
     text.append ("\nVar length   : " + HexFormatter.format4 (varLength));
 
     int unknown = buffer[4] & 0xFF;
@@ -232,7 +232,7 @@ public class StoredVariables extends AbstractFile
     text.append ("\nArrays : \n\n");
     while (ptr < totalLength + 5)
     {
-      int offset = Utility.unsignedShort (buffer, ptr + 2);
+      int offset = Utility.getShort (buffer, ptr + 2);
       int dimensions = buffer[ptr + 4] & 0xFF;
       int[] dimensionSizes = new int[dimensions];
       int totalElements = 0;

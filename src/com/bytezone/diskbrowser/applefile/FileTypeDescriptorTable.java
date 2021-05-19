@@ -28,11 +28,11 @@ public class FileTypeDescriptorTable extends AbstractFile
 
     versionMajor = buffer[0] & 0xFF;
     versionMinor = buffer[1] & 0xFF;
-    flags = Utility.unsignedShort (buffer, 2);
-    numEntries = Utility.unsignedShort (buffer, 4);
-    spareWord = Utility.unsignedShort (buffer, 6);
-    indexRecordSize = Utility.unsignedShort (buffer, 8);
-    offsetToIdx = Utility.unsignedShort (buffer, 10);
+    flags = Utility.getShort (buffer, 2);
+    numEntries = Utility.getShort (buffer, 4);
+    spareWord = Utility.getShort (buffer, 6);
+    indexRecordSize = Utility.getShort (buffer, 8);
+    offsetToIdx = Utility.getShort (buffer, 10);
 
     int ptr = offsetToIdx;
     for (int i = 0; i < numEntries; i++)
@@ -80,10 +80,10 @@ public class FileTypeDescriptorTable extends AbstractFile
 
     public IndexRecord (byte[] buffer, int offset)
     {
-      fileType = Utility.unsignedShort (buffer, offset);
-      auxType = Utility.unsignedLong (buffer, offset + 2);
-      flags = Utility.unsignedShort (buffer, offset + 6);
-      this.offset = Utility.unsignedShort (buffer, offset + 8);
+      fileType = Utility.getShort (buffer, offset);
+      auxType = Utility.getLong (buffer, offset + 2);
+      flags = Utility.getShort (buffer, offset + 6);
+      this.offset = Utility.getShort (buffer, offset + 8);
       string = HexFormatter.getPascalString (buffer, this.offset);
     }
 

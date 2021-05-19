@@ -620,15 +620,15 @@ public abstract class HiResImage extends AbstractFile
       return false;
 
     String text = new String (buffer, 0, 2);
-    int size = Utility.unsignedLong (buffer, 2);
+    int size = Utility.getLong (buffer, 2);
 
     if (false)
     {
-      int empty = Utility.unsignedLong (buffer, 6);
-      int offset = Utility.unsignedLong (buffer, 10);
-      int header = Utility.unsignedLong (buffer, 14);
-      int width = Utility.unsignedLong (buffer, 18);
-      int height = Utility.unsignedLong (buffer, 22);
+      int empty = Utility.getLong (buffer, 6);
+      int offset = Utility.getLong (buffer, 10);
+      int header = Utility.getLong (buffer, 14);
+      int width = Utility.getLong (buffer, 18);
+      int height = Utility.getLong (buffer, 22);
 
       System.out.println (buffer.length);
       System.out.println (size);
@@ -800,7 +800,7 @@ public abstract class HiResImage extends AbstractFile
     public ColorEntry (byte[] data, int offset)
     // -------------------------------------------------------------------------------//
     {
-      value = Utility.unsignedShort (data, offset);
+      value = Utility.getShort (data, offset);
 
       int red = ((value >> 8) & 0x0f) * 17;
       int green = ((value >> 4) & 0x0f) * 17;
@@ -829,8 +829,8 @@ public abstract class HiResImage extends AbstractFile
     public DirEntry (byte[] data, int offset)
     // -------------------------------------------------------------------------------//
     {
-      numBytes = Utility.unsignedShort (data, offset);
-      mode = Utility.unsignedShort (data, offset + 2);
+      numBytes = Utility.getShort (data, offset);
+      mode = Utility.getShort (data, offset + 2);
     }
 
     // -------------------------------------------------------------------------------//

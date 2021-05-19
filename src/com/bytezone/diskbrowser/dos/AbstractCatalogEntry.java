@@ -67,7 +67,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     this.catalogSectorDA = catalogSector;
 
     name = getName ("", entryBuffer);
-    reportedSize = Utility.unsignedShort (entryBuffer, 33);
+    reportedSize = Utility.getShort (entryBuffer, 33);
 
     int type = entryBuffer[2] & 0x7F;
     locked = (entryBuffer[2] & 0x80) != 0;
@@ -234,14 +234,14 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           break;
 
         case IntegerBasic:
-          reportedLength = Utility.unsignedShort (buffer, 0);
+          reportedLength = Utility.getShort (buffer, 0);
           exactBuffer = new byte[reportedLength];
           System.arraycopy (buffer, 2, exactBuffer, 0, reportedLength);
           appleFile = new IntegerBasicProgram (name, exactBuffer);
           break;
 
         case ApplesoftBasic:
-          reportedLength = Utility.unsignedShort (buffer, 0);
+          reportedLength = Utility.getShort (buffer, 0);
           exactBuffer = new byte[reportedLength];
           if (reportedLength > buffer.length)
             reportedLength = buffer.length - 2;
@@ -252,8 +252,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
         case Binary:                        // binary file
         case Relocatable:                   // relocatable binary file
         case BB:
-          int loadAddress = Utility.unsignedShort (buffer, 0);
-          reportedLength = Utility.unsignedShort (buffer, 2);
+          int loadAddress = Utility.getShort (buffer, 0);
+          reportedLength = Utility.getShort (buffer, 2);
           if (reportedLength == 0)
           {
             System.out.println (name.trim () + " reported length : 0 - reverting to "
@@ -359,7 +359,7 @@ abstract class AbstractCatalogEntry implements AppleFileSource
   {
     byte[] exactBuffer;
 
-    int reportedLength = Utility.unsignedShort (buffer, 2);
+    int reportedLength = Utility.getShort (buffer, 2);
     if (reportedLength == 0)
     {
       System.out.println (

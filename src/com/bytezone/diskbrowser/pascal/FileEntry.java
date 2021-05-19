@@ -26,7 +26,7 @@ public class FileEntry extends CatalogEntry
   {
     super (parent, buffer);
 
-    bytesUsedInLastBlock = Utility.unsignedShort (buffer, 22);
+    bytesUsedInLastBlock = Utility.getShort (buffer, 22);
     date = HexFormatter.getPascalDate (buffer, 24);
 
     int max = Math.min (lastBlock, parent.getDisk ().getTotalBlocks ());

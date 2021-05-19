@@ -35,7 +35,7 @@ class DosVTOCSector extends AbstractSector
     direction = buffer[49];
     maxTracks = buffer[52] & 0xFF;
     maxSectors = buffer[53] & 0xFF;
-    sectorSize = Utility.unsignedShort (buffer, 54);
+    sectorSize = Utility.getShort (buffer, 54);
 
     flagSectors ();
   }

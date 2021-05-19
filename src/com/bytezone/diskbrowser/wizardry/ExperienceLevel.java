@@ -22,9 +22,9 @@ class ExperienceLevel extends AbstractFile
       if (buffer[ptr] == 0)
         break;
 
-      long points = Utility.unsignedShort (buffer, ptr)
-          + Utility.unsignedShort (buffer, ptr + 2) * 10000
-          + Utility.unsignedShort (buffer, ptr + 4) * 100000000L;
+      long points =
+          Utility.getShort (buffer, ptr) + Utility.getShort (buffer, ptr + 2) * 10000
+              + Utility.getShort (buffer, ptr + 4) * 100000000L;
       expLevels[seq++] = points;
     }
   }

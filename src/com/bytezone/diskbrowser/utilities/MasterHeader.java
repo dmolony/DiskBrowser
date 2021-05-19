@@ -38,6 +38,7 @@ class MasterHeader
       //        bin2 = true;
       //        break;
       //      }
+
       if (isBin2 (buffer, ptr))
       {
         binary2Header = new Binary2Header (buffer, 0);
@@ -56,15 +57,16 @@ class MasterHeader
         }
       }
 
+      System.out.println (HexFormatter.format (buffer, 0, 256));
       throw new FileFormatException ("NuFile not found");
     }
 
-    crc = Utility.getWord (buffer, ptr + 6);
+    crc = Utility.getShort (buffer, ptr + 6);
     totalRecords = Utility.getLong (buffer, ptr + 8);
     created = new DateTime (buffer, ptr + 12);
     modified = new DateTime (buffer, ptr + 20);
-    version = Utility.getWord (buffer, ptr + 28);
-    reserved = Utility.getWord (buffer, ptr + 30);
+    version = Utility.getShort (buffer, ptr + 28);
+    reserved = Utility.getShort (buffer, ptr + 30);
     eof = Utility.getLong (buffer, ptr + 38);
 
     //    assert reserved == 0;

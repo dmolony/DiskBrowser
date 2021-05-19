@@ -39,19 +39,18 @@ class Character extends AbstractFile
     stats.race = races[buffer[34] & 0xFF];
     stats.typeInt = buffer[36] & 0xFF;
     stats.type = types[stats.typeInt];
-    stats.ageInWeeks = Utility.unsignedShort (buffer, 38);
+    stats.ageInWeeks = Utility.getShort (buffer, 38);
     stats.statusValue = buffer[40];
     stats.status = statuses[stats.statusValue];
     stats.alignment = alignments[buffer[42] & 0xFF];
 
-    stats.gold =
-        Utility.unsignedShort (buffer, 52) + Utility.unsignedShort (buffer, 54) * 10000;
+    stats.gold = Utility.getShort (buffer, 52) + Utility.getShort (buffer, 54) * 10000;
     stats.experience =
-        Utility.unsignedShort (buffer, 124) + Utility.unsignedShort (buffer, 126) * 10000;
-    stats.level = Utility.unsignedShort (buffer, 132);
+        Utility.getShort (buffer, 124) + Utility.getShort (buffer, 126) * 10000;
+    stats.level = Utility.getShort (buffer, 132);
 
-    stats.hitsLeft = Utility.unsignedShort (buffer, 134);
-    stats.hitsMax = Utility.unsignedShort (buffer, 136);
+    stats.hitsLeft = Utility.getShort (buffer, 134);
+    stats.hitsMax = Utility.getShort (buffer, 136);
     stats.armourClass = buffer[176];
 
     attributes.strength = (buffer[44] & 0xFF) % 16;

@@ -59,6 +59,9 @@ public class DiskFactory
     if (debug)
       System.out.println ("\nFactory : " + pathName);
 
+    nuFX = null;
+    binary2 = null;
+
     File file = new File (pathName);
     if (!file.exists ())
       return null;
@@ -168,9 +171,12 @@ public class DiskFactory
       catch (Exception e)
       {
         //        e.printStackTrace ();
-        System.out.println (e.getMessage ());
+        if (e.getMessage () == null)
+          System.out.println (e);
+        else
+          System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
-        System.out.println (nuFX);
+        //        System.out.println (nuFX);
         return null;
       }
     }
@@ -198,7 +204,7 @@ public class DiskFactory
         //        e.printStackTrace ();
         System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
-        System.out.println (binary2);
+        //        System.out.println (binary2);
         return null;
       }
     }
@@ -705,6 +711,7 @@ public class DiskFactory
     catch (Exception e)
     {
       System.out.println (e);
+      e.printStackTrace ();
       System.out.println ("Prodos hard disk had error");
     }
 

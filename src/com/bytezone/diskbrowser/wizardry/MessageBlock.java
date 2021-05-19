@@ -23,14 +23,14 @@ class MessageBlock extends AbstractFile implements Iterable<MessageDataBlock>
   {
     super ("bollocks", buffer);
 
-    indexOffset = Utility.getWord (buffer, 0);
-    indexLength = Utility.getWord (buffer, 2);
+    indexOffset = Utility.getShort (buffer, 0);
+    indexLength = Utility.getShort (buffer, 2);
 
     int ptr = indexOffset * 512;
 
     for (int i = 0, max = indexLength / 2; i < max; i++)
     {
-      int firstMessageNo = Utility.getWord (buffer, ptr + i * 2);
+      int firstMessageNo = Utility.getShort (buffer, ptr + i * 2);
       byte[] data = new byte[512];
       System.arraycopy (buffer, i * 512, data, 0, data.length);
       MessageDataBlock messageDataBlock = new MessageDataBlock (

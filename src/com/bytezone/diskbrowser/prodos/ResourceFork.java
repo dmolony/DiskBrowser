@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.applefile;
+package com.bytezone.diskbrowser.prodos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,14 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class ResourceFork
 // -----------------------------------------------------------------------------------//
 {
+  private static String[] resourceTypes =
+      { "", "rIcon", "rPicture", "rControlList", "rControlTemplate", "rC1InputString",
+        "rPString", "rStringList", "rMenuBar", "rMenu", "rMenuItem", "rTextForLETextBox2",
+        "", "rCt1lColorTbl", "rWindParaml", "rWindParam2", "rWindColor", "rTextBlock",
+        "rStyleBlock", "rToolStartup", "rResName", "rAlertString", "rText", "", "", "",
+        "rTwoRects", "", "rListRef", "rcString", "", "", "rErrorString", "rKTransTable",
+        "", "rCloutputString", "", "rTERuler", "", "", "", "", "" };
+
   byte[] buffer;
   ResourceFileHeader resourceFileHeader;
 
@@ -20,7 +28,19 @@ public class ResourceFork
     this.buffer = buffer;
 
     resourceFileHeader = new ResourceFileHeader (buffer);
-    System.out.println (resourceFileHeader);
+  }
+
+  public boolean isValid ()
+  {
+    return resourceFileHeader.resourceMap != null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return resourceFileHeader.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -40,7 +60,8 @@ public class ResourceFork
       fileToMap = Utility.getLong (buffer, 4);
       fileMapSize = Utility.getLong (buffer, 8);
 
-      resourceMap = new ResourceMap (buffer, fileToMap, fileMapSize);
+      if (fileVersion == 0)
+        resourceMap = new ResourceMap (buffer, fileToMap, fileMapSize);
     }
 
     // -------------------------------------------------------------------------------//
@@ -83,17 +104,23 @@ public class ResourceFork
     {
       int offset = ptr;
 
+      if (ptr > buffer.length)
+      {
+        System.out.println ("bad");
+        return;
+      }
+
       mapNext = Utility.getLong (buffer, ptr);
-      mapFlags = Utility.getWord (buffer, ptr + 4);
+      mapFlags = Utility.getShort (buffer, ptr + 4);
       mapOffset = Utility.getLong (buffer, ptr + 6);
       mapSize = Utility.getLong (buffer, ptr + 10);
-      mapToIndex = Utility.getWord (buffer, ptr + 14);
-      mapFileNum = Utility.getWord (buffer, ptr + 16);
-      mapId = Utility.getWord (buffer, ptr + 18);
+      mapToIndex = Utility.getShort (buffer, ptr + 14);
+      mapFileNum = Utility.getShort (buffer, ptr + 16);
+      mapId = Utility.getShort (buffer, ptr + 18);
       mapIndexSize = Utility.getLong (buffer, ptr + 20);
       mapIndexUsed = Utility.getLong (buffer, ptr + 24);
-      mapFreeListSize = Utility.getWord (buffer, ptr + 28);
-      mapFreeListUsed = Utility.getWord (buffer, ptr + 30);
+      mapFreeListSize = Utility.getShort (buffer, ptr + 28);
+      mapFreeListUsed = Utility.getShort (buffer, ptr + 30);
 
       ptr = offset + 32;
       for (int i = 0; i < mapFreeListUsed; i++)
@@ -188,10 +215,10 @@ public class ResourceFork
     public ResourceReferenceRecord (byte[] buffer, int ptr)
     // -------------------------------------------------------------------------------//
     {
-      resType = Utility.getWord (buffer, ptr);
+      resType = Utility.getShort (buffer, ptr);
       resId = Utility.getLong (buffer, ptr + 2);
       resOffset = Utility.getLong (buffer, ptr + 6);
-      resAttr = Utility.getWord (buffer, ptr + 10);
+      resAttr = Utility.getShort (buffer, ptr + 10);
       resSize = Utility.getLong (buffer, ptr + 12);
       resHandle = Utility.getLong (buffer, ptr + 16);
 
@@ -206,7 +233,13 @@ public class ResourceFork
     {
       StringBuilder text = new StringBuilder ();
 
-      text.append (String.format ("Type .......... %04X%n", resType));
+      String resourceTypeText = "";
+      int index = resType & 0xFF;
+      if (resType > 0x8000 && index < resourceTypes.length)
+        resourceTypeText = resourceTypes[index];
+
+      text.append (
+          String.format ("Type .......... %04X  %s%n", resType, resourceTypeText));
       text.append (String.format ("ID ............ %04X  %<d%n", resId));
       text.append (String.format ("Offset ........ %04X  %<d%n", resOffset));
       text.append (String.format ("Attr .......... %04X  %<d%n", resAttr));

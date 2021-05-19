@@ -82,7 +82,7 @@ class DosTSListSector extends AbstractSector
     addText (text, buffer, 7, 4, "Not used");
     addText (text, buffer, 11, 1, "Not used");
 
-    int sectorBase = Utility.unsignedShort (buffer, 5);
+    int sectorBase = Utility.getShort (buffer, 5);
 
     for (int i = 12; i <= 255; i += 2)
     {

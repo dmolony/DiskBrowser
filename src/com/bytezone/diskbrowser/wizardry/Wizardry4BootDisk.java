@@ -304,11 +304,11 @@ public class Wizardry4BootDisk extends PascalDisk
     {
       //      System.out.println (HexFormatter.format (buffer, 0x08600 + i * 32, 32));
       int offset = 0x08600 + i * 32 + 18;
-      int key = Utility.unsignedShort (buffer, offset);
+      int key = Utility.getShort (buffer, offset);
       if (key > 0)
         text.append (String.format ("%04X  %04X  * %s%n", offset, key,
             messageBlock.getMessageText (key)));
-      key = Utility.unsignedShort (buffer, offset + 8);
+      key = Utility.getShort (buffer, offset + 8);
       if (key > 0)
         text.append (String.format ("%04X  %04X    %s%n", offset + 8, key,
             messageBlock.getMessageText (key)));

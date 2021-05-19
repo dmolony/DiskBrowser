@@ -32,6 +32,13 @@ public class SimpleText extends AbstractFile
       if (ptr < buffer.length && buffer[ptr] == 0x0A)
         ptr++;
     }
+
+    if (resourceFork != null)
+    {
+      text.append ("\n\nResource Fork\n=============\n");
+      text.append (resourceFork);
+    }
+
     return text.toString ();
   }
 

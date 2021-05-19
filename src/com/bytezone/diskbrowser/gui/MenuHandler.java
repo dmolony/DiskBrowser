@@ -79,6 +79,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   FormattedDisk currentDisk;
   private final SaveTempFileAction saveTempFileAction = new SaveTempFileAction ();
+  private final SaveSingleFileAction saveSingleFileAction = new SaveSingleFileAction ();
   final SaveSectorsAction saveSectorsAction = new SaveSectorsAction ();
 
   private final BasicPreferences basicPreferences = new BasicPreferences ();
@@ -115,6 +116,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem refreshTreeItem = new JMenuItem ("Refresh current tree");
   final JMenuItem executeDiskItem = new JMenuItem ();
   final JMenuItem saveDiskItem = new JMenuItem ("Save converted disk as...");
+  final JMenuItem saveFileItem = new JMenuItem ("Save file...");
   final JMenuItem saveSectorsItem = new JMenuItem ("Save sectors as...");
   final JMenuItem printItem = new JMenuItem ("Print output panel...");
   final JMenuItem closeTabItem = new JMenuItem ();
@@ -162,7 +164,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem blankAfterReturnItem =
       new JCheckBoxMenuItem ("Blank line after RETURN");
   final JMenuItem formatRemItem = new JCheckBoxMenuItem ("Allow formatted REM");
-  //  final JMenuItem deleteExtraRemSpace = new JCheckBoxMenuItem ("Delete extra REM space");
+  //  final JMenuItem deleteExtraRemSpace =
+  //      new JCheckBoxMenuItem ("Delete extra REM space");
   final JMenuItem deleteExtraDataSpace =
       new JCheckBoxMenuItem ("Delete extra DATA space");
 
@@ -207,6 +210,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     fileMenu.addSeparator ();
     fileMenu.add (refreshTreeItem);
     fileMenu.add (saveDiskItem);
+    fileMenu.add (saveFileItem);
     fileMenu.add (saveSectorsItem);
 
     addLauncherMenu ();
@@ -384,6 +388,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     scaleGroup.add (scale3Item);
 
     saveDiskItem.setAction (saveTempFileAction);
+    saveFileItem.setAction (saveSingleFileAction);
     saveSectorsItem.setAction (saveSectorsAction);
 
     KeyStroke keyStroke1 = KeyStroke.getKeyStroke (KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK);
@@ -717,6 +722,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       currentDisk = event.appleFileSource.getFormattedDisk ();
       adjustMenus (currentDisk);
     }
+
+    saveSingleFileAction.setFile (event.appleFileSource);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -766,6 +773,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     saveDiskItem.setEnabled (disk.isTempDisk ());
     saveTempFileAction.setDisk (disk);
+    //    saveSingleFileAction.setDisk (disk);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -26,7 +26,7 @@ public class SubDirectoryHeader extends DirectoryHeader
     this.parentDirectory = parent.parentDirectory;
     this.blockNo = blockNo;
 
-    parentPointer = Utility.unsignedShort (entryBuffer, 35);
+    parentPointer = Utility.getShort (entryBuffer, 35);
     parentSequence = entryBuffer[37] & 0xFF;
     parentSize = entryBuffer[38] & 0xFF;
 

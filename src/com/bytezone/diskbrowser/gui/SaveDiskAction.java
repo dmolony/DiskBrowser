@@ -12,13 +12,13 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-class SaveTempFileAction extends DefaultAction
+class SaveDiskAction extends DefaultAction
 // -----------------------------------------------------------------------------------//
 {
   FormattedDisk disk;
 
   // ---------------------------------------------------------------------------------//
-  SaveTempFileAction ()
+  SaveDiskAction ()
   // ---------------------------------------------------------------------------------//
   {
     super ("Save converted disk...", "Save converted disk");

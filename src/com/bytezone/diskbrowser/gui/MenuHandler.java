@@ -78,8 +78,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   private static final String PREFS_PALETTE = "palette";
 
   FormattedDisk currentDisk;
-  private final SaveTempFileAction saveTempFileAction = new SaveTempFileAction ();
-  private final SaveSingleFileAction saveSingleFileAction = new SaveSingleFileAction ();
+  private final SaveDiskAction saveDiskAction = new SaveDiskAction ();
+  private final SaveSingleFileAction saveFileAction = new SaveSingleFileAction ();
   final SaveSectorsAction saveSectorsAction = new SaveSectorsAction ();
 
   private final BasicPreferences basicPreferences = new BasicPreferences ();
@@ -387,8 +387,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     scaleGroup.add (scale2Item);
     scaleGroup.add (scale3Item);
 
-    saveDiskItem.setAction (saveTempFileAction);
-    saveFileItem.setAction (saveSingleFileAction);
+    saveDiskItem.setAction (saveDiskAction);
+    saveFileItem.setAction (saveFileAction);
     saveSectorsItem.setAction (saveSectorsAction);
 
     KeyStroke keyStroke1 = KeyStroke.getKeyStroke (KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK);
@@ -723,7 +723,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       adjustMenus (currentDisk);
     }
 
-    saveSingleFileAction.setFile (event.appleFileSource);
+    saveFileAction.setFile (event.appleFileSource);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -772,8 +772,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     }
 
     saveDiskItem.setEnabled (disk.isTempDisk ());
-    saveTempFileAction.setDisk (disk);
-    //    saveSingleFileAction.setDisk (disk);
+    saveDiskAction.setDisk (disk);
   }
 
   // ---------------------------------------------------------------------------------//

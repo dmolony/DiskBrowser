@@ -2,11 +2,7 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 // -----------------------------------------------------------------------------------//
@@ -19,7 +15,7 @@ class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionLis
   SaveSectorsAction ()
   // ---------------------------------------------------------------------------------//
   {
-    super ("Save sectors...", "Save currently selected sectors");
+    super ("Save sectors...", "Save currently selected sectors", "Save sectors");
     this.setEnabled (false);
   }
 
@@ -34,31 +30,26 @@ class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionLis
       return;
     }
 
-    if (fileChooser == null)
-    {
-      fileChooser = new JFileChooser ();
-      fileChooser.setDialogTitle ("Save sectors");
-    }
+    setSelectedFile (new File ("savedSectors.bin"));
+    saveBuffer (event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ()));
 
-    fileChooser.setSelectedFile (new File ("savedSectors.bin"));
-
-    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
-    {
-      File file = fileChooser.getSelectedFile ();
-      try
-      {
-        byte[] buffer =
-            event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
-        Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
-        JOptionPane.showMessageDialog (null,
-            String.format ("File %s saved", file.getName ()));
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace ();
-        JOptionPane.showMessageDialog (null, "File failed to save");
-      }
-    }
+    //    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
+    //    {
+    //      File file = fileChooser.getSelectedFile ();
+    //      try
+    //      {
+    //        byte[] buffer =
+    //            event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
+    //        Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
+    //        JOptionPane.showMessageDialog (null,
+    //            String.format ("File %s saved", file.getName ()));
+    //      }
+    //      catch (IOException e)
+    //      {
+    //        e.printStackTrace ();
+    //        JOptionPane.showMessageDialog (null, "File failed to save");
+    //      }
+    //  }
   }
 
   // ---------------------------------------------------------------------------------//

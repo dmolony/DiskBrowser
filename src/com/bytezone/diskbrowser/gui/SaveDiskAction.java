@@ -2,25 +2,23 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 
 // -----------------------------------------------------------------------------------//
 class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
 // -----------------------------------------------------------------------------------//
 {
-  FormattedDisk disk;
+  FormattedDisk formattedDisk;
 
   // ---------------------------------------------------------------------------------//
   SaveDiskAction ()
   // ---------------------------------------------------------------------------------//
   {
-    super ("Save converted disk...", "Save converted disk");
+    super ("Save converted disk...", "Save converted disk", "Save converted disk");
   }
 
   // ---------------------------------------------------------------------------------//
@@ -28,35 +26,18 @@ class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
   public void actionPerformed (ActionEvent evt)
   // ---------------------------------------------------------------------------------//
   {
-    if (disk == null)
+    if (formattedDisk == null)
     {
       JOptionPane.showMessageDialog (null, "No disk selected");
       return;
     }
 
-    if (fileChooser == null)
-    {
-      fileChooser = new JFileChooser ();
-      fileChooser.setDialogTitle ("Save converted disk");
-    }
+    Disk disk = formattedDisk.getDisk ();
+    int blocks = disk.getTotalBlocks ();
+    String suffix = blocks <= 560 ? ".dsk" : ".hdv";
 
-    fileChooser.setSelectedFile (new File (disk.getName () + ".dsk"));
-
-    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
-    {
-      File file = fileChooser.getSelectedFile ();
-      try
-      {
-        Files.copy (disk.getDisk ().getFile ().toPath (), file.toPath ());
-        JOptionPane.showMessageDialog (null,
-            String.format ("File %s saved", file.getName ()));
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace ();
-        JOptionPane.showMessageDialog (null, "Disk failed to save");
-      }
-    }
+    setSelectedFile (new File (formattedDisk.getName () + suffix));
+    saveFile (disk.getFile ().toPath ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -64,7 +45,7 @@ class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
   public void diskSelected (DiskSelectedEvent event)
   // ---------------------------------------------------------------------------------//
   {
-    this.disk = event.getFormattedDisk ();
-    setEnabled (disk != null && disk.isTempDisk ());
+    formattedDisk = event.getFormattedDisk ();
+    setEnabled (formattedDisk != null && formattedDisk.isTempDisk ());
   }
 }

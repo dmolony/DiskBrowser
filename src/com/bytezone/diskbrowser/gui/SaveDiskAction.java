@@ -48,7 +48,8 @@ class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
       try
       {
         Files.copy (disk.getDisk ().getFile ().toPath (), file.toPath ());
-        JOptionPane.showMessageDialog (null, "Disk saved");
+        JOptionPane.showMessageDialog (null,
+            String.format ("File %s saved", file.getName ()));
       }
       catch (IOException e)
       {
@@ -64,6 +65,6 @@ class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
   // ---------------------------------------------------------------------------------//
   {
     this.disk = event.getFormattedDisk ();
-    setEnabled (disk.isTempDisk ());
+    setEnabled (disk != null && disk.isTempDisk ());
   }
 }

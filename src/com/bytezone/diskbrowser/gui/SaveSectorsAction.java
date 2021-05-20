@@ -50,7 +50,8 @@ class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionLis
         byte[] buffer =
             event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
         Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
-        JOptionPane.showMessageDialog (null, "File saved");
+        JOptionPane.showMessageDialog (null,
+            String.format ("File %s saved", file.getName ()));
       }
       catch (IOException e)
       {

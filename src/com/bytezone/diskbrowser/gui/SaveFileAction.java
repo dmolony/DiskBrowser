@@ -50,7 +50,8 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
       {
         Files.write (file.toPath (), appleFileSource.getDataSource ().getBuffer (),
             StandardOpenOption.CREATE_NEW);
-        JOptionPane.showMessageDialog (null, "File saved");
+        JOptionPane.showMessageDialog (null,
+            String.format ("File %s saved", file.getName ()));
       }
       catch (IOException e)
       {
@@ -66,5 +67,8 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
   // ---------------------------------------------------------------------------------//
   {
     this.appleFileSource = event.appleFileSource;
+    setEnabled (
+        event.appleFileSource != null && event.appleFileSource.getDataSource () != null
+            && event.appleFileSource.getDataSource ().getBuffer () != null);
   }
 }

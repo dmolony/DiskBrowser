@@ -40,11 +40,10 @@ class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
       String suffix = blocks <= 560 ? ".dsk" : ".hdv";
 
       setSelectedFile (new File (formattedDisk.getName () + suffix));
-      //      saveFile (disk.getFile ().toPath ());
       saveBuffer (appleDisk.getBuffer ());
     }
     else
-      System.out.println ("Not an AppleDisk");
+      System.out.println ("Not an AppleDisk");        // impossible
   }
 
   // ---------------------------------------------------------------------------------//

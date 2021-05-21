@@ -120,7 +120,7 @@ public class DisksWindow extends JFrame
       }
     });
 
-    scrollPane.setPreferredSize (new Dimension (1200, 700));
+    scrollPane.setPreferredSize (new Dimension (1200, 693));
     setDefaultCloseOperation (HIDE_ON_CLOSE);
 
     deleteWindow = new DeleteWindow (rootFolderData);

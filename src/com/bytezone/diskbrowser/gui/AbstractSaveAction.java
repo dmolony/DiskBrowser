@@ -43,55 +43,26 @@ public abstract class AbstractSaveAction extends DefaultAction
   void saveBuffer (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
+    if (fileChooser.showSaveDialog (null) != JFileChooser.APPROVE_OPTION)
+      return;
+
+    File file = fileChooser.getSelectedFile ();
+    try
     {
-      File file = fileChooser.getSelectedFile ();
-      try
-      {
-        Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
-        JOptionPane.showMessageDialog (null,
-            String.format ("File %s saved", file.getName ()));
-      }
-      catch (FileAlreadyExistsException e)
-      {
-        JOptionPane.showMessageDialog (null,
-            "File " + file.getName () + " already exists", "Failed",
-            JOptionPane.ERROR_MESSAGE);
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace ();
-        JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (),
-            "Failed", JOptionPane.ERROR_MESSAGE);
-      }
+      Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
+      JOptionPane.showMessageDialog (null,
+          String.format ("File %s saved", file.getName ()));
+    }
+    catch (FileAlreadyExistsException e)
+    {
+      JOptionPane.showMessageDialog (null, "File " + file.getName () + " already exists",
+          "Failed", JOptionPane.ERROR_MESSAGE);
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace ();
+      JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (),
+          "Failed", JOptionPane.ERROR_MESSAGE);
     }
   }
-
-  // ---------------------------------------------------------------------------------//
-  //  void saveFile (Path sourcePath)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
-  //    {
-  //      File file = fileChooser.getSelectedFile ();
-  //      try
-  //      {
-  //        Files.copy (sourcePath, file.toPath ());
-  //        JOptionPane.showMessageDialog (null,
-  //            String.format ("File %s saved", file.getName ()));
-  //      }
-  //      catch (FileAlreadyExistsException e)
-  //      {
-  //        JOptionPane.showMessageDialog (null,
-  //            "File " + file.getName () + " already exists", "Failed",
-  //            JOptionPane.ERROR_MESSAGE);
-  //      }
-  //      catch (IOException e)
-  //      {
-  //        e.printStackTrace ();
-  //        JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (),
-  //            "Failed", JOptionPane.ERROR_MESSAGE);
-  //      }
-  //    }
-  //  }
 }

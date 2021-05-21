@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import javax.swing.JFileChooser;
@@ -16,15 +15,15 @@ import com.bytezone.diskbrowser.utilities.DefaultAction;
 public abstract class AbstractSaveAction extends DefaultAction
 // -----------------------------------------------------------------------------------//
 {
-  JFileChooser fileChooser;
-  String title;
+  private JFileChooser fileChooser;
+  private String dialogTitle;
 
   // ---------------------------------------------------------------------------------//
-  public AbstractSaveAction (String text, String tip, String title)
+  public AbstractSaveAction (String menuText, String tip, String dialogTitle)
   // ---------------------------------------------------------------------------------//
   {
-    super (text, tip);
-    this.title = title;
+    super (menuText, tip);
+    this.dialogTitle = dialogTitle;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -34,7 +33,7 @@ public abstract class AbstractSaveAction extends DefaultAction
     if (fileChooser == null)
     {
       fileChooser = new JFileChooser ();
-      fileChooser.setDialogTitle (title);
+      fileChooser.setDialogTitle (dialogTitle);
     }
 
     fileChooser.setSelectedFile (file);
@@ -69,23 +68,30 @@ public abstract class AbstractSaveAction extends DefaultAction
   }
 
   // ---------------------------------------------------------------------------------//
-  void saveFile (Path sourcePath)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
-    {
-      File file = fileChooser.getSelectedFile ();
-      try
-      {
-        Files.copy (sourcePath, file.toPath ());
-        JOptionPane.showMessageDialog (null,
-            String.format ("File %s saved", file.getName ()));
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace ();
-        JOptionPane.showMessageDialog (null, "File failed to save");
-      }
-    }
-  }
+  //  void saveFile (Path sourcePath)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
+  //    {
+  //      File file = fileChooser.getSelectedFile ();
+  //      try
+  //      {
+  //        Files.copy (sourcePath, file.toPath ());
+  //        JOptionPane.showMessageDialog (null,
+  //            String.format ("File %s saved", file.getName ()));
+  //      }
+  //      catch (FileAlreadyExistsException e)
+  //      {
+  //        JOptionPane.showMessageDialog (null,
+  //            "File " + file.getName () + " already exists", "Failed",
+  //            JOptionPane.ERROR_MESSAGE);
+  //      }
+  //      catch (IOException e)
+  //      {
+  //        e.printStackTrace ();
+  //        JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (),
+  //            "Failed", JOptionPane.ERROR_MESSAGE);
+  //      }
+  //    }
+  //  }
 }

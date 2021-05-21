@@ -2,8 +2,12 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.JOptionPane;
+
+import com.bytezone.diskbrowser.disk.Disk;
+import com.bytezone.diskbrowser.disk.DiskAddress;
 
 // -----------------------------------------------------------------------------------//
 class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionListener
@@ -30,8 +34,14 @@ class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionLis
       return;
     }
 
-    setSelectedFile (new File ("savedSectors.bin"));
-    saveBuffer (event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ()));
+    // block 0 will not read when it is the only DiskAddress in the list
+    List<DiskAddress> blocks = event.getSectors ();
+    Disk disk = event.getFormattedDisk ().getDisk ();
+    byte[] buffer =
+        blocks.size () == 1 ? disk.readBlock (blocks.get (0)) : disk.readBlocks (blocks);
+
+    setSelectedFile (new File ("SavedSectors.bin"));
+    saveBuffer (buffer);
   }
 
   // ---------------------------------------------------------------------------------//

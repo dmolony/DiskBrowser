@@ -17,8 +17,7 @@ public class SectorListConverter
     sectors = new ArrayList<> ();
     sectorText = text;
 
-    String[] blocks = text.split (";");
-    for (String s : blocks)
+    for (String s : text.split (";"))
     {
       int pos = s.indexOf ('-');
       if (pos > 0)

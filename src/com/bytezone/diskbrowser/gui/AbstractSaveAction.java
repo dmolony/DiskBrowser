@@ -2,6 +2,7 @@ package com.bytezone.diskbrowser.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -52,10 +53,17 @@ public abstract class AbstractSaveAction extends DefaultAction
         JOptionPane.showMessageDialog (null,
             String.format ("File %s saved", file.getName ()));
       }
+      catch (FileAlreadyExistsException e)
+      {
+        JOptionPane.showMessageDialog (null,
+            "File " + file.getName () + " already exists", "Failed",
+            JOptionPane.ERROR_MESSAGE);
+      }
       catch (IOException e)
       {
         e.printStackTrace ();
-        JOptionPane.showMessageDialog (null, "File failed to save");
+        JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (),
+            "Failed", JOptionPane.ERROR_MESSAGE);
       }
     }
   }

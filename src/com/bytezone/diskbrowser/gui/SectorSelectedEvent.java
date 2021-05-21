@@ -12,7 +12,7 @@ class SectorSelectedEvent extends EventObject
 // -----------------------------------------------------------------------------------//
 {
   private final List<DiskAddress> sectors;
-  private final FormattedDisk owner;
+  private final FormattedDisk owner;          // for dual-format disks
   boolean redo;
 
   // ---------------------------------------------------------------------------------//
@@ -20,6 +20,7 @@ class SectorSelectedEvent extends EventObject
   // ---------------------------------------------------------------------------------//
   {
     super (source);
+
     this.sectors = sectors;
     // always store the parent if this disk is part of a dual-dos disk
     this.owner = owner.getParent () == null ? owner : owner.getParent ();
@@ -44,8 +45,10 @@ class SectorSelectedEvent extends EventObject
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
-    SectorListConverter slc = new SectorListConverter (sectors);
-    text.append (slc.sectorText);
+
+    SectorListConverter sectorListConverter = new SectorListConverter (sectors);
+    text.append (sectorListConverter.sectorText);
+
     return text.toString ();
   }
 

@@ -1,4 +1,6 @@
-package com.bytezone.diskbrowser.utilities;
+package com.bytezone.diskbrowser.nufx;
+
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class LZW1 extends LZW

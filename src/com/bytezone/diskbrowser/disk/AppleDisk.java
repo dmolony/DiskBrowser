@@ -16,9 +16,9 @@ import java.util.zip.Checksum;
 import com.bytezone.diskbrowser.nib.NibFile;
 import com.bytezone.diskbrowser.nib.V2dFile;
 import com.bytezone.diskbrowser.nib.WozFile;
-import com.bytezone.diskbrowser.utilities.Binary2;
+import com.bytezone.diskbrowser.nufx.Binary2;
+import com.bytezone.diskbrowser.nufx.NuFX;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
-import com.bytezone.diskbrowser.utilities.NuFX;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//

@@ -1,10 +1,14 @@
-package com.bytezone.diskbrowser.utilities;
+package com.bytezone.diskbrowser.nufx;
 
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.fileTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.bytezone.diskbrowser.utilities.DateTime;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class Record

@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.utilities;
+package com.bytezone.diskbrowser.nufx;
 
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.BLOCK_SIZE;
 
@@ -14,6 +14,7 @@ import com.bytezone.diskbrowser.prodos.write.FileAlreadyExistsException;
 import com.bytezone.diskbrowser.prodos.write.FileEntry;
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 import com.bytezone.diskbrowser.prodos.write.VolumeCatalogFullException;
+import com.bytezone.diskbrowser.utilities.FileFormatException;
 
 // -----------------------------------------------------------------------------------//
 public class NuFX

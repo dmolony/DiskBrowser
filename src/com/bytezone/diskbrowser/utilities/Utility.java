@@ -479,7 +479,7 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  static boolean isMagic (byte[] buffer, int ptr, byte[] magic)
+  public static boolean isMagic (byte[] buffer, int ptr, byte[] magic)
   // ---------------------------------------------------------------------------------//
   {
     if (ptr + magic.length >= buffer.length)
@@ -517,7 +517,7 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  protected static int getCRC (final byte[] buffer, int length, int initialValue)
+  public static int getCRC (final byte[] buffer, int length, int initialValue)
   // ---------------------------------------------------------------------------------//
   {
     int crc = initialValue;

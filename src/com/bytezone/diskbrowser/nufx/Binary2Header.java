@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.utilities;
+package com.bytezone.diskbrowser.nufx;
 
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.fileTypes;
 
@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class Binary2Header

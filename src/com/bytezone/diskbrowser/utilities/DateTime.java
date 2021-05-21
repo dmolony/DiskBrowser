@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 // -----------------------------------------------------------------------------------//
-class DateTime
+public class DateTime
 // -----------------------------------------------------------------------------------//
 {
   private static String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",

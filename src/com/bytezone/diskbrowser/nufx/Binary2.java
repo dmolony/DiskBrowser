@@ -1,4 +1,4 @@
-package com.bytezone.diskbrowser.utilities;
+package com.bytezone.diskbrowser.nufx;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,8 +1,10 @@
-package com.bytezone.diskbrowser.utilities;
+package com.bytezone.diskbrowser.nufx;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 abstract class LZW

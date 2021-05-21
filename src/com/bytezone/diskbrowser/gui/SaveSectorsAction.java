@@ -32,24 +32,6 @@ class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionLis
 
     setSelectedFile (new File ("savedSectors.bin"));
     saveBuffer (event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ()));
-
-    //    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
-    //    {
-    //      File file = fileChooser.getSelectedFile ();
-    //      try
-    //      {
-    //        byte[] buffer =
-    //            event.getFormattedDisk ().getDisk ().readBlocks (event.getSectors ());
-    //        Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
-    //        JOptionPane.showMessageDialog (null,
-    //            String.format ("File %s saved", file.getName ()));
-    //      }
-    //      catch (IOException e)
-    //      {
-    //        e.printStackTrace ();
-    //        JOptionPane.showMessageDialog (null, "File failed to save");
-    //      }
-    //  }
   }
 
   // ---------------------------------------------------------------------------------//

@@ -82,23 +82,10 @@ public class Binary2
 
     text.append (String.format ("%s%n", UNDERLINE));
 
-    //    int totalUncompressedSize = 0;
-    //    int totalCompressedSize = 0;
-
     for (Binary2Header header : headers)
-    {
       text.append (String.format ("%s%n", header.getLine ()));
-      //      totalUncompressedSize += record.getUncompressedSize ();
-      //      totalCompressedSize += record.getCompressedSize ();
-    }
 
     text.append (String.format ("%s%n", UNDERLINE));
-
-    //    float pct = 0;
-    //    if (totalUncompressedSize > 0)
-    //      pct = totalCompressedSize * 100 / totalUncompressedSize;
-    //    text.append (String.format (" Uncomp:%7d  Comp:%7d  %%of orig:%3.0f%%%n%n",
-    //        totalUncompressedSize, totalCompressedSize, pct));
 
     return text.toString ();
   }

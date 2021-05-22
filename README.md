@@ -30,7 +30,7 @@
 * [Usage](resources/usage.md)
 
 ### Installation
-* Install the **latest** version of the [JDK](https://jdk.java.net).
+* Install the **latest** version of the [JDK](https://jdk.java.net/16/).
 * Download DiskBrowser.jar from the [releases](https://github.com/dmolony/diskbrowser/releases) page.
 * Double-click the jar file, or enter 'java -jar DiskBrowser.jar' in the terminal.
 * Set your root folder (the top-level folder where you keep your disk images).

@@ -52,6 +52,8 @@ Java runs on Windows, MacOS and Linux.
 #### Graphics 
 ![Graphics](resources/graphics.png?raw=true "Graphics")
 #### Applesoft Formatting and Analysis
+Applesoft programs are displayed in a modern, easily-readable format. A comprehensive cross-listing of variables, strings, calls and jumps is available. Easily find duplicate variable names.
+For the truly retro look, programs can be displayed in the original 40-column line wrap mode.
 ![Applesoft](resources/basic.png?raw=true "Applesoft")
 #### Pascal code
 ![Pascal](resources/pascal.png?raw=true "Pascal")

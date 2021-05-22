@@ -60,6 +60,10 @@ Java runs on Windows, MacOS and Linux.
 #### Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
 #### Visicalc
+DiskBrowser includes an inbuilt Visicalc processor which will evaluate the sheet and display the results.
 ![Visicalc](resources/visicalc.png?raw=true "Visicalc")
 #### Complete Disk List
+Generates a list of all the disks in your collection. The list can be sorted by any of the table headings. Checksums can be generated as needed, or for the whole collection.
 ![Disk List](resources/disklist.png?raw=true "Disk List")
+Select a disk and click the duplicates button to see all of the disks that share the same checksum.
+![Duplicates](resources/duplicates.png?raw=true "Duplicates")

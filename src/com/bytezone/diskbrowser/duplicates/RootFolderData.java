@@ -177,38 +177,35 @@ public class RootFolderData implements RootDirectoryChangeListener
   }
 
   // ---------------------------------------------------------------------------------//
-  public void incrementType (File file, String filename)
+  public void incrementType (File file, String fileName)
   // ---------------------------------------------------------------------------------//
   {
-    int pos = Utility.getSuffixNo (filename);
+    int pos = Utility.getSuffixNo (fileName);
     if (pos >= 0)
     {
-      int cmp = 0;
-      if (filename.endsWith (".gz"))
-        cmp = 1;
-      else if (filename.endsWith (".zip"))
-        cmp = 2;
+      int cmp = fileName.endsWith (".zip") ? 2 : fileName.endsWith (".gz") ? 1 : 0;
+
       typeTotals[cmp][pos]++;
       typeTotals[3][pos]++;
       ++totalDisks;
     }
     else
-      System.out.println ("no suffix: " + filename);
+      System.out.println ("no suffix: " + fileName);
 
-    checkDuplicates (file, filename);
+    checkDuplicates (file, fileName);
   }
 
   // ---------------------------------------------------------------------------------//
-  private void checkDuplicates (File file, String filename)
+  private void checkDuplicates (File file, String fileName)
   // ---------------------------------------------------------------------------------//
   {
     String rootName = file.getAbsolutePath ().substring (rootFolderNameLength);
-    DiskDetails diskDetails = new DiskDetails (file, rootName, filename, doChecksums);
+    DiskDetails diskDetails = new DiskDetails (file, rootName, fileName, doChecksums);
 
-    if (fileNameMap.containsKey (filename))
-      fileNameMap.get (filename).addDuplicateName (diskDetails);
+    if (fileNameMap.containsKey (fileName))
+      fileNameMap.get (fileName).addDuplicateName (diskDetails);
     else
-      fileNameMap.put (filename, diskDetails);
+      fileNameMap.put (fileName, diskDetails);
 
     if (doChecksums)
     {
@@ -326,16 +323,16 @@ public class RootFolderData implements RootDirectoryChangeListener
       int grandTotal[] = new int[4];
 
       for (int i = 0; i < typeTotals[0].length; i++)
-      {
-        line = String.format ("%14.14s  %,7d  %,7d  %,7d  %,7d",
-            Utility.getSuffix (i) + " ...........", typeTotals[0][i], typeTotals[1][i],
-            typeTotals[2][i], typeTotals[3][i]);
-        g.drawString (line, x, y);
-        for (int j = 0; j < typeTotals.length; j++)
-          grandTotal[j] += typeTotals[j][i];
-
-        y += lineHeight;
-      }
+        if (typeTotals[3][i] > 0)
+        {
+          line = String.format ("%14.14s  %,7d  %,7d  %,7d  %,7d",
+              Utility.getSuffix (i) + " ...........", typeTotals[0][i], typeTotals[1][i],
+              typeTotals[2][i], typeTotals[3][i]);
+          g.drawString (line, x, y);
+          for (int j = 0; j < typeTotals.length; j++)
+            grandTotal[j] += typeTotals[j][i];
+          y += lineHeight;
+        }
 
       line = String.format ("Total           %,7d  %,7d  %,7d  %,7d%n%n", grandTotal[0],
           grandTotal[1], grandTotal[2], grandTotal[3]);

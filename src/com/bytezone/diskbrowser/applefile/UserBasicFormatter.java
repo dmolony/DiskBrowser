@@ -47,8 +47,8 @@ public class UserBasicFormatter extends BasicFormatter
     {
       StringBuilder text = new StringBuilder (String.format ("%5d", (line.lineNumber)));
 
-      int indentLevel = loopVariables.size ();   // each full line starts at the loop indent
-      int ifIndent = 0;                     // IF statement(s) limit back indentation by NEXT
+      int indentLevel = loopVariables.size (); // each full line starts at the loop indent
+      int ifIndent = 0;                  // IF statement(s) limit back indentation by NEXT
 
       for (SubLine subline : line.sublines)
       {
@@ -107,7 +107,7 @@ public class UserBasicFormatter extends BasicFormatter
         String lineText = alignment.getAlignedText (subline);
 
         if (subline.is (TOKEN_DATA) && basicPreferences.deleteExtraDataSpace)
-          lineText = lineText.replaceFirst ("DATA  ", "DATA ");
+          lineText = lineText.replaceFirst ("DATA  +", "DATA ");     // regex
 
         // Check for a wrappable REM/DATA/DIM statement
         // (see SEA BATTLE on DISK283.DSK)

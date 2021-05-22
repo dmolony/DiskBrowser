@@ -35,6 +35,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
   private final RootFolderData rootFolderData = new RootFolderData ();
 
+  private final List<QuitListener> quitListeners = new ArrayList<> ();
+
   // ---------------------------------------------------------------------------------//
   public DiskBrowser ()
   // ---------------------------------------------------------------------------------//
@@ -94,30 +96,18 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     //    toolBar.add (aboutAction);
 
     // set the listeners
-    rootDirectoryAction.addListener (rootFolderData);
-    rootDirectoryAction.addListener (catalogPanel);
-    rootDirectoryAction.addListener (duplicateAction);
+    rootDirectoryAction.addListener (rootFolderData, catalogPanel, duplicateAction);
 
-    catalogPanel.addDiskSelectionListener (this);
-    catalogPanel.addDiskSelectionListener (dataPanel);
-    catalogPanel.addDiskSelectionListener (diskLayoutPanel);
-    catalogPanel.addDiskSelectionListener (redoHandler);
-    catalogPanel.addDiskSelectionListener (menuHandler);
-    catalogPanel.addDiskSelectionListener (menuHandler.saveDiskAction);
+    catalogPanel.addDiskSelectionListener (this, dataPanel, diskLayoutPanel, redoHandler,
+        menuHandler, menuHandler.saveDiskAction);
 
-    catalogPanel.addFileSelectionListener (dataPanel);
-    catalogPanel.addFileSelectionListener (diskLayoutPanel);
-    catalogPanel.addFileSelectionListener (redoHandler);
-    catalogPanel.addFileSelectionListener (menuHandler);
-    catalogPanel.addFileSelectionListener (menuHandler.saveFileAction);
+    catalogPanel.addFileSelectionListener (dataPanel, diskLayoutPanel, redoHandler,
+        menuHandler, menuHandler.saveFileAction);
 
-    catalogPanel.addFileNodeSelectionListener (dataPanel);
-    catalogPanel.addFileNodeSelectionListener (redoHandler);
+    catalogPanel.addFileNodeSelectionListener (dataPanel, redoHandler);
 
-    diskLayoutPanel.addSectorSelectionListener (dataPanel);
-    diskLayoutPanel.addSectorSelectionListener (redoHandler);
-    diskLayoutPanel.addSectorSelectionListener (catalogPanel);
-    diskLayoutPanel.addSectorSelectionListener (menuHandler.saveSectorsAction);
+    diskLayoutPanel.addSectorSelectionListener (dataPanel, redoHandler, catalogPanel,
+        menuHandler.saveSectorsAction);
 
     duplicateAction.addTableSelectionListener (catalogPanel);
 
@@ -144,10 +134,10 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.duplicateItem.setAction (duplicateAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
-    addQuitListener (rootDirectoryAction);
-    addQuitListener (menuHandler);
-    addQuitListener (catalogPanel);
-    addQuitListener (this);
+    quitListeners.add (rootDirectoryAction);
+    quitListeners.add (menuHandler);
+    quitListeners.add (catalogPanel);
+    quitListeners.add (this);
 
     if (Desktop.isDesktopSupported ())
     {
@@ -251,22 +241,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   }
 
   // ---------------------------------------------------------------------------------//
-  public static void main (String[] args)
-  // ---------------------------------------------------------------------------------//
-  {
-    DiskBrowser.args = args;
-    EventQueue.invokeLater (new Runnable ()
-    {
-      @Override
-      public void run ()
-      {
-        setLookAndFeel ();
-        new DiskBrowser ().setVisible (true);
-      }
-    });
-  }
-
-  // ---------------------------------------------------------------------------------//
   private static void setLookAndFeel ()
   // ---------------------------------------------------------------------------------//
   {
@@ -282,22 +256,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     {
       e.printStackTrace ();
     }
-  }
-
-  List<QuitListener> quitListeners = new ArrayList<> ();
-
-  // ---------------------------------------------------------------------------------//
-  public void addQuitListener (QuitListener listener)
-  // ---------------------------------------------------------------------------------//
-  {
-    quitListeners.add (listener);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public void removeQuitListener (QuitListener listener)
-  // ---------------------------------------------------------------------------------//
-  {
-    quitListeners.remove (listener);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -316,5 +274,21 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   {
     for (QuitListener listener : quitListeners)
       listener.restore (prefs);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static void main (String[] args)
+  // ---------------------------------------------------------------------------------//
+  {
+    DiskBrowser.args = args;
+    EventQueue.invokeLater (new Runnable ()
+    {
+      @Override
+      public void run ()
+      {
+        setLookAndFeel ();
+        new DiskBrowser ().setVisible (true);
+      }
+    });
   }
 }

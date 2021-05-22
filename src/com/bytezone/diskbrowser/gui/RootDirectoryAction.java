@@ -65,6 +65,15 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
   }
 
   // ---------------------------------------------------------------------------------//
+  public void addListener (RootDirectoryChangeListener... listenerList)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (RootDirectoryChangeListener rootDirectoryChangeListener : listenerList)
+      if (!listeners.contains (rootDirectoryChangeListener))
+        listeners.add (rootDirectoryChangeListener);
+  }
+
+  // ---------------------------------------------------------------------------------//
   @Override
   public void quit (Preferences prefs)
   // ---------------------------------------------------------------------------------//

@@ -321,6 +321,14 @@ class CatalogPanel extends JTabbedPane
     selector.addDiskSelectionListener (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
+  public void addDiskSelectionListener (DiskSelectionListener... listeners)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (DiskSelectionListener diskSelectionListener : listeners)
+      selector.addDiskSelectionListener (diskSelectionListener);
+  }
+
   // Pass through to DiskSelector
   // ---------------------------------------------------------------------------------//
   public void addFileSelectionListener (FileSelectionListener listener)
@@ -329,12 +337,28 @@ class CatalogPanel extends JTabbedPane
     selector.addFileSelectionListener (listener);
   }
 
+  // ---------------------------------------------------------------------------------//
+  public void addFileSelectionListener (FileSelectionListener... listeners)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (FileSelectionListener fileSelectionListener : listeners)
+      selector.addFileSelectionListener (fileSelectionListener);
+  }
+
   // Pass through to DiskSelector
   // ---------------------------------------------------------------------------------//
   public void addFileNodeSelectionListener (FileNodeSelectionListener listener)
   // ---------------------------------------------------------------------------------//
   {
     selector.addFileNodeSelectionListener (listener);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void addFileNodeSelectionListener (FileNodeSelectionListener... listeners)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (FileNodeSelectionListener fileNodeSelectionListener : listeners)
+      selector.addFileNodeSelectionListener (fileNodeSelectionListener);
   }
 
   // ---------------------------------------------------------------------------------//

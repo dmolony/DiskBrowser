@@ -19,8 +19,8 @@ import javax.swing.JScrollPane;
 
 import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
-import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.disk.FormattedDisk;
+import com.bytezone.diskbrowser.disk.HybridDisk;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
@@ -139,6 +139,14 @@ class DiskLayoutPanel extends JPanel
   // ---------------------------------------------------------------------------------//
   {
     diskLayoutImage.addSectorSelectionListener (listener);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void addSectorSelectionListener (SectorSelectionListener... listeners)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (SectorSelectionListener sectorSelectionListener : listeners)
+      diskLayoutImage.addSectorSelectionListener (sectorSelectionListener);
   }
 
   // ---------------------------------------------------------------------------------//

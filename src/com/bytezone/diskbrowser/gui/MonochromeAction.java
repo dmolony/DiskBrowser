@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -12,17 +14,16 @@ import javax.swing.KeyStroke;
 class MonochromeAction extends AbstractAction
 // -----------------------------------------------------------------------------------//
 {
-  private final DataPanel owner;
+  List<MonochromeListener> listeners = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  MonochromeAction (DataPanel owner)
+  MonochromeAction ()
   // ---------------------------------------------------------------------------------//
   {
     super ("Monochrome");
     putValue (Action.SHORT_DESCRIPTION, "Display image in monochrome or color");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt M"));
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_M);
-    this.owner = owner;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -30,6 +31,22 @@ class MonochromeAction extends AbstractAction
   public void actionPerformed (ActionEvent e)
   // ---------------------------------------------------------------------------------//
   {
-    owner.setMonochrome (((JMenuItem) e.getSource ()).isSelected ());
+    for (MonochromeListener listener : listeners)
+      listener.setMonochrome (((JMenuItem) e.getSource ()).isSelected ());
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void addMonochromeListener (MonochromeListener listener)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (!listeners.contains (listener))
+      listeners.add (listener);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public interface MonochromeListener
+  // ---------------------------------------------------------------------------------//
+  {
+    public void setMonochrome (boolean value);
   }
 }

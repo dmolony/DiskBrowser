@@ -37,15 +37,17 @@ import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
+import com.bytezone.diskbrowser.gui.ColourQuirksAction.ColourQuirksListener;
 import com.bytezone.diskbrowser.gui.DebuggingAction.DebugListener;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
+import com.bytezone.diskbrowser.gui.MonochromeAction.MonochromeListener;
 
 // -----------------------------------------------------------------------------------//
-public class DataPanel extends JTabbedPane
-    implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
-    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
-    AssemblerPreferencesListener, TextPreferencesListener, DebugListener
+public class DataPanel extends JTabbedPane implements DiskSelectionListener,
+    FileSelectionListener, SectorSelectionListener, FileNodeSelectionListener,
+    FontChangeListener, BasicPreferencesListener, AssemblerPreferencesListener,
+    TextPreferencesListener, DebugListener, ColourQuirksListener, MonochromeListener
 // -----------------------------------------------------------------------------------//
 {
   private static final int TEXT_WIDTH = 65;
@@ -157,8 +159,13 @@ public class DataPanel extends JTabbedPane
     menuHandler.lineWrapItem.setAction (lineWrapAction);
     lineWrapAction.addListener (formattedText);
 
-    menuHandler.colourQuirksItem.setAction (new ColourQuirksAction (this));
-    menuHandler.monochromeItem.setAction (new MonochromeAction (this));
+    ColourQuirksAction colourQuirksAction = new ColourQuirksAction ();
+    colourQuirksAction.addColourQuirksListener (this);
+    menuHandler.colourQuirksItem.setAction (colourQuirksAction);
+
+    MonochromeAction monochromeAction = new MonochromeAction ();
+    monochromeAction.addMonochromeListener (this);
+    menuHandler.monochromeItem.setAction (monochromeAction);
 
     DebuggingAction debuggingAction = new DebuggingAction ();
     debuggingAction.addDebugListener (this);
@@ -213,6 +220,7 @@ public class DataPanel extends JTabbedPane
   }
 
   // ---------------------------------------------------------------------------------//
+  @Override
   public void setColourQuirks (boolean value)
   // ---------------------------------------------------------------------------------//
   {

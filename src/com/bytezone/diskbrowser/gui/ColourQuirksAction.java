@@ -2,6 +2,8 @@ package com.bytezone.diskbrowser.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -12,17 +14,16 @@ import javax.swing.KeyStroke;
 public class ColourQuirksAction extends AbstractAction
 // -----------------------------------------------------------------------------------//
 {
-  private final DataPanel owner;
+  List<ColourQuirksListener> listeners = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  public ColourQuirksAction (DataPanel owner)
+  public ColourQuirksAction ()
   // ---------------------------------------------------------------------------------//
   {
     super ("Smear HGR");
     putValue (Action.SHORT_DESCRIPTION, "Display pixels like a TV screen");
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt Q"));
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_Q);
-    this.owner = owner;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -30,6 +31,22 @@ public class ColourQuirksAction extends AbstractAction
   public void actionPerformed (ActionEvent e)
   // ---------------------------------------------------------------------------------//
   {
-    owner.setColourQuirks (((JMenuItem) e.getSource ()).isSelected ());
+    for (ColourQuirksListener listener : listeners)
+      listener.setColourQuirks (((JMenuItem) e.getSource ()).isSelected ());
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void addColourQuirksListener (ColourQuirksListener listener)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (!listeners.contains (listener))
+      listeners.add (listener);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public interface ColourQuirksListener
+  // ---------------------------------------------------------------------------------//
+  {
+    public void setColourQuirks (boolean value);
   }
 }

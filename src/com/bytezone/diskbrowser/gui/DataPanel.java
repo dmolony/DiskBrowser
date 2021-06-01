@@ -37,6 +37,7 @@ import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
+import com.bytezone.diskbrowser.gui.DebuggingAction.DebugListener;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
 
@@ -44,7 +45,7 @@ import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
 public class DataPanel extends JTabbedPane
     implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
     FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
-    AssemblerPreferencesListener, TextPreferencesListener
+    AssemblerPreferencesListener, TextPreferencesListener, DebugListener
 // -----------------------------------------------------------------------------------//
 {
   private static final int TEXT_WIDTH = 65;
@@ -158,7 +159,10 @@ public class DataPanel extends JTabbedPane
 
     menuHandler.colourQuirksItem.setAction (new ColourQuirksAction (this));
     menuHandler.monochromeItem.setAction (new MonochromeAction (this));
-    menuHandler.debuggingItem.setAction (new DebuggingAction (this));
+
+    DebuggingAction debuggingAction = new DebuggingAction ();
+    debuggingAction.addDebugListener (this);
+    menuHandler.debuggingItem.setAction (debuggingAction);
 
     // fill in the placeholders created by the MenuHandler
     List<Palette> palettes = HiResImage.getPalettes ();
@@ -256,6 +260,7 @@ public class DataPanel extends JTabbedPane
   }
 
   // ---------------------------------------------------------------------------------//
+  @Override
   public void setDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {

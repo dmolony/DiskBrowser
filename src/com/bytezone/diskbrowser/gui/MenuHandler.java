@@ -347,6 +347,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     showAllFormatItem.addActionListener (basicPreferencesAction);
     showAllXrefItem.addActionListener (basicPreferencesAction);
     appleLineWrapItem.addActionListener (basicPreferencesAction);
+
     for (JMenuItem item : applesoftFormatItems)
       item.addActionListener (basicPreferencesAction);
     for (JMenuItem item : applesoftXrefItems)
@@ -374,10 +375,12 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
     sectorGroup.add (sector256Item);
     sectorGroup.add (sector512Item);
+
     interleaveGroup.add (interleave0Item);
     interleaveGroup.add (interleave1Item);
     interleaveGroup.add (interleave2Item);
     interleaveGroup.add (interleave3Item);
+
     scaleGroup.add (scale1Item);
     scaleGroup.add (scale2Item);
     scaleGroup.add (scale3Item);
@@ -546,6 +549,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
         openSupported = true;
         break;
       }
+
     if (!openSupported)
       return;
 

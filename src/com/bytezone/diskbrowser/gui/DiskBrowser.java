@@ -124,8 +124,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // set the MenuItem Actions
     menuHandler.printItem.setAction (print);
-    //    menuHandler.addHelpMenuAction (preferencesAction, "prefs");
-    //    menuHandler.addHelpMenuAction (aboutAction, "about");
     menuHandler.refreshTreeItem.setAction (refreshTreeAction);
     menuHandler.rootItem.setAction (rootDirectoryAction);
     menuHandler.showCatalogItem.setAction (hideCatalogAction);
@@ -153,9 +151,9 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
             e -> JOptionPane.showMessageDialog (null, "Preferences dialog"));
 
       if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
-        desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());
+        desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());   // needed for cmd-Q
       //      else
-      setQuitHandler ();
+      setQuitHandler ();        // needed for the close button
     }
     else
     {
@@ -199,7 +197,6 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
         fireQuitEvent ();
       }
     });
-
   }
 
   // ---------------------------------------------------------------------------------//

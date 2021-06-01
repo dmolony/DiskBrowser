@@ -157,6 +157,7 @@ class DiskLayoutSelection implements Iterable<DiskAddress>
     for (DiskAddress selection : highlights)
       if (selection != null && da.matches (selection))
         return true;
+
     return false;
   }
 

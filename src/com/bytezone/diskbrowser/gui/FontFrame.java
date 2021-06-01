@@ -47,6 +47,7 @@ public class FontFrame extends JFrame
   // ---------------------------------------------------------------------------------//
   {
     super ("Font Selection");
+
     this.fontAction = fontAction;
     buildLayout ();
     getFonts ();
@@ -96,8 +97,7 @@ public class FontFrame extends JFrame
   public String getSelectedValue ()
   // ---------------------------------------------------------------------------------//
   {
-    String fontName = fontList.getSelectedValue ();
-    return fontName;
+    return fontList.getSelectedValue ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -112,8 +112,7 @@ public class FontFrame extends JFrame
   public String getSelectedSize ()
   // ---------------------------------------------------------------------------------//
   {
-    String fontSize = fontSizePanel.getSelectedText ();
-    return fontSize;
+    return fontSizePanel.getSelectedText ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -146,7 +145,6 @@ public class FontFrame extends JFrame
 
     int ptr = 0;
     for (String fontName : fonts)
-    {
       while (ptr < pf.length)
       {
         int result = fontName.compareToIgnoreCase (pf[ptr]);
@@ -159,7 +157,6 @@ public class FontFrame extends JFrame
         }
         break;
       }
-    }
 
     fontList.setSelectedValue (initialFont, true);
   }
@@ -254,13 +251,14 @@ public class FontFrame extends JFrame
   private Font getCurrentFont ()
   // ---------------------------------------------------------------------------------//
   {
-    String fontName = getSelectedValue ();
     String fontSize = getSelectedSize ();
     if (fontSize.isEmpty ())
       return null;
+
     int pos = fontSize.indexOf (' ');
     int size = Integer.parseInt (fontSize.substring (0, pos));
-    return new Font (fontName, Font.PLAIN, size);
+
+    return new Font (getSelectedValue (), Font.PLAIN, size);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -269,8 +267,10 @@ public class FontFrame extends JFrame
   {
     initialFont = getSelectedValue ();
     initialSize = getSelectedSize ();
+
     int pos = initialSize.indexOf (' ');
     int size = Integer.parseInt (initialSize.substring (0, pos));
+
     Font font = new Font (initialFont, Font.PLAIN, size);
     fontAction.fireFontChangeEvent (font);
   }

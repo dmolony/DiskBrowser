@@ -174,10 +174,7 @@ class CatalogPanel extends JTabbedPane
   // ---------------------------------------------------------------------------------//
   {
     Tab tab = (Tab) getSelectedComponent ();
-    if (diskTabs.size () > 1 && tab instanceof AppleDiskTab)
-      closeTabAction.setEnabled (true);
-    else
-      closeTabAction.setEnabled (false);
+    closeTabAction.setEnabled (diskTabs.size () > 1 && tab instanceof AppleDiskTab);
   }
 
   // ---------------------------------------------------------------------------------//

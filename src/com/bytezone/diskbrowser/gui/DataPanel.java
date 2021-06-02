@@ -9,6 +9,8 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -37,17 +39,14 @@ import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile2;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
-import com.bytezone.diskbrowser.gui.ColourQuirksAction.ColourQuirksListener;
-import com.bytezone.diskbrowser.gui.DebuggingAction.DebugListener;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
-import com.bytezone.diskbrowser.gui.MonochromeAction.MonochromeListener;
 
 // -----------------------------------------------------------------------------------//
-public class DataPanel extends JTabbedPane implements DiskSelectionListener,
-    FileSelectionListener, SectorSelectionListener, FileNodeSelectionListener,
-    FontChangeListener, BasicPreferencesListener, AssemblerPreferencesListener,
-    TextPreferencesListener, DebugListener, ColourQuirksListener, MonochromeListener
+public class DataPanel extends JTabbedPane
+    implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
+    FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
+    AssemblerPreferencesListener, TextPreferencesListener, PropertyChangeListener
 // -----------------------------------------------------------------------------------//
 {
   private static final int TEXT_WIDTH = 65;
@@ -74,6 +73,10 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   private Worker animation;
 
   final MenuHandler menuHandler;
+
+  DebuggingAction debuggingAction = new DebuggingAction ();
+  MonochromeAction monochromeAction = new MonochromeAction ();
+  ColourQuirksAction colourQuirksAction = new ColourQuirksAction ();
 
   enum TabType
   {
@@ -159,16 +162,13 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
     menuHandler.lineWrapItem.setAction (lineWrapAction);
     lineWrapAction.addListener (formattedText);
 
-    ColourQuirksAction colourQuirksAction = new ColourQuirksAction ();
-    colourQuirksAction.addColourQuirksListener (this);
+    colourQuirksAction.addPropertyChangeListener (this);
     menuHandler.colourQuirksItem.setAction (colourQuirksAction);
 
-    MonochromeAction monochromeAction = new MonochromeAction ();
-    monochromeAction.addMonochromeListener (this);
+    monochromeAction.addPropertyChangeListener (this);
     menuHandler.monochromeItem.setAction (monochromeAction);
 
-    DebuggingAction debuggingAction = new DebuggingAction ();
-    debuggingAction.addDebugListener (this);
+    debuggingAction.addPropertyChangeListener (this);
     menuHandler.debuggingItem.setAction (debuggingAction);
 
     // fill in the placeholders created by the MenuHandler
@@ -213,6 +213,19 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   }
 
   // ---------------------------------------------------------------------------------//
+  @Override
+  public void propertyChange (PropertyChangeEvent evt)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (evt.getSource () == debuggingAction)
+      setDebug ((Boolean) evt.getNewValue ());
+    else if (evt.getSource () == monochromeAction)
+      setMonochrome ((Boolean) evt.getNewValue ());
+    else if (evt.getSource () == colourQuirksAction)
+      setColourQuirks ((Boolean) evt.getNewValue ());
+  }
+
+  // ---------------------------------------------------------------------------------//
   void setLineWrap (boolean lineWrap)
   // ---------------------------------------------------------------------------------//
   {
@@ -220,7 +233,6 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
   public void setColourQuirks (boolean value)
   // ---------------------------------------------------------------------------------//
   {
@@ -268,7 +280,6 @@ public class DataPanel extends JTabbedPane implements DiskSelectionListener,
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
   public void setDebug (boolean value)
   // ---------------------------------------------------------------------------------//
   {

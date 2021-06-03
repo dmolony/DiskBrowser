@@ -16,7 +16,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -62,7 +61,7 @@ public class DataPanel extends JTabbedPane
   boolean assemblerTextValid;
   DataSource currentDataSource;
 
-  private Worker animation;
+  private AnimationWorker animation;
 
   final MenuHandler menuHandler;
 
@@ -381,7 +380,7 @@ public class DataPanel extends JTabbedPane
         {
           if (animation != null)
             animation.cancel ();
-          animation = new Worker ((SHRPictureFile2) dataSource);
+          animation = new AnimationWorker (this, (SHRPictureFile2) dataSource);
           animation.execute ();
         }
       }
@@ -514,50 +513,5 @@ public class DataPanel extends JTabbedPane
   {
     if (currentDataSource instanceof BasicTextFile)
       setDataSource (currentDataSource);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  class Worker extends SwingWorker<Void, Integer>
-  // ---------------------------------------------------------------------------------//
-  {
-    volatile boolean running;
-    SHRPictureFile2 image;
-
-    public Worker (SHRPictureFile2 image)
-    {
-      assert image.isAnimation ();
-      this.image = image;
-    }
-
-    public void cancel ()
-    {
-      running = false;
-    }
-
-    @Override
-    protected Void doInBackground () throws Exception
-    {
-      running = true;
-      try
-      {
-        while (running)
-        {
-          Thread.sleep (image.getDelay ());
-          publish (0);
-        }
-      }
-      catch (InterruptedException e)
-      {
-        e.printStackTrace ();
-      }
-      return null;
-    }
-
-    @Override
-    protected void process (List<Integer> chunks)
-    {
-      image.nextFrame ();
-      update ();
-    }
   }
 }

@@ -1,13 +1,7 @@
 package com.bytezone.diskbrowser.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -17,7 +11,6 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -50,7 +43,6 @@ public class DataPanel extends JTabbedPane
 // -----------------------------------------------------------------------------------//
 {
   private static final int TEXT_WIDTH = 65;
-  private static final int BACKGROUND = 245;
 
   private final JTextArea formattedText;
   private final JTextArea hexText;
@@ -77,6 +69,7 @@ public class DataPanel extends JTabbedPane
   DebuggingAction debuggingAction = new DebuggingAction ();
   MonochromeAction monochromeAction = new MonochromeAction ();
   ColourQuirksAction colourQuirksAction = new ColourQuirksAction ();
+  LineWrapAction lineWrapAction = new LineWrapAction ();
 
   enum TabType
   {
@@ -158,9 +151,8 @@ public class DataPanel extends JTabbedPane
       }
     });
 
-    LineWrapAction lineWrapAction = new LineWrapAction ();
     menuHandler.lineWrapItem.setAction (lineWrapAction);
-    lineWrapAction.addListener (formattedText);
+    lineWrapAction.addPropertyChangeListener (this);
 
     colourQuirksAction.addPropertyChangeListener (this);
     menuHandler.colourQuirksItem.setAction (colourQuirksAction);
@@ -223,6 +215,8 @@ public class DataPanel extends JTabbedPane
       setMonochrome ((Boolean) evt.getNewValue ());
     else if (evt.getSource () == colourQuirksAction)
       setColourQuirks ((Boolean) evt.getNewValue ());
+    else if (evt.getSource () == lineWrapAction)
+      setLineWrap ((Boolean) evt.getNewValue ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -433,71 +427,6 @@ public class DataPanel extends JTabbedPane
   {
     textArea.setText (text);
     textArea.setCaretPosition (0);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private class ImagePanel extends JPanel
-  // ---------------------------------------------------------------------------------//
-  {
-    private BufferedImage image;
-    private double scale = 1;
-    private double userScale = .5;
-
-    public ImagePanel ()
-    {
-      this.setBackground (new Color (BACKGROUND, BACKGROUND, BACKGROUND));
-    }
-
-    private void setScale (double scale)
-    {
-      this.userScale = scale;
-    }
-
-    private void setImage (BufferedImage image)
-    {
-      this.image = image;
-      int width, height;
-
-      if (image != null)
-      {
-        Graphics2D g2 = image.createGraphics ();
-        g2.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-        width = image.getWidth ();
-        height = image.getHeight ();
-      }
-      else
-        width = height = 0;
-
-      if (true)
-      {
-        if (width < 400 && width > 0)
-          scale = (400 - 1) / width + 1;
-        else
-          scale = 1;
-        if (scale > 4)
-          scale = 4;
-      }
-
-      scale *= userScale;
-
-      setPreferredSize (new Dimension ((int) (width * scale), (int) (height * scale)));
-      repaint ();
-    }
-
-    @Override
-    public void paintComponent (Graphics g)
-    {
-      super.paintComponent (g);
-
-      if (image != null)
-      {
-        Graphics2D g2 = ((Graphics2D) g);
-        g2.transform (AffineTransform.getScaleInstance (scale, scale));
-        g2.drawImage (image,
-            (int) ((getWidth () - image.getWidth () * scale) / 2 / scale), 4, this);
-      }
-    }
   }
 
   // ---------------------------------------------------------------------------------//

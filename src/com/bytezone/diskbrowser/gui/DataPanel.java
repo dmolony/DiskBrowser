@@ -43,6 +43,7 @@ public class DataPanel extends JTabbedPane
 {
   private static final int TEXT_WIDTH = 65;
 
+  //  final MenuHandler menuHandler;
   private final JTextArea formattedText;
   private final JTextArea hexText;
   private final JTextArea disassemblyText;
@@ -50,36 +51,34 @@ public class DataPanel extends JTabbedPane
   // these two panes are interchangeable
   private final JScrollPane formattedPane;
   private final JScrollPane imagePane;
+
   private boolean imageVisible = false;
 
-  private final ImagePanel imagePanel;                        // internal class
+  private final ImagePanel imagePanel = new ImagePanel ();
+  private AnimationWorker animation;
   private boolean debugMode;
+  private DataSource currentDataSource;
 
   // used to determine whether the text has been set
-  boolean formattedTextValid;
-  boolean hexTextValid;
-  boolean assemblerTextValid;
-  DataSource currentDataSource;
+  private boolean formattedTextValid;
+  private boolean hexTextValid;
+  private boolean assemblerTextValid;
 
-  private AnimationWorker animation;
+  private DebuggingAction debuggingAction = new DebuggingAction ();
+  private MonochromeAction monochromeAction = new MonochromeAction ();
+  private ColourQuirksAction colourQuirksAction = new ColourQuirksAction ();
+  private LineWrapAction lineWrapAction = new LineWrapAction ();
 
-  final MenuHandler menuHandler;
-
-  DebuggingAction debuggingAction = new DebuggingAction ();
-  MonochromeAction monochromeAction = new MonochromeAction ();
-  ColourQuirksAction colourQuirksAction = new ColourQuirksAction ();
-  LineWrapAction lineWrapAction = new LineWrapAction ();
-
-  enum TabType
+  private enum TabType
   {
     FORMATTED, HEX, DISASSEMBLED
   }
 
   // ---------------------------------------------------------------------------------//
-  public DataPanel (MenuHandler mh)
+  public DataPanel (MenuHandler menuHandler)
   // ---------------------------------------------------------------------------------//
   {
-    this.menuHandler = mh;
+    //    this.menuHandler = mh;
     setTabPlacement (SwingConstants.BOTTOM);
 
     formattedText = new JTextArea (10, TEXT_WIDTH);
@@ -89,7 +88,7 @@ public class DataPanel extends JTabbedPane
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"
         + "\nthe disk. You will then be able to select individual files to "
-        + "view completely.");
+        + "view them.");
 
     hexText = new JTextArea (10, TEXT_WIDTH);
     setPanel (hexText, "Hex dump");
@@ -97,7 +96,6 @@ public class DataPanel extends JTabbedPane
     disassemblyText = new JTextArea (10, TEXT_WIDTH);
     setPanel (disassemblyText, "Disassembly");
 
-    imagePanel = new ImagePanel ();
     imagePane =
         new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -124,6 +122,7 @@ public class DataPanel extends JTabbedPane
               formattedTextValid = true;
             }
             break;
+
           case 1:                           // Hex
             if (!hexTextValid)
             {
@@ -134,6 +133,7 @@ public class DataPanel extends JTabbedPane
               hexTextValid = true;
             }
             break;
+
           case 2:                           // Assembler
             if (!assemblerTextValid)
             {
@@ -144,8 +144,9 @@ public class DataPanel extends JTabbedPane
               assemblerTextValid = true;
             }
             break;
+
           default:
-            System.out.println ("Invalid index selected in DataPanel");
+            System.out.println ("Impossible - Invalid index selected in DataPanel");
         }
       }
     });
@@ -172,6 +173,7 @@ public class DataPanel extends JTabbedPane
       JCheckBoxMenuItem item = (JCheckBoxMenuItem) enumeration.nextElement ();
       item.setAction (new PaletteAction (this, palettes.get (ndx++)));
     }
+
     menuHandler.nextPaletteItem.setAction (new NextPaletteAction (this, buttonGroup));
     menuHandler.prevPaletteItem.setAction (new PreviousPaletteAction (this, buttonGroup));
   }
@@ -315,6 +317,7 @@ public class DataPanel extends JTabbedPane
     JScrollPane outputScrollPane =
         new JScrollPane (outputPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
     outputScrollPane.setBorder (null);              // remove the ugly default border
     add (outputScrollPane, tabName);
     return outputScrollPane;

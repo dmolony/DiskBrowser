@@ -85,14 +85,13 @@ class DiskLegendPanel extends DiskPanel
     int val = formattedDisk.falseNegativeBlocks ();
     if (val > 0)
     {
-      g.drawString (
-          val + " unused sector" + (val == 1 ? "" : "s") + " marked as unavailable", 10,
-          y);
+      g.drawString (val + " unused sector" + (val == 1 ? "" : "s")    //
+          + " marked as unavailable", 10, y);
       y += lineHeight;
     }
     val = formattedDisk.falsePositiveBlocks ();
     if (val > 0)
-      g.drawString (val + " used sector" + (val == 1 ? "" : "s") + " marked as available",
-          10, y);
+      g.drawString (val + " used sector" + (val == 1 ? "" : "s")      //
+          + " marked as available", 10, y);
   }
 }

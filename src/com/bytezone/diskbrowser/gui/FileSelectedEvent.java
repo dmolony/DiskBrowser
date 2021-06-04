@@ -22,7 +22,8 @@ class FileSelectedEvent extends EventObject
     this.appleFileSource = appleFileSource;
 
     // If a file is selected from a disk which is part of a hybrid disk, then the 
-    // parent must be told so that it can ensure its internal currentDisk is set correctly
+    // parent must be told so that it can ensure its internal currentDisk is set
+    // correctly
     FormattedDisk fd = appleFileSource.getFormattedDisk ();
     HybridDisk ddd = (HybridDisk) fd.getParent ();
     if (ddd != null)

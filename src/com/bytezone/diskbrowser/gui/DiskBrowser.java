@@ -6,6 +6,8 @@ import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -22,7 +24,8 @@ import javax.swing.UIManager;
 import com.bytezone.diskbrowser.duplicates.RootFolderData;
 
 // -----------------------------------------------------------------------------------//
-public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitListener
+public class DiskBrowser extends JFrame
+    implements DiskSelectionListener, QuitListener, PropertyChangeListener
 // -----------------------------------------------------------------------------------//
 {
   private static String[] args;
@@ -36,6 +39,12 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
   private final RootFolderData rootFolderData = new RootFolderData ();
 
   private final List<QuitListener> quitListeners = new ArrayList<> ();
+
+  private final JPanel catalogBorderPanel;
+  private final JPanel layoutBorderPanel;
+
+  HideCatalogAction hideCatalogAction = new HideCatalogAction ();
+  HideLayoutAction hideLayoutAction = new HideLayoutAction ();
 
   // ---------------------------------------------------------------------------------//
   public DiskBrowser ()
@@ -61,7 +70,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // create and add the left-hand catalog panel
     CatalogPanel catalogPanel = new CatalogPanel (redoHandler);
-    JPanel catalogBorderPanel = addPanel (catalogPanel, "Catalog", BorderLayout.WEST);
+    catalogBorderPanel = addPanel (catalogPanel, "Catalog", BorderLayout.WEST);
 
     // create and add the centre output panel
     DataPanel dataPanel = new DataPanel (menuHandler);
@@ -69,8 +78,7 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // create and add the right-hand disk layout panel
     DiskLayoutPanel diskLayoutPanel = new DiskLayoutPanel ();
-    JPanel layoutBorderPanel =
-        addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
+    layoutBorderPanel = addPanel (diskLayoutPanel, "Disk layout", BorderLayout.EAST);
 
     // create actions
     DuplicateAction duplicateAction = new DuplicateAction (rootFolderData);
@@ -80,12 +88,12 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
     AbstractAction print = new PrintAction (dataPanel);
     //    AboutAction aboutAction = new AboutAction ();
-    HideCatalogAction hideCatalogAction =
-        new HideCatalogAction (this, catalogBorderPanel);
-    HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
-    ShowFreeSectorsAction showFreeAction =
-        new ShowFreeSectorsAction (menuHandler, diskLayoutPanel);
+    //    HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
+    ShowFreeSectorsAction showFreeAction = new ShowFreeSectorsAction ();
     CloseTabAction closeTabAction = new CloseTabAction (catalogPanel);
+
+    hideCatalogAction.addPropertyChangeListener (this);
+    hideLayoutAction.addPropertyChangeListener (this);
 
     // add action buttons to toolbar
     toolBar.add (rootDirectoryAction);
@@ -132,6 +140,8 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     menuHandler.duplicateItem.setAction (duplicateAction);
     menuHandler.closeTabItem.setAction (closeTabAction);
 
+    showFreeAction.addPropertyChangeListener (diskLayoutPanel);
+
     quitListeners.add (rootDirectoryAction);
     quitListeners.add (menuHandler);
     quitListeners.add (catalogPanel);
@@ -173,9 +183,9 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
 
     // Remove the two optional panels if they were previously hidden
     if (!menuHandler.showLayoutItem.isSelected ())
-      hideLayoutAction.set (false);
+      setLayoutPanel (false);
     if (!menuHandler.showCatalogItem.isSelected ())
-      hideCatalogAction.set (false);
+      setCatalogPanel (false);
 
     menuHandler.addBasicPreferencesListener (dataPanel);
     menuHandler.addAssemblerPreferencesListener (dataPanel);
@@ -209,6 +219,41 @@ public class DiskBrowser extends JFrame implements DiskSelectionListener, QuitLi
     panel.add (pane);
     add (panel, location);
     return panel;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void propertyChange (PropertyChangeEvent evt)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (evt.getSource () == hideCatalogAction)
+      setCatalogPanel ((boolean) evt.getNewValue ());
+    else if (evt.getSource () == hideLayoutAction)
+      setLayoutPanel ((boolean) evt.getNewValue ());
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void setCatalogPanel (boolean show)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (show)
+      add (catalogBorderPanel, BorderLayout.WEST);
+    else
+      remove (catalogBorderPanel);
+
+    validate ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void setLayoutPanel (boolean show)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (show)
+      add (layoutBorderPanel, BorderLayout.EAST);
+    else
+      remove (layoutBorderPanel);
+
+    validate ();
   }
 
   // ---------------------------------------------------------------------------------//

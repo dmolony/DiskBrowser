@@ -438,6 +438,7 @@ public class DataPanel extends JTabbedPane
   {
     setSelectedIndex (0);
     setDataSource (null);
+
     if (event.getFormattedDisk () != null)
       setDataSource (event.getFormattedDisk ().getCatalog ().getDataSource ());
     else

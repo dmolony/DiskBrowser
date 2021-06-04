@@ -76,7 +76,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   private static final String PREFS_PALETTE = "palette";
 
-  FormattedDisk currentDisk;
   final SaveDiskAction saveDiskAction = new SaveDiskAction ();
   final SaveFileAction saveFileAction = new SaveFileAction ();
   final SaveSectorsAction saveSectorsAction = new SaveSectorsAction ();
@@ -185,6 +184,8 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
   final JMenuItem showTextHeaderItem = new JCheckBoxMenuItem ("Show header");
 
   ButtonGroup paletteGroup = new ButtonGroup ();
+
+  FormattedDisk currentDisk;
 
   // ---------------------------------------------------------------------------------//
   MenuHandler ()
@@ -560,60 +561,6 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public void quit (Preferences prefs)
-  // ---------------------------------------------------------------------------------//
-  {
-    prefs.putBoolean (PREFS_LINE_WRAP, lineWrapItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_LAYOUT, showLayoutItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_CATALOG, showCatalogItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
-    prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
-    prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
-    prefs.putInt (PREFS_PALETTE,
-        HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
-    fontAction.quit (prefs);
-
-    int scale = scale1Item.isSelected () ? 1 : scale2Item.isSelected () ? 2 : 3;
-    prefs.putInt (PREFS_SCALE, scale);
-
-    prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_ALL_FORMAT, showAllFormatItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_ALL_XREF, showAllXrefItem.isSelected ());
-
-    prefs.putBoolean (PREFS_APPLE_LINE_WRAP, appleLineWrapItem.isSelected ());
-
-    prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
-    prefs.putBoolean (PREFS_SPLIT_DIM, splitDimItem.isSelected ());
-    prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
-    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturnItem.isSelected ());
-    prefs.putBoolean (PREFS_FORMAT_REM, formatRemItem.isSelected ());
-    prefs.putBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, deleteExtraDataSpace.isSelected ());
-
-    prefs.putBoolean (PREFS_SHOW_GOSUB_GOTO, showXrefItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_CALLS, showCallsItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_SYMBOLS, showSymbolsItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_FUNCTIONS, showFunctionsItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_CONSTANTS, showConstantsItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
-        showDuplicateSymbolsItem.isSelected ());
-
-    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
-        showAssemblerTargetsItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_STRINGS,
-        showAssemblerStringsItem.isSelected ());
-    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_HEADER, showAssemblerHeaderItem.isSelected ());
-
-    prefs.putBoolean (PREFS_PRODOS_SORT_DIRECTORIES,
-        prodosSortDirectoriesItem.isSelected ());
-
-    prefs.putBoolean (PREFS_TEXT_SHOW_OFFSETS, showTextOffsetsItem.isSelected ());
-    prefs.putBoolean (PREFS_TEXT_SHOW_HEADER, showTextHeaderItem.isSelected ());
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
   public void restore (Preferences prefs)
   // ---------------------------------------------------------------------------------//
   {
@@ -699,6 +646,60 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     AbstractFile.setDefaultDebug (debuggingItem.isSelected ());
 
     fontAction.restore (prefs);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void quit (Preferences prefs)
+  // ---------------------------------------------------------------------------------//
+  {
+    prefs.putBoolean (PREFS_LINE_WRAP, lineWrapItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_LAYOUT, showLayoutItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_CATALOG, showCatalogItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_FREE_SECTORS, showFreeSectorsItem.isSelected ());
+    prefs.putBoolean (PREFS_COLOUR_QUIRKS, colourQuirksItem.isSelected ());
+    prefs.putBoolean (PREFS_MONOCHROME, monochromeItem.isSelected ());
+    prefs.putInt (PREFS_PALETTE,
+        HiResImage.getPaletteFactory ().getCurrentPaletteIndex ());
+    fontAction.quit (prefs);
+
+    int scale = scale1Item.isSelected () ? 1 : scale2Item.isSelected () ? 2 : 3;
+    prefs.putInt (PREFS_SCALE, scale);
+
+    prefs.putBoolean (PREFS_SHOW_HEADER, showHeaderItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ALL_FORMAT, showAllFormatItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ALL_XREF, showAllXrefItem.isSelected ());
+
+    prefs.putBoolean (PREFS_APPLE_LINE_WRAP, appleLineWrapItem.isSelected ());
+
+    prefs.putBoolean (PREFS_SPLIT_REMARKS, splitRemarkItem.isSelected ());
+    prefs.putBoolean (PREFS_SPLIT_DIM, splitDimItem.isSelected ());
+    prefs.putBoolean (PREFS_ALIGN_ASSIGN, alignAssignItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_CARET, showCaretItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_THEN, showThenItem.isSelected ());
+    prefs.putBoolean (PREFS_BLANK_AFTER_RETURN, blankAfterReturnItem.isSelected ());
+    prefs.putBoolean (PREFS_FORMAT_REM, formatRemItem.isSelected ());
+    prefs.putBoolean (PREFS_DELETE_EXTRA_DATA_SPACE, deleteExtraDataSpace.isSelected ());
+
+    prefs.putBoolean (PREFS_SHOW_GOSUB_GOTO, showXrefItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_CALLS, showCallsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_SYMBOLS, showSymbolsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_FUNCTIONS, showFunctionsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_CONSTANTS, showConstantsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_DUPLICATE_SYMBOLS,
+        showDuplicateSymbolsItem.isSelected ());
+
+    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_TARGETS,
+        showAssemblerTargetsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_STRINGS,
+        showAssemblerStringsItem.isSelected ());
+    prefs.putBoolean (PREFS_SHOW_ASSEMBLER_HEADER, showAssemblerHeaderItem.isSelected ());
+
+    prefs.putBoolean (PREFS_PRODOS_SORT_DIRECTORIES,
+        prodosSortDirectoriesItem.isSelected ());
+
+    prefs.putBoolean (PREFS_TEXT_SHOW_OFFSETS, showTextOffsetsItem.isSelected ());
+    prefs.putBoolean (PREFS_TEXT_SHOW_HEADER, showTextHeaderItem.isSelected ());
   }
 
   // ---------------------------------------------------------------------------------//

@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -25,8 +27,8 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoEvent;
 import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 
 // -----------------------------------------------------------------------------------//
-class DiskLayoutPanel extends JPanel
-    implements DiskSelectionListener, FileSelectionListener, RedoListener
+class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
+    FileSelectionListener, RedoListener, PropertyChangeListener
 // -----------------------------------------------------------------------------------//
 {
   private static final int SIZE = 15;             // basic unit of a display block
@@ -132,6 +134,14 @@ class DiskLayoutPanel extends JPanel
   // ---------------------------------------------------------------------------------//
   {
     diskLayoutImage.setShowFreeSectors (free);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void propertyChange (PropertyChangeEvent evt)
+  // ---------------------------------------------------------------------------------//
+  {
+    setFree ((Boolean) evt.getNewValue ());
   }
 
   // ---------------------------------------------------------------------------------//

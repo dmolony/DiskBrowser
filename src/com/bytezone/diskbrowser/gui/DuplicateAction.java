@@ -3,6 +3,8 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.Action;
@@ -14,7 +16,7 @@ import com.bytezone.diskbrowser.duplicates.RootFolderData;
 import com.bytezone.diskbrowser.utilities.DefaultAction;
 
 // -----------------------------------------------------------------------------------//
-public class DuplicateAction extends DefaultAction implements RootDirectoryChangeListener
+public class DuplicateAction extends DefaultAction implements PropertyChangeListener
 // -----------------------------------------------------------------------------------//
 {
   RootFolderData rootFolderData;
@@ -36,12 +38,20 @@ public class DuplicateAction extends DefaultAction implements RootDirectoryChang
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
-  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
+  private void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
   // ---------------------------------------------------------------------------------//
   {
     assert rootFolderData.getRootFolder () == newRootFolder;
     setEnabled (rootFolderData.getRootFolder () != null);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void propertyChange (PropertyChangeEvent evt)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (evt.getPropertyName ().equals ("RootDirectory"))
+      rootDirectoryChanged ((File) evt.getOldValue (), (File) evt.getNewValue ());
   }
 
   // ---------------------------------------------------------------------------------//

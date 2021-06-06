@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,11 +22,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.bytezone.diskbrowser.gui.DuplicateAction.DiskTableSelectionListener;
-import com.bytezone.diskbrowser.gui.RootDirectoryChangeListener;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public class RootFolderData implements RootDirectoryChangeListener
+public class RootFolderData implements PropertyChangeListener
 // -----------------------------------------------------------------------------------//
 {
   private static final String header =
@@ -274,13 +275,21 @@ public class RootFolderData implements RootDirectoryChangeListener
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
-  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
+  private void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
   // ---------------------------------------------------------------------------------//
   {
     rootFolder = newRootFolder;
     rootFolderNameLength = rootFolder.getAbsolutePath ().length ();
     disksWindow = null;           // force a recount
+  }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public void propertyChange (PropertyChangeEvent evt)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (evt.getPropertyName ().equals ("RootDirectory"))
+      rootDirectoryChanged ((File) evt.getOldValue (), (File) evt.getNewValue ());
   }
 
   // ---------------------------------------------------------------------------------//

@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -36,9 +38,8 @@ import com.bytezone.diskbrowser.gui.RedoHandler.RedoListener;
 import com.bytezone.diskbrowser.gui.TreeBuilder.FileNode;
 
 // -----------------------------------------------------------------------------------//
-class CatalogPanel extends JTabbedPane
-    implements RedoListener, SectorSelectionListener, QuitListener, FontChangeListener,
-    RootDirectoryChangeListener, DiskTableSelectionListener
+class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionListener,
+    QuitListener, FontChangeListener, DiskTableSelectionListener, PropertyChangeListener
 // -----------------------------------------------------------------------------------//
 {
   private static final String prefsLastDiskUsed = "Last disk used";
@@ -66,8 +67,7 @@ class CatalogPanel extends JTabbedPane
   }
 
   // ---------------------------------------------------------------------------------//
-  @Override
-  public void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
+  private void rootDirectoryChanged (File oldRootFolder, File newRootFolder)
   // ---------------------------------------------------------------------------------//
   {
     rootFolder = newRootFolder;
@@ -80,6 +80,15 @@ class CatalogPanel extends JTabbedPane
 
     insertFileSystemTab (null);
     setSelectedIndex (0);
+  }
+
+  // -------------------------------------------------------------------------------//
+  @Override
+  public void propertyChange (PropertyChangeEvent evt)
+  // -------------------------------------------------------------------------------//
+  {
+    if (evt.getPropertyName ().equals ("RootDirectory"))
+      rootDirectoryChanged ((File) evt.getOldValue (), (File) evt.getNewValue ());
   }
 
   // ---------------------------------------------------------------------------------//

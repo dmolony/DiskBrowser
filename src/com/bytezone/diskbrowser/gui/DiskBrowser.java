@@ -43,8 +43,8 @@ public class DiskBrowser extends JFrame
   private final JPanel catalogBorderPanel;
   private final JPanel layoutBorderPanel;
 
-  HideCatalogAction hideCatalogAction = new HideCatalogAction ();
-  HideLayoutAction hideLayoutAction = new HideLayoutAction ();
+  private final HideCatalogAction hideCatalogAction = new HideCatalogAction ();
+  private final HideLayoutAction hideLayoutAction = new HideLayoutAction ();
 
   // ---------------------------------------------------------------------------------//
   public DiskBrowser ()
@@ -104,7 +104,9 @@ public class DiskBrowser extends JFrame
     //    toolBar.add (aboutAction);
 
     // set the listeners
-    rootDirectoryAction.addListener (rootFolderData, catalogPanel, duplicateAction);
+    rootDirectoryAction.addPropertyChangeListener (rootFolderData);
+    rootDirectoryAction.addPropertyChangeListener (catalogPanel);
+    rootDirectoryAction.addPropertyChangeListener (duplicateAction);
 
     catalogPanel.addDiskSelectionListener (this, dataPanel, diskLayoutPanel, redoHandler,
         menuHandler, menuHandler.saveDiskAction);

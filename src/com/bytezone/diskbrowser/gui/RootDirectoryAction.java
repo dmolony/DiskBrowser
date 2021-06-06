@@ -3,8 +3,6 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.Action;
@@ -18,7 +16,7 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
 // -----------------------------------------------------------------------------------//
 {
   private static final String prefsRootDirectory = "Root directory";
-  private final List<RootDirectoryChangeListener> listeners = new ArrayList<> ();
+
   private File rootFolder;
 
   // ---------------------------------------------------------------------------------//
@@ -27,6 +25,7 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
   {
     super ("Set HOME folder...", "Defines root folder where the disk images are kept",
         "/com/bytezone/diskbrowser/icons/");
+
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("alt H"));
     putValue (Action.MNEMONIC_KEY, KeyEvent.VK_H);
 
@@ -57,23 +56,6 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
   }
 
   // ---------------------------------------------------------------------------------//
-  public void addListener (RootDirectoryChangeListener listener)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (!listeners.contains (listener))
-      listeners.add (listener);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public void addListener (RootDirectoryChangeListener... listenerList)
-  // ---------------------------------------------------------------------------------//
-  {
-    for (RootDirectoryChangeListener rootDirectoryChangeListener : listenerList)
-      if (!listeners.contains (rootDirectoryChangeListener))
-        listeners.add (rootDirectoryChangeListener);
-  }
-
-  // ---------------------------------------------------------------------------------//
   @Override
   public void quit (Preferences prefs)
   // ---------------------------------------------------------------------------------//
@@ -87,9 +69,7 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
   public void restore (Preferences prefs)
   // ---------------------------------------------------------------------------------//
   {
-    String rootDirectory = prefs.get (prefsRootDirectory, "");
-
-    File rootDirectoryFile = new File (rootDirectory);
+    File rootDirectoryFile = new File (prefs.get (prefsRootDirectory, ""));
 
     if (!rootDirectoryFile.exists () || !rootDirectoryFile.isDirectory ())
     {
@@ -105,7 +85,7 @@ class RootDirectoryAction extends DefaultAction implements QuitListener
   {
     File oldRootFolder = rootFolder;
     rootFolder = newRootFolder;
-    for (RootDirectoryChangeListener listener : listeners)
-      listener.rootDirectoryChanged (oldRootFolder, newRootFolder);
+
+    firePropertyChange ("RootDirectory", oldRootFolder, newRootFolder);
   }
 }

@@ -48,10 +48,10 @@ abstract class CatalogEntry implements AppleFileSource
     name = HexFormatter.getString (entryBuffer, 1, entryBuffer[0] & 0x0F);
     storageType = (entryBuffer[0] & 0xF0) >> 4;
 
-    created = Utility.getAppleDate (entryBuffer, 24);
-    version = entryBuffer[28] & 0xFF;
-    minVersion = entryBuffer[29] & 0xFF;
-    access = entryBuffer[30] & 0xFF;
+    created = Utility.getAppleDate (entryBuffer, 0x18);
+    version = entryBuffer[0x1C] & 0xFF;
+    minVersion = entryBuffer[0x1D] & 0xFF;
+    access = entryBuffer[0x1E] & 0xFF;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -118,4 +118,12 @@ abstract class CatalogEntry implements AppleFileSource
 
     return text.toString ();
   }
+
+  // https://comp.sys.apple2.narkive.com/lOfvHRLD/prodos-storage-type-and-user-types
+  // Two previously unused bytes in each file's directory entry are now used to 
+  // indicate the case of a filename. The bytes are at relative locations 
+  // +$1C and +$1D in each directory entry, and were previously labeled version 
+  // and min_version. Since ProDOS 8 never actually used these bytes for version 
+  // checking (except in one case, discussed below), they are now used to store 
+  // lowercase information. (In the Volume header, bytes +$1A and +$1B are used instead.)
 }

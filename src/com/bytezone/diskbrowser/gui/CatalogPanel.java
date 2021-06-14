@@ -89,6 +89,9 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
   {
     if (evt.getPropertyName ().equals ("RootDirectory"))
       rootDirectoryChanged ((File) evt.getOldValue (), (File) evt.getNewValue ());
+    //    else
+    //      closeCurrentTab ();
+    //    System.out.println (evt.getPropertyName ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -159,7 +162,6 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
       fileTab.replaceDisk (((AppleDiskTab) tab).disk);
   }
 
-  // called from CloseTabAction
   // ---------------------------------------------------------------------------------//
   public void closeCurrentTab ()
   // ---------------------------------------------------------------------------------//

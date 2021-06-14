@@ -32,6 +32,7 @@ public class DiskFactory
 // -----------------------------------------------------------------------------------//
 {
   private static boolean debug = false;
+
   private static final int DISK_800K = 819200;
   private static final int DISK_143K = 143360;
   private static final int DISK_116K = 116480;

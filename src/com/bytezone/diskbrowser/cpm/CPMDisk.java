@@ -18,6 +18,8 @@ import com.bytezone.diskbrowser.gui.DataSource;
 public class CPMDisk extends AbstractFormattedDisk
 // -----------------------------------------------------------------------------------//
 {
+  private static final int EMPTY_BYTE_VALUE = 0xE5;
+
   private final Color green = new Color (0, 200, 0);
 
   public final SectorType catalogSector = new SectorType ("Catalog", green);
@@ -50,7 +52,7 @@ public class CPMDisk extends AbstractFormattedDisk
     sectorTypesList.add (macSector);
     sectorTypesList.add (otherSector);
 
-    setEmptyByte ((byte) 0xE5);
+    setEmptyByte ((byte) EMPTY_BYTE_VALUE);
 
     // search for the version string
     for (int i = 8; i >= 4; i -= 2)
@@ -74,22 +76,28 @@ public class CPMDisk extends AbstractFormattedDisk
 
       sectorTypes[da.getBlockNo ()] = catalogSector;
       byte[] buffer = disk.readBlock (da);
+
       int b1 = buffer[0] & 0xFF;
       int b2 = buffer[1] & 0xFF;
-      if (b1 == 0xE5)
+
+      if (b1 == EMPTY_BYTE_VALUE && b2 == EMPTY_BYTE_VALUE)
         continue;
-      if (b1 > 31)
+
+      if (b1 > 31 && b1 != EMPTY_BYTE_VALUE)
         break;
-      if (b2 < 32 || (b2 > 126 && b2 != 0xE5))
+
+      if (b2 < 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
         break;
 
       for (int i = 0; i < buffer.length; i += 32)
       {
         b1 = buffer[i] & 0xFF;
         b2 = buffer[i + 1] & 0xFF;
-        if (b1 == 0xE5)
-          break;
-        if (b2 < 32 || (b2 > 126 && b2 != 0xE5))
+
+        if (b1 == EMPTY_BYTE_VALUE)         // deleted file??
+          continue;
+
+        if (b2 < 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
           break;
 
         DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
@@ -110,9 +118,6 @@ public class CPMDisk extends AbstractFormattedDisk
           parent.add (entry);
       }
     }
-
-    //    root.setUserObject (getCatalog ());         // override the disk's default display
-    //    makeNodeVisible (rootNode.getFirstLeaf ());
 
     volumeNode.setUserObject (getCatalog ());
     makeNodeVisible (volumeNode.getFirstLeaf ());
@@ -147,6 +152,7 @@ public class CPMDisk extends AbstractFormattedDisk
   {
     if (fileEntries.size () > 0 && fileEntries.size () > fileNo)
       return fileEntries.get (fileNo).getSectors ();
+
     return null;
   }
 
@@ -224,13 +230,13 @@ public class CPMDisk extends AbstractFormattedDisk
       byte[] buffer = disk.readBlock (3, sector);
 
       // check if entire sector is empty (everything == 0xE5)
-      if (bufferContainsAll (buffer, (byte) 0xE5))
+      if (bufferContainsAll (buffer, (byte) EMPTY_BYTE_VALUE))
         break;
 
       for (int i = 0; i < buffer.length; i += 32)
       {
         int val = buffer[i] & 0xFF;
-        if (val == 0xE5)
+        if (val == EMPTY_BYTE_VALUE)
           break;
 
         if (val > 31)
@@ -239,7 +245,7 @@ public class CPMDisk extends AbstractFormattedDisk
         for (int j = 1; j <= 8; j++)
         {
           val = buffer[i + j] & 0xFF;
-          if (val < 32 || (val > 126 && val != 0xE5))
+          if (val < 32 || (val > 126 && val != EMPTY_BYTE_VALUE))
             return false;
         }
       }

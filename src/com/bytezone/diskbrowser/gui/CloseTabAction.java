@@ -19,6 +19,7 @@ public class CloseTabAction extends AbstractAction
   // ---------------------------------------------------------------------------------//
   {
     super ("Close Tab");
+
     putValue (Action.SHORT_DESCRIPTION, "Close the current disk tab");
     //    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke ("ctrl W"));
     int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMaskEx ();

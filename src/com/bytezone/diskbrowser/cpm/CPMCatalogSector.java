@@ -26,7 +26,7 @@ class CPMCatalogSector extends AbstractSector
 
     for (int i = 0; i <= 255; i += CATALOG_ENTRY_SIZE)
     {
-      if (buffer[i] == (byte) 0xE5)
+      if (buffer[i] == (byte) 0xE5 && buffer[i + 1] == (byte) 0xE5)
         break;
 
       boolean readOnly = (buffer[i + 9] & 0x80) != 0;

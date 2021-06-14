@@ -153,7 +153,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     resourceFork = new ResourceFork (disk.readBlocks (resourceBlocks));
 
     if (!resourceFork.isValid ())
-      System.out.printf ("Invalid Resource Fork: %s%n", name);
+      System.out.printf ("Invalid Resource Fork: %s%n", getUniqueName ());
   }
 
   // ---------------------------------------------------------------------------------//

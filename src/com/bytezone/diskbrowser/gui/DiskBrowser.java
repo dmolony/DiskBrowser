@@ -90,7 +90,9 @@ public class DiskBrowser extends JFrame
     //    AboutAction aboutAction = new AboutAction ();
     //    HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
     ShowFreeSectorsAction showFreeAction = new ShowFreeSectorsAction ();
+
     CloseTabAction closeTabAction = new CloseTabAction (catalogPanel);
+    //    closeTabAction.addPropertyChangeListener (catalogPanel);
 
     hideCatalogAction.addPropertyChangeListener (this);
     hideLayoutAction.addPropertyChangeListener (this);

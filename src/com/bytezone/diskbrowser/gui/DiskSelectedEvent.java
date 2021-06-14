@@ -9,7 +9,7 @@ import com.bytezone.diskbrowser.disk.FormattedDisk;
 class DiskSelectedEvent extends EventObject
 // -----------------------------------------------------------------------------------//
 {
-  private final FormattedDisk owner;
+  private final FormattedDisk formattedDisk;
   boolean redo;
 
   // ---------------------------------------------------------------------------------//
@@ -17,14 +17,14 @@ class DiskSelectedEvent extends EventObject
   // ---------------------------------------------------------------------------------//
   {
     super (source);
-    this.owner = disk;
+    this.formattedDisk = disk;
   }
 
   // ---------------------------------------------------------------------------------//
   public FormattedDisk getFormattedDisk ()
   // ---------------------------------------------------------------------------------//
   {
-    return owner;
+    return formattedDisk;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -32,14 +32,14 @@ class DiskSelectedEvent extends EventObject
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    return owner.getDisk ().getFile ().getAbsolutePath ();
+    return formattedDisk.getDisk ().getFile ().getAbsolutePath ();
   }
 
   // ---------------------------------------------------------------------------------//
   public String toText ()
   // ---------------------------------------------------------------------------------//
   {
-    return owner.getAbsolutePath ();
+    return formattedDisk.getAbsolutePath ();
   }
 
   // ---------------------------------------------------------------------------------//

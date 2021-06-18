@@ -80,7 +80,7 @@ public class CPMDisk extends AbstractFormattedDisk
       int b1 = buffer[0] & 0xFF;
       int b2 = buffer[1] & 0xFF;
 
-      if (b1 == EMPTY_BYTE_VALUE && b2 == EMPTY_BYTE_VALUE)
+      if (b1 == EMPTY_BYTE_VALUE && (b2 == EMPTY_BYTE_VALUE || b2 == 0))
         continue;
 
       if (b1 > 31 && b1 != EMPTY_BYTE_VALUE)
@@ -233,21 +233,54 @@ public class CPMDisk extends AbstractFormattedDisk
       if (bufferContainsAll (buffer, (byte) EMPTY_BYTE_VALUE))
         break;
 
+      int b1 = buffer[0] & 0xFF;
+      int b2 = buffer[1] & 0xFF;
+
+      if (b1 == EMPTY_BYTE_VALUE && (b2 == EMPTY_BYTE_VALUE || b2 == 0))
+        continue;
+
+      if (b1 > 31 && b1 != EMPTY_BYTE_VALUE)
+        break;
+
+      if (b2 < 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
+        break;
+
       for (int i = 0; i < buffer.length; i += 32)
       {
-        int val = buffer[i] & 0xFF;
-        if (val == EMPTY_BYTE_VALUE)
-          break;
+        b1 = buffer[i] & 0xFF;
+        b2 = buffer[i + 1] & 0xFF;
 
-        if (val > 31)
+        if (b1 == EMPTY_BYTE_VALUE)         // deleted file??
+          continue;
+
+        if (b2 < 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
           return false;
 
-        for (int j = 1; j <= 8; j++)
-        {
-          val = buffer[i + j] & 0xFF;
-          if (val < 32 || (val > 126 && val != EMPTY_BYTE_VALUE))
-            return false;
-        }
+        //        int val = buffer[i] & 0xFF;
+        //        if (val == EMPTY_BYTE_VALUE)
+        //        {
+        //          if (debug)
+        //            System.out.println ("empty value found - deleted file?");
+        //          break;
+        //        }
+
+        //        if (val > 31)
+        //        {
+        //          if (debug)
+        //            System.out.println ("val > 31");
+        //          return false;
+        //        }
+
+        //        for (int j = 1; j <= 8; j++)
+        //        {
+        //          val = buffer[i + j] & 0xFF;
+        //          if (val < 32 || (val > 126 && val != EMPTY_BYTE_VALUE))
+        //          {
+        //            if (debug)
+        //              System.out.println ("val < 32 || val > 126");
+        //            return false;
+        //          }
+        //        }
       }
     }
 

@@ -50,8 +50,14 @@ class CPMCatalogSector extends AbstractSector
         extra = "";
       }
 
-      addText (text, buffer, i, 1, "User number");
-      addText (text, buffer, i + 1, 4, "File name : " + new String (buffer, i + 1, 8));
+      if (buffer[i] == (byte) 0xE5)
+        addText (text, buffer, i, 1, "Deleted file?");
+      else
+        addText (text, buffer, i, 1, "User number");
+      if (buffer[i + 1] == 0)
+        addText (text, buffer, i + 1, 4, "File name : ");
+      else
+        addText (text, buffer, i + 1, 4, "File name : " + new String (buffer, i + 1, 8));
       addText (text, buffer, i + 5, 4, "");
       addText (text, buffer, i + 9, 3, "File type : " + type + extra);
       addText (text, buffer, i + 12, 1, "Extent counter LO");

@@ -54,7 +54,10 @@ class DirectoryEntry implements AppleFileSource
     type = new String (typeBuffer).trim ();
 
     userNumber = buffer[offset] & 0xFF;
-    name = new String (buffer, offset + 1, 8).trim ();
+    if (userNumber == 0xE5 && buffer[offset + 1] == 0)
+      name = "";
+    else
+      name = new String (buffer, offset + 1, 8).trim ();
     extent = buffer[offset + 12] & 0xFF;
     s2 = buffer[offset + 13] & 0xFF;
     s1 = buffer[offset + 14] & 0xFF;
@@ -120,6 +123,7 @@ class DirectoryEntry implements AppleFileSource
     for (DiskAddress sector : blocks)
       if (sector.matches (da))
         return true;
+
     return false;
   }
 

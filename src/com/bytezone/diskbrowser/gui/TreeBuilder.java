@@ -23,7 +23,7 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class TreeBuilder
 // -----------------------------------------------------------------------------------//
 {
-  private static SimpleDateFormat sdf = new SimpleDateFormat ("dd MMM yyyy");
+  private static SimpleDateFormat sdf = new SimpleDateFormat ("dd LLL yyyy");
 
   private final FileComparator fileComparator = new FileComparator ();
   private final JTree tree;
@@ -219,8 +219,7 @@ class TreeBuilder
           String type = pos > 0 && !f.isDirectory () ? name.substring (pos) : "";
           String size = f.isDirectory () ? "" : String.format ("%,14d", f.length ());
           text.append (String.format ("%s  %-40.40s  %s  %-14s  %s%n",
-              f.isDirectory () ? "D" : " ", name, sdf.format (d).replace (".", ""), size,
-              type));
+              f.isDirectory () ? "D" : " ", name, sdf.format (d), size, type));
         }
       }
 

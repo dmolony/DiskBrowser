@@ -363,7 +363,6 @@ public class AppleDisk implements Disk
   // ---------------------------------------------------------------------------------//
   {
     this.dosVersion = version;
-    //    System.out.printf ("DOS version %02X%n", version);
   }
 
   /*

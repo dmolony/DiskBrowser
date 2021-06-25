@@ -413,18 +413,17 @@ public class HexFormatter
   public static GregorianCalendar getPascalDate (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    int year = (buffer[offset + 1] & 0xFF);
-    int day = (buffer[offset] & 0xF0) >> 4;
-    int month = buffer[offset] & 0x0F;
-    if (day == 0 || month == 0)
-      return null;
-    if (year % 2 > 0)
-      day += 16;
-    year /= 2;
+    int date = Utility.getShort (buffer, offset);
+
+    int month = date & 0x0F;
+    int day = (date & 0x1F0) >>> 4;
+    int year = (date & 0xFE00) >>> 9;
+
     if (year < 70)
       year += 2000;
     else
       year += 1900;
+
     return new GregorianCalendar (year, month - 1, day);
   }
 

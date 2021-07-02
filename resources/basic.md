@@ -6,8 +6,8 @@
 #### Original
 <img src="basic1.png" alt="truly awful" width="350"/>
 
-#### Minor improvements
+#### No formatting
 <img src="basic2.png" alt="better" width="850"/>
 
-#### Split lines
+#### Formatted
 <img src="basic3.png" alt="best" width="550"/>

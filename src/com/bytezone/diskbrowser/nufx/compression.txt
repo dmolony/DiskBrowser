@@ -25,3 +25,7 @@ Zoo . . . . . . . . . . . . . . | .ZOO | U | IBM PC, Amiga, Atari ST,
                                 |      |   | Unix systems
 ARC . . . . . . . . . . . . . . | .ARC | U | IBM PC, Amiga, Atari ST
 Compress . . . . . . . . . . .  | .Z   | U | Unix Systems
+
+
+see also:
+http://fileformats.archiveteam.org/wiki/Squeeze

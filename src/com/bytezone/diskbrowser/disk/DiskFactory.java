@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.disk;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,6 +24,7 @@ import com.bytezone.diskbrowser.nufx.NuFX;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.prodos.ProdosDisk;
 import com.bytezone.diskbrowser.utilities.FileFormatException;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 import com.bytezone.diskbrowser.wizardry.Wizardry4BootDisk;
 import com.bytezone.diskbrowser.wizardry.WizardryScenarioDisk;
@@ -208,6 +210,14 @@ public class DiskFactory
         //        System.out.println (binary2);
         return null;
       }
+    }
+    else if ("bsq".equals (suffix))
+    {
+      if (debug)
+        System.out.println (" ** bsq **");
+      byte[] prefix = getPrefix (file);
+      System.out.println (HexFormatter.format (prefix));
+      String key = "FiLeStArTfIlEsTaRt";
     }
 
     FormattedDisk disk = null;
@@ -931,5 +941,23 @@ public class DiskFactory
       System.out.println ("Not a CPM disk");
 
     return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static byte[] getPrefix (File file)
+  // ---------------------------------------------------------------------------------//
+  {
+    byte[] buffer = new byte[1024];
+    try (BufferedInputStream bis = new BufferedInputStream (new FileInputStream (file)))
+    {
+      bis.read (buffer);
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace ();
+      System.exit (1);
+    }
+
+    return buffer;
   }
 }

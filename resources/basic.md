@@ -1,12 +1,12 @@
 ### Applesoft program listing
 Programs can be displayed in a variety of formats.
-#### This is how it looked originally
+#### State of the art circa 1980
 <img src="basic0.png" alt="terrible" width="700"/>
 
-#### Original but ugly
+#### Original
 <img src="basic1.png" alt="truly awful" width="350"/>
 
-#### Some improvements
+#### Minor improvements
 <img src="basic2.png" alt="better" width="850"/>
 
 #### Split lines

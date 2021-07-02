@@ -4,7 +4,7 @@
 <img src="basic0.png" alt="terrible" width="700"/>
 
 #### Original
-<img src="basic4.png" alt="truly awful" width="350"/>
+<img src="basic5.png" alt="truly awful" width="350"/>
 
 #### No formatting
 <img src="basic2.png" alt="better" width="850"/>

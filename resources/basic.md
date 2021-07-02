@@ -1,5 +1,5 @@
 ### Applesoft program listing
-Programs can be displayed in a variety of formats.
+
 #### State of the art circa 1980
 <img src="basic0.png" alt="terrible" width="700"/>
 

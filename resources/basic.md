@@ -3,7 +3,7 @@
 #### State of the art circa 1980
 <img src="basic0.png" alt="terrible" width="700"/>
 
-#### Original
+#### Original (using Print Char 21)
 <img src="basic5.png" alt="truly awful" width="400"/>
 
 #### No formatting

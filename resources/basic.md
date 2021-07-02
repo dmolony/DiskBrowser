@@ -1,8 +1,9 @@
-###Applesoft program listing
+### Applesoft program listing
 Programs can be displayed in a variety of formats.
 - This is how it looked originally
 
 ![Original](basic0.png?raw=true "terrible")
+<img src="basic0.png" alt="drawing" width="200"/>
 - Original but ugly
 
 ![Original](basic1.png?raw=true "Truly awful")

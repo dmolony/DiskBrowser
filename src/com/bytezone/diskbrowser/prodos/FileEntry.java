@@ -459,6 +459,10 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new DeviceDriver (name, exactBuffer, auxType);
           break;
 
+        case FILE_TYPE_TIF:
+          file = new DefaultAppleFile (name, exactBuffer);
+          break;
+
         case FILE_TYPE_ICN:
           file = new IconFile (name, exactBuffer);
           break;

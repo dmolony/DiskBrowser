@@ -17,9 +17,9 @@ public abstract class AbstractFile implements DataSource
 
   protected String name;
   public byte[] buffer;
-  protected AssemblerProgram assembler;
+  AssemblerProgram assembler;
   protected BufferedImage image;
-  protected int loadAddress;
+  int loadAddress;
   ResourceFork resourceFork;
 
   // ---------------------------------------------------------------------------------//
@@ -35,7 +35,16 @@ public abstract class AbstractFile implements DataSource
   public String getText ()      // Override this to get a tailored text representation
   // ---------------------------------------------------------------------------------//
   {
-    return "Name : " + name + "\n\nNo text description";
+    StringBuilder text = new StringBuilder ();
+
+    text.append ("Name : " + name + "\n\nNo text description");
+    if (resourceFork != null)
+    {
+      text.append ("\n\n");
+      text.append (resourceFork);
+    }
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//

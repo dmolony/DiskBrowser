@@ -18,6 +18,7 @@ public class DefaultAppleFile extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
+
     this.text = "Name : " + name + "\n\n" + text;
   }
 
@@ -35,8 +36,10 @@ public class DefaultAppleFile extends AbstractFile
   {
     if (text != null)
       return text;
+
     if (buffer == null)
       return "Invalid file : " + name;
+
     return super.getText ();
   }
 }

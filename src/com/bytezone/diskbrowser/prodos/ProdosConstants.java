@@ -21,6 +21,7 @@ public interface ProdosConstants
   static int FILE_TYPE_IIGS_SOURCE = 0xB0;
   static int FILE_TYPE_IIGS_OBJECT = 0xB1;
   static int FILE_TYPE_IIGS_APPLICATION = 0xB3;
+  static int FILE_TYPE_TIF = 0xB7;
   static int FILE_TYPE_IIGS_DEVICE_DRIVER = 0xBB;
   static int FILE_TYPE_LDF = 0xBC;
   static int FILE_TYPE_GS_BASIC = 0xAB;

@@ -70,6 +70,8 @@ public class OriginalHiResImage extends HiResImage
             for (int ptr = base; ptr < max; ptr++)
             {
               int value = buffer[ptr] & 0x7F;
+              if ((buffer[ptr] & 0x80) != 0)
+                System.out.printf ("bit shift pixel found in %s%n", name);
               for (int px = 0; px < 7; px++)
               {
                 int val = (value >> px) & 0x01;

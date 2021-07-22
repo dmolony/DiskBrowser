@@ -38,9 +38,10 @@ public abstract class AbstractFile implements DataSource
     StringBuilder text = new StringBuilder ();
 
     text.append ("Name : " + name + "\n\nNo text description");
+
     if (resourceFork != null)
     {
-      text.append ("\n\n");
+      text.append ("\n\nResource Fork:\n\n");
       text.append (resourceFork);
     }
 

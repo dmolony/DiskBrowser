@@ -40,7 +40,7 @@ class Item extends AbstractFile implements Comparable<Item>
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Name ......... : " + name);
+    text.append ("Name ......... : " + getName ());
     //		int length = HexFormatter.intValue (buffer[16]);
     text.append ("\nGeneric name . : " + genericName);
     text.append ("\nType ......... : " + type);
@@ -112,7 +112,7 @@ class Item extends AbstractFile implements Comparable<Item>
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder ();
-    line.append (String.format ("%-16s", name));
+    line.append (String.format ("%-16s", getName ()));
     if (buffer[36] == -1)
       line.append ("(c) ");
     else
@@ -142,7 +142,8 @@ class Item extends AbstractFile implements Comparable<Item>
   public String getDump (int block)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder line = new StringBuilder (String.format ("%3d %-16s", itemID, name));
+    StringBuilder line =
+        new StringBuilder (String.format ("%3d %-16s", itemID, getName ()));
     int lo = block == 0 ? 32 : block == 1 ? 46 : 70;
     int hi = lo + 24;
     if (hi > buffer.length)

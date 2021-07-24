@@ -57,7 +57,9 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     propertyTablePtr = header.getWord (offset + 7);
     int ptr = propertyTablePtr;
     int nameLength = header.getByte (ptr) * 2;
-    this.name = nameLength == 0 ? "<<" + id + ">>" : new ZString (header, ++ptr).value;
+    System.out.printf ("was %s%n", this.getName ());
+    setName (nameLength == 0 ? "<<" + id + ">>" : new ZString (header, ++ptr).value);
+    System.out.printf ("now %s%n", this.getName ());
     ptr += nameLength;
 
     // read each property
@@ -84,11 +86,11 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format ("ID       : %02X  (%<3d)  %s%n%n", id, name));
+    text.append (String.format ("ID       : %02X  (%<3d)  %s%n%n", id, getName ()));
 
-    String obj1 = parent == 0 ? "" : header.getObject (parent - 1).name;
-    String obj2 = sibling == 0 ? "" : header.getObject (sibling - 1).name;
-    String obj3 = child == 0 ? "" : header.getObject (child - 1).name;
+    String obj1 = parent == 0 ? "" : header.getObject (parent - 1).getName ();
+    String obj2 = sibling == 0 ? "" : header.getObject (sibling - 1).getName ();
+    String obj3 = child == 0 ? "" : header.getObject (child - 1).getName ();
 
     text.append (String.format ("Parent   : %02X  (%<3d)  %s%n", parent, obj1));
     text.append (String.format ("Sibling  : %02X  (%<3d)  %s%n", sibling, obj2));
@@ -132,7 +134,7 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    return HexFormatter.getHexString (buffer, startPtr, HEADER_SIZE) + "   " + name;
+    return HexFormatter.getHexString (buffer, startPtr, HEADER_SIZE) + "   " + getName ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -200,7 +202,7 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
       if (propertyNumber >= 19)                   // directions
       {
         ZObject object = getObject ();
-        String objectName = object == null ? "no object" : object.name;
+        String objectName = object == null ? "no object" : object.getName ();
 
         switch (length)
         {
@@ -271,8 +273,8 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
         for (int i = 0; i < length; i++)
         {
           int objectId = header.getByte (ptr + i + 1);
-          text.append (
-              String.format ("%s%s", (i == 0 ? "" : ", "), getObject (objectId).name));
+          text.append (String.format ("%s%s", (i == 0 ? "" : ", "),
+              getObject (objectId).getName ()));
         }
       }
       //      else
@@ -296,6 +298,6 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   public int compareTo (ZObject o)
   // ---------------------------------------------------------------------------------//
   {
-    return this.name.compareTo (o.name);
+    return this.getName ().compareTo (o.getName ());
   }
 }

@@ -557,14 +557,14 @@ public class DiskFactory
       disk = checkPascalDisk (appleDisk512);
 
     if (disk == null)
-      disk = checkCPMDisk (appleDisk256);
-
-    if (disk == null)
     {
       disk2 = checkInfocomDisk (appleDisk256);
       if (disk2 != null)
         disk = disk2;
     }
+
+    if (disk == null)
+      disk = checkCPMDisk (appleDisk256);       // checks almost nothing
 
     if (disk == null)
       disk = new DataDisk (appleDisk256);

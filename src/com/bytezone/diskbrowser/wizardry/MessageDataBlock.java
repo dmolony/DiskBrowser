@@ -75,7 +75,8 @@ class MessageDataBlock extends AbstractFile
     }
     else
       lastMessageNo = firstMessageNo;
-    this.name += " - " + lastMessageNo;
+//    this.name += " - " + lastMessageNo;
+    setName (getName () + " - " + lastMessageNo);
   }
 
   // ---------------------------------------------------------------------------------//

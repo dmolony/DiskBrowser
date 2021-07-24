@@ -104,7 +104,7 @@ class Character extends AbstractFile
         item.partyOwns++;
       }
       else
-        System.out.println (name + " ItemID : " + itemID + " is outside range 0:"
+        System.out.println (getName () + " ItemID : " + itemID + " is outside range 0:"
             + (itemList.size () - 1));
     }
   }
@@ -121,7 +121,7 @@ class Character extends AbstractFile
           if (index > 0 && index <= spellList.size ())
             spellBook.add (spellList.get (index - 1));
           else
-            System.out.println ("LinkSpell: " + name + " SpellID : " + index
+            System.out.println ("LinkSpell: " + getName () + " SpellID : " + index
                 + " is outside range 1:" + spellList.size ());
         }
   }
@@ -133,7 +133,7 @@ class Character extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Character name ..... " + name);
+    text.append ("Character name ..... " + getName ());
     text.append ("\n\nRace ............... " + stats.race);
     text.append ("\nType ............... " + stats.type);
     text.append ("\nAlignment .......... " + stats.alignment);
@@ -301,7 +301,7 @@ class Character extends AbstractFile
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    return name;
+    return getName ();
   }
 
   // ---------------------------------------------------------------------------------//

@@ -151,7 +151,7 @@ class Monster extends AbstractFile
 
     text.append ("\n\nPartner ID ...... " + partnerID);
     if (partnerOdds > 0)
-      text.append ("   " + monsters.get (partnerID).name);
+      text.append ("   " + monsters.get (partnerID).getName ());
     text.append ("\nPartner odds .... " + partnerOdds + "%");
 
     text.append ("\n\nMage level ...... " + mageSpellLevel);

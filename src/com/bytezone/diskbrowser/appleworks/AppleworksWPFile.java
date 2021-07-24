@@ -139,7 +139,7 @@ public class AppleworksWPFile extends AbstractFile
           break;
 
         default:
-          System.out.printf ("Unknown value in %s: %02X %02X%n", name, b1, b2);
+          System.out.printf ("Unknown value in %s: %02X %02X%n", getName (), b1, b2);
       }
       ptr += 2;
     }

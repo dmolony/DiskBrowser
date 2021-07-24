@@ -13,6 +13,7 @@ import com.bytezone.diskbrowser.disk.Disk;
 import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
+import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
 public class CPMDisk extends AbstractFormattedDisk
@@ -228,6 +229,7 @@ public class CPMDisk extends AbstractFormattedDisk
     for (int sector = 0; sector < 8; sector++)
     {
       byte[] buffer = disk.readBlock (3, sector);
+      System.out.println (HexFormatter.format (buffer));
 
       // check if entire sector is empty (everything == 0xE5)
       if (bufferContainsAll (buffer, (byte) EMPTY_BYTE_VALUE))

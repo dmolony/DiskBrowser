@@ -15,7 +15,7 @@ public abstract class AbstractFile implements DataSource
 {
   static boolean showDebugText;
 
-  protected String name;
+  String name;
   public byte[] buffer;
   AssemblerProgram assembler;
   protected BufferedImage image;
@@ -28,6 +28,13 @@ public abstract class AbstractFile implements DataSource
   {
     this.name = name;
     this.buffer = buffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public void setName (String name)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.name = name;       // Infocom ZObject uses this - but it sucks 
   }
 
   // ---------------------------------------------------------------------------------//

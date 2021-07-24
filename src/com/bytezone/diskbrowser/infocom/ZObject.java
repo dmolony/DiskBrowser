@@ -57,9 +57,7 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     propertyTablePtr = header.getWord (offset + 7);
     int ptr = propertyTablePtr;
     int nameLength = header.getByte (ptr) * 2;
-    System.out.printf ("was %s%n", this.getName ());
     setName (nameLength == 0 ? "<<" + id + ">>" : new ZString (header, ++ptr).value);
-    System.out.printf ("now %s%n", this.getName ());
     ptr += nameLength;
 
     // read each property

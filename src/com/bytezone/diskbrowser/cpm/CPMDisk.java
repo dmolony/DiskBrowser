@@ -1,6 +1,7 @@
 package com.bytezone.diskbrowser.cpm;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -210,6 +211,60 @@ public class CPMDisk extends AbstractFormattedDisk
 
   // ---------------------------------------------------------------------------------//
   public static boolean isCorrectFormat (AppleDisk disk)
+  // ---------------------------------------------------------------------------------//
+  {
+    boolean debug = false;
+
+    disk.setInterleave (3);
+
+    // collect catalog sectors
+    List<DiskAddress> catalog = new ArrayList<> ();
+    for (int i = 0; i < 8; i++)
+      catalog.add (disk.getDiskAddress (3, i));
+    byte[] buffer = disk.readBlocks (catalog);
+
+    if (debug)
+      System.out.println (HexFormatter.format (buffer));
+
+    for (int i = 0; i < 2; i++)
+    {
+      int start = i * 1024;
+      int end = start + 1024;
+
+      for (int ptr = start; ptr < end; ptr += 32)
+      {
+        if (buffer[ptr] == (byte) EMPTY_BYTE_VALUE)
+        {
+          if (buffer[ptr + 1] == (byte) EMPTY_BYTE_VALUE)     // finished this block
+            break;
+          continue;                                           // deleted file?
+        }
+
+        int userNo = buffer[ptr] & 0xFF;
+        if (userNo > 31)
+          return false;
+
+        for (int j = 1; j < 12; j++)
+        {
+          int ch = buffer[ptr + j] & 0xFF;
+          if (ch < 32 || ch > 126)                            // invalid ascii
+            return false;
+        }
+
+        if (debug)
+        {
+          String fileName = new String (buffer, ptr + 1, 8);
+          String fileType = new String (buffer, ptr + 9, 3);
+          System.out.printf ("%2d  %s %s%n", userNo, fileName, fileType);
+        }
+      }
+    }
+
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private static boolean isCorrectFormat2 (AppleDisk disk)
   // ---------------------------------------------------------------------------------//
   {
     disk.setInterleave (3);

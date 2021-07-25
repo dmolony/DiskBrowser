@@ -28,31 +28,31 @@ public class CPMBasicFile extends TextFile
     while (buffer[ptr] != 0)
       ptr++;
 
-    int offset = getShort (buffer, 1) - ptr;
+    int loadAddress = getShort (buffer, 1) - ptr - 1;
 
     ptr = 1;
     while (ptr < buffer.length)
     {
-      int val1 = getShort (buffer, ptr);
+      int nextAddress = getShort (buffer, ptr);
 
-      if (val1 == 0)
+      if (nextAddress == 0)
         break;
 
-      int val2 = getShort (buffer, ptr + 2);
+      int lineNumber = getShort (buffer, ptr + 2);
 
-      text.append (String.format ("%7d  ", val2));
+      text.append (String.format ("%7d  ", lineNumber));
       ptr += 4;
 
       while (buffer[ptr] != 0)
       {
         int val = buffer[ptr++] & 0xFF;
         if ((val & 0x80) == 0 && val >= 32)
-          text.append (String.format ("%s", (char) val));
+          text.append (String.format ("%s", (char) val));     // printable
         else
-          text.append (String.format ("<%02X>", val));
+          text.append (String.format ("<%02X>", val));        // token?
       }
 
-      ptr = val1 - offset + 1;
+      ptr = nextAddress - loadAddress;
       text.append ("\n");
     }
 

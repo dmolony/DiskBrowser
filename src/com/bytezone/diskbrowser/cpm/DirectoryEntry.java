@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
+import com.bytezone.diskbrowser.applefile.CPMBasicFile;
 import com.bytezone.diskbrowser.applefile.CPMTextFile;
 import com.bytezone.diskbrowser.applefile.DefaultAppleFile;
 import com.bytezone.diskbrowser.disk.AppleDiskAddress;
@@ -58,6 +59,7 @@ class DirectoryEntry implements AppleFileSource
       name = "";
     else
       name = new String (buffer, offset + 1, 8).trim ();
+
     extent = buffer[offset + 12] & 0xFF;
     s2 = buffer[offset + 13] & 0xFF;
     s1 = buffer[offset + 14] & 0xFF;
@@ -226,6 +228,8 @@ class DirectoryEntry implements AppleFileSource
     else if ("ASM".equals (type) || "DOC".equals (type) || "TXT".equals (type)
         || count > 2)
       appleFile = new CPMTextFile (name, exactBuffer);
+    else if ("BAS".equals (type))
+      appleFile = new CPMBasicFile (name, exactBuffer);
     else
       appleFile = new DefaultAppleFile (name, exactBuffer, "CPM File : " + type);
 

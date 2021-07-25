@@ -188,19 +188,18 @@ public class CPMDisk extends AbstractFormattedDisk
   public AppleFileSource getCatalog ()
   // ---------------------------------------------------------------------------------//
   {
-    String newLine = String.format ("%n");
     String line =
         "----  ---------  --- - -  --   --   --   --   ----------------------------"
-            + "-------------------" + newLine;
+            + "-------------------\n";
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("File : %s%n%n", getDisplayPath ()));
-    text.append ("User  Name       Typ R S  Ex   S2   S1   RC   Blocks" + newLine);
+    text.append ("User  Name       Typ R S  Ex   S2   S1   RC   Blocks\n");
     text.append (line);
 
     for (AppleFileSource entry : fileEntries)
     {
       text.append (((DirectoryEntry) entry).line ());
-      text.append (newLine);
+      text.append ("\n");
     }
     text.append (line);
     if (version != 0)
@@ -235,7 +234,8 @@ public class CPMDisk extends AbstractFormattedDisk
       {
         if (buffer[ptr] == (byte) EMPTY_BYTE_VALUE)
         {
-          if (buffer[ptr + 1] == (byte) EMPTY_BYTE_VALUE)     // finished this block
+          if (buffer[ptr + 1] == (byte) EMPTY_BYTE_VALUE      //
+              || buffer[ptr + 1] == 0)                        // finished this block
             break;
           continue;                                           // deleted file?
         }
@@ -246,7 +246,7 @@ public class CPMDisk extends AbstractFormattedDisk
 
         for (int j = 1; j < 12; j++)
         {
-          int ch = buffer[ptr + j] & 0xFF;
+          int ch = buffer[ptr + j] & 0x7F;                    // remove flag
           if (ch < 32 || ch > 126)                            // invalid ascii
             return false;
         }
@@ -259,6 +259,9 @@ public class CPMDisk extends AbstractFormattedDisk
         }
       }
     }
+
+    if (debug)
+      System.out.println ("CP/M disk");
 
     return true;
   }

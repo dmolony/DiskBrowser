@@ -29,20 +29,25 @@ class CPMCatalogSector extends AbstractSector
       if (buffer[i] == (byte) 0xE5 && buffer[i + 1] == (byte) 0xE5)
         break;
 
+      int userNumber = buffer[i] & 0xFF;
+      if (userNumber > 31 && userNumber != (byte) 0xE5)
+        break;
+
       boolean readOnly = (buffer[i + 9] & 0x80) != 0;
       boolean systemFile = (buffer[i + 10] & 0x80) != 0;
+      boolean unknown = (buffer[i + 11] & 0x80) != 0;
       String type;
       String extra;
 
-      if (readOnly || systemFile)
+      if (readOnly || systemFile || unknown)
       {
         byte[] typeBuffer = new byte[3];
         typeBuffer[0] = (byte) (buffer[i + 9] & 0x7F);
         typeBuffer[1] = (byte) (buffer[i + 10] & 0x7F);
-        typeBuffer[2] = buffer[i + 11];
+        typeBuffer[2] = (byte) (buffer[i + 11] & 0x7F);
         type = new String (typeBuffer).trim ();
-        extra = String.format (" (%s%s)", readOnly ? "read only" : "",
-            systemFile ? "system file" : "");
+        extra = String.format (" (%s%s%s)", readOnly ? "read only" : "",
+            systemFile ? "system file" : "", unknown ? "unknown" : "");
       }
       else
       {

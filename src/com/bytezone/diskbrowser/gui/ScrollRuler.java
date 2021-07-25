@@ -29,14 +29,14 @@ class ScrollRuler extends JComponent
   private boolean isHex = true;
   private boolean isTrackMode = true;
   private LayoutDetails layoutDetails;
-  private final JComponent image;
+  private final DiskLayoutImage diskLayoutImage;
 
   // ---------------------------------------------------------------------------------//
-  ScrollRuler (JComponent image, int orientation)
+  ScrollRuler (DiskLayoutImage diskLayoutImage, int orientation)
   // ---------------------------------------------------------------------------------//
   {
     this.orientation = orientation;
-    this.image = image;
+    this.diskLayoutImage = diskLayoutImage;
 
     // set defaults until setLayout is called
     if (orientation == HORIZONTAL)
@@ -46,20 +46,20 @@ class ScrollRuler extends JComponent
   }
 
   // ---------------------------------------------------------------------------------//
-  public void setLayout (LayoutDetails layout)
+  public void setLayout (LayoutDetails layoutDetails)
   // ---------------------------------------------------------------------------------//
   {
-    this.layoutDetails = layout;
+    this.layoutDetails = layoutDetails;
 
     // Must match the preferred size of DiskLayoutImage
     if (orientation == HORIZONTAL)
-      setPreferredSize (
-          new Dimension (layout.block.width * layout.grid.width + 1, HEIGHT));
+      setPreferredSize (new Dimension (
+          layoutDetails.block.width * layoutDetails.grid.width + 1, HEIGHT));
     else
-      setPreferredSize (
-          new Dimension (WIDTH, layout.block.height * layout.grid.height + 1));
+      setPreferredSize (new Dimension (WIDTH,
+          layoutDetails.block.height * layoutDetails.grid.height + 1));
 
-    setTrackMode (layout.grid.width == 16 || layout.grid.width == 13);
+    setTrackMode (layoutDetails.grid.width == 16 || layoutDetails.grid.width == 13);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -105,7 +105,7 @@ class ScrollRuler extends JComponent
   {
     int start = (clipRect.x / width);
     int end = start + clipRect.width / width;
-    end = Math.min (end, image.getWidth () / width - 1);
+    end = Math.min (end, diskLayoutImage.getWidth () / width - 1);
 
     String format;
     int offset;
@@ -131,7 +131,7 @@ class ScrollRuler extends JComponent
   {
     int start = (clipRect.y / height);
     int end = start + clipRect.height / height;
-    end = Math.min (end, image.getHeight () / height - 1);
+    end = Math.min (end, diskLayoutImage.getHeight () / height - 1);
 
     String format = isHex ? "%04X" : "%04d";
 

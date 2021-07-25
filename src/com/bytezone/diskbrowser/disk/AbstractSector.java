@@ -8,14 +8,12 @@ import javax.swing.JPanel;
 import com.bytezone.diskbrowser.applefile.AssemblerProgram;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public abstract class AbstractSector implements DataSource
 // -----------------------------------------------------------------------------------//
 {
-  private static String newLine = String.format ("%n");
-  private static String newLine2 = newLine + newLine;
-
   final public byte[] buffer;
   protected Disk disk;
   protected DiskAddress diskAddress;
@@ -90,10 +88,11 @@ public abstract class AbstractSector implements DataSource
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (title + newLine2);
-    text.append ("Offset    Value         Description" + newLine);
+    text.append (title + "\n\n");
+    text.append ("Offset    Value         Description\n");
     text.append ("=======   ===========   "
-        + "===============================================================" + newLine);
+        + "===============================================================\n");
+
     return text;
   }
 
@@ -143,14 +142,13 @@ public abstract class AbstractSector implements DataSource
       String desc)
   // ---------------------------------------------------------------------------------//
   {
-    if (size == 1)
-      desc += " (" + (b[offset] & 0xFF) + ")";
-    else if (size == 2)
-      desc +=
-          String.format (" (%,d)", ((b[offset + 1] & 0xFF) * 256 + (b[offset] & 0xFF)));
-    else if (size == 3)
-      desc += String.format (" (%,d)", ((b[offset + 2] & 0xFF) * 65536)
-          + ((b[offset + 1] & 0xFF) * 256) + (b[offset] & 0xFF));
+    desc += switch (size)
+    {
+      case 1 -> " (" + (b[offset] & 0xFF) + ")";
+      case 2 -> String.format (" (%,d)", Utility.getShort (b, offset));
+      case 3 -> String.format (" (%,d)", Utility.readTriple (b, offset));
+      default -> "";
+    };
 
     addText (text, b, offset, size, desc);
   }

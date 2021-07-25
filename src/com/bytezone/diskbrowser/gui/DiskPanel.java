@@ -13,6 +13,7 @@ public class DiskPanel extends JPanel
 {
   FormattedDisk formattedDisk;
   LayoutDetails layoutDetails;
+
   int blockWidth = 30;              // default
   int blockHeight = 15;             // default
   int centerOffset;
@@ -20,11 +21,11 @@ public class DiskPanel extends JPanel
   Color backgroundColor = new Color (0xE0, 0xE0, 0xE0);
 
   // ---------------------------------------------------------------------------------//
-  public void setDisk (FormattedDisk disk, LayoutDetails details)
+  public void setDisk (FormattedDisk formattedDisk, LayoutDetails layoutDetails)
   // ---------------------------------------------------------------------------------//
   {
-    formattedDisk = disk;
-    layoutDetails = details;
+    this.formattedDisk = formattedDisk;
+    this.layoutDetails = layoutDetails;
 
     blockWidth = layoutDetails.block.width;
     blockHeight = layoutDetails.block.height;

@@ -242,6 +242,7 @@ public class HexFormatter
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder hex = new StringBuilder ();
+
     int max = Math.min (offset + length, buffer.length);
     for (int i = offset; i < max; i++)
     {
@@ -249,8 +250,10 @@ public class HexFormatter
       if (space)
         hex.append (' ');
     }
+
     if (length > 0 && space)
       hex.deleteCharAt (hex.length () - 1);
+
     return hex.toString ();
   }
 

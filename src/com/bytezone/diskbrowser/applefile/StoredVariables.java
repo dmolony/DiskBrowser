@@ -52,7 +52,7 @@ public class StoredVariables extends AbstractFile
       else if (suffix == '%')
       {
         intValue = Utility.intValue (buffer[ptr + 3], buffer[ptr + 2]);   // backwards!
-        if ((buffer[ptr + 2] & 0x80) > 0)
+        if ((buffer[ptr + 2] & 0x80) != 0)
           intValue -= 65536;
         text.append (" = " + intValue);
       }
@@ -101,7 +101,7 @@ public class StoredVariables extends AbstractFile
       suffix = ' ';
     }
 
-    StringBuffer variableName = new StringBuffer ();
+    StringBuilder variableName = new StringBuilder ();
     variableName.append (c1);
     if (c2 > 32)
       variableName.append (c2);
@@ -116,12 +116,14 @@ public class StoredVariables extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("(");
+
     for (int i = 0; i < values.length; i++)
     {
       text.append (values[i]);
       if (i < values.length - 1)
         text.append (',');
     }
+
     return text.append (')').toString ();
   }
 
@@ -201,6 +203,7 @@ public class StoredVariables extends AbstractFile
     for (int i = 0; i < 5; i++)
       if (buffer[p + i] != 0)
         return true;
+
     return false;
   }
 

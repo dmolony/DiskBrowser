@@ -213,20 +213,13 @@ class DirectoryEntry implements AppleFileSource
     byte[] exactBuffer = new byte[len];
     System.arraycopy (buffer, 0, exactBuffer, 0, len);
 
-    int max = Math.min (256, exactBuffer.length);
-    int count = 0;
-    for (int i = 1; i < max; i++)
-    {
-      if (exactBuffer[i - 1] == 0x0D && exactBuffer[i] == 0x0A)
-        ++count;
-    }
-
     if ("COM".equals (type))
       appleFile = new DefaultAppleFile (name, exactBuffer, "COM File");
     else if ("DVR".equals (type))
       appleFile = new DefaultAppleFile (name, exactBuffer, "DVR File");
     else if ("ASM".equals (type) || "DOC".equals (type) || "TXT".equals (type)
-        || count > 2)
+        || "LET".equals (type) || "ALX".equals (type) || "SRC".equals (type)
+        || exactBuffer[len - 1] == 0x1A)
       appleFile = new CPMTextFile (name, exactBuffer);
     else if ("BAS".equals (type))
       appleFile = new CPMBasicFile (name, exactBuffer);

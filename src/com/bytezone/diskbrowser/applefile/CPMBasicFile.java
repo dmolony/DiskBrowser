@@ -206,17 +206,13 @@ public class CPMBasicFile extends BasicProgram
         break;
 
       int lineNumber = getShort (buffer, ptr + 2);
-      text.append (String.format (" %d  ", lineNumber));
 
       lastPtr = ptr;
       ptr = nextAddress - loadAddress;
 
-      text.append (HexFormatter.getHexString (buffer, lastPtr + 4, ptr - lastPtr));
+      text.append (String.format (" %d  ", lineNumber));
+      text.append (HexFormatter.getHexString (buffer, lastPtr + 4, ptr - lastPtr - 4));
       text.append ("\n");
-      if (ptr < 0 || ptr >= buffer.length)
-        break;
-      if (buffer[ptr - 1] != 0)             // end of previous line
-        break;
     }
 
     return text.toString ();

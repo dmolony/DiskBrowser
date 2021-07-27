@@ -5,7 +5,7 @@ import static com.bytezone.diskbrowser.utilities.Utility.getShort;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
-public class CPMBasicFile extends TextFile
+public class CPMBasicFile extends BasicProgram
 // -----------------------------------------------------------------------------------//
 {
   String[] tokens = { //
@@ -52,7 +52,7 @@ public class CPMBasicFile extends TextFile
   {
     StringBuilder text = new StringBuilder ();
 
-    if (textPreferences.showHeader)
+    if (basicPreferences.showHeader)
       text.append ("Name : " + name + "\n\n");
 
     int ptr = 5;
@@ -60,6 +60,11 @@ public class CPMBasicFile extends TextFile
       ptr++;
 
     int loadAddress = getShort (buffer, 1) - ptr - 1;
+    if (!validate (buffer, loadAddress))
+      System.out.println ("Invalid load address");
+
+    if (showDebugText)
+      return debugText (loadAddress);
 
     ptr = 1;
     while (ptr < buffer.length)
@@ -83,10 +88,10 @@ public class CPMBasicFile extends TextFile
         {
           if (val == 0xFF)
           {
-            int next = buffer[ptr++] & 0xFF;
-            String token = functions[next & 0x7F];
+            val = buffer[ptr++] & 0xFF;
+            String token = functions[val & 0x7F];
             if (token.length () == 0)
-              token = String.format ("<FF %02X>", next);
+              token = String.format ("<FF %02X>", val);
             text.append (token);
           }
           else
@@ -107,6 +112,10 @@ public class CPMBasicFile extends TextFile
           {
             text.append ("'");
             ptr += 2;
+          }
+          else if (val == 0x3A && ptr < buffer.length && buffer[ptr] == (byte) 0x9E)
+          {
+            // ignore colon before ELSE
           }
           else
             text.append (String.format ("%s", (char) val));
@@ -179,5 +188,60 @@ public class CPMBasicFile extends TextFile
       text.deleteCharAt (text.length () - 1);
 
     return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private String debugText (int loadAddress)
+  // ---------------------------------------------------------------------------------//
+  {
+    StringBuilder text = new StringBuilder ();
+
+    int ptr = 1;
+    int lastPtr;
+
+    while (ptr < buffer.length)
+    {
+      int nextAddress = getShort (buffer, ptr);
+      if (nextAddress == 0)
+        break;
+
+      int lineNumber = getShort (buffer, ptr + 2);
+      text.append (String.format (" %d  ", lineNumber));
+
+      lastPtr = ptr;
+      ptr = nextAddress - loadAddress;
+
+      text.append (HexFormatter.getHexString (buffer, lastPtr + 4, ptr - lastPtr));
+      text.append ("\n");
+      if (ptr < 0 || ptr >= buffer.length)
+        break;
+      if (buffer[ptr - 1] != 0)             // end of previous line
+        break;
+    }
+
+    return text.toString ();
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private boolean validate (byte[] buffer, int loadAddress)
+  // ---------------------------------------------------------------------------------//
+  {
+//    System.out.printf ("Load Address: %04X%n", loadAddress);
+    int ptr = 1;
+
+    while (ptr < buffer.length)
+    {
+      int nextAddress = getShort (buffer, ptr);
+//      System.out.printf ("%04X%n", nextAddress);
+      if (nextAddress == 0)
+        return true;
+      ptr = nextAddress - loadAddress;
+      if (ptr < 0 || ptr >= buffer.length)
+        return false;
+      if (buffer[ptr - 1] != 0)             // end of previous line
+        return false;
+    }
+
+    return false;
   }
 }

@@ -9,22 +9,33 @@ public class CPMBasicFile extends TextFile
 // -----------------------------------------------------------------------------------//
 {
   String[] tokens = { //
-      "", "END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ",               // 0x80
-      "LET", "GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM",        // 0x88
-      "STOP", "PRINT", "CLEAR", "LIST", "NEW", "ON", "DEF", "POKE",           // 0x90
-      "", "", "", "LPRINT", "LLIST", "WIDTH", "ELSE", "",                     // 0x98
-      "", "SWAP", "ERASE", "", "ERROR", "RESUME", "DELETE", "",               // 0xA0
-      "RENUM", "DEFSTR", "DEFINT", "", "DEFDBL", "LINE", "", "WHILE",         // 0xA8
-      "WEND", "CALL", "WRITE", "COMMON", "CHAIN", "OPTION", "RANDOMIZE", "SYSTEM", // 0xB0
-      "OPEN", "FIELD", "GET", "PUT", "CLOSE", "LOAD", "MERGE", "",            // 0xB8
-      "NAME", "KILL", "LSET", "RSET", "SAVE", "RESET", "TEXT", "HOME",        // 0xC0
-      "VTAB", "HTAB", "INVERSE", "NORMAL", "", "", "", "",                    // 0xC8
-      "", "", "", "", "", "WAIT", "", "",                                     // 0xD0
-      "", "", "", "", "", "TO", "THEN", "TAB(",                               // 0xD8
-      "STEP", "USR", "FN", "SPC(", "", "ERL", "ERR", "STRING$",               // 0xE0
-      "USING", "INSTR", "", "VARPTR", "", "", "INKEY$", ">",                  // 0xE8
-      "=", "<", "+", "-", "*", "/", "", "AND",                                // 0xF0
-      "OR", "", "", "", "MOD", "/", "", "",                                   // 0xF8
+      "", "END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ",           // 0x80
+      "LET", "GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM",    // 0x88
+      "STOP", "PRINT", "CLEAR", "LIST", "NEW", "ON", "DEF", "POKE",       // 0x90
+      "", "", "", "LPRINT", "LLIST", "WIDTH", "ELSE", "",                 // 0x98
+      "", "SWAP", "ERASE", "", "ERROR", "RESUME", "DELETE", "",           // 0xA0
+      "RENUM", "DEFSTR", "DEFINT", "", "DEFDBL", "LINE", "", "WHILE",     // 0xA8
+      "WEND", "CALL", "WRITE", "COMMON", "CHAIN",                         // 0xB0
+      "OPTION", "RANDOMIZE", "SYSTEM",                                    // 0xB5
+      "OPEN", "FIELD", "GET", "PUT", "CLOSE", "LOAD", "MERGE", "",        // 0xB8
+      "NAME", "KILL", "LSET", "RSET", "SAVE", "RESET", "TEXT", "HOME",    // 0xC0
+      "VTAB", "HTAB", "INVERSE", "NORMAL", "", "", "", "",                // 0xC8
+      "", "", "", "", "", "WAIT", "", "",                                 // 0xD0
+      "", "", "", "", "", "TO", "THEN", "TAB(",                           // 0xD8
+      "STEP", "USR", "FN", "SPC(", "", "ERL", "ERR", "STRING$",           // 0xE0
+      "USING", "INSTR", "'", "VARPTR", "", "", "INKEY$", ">",             // 0xE8
+      "=", "<", "+", "-", "*", "/", "", "AND",                            // 0xF0
+      "OR", "", "", "", "MOD", "/", "", "",                               // 0xF8
+  };
+
+  String[] functions = { //
+      "", "LEFT$", "RIGHT$", "MID$", "SGN", "INT", "ABS", "SQR",      // 0x80
+      "RND", "SIN", "LOG", "EXP", "COS", "TAN", "ATN", "FRE",         // 0x88
+      "POS", "LEN", "STR$", "VAL", "ASC", "CHR$", "PEEK", "SPACE$",   // 0x90
+      "OCT$", "HEX$", "LPOS", "CINT", "CSNG", "CDBL", "FIX", "",      // 0x98
+      "", "", "", "", "", "", "", "",                                 // 0xA0
+      "", "", "CVI", "CVS", "CVD", "", "EOF", "LOC",                  // 0xA8
+      "", "MKI$", "MKS$", "MKD$",                                     // 0xB0
   };
 
   // ---------------------------------------------------------------------------------//
@@ -59,7 +70,6 @@ public class CPMBasicFile extends TextFile
         break;
 
       int lineNumber = getShort (buffer, ptr + 2);
-//      System.out.println (lineNumber);
 
       text.append (String.format (" %d ", lineNumber));
       ptr += 4;
@@ -69,13 +79,41 @@ public class CPMBasicFile extends TextFile
       {
         int val = buffer[ptr++] & 0xFF;
 
-        if (val >= 0x20 && val <= 0x7E)              // printable
+        if (val >= 0x80)
         {
-          text.append (String.format ("%s", (char) val));
+          if (val == 0xFF)
+          {
+            int next = buffer[ptr++] & 0xFF;
+            String token = functions[next & 0x7F];
+            if (token.length () == 0)
+              token = String.format ("<FF %02X>", next);
+            text.append (token);
+          }
+          else
+          {
+            String token = tokens[val & 0x7F];
+            if (token.length () == 0)
+              token = String.format ("<%02X>", val);
+            text.append (token);
+          }
           continue;
         }
 
-        if (val >= 0x11 && val <= 0x1A)
+        if (val >= 0x20 && val <= 0x7E)              // printable
+        {
+          // check for stupid apostrophe comment
+          if (val == 0x3A && ptr + 1 < buffer.length && buffer[ptr] == (byte) 0x8F
+              && buffer[ptr + 1] == (byte) 0xEA)
+          {
+            text.append ("'");
+            ptr += 2;
+          }
+          else
+            text.append (String.format ("%s", (char) val));
+          continue;
+        }
+
+        if (val >= 0x11 && val <= 0x1A)               // inline numbers
         {
           text.append (val - 0x11);
           continue;
@@ -128,55 +166,8 @@ public class CPMBasicFile extends TextFile
             ptr += 8;
             break;
 
-          case 0xFF:
-            int next = buffer[ptr++] & 0xFF;
-            String token = switch (next)
-            {
-              case 0x81 -> "LEFT$";
-              case 0x82 -> "RIGHT$";
-              case 0x83 -> "MID$";
-              case 0x84 -> "SGN";
-              case 0x85 -> "INT";
-              case 0x86 -> "ABS";
-              case 0x87 -> "SQR";
-              case 0x88 -> "RND";
-              case 0x89 -> "SIN";
-              case 0x8A -> "LOG";
-              case 0x8B -> "EXP";
-              case 0x8C -> "COS";
-              case 0x8D -> "TAN";
-              case 0x8E -> "ATN";
-              case 0x8F -> "FRE";
-              case 0x90 -> "POS";
-              case 0x91 -> "LEN";
-              case 0x92 -> "STR$";
-              case 0x93 -> "VAL";
-              case 0x94 -> "ASC";
-              case 0x95 -> "CHR$";
-              case 0x96 -> "PEEK";
-              case 0x97 -> "SPACE$";
-              case 0x98 -> "OCT$";
-              case 0x99 -> "HEX$";
-              case 0x9A -> "LPOS";
-              case 0x9B -> "CINT";
-              case 0x9C -> "CSNG";
-              case 0x9D -> "CDBL";
-              case 0x9E -> "FIX";
-              case 0xAA -> "CVI";
-              case 0xAB -> "CVS";
-              case 0xAC -> "CVD";
-              case 0xAE -> "EOF";
-              case 0xAF -> "LOC";
-              case 0xB1 -> "MKI$";
-              case 0xB2 -> "MKS$";
-              case 0xB3 -> "MKD$";
-              default -> String.format ("<FF %02X>", next);
-            };
-            text.append (token);
-            break;
-
           default:
-            text.append (getToken (val));
+            text.append (String.format ("<%02X>", val));
         }
       }
 
@@ -188,22 +179,5 @@ public class CPMBasicFile extends TextFile
       text.deleteCharAt (text.length () - 1);
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private String getToken (int val)
-  // ---------------------------------------------------------------------------------//
-  {
-    if (val < 0x80)
-      return String.format ("<****%02X*****>", val);
-
-    String token = tokens[val - 0x80];
-    if (token.length () == 0)
-    {
-      token = String.format ("<%02X>", val);
-//      System.out.println (token);
-    }
-
-    return token;
   }
 }

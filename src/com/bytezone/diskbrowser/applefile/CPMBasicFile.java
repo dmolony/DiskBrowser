@@ -9,22 +9,22 @@ public class CPMBasicFile extends TextFile
 // -----------------------------------------------------------------------------------//
 {
   String[] tokens = { //
-      "", "END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ",   // 0x80
-      "", "GOTO", "RUN", "IF", "", "GOSUB", "RETURN", "REM",      // 0x88
-      "POS", "PRINT", "CLEAR", "", "", "ON", "DEF", "POKE",       // 0x90
-      "", "", "", "", "", "", "ELSE", "",                         // 0x98
-      "", "", "", "", "", "", "", "",                             // 0xA0
-      "", "", "DEFINT", "", "", "LINE", "", "",                   // 0xA8
-      "", "", "", "COMMON", "CHAIN", "", "", "SYSTEM",            // 0xB0
-      "OPEN", "FIELD", "GET", "", "CLOSE", "", "", "",            // 0xB8
-      "", "KILL", "LSET", "", "", "RESET", "TEXT", "HOME",        // 0xC0
-      "VTAB", "HTAB", "INVERSE", "NORMAL", "", "", "", "",        // 0xC8
-      "", "", "", "", "", "", "", "",                             // 0xD0
-      "", "", "", "", "", "TO", "THEN", "TAB(",                   // 0xD8
-      "STEP", "USR", "FN", "SPC(", "", "", "", "STRING$",         // 0xE0
-      "USING", "INSTR", "", "VARPTR", "", "", "INKEY$", ">",      // 0xE8
-      "=", "<", "+", "-", "*", "/", "", "AND",                    // 0xF0
-      "OR", "", "", "", "MOD", "/", "", "",                       // 0xF8
+      "", "END", "FOR", "NEXT", "DATA", "INPUT", "DIM", "READ",               // 0x80
+      "LET", "GOTO", "RUN", "IF", "RESTORE", "GOSUB", "RETURN", "REM",        // 0x88
+      "STOP", "PRINT", "CLEAR", "LIST", "NEW", "ON", "DEF", "POKE",           // 0x90
+      "", "", "", "LPRINT", "LLIST", "WIDTH", "ELSE", "",                     // 0x98
+      "", "SWAP", "ERASE", "", "ERROR", "RESUME", "DELETE", "",               // 0xA0
+      "RENUM", "DEFSTR", "DEFINT", "", "DEFDBL", "LINE", "", "WHILE",         // 0xA8
+      "WEND", "CALL", "WRITE", "COMMON", "CHAIN", "OPTION", "RANDOMIZE", "SYSTEM", // 0xB0
+      "OPEN", "FIELD", "GET", "PUT", "CLOSE", "LOAD", "MERGE", "",            // 0xB8
+      "NAME", "KILL", "LSET", "RSET", "SAVE", "RESET", "TEXT", "HOME",        // 0xC0
+      "VTAB", "HTAB", "INVERSE", "NORMAL", "", "", "", "",                    // 0xC8
+      "", "", "", "", "", "WAIT", "", "",                                     // 0xD0
+      "", "", "", "", "", "TO", "THEN", "TAB(",                               // 0xD8
+      "STEP", "USR", "FN", "SPC(", "", "ERL", "ERR", "STRING$",               // 0xE0
+      "USING", "INSTR", "", "VARPTR", "", "", "INKEY$", ">",                  // 0xE8
+      "=", "<", "+", "-", "*", "/", "", "AND",                                // 0xF0
+      "OR", "", "", "", "MOD", "/", "", "",                                   // 0xF8
   };
 
   // ---------------------------------------------------------------------------------//
@@ -88,11 +88,11 @@ public class CPMBasicFile extends TextFile
             break;
 
           case 0x09:
-            text.append ("         ");
+            text.append ("        ");
             break;
 
           case 0x0A:
-            text.append ("\n");
+            text.append ("\n ");
             break;
 
           case 0x0C:
@@ -100,10 +100,6 @@ public class CPMBasicFile extends TextFile
             int b2 = buffer[ptr++] & 0xFF;
             text.append ("&H" + String.format ("%X", b2 * 256 + b1));
             break;
-
-//          case 0x0D:
-//            System.out.println ("found 0x0D");
-//            break;
 
           case 0x0E:                                // same as 0x1C ??
             b1 = buffer[ptr++] & 0xFF;
@@ -139,12 +135,42 @@ public class CPMBasicFile extends TextFile
               case 0x81 -> "LEFT$";
               case 0x82 -> "RIGHT$";
               case 0x83 -> "MID$";
+              case 0x84 -> "SGN";
+              case 0x85 -> "INT";
+              case 0x86 -> "ABS";
+              case 0x87 -> "SQR";
+              case 0x88 -> "RND";
+              case 0x89 -> "SIN";
+              case 0x8A -> "LOG";
+              case 0x8B -> "EXP";
+              case 0x8C -> "COS";
+              case 0x8D -> "TAN";
+              case 0x8E -> "ATN";
               case 0x8F -> "FRE";
+              case 0x90 -> "POS";
               case 0x91 -> "LEN";
+              case 0x92 -> "STR$";
+              case 0x93 -> "VAL";
               case 0x94 -> "ASC";
               case 0x95 -> "CHR$";
               case 0x96 -> "PEEK";
-              default -> String.format ("<%02X>", next);
+              case 0x97 -> "SPACE$";
+              case 0x98 -> "OCT$";
+              case 0x99 -> "HEX$";
+              case 0x9A -> "LPOS";
+              case 0x9B -> "CINT";
+              case 0x9C -> "CSNG";
+              case 0x9D -> "CDBL";
+              case 0x9E -> "FIX";
+              case 0xAA -> "CVI";
+              case 0xAB -> "CVS";
+              case 0xAC -> "CVD";
+              case 0xAE -> "EOF";
+              case 0xAF -> "LOC";
+              case 0xB1 -> "MKI$";
+              case 0xB2 -> "MKS$";
+              case 0xB3 -> "MKD$";
+              default -> String.format ("<FF %02X>", next);
             };
             text.append (token);
             break;

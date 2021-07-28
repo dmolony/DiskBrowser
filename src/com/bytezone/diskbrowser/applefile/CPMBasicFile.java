@@ -166,12 +166,18 @@ public class CPMBasicFile extends BasicProgram
             break;
 
           case 0x1D:
-            text.append ("<" + HexFormatter.getHexString (buffer, ptr, 4, true) + ">");
+            String d4 = HexFormatter.floatValueMS4 (buffer, ptr) + "";
+            if (d4.endsWith (".0"))
+              d4 = d4.substring (0, d4.length () - 2);
+            text.append (d4 + "!");
             ptr += 4;
             break;
 
           case 0x1F:
-            text.append ("<" + HexFormatter.getHexString (buffer, ptr, 8, true) + ">");
+            String d8 = HexFormatter.floatValueMS8 (buffer, ptr) + "";
+            if (d8.endsWith (".0"))
+              d8 = d8.substring (0, d8.length () - 2);
+            text.append (d8 + "#");
             ptr += 8;
             break;
 
@@ -179,6 +185,7 @@ public class CPMBasicFile extends BasicProgram
             text.append (String.format ("<%02X>", val));
         }
       }
+      System.out.println ();
 
       ptr = nextAddress - loadAddress;
       text.append ("\n");

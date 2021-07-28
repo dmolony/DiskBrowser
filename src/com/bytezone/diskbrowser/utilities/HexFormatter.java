@@ -11,8 +11,8 @@ public class HexFormatter
   private static String[] hex =
       { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
   private static MathContext mathContext = new MathContext (9);
-  private static MathContext mathContext4 = new MathContext (7);
-  private static MathContext mathContext8 = new MathContext (12);
+  private static MathContext mathContext4 = new MathContext (6);
+  private static MathContext mathContext8 = new MathContext (15);
 
   // ---------------------------------------------------------------------------------//
   public static String format (byte[] buffer)
@@ -169,12 +169,6 @@ public class HexFormatter
   {
     StringBuilder text = new StringBuilder ();
 
-    //    if (buffer.length == 0)
-    //    {
-    //      System.out.println ("empty buffer");
-    //      return text.toString ();
-    //    }
-
     for (int i = offset; i < offset + length; i++)
     {
       int c = buffer[i] & 0xFF;
@@ -306,7 +300,8 @@ public class HexFormatter
   {
     if (value < 0)
       return "***err**";
-    StringBuffer text = new StringBuffer ();
+
+    StringBuilder text = new StringBuilder ();
     for (int i = 0, weight = 4096; i < 4; i++)
     {
       int digit = value / weight;
@@ -316,6 +311,7 @@ public class HexFormatter
       value %= weight;
       weight /= 16;
     }
+
     return text.toString ();
   }
 
@@ -332,44 +328,15 @@ public class HexFormatter
   {
     if (value < 0)
       value += 256;
-    String text = hex[value / 16] + hex[value % 16];
-    return text;
+
+    return hex[value / 16] + hex[value % 16];
   }
 
   // ---------------------------------------------------------------------------------//
   public static String format1 (int value)
   // ---------------------------------------------------------------------------------//
   {
-    String text = hex[value];
-    return text;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static double floatValueOld (byte[] buffer, int offset)
-  // ---------------------------------------------------------------------------------//
-  {
-    double val = 0;
-
-    int exponent = (buffer[offset] & 0xFF) - 0x80;
-
-    int mantissa =
-        (buffer[offset + 1] & 0x7F) * 0x1000000 + (buffer[offset + 2] & 0xFF) * 0x10000
-            + (buffer[offset + 3] & 0xFF) * 0x100 + (buffer[offset + 4] & 0xFF);
-
-    int weight1 = 1;
-    long weight2 = 2147483648L;
-    double multiplier = 0;
-
-    for (int i = 0; i < 32; i++)
-    {
-      if ((mantissa & weight2) > 0)
-        multiplier += (1.0 / weight1);
-      weight2 /= 2;
-      weight1 *= 2;
-    }
-    val = Math.pow (2, exponent - 1) * (multiplier + 1);
-
-    return val;
+    return hex[value];
   }
 
   // ---------------------------------------------------------------------------------//
@@ -385,7 +352,7 @@ public class HexFormatter
     boolean negative = (buffer[ptr + 1] & 0x80) != 0;
     double value = 0.5;
 
-    for (int i = 2, weight = 0x40000000; i <= 32; i++, weight >>>= 1)
+    for (int i = 2, weight = 0x40_00_00_00; i <= 32; i++, weight >>>= 1)
       if ((mantissa & weight) > 0)
         value += Math.pow (0.5, i);
 
@@ -396,6 +363,7 @@ public class HexFormatter
     return negative ? rounded * -1 : rounded;
   }
 
+  // https://en.wikipedia.org/wiki/Microsoft_Binary_Format
   // ---------------------------------------------------------------------------------//
   public static double floatValueMS4 (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
@@ -446,27 +414,6 @@ public class HexFormatter
 
     return negative ? rounded * -1 : rounded;
   }
-
-  // ---------------------------------------------------------------------------------//
-  //  public static GregorianCalendar getAppleDate (byte[] buffer, int offset)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    int date = Utility.intValue (buffer[offset], buffer[offset + 1]);
-  //    if (date > 0)
-  //    {
-  //      int year = (date & 0xFE00) >> 9;
-  //      int month = (date & 0x01E0) >> 5;
-  //      int day = date & 0x001F;
-  //      int hour = buffer[offset + 3] & 0x1F;
-  //      int minute = buffer[offset + 2] & 0x3F;
-  //      if (year < 70)
-  //        year += 2000;
-  //      else
-  //        year += 1900;
-  //      return new GregorianCalendar (year, month - 1, day, hour, minute);
-  //    }
-  //    return null;
-  //  }
 
   // ---------------------------------------------------------------------------------//
   public static GregorianCalendar getPascalDate (byte[] buffer, int offset)

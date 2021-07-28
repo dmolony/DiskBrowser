@@ -48,7 +48,7 @@ public class PascalDisk extends AbstractFormattedDisk
   SectorType badSector = new SectorType ("Bad", Color.darkGray);
 
   SectorType[] sectors = { catalogSector, badSector, codeSector, textSector, infoSector,
-                           dataSector, grafSector, fotoSector };
+      dataSector, grafSector, fotoSector };
 
   // ---------------------------------------------------------------------------------//
   public PascalDisk (Disk disk)
@@ -215,7 +215,7 @@ public class PascalDisk extends AbstractFormattedDisk
       if (nameLength < 1 || nameLength > 15)
         return false;
       int lastByte = Utility.getShort (buffer, ptr + 22);
-      GregorianCalendar date = HexFormatter.getPascalDate (buffer, 24);
+      GregorianCalendar date = Utility.getPascalDate (buffer, 24);
       if (debug)
         System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,
             new String (buffer, ptr + 7, nameLength), lastByte, date);

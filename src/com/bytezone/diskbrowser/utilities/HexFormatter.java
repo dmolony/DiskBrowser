@@ -1,18 +1,11 @@
 package com.bytezone.diskbrowser.utilities;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.GregorianCalendar;
-
 // -----------------------------------------------------------------------------------//
 public class HexFormatter
 // -----------------------------------------------------------------------------------//
 {
   private static String[] hex =
       { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
-  private static MathContext mathContext = new MathContext (9);
-  private static MathContext mathContext4 = new MathContext (6);
-  private static MathContext mathContext8 = new MathContext (15);
 
   // ---------------------------------------------------------------------------------//
   public static String format (byte[] buffer)
@@ -337,100 +330,6 @@ public class HexFormatter
   // ---------------------------------------------------------------------------------//
   {
     return hex[value];
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static double floatValue (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int exponent = buffer[ptr] & 0x7F;                      // biased 128
-    if (exponent == 0)
-      return 0.0;
-
-    int mantissa = (buffer[ptr + 1] & 0x7F) << 24 | (buffer[ptr + 2] & 0xFF) << 16
-        | (buffer[ptr + 3] & 0xFF) << 8 | (buffer[ptr + 4] & 0xFF);
-    boolean negative = (buffer[ptr + 1] & 0x80) != 0;
-    double value = 0.5;
-
-    for (int i = 2, weight = 0x40_00_00_00; i <= 32; i++, weight >>>= 1)
-      if ((mantissa & weight) > 0)
-        value += Math.pow (0.5, i);
-
-    value *= Math.pow (2, exponent);
-    BigDecimal bd = new BigDecimal (value);
-    double rounded = bd.round (mathContext).doubleValue ();
-
-    return negative ? rounded * -1 : rounded;
-  }
-
-  // https://en.wikipedia.org/wiki/Microsoft_Binary_Format
-  // ---------------------------------------------------------------------------------//
-  public static double floatValueMS4 (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int exponent = buffer[ptr + 3] & 0x7F;                      // biased 128
-    if (exponent == 0)
-      return 0.0;
-
-    int mantissa = (buffer[ptr + 2] & 0x7F) << 16 | (buffer[ptr + 1] & 0xFF) << 8
-        | (buffer[ptr] & 0xFF);
-    boolean negative = (buffer[ptr + 2] & 0x80) != 0;
-    double value = 0.5;
-
-    for (int i = 2, weight = 0x40_00_00; i <= 23; i++, weight >>>= 1)
-      if ((mantissa & weight) != 0)
-        value += Math.pow (0.5, i);
-
-    value *= Math.pow (2, exponent);
-    BigDecimal bd = new BigDecimal (value);
-    double rounded = bd.round (mathContext4).doubleValue ();
-
-    return negative ? rounded * -1 : rounded;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static double floatValueMS8 (byte[] buffer, int ptr)
-  // ---------------------------------------------------------------------------------//
-  {
-    int exponent = buffer[ptr + 7] & 0x7F;                      // biased 128
-    if (exponent == 0)
-      return 0.0;
-
-    long mantissa = (long) (buffer[ptr + 6] & 0x7F) << 48
-        | (long) (buffer[ptr + 5] & 0xFF) << 40 | (long) (buffer[ptr + 4] & 0xFF) << 32
-        | (long) (buffer[ptr + 3] & 0xFF) << 24 | (buffer[ptr + 2] & 0xFF) << 16
-        | (buffer[ptr + 1] & 0xFF) << 8 | (buffer[ptr] & 0xFF);
-    boolean negative = (buffer[ptr + 6] & 0x80) != 0;
-    double value = 0.5;
-
-    long weight = 0x40_00_00_00_00_00_00L;
-    for (int i = 2; i <= 55; i++, weight >>>= 1)
-      if ((mantissa & weight) != 0)
-        value += Math.pow (0.5, i);
-
-    value *= Math.pow (2, exponent);
-    BigDecimal bd = new BigDecimal (value);
-    double rounded = bd.round (mathContext8).doubleValue ();
-
-    return negative ? rounded * -1 : rounded;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public static GregorianCalendar getPascalDate (byte[] buffer, int offset)
-  // ---------------------------------------------------------------------------------//
-  {
-    int date = Utility.getShort (buffer, offset);
-
-    int month = date & 0x0F;
-    int day = (date & 0x1F0) >>> 4;
-    int year = (date & 0xFE00) >>> 9;
-
-    if (year < 70)
-      year += 2000;
-    else
-      year += 1900;
-
-    return new GregorianCalendar (year, month - 1, day);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -60,7 +60,7 @@ public class StoredVariables extends AbstractFile
       {
         if (hasValue (ptr + 2))
         {
-          String value = HexFormatter.floatValue (buffer, ptr + 2) + "";
+          String value = Utility.floatValue (buffer, ptr + 2) + "";
           if (value.endsWith (".0"))
             text.append (" = " + value.substring (0, value.length () - 2));
           else
@@ -180,7 +180,7 @@ public class StoredVariables extends AbstractFile
         else if (elementSize == 5)
         {
           if (hasValue (p))
-            text.append (HexFormatter.floatValue (buffer, p));
+            text.append (Utility.floatValue (buffer, p));
           text.append ("\n");
         }
         p += elementSize;

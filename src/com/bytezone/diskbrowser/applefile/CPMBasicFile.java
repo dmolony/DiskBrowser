@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.applefile;
 import static com.bytezone.diskbrowser.utilities.Utility.getShort;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class CPMBasicFile extends BasicProgram
@@ -166,7 +167,7 @@ public class CPMBasicFile extends BasicProgram
             break;
 
           case 0x1D:
-            String d4 = HexFormatter.floatValueMS4 (buffer, ptr) + "";
+            String d4 = Utility.floatValueMS4 (buffer, ptr) + "";
             if (d4.endsWith (".0"))
               d4 = d4.substring (0, d4.length () - 2);
             text.append (d4 + "!");
@@ -174,7 +175,7 @@ public class CPMBasicFile extends BasicProgram
             break;
 
           case 0x1F:
-            String d8 = HexFormatter.floatValueMS8 (buffer, ptr) + "";
+            String d8 = Utility.floatValueMS8 (buffer, ptr) + "";
             if (d8.endsWith (".0"))
               d8 = d8.substring (0, d8.length () - 2);
             text.append (d8 + "#");

@@ -44,7 +44,7 @@ class PascalCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, 16, 2, "Files on disk");
     addTextAndDecimal (text, buffer, 18, 2, "First block of volume");
 
-    GregorianCalendar calendar = HexFormatter.getPascalDate (buffer, 20);
+    GregorianCalendar calendar = Utility.getPascalDate (buffer, 20);
     String date = calendar == null ? "--" : df.format (calendar.getTime ());
     addText (text, buffer, 20, 2, "Most recent date setting : " + date);
     addTextAndDecimal (text, buffer, 22, 4, "Reserved");
@@ -71,7 +71,7 @@ class PascalCatalogSector extends AbstractSector
       addText (text, buffer, ptr + 18, 4, "File name : " + name);
       addTextAndDecimal (text, buffer, ptr + 22, 2, "Bytes in file's last block");
 
-      calendar = HexFormatter.getPascalDate (buffer, ptr + 24);
+      calendar = Utility.getPascalDate (buffer, ptr + 24);
       date = calendar == null ? "--" : df.format (calendar.getTime ());
       addText (text, buffer, ptr + 24, 2, "Date : " + date);
 

@@ -60,9 +60,9 @@ public class CPMBasicFile extends BasicProgram
     while (buffer[ptr] != 0)
       ptr++;
 
-    int loadAddress = getShort (buffer, 1) - ptr - 1;
-    if (!validate (buffer, loadAddress))
-      System.out.println ("Invalid load address");
+//    int loadAddress = getShort (buffer, 1) - ptr - 1;
+//    if (!validate (buffer, loadAddress))
+//      System.out.println ("Invalid load address");
 
     if (showDebugText)
       return debugText (loadAddress);
@@ -80,10 +80,13 @@ public class CPMBasicFile extends BasicProgram
       text.append (String.format (" %d ", lineNumber));
       ptr += 4;
 
-      int end = nextAddress - loadAddress - 1;
-      while (ptr < end)
+//      int end = nextAddress - loadAddress - 1;
+      while (true)
       {
         int val = buffer[ptr++] & 0xFF;
+
+        if (val == 0)
+          break;
 
         if (val >= 0x80)
         {
@@ -186,9 +189,11 @@ public class CPMBasicFile extends BasicProgram
             text.append (String.format ("<%02X>", val));
         }
       }
+
       System.out.println ();
 
-      ptr = nextAddress - loadAddress;
+//      ptr = nextAddress - loadAddress;
+//      ptr++;
       text.append ("\n");
     }
 
@@ -214,38 +219,27 @@ public class CPMBasicFile extends BasicProgram
         break;
 
       int lineNumber = getShort (buffer, ptr + 2);
-
       lastPtr = ptr;
-      ptr = nextAddress - loadAddress;
 
-      text.append (String.format (" %d  ", lineNumber));
-      text.append (HexFormatter.getHexString (buffer, lastPtr + 4, ptr - lastPtr - 4));
-      text.append ("\n");
+      ptr += 4;
+
+      int val;
+      while ((val = buffer[ptr++]) != 0)
+      {
+        ptr += switch (val)
+        {
+          case 0x0C, 0x0E, 0x1C -> 2;   // 2 byte numeric
+          case 0x1D -> 4;               // 4 byte single precision
+          case 0x1F -> 8;               // 8 byte double precision
+          case 0x0F, 0xFF -> 1;         // 1 byte numeric, function table entry
+          default -> 0;
+        };
+      }
+
+      text.append (String.format (" %d  %s%n", lineNumber,
+          HexFormatter.getHexString (buffer, lastPtr + 4, ptr - lastPtr - 4)));
     }
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private boolean validate (byte[] buffer, int loadAddress)
-  // ---------------------------------------------------------------------------------//
-  {
-//    System.out.printf ("Load Address: %04X%n", loadAddress);
-    int ptr = 1;
-
-    while (ptr < buffer.length)
-    {
-      int nextAddress = getShort (buffer, ptr);
-//      System.out.printf ("%04X%n", nextAddress);
-      if (nextAddress == 0)
-        return true;
-      ptr = nextAddress - loadAddress;
-      if (ptr < 0 || ptr >= buffer.length)
-        return false;
-      if (buffer[ptr - 1] != 0)             // end of previous line
-        return false;
-    }
-
-    return false;
   }
 }

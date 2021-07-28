@@ -60,12 +60,8 @@ public class CPMBasicFile extends BasicProgram
     while (buffer[ptr] != 0)
       ptr++;
 
-//    int loadAddress = getShort (buffer, 1) - ptr - 1;
-//    if (!validate (buffer, loadAddress))
-//      System.out.println ("Invalid load address");
-
     if (showDebugText)
-      return debugText (loadAddress);
+      return debugText ();
 
     ptr = 1;
     while (ptr < buffer.length)
@@ -204,7 +200,7 @@ public class CPMBasicFile extends BasicProgram
   }
 
   // ---------------------------------------------------------------------------------//
-  private String debugText (int loadAddress)
+  private String debugText ()
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();

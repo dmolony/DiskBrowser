@@ -76,7 +76,6 @@ public class CPMBasicFile extends BasicProgram
       text.append (String.format (" %d ", lineNumber));
       ptr += 4;
 
-//      int end = nextAddress - loadAddress - 1;
       while (true)
       {
         int val = buffer[ptr++] & 0xFF;

@@ -30,13 +30,13 @@ public class CPMBasicFile extends BasicProgram
   };
 
   String[] functions = { //
-      "", "LEFT$", "RIGHT$", "MID$", "SGN", "INT", "ABS", "SQR",      // 0x80
-      "RND", "SIN", "LOG", "EXP", "COS", "TAN", "ATN", "FRE",         // 0x88
-      "POS", "LEN", "STR$", "VAL", "ASC", "CHR$", "PEEK", "SPACE$",   // 0x90
-      "OCT$", "HEX$", "LPOS", "CINT", "CSNG", "CDBL", "FIX", "",      // 0x98
-      "", "", "", "", "", "", "", "",                                 // 0xA0
-      "", "", "CVI", "CVS", "CVD", "", "EOF", "LOC",                  // 0xA8
-      "", "MKI$", "MKS$", "MKD$",                                     // 0xB0
+      "", "LEFT$", "RIGHT$", "MID$", "SGN", "INT", "ABS", "SQR",          // 0x80
+      "RND", "SIN", "LOG", "EXP", "COS", "TAN", "ATN", "FRE",             // 0x88
+      "POS", "LEN", "STR$", "VAL", "ASC", "CHR$", "PEEK", "SPACE$",       // 0x90
+      "OCT$", "HEX$", "LPOS", "CINT", "CSNG", "CDBL", "FIX", "",          // 0x98
+      "", "", "", "", "", "", "", "",                                     // 0xA0
+      "", "", "CVI", "CVS", "CVD", "", "EOF", "LOC",                      // 0xA8
+      "", "MKI$", "MKS$", "MKD$",                                         // 0xB0
   };
 
   // ---------------------------------------------------------------------------------//
@@ -83,7 +83,7 @@ public class CPMBasicFile extends BasicProgram
         if (val == 0)
           break;
 
-        if (val >= 0x80)
+        if ((val & 0x80) != 0)
         {
           if (val == 0xFF)
           {
@@ -142,26 +142,22 @@ public class CPMBasicFile extends BasicProgram
             break;
 
           case 0x0C:
-            int b1 = buffer[ptr++] & 0xFF;
-            int b2 = buffer[ptr++] & 0xFF;
-            text.append ("&H" + String.format ("%X", b2 * 256 + b1));
+            text.append ("&H" + String.format ("%X", Utility.getShort (buffer, ptr)));
+            ptr += 2;
             break;
 
           case 0x0E:                                // same as 0x1C ??
-            b1 = buffer[ptr++] & 0xFF;
-            b2 = buffer[ptr++] & 0xFF;
-            text.append (b2 * 256 + b1);
+            text.append (Utility.getShort (buffer, ptr));
+            ptr += 2;
             break;
 
           case 0x0F:
-            int nextVal = buffer[ptr++] & 0xFF;
-            text.append (nextVal);
+            text.append (buffer[ptr++] & 0xFF);
             break;
 
           case 0x1C:                                // same as 0x0E ??
-            b1 = buffer[ptr++] & 0xFF;
-            b2 = buffer[ptr++] & 0xFF;
-            text.append (b2 * 256 + b1);
+            text.append (Utility.getShort (buffer, ptr));
+            ptr += 2;
             break;
 
           case 0x1D:
@@ -188,10 +184,7 @@ public class CPMBasicFile extends BasicProgram
       text.append ("\n");
     }
 
-    if (text.length () > 0)
-      text.deleteCharAt (text.length () - 1);
-
-    return text.toString ();
+    return Utility.rtrim (text);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -231,6 +224,6 @@ public class CPMBasicFile extends BasicProgram
           HexFormatter.getHexString (buffer, lastPtr + 4, ptr - lastPtr - 4)));
     }
 
-    return text.toString ();
+    return Utility.rtrim (text);
   }
 }

@@ -186,10 +186,6 @@ public class CPMBasicFile extends BasicProgram
         }
       }
 
-      System.out.println ();
-
-//      ptr = nextAddress - loadAddress;
-//      ptr++;
       text.append ("\n");
     }
 

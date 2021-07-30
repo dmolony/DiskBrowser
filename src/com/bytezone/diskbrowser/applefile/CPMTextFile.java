@@ -26,7 +26,10 @@ public class CPMTextFile extends TextFile
     {
       String line = getLine (ptr);
       text.append (line + "\n");
-      ptr += line.length () + 2;
+      ptr += line.length () + 1;
+      if (ptr < buffer.length && buffer[ptr - 1] == 0x0D && buffer[ptr] == 0x0A)
+        ++ptr;
+
       while (ptr < buffer.length && buffer[ptr] == 0)
         ++ptr;
     }
@@ -43,8 +46,8 @@ public class CPMTextFile extends TextFile
   {
     StringBuilder line = new StringBuilder ();
 
-    int max = buffer.length - 1;
-    while (ptr < max && buffer[ptr] != 0x0D && buffer[ptr + 1] != 0x0A)
+//    int max = buffer.length - 1;
+    while (ptr < buffer.length && buffer[ptr] != 0x0D && buffer[ptr] != 0x0A)
       line.append ((char) (buffer[ptr++] & 0x7F));
 
     return line.toString ();

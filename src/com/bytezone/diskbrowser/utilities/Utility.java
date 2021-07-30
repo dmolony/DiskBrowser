@@ -231,6 +231,11 @@ public final class Utility
       int minute = buffer[offset + 2] & 0x3F;
       int hour = buffer[offset + 3] & 0x1F;
 
+      if (hour > 23)
+        hour = 0;
+      if (minute > 59)
+        minute = 0;
+
       if (year < 70)
         year += 2000;
       else

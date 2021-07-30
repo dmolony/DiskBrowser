@@ -217,8 +217,9 @@ class DirectoryEntry implements AppleFileSource
       appleFile = new DefaultAppleFile (name, exactBuffer, "COM File");
     else if ("DVR".equals (type))
       appleFile = new DefaultAppleFile (name, exactBuffer, "DVR File");
-    else if ("ASM".equals (type) || "DOC".equals (type) || "TXT".equals (type)
-        || "LET".equals (type) || "ALX".equals (type) || "SRC".equals (type)
+    else if ("ASM".equals (type) || "DOC".equals (type) || "COB".equals (type)
+        || "HLP".equals (type) || "TXT".equals (type) || "LET".equals (type)
+        || "ALX".equals (type) || "SRC".equals (type) || "H".equals (type)
         || exactBuffer[len - 1] == 0x1A)
       appleFile = new CPMTextFile (name, exactBuffer);
     else if ("BAS".equals (type))

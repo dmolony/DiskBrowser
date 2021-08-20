@@ -6,7 +6,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-class MasterHeader
+public class MasterHeader
 // -----------------------------------------------------------------------------------//
 {
   private static final byte[] NuFile =

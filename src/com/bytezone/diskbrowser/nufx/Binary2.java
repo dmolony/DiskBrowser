@@ -31,6 +31,13 @@ public class Binary2
   {
     fileName = path.toFile ().getName ();
     buffer = Files.readAllBytes (path);
+    read (buffer);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void read (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
     int ptr = 0;
 
     do

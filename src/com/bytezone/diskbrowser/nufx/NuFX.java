@@ -39,8 +39,24 @@ public class NuFX
   // ---------------------------------------------------------------------------------//
   {
     buffer = Files.readAllBytes (path);
-    volumeName = new VolumeName (path);
+    volumeName = new VolumeName (path.getFileName ().toString ());
+    read (buffer);
+  }
 
+  // ---------------------------------------------------------------------------------//
+  public NuFX (byte[] buffer, String fileName)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.buffer = buffer;
+    this.volumeName = new VolumeName (fileName);
+
+    read (buffer);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void read (byte[] buffer)
+  // ---------------------------------------------------------------------------------//
+  {
     masterHeader = new MasterHeader (buffer);
 
     int dataPtr = 48;
@@ -250,8 +266,8 @@ public class NuFX
     StringBuilder text = new StringBuilder ();
 
     text.append (String.format (" %-15.15s Created:%-17s Mod:%-17s   Recs:%5d%n%n",
-        volumeName.getFileName (), masterHeader.getCreated2 (),
-        masterHeader.getModified2 (), masterHeader.getTotalRecords ()));
+        volumeName.volumeName, masterHeader.getCreated2 (), masterHeader.getModified2 (),
+        masterHeader.getTotalRecords ()));
 
     text.append (" Name                        Type Auxtyp Archived"
         + "         Fmat Size Un-Length\n");
@@ -288,27 +304,19 @@ public class NuFX
 
     private String volumeName = "DiskBrowser";
     private int nameOffset = 0;
-    private Path path;
 
     // -------------------------------------------------------------------------------//
-    VolumeName (Path path)
+    VolumeName (String name)
     // -------------------------------------------------------------------------------//
     {
-      this.path = path;
-      volumeName = getFileName ();
-      int pos = volumeName.lastIndexOf ('.');
+      int pos = name.lastIndexOf ('.');
       if (pos > 0)
-        volumeName = volumeName.substring (0, pos);
-      if (volumeName.length () > 15)
-        volumeName = volumeName.substring (0, 15);
-      volumeName = volumeName.replace (' ', '.');
-    }
+        name = name.substring (0, pos);
+      if (name.length () > 15)
+        name = name.substring (0, 15);
+      name = name.replace (' ', '.');
 
-    // -------------------------------------------------------------------------------//
-    String getFileName ()
-    // -------------------------------------------------------------------------------//
-    {
-      return path.getFileName ().toString ();
+      this.volumeName = name;
     }
 
     // -------------------------------------------------------------------------------//

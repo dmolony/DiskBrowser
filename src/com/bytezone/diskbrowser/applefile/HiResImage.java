@@ -16,10 +16,9 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public abstract class HiResImage extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
-  static final String[] auxTypes =
-      { "Paintworks Packed SHR Image", "Packed Super Hi-Res Image",
-        "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
-        "Packed Super Hi-Res 3200 color image" };
+  static final String[] auxTypes = { "Paintworks Packed SHR Image",
+      "Packed Super Hi-Res Image", "Super Hi-Res Image (Apple Preferred Format)",
+      "Packed QuickDraw II PICT File", "Packed Super Hi-Res 3200 color image" };
   static final int COLOR_TABLE_SIZE = 32;
   static final int COLOR_TABLE_OFFSET_AUX_0 = 32_256;
   static final int COLOR_TABLE_OFFSET_AUX_2 = 32_000;
@@ -90,7 +89,7 @@ public abstract class HiResImage extends AbstractFile
   // $C0 1000                  .
   // $C0 8000                  .
   // $C0 8001                  .
-  // $C0 8005                  .
+  // $C0 8005                  6
   // $C0 8006                  .
   // $C1 0042                  4
   // $C1 0043                  4
@@ -106,7 +105,7 @@ public abstract class HiResImage extends AbstractFile
   // 3 CompressedSlides.do
   // 4 System Addons.hdv
   // 5 gfx.po
-  //
+  // 6 Dream Grafix v1.02.po
 
   // see also - https://docs.google.com/spreadsheets/d
   //           /1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/edit#gid=0

@@ -19,7 +19,7 @@ abstract class LZW
 
   int crc;
   int crcBase;
-  int v3eof;                     // LZW/2 calculates the crc sans padding
+  int v3eof;                     // LZW/2 calculates the crc without padding
 
   private int byteBuffer;        // one character buffer
   private int bitsLeft;          // unused bits left in buffer

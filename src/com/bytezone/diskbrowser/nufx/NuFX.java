@@ -59,9 +59,7 @@ public class NuFX
   {
     masterHeader = new MasterHeader (buffer);
 
-    int dataPtr = 48;
-    if (masterHeader.bin2)
-      dataPtr += 128;
+    int dataPtr = masterHeader.bin2 ? 176 : 48;
 
     if (debug)
       System.out.printf ("%s%n%n", masterHeader);

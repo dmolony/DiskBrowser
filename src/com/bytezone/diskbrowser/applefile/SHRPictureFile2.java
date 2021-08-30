@@ -5,6 +5,7 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytezone.diskbrowser.nufx.LZW3;
 import com.bytezone.diskbrowser.prodos.ProdosConstants;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -141,6 +142,36 @@ public class SHRPictureFile2 extends HiResImage
         colorTables = new ColorTable[16];
         for (int i = 0; i < colorTables.length; i++)
           colorTables[i] = new ColorTable (i, buffer, 32256 + i * COLOR_TABLE_SIZE);
+
+        break;
+
+      case 0x8005:
+        int ptr = buffer.length - 17;
+
+        int imageType = Utility.getShort (buffer, ptr);
+        int imageHeight = Utility.getShort (buffer, ptr + 2);
+        int imageWidth = Utility.getShort (buffer, ptr + 4);
+
+        String id = HexFormatter.getPascalString (buffer, ptr + 6);
+        assert "DreamWorld".equals (id);
+
+        int expectedLen = 32000 + 512;
+        if (imageType == 0)                 // 256 colours
+          expectedLen += (256 + 512);
+        else                                // 3200 colours
+          expectedLen += 6400;
+
+        byte[] dstBuffer = new byte[expectedLen + 1024];
+        LZW3 lzw3 = new LZW3 ();
+        int bytes = lzw3.unpack (buffer, dstBuffer, expectedLen);
+        buffer = dstBuffer;
+
+        colorTables = new ColorTable[imageHeight];
+        for (int i = 0; i < colorTables.length; i++)
+        {
+          colorTables[i] = new ColorTable (i, this.buffer, 32000 + i * COLOR_TABLE_SIZE);
+          colorTables[i].reverse ();
+        }
 
         break;
 

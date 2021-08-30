@@ -90,7 +90,7 @@ abstract class LZW
     }
 
     bitsLeft--;
-    boolean bit = ((byteBuffer << bitsLeft) & 0x80) == 0x80;
+    boolean bit = ((byteBuffer << bitsLeft) & 0x80) != 0;
 
     return bit;
   }

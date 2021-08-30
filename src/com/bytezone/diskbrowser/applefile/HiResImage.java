@@ -16,9 +16,10 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public abstract class HiResImage extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
-  static final String[] auxTypes = { "Paintworks Packed SHR Image",
-      "Packed Super Hi-Res Image", "Super Hi-Res Image (Apple Preferred Format)",
-      "Packed QuickDraw II PICT File", "Packed Super Hi-Res 3200 color image" };
+  static final String[] auxTypes =
+      { "Paintworks Packed SHR Image", "Packed Super Hi-Res Image",
+          "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
+          "Packed Super Hi-Res 3200 color image", "DreamGraphix" };
   static final int COLOR_TABLE_SIZE = 32;
   static final int COLOR_TABLE_OFFSET_AUX_0 = 32_256;
   static final int COLOR_TABLE_OFFSET_AUX_2 = 32_000;
@@ -57,7 +58,7 @@ public abstract class HiResImage extends AbstractFile
   //   $C0 PNT   $1000
   //   $C0 PNT   $8000  Drawplus? Paintworks Gold?
   //   $C0 PNT   $8001  GTv background picture
-  //   $C0 PNT   $8005  DreamGraphix document
+  //   $C0 PNT   $8005  DreamGraphix document                   SHRPictureFile2
   //   $C0 PNT   $8006  GIF
   //  ---- ---- ------  --------------------------------------  ------------------------
   // * $C1 PIC   $0000  IIGS Super Hi-Res Image                 SHRPictureFile2
@@ -296,7 +297,10 @@ public abstract class HiResImage extends AbstractFile
         break;
 
       case ProdosConstants.FILE_TYPE_PNT:           // 0xC0
-        auxText = auxType > 4 ? "Unknown aux: " + auxType : auxTypes[auxType];
+        if (auxType == 0x8005)
+          auxText = auxTypes[5];
+        else
+          auxText = auxType > 4 ? "Unknown aux: " + auxType : auxTypes[auxType];
         break;
 
       case ProdosConstants.FILE_TYPE_PIC:           // 0xC1

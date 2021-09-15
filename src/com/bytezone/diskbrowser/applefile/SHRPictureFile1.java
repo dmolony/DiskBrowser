@@ -23,6 +23,7 @@ public class SHRPictureFile1 extends HiResImage
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, fileType, auxType, eof);
+    System.out.println ("here");
 
     int ptr = 0;
     while (ptr < buffer.length)

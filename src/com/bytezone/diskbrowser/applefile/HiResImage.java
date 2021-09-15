@@ -28,78 +28,78 @@ public abstract class HiResImage extends AbstractFile
   private ColorTable defaultColorTable320 = new ColorTable (0, 0x00);
   private ColorTable defaultColorTable640 = new ColorTable (0, 0x80);
 
-  //  ---- ---- ------  --------------------------------------  ------------------------
-  //  File Type  Aux    Name                                    Description
-  //  ---- ---- ------  --------------------------------------  ------------------------
-  //   $06 BIN                 isGif()                          OriginalHiResImage
-  //   $06 BIN                 isPng()                          OriginalHiResImage
-  //   $06 BIN          .BMP   isBmp()                          OriginalHiResImage
-  //   $06 BIN          .AUX                                    DoubleHiResImage
-  //   $06 BIN          .PAC                                    DoubleHiResImage
-  //   $06 BIN          .A2FC                                   DoubleHiResImage
-  //   $06 BIN   $2000  eof $4000                               DoubleHiResImage
-  //   $06 BIN   $1FFF  eof $1FF8/$1FFF/$2000/$4000             OriginalHiResImage
-  //   $06 BIN   $2000  eof $1FF8/$1FFF/$2000/$4000             OriginalHiResImage
-  //   $06 BIN   $4000  eof $1FF8/$1FFF/$2000/$4000             OriginalHiResImage (?)
-  //   $06 BIN   $4000  eof $4000                               DoubleHiResImage   (?)
-  //   $06 BIN          .3200                                   SHRPictureFile2
-  //   $06 BIN          .3201                                   SHRPictureFile2 packed
-  //  ---- ---- ------  --------------------------------------  ------------------------
-  //   $08 FOT  <$4000  Apple II Graphics File                  OriginalHiResImage
-  //   $08 FOT   $4000  Packed Hi-Res file                            ???
-  //   $08 FOT   $4001  Packed Double Hi-Res file                     ???
-  //   $08 FOT   $8066  Fadden Hi-res                           FaddenHiResImage
-  //  ---- ---- ------  --------------------------------------  ------------------------
-  // * $C0 PNT   $0000  Paintworks Packed Super Hi-Res          SHRPictureFile2
-  // * $C0 PNT   $0001  Packed IIGS Super Hi-Res Image          SHRPictureFile2
-  // * $C0 PNT   $0002  IIGS Super Hi-Res Picture File (APF)    SHRPictureFile1
-  //   $C0 PNT   $0003  Packed IIGS QuickDraw II PICT File      SHRPictureFile2 *
-  // * $C0 PNT   $0004  Packed Super Hi-Res 3200 (Brooks)       SHRPictureFile2 .3201
-  //   $C0 PNT   $1000
-  //   $C0 PNT   $8000  Drawplus? Paintworks Gold?
-  //   $C0 PNT   $8001  GTv background picture
-  //   $C0 PNT   $8005  DreamGraphix document                   SHRPictureFile2
-  //   $C0 PNT   $8006  GIF
-  //  ---- ---- ------  --------------------------------------  ------------------------
-  // * $C1 PIC   $0000  IIGS Super Hi-Res Image                 SHRPictureFile2
-  //   $C1 PIC   $0001  IIGS QuickDraw II PICT File             SHRPictureFile2 *
-  // * $C1 PIC   $0002  Super Hi-Res 3200 (Brooks)              SHRPictureFile2 .3200
-  //   $C1 PIC   $2000  = $C1/0000
-  //   $C1 PIC   $4100  = $C1/0000
-  //   $C1 PIC   $4950  = $C1/0000
-  //   $C1 PIC   $8001  Allison raw image
-  //   $C1 PIC   $8002  Thunderscan
-  //   $C1 PIC   $8003  DreamGraphix
-  //  ---- ---- ------  --------------------------------------  ------------------------
-  //   $C2 ANI          Paintworks animation
-  //   $C3 PAL          Paintworks palette
-  //  ---- ---- ------  --------------------------------------  ------------------------
+  // ---- ---- ------ -------------------------------------- ------------------------
+  // File Type Aux Name Description
+  // ---- ---- ------ -------------------------------------- ------------------------
+  // $06 BIN isGif() OriginalHiResImage
+  // $06 BIN isPng() OriginalHiResImage
+  // $06 BIN .BMP isBmp() OriginalHiResImage
+  // $06 BIN .AUX DoubleHiResImage
+  // $06 BIN .PAC DoubleHiResImage
+  // $06 BIN .A2FC DoubleHiResImage
+  // $06 BIN $2000 eof $4000 DoubleHiResImage
+  // $06 BIN $1FFF eof $1FF8/$1FFF/$2000/$4000 OriginalHiResImage
+  // $06 BIN $2000 eof $1FF8/$1FFF/$2000/$4000 OriginalHiResImage
+  // $06 BIN $4000 eof $1FF8/$1FFF/$2000/$4000 OriginalHiResImage (?)
+  // $06 BIN $4000 eof $4000 DoubleHiResImage (?)
+  // $06 BIN .3200 SHRPictureFile2
+  // $06 BIN .3201 SHRPictureFile2 packed
+  // ---- ---- ------ -------------------------------------- ------------------------
+  // $08 FOT <$4000 Apple II Graphics File OriginalHiResImage
+  // $08 FOT $4000 Packed Hi-Res file ???
+  // $08 FOT $4001 Packed Double Hi-Res file ???
+  // $08 FOT $8066 Fadden Hi-res FaddenHiResImage
+  // ---- ---- ------ -------------------------------------- ------------------------
+  // * $C0 PNT $0000 Paintworks Packed Super Hi-Res SHRPictureFile2
+  // * $C0 PNT $0001 Packed IIGS Super Hi-Res Image SHRPictureFile2
+  // * $C0 PNT $0002 IIGS Super Hi-Res Picture File (APF) SHRPictureFile1
+  // $C0 PNT $0003 Packed IIGS QuickDraw II PICT File SHRPictureFile2 *
+  // * $C0 PNT $0004 Packed Super Hi-Res 3200 (Brooks) SHRPictureFile2 .3201
+  // $C0 PNT $1000
+  // $C0 PNT $8000 Drawplus? Paintworks Gold?
+  // $C0 PNT $8001 GTv background picture
+  // $C0 PNT $8005 DreamGraphix document SHRPictureFile2
+  // $C0 PNT $8006 GIF
+  // ---- ---- ------ -------------------------------------- ------------------------
+  // * $C1 PIC $0000 IIGS Super Hi-Res Image SHRPictureFile2
+  // $C1 PIC $0001 IIGS QuickDraw II PICT File SHRPictureFile2 *
+  // * $C1 PIC $0002 Super Hi-Res 3200 (Brooks) SHRPictureFile2 .3200
+  // $C1 PIC $2000 = $C1/0000
+  // $C1 PIC $4100 = $C1/0000
+  // $C1 PIC $4950 = $C1/0000
+  // $C1 PIC $8001 Allison raw image
+  // $C1 PIC $8002 Thunderscan
+  // $C1 PIC $8003 DreamGraphix
+  // ---- ---- ------ -------------------------------------- ------------------------
+  // $C2 ANI Paintworks animation
+  // $C3 PAL Paintworks palette
+  // ---- ---- ------ -------------------------------------- ------------------------
 
-  // packed      unpacked
-  // $06.3200                  1
-  // $06.3201                  .
-  // $08 0000                  .
-  // $08 4000                  .
-  // $08 4001                  .
-  // $08 8066                  3
-  // $C0 0000                  1
-  // $C0 0001    $C1 0000      2     1
-  // $C0 0002                  1,5
-  // $C0 0003    $C1 0001      .     .
-  // $C0 0004    $C1 0002      .     1
-  // $C0 1000                  .
-  // $C0 8000                  .
-  // $C0 8001                  .
-  // $C0 8005                  6
-  // $C0 8006                  .
-  // $C1 0042                  4
-  // $C1 0043                  4
-  // $C1 2000                  .
-  // $C1 4100                  1
-  // $C1 4950                  .
-  // $C1 8001                  .
-  // $C1 8002                  .
-  // $C1 8003                  .
+  // packed unpacked
+  // $06.3200 1
+  // $06.3201 .
+  // $08 0000 .
+  // $08 4000 .
+  // $08 4001 .
+  // $08 8066 3
+  // $C0 0000 1
+  // $C0 0001 $C1 0000 2 1
+  // $C0 0002 1,5
+  // $C0 0003 $C1 0001 . .
+  // $C0 0004 $C1 0002 . 1
+  // $C0 1000 .
+  // $C0 8000 .
+  // $C0 8001 .
+  // $C0 8005 6
+  // $C0 8006 .
+  // $C1 0042 4
+  // $C1 0043 4
+  // $C1 2000 .
+  // $C1 4100 1
+  // $C1 4950 .
+  // $C1 8001 .
+  // $C1 8002 .
+  // $C1 8003 .
 
   // 1 Graphics & Animation.2mg
   // 2 0603 Katie's Farm - Disk 2.po
@@ -109,7 +109,8 @@ public abstract class HiResImage extends AbstractFile
   // 6 Dream Grafix v1.02.po
 
   // see also - https://docs.google.com/spreadsheets/d
-  //           /1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/edit#gid=0
+  // . /1rKR6A_bVniSCtIP_rrv8QLWJdj4h6jEU1jJj0AebWwg/edit#gid=0
+  // also - http://lukazi.blogspot.com/2017/03/double-high-resolution-graphics-dhgr.html
 
   static PaletteFactory paletteFactory = new PaletteFactory ();
 
@@ -498,7 +499,7 @@ public abstract class HiResImage extends AbstractFile
   int calculateBufferSize (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    //    int ptr = 0;
+    // int ptr = 0;
     int size = 0;
     while (ptr < buffer.length)
     {

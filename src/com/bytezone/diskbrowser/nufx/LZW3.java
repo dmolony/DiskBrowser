@@ -44,10 +44,10 @@ public class LZW3
 
     initTable ();
 
-    bitOffset = 0;
+    int a;
+    int y;
 
-    int a = 0;
-    int y = 0;
+    bitOffset = 0;
 
     while (true)
     {
@@ -57,7 +57,7 @@ public class LZW3
         return -1;
       }
 
-      readCode ();                      // sets iCode
+      iCode = readCode ();
 
       if (iCode == EOF_CODE)
         break;
@@ -65,7 +65,7 @@ public class LZW3
       if (iCode == CLEAR_CODE)
       {
         initTable ();
-        readCode ();                    // sets iCode
+        iCode = readCode ();
 
         oldCode = iCode;
         k = iCode;
@@ -90,7 +90,6 @@ public class LZW3
         a = hashNext[y];
       }
 
-//      a &= 0xFF;        // should already be in 8 bits
       finChar = a;
       k = a;
       y = 0;
@@ -134,19 +133,21 @@ public class LZW3
   }
 
   // ---------------------------------------------------------------------------------//
-  private void readCode ()
+  private int readCode ()
   // ---------------------------------------------------------------------------------//
   {
     int bitIdx = bitOffset & 0x07;
     int byteIdx = bitOffset >>> 3;          // no sign extension
 
-    iCode = srcBuf[byteIdx] & 0xFF | (srcBuf[byteIdx + 1] & 0xFF) << 8
+    int iCode = srcBuf[byteIdx] & 0xFF | (srcBuf[byteIdx + 1] & 0xFF) << 8
         | (srcBuf[byteIdx + 2] & 0xFF) << 16;
 
     iCode >>>= bitIdx;
     iCode &= nBitMask;
 
     bitOffset += nBitMod1;
+
+    return iCode;
   }
 
   // ---------------------------------------------------------------------------------//

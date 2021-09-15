@@ -56,7 +56,8 @@ Applesoft programs are displayed in a modern, easily-readable format. A comprehe
 For the truly retro look, programs can be displayed in the [original 40-column line wrap](resources/basic.md) mode.
 ![Applesoft](resources/basic.png?raw=true "Applesoft")
 #### Pascal code
-![Pascal](resources/pascal.png?raw=true "Pascal")
+![Pascal](resources/pascal.png?raw=true "Pascal text")
+![Pascal](resources/pascal2.png?raw=true "Pascal internals")
 #### Infocom
 ![Infocom](resources/zork.png?raw=true "Infocom")
 #### Wizardry

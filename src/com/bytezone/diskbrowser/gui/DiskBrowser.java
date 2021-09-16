@@ -52,7 +52,7 @@ public class DiskBrowser extends JFrame
   {
     super (windowTitle);
 
-    UIManager.put ("TabbedPane.foreground", Color.BLACK);   // java bug fix
+// UIManager.put ("TabbedPane.foreground", Color.BLACK); // java bug fix
 
     if (args.length > 0 && "-reset".equals (args[0]))
       new WindowState (prefs).clear ();
@@ -85,14 +85,14 @@ public class DiskBrowser extends JFrame
     RootDirectoryAction rootDirectoryAction = new RootDirectoryAction ();
 
     RefreshTreeAction refreshTreeAction = new RefreshTreeAction (catalogPanel);
-    //    PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
+    // PreferencesAction preferencesAction = new PreferencesAction (this, prefs);
     AbstractAction print = new PrintAction (dataPanel);
-    //    AboutAction aboutAction = new AboutAction ();
-    //    HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
+    // AboutAction aboutAction = new AboutAction ();
+    // HideLayoutAction hideLayoutAction = new HideLayoutAction (this, layoutBorderPanel);
     ShowFreeSectorsAction showFreeAction = new ShowFreeSectorsAction ();
 
     CloseTabAction closeTabAction = new CloseTabAction (catalogPanel);
-    //    closeTabAction.addPropertyChangeListener (catalogPanel);
+    // closeTabAction.addPropertyChangeListener (catalogPanel);
 
     hideCatalogAction.addPropertyChangeListener (this);
     hideLayoutAction.addPropertyChangeListener (this);
@@ -100,10 +100,10 @@ public class DiskBrowser extends JFrame
     // add action buttons to toolbar
     toolBar.add (rootDirectoryAction);
     toolBar.add (refreshTreeAction);
-    //    toolBar.add (preferencesAction);
+    // toolBar.add (preferencesAction);
     toolBar.add (duplicateAction);
     toolBar.add (print);
-    //    toolBar.add (aboutAction);
+    // toolBar.add (aboutAction);
 
     // set the listeners
     rootDirectoryAction.addPropertyChangeListener (rootFolderData);
@@ -132,7 +132,7 @@ public class DiskBrowser extends JFrame
 
     menuHandler.fontAction.addFontChangeListener (dataPanel);
     menuHandler.fontAction.addFontChangeListener (catalogPanel);
-    //    menuHandler.fontAction.addFontChangeListener (diskLayoutPanel);
+    // menuHandler.fontAction.addFontChangeListener (diskLayoutPanel);
 
     // set the MenuItem Actions
     menuHandler.printItem.setAction (print);
@@ -166,7 +166,7 @@ public class DiskBrowser extends JFrame
 
       if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
         desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());   // needed for cmd-Q
-      //      else
+      // else
       setQuitHandler ();        // needed for the close button
     }
     else
@@ -290,11 +290,11 @@ public class DiskBrowser extends JFrame
   private static void setLookAndFeel ()
   // ---------------------------------------------------------------------------------//
   {
-    //    FlatLightLaf.install ();
+    // FlatLightLaf.install ();
     try
     {
       UIManager.setLookAndFeel (UIManager.getSystemLookAndFeelClassName ());
-      //      UIManager.setLookAndFeel (new FlatLightLaf ());
+      // UIManager.setLookAndFeel (new FlatLightLaf ());
       if (MAC)
         System.setProperty ("apple.laf.useScreenMenuBar", "true");
     }

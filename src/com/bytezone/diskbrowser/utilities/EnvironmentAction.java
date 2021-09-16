@@ -38,9 +38,15 @@ public class EnvironmentAction extends AbstractAction
     textFormatter.addLine ("Java version", System.getProperty ("java.runtime.version"));
     textFormatter.addLine ();
 
+    String userHome = System.getProperty ("user.home");
+
     String path = System.getProperty ("java.class.path");
     for (String s : path.split (File.pathSeparator))
+    {
+      if (s.startsWith (userHome))
+        s = "~" + s.substring (userHome.length ());
       textFormatter.addLine ("Classpath", s);
+    }
 
     JOptionPane.showMessageDialog (null, textFormatter.toLabel (), "Java Environment",
         JOptionPane.INFORMATION_MESSAGE);

@@ -23,7 +23,6 @@ public class SHRPictureFile1 extends HiResImage
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer, fileType, auxType, eof);
-    System.out.println ("here");
 
     int ptr = 0;
     while (ptr < buffer.length)
@@ -142,7 +141,7 @@ public class SHRPictureFile1 extends HiResImage
       int lo = dirEntry.mode & 0x00FF;      // mode bit if hi == 0
 
       boolean fillMode = (dirEntry.mode & 0x20) != 0;
-      //      assert fillMode == false;
+      // assert fillMode == false;
 
       if (hi != 0)
         System.out.println ("hi not zero");
@@ -243,7 +242,8 @@ public class SHRPictureFile1 extends HiResImage
         if (ptr < data.length - 32)
           colorTables[i] = new ColorTable (i, data, ptr);
         else
-          colorTables[i] = new ColorTable (i, 0x00);      // default empty table !! not finished
+          colorTables[i] = new ColorTable (i, 0x00);      // default empty table !! not
+                                                          // finished
         ptr += 32;
       }
     }
@@ -333,11 +333,11 @@ public class SHRPictureFile1 extends HiResImage
       ptr = 0;
       for (int line = 0; line < numScanLines; line++)
       {
-        //        if (isOddAndEmpty (packedScanLines[line]))
-        //        {
-        //          System.out.println ("Odd number of bytes in empty buffer in " + name);
-        //          break;
-        //        }
+        // if (isOddAndEmpty (packedScanLines[line]))
+        // {
+        // System.out.println ("Odd number of bytes in empty buffer in " + name);
+        // break;
+        // }
 
         int bytesUnpacked = unpack (packedScanLines[line], 0,
             packedScanLines[line].length, unpackedBuffer, ptr);
@@ -353,16 +353,17 @@ public class SHRPictureFile1 extends HiResImage
     }
 
     // -------------------------------------------------------------------------------//
-    //    private boolean isOddAndEmpty (byte[] buffer)
-    //    // -------------------------------------------------------------------------------//
-    //    {
-    //      if (buffer.length % 2 == 0)
-    //        return false;
-    //      for (byte b : buffer)
-    //        if (b != 0)
-    //          return false;
-    //      return true;
-    //    }
+    // private boolean isOddAndEmpty (byte[] buffer)
+    // //
+    // -------------------------------------------------------------------------------//
+    // {
+    // if (buffer.length % 2 == 0)
+    // return false;
+    // for (byte b : buffer)
+    // if (b != 0)
+    // return false;
+    // return true;
+    // }
 
     // -------------------------------------------------------------------------------//
     @Override

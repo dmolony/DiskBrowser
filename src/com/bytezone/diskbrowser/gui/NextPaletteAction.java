@@ -17,11 +17,11 @@ import com.bytezone.diskbrowser.applefile.PaletteFactory.CycleDirection;
 class NextPaletteAction extends AbstractAction
 // -----------------------------------------------------------------------------------//
 {
-  private final DataPanel owner;
+  private final OutputPanel owner;
   private final ButtonGroup buttonGroup;
 
   // ---------------------------------------------------------------------------------//
-  NextPaletteAction (DataPanel owner, ButtonGroup buttonGroup)
+  NextPaletteAction (OutputPanel owner, ButtonGroup buttonGroup)
   // ---------------------------------------------------------------------------------//
   {
     super ("Next Palette");

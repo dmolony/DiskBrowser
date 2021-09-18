@@ -12,10 +12,10 @@ class PaletteAction extends AbstractAction
 // -----------------------------------------------------------------------------------//
 {
   private final Palette palette;
-  private final DataPanel owner;
+  private final OutputPanel owner;
 
   // ---------------------------------------------------------------------------------//
-  PaletteAction (DataPanel owner, Palette palette)
+  PaletteAction (OutputPanel owner, Palette palette)
   // ---------------------------------------------------------------------------------//
   {
     super (palette.getName ());

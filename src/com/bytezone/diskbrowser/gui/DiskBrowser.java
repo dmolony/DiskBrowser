@@ -73,7 +73,7 @@ public class DiskBrowser extends JFrame
     catalogBorderPanel = addPanel (catalogPanel, "Catalog", BorderLayout.WEST);
 
     // create and add the centre output panel
-    DataPanel dataPanel = new DataPanel (menuHandler);
+    OutputPanel dataPanel = new OutputPanel (menuHandler);
     addPanel (dataPanel, "Output", BorderLayout.CENTER);
 
     // create and add the right-hand disk layout panel

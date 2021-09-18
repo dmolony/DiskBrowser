@@ -16,10 +16,10 @@ import com.bytezone.diskbrowser.utilities.DefaultAction;
 class PrintAction extends DefaultAction
 // -----------------------------------------------------------------------------------//
 {
-  DataPanel owner;
+  OutputPanel owner;
 
   // ---------------------------------------------------------------------------------//
-  public PrintAction (DataPanel owner)
+  public PrintAction (OutputPanel owner)
   // ---------------------------------------------------------------------------------//
   {
     super ("Print...", "Print the contents of the output panel",

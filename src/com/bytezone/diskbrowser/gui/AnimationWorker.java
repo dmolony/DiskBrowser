@@ -12,10 +12,10 @@ public class AnimationWorker extends SwingWorker<Void, Integer>
 {
   volatile boolean running;
   SHRPictureFile2 image;
-  DataPanel owner;
+  OutputPanel owner;
 
   // ---------------------------------------------------------------------------------//
-  public AnimationWorker (DataPanel owner, SHRPictureFile2 image)
+  public AnimationWorker (OutputPanel owner, SHRPictureFile2 image)
   // ---------------------------------------------------------------------------------//
   {
     assert image.isAnimation ();

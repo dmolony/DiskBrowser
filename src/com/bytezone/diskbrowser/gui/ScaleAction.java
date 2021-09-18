@@ -10,11 +10,11 @@ import javax.swing.KeyStroke;
 
 public class ScaleAction extends AbstractAction
 {
-  private final DataPanel owner;
+  private final OutputPanel owner;
   private double scale;
 
   // ---------------------------------------------------------------------------------//
-  public ScaleAction (DataPanel owner, double scale, int menu)
+  public ScaleAction (OutputPanel owner, double scale, int menu)
   // ---------------------------------------------------------------------------------//
   {
     super ("Scale " + scale);

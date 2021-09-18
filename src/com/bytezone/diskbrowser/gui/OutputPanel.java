@@ -35,7 +35,7 @@ import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
 
 // -----------------------------------------------------------------------------------//
-public class DataPanel extends JTabbedPane
+public class OutputPanel extends JTabbedPane
     implements DiskSelectionListener, FileSelectionListener, SectorSelectionListener,
     FileNodeSelectionListener, FontChangeListener, BasicPreferencesListener,
     AssemblerPreferencesListener, TextPreferencesListener, PropertyChangeListener
@@ -75,7 +75,7 @@ public class DataPanel extends JTabbedPane
   }
 
   // ---------------------------------------------------------------------------------//
-  public DataPanel (MenuHandler menuHandler)
+  public OutputPanel (MenuHandler menuHandler)
   // ---------------------------------------------------------------------------------//
   {
     //    this.menuHandler = mh;

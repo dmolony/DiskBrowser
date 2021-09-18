@@ -63,7 +63,7 @@ For the truly retro look, programs can be displayed in the [original 40-column l
 #### Wizardry
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
 #### Visicalc
-DiskBrowser includes an inbuilt Visicalc processor which will evaluate the sheet and display the results.
+DiskBrowser has an inbuilt Visicalc processor which will evaluate the sheet and display the results.
 ![Visicalc](resources/visicalc.png?raw=true "Visicalc")
 #### Complete Disk List
 Generates a list of all the disks in your collection. The list can be sorted by any of the table headings. Checksums can be generated as needed, or for the whole collection.

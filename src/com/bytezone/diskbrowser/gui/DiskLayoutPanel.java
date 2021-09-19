@@ -262,8 +262,8 @@ class DiskLayoutPanel extends JPanel implements DiskSelectionListener,
 
   private void checkCorrectDisk (FormattedDisk newDisk)
   {
-    if (newDisk instanceof HybridDisk)
-      newDisk = ((HybridDisk) newDisk).getCurrentDisk (); // never set to a hybrid disk
+    if (newDisk instanceof HybridDisk hybridDisk)
+      newDisk = hybridDisk.getCurrentDisk ();           // never set to a hybrid disk
     if (newDisk != diskLayoutImage.getDisk ())
     {
       LayoutDetails layout = new LayoutDetails (newDisk);

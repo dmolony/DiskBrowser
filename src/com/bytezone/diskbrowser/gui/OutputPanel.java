@@ -43,7 +43,7 @@ public class OutputPanel extends JTabbedPane
 {
   private static final int TEXT_WIDTH = 65;
 
-  //  final MenuHandler menuHandler;
+  // final MenuHandler menuHandler;
   private final JTextArea formattedText;
   private final JTextArea hexText;
   private final JTextArea disassemblyText;
@@ -78,12 +78,11 @@ public class OutputPanel extends JTabbedPane
   public OutputPanel (MenuHandler menuHandler)
   // ---------------------------------------------------------------------------------//
   {
-    //    this.menuHandler = mh;
     setTabPlacement (SwingConstants.BOTTOM);
 
     formattedText = new JTextArea (10, TEXT_WIDTH);
     formattedPane = setPanel (formattedText, "Formatted");
-    //    formattedText.setLineWrap (prefs.getBoolean (MenuHandler.PREFS_LINE_WRAP, true));
+    // formattedText.setLineWrap (prefs.getBoolean (MenuHandler.PREFS_LINE_WRAP, true));
     formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"
@@ -183,9 +182,8 @@ public class OutputPanel extends JTabbedPane
   // ---------------------------------------------------------------------------------//
   {
     HiResImage.getPaletteFactory ().setCurrentPalette (palette);
-    if (currentDataSource instanceof HiResImage)
+    if (currentDataSource instanceof HiResImage image)
     {
-      HiResImage image = (HiResImage) currentDataSource;
       image.setPalette ();
       imagePanel.setImage (image.getImage ());
     }
@@ -196,9 +194,8 @@ public class OutputPanel extends JTabbedPane
   // ---------------------------------------------------------------------------------//
   {
     Palette palette = HiResImage.getPaletteFactory ().cyclePalette (direction);
-    if (currentDataSource instanceof HiResImage)
+    if (currentDataSource instanceof HiResImage image)
     {
-      HiResImage image = (HiResImage) currentDataSource;
       image.setPalette ();
       imagePanel.setImage (image.getImage ());
     }
@@ -231,9 +228,8 @@ public class OutputPanel extends JTabbedPane
   public void setColourQuirks (boolean value)
   // ---------------------------------------------------------------------------------//
   {
-    if (currentDataSource instanceof HiResImage)
+    if (currentDataSource instanceof HiResImage image)
     {
-      HiResImage image = (HiResImage) currentDataSource;
       image.setColourQuirks (value);
       imagePanel.setImage (image.getImage ());
     }
@@ -243,9 +239,8 @@ public class OutputPanel extends JTabbedPane
   public void setMonochrome (boolean value)
   // ---------------------------------------------------------------------------------//
   {
-    if (currentDataSource instanceof HiResImage)
+    if (currentDataSource instanceof HiResImage image)
     {
-      HiResImage image = (HiResImage) currentDataSource;
       image.setMonochrome (value);
       imagePanel.setImage (image.getImage ());
     }
@@ -256,22 +251,16 @@ public class OutputPanel extends JTabbedPane
   // ---------------------------------------------------------------------------------//
   {
     imagePanel.setScale (scale);
-    if (currentDataSource instanceof HiResImage)
-    {
-      HiResImage image = (HiResImage) currentDataSource;
+    if (currentDataSource instanceof HiResImage image)
       imagePanel.setImage (image.getImage ());
-    }
   }
 
   // ---------------------------------------------------------------------------------//
   public void update ()
   // ---------------------------------------------------------------------------------//
   {
-    if (currentDataSource instanceof HiResImage)
-    {
-      HiResImage image = (HiResImage) currentDataSource;
+    if (currentDataSource instanceof HiResImage image)
       imagePanel.setImage (image.getImage ());
-    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -480,7 +469,6 @@ public class OutputPanel extends JTabbedPane
   {
     setSelectedIndex (0);
     setDataSource (event.getFileNode ());
-    //    FileNode node = event.getFileNode ();
   }
 
   // ---------------------------------------------------------------------------------//

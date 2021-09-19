@@ -104,20 +104,22 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  //  public static int getLong (byte[] buffer, int ptr)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    return getWord (buffer, ptr) + getWord (buffer, ptr + 2) * 0x10000;
-  //  }
+  // public static int getLong (byte[] buffer, int ptr)
+  // //
+  // ---------------------------------------------------------------------------------//
+  // {
+  // return getWord (buffer, ptr) + getWord (buffer, ptr + 2) * 0x10000;
+  // }
 
   // ---------------------------------------------------------------------------------//
-  //  public static int getWord (byte[] buffer, int ptr)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    int a = (buffer[ptr + 1] & 0xFF) << 8;
-  //    int b = buffer[ptr] & 0xFF;
-  //    return a + b;
-  //  }
+  // public static int getWord (byte[] buffer, int ptr)
+  // //
+  // ---------------------------------------------------------------------------------//
+  // {
+  // int a = (buffer[ptr + 1] & 0xFF) << 8;
+  // int b = buffer[ptr] & 0xFF;
+  // return a + b;
+  // }
 
   // ---------------------------------------------------------------------------------//
   public static int intValue (byte b1, byte b2)
@@ -137,19 +139,21 @@ public final class Utility
   public static int getLong (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    if (ptr >= buffer.length)
+    try
     {
-      System.out.printf ("Index out of range (getLong): %08X%n", ptr);
+      int val = 0;
+      for (int i = 3; i >= 0; i--)
+      {
+        val <<= 8;
+        val += buffer[ptr + i] & 0xFF;
+      }
+      return val;
+    }
+    catch (ArrayIndexOutOfBoundsException e)
+    {
+      System.out.printf ("Index out of range (getLong): %08X  %<d%n", ptr);
       return 0;
     }
-
-    int val = 0;
-    for (int i = 3; i >= 0; i--)
-    {
-      val <<= 8;
-      val += buffer[ptr + i] & 0xFF;
-    }
-    return val;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -166,41 +170,52 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  //  public static int getWordBigEndian (byte[] buffer, int ptr)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    int val = 0;
-  //    for (int i = 0; i < 2; i++)
-  //    {
-  //      val <<= 8;
-  //      val += buffer[ptr + i] & 0xFF;
-  //    }
-  //    return val;
-  //  }
+  // public static int getWordBigEndian (byte[] buffer, int ptr)
+  // //
+  // ---------------------------------------------------------------------------------//
+  // {
+  // int val = 0;
+  // for (int i = 0; i < 2; i++)
+  // {
+  // val <<= 8;
+  // val += buffer[ptr + i] & 0xFF;
+  // }
+  // return val;
+  // }
 
   // ---------------------------------------------------------------------------------//
   public static int getShort (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    if (ptr >= buffer.length)
+    try
     {
-      System.out.printf ("Index out of range (getShort): %04X%n", ptr);
+      return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
+    }
+    catch (ArrayIndexOutOfBoundsException e)
+    {
+      System.out.printf ("Index out of range (getShort): %04X  %<d%n", ptr);
       return 0;
     }
-
-    return (buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8);
   }
 
   // ---------------------------------------------------------------------------------//
   public static int signedShort (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    if (ptr >= buffer.length)
+// if (ptr >= buffer.length)
+// {
+// System.out.println ("Index out of range (signed short): " + ptr);
+// return 0;
+// }
+    try
     {
-      System.out.println ("Index out of range (signed short): " + ptr);
+      return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));
+    }
+    catch (ArrayIndexOutOfBoundsException e)
+    {
+      System.out.printf ("Index out of range (signedShort): %04X  %<d%n", ptr);
       return 0;
     }
-    return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -220,7 +235,7 @@ public final class Utility
   public static LocalDateTime getAppleDate (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    //    int yymmdd = readShort (buffer, offset);
+    // int yymmdd = readShort (buffer, offset);
     int yymmdd = getShort (buffer, offset);
     if (yymmdd != 0)
     {
@@ -297,11 +312,12 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  //  public static int readShort (byte[] buffer, int ptr)
-  //  // ---------------------------------------------------------------------------------//
-  //  {
-  //    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8;
-  //  }
+  // public static int readShort (byte[] buffer, int ptr)
+  // //
+  // ---------------------------------------------------------------------------------//
+  // {
+  // return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8;
+  // }
 
   // ---------------------------------------------------------------------------------//
   public static int readTriple (byte[] buffer, int ptr)

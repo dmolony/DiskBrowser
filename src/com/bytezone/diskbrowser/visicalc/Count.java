@@ -27,7 +27,7 @@ class Count extends ValueListFunction
     else
       for (Value v : list)
       {
-        if (v instanceof Cell && ((Cell) v).isCellType (CellType.EMPTY))
+        if (v instanceof Cell cell && cell.isCellType (CellType.EMPTY))
           continue;
 
         v.calculate ();     // is this required?

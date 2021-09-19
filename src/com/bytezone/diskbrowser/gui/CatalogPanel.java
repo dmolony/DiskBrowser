@@ -89,9 +89,9 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
   {
     if (evt.getPropertyName ().equals ("RootDirectory"))
       rootDirectoryChanged ((File) evt.getOldValue (), (File) evt.getNewValue ());
-    //    else
-    //      closeCurrentTab ();
-    //    System.out.println (evt.getPropertyName ());
+    // else
+    // closeCurrentTab ();
+    // System.out.println (evt.getPropertyName ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -158,8 +158,8 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     tab.refresh ();
 
     // Any newly created disk needs to appear in the FileSystemTab's tree
-    if (tab instanceof AppleDiskTab)
-      fileTab.replaceDisk (((AppleDiskTab) tab).disk);
+    if (tab instanceof AppleDiskTab appleDiskTab)
+      fileTab.replaceDisk (appleDiskTab.disk);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -221,8 +221,8 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
 
         FormattedDisk fd = ((AppleDiskTab) selectedTab).disk;
         prefs.put (prefsLastDiskUsed, fd.getAbsolutePath ());
-        if (fd instanceof HybridDisk)
-          prefs.putInt (prefsLastDosUsed, ((HybridDisk) fd).getCurrentDiskNo ());
+        if (fd instanceof HybridDisk hybridDisk)
+          prefs.putInt (prefsLastDosUsed, hybridDisk.getCurrentDiskNo ());
         else
           prefs.putInt (prefsLastDosUsed, -1);
 
@@ -231,16 +231,16 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
         {
           EventObject event = redoEvent.value;
 
-          if (event instanceof FileSelectedEvent)
+          if (event instanceof FileSelectedEvent fileSelectedEvent)
           {
-            AppleFileSource afs = ((FileSelectedEvent) event).appleFileSource;
+            AppleFileSource afs = fileSelectedEvent.appleFileSource;
             prefs.put (prefsLastFileUsed, afs == null ? "" : afs.getUniqueName ());
             prefs.put (prefsLastSectorsUsed, "");
           }
-          else if (event instanceof SectorSelectedEvent)
+          else if (event instanceof SectorSelectedEvent sectorSelectedEvent)
           {
             prefs.put (prefsLastFileUsed, "");
-            prefs.put (prefsLastSectorsUsed, ((SectorSelectedEvent) event).toText ());
+            prefs.put (prefsLastSectorsUsed, sectorSelectedEvent.toText ());
           }
         }
       }
@@ -273,8 +273,8 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
       if (diskEvent != null)
       {
         fd1 = diskEvent.getFormattedDisk ();
-        if (lastDosUsed >= 0 && fd1 instanceof HybridDisk)
-          ((HybridDisk) fd1).setCurrentDiskNo (lastDosUsed);
+        if (lastDosUsed >= 0 && fd1 instanceof HybridDisk hybridDisk)
+          hybridDisk.setCurrentDiskNo (lastDosUsed);
       }
     }
     else
@@ -399,13 +399,13 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
     {
       case "DiskEvent":
       case "FileNodeEvent":
-        if (tab instanceof FileSystemTab)
-          ((FileSystemTab) tab).redoEvent (event);
+        if (tab instanceof FileSystemTab fileSystemTab)
+          fileSystemTab.redoEvent (event);
         break;
 
       case "FileEvent":
-        if (tab instanceof AppleDiskTab)
-          ((AppleDiskTab) tab).redoEvent (event);
+        if (tab instanceof AppleDiskTab appleDiskTab)
+          appleDiskTab.redoEvent (event);
         break;
 
       case "SectorEvent":
@@ -426,8 +426,8 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
   {
     // user has clicked in the DiskLayoutPanel, so turn off any current file selection
     Tab tab = (Tab) getSelectedComponent ();
-    if (tab instanceof AppleDiskTab)
-      ((AppleDiskTab) tab).tree.setSelectionPath (null);
+    if (tab instanceof AppleDiskTab appleDiskTab)
+      appleDiskTab.tree.setSelectionPath (null);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -462,7 +462,7 @@ class CatalogPanel extends JTabbedPane implements RedoListener, SectorSelectionL
       FileNode node = (FileNode) selectedNode.getUserObject ();
       if (node.file.isDirectory ())
       {
-        //        lister.catalogLister.setNode (selectedNode);
+        // lister.catalogLister.setNode (selectedNode);
       }
       else if (e.getClickCount () == 2)
         addDiskPanel (node.getFormattedDisk (), true);

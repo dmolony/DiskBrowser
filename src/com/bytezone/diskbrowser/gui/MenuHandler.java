@@ -212,7 +212,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     addLauncherMenu ();
 
     fileMenu.add (printItem);
-    //    fileMenu.addSeparator ();
+    // fileMenu.addSeparator ();
     fileMenu.add (closeTabItem);
 
     JMenuItem fontItem = new JMenuItem (fontAction);
@@ -271,13 +271,13 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (splitRemarkItem);
     applesoftMenu.add (splitDimItem);
     applesoftMenu.add (alignAssignItem);
-    //    applesoftMenu.add (showBasicTargetsItem);
-    //    applesoftMenu.add (onlyShowTargetLinesItem);
+    // applesoftMenu.add (showBasicTargetsItem);
+    // applesoftMenu.add (onlyShowTargetLinesItem);
     applesoftMenu.add (showCaretItem);
     applesoftMenu.add (showThenItem);
     applesoftMenu.add (blankAfterReturnItem);
     applesoftMenu.add (formatRemItem);
-    //    applesoftMenu.add (deleteExtraRemSpace);
+    // applesoftMenu.add (deleteExtraRemSpace);
     applesoftMenu.add (deleteExtraDataSpace);
     applesoftMenu.addSeparator ();
     applesoftMenu.add (showXrefItem);
@@ -285,7 +285,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
     applesoftMenu.add (showSymbolsItem);
     applesoftMenu.add (showFunctionsItem);
     applesoftMenu.add (showConstantsItem);
-    //    applesoftMenu.add (listStringsItem);
+    // applesoftMenu.add (listStringsItem);
     applesoftMenu.add (showDuplicateSymbolsItem);
 
     assemblerMenu.add (showAssemblerHeaderItem);
@@ -738,7 +738,7 @@ class MenuHandler implements DiskSelectionListener, FileSelectionListener, QuitL
       interleave3Item.setSelected (disk.getDisk ().getInterleave () == 3);
     }
 
-    boolean isDataDisk = (disk instanceof DataDisk);
+    boolean isDataDisk = disk instanceof DataDisk;
 
     sector256Item.setEnabled (isDataDisk);
     sector512Item.setEnabled (isDataDisk);

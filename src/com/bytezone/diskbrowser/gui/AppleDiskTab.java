@@ -158,9 +158,9 @@ class AppleDiskTab extends AbstractTab
 
     // check for multi-volume disk (only search the current branch)
     FormattedDisk fd = ((AppleFileSource) rootNode.getUserObject ()).getFormattedDisk ();
-    if (fd instanceof HybridDisk)
+    if (fd instanceof HybridDisk hd)
     {
-      int volume = ((HybridDisk) fd).getCurrentDiskNo ();
+      int volume = hd.getCurrentDiskNo ();
       rootNode = (DefaultMutableTreeNode) rootNode.getChildAt (volume);
     }
 
@@ -169,8 +169,8 @@ class AppleDiskTab extends AbstractTab
     {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) children.nextElement ();
       Object userObject = node.getUserObject ();
-      if (userObject instanceof AppleFileSource
-          && nodeName.equals (((AppleFileSource) userObject).getUniqueName ()))
+      if (userObject instanceof AppleFileSource afs
+          && nodeName.equals (afs.getUniqueName ()))
         return node;
     }
     return null;

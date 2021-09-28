@@ -364,9 +364,9 @@ public class OutputPanel extends JTabbedPane
       removeImage ();
     else
     {
-      if (dataSource instanceof HiResImage)
+      if (dataSource instanceof HiResImage hri)
       {
-        ((HiResImage) dataSource).checkPalette ();
+        hri.checkPalette ();
         image = dataSource.getImage ();
         if (((HiResImage) dataSource).isAnimation ())
         {

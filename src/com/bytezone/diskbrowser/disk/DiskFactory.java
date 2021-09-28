@@ -173,13 +173,13 @@ public class DiskFactory
       }
       catch (Exception e)
       {
-        //        e.printStackTrace ();
+        // e.printStackTrace ();
         if (e.getMessage () == null)
           System.out.println (e);
         else
           System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
-        //        System.out.println (nuFX);
+        // System.out.println (nuFX);
         return null;
       }
     }
@@ -204,10 +204,10 @@ public class DiskFactory
       }
       catch (Exception e)
       {
-        //        e.printStackTrace ();
+        // e.printStackTrace ();
         System.out.println (e.getMessage ());
         System.out.printf ("Error unpacking: %s%n", file.getAbsolutePath ());
-        //        System.out.println (binary2);
+        // System.out.println (binary2);
         return null;
       }
     }
@@ -419,7 +419,7 @@ public class DiskFactory
 
     if (true)
     {
-      //      long checksum = appleDisk256.getBootChecksum ();
+      // long checksum = appleDisk256.getBootChecksum ();
       long checksum = 0;
 
       if (checksum == 227968344L)       // empty boot sector
@@ -444,7 +444,7 @@ public class DiskFactory
         if (debug)
           System.out.println ("  known DOS checksum : " + checksum);
         disk = checkDos (appleDisk256);
-        //        disk2 = checkProdos (appleDisk512);     // no need for this
+        // disk2 = checkProdos (appleDisk512); // no need for this
         if (disk2 != null && disk != null)      // should be impossible
         {
           if (debug)
@@ -490,11 +490,11 @@ public class DiskFactory
       else if (debug)
         System.out.println ("  unknown checksum : " + checksum);
 
-      //      else if (checksum == 1212926910L || checksum == 1365043894L
-      //          || checksum == 2128073918L)
-      //        disk = checkCPMDisk (file);
+      // else if (checksum == 1212926910L || checksum == 1365043894L
+      // || checksum == 2128073918L)
+      // disk = checkCPMDisk (file);
 
-      //      System.out.println (checksum);
+      // System.out.println (checksum);
 
       if (disk != null)
       {
@@ -608,7 +608,7 @@ public class DiskFactory
         if (debug)
           System.out.println ("  --> DOS");
         DosDisk dosDisk = new DosDisk (disk);
-        //        disk.setDosVersion (dosDisk.getVersion ());
+        // disk.setDosVersion (dosDisk.getVersion ());
 
         return dosDisk;
       }
@@ -701,10 +701,10 @@ public class DiskFactory
         System.out.println ("*** extended ***");     // System Addons.hdv
       }
       AppleDisk disk;
-      //      if (nuFX == null)
+      // if (nuFX == null)
       disk = new AppleDisk (file, tracks, 8);
-      //      else
-      //        disk = new AppleDisk (file, tracks, 8, nuFX);
+      // else
+      // disk = new AppleDisk (file, tracks, 8, nuFX);
 
       if (ProdosDisk.isCorrectFormat (disk))
       {
@@ -855,7 +855,7 @@ public class DiskFactory
       String fileName = file.getAbsolutePath ().toLowerCase ();
       int pos = file.getAbsolutePath ().indexOf ('.');
       char c = fileName.charAt (pos - 1);
-      //      String suffix = fileName.substring (pos + 1);
+      // String suffix = fileName.substring (pos + 1);
       int requiredDisks = c == '1' ? 6 : c == 'a' ? 10 : 0;
 
       if (requiredDisks > 0)

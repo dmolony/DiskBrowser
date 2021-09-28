@@ -202,11 +202,6 @@ public final class Utility
   public static int signedShort (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-// if (ptr >= buffer.length)
-// {
-// System.out.println ("Index out of range (signed short): " + ptr);
-// return 0;
-// }
     try
     {
       return (short) ((buffer[ptr] & 0xFF) | ((buffer[ptr + 1] & 0xFF) << 8));

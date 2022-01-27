@@ -28,14 +28,14 @@ public class ImagePanel extends JPanel
   }
 
   // ---------------------------------------------------------------------------------//
-  void setScale (double scale)
+  public void setScale (double scale)
   // ---------------------------------------------------------------------------------//
   {
     this.userScale = scale;
   }
 
   // ---------------------------------------------------------------------------------//
-  void setImage (BufferedImage image)
+  public void setImage (BufferedImage image)
   // ---------------------------------------------------------------------------------//
   {
     this.image = image;
@@ -44,8 +44,7 @@ public class ImagePanel extends JPanel
     if (image != null)
     {
       Graphics2D g2 = image.createGraphics ();
-      g2.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
-          RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setRenderingHint (RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       width = image.getWidth ();
       height = image.getHeight ();
     }
@@ -79,8 +78,7 @@ public class ImagePanel extends JPanel
     {
       Graphics2D g2 = ((Graphics2D) g);
       g2.transform (AffineTransform.getScaleInstance (scale, scale));
-      g2.drawImage (image, (int) ((getWidth () - image.getWidth () * scale) / 2 / scale),
-          4, this);
+      g2.drawImage (image, (int) ((getWidth () - image.getWidth () * scale) / 2 / scale), 4, this);
     }
   }
 }

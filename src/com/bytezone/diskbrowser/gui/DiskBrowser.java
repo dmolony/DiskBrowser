@@ -52,7 +52,7 @@ public class DiskBrowser extends JFrame
   {
     super (windowTitle);
 
-// UIManager.put ("TabbedPane.foreground", Color.BLACK); // java bug fix
+    // UIManager.put ("TabbedPane.foreground", Color.BLACK); // java bug fix
 
     if (args.length > 0 && "-reset".equals (args[0]))
       new WindowState (prefs).clear ();
@@ -113,8 +113,8 @@ public class DiskBrowser extends JFrame
     catalogPanel.addDiskSelectionListener (this, dataPanel, diskLayoutPanel, redoHandler,
         menuHandler, menuHandler.saveDiskAction);
 
-    catalogPanel.addFileSelectionListener (dataPanel, diskLayoutPanel, redoHandler,
-        menuHandler, menuHandler.saveFileAction);
+    catalogPanel.addFileSelectionListener (dataPanel, diskLayoutPanel, redoHandler, menuHandler,
+        menuHandler.saveFileAction);
 
     catalogPanel.addFileNodeSelectionListener (dataPanel, redoHandler);
 
@@ -160,9 +160,9 @@ public class DiskBrowser extends JFrame
             "Author - Denis Molony\nGitHub - https://github.com/dmolony/DiskBrowser",
             "About DiskBrowser", JOptionPane.INFORMATION_MESSAGE));
 
-      if (desktop.isSupported (Desktop.Action.APP_PREFERENCES) && false)
-        desktop.setPreferencesHandler (
-            e -> JOptionPane.showMessageDialog (null, "Preferences dialog"));
+      //      if (desktop.isSupported (Desktop.Action.APP_PREFERENCES) && false)
+      //        desktop.setPreferencesHandler (
+      //            e -> JOptionPane.showMessageDialog (null, "Preferences dialog"));
 
       if (desktop.isSupported (Desktop.Action.APP_QUIT_HANDLER))
         desktop.setQuitHandler ( (e, r) -> fireQuitEvent ());   // needed for cmd-Q
@@ -265,8 +265,7 @@ public class DiskBrowser extends JFrame
   public void diskSelected (DiskSelectedEvent e)
   // ---------------------------------------------------------------------------------//
   {
-    setTitle (windowTitle + e.getFormattedDisk () == null ? ""
-        : e.getFormattedDisk ().getName ());
+    setTitle (windowTitle + e.getFormattedDisk () == null ? "" : e.getFormattedDisk ().getName ());
   }
 
   // ---------------------------------------------------------------------------------//

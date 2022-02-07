@@ -15,7 +15,7 @@ public abstract class AbstractFile implements DataSource
 {
   static boolean showDebugText;
 
-  String name;
+  protected String name;
   public byte[] buffer;
   AssemblerProgram assembler;
   protected BufferedImage image;

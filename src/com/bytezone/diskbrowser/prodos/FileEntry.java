@@ -29,6 +29,7 @@ import com.bytezone.diskbrowser.applefile.MerlinSource;
 import com.bytezone.diskbrowser.applefile.ObjectModule;
 import com.bytezone.diskbrowser.applefile.OriginalHiResImage;
 import com.bytezone.diskbrowser.applefile.PascalArea;
+import com.bytezone.diskbrowser.applefile.PascalCode;
 import com.bytezone.diskbrowser.applefile.ProdosDirectory;
 import com.bytezone.diskbrowser.applefile.QuickDrawFont;
 import com.bytezone.diskbrowser.applefile.SHRPictureFile1;
@@ -71,8 +72,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   private FileEntry link;
 
   // ---------------------------------------------------------------------------------//
-  FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent,
-      int parentBlock, int entryNo)
+  FileEntry (ProdosDisk fDisk, byte[] entryBuffer, DirectoryHeader parent, int parentBlock,
+      int entryNo)
   // ---------------------------------------------------------------------------------//
   {
     super (fDisk, entryBuffer, parentBlock, entryNo);
@@ -348,8 +349,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
                 file = new DoubleHiResImage (name, outBuffer);
                 break;
               case 0x8000:
-                file =
-                    new SHRPictureFile2 (name, outBuffer, FILE_TYPE_PIC, 0x2000, 0x8000);
+                file = new SHRPictureFile2 (name, outBuffer, FILE_TYPE_PIC, 0x2000, 0x8000);
                 break;
               default:
                 file = new AssemblerProgram (name, exactBuffer, auxType);
@@ -369,8 +369,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           }
           //  else if (name.endsWith (".PIC"))          // 0091 X-BASIC../../XBASIC.PIC
           //    file = new SHRPictureFile2 (name, exactBuffer, fileType, auxType, endOfFile);
-          else if ((name.equals ("DOS.3.3") || name.equals ("DDOS.3.3"))
-              && endOfFile == 0x2800 && DosMasterFile.isDos33 (parentDisk, exactBuffer))
+          else if ((name.equals ("DOS.3.3") || name.equals ("DDOS.3.3")) && endOfFile == 0x2800
+              && DosMasterFile.isDos33 (parentDisk, exactBuffer))
           {
             file = new DosMasterFile (name, exactBuffer);
           }
@@ -413,8 +413,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
         case FILE_TYPE_DIRECTORY:
           VolumeDirectoryHeader vdh = parentDisk.getVolumeDirectoryHeader ();
-          file = new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks,
-              vdh.freeBlocks, vdh.usedBlocks);
+          file = new ProdosDirectory (parentDisk, name, buffer, vdh.totalBlocks, vdh.freeBlocks,
+              vdh.usedBlocks);
           break;
 
         case FILE_TYPE_APPLESOFT_BASIC_VARS:
@@ -539,6 +539,11 @@ class FileEntry extends CatalogEntry implements ProdosConstants
           file = new DefaultAppleFile (name, exactBuffer);
           break;
 
+        case FILE_TYPE_PCD:
+          //        case FILE_TYPE_PDA:
+          file = new PascalCode (name, exactBuffer, 0);
+          break;
+
         case FILE_TYPE_NON:
           if (name.endsWith (".TIFF") && HiResImage.isTiff (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
@@ -618,8 +623,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         if (addresses.size () > 0)
         {
           byte[] tempBuffer = disk.readBlocks (addresses);
-          buffers.add (
-              new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
+          buffers.add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
           addresses.clear ();
         }
         logicalBlock += 256;
@@ -719,8 +723,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   }
 
   // ---------------------------------------------------------------------------------//
-  private int readIndexBlock (int indexBlock, List<DiskAddress> addresses,
-      List<TextBuffer> buffers, int logicalBlock)
+  private int readIndexBlock (int indexBlock, List<DiskAddress> addresses, List<TextBuffer> buffers,
+      int logicalBlock)
   // ---------------------------------------------------------------------------------//
   {
     byte[] indexBuffer = disk.readBlock (indexBlock);
@@ -732,8 +736,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
       else if (addresses.size () > 0)
       {
         byte[] tempBuffer = disk.readBlocks (addresses);
-        buffers
-            .add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
+        buffers.add (new TextBuffer (tempBuffer, auxType, logicalBlock - addresses.size ()));
         addresses.clear ();
       }
       logicalBlock++;
@@ -804,14 +807,13 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     String locked = (access == 0x00) ? "*" : " ";
 
     if (true)
-      return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType],
-          blocksUsed, locked) + name;
+      return String.format ("%s  %03d %s", ProdosConstants.fileTypes[fileType], blocksUsed, locked)
+          + name;
 
     String timeC = created == null ? "" : created.format (ProdosDisk.df);
     String timeF = modified == null ? "" : modified.format (ProdosDisk.df);
 
-    return String.format ("%s %s%-30s %3d %,10d %15s %15s",
-        ProdosConstants.fileTypes[fileType], locked, parentDirectory.name + "/" + name,
-        blocksUsed, endOfFile, timeC, timeF);
+    return String.format ("%s %s%-30s %3d %,10d %15s %15s", ProdosConstants.fileTypes[fileType],
+        locked, parentDirectory.name + "/" + name, blocksUsed, endOfFile, timeC, timeF);
   }
 }

@@ -12,6 +12,8 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class Character extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
+  private static char[] awardsText = ">!$#&*<?BCPKODG@".toCharArray ();
+
   private final Attributes attributes;
   private final Statistics stats;
   int scenario;
@@ -45,8 +47,7 @@ class Character extends AbstractFile
     stats.alignment = alignments[buffer[42] & 0xFF];
 
     stats.gold = Utility.getShort (buffer, 52) + Utility.getShort (buffer, 54) * 10000;
-    stats.experience =
-        Utility.getShort (buffer, 124) + Utility.getShort (buffer, 126) * 10000;
+    stats.experience = Utility.getShort (buffer, 124) + Utility.getShort (buffer, 126) * 10000;
     stats.level = Utility.getShort (buffer, 132);
 
     stats.hitsLeft = Utility.getShort (buffer, 134);
@@ -104,8 +105,8 @@ class Character extends AbstractFile
         item.partyOwns++;
       }
       else
-        System.out.println (getName () + " ItemID : " + itemID + " is outside range 0:"
-            + (itemList.size () - 1));
+        System.out.println (
+            getName () + " ItemID : " + itemID + " is outside range 0:" + (itemList.size () - 1));
     }
   }
 
@@ -150,7 +151,7 @@ class Character extends AbstractFile
     text.append ("\nMaximum hits ....... " + stats.hitsMax);
     text.append ("\nArmour class ....... " + stats.armourClass);
     text.append ("\nAsset value ........ " + String.format ("%,d", stats.assetValue));
-    text.append ("\nAwards ............. " + isWinner ());
+    text.append ("\nAwards ............. " + getAwardString ());
     text.append ("\nOut ................ " + isOut ());
     text.append ("\n\nStrength ........... " + attributes.strength);
     text.append ("\nIntelligence ....... " + attributes.intelligence);
@@ -218,26 +219,22 @@ class Character extends AbstractFile
     return stats.nextLevel;
   }
 
-  // this is temporary until I have more data
   // ---------------------------------------------------------------------------------//
-  public String isWinner ()
+  public String getAwardString ()
   // ---------------------------------------------------------------------------------//
   {
-    int v1 = buffer[206];
-    int v2 = buffer[207];
-    if (v1 == 0x01)
-      return ">";
-    if (v1 == 0x00 && v2 == 0x00)
-      return "";
-    if (v1 == 0x00 && v2 == 0x20)
-      return "D";
-    if (v1 == 0x20 && v2 == 0x20)
-      return "*D";
-    if (v1 == 0x21 && v2 == 0x60)
-      return ">*DG";
-    if (v1 == 0x21 && v2 == 0x28)
-      return ">*KD";
-    return "Unknown : " + v1 + " " + v2;
+    StringBuilder text = new StringBuilder ();
+
+    int awards = Utility.getShort (buffer, 206);
+
+    for (int i = 0; i < 16; i++)
+    {
+      if ((awards & 0x01) != 0)
+        text.append (awardsText[i]);
+      awards >>>= 1;
+    }
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -322,8 +319,7 @@ class Character extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("%s%-15s (%d)", equipped ? "*" : " ", item.getName (),
-          item.getCost ());
+      return String.format ("%s%-15s (%d)", equipped ? "*" : " ", item.getName (), item.getCost ());
     }
   }
 

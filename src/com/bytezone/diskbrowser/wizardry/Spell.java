@@ -38,8 +38,7 @@ class Spell extends AbstractFile
     this.spellType = type;
     this.level = level;
 
-    if (lastSpellFound + 1 < spellNames.length
-        && spellName.equals (spellNames[lastSpellFound + 1]))
+    if (lastSpellFound + 1 < spellNames.length && spellName.equals (spellNames[lastSpellFound + 1]))
       setSpell (++lastSpellFound);
     else
     {
@@ -64,8 +63,7 @@ class Spell extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public static Spell getSpell (String spellName, SpellType type, int level,
-      byte[] buffer)
+  public static Spell getSpell (String spellName, SpellType type, int level, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     return new Spell (spellName, type, level, buffer);
@@ -76,7 +74,7 @@ class Spell extends AbstractFile
   public String getName ()
   // ---------------------------------------------------------------------------------//
   {
-    return getName ();
+    return name;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -211,69 +209,64 @@ class Spell extends AbstractFile
     return text.toString ();
   }
 
-  private static String[] spellNames = { "KALKI", "DIOS", "BADIOS", "MILWA", "PORFIC",
-      "MATU", "CALFO", "MANIFO", "MONTINO", "LOMILWA", "DIALKO", "LATUMAPIC", "BAMATU",
-      "DIAL", "BADIAL", "LATUMOFIS", "MAPORFIC", "DIALMA", "BADIALMA", "LITOKAN", "KANDI",
-      "DI", "BADI", "LORTO", "MADI", "MABADI", "LOKTOFEIT", "MALIKTO", "KADORTO",
+  private static String[] spellNames = { "KALKI", "DIOS", "BADIOS", "MILWA", "PORFIC", "MATU",
+      "CALFO", "MANIFO", "MONTINO", "LOMILWA", "DIALKO", "LATUMAPIC", "BAMATU", "DIAL", "BADIAL",
+      "LATUMOFIS", "MAPORFIC", "DIALMA", "BADIALMA", "LITOKAN", "KANDI", "DI", "BADI", "LORTO",
+      "MADI", "MABADI", "LOKTOFEIT", "MALIKTO", "KADORTO",
 
-      "HALITO", "MOGREF", "KATINO", "DUMAPIC", "DILTO", "SOPIC", "MAHALITO", "MOLITO",
-      "MORLIS", "DALTO", "LAHALITO", "MAMORLIS", "MAKANITO", "MADALTO", "LAKANITO",
-      "ZILWAN", "MASOPIC", "HAMAN", "MALOR", "MAHAMAN", "TILTOWAIT" };
+      "HALITO", "MOGREF", "KATINO", "DUMAPIC", "DILTO", "SOPIC", "MAHALITO", "MOLITO", "MORLIS",
+      "DALTO", "LAHALITO", "MAMORLIS", "MAKANITO", "MADALTO", "LAKANITO", "ZILWAN", "MASOPIC",
+      "HAMAN", "MALOR", "MAHAMAN", "TILTOWAIT" };
 
   private static String[] translations = { "Blessings", "Heal", "Harm", "Light", "Shield",
-      "Blessing & zeal", "X-ray vision", "Statue", "Still air", "More light",
-      "Softness/supple", "Identification", "Prayer", "Heal (more)", "Hurt (more)",
-      "Cure poison", "Shield (big)", "Heal (greatly)", "Hurt (greatly)", "Flame tower",
-      "Location", "Life", "Death", "Blades", "Healing", "Harm (incredibly)", "Recall",
-      "The Word of Death", "Resurrection",
+      "Blessing & zeal", "X-ray vision", "Statue", "Still air", "More light", "Softness/supple",
+      "Identification", "Prayer", "Heal (more)", "Hurt (more)", "Cure poison", "Shield (big)",
+      "Heal (greatly)", "Hurt (greatly)", "Flame tower", "Location", "Life", "Death", "Blades",
+      "Healing", "Harm (incredibly)", "Recall", "The Word of Death", "Resurrection",
 
       "Little Fire", "Body Iron", "Bad Air", "Clarity", "Darkness", "Glass", "Big fire",
-      "Spark storm", "Fear", "Blizzard blast", "Flame storm", "Terror", "Deadly air",
-      "Frost", "Suffocation", "Dispell", "Big glass", "Change", "Apport", "Great change",
+      "Spark storm", "Fear", "Blizzard blast", "Flame storm", "Terror", "Deadly air", "Frost",
+      "Suffocation", "Dispell", "Big glass", "Change", "Apport", "Great change",
       "(untranslatable)" };
 
   private static SpellThrown[] when = { SpellThrown.COMBAT, SpellThrown.ANY_TIME,
       SpellThrown.COMBAT, SpellThrown.ANY_TIME, SpellThrown.COMBAT, SpellThrown.COMBAT,
       SpellThrown.LOOTING, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.ANY_TIME,
       SpellThrown.ANY_TIME, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.ANY_TIME,
-      SpellThrown.COMBAT, SpellThrown.ANY_TIME, SpellThrown.ANY_TIME,
-      SpellThrown.ANY_TIME, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.CAMP,
-      SpellThrown.CAMP, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.ANY_TIME,
-      SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.ANY_TIME,
+      SpellThrown.COMBAT, SpellThrown.ANY_TIME, SpellThrown.ANY_TIME, SpellThrown.ANY_TIME,
+      SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.CAMP, SpellThrown.CAMP,
+      SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.ANY_TIME, SpellThrown.COMBAT,
+      SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.ANY_TIME,
 
       SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.CAMP,
       SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT,
       SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT,
       SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT,
-      SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT_OR_CAMP,
-      SpellThrown.COMBAT, SpellThrown.COMBAT, };
+      SpellThrown.COMBAT, SpellThrown.COMBAT, SpellThrown.COMBAT_OR_CAMP, SpellThrown.COMBAT,
+      SpellThrown.COMBAT, };
 
   private static SpellTarget[] affects = { SpellTarget.PARTY, SpellTarget.PERSON,
       SpellTarget.MONSTER, SpellTarget.PARTY, SpellTarget.CASTER, SpellTarget.PARTY,
-      SpellTarget.CASTER, SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP,
-      SpellTarget.PARTY, SpellTarget.PERSON, SpellTarget.PARTY, SpellTarget.PARTY,
-      SpellTarget.PERSON, SpellTarget.MONSTER, SpellTarget.PERSON, SpellTarget.PARTY,
-      SpellTarget.PERSON, SpellTarget.MONSTER, SpellTarget.PARTY, SpellTarget.PERSON,
-      SpellTarget.PERSON, SpellTarget.MONSTER, SpellTarget.MONSTER_GROUP,
-      SpellTarget.PERSON, SpellTarget.MONSTER, SpellTarget.PARTY,
-      SpellTarget.MONSTER_GROUP, SpellTarget.PERSON,
+      SpellTarget.CASTER, SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP, SpellTarget.PARTY,
+      SpellTarget.PERSON, SpellTarget.PARTY, SpellTarget.PARTY, SpellTarget.PERSON,
+      SpellTarget.MONSTER, SpellTarget.PERSON, SpellTarget.PARTY, SpellTarget.PERSON,
+      SpellTarget.MONSTER, SpellTarget.PARTY, SpellTarget.PERSON, SpellTarget.PERSON,
+      SpellTarget.MONSTER, SpellTarget.MONSTER_GROUP, SpellTarget.PERSON, SpellTarget.MONSTER,
+      SpellTarget.PARTY, SpellTarget.MONSTER_GROUP, SpellTarget.PERSON,
 
-      SpellTarget.MONSTER, SpellTarget.CASTER, SpellTarget.MONSTER_GROUP,
-      SpellTarget.NONE, SpellTarget.MONSTER_GROUP, SpellTarget.CASTER,
+      SpellTarget.MONSTER, SpellTarget.CASTER, SpellTarget.MONSTER_GROUP, SpellTarget.NONE,
+      SpellTarget.MONSTER_GROUP, SpellTarget.CASTER, SpellTarget.MONSTER_GROUP,
       SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP,
-      SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP, SpellTarget.ALL_MONSTERS,
-      SpellTarget.ALL_MONSTERS, SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP,
-      SpellTarget.MONSTER, SpellTarget.PARTY, SpellTarget.VARIABLE, SpellTarget.PARTY,
-      SpellTarget.PARTY, SpellTarget.ALL_MONSTERS };
+      SpellTarget.MONSTER_GROUP, SpellTarget.ALL_MONSTERS, SpellTarget.ALL_MONSTERS,
+      SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER, SpellTarget.PARTY,
+      SpellTarget.VARIABLE, SpellTarget.PARTY, SpellTarget.PARTY, SpellTarget.ALL_MONSTERS };
 
   private static String[] descriptions = {
-      "KALKI reduces the AC of all party members by one, and thus makes"
-          + " them harder to hit.",
+      "KALKI reduces the AC of all party members by one, and thus makes" + " them harder to hit.",
       "DIOS restores from one to eight hit points of damage from a party"
           + "member. It will not bring dead back to life.",
       "BADIOS causes one to eight hit points of damage to a monster, and"
-          + " may kill it. It is the reverse of dios. Note the BA prefix which"
-          + " means 'not'.",
+          + " may kill it. It is the reverse of dios. Note the BA prefix which" + " means 'not'.",
       "MILWA causes a softly glowing light to follow the party, allowing"
           + " them to see further into the maze, and also revealing all secret"
           + " doors. See also LOMILWA. This spell lasts only a short while.",
@@ -284,8 +277,7 @@ class Spell extends AbstractFile
           + " on a chest 95% of the time.",
       "MANIFO causes some of the monsters in a group to become stiff as"
           + " statues for one or more melee rounds. The chance of success,"
-          + " and the duration of the effects, depend on the power of the"
-          + " target monsters.",
+          + " and the duration of the effects, depend on the power of the" + " target monsters.",
       "MONTINO causes the air around a group of monsters to stop"
           + " transmitting sound. Like MANIFO, only some of the monsters will"
           + " be affected, and for varying lengths of time. Monsters and"
@@ -297,20 +289,16 @@ class Spell extends AbstractFile
           + " only the square you are in, and the next two squares, will"
           + " plot. Normally you might see five or six squares ahead with"
           + " LOMILWA on. Quick Plotting lets you move fast through known"
-          + " areas. Note that it will be turned off when you enter camp or"
-          + " combat mode.",
+          + " areas. Note that it will be turned off when you enter camp or" + " combat mode.",
       "DIALKO cures paralysis, and removes the effects of MANIFO and"
           + " KATINO from one member of the party.",
-      "LATUMAPIC makes it readily apparent exactly what the opposing"
-          + " monsters really are.",
+      "LATUMAPIC makes it readily apparent exactly what the opposing" + " monsters really are.",
       "BAMATU has the effects of MATU at twice the effectiveness.",
       "DIAL restores two to 16 hit points of damage, and is similar to" + " DIOS.",
       "BADIAL causes two to 16 hit points of damage in the same way as" + " BADIOS.",
       "LATUMOFIS makes a poisoned person whole and fit again. Note that"
-          + " poison causes a person to lose hit points steadily during"
-          + " movement and combat.",
-      "MAPORFIC is an improved PORFIC, with effects that last for the"
-          + " entire expedition.",
+          + " poison causes a person to lose hit points steadily during" + " movement and combat.",
+      "MAPORFIC is an improved PORFIC, with effects that last for the" + " entire expedition.",
       "DIALMA restores three to 24 hit points.",
       "BADIALMA causes three to 24 hit points of damage.",
       "LITOKAN causes a pillar of flame to strike a group of monsters,"
@@ -340,8 +328,7 @@ class Spell extends AbstractFile
 
       "HALITO causes a flame ball the size of a baseball to hit a monster,"
           + " doing from one to eight points of damage.",
-      "MOGREF reduces the caster's AC by two. The effect lasts the entire"
-          + " encounter.",
+      "MOGREF reduces the caster's AC by two. The effect lasts the entire" + " encounter.",
       "KATINO causes most of the monsters in a group to fall asleep."
           + " Katino only effects normal, animal or humanoid monsters. The"
           + " chance of the spell affecting an individual monster, and the"

@@ -15,6 +15,10 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class MazeLevel extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
+  private static final String[] squareType =
+      { "Normal", "Stairs", "Pit", "Chute", "Spinner", "Darkness", "Teleport", "Ouch", "Elevator",
+          "Rock/Water", "Fizzle", "Message/Item", "Monster" };
+
   public final int level;
   private List<Message> messages;
   private List<Monster> monsters;
@@ -51,15 +55,15 @@ class MazeLevel extends AbstractFile
     text.append (HexFormatter.format (buffer, 360, 120, true, 360));
     addWalls (text, 360);
 
-    text.append ("\nEncounters (FIGHTS)\n\n");
+    text.append ("\nFIGHTS\n\n");
     text.append (HexFormatter.format (buffer, 480, 80, true, 480));
     addEncounters (text, 480);
 
-    text.append ("\nExtras (SQREXTRA)\n\n");
+    text.append ("\nSQREXTRA\n\n");
     text.append (HexFormatter.format (buffer, 560, 200, true, 560));
     addExtras (text, 560);
 
-    text.append ("\nIndex (SQRTYPE)\n\n");
+    text.append ("\nSQRTYPE\n\n");
     text.append (String.format ("%04X: %s%n", 760, HexFormatter.getHexString (buffer, 760, 8)));
 
     text.append ("\nAUX0\n\n");
@@ -74,71 +78,12 @@ class MazeLevel extends AbstractFile
     text.append (HexFormatter.format (buffer, 832, 32, true, 832));
     text.append ("\n");
 
-    text.append ("\n\n      0 1  2 3  4 5  6 7  8 9  A B  C D  E F\n");
-    text.append (String.format ("%04X: ", 760));
-    for (int i = 0; i < 8; i++)
-    {
-      int val = buffer[760 + i] & 0xFF;
-      text.append (String.format ("%X:%X  ", val % 16, val / 16));
-    }
-
-    String[] squareType = { "Normal", "Stairs", "Pit", "Chute", "Spinner", "Darkness", "Teleport",
-        "Ouch", "Elevator", "Rock/Water", "Fizzle", "Message/Item", "Monster" };
-
     List<MazeAddress> messageList = new ArrayList<> ();
     List<MazeAddress> monsterList = new ArrayList<> ();
 
-    text.append ("\n\nSQREXTRA  SQRTYPE   TSQUARE           AUX0  AUX1  AUX2\n");
-    for (int j = 0; j < 16; j++)
-    {
-      String extraText = "";
-      int val = buffer[760 + j / 2] & 0xFF;
-      String extra = (j % 2) == 0 ? squareType[val % 16] : squareType[val / 16];
+    addTable (text, messageList, monsterList);
 
-      MazeAddress address = getAddress (j);
-      int cellFlag = (j % 2) == 0 ? val % 16 : val / 16;
-      if (cellFlag == 11)
-      {
-        extraText = "Msg:" + String.format ("%04X  ", address.row);
-        messageList.add (address);          // to print at the end
-
-        int messageType = address.column;       // AUX3
-        if (messageType == 2)
-        {
-          extraText += "Obtained: ";
-          if (items != null)
-            extraText += items.get (address.level).getName ();
-        }
-
-        if (messageType == 5)
-        {
-          extraText += "Requires: ";
-          if (items != null)
-            extraText += items.get (address.level).getName ();
-        }
-
-        if (messageType == 4)
-        {
-          if (address.level < monsters.size ())
-            extraText += monsters.get (address.level).realName;
-          else
-            extraText += "Obtained: " + items.get ((address.level - 64536) * -1).getName ();
-        }
-      }
-
-      if (cellFlag == 12)
-      {
-        monsterList.add (address);
-        extraText = "Encounter: ";
-        if (monsters != null)
-          extraText += monsters.get (address.column).realName;
-      }
-
-      text.append (String.format ("    %X   -->   %X     %-15s   %04X  %04X  %04X  %s%n", j,
-          cellFlag, extra, address.level, address.row, address.column, extraText));
-    }
-
-    text.append ("\n\nRest (ENMYCALC)\n\n");
+    text.append ("\n\nENMYCALC\n\n");
     text.append (HexFormatter.format (buffer, 864, buffer.length - 864, true, 864));
     addEnmyCalc (text, 864);
 
@@ -227,9 +172,69 @@ class MazeLevel extends AbstractFile
       for (int j = 0; j < 10; j++)
       {
         int val = buffer[ptr++] & 0xFF;
-        text.append (String.format ("%X %X ", (val & 0x0F), (val & 0xF0) >> 4));
+        int left = (val & 0xF0) >> 4;
+        int right = (val & 0x0F);
+        String sLeft = left == 0 ? " " : String.format ("%X", left);
+        String sRight = right == 0 ? " " : String.format ("%X", right);
+        text.append (String.format ("%s %s ", sRight, sLeft));
       }
       text.append ("\n");
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addTable (StringBuilder text, List<MazeAddress> messageList,
+      List<MazeAddress> monsterList)
+  // ---------------------------------------------------------------------------------//
+  {
+    text.append ("\n\nSQREXTRA  SQRTYPE   TSQUARE           AUX0  AUX1  AUX2\n");
+    for (int j = 0; j < 16; j++)
+    {
+      String extraText = "";
+      int val = buffer[760 + j / 2] & 0xFF;
+      String extra = (j % 2) == 0 ? squareType[val % 16] : squareType[val / 16];
+
+      MazeAddress address = getAddress (j);
+      int cellFlag = (j % 2) == 0 ? val % 16 : val / 16;
+      if (cellFlag == 11)
+      {
+        extraText = "Msg:" + String.format ("%04X  ", address.row);
+        messageList.add (address);          // to print at the end
+
+        int messageType = address.column;       // AUX3
+        if (messageType == 2)
+        {
+          extraText += "Obtained: ";
+          if (items != null)
+            extraText += items.get (address.level).getName ();
+        }
+
+        if (messageType == 5)
+        {
+          extraText += "Requires: ";
+          if (items != null)
+            extraText += items.get (address.level).getName ();
+        }
+
+        if (messageType == 4)
+        {
+          if (address.level < monsters.size ())
+            extraText += monsters.get (address.level).realName;
+          else
+            extraText += "Obtained: " + items.get ((address.level - 64536) * -1).getName ();
+        }
+      }
+
+      if (cellFlag == 12)
+      {
+        monsterList.add (address);
+        extraText = "Encounter: ";
+        if (monsters != null)
+          extraText += monsters.get (address.column).realName;
+      }
+
+      text.append (String.format ("    %X   -->   %X     %-15s   %04X  %04X  %04X  %s%n", j,
+          cellFlag, extra, address.level, address.row, address.column, extraText));
     }
   }
 
@@ -313,9 +318,9 @@ class MazeLevel extends AbstractFile
     int offset = column * BYTES_PER_COL + row / CELLS_PER_BYTE;
 
     int value = buffer[offset] & 0xFF;
-    value >>>= (row % CELLS_PER_BYTE) * BITS_PER_ROW;   // push 0, 2, 4, 6 bits
+    value >>>= (row % CELLS_PER_BYTE) * BITS_PER_ROW;   // shift 0, 2, 4, 6 bits
     cell.westWall = ((value & 1) == 1);                 // use rightmost bit
-    value >>>= 1;                                       // push 1 bit
+    value >>>= 1;                                       // shift 1 bit
     cell.westDoor = ((value & 1) == 1);                 // use rightmost bit
 
     value = buffer[offset + 120] & 0xFF;
@@ -395,9 +400,7 @@ class MazeLevel extends AbstractFile
         cell.elevator = true;
         MazeAddress elevatorAddress = getAddress (b);
         cell.elevatorTo = elevatorAddress.row;
-        //            HexFormatter.intValue (buffer[800 + b * 2], buffer[801 + b * 2]);
         cell.elevatorFrom = elevatorAddress.column;
-        //            HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
         break;
 
       case 9:       // rock/water
@@ -410,34 +413,28 @@ class MazeLevel extends AbstractFile
 
       case 11:      // screen message
         MazeAddress messageAddress = getAddress (b);
-        //   int messageNum = HexFormatter.intValue (buffer[800 + b * 2], buffer[801 + b * 2]);
-
         Message m = getMessage (messageAddress.row);
         if (m != null)
           cell.message = m;
 
         cell.messageType = messageAddress.column;
-        //     HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
 
         int itemID = -1;
 
         if (cell.messageType == 2 && items != null)                 // obtain Item
         {
-          //   itemID = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
           itemID = messageAddress.level;
           cell.itemObtained = items.get (itemID);
         }
 
         if (cell.messageType == 5 && items != null)                 // requires Item
         {
-          //  itemID = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
           itemID = messageAddress.level;
           cell.itemRequired = items.get (itemID);
         }
 
         if (cell.messageType == 4)
         {
-          //   value = HexFormatter.intValue (buffer[768 + b * 2], buffer[769 + b * 2]);
           itemID = messageAddress.level;
           if (value <= 100)
           {
@@ -477,6 +474,7 @@ class MazeLevel extends AbstractFile
   private MazeAddress getAddress (int b)      // 0:F
   // ---------------------------------------------------------------------------------//
   {
+    // converts AUX1, AUX2, AUX3 into a MazeAddress (level, row, column)
     int x = b * 2;
     return new MazeAddress (Utility.getShort (buffer, 768 + x), Utility.getShort (buffer, 800 + x),
         Utility.getShort (buffer, 832 + x));

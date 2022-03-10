@@ -36,35 +36,43 @@ class MazeLevel extends AbstractFile
     StringBuilder text = new StringBuilder ();
 
     text.append ("West walls/doors\n\n");
-    text.append (HexFormatter.format (buffer, 0, 120));
+    text.append (HexFormatter.format (buffer, 0, 120, true, 0));
     addWalls (text, 0);
 
     text.append ("\nSouth walls/doors\n\n");
-    text.append (HexFormatter.format (buffer, 120, 120));
+    text.append (HexFormatter.format (buffer, 120, 120, true, 120));
     addWalls (text, 120);
 
     text.append ("\nEast walls/doors\n\n");
-    text.append (HexFormatter.format (buffer, 240, 120));
+    text.append (HexFormatter.format (buffer, 240, 120, true, 240));
     addWalls (text, 240);
 
     text.append ("\nNorth walls/doors\n\n");
-    text.append (HexFormatter.format (buffer, 360, 120));
+    text.append (HexFormatter.format (buffer, 360, 120, true, 360));
     addWalls (text, 360);
 
-    text.append ("\nEncounters\n\n");
-    text.append (HexFormatter.format (buffer, 480, 80));
+    text.append ("\nEncounters (FIGHTS)\n\n");
+    text.append (HexFormatter.format (buffer, 480, 80, true, 480));
     addEncounters (text, 480);
 
-    text.append ("\nExtras\n\n");
-    text.append (HexFormatter.format (buffer, 560, 200));
+    text.append ("\nExtras (SQREXTRA)\n\n");
+    text.append (HexFormatter.format (buffer, 560, 200, true, 560));
     addExtras (text, 560);
 
-    text.append ("\nIndex\n\n");
-    text.append (
-        String.format ("%04X: %s%n", 760, HexFormatter.getHexString (buffer, 760, 8)));
+    text.append ("\nIndex (SQRTYPE)\n\n");
+    text.append (String.format ("%04X: %s%n", 760, HexFormatter.getHexString (buffer, 760, 8)));
 
-    text.append ("\nTable\n\n");
-    text.append (HexFormatter.format (buffer, 768, 96));
+    text.append ("\nAUX0\n\n");
+    text.append (HexFormatter.format (buffer, 768, 32, true, 768));
+    text.append ("\n");
+
+    text.append ("\nAUX1\n\n");
+    text.append (HexFormatter.format (buffer, 800, 32, true, 800));
+    text.append ("\n");
+
+    text.append ("\nAUX2\n\n");
+    text.append (HexFormatter.format (buffer, 832, 32, true, 832));
+    text.append ("\n");
 
     text.append ("\n\n      0 1  2 3  4 5  6 7  8 9  A B  C D  E F\n");
     text.append (String.format ("%04X: ", 760));
@@ -74,19 +82,19 @@ class MazeLevel extends AbstractFile
       text.append (String.format ("%X:%X  ", val % 16, val / 16));
     }
 
-    String[] extras =
-        { "", "Stairs", "Pit", "Chute", "Spinner", "Darkness", "Teleport", "Ouch",
-          "Elevator", "Rock/Water", "Fizzle", "Message/Item", "Monster" };
+    String[] squareType = { "Normal", "Stairs", "Pit", "Chute", "Spinner", "Darkness", "Teleport",
+        "Ouch", "Elevator", "Rock/Water", "Fizzle", "Message/Item", "Monster" };
 
     List<MazeAddress> messageList = new ArrayList<> ();
     List<MazeAddress> monsterList = new ArrayList<> ();
 
-    text.append ("\n\nValue   Index   Contains          Table\n");
+    text.append ("\n\nSQREXTRA  SQRTYPE   TSQUARE           AUX0  AUX1  AUX2\n");
     for (int j = 0; j < 16; j++)
     {
       String extraText = "";
       int val = buffer[760 + j / 2] & 0xFF;
-      String extra = (j % 2) == 0 ? extras[val % 16] : extras[val / 16];
+      String extra = (j % 2) == 0 ? squareType[val % 16] : squareType[val / 16];
+
       MazeAddress address = getAddress (j);
       int cellFlag = (j % 2) == 0 ? val % 16 : val / 16;
       if (cellFlag == 11)
@@ -94,7 +102,7 @@ class MazeLevel extends AbstractFile
         extraText = "Msg:" + String.format ("%04X  ", address.row);
         messageList.add (address);          // to print at the end
 
-        int messageType = address.column;
+        int messageType = address.column;       // AUX3
         if (messageType == 2)
         {
           extraText += "Obtained: ";
@@ -111,7 +119,10 @@ class MazeLevel extends AbstractFile
 
         if (messageType == 4)
         {
-          extraText += "Unknown";
+          if (address.level < monsters.size ())
+            extraText += monsters.get (address.level).realName;
+          else
+            extraText += "Obtained: " + items.get ((address.level - 64536) * -1).getName ();
         }
       }
 
@@ -123,14 +134,15 @@ class MazeLevel extends AbstractFile
           extraText += monsters.get (address.column).realName;
       }
 
-      text.append (String.format ("  %X  -->  %X     %-15s   %04X  %04X  %04X  %s%n", j,
+      text.append (String.format ("    %X   -->   %X     %-15s   %04X  %04X  %04X  %s%n", j,
           cellFlag, extra, address.level, address.row, address.column, extraText));
     }
 
-    text.append ("\n\nRest\n\n");
-    text.append (HexFormatter.format (buffer, 864, buffer.length - 864));
+    text.append ("\n\nRest (ENMYCALC)\n\n");
+    text.append (HexFormatter.format (buffer, 864, buffer.length - 864, true, 864));
+    addEnmyCalc (text, 864);
 
-    text.append ("\n");
+    text.append ("\n\n");
     for (MazeAddress address : messageList)
     {
       Message message = getMessage (address.row);
@@ -161,9 +173,27 @@ class MazeLevel extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     text.append ("\n\n");
-    for (int i = 0; i < 20; i++)
-      text.append (String.format ("  Col %2d: %s%n", i,
-          HexFormatter.getHexString (buffer, ptr + i * 6, 6)));
+
+    for (int col = 0; col < 20; col++)
+    {
+      text.append (String.format ("Col %2d : %s : ", col,
+          HexFormatter.getHexString (buffer, ptr + col * 6, 6)));
+
+      for (int i = 0; i < 5; i++)
+      {
+        int val = buffer[ptr++] & 0xFF;
+        for (int j = 0; j < 4; j++)
+        {
+          int wall = (val & 0x03);                   // right to left ordering
+          text.append (String.format ("%d ", wall));
+          val >>>= 2;
+        }
+      }
+
+      assert buffer[ptr] == 0;
+      ptr++;                        // skip last byte
+      text.append ("\n");
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -173,25 +203,15 @@ class MazeLevel extends AbstractFile
     text.append ("\n\n");
     for (int i = 0; i < 20; i++)
     {
-      text.append (String.format ("  Col %2d: %s  ", i,
-          HexFormatter.getHexString (buffer, ptr + i * 4, 4)));
-      StringBuilder bitString = new StringBuilder ();
-      for (int j = 2; j >= 0; j--)
+      text.append (
+          String.format ("  Col %2d: %s  ", i, HexFormatter.getHexString (buffer, ptr + i * 4, 4)));
+      int val = Utility.readTriple (buffer, ptr + i * 4);
+      for (int j = 0; j < 20; j++)
       {
-        byte b = buffer[ptr + i * 4 + j];
-        String s = ("0000000" + Integer.toBinaryString (0xFF & b))
-            .replaceAll (".*(.{8})$", "$1");
-        bitString.append (s);
-        //        text.append (s);
-        //        text.append ("  ");
+        text.append ((val & 0x01) == 0 ? "  " : " 1");
+        val >>>= 1;
       }
 
-      String bitsReversed = bitString.reverse ().toString ();
-      bitsReversed = bitsReversed.replace ("1", " 1");
-      bitsReversed = bitsReversed.replace ("0", "  ");
-      text.append (bitsReversed.substring (0, 40));
-      text.append ("  : ");
-      text.append (bitsReversed.substring (40));
       text.append ("\n");
     }
   }
@@ -206,13 +226,33 @@ class MazeLevel extends AbstractFile
       text.append (String.format ("  Col %2d:  ", i));
       for (int j = 0; j < 10; j++)
       {
-        int val = buffer[ptr + i * 10 + j] & 0xFF;
-        int left = val / 16;          // 0:F
-        int right = val % 16;         // 0:F
-        text.append (String.format ("%X:%X  ", right, left));
+        int val = buffer[ptr++] & 0xFF;
+        text.append (String.format ("%X %X ", (val & 0x0F), (val & 0xF0) >> 4));
       }
       text.append ("\n");
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addEnmyCalc (StringBuilder text, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    text.append ("\n\n");
+
+    text.append (String.format ("MINENEMY   %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
+        Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
+    ptr += 2;
+    text.append (String.format ("MULTWORS   %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
+        Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
+    ptr += 2;
+    text.append (String.format ("WORSE01    %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
+        Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
+    ptr += 2;
+    text.append (String.format ("RANGE0N    %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
+        Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
+    ptr += 2;
+    text.append (String.format ("PERCWORS   %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
+        Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -224,8 +264,7 @@ class MazeLevel extends AbstractFile
     image = new BufferedImage (20 * cellSize.width + 1, 20 * cellSize.height + 1,
         BufferedImage.TYPE_USHORT_555_RGB);
     Graphics2D g = image.createGraphics ();
-    g.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    g.setRenderingHint (RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     for (int row = 0; row < 20; row++)
       for (int column = 0; column < 20; column++)
@@ -439,8 +478,8 @@ class MazeLevel extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     int x = b * 2;
-    return new MazeAddress (Utility.getShort (buffer, 768 + x),
-        Utility.getShort (buffer, 800 + x), Utility.getShort (buffer, 832 + x));
+    return new MazeAddress (Utility.getShort (buffer, 768 + x), Utility.getShort (buffer, 800 + x),
+        Utility.getShort (buffer, 832 + x));
   }
 
   // ---------------------------------------------------------------------------------//

@@ -102,8 +102,7 @@ public class WizardryScenarioDisk extends PascalDisk
     extractMonsters (linkNode ("Monsters", "Monsters string", dataNode), sectors);
     extractCharacters (linkNode ("Characters", "Characters string", dataNode), sectors);
     extractImages (linkNode ("Images", "Images string", dataNode), sectors);
-    extractExperienceLevels (linkNode ("Experience", "Experience string", dataNode),
-        sectors);
+    extractExperienceLevels (linkNode ("Experience", "Experience string", dataNode), sectors);
     //		node = linkNode ("Spells", "Spells string", dataNode);
     DefaultMutableTreeNode node = null;
     extractSpells (node, sectors);
@@ -122,8 +121,7 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private DefaultMutableTreeNode linkNode (String name, String text,
-      DefaultMutableTreeNode parent)
+  private DefaultMutableTreeNode linkNode (String name, String text, DefaultMutableTreeNode parent)
   // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource afs = new DefaultAppleFileSource (name, text, this);
@@ -212,8 +210,8 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private int addReward (byte[] buffer, List<DiskAddress> blocks,
-      DefaultMutableTreeNode node, int seq)
+  private int addReward (byte[] buffer, List<DiskAddress> blocks, DefaultMutableTreeNode node,
+      int seq)
   // ---------------------------------------------------------------------------------//
   {
     int recLen = 168;
@@ -237,8 +235,8 @@ public class WizardryScenarioDisk extends PascalDisk
     ScenarioData sd = scenarioHeader.data.get (Header.CHARACTER_AREA);
     characters = new ArrayList<> (sd.total);
     int max = sd.totalBlocks / 2;
-    if (max < sd.total)
-      System.out.println ("Characters short in Wizardry disk");
+    //    if (max < sd.total)
+    //      System.out.println ("Characters short in Wizardry disk");
 
     for (int i = 0; i < max; i++)
     {
@@ -257,13 +255,11 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       Statistics stats = ch.getStatistics ();
       Attributes att = ch.getAttributes ();
-      text.append (
-          String.format ("%-15s %2d  %-8s %-8s %-8s  %3d", ch, (stats.ageInWeeks / 52),
-              stats.alignment, stats.race, stats.type, stats.hitsMax));
-      text.append (String.format ("  %2d  %2d  %2d  %2d  %2d  %2d", att.strength,
-          att.intelligence, att.piety, att.vitality, att.agility, att.luck));
-      text.append (
-          String.format ("  %5s  %s%n", stats.status, ch.isOut () ? "* OUT *" : ""));
+      text.append (String.format ("%-15s %2d  %-8s %-8s %-8s  %3d", ch, (stats.ageInWeeks / 52),
+          stats.alignment, stats.race, stats.type, stats.hitsMax));
+      text.append (String.format ("  %2d  %2d  %2d  %2d  %2d  %2d", att.strength, att.intelligence,
+          att.piety, att.vitality, att.agility, att.luck));
+      text.append (String.format ("  %5s  %s%n", stats.status, ch.isOut () ? "* OUT *" : ""));
     }
 
     DefaultAppleFileSource afs = (DefaultAppleFileSource) node.getUserObject ();
@@ -273,15 +269,15 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addCharacters (byte[] buffer, List<DiskAddress> blocks,
-      DefaultMutableTreeNode node)
+  private void addCharacters (byte[] buffer, List<DiskAddress> blocks, DefaultMutableTreeNode node)
   // ---------------------------------------------------------------------------------//
   {
     int recLen = 208;
     for (int ptr = 0; ptr < 832; ptr += recLen)
     {
       int nameLength = buffer[ptr] & 0xFF;
-      if (nameLength == 0xC3 || buffer[ptr + 40] == 0x07)
+      if (nameLength == 0xC3)
+        // || buffer[ptr + 40] == 0x07)     7 = LOST
         continue;
       String name = HexFormatter.getString (buffer, ptr + 1, nameLength);
 
@@ -330,8 +326,7 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addMonsters (byte[] buffer, List<DiskAddress> blocks,
-      DefaultMutableTreeNode node)
+  private void addMonsters (byte[] buffer, List<DiskAddress> blocks, DefaultMutableTreeNode node)
   // ---------------------------------------------------------------------------------//
   {
     int recLen = 158;
@@ -387,8 +382,7 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addItems (byte[] buffer, List<DiskAddress> blocks,
-      DefaultMutableTreeNode node)
+  private void addItems (byte[] buffer, List<DiskAddress> blocks, DefaultMutableTreeNode node)
   // ---------------------------------------------------------------------------------//
   {
     int recLen = 78;
@@ -584,8 +578,7 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void extractExperienceLevels (DefaultMutableTreeNode node,
-      List<DiskAddress> sectors)
+  private void extractExperienceLevels (DefaultMutableTreeNode node, List<DiskAddress> sectors)
   // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
@@ -627,20 +620,18 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addToNode (AbstractFile af, DefaultMutableTreeNode node,
-      List<DiskAddress> blocks, SectorType type)
+  private void addToNode (AbstractFile af, DefaultMutableTreeNode node, List<DiskAddress> blocks,
+      SectorType type)
   // ---------------------------------------------------------------------------------//
   {
-    DefaultAppleFileSource dafs =
-        new DefaultAppleFileSource (af.getName (), af, this, blocks);
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource (af.getName (), af, this, blocks);
     DefaultMutableTreeNode childNode = new DefaultMutableTreeNode (dafs);
     node.add (childNode);
     childNode.setAllowsChildren (false);
   }
 
   // ---------------------------------------------------------------------------------//
-  private List<DiskAddress> getTwoBlocks (ScenarioData sd, int i,
-      List<DiskAddress> sectors)
+  private List<DiskAddress> getTwoBlocks (ScenarioData sd, int i, List<DiskAddress> sectors)
   // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> (2);

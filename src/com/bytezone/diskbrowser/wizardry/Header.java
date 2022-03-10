@@ -17,11 +17,10 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class Header
 // -----------------------------------------------------------------------------------//
 {
-  static String[] typeText = { "header", "maze", "monsters", "rewards", "items",
-                               "characters", "images", "char levels" };
-  static String[] scenarioNames =
-      { "PROVING GROUNDS OF THE MAD OVERLORD!", "THE KNIGHT OF DIAMONDS",
-        "THE LEGACY OF LLYLGAMYN", "THE RETURN OF WERDNA" };
+  static String[] typeText =
+      { "header", "maze", "monsters", "rewards", "items", "characters", "images", "char levels" };
+  static String[] scenarioNames = { "PROVING GROUNDS OF THE MAD OVERLORD!",
+      "THE KNIGHT OF DIAMONDS", "THE LEGACY OF LLYLGAMYN", "THE RETURN OF WERDNA" };
 
   static final int MAZE_AREA = 1;
   static final int MONSTER_AREA = 2;
@@ -74,8 +73,7 @@ class Header
       ptr += 10;
     }
 
-    DefaultAppleFileSource dafs =
-        new DefaultAppleFileSource ("Header", text.toString (), owner);
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource ("Header", text.toString (), owner);
     dafs.setSectors (data.get (0).sectors);
     DefaultMutableTreeNode headerNode = new DefaultMutableTreeNode (dafs);
     dataNode.add (headerNode);
@@ -128,8 +126,7 @@ class Header
       ptr += 2;
     }
 
-    DefaultAppleFileSource dafs =
-        new DefaultAppleFileSource (title, text.toString (), owner);
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource (title, text.toString (), owner);
     dafs.setSectors (blocks);
     DefaultMutableTreeNode node = new DefaultMutableTreeNode (dafs);
     node.setAllowsChildren (false);
@@ -137,8 +134,7 @@ class Header
   }
 
   // ---------------------------------------------------------------------------------//
-  private void linkPictures (String title, DiskAddress da,
-      DefaultMutableTreeNode headerNode)
+  private void linkPictures (String title, DiskAddress da, DefaultMutableTreeNode headerNode)
   // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> ();
@@ -155,8 +151,7 @@ class Header
   }
 
   // ---------------------------------------------------------------------------------//
-  private void linkSpells (String title, DiskAddress da,
-      DefaultMutableTreeNode headerNode)
+  private void linkSpells (String title, DiskAddress da, DefaultMutableTreeNode headerNode)
   // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> blocks = new ArrayList<> ();
@@ -180,8 +175,7 @@ class Header
       list.append ("  " + s + "\n");
     }
 
-    DefaultAppleFileSource dafs =
-        new DefaultAppleFileSource (title, list.toString (), owner);
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource (title, list.toString (), owner);
     dafs.setSectors (blocks);
     DefaultMutableTreeNode node = new DefaultMutableTreeNode (dafs);
     node.setAllowsChildren (false);
@@ -224,8 +218,8 @@ class Header
   {
     int dunno;
     int total;
-    int totalBlocks;
-    int dataOffset;
+    int totalBlocks;                // size in blocks
+    int dataOffset;                 // first block
     int type;
     List<DiskAddress> sectors;
 

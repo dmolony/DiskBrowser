@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.wizardry;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,8 +17,8 @@ class Character extends AbstractFile
   private final Statistics stats;
   int scenario;
 
-  private final Collection<Spell> spellBook = new ArrayList<> ();
-  private final Collection<Baggage> baggageList = new ArrayList<> ();
+  private final List<Spell> spellBook = new ArrayList<> ();
+  private final List<Baggage> baggageList = new ArrayList<> ();
 
   static String[] races = { "No race", "Human", "Elf", "Dwarf", "Gnome", "Hobbit" };
   static String[] alignments = { "Unalign", "Good", "Neutral", "Evil" };

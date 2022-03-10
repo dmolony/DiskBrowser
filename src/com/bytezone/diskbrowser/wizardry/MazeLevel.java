@@ -12,7 +12,7 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-class MazeLevel extends AbstractFile
+public class MazeLevel extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
   private static final String[] squareType =
@@ -34,7 +34,7 @@ class MazeLevel extends AbstractFile
 
   // ---------------------------------------------------------------------------------//
   @Override
-  public String getHexDump ()
+  public String getText ()
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
@@ -421,42 +421,47 @@ class MazeLevel extends AbstractFile
 
         int itemID = -1;
 
-        if (cell.messageType == 2 && items != null)                 // obtain Item
+        switch (cell.messageType)
         {
-          itemID = messageAddress.level;
-          cell.itemObtained = items.get (itemID);
+          case 2:                 // obtain Item
+            if (items != null)
+            {
+              itemID = messageAddress.level;
+              cell.itemObtained = items.get (itemID);
+            }
+            break;
+
+          case 4:
+            itemID = messageAddress.level;
+            if (itemID <= 100)
+            {
+              cell.monsterID = itemID;
+              cell.monsters = monsters;
+            }
+            else
+            {
+              int val = (itemID - 64536) * -1;
+              // this gives Index error: 20410, Size 104 in Wizardry_III/legacy2.dsk
+              if (items != null && val < items.size ())
+                cell.itemObtained = items.get (val);          // check this
+              if (cell.itemObtained == null)
+                System.out.printf ("Item %d (%d) not found on level %d%n", val, value, level);
+            }
+            break;
+
+          case 5:                // requires Item
+            if (items != null)
+            {
+              itemID = messageAddress.level;
+              cell.itemRequired = items.get (itemID);
+            }
+            break;
         }
 
-        if (cell.messageType == 5 && items != null)                 // requires Item
-        {
-          itemID = messageAddress.level;
-          cell.itemRequired = items.get (itemID);
-        }
-
-        if (cell.messageType == 4)
-        {
-          itemID = messageAddress.level;
-          if (value <= 100)
-          {
-            cell.monsterID = value;
-            cell.monsters = monsters;
-          }
-          else
-          {
-            int val = (value - 64536) * -1;
-            System.out.println ("Value : " + val);
-            // this gives Index error: 20410, Size 104 in Wizardry_III/legacy2.dsk
-            if (items != null && val < items.size ())
-              cell.itemObtained = items.get (val);          // check this
-            if (cell.itemObtained == null)
-              System.out.printf ("Item %d not found%n", val);
-          }
-        }
         break;
 
       case 12:      // encounter
         MazeAddress monsterAddress = getAddress (b);
-        //  cell.monsterID = HexFormatter.intValue (buffer[832 + b * 2], buffer[833 + b * 2]);
         cell.monsterID = monsterAddress.column;
         cell.monsters = monsters;
         break;

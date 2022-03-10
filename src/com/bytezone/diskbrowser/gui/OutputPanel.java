@@ -33,6 +33,7 @@ import com.bytezone.diskbrowser.disk.DiskAddress;
 import com.bytezone.diskbrowser.disk.SectorList;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeEvent;
 import com.bytezone.diskbrowser.gui.FontAction.FontChangeListener;
+import com.bytezone.diskbrowser.wizardry.MazeLevel;
 
 // -----------------------------------------------------------------------------------//
 public class OutputPanel extends JTabbedPane
@@ -86,8 +87,7 @@ public class OutputPanel extends JTabbedPane
     formattedText.setText ("Please use the 'File->Set HOME folder...' command to "
         + "\ntell DiskBrowser where your Apple disks are located."
         + "\n\nTo see the contents of a disk in more detail, double-click"
-        + "\nthe disk. You will then be able to select individual files to "
-        + "view them.");
+        + "\nthe disk. You will then be able to select individual files to " + "view them.");
 
     hexText = new JTextArea (10, TEXT_WIDTH);
     setPanel (hexText, "Hex dump");
@@ -95,9 +95,8 @@ public class OutputPanel extends JTabbedPane
     disassemblyText = new JTextArea (10, TEXT_WIDTH);
     setPanel (disassemblyText, "Disassembly");
 
-    imagePane =
-        new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    imagePane = new JScrollPane (imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
     imagePane.setBorder (null);
 
@@ -272,9 +271,10 @@ public class OutputPanel extends JTabbedPane
     AbstractFile.setDebug (value);
     setText (formattedText, currentDataSource.getText ());
 
-    if (currentDataSource instanceof HiResImage
+    if (currentDataSource instanceof HiResImage           //
+        || currentDataSource instanceof MazeLevel         // Wizardry
         || currentDataSource instanceof QuickDrawFont)
-      setDataSource (currentDataSource);      // toggles text/image
+      setDataSource (currentDataSource);                  // toggles text/image
   }
 
   // ---------------------------------------------------------------------------------//
@@ -493,8 +493,7 @@ public class OutputPanel extends JTabbedPane
   public void setAssemblerPreferences (AssemblerPreferences assemblerPreferences)
   // ---------------------------------------------------------------------------------//
   {
-    if (currentDataSource instanceof AssemblerProgram
-        || currentDataSource instanceof BootSector)
+    if (currentDataSource instanceof AssemblerProgram || currentDataSource instanceof BootSector)
       setDataSource (currentDataSource);
   }
 

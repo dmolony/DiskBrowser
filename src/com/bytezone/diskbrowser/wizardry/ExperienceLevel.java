@@ -22,9 +22,8 @@ class ExperienceLevel extends AbstractFile
       if (buffer[ptr] == 0)
         break;
 
-      long points =
-          Utility.getShort (buffer, ptr) + Utility.getShort (buffer, ptr + 2) * 10000
-              + Utility.getShort (buffer, ptr + 4) * 100000000L;
+      long points = Utility.getShort (buffer, ptr) + Utility.getShort (buffer, ptr + 2) * 10000
+          + Utility.getShort (buffer, ptr + 4) * 100000000L;
       expLevels[seq++] = points;
     }
   }
@@ -33,9 +32,7 @@ class ExperienceLevel extends AbstractFile
   long getExperiencePoints (int level)
   // ---------------------------------------------------------------------------------//
   {
-    if (level < 13)
-      return expLevels[level];
-    return (level - 12) * expLevels[0] + expLevels[12];
+    return level < 13 ? expLevels[level - 1] : (level - 13) * expLevels[0] + expLevels[12];
   }
 
   // ---------------------------------------------------------------------------------//
@@ -43,9 +40,13 @@ class ExperienceLevel extends AbstractFile
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder line = new StringBuilder ();
-    for (long exp : expLevels)
-      line.append (exp + "\n");
+    StringBuilder line = new StringBuilder (name + "\n\nLevel   Points Needed\n");
+
+    for (int i = 2; i <= 26; i++)
+      line.append (String.format ("  %2d   %,13d%n", i, getExperiencePoints (i)));
+
+    line.append (String.format ("%n       %,13d+", expLevels[0]));
+
     return line.toString ();
   }
 }

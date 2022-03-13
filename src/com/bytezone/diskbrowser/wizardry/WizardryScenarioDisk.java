@@ -586,6 +586,10 @@ public class WizardryScenarioDisk extends PascalDisk
     experiences = new ArrayList<> (sd.total);
     int max = sd.totalBlocks / 2;
 
+    int count = 0;
+    String[] classes =
+        { "FIGHTER", "MAGE", "PRIEST", "THIEF", "BISHOP", "SAMURAI", "LORD", "NINJA" };
+
     for (int i = 0; i < max; i++)
     {
       List<DiskAddress> blocks = getTwoBlocks (sd, i, sectors);
@@ -599,7 +603,7 @@ public class WizardryScenarioDisk extends PascalDisk
 
         byte[] newBuffer = new byte[78];
         System.arraycopy (buffer, ptr, newBuffer, 0, newBuffer.length);
-        ExperienceLevel el = new ExperienceLevel ("exp", newBuffer);
+        ExperienceLevel el = new ExperienceLevel (classes[count++], newBuffer);
         experiences.add (el);
         addToNode (el, node, blocks, experienceSector);
       }

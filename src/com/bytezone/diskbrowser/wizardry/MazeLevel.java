@@ -15,6 +15,10 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class MazeLevel extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
+  private static final int AUX0 = 768;
+  private static final int AUX1 = 800;
+  private static final int AUX2 = 832;
+
   private static final String[] squareType =
       { "Normal", "Stairs", "Pit", "Chute", "Spinner", "Darkness", "Teleport", "Ouch", "Elevator",
           "Rock/Water", "Fizzle", "Message/Item", "Monster" };
@@ -67,15 +71,15 @@ public class MazeLevel extends AbstractFile
     text.append (String.format ("%04X: %s%n", 760, HexFormatter.getHexString (buffer, 760, 8)));
 
     text.append ("\nAUX0\n\n");
-    text.append (HexFormatter.format (buffer, 768, 32, true, 768));
+    text.append (HexFormatter.format (buffer, AUX0, 32, true, AUX0));
     text.append ("\n");
 
     text.append ("\nAUX1\n\n");
-    text.append (HexFormatter.format (buffer, 800, 32, true, 800));
+    text.append (HexFormatter.format (buffer, AUX1, 32, true, AUX1));
     text.append ("\n");
 
     text.append ("\nAUX2\n\n");
-    text.append (HexFormatter.format (buffer, 832, 32, true, 832));
+    text.append (HexFormatter.format (buffer, AUX2, 32, true, AUX2));
     text.append ("\n");
 
     List<MazeAddress> messageList = new ArrayList<> ();
@@ -121,8 +125,8 @@ public class MazeLevel extends AbstractFile
 
     for (int col = 0; col < 20; col++)
     {
-      text.append (String.format ("Col %2d : %s : ", col,
-          HexFormatter.getHexString (buffer, ptr + col * 6, 6)));
+      text.append (
+          String.format ("   Col %2d : %s : ", col, HexFormatter.getHexString (buffer, ptr, 6)));
 
       for (int i = 0; i < 5; i++)
       {
@@ -209,19 +213,19 @@ public class MazeLevel extends AbstractFile
             extraText += items.get (address.level).getName ();
         }
 
-        if (messageType == 5)
-        {
-          extraText += "Requires: ";
-          if (items != null)
-            extraText += items.get (address.level).getName ();
-        }
-
         if (messageType == 4)
         {
           if (address.level < monsters.size ())
             extraText += monsters.get (address.level).realName;
           else
             extraText += "Obtained: " + items.get ((address.level - 64536) * -1).getName ();
+        }
+
+        if (messageType == 5)
+        {
+          extraText += "Requires: ";
+          if (items != null)
+            extraText += items.get (address.level).getName ();
         }
       }
 
@@ -279,6 +283,7 @@ public class MazeLevel extends AbstractFile
         int y = image.getHeight () - (row + 1) * cellSize.height - 1;
         cell.draw (g, x, y);
       }
+
     return image;
   }
 
@@ -365,53 +370,53 @@ public class MazeLevel extends AbstractFile
       case 0:         // normal
         break;
 
-      case 1:
+      case 1:         // stairs
         cell.stairs = true;
         cell.addressTo = getAddress (b);
         break;
 
-      case 2:
+      case 2:         // pit
         cell.pit = true;
         break;
 
-      case 3:
+      case 3:         // chute
         cell.chute = true;
         cell.addressTo = getAddress (b);
         break;
 
-      case 4:
+      case 4:         // spinner
         cell.spinner = true;
         break;
 
-      case 5:
+      case 5:         // dark
         cell.darkness = true;
         break;
 
-      case 6:
+      case 6:         // transfer
         cell.teleport = true;
         cell.addressTo = getAddress (b);
         break;
 
-      case 7:       // ouchy
+      case 7:         // ouchy
         cell.unknown = cellFlag;
         break;
 
-      case 8:       // buttonz
+      case 8:         // buttonz
         cell.elevator = true;
         MazeAddress elevatorAddress = getAddress (b);
         cell.elevatorTo = elevatorAddress.row;
         cell.elevatorFrom = elevatorAddress.column;
         break;
 
-      case 9:       // rock/water
+      case 9:         // rock/water
         cell.rock = true;
         break;
 
-      case 10:      // fizzle
+      case 10:        // fizzle
         cell.spellsBlocked = true;
         break;
 
-      case 11:      // screen message
+      case 11:        // screen message
         MazeAddress messageAddress = getAddress (b);
         Message m = getMessage (messageAddress.row);
         if (m != null)
@@ -419,20 +424,15 @@ public class MazeLevel extends AbstractFile
 
         cell.messageType = messageAddress.column;
 
-        int itemID = -1;
-
         switch (cell.messageType)
         {
           case 2:                 // obtain Item
             if (items != null)
-            {
-              itemID = messageAddress.level;
-              cell.itemObtained = items.get (itemID);
-            }
+              cell.itemObtained = items.get (messageAddress.level);
             break;
 
           case 4:
-            itemID = messageAddress.level;
+            int itemID = messageAddress.level;
             if (itemID <= 100)
             {
               cell.monsterID = itemID;
@@ -451,10 +451,7 @@ public class MazeLevel extends AbstractFile
 
           case 5:                // requires Item
             if (items != null)
-            {
-              itemID = messageAddress.level;
-              cell.itemRequired = items.get (itemID);
-            }
+              cell.itemRequired = items.get (messageAddress.level);
             break;
         }
 
@@ -480,9 +477,9 @@ public class MazeLevel extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     // converts AUX1, AUX2, AUX3 into a MazeAddress (level, row, column)
-    int x = b * 2;
-    return new MazeAddress (Utility.getShort (buffer, 768 + x), Utility.getShort (buffer, 800 + x),
-        Utility.getShort (buffer, 832 + x));
+    b *= 2;
+    return new MazeAddress (Utility.getShort (buffer, 768 + b), Utility.getShort (buffer, 800 + b),
+        Utility.getShort (buffer, 832 + b));
   }
 
   // ---------------------------------------------------------------------------------//

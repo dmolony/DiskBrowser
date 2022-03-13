@@ -11,7 +11,9 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 class MazeCell
 // -----------------------------------------------------------------------------------//
 {
-  static Dimension cellSize = new Dimension (22, 22);       // size in pixels
+  static final Dimension cellSize = new Dimension (22, 22);       // size in pixels
+  static final Color SECRET_DOOR = Color.RED;
+  static final Color DOOR = Color.GREEN;
 
   boolean northWall;
   boolean southWall;
@@ -64,7 +66,7 @@ class MazeCell
   // ---------------------------------------------------------------------------------//
   {
     g.setColor (Color.BLACK);
-    g.fillRect (x, y, 22, 22);
+    g.fillRect (x, y, cellSize.width, cellSize.height);
 
     g.setColor (Color.WHITE);
 
@@ -77,7 +79,7 @@ class MazeCell
     if (southWall)
       drawSouth (g, x, y);
 
-    g.setColor (Color.RED);
+    g.setColor (DOOR);
 
     if (westDoor)
       drawWest (g, x, y);
@@ -88,7 +90,7 @@ class MazeCell
     if (southDoor)
       drawSouth (g, x, y);
 
-    g.setColor (Color.GREEN);
+    g.setColor (SECRET_DOOR);
 
     if (westDoor && westWall)
       drawWest (g, x, y);
@@ -144,8 +146,7 @@ class MazeCell
   void drawEast (Graphics2D g, int x, int y)
   // ---------------------------------------------------------------------------------//
   {
-    g.drawLine (x + cellSize.width - 1, y + 1, x + cellSize.width - 1,
-        y + cellSize.height - 1);
+    g.drawLine (x + cellSize.width - 1, y + 1, x + cellSize.width - 1, y + cellSize.height - 1);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -159,8 +160,7 @@ class MazeCell
   void drawSouth (Graphics2D g, int x, int y)
   // ---------------------------------------------------------------------------------//
   {
-    g.drawLine (x + 1, y + cellSize.height - 1, x + cellSize.width - 1,
-        y + cellSize.height - 1);
+    g.drawLine (x + 1, y + cellSize.height - 1, x + cellSize.width - 1, y + cellSize.height - 1);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -324,8 +324,8 @@ class MazeCell
         sign.append ("castle&nbsp;");
       else
       {
-        sign.append ("L" + addressTo.level + " " + addressTo.row + "N " + addressTo.column
-            + "E&nbsp;");
+        sign.append (
+            "L" + addressTo.level + " " + addressTo.row + "N " + addressTo.column + "E&nbsp;");
       }
     }
     if (pit)

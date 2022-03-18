@@ -68,11 +68,13 @@ abstract class Message extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder message = new StringBuilder ();
+
     for (String line : lines)
       message.append ("&nbsp;" + line + "&nbsp;<br>");
     if (message.length () > 0)
       for (int i = 0; i < 4; i++)
-        message.deleteCharAt (message.length () - 1); // remove <br> tag
+        message.deleteCharAt (message.length () - 1);         // remove <br> tag
+
     return message.toString ();
   }
 

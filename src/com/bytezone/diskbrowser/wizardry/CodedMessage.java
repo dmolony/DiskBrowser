@@ -20,12 +20,12 @@ class CodedMessage extends Message
   protected String getLine (int offset)
   // ---------------------------------------------------------------------------------//
   {
-    int length = buffer[offset] & 0xFF;
+    int length = buffer[offset++] & 0xFF;
     byte[] translation = new byte[length];
     codeOffset--;
     for (int j = 0; j < length; j++)
     {
-      translation[j] = buffer[offset + 1 + j];
+      translation[j] = buffer[offset + j];
       translation[j] -= codeOffset - j * 3;
     }
     return HexFormatter.getString (translation, 0, length);

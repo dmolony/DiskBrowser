@@ -466,7 +466,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       int sequence = buffer[ptr + recordLength - 2];
       ++totalLines;
-      if (sequence == 1) // end of message
+      if (sequence == 1)            // end of message
       {
         int totalBytes = totalLines * recordLength;
         byte[] newBuffer = new byte[totalBytes];

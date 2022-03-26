@@ -139,7 +139,7 @@ public class MazeLevel extends AbstractFile
         }
       }
 
-      assert buffer[ptr] == 0;
+      //      assert buffer[ptr] == 0;
       ptr++;                        // skip last byte
       text.append ("\n");
     }

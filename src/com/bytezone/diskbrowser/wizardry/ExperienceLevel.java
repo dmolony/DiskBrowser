@@ -32,6 +32,8 @@ class ExperienceLevel extends AbstractFile
   long getExperiencePoints (int level)
   // ---------------------------------------------------------------------------------//
   {
+    if (level == 0)
+      return expLevels[0];
     return level < 13 ? expLevels[level - 1] : (level - 13) * expLevels[0] + expLevels[12];
   }
 

@@ -48,8 +48,8 @@ public class AppleDisk implements Disk
 
   private int interleave = 0;
   private static int[][] interleaveSector = //
-      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-          22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },                     // None
+      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,       // 
+          17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 },   // None
           { 0, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 15 },       // Prodos/Pascal
           { 0, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 15 },       // Infocom
           { 0, 6, 12, 3, 9, 15, 14, 5, 11, 2, 8, 7, 13, 4, 10, 1 } };     // CPM
@@ -101,8 +101,7 @@ public class AppleDisk implements Disk
   }
 
   // ---------------------------------------------------------------------------------//
-  public AppleDisk (File file, int tracks, int sectors, int skip)
-      throws FileFormatException
+  public AppleDisk (File file, int tracks, int sectors, int skip) throws FileFormatException
   // ---------------------------------------------------------------------------------//
   {
     assert (file.exists ()) : "No such path :" + file.getAbsolutePath ();
@@ -158,8 +157,7 @@ public class AppleDisk implements Disk
       tracks = blocks / 8;          // change parameter!
       sectors = 8;                  // change parameter!
     }
-    else if (suffix.equalsIgnoreCase ("HDV")
-        || (suffix.equalsIgnoreCase ("po") && tracks > 50)) // ULTIMATE APPLE1 CFFA 3.5.po
+    else if (suffix.equalsIgnoreCase ("HDV") || (suffix.equalsIgnoreCase ("po") && tracks > 50)) // ULTIMATE APPLE1 CFFA 3.5.po
     {
       //this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
       this.blocks = tracks * sectors;
@@ -557,8 +555,7 @@ public class AppleDisk implements Disk
   {
     if (!isValidAddress (block))
     {
-      System.out.printf ("getDiskAddress: Invalid block : %d of %d%n", block,
-          this.blocks);
+      System.out.printf ("getDiskAddress: Invalid block : %d of %d%n", block, this.blocks);
       return null;
       //      return new AppleDiskAddress (this, 0);    // this was looping 26/07/2016
     }
@@ -624,10 +621,9 @@ public class AppleDisk implements Disk
   // ---------------------------------------------------------------------------------//
   {
     assert da.getDisk () == this : "Disk address not applicable to this disk";
-    assert sectorSize == SECTOR_SIZE
-        || sectorSize == BLOCK_SIZE : "Invalid sector size : " + sectorSize;
-    assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
-        + interleave;
+    assert sectorSize == SECTOR_SIZE || sectorSize == BLOCK_SIZE : "Invalid sector size : "
+        + sectorSize;
+    assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : " + interleave;
 
     if (sectorSize == SECTOR_SIZE)
     {
@@ -640,8 +636,7 @@ public class AppleDisk implements Disk
       System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset, SECTOR_SIZE);
 
       diskOffset = getBufferOffset (da, 1);
-      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + SECTOR_SIZE,
-          SECTOR_SIZE);
+      System.arraycopy (diskBuffer, diskOffset, buffer, bufferOffset + SECTOR_SIZE, SECTOR_SIZE);
     }
   }
 
@@ -650,10 +645,9 @@ public class AppleDisk implements Disk
   // ---------------------------------------------------------------------------------//
   {
     assert da.getDisk () == this : "Disk address not applicable to this disk";
-    assert sectorSize == SECTOR_SIZE
-        || sectorSize == BLOCK_SIZE : "Invalid sector size : " + sectorSize;
-    assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : "
-        + interleave;
+    assert sectorSize == SECTOR_SIZE || sectorSize == BLOCK_SIZE : "Invalid sector size : "
+        + sectorSize;
+    assert interleave >= 0 && interleave <= MAX_INTERLEAVE : "Invalid interleave : " + interleave;
 
     if (sectorSize == SECTOR_SIZE)
     {

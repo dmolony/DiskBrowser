@@ -140,9 +140,9 @@ class Reward extends AbstractFile
             String lineTitle = title ? "Items ..........." : "";
             title = false;
             for (int j = 0; j < lineItem.length; j++)
-              lineItem[j] = i + j <= max ? items.get (i + j).getName () : "";
-            text.append (String.format ("%-17s %-16s %-16s %-16s %-16s%n", lineTitle,
-                lineItem[0], lineItem[1], lineItem[2], lineItem[3]));
+              lineItem[j] = i + j < items.size () ? items.get (i + j).getName () : "";
+            text.append (String.format ("%-17s %-16s %-16s %-16s %-16s%n", lineTitle, lineItem[0],
+                lineItem[1], lineItem[2], lineItem[3]));
           }
           break;
         default:

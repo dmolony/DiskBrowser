@@ -43,9 +43,8 @@ class Monster extends AbstractFile
   static int[] weight1 = { 0, 1, 2, 4, 8, 16, 32, 64, 253, 506, 0 };
   static int[] weight2 = { 0, 60, 120, 180, 300, 540, 1020, 0 };
 
-  public static String[] monsterClass =
-      { "Fighter", "Mage", "Priest", "Thief", "Midget", "Giant", "Mythical", "Dragon",
-          "Animal", "Were", "Undead", "Demon", "Insect", "Enchanted" };
+  public static String[] monsterClass = { "Fighter", "Mage", "Priest", "Thief", "Midget", "Giant",
+      "Mythical", "Dragon", "Animal", "Were", "Undead", "Demon", "Insect", "Enchanted" };
 
   private static int[] experience = {                                     //
       55, 235, 415, 230, 380, 620, 840, 520, 550, 350,                    // 00-09
@@ -111,7 +110,7 @@ class Monster extends AbstractFile
 
     // these values definitely affect the damage a monster does (when breathing?)
     int exp2 = ((buffer[72] & 0xFF) * (buffer[74] & 0xFF) - 1) * 20;
-    int exp3 = weight2[speed]; // 1-6
+    int exp3 = weight2[speed];                                          // 1-6
     int exp4 = (10 - armourClass) * 40;
     int exp5 = getBonus (35, mageSpellLevel);
     int exp6 = getBonus (35, priestSpellLevel);
@@ -175,8 +174,8 @@ class Monster extends AbstractFile
     if (debug)
       text.append ("           " + exp9);
 
-    text.append ("\n\nExperience ...... " + (exp2 + exp3 + exp4 + exp5 + exp6 + exp7
-        + exp8 + exp9 + exp10 + exp11 + exp12));
+    text.append ("\n\nExperience ...... "
+        + (exp2 + exp3 + exp4 + exp5 + exp6 + exp7 + exp8 + exp9 + exp10 + exp11 + exp12));
 
     text.append ("\n\n===== Gold reward ======");
     //		text.append ("\nTable ........... " + rewardTable1);
@@ -255,8 +254,7 @@ class Monster extends AbstractFile
   public String getDump (int block)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder line =
-        new StringBuilder (String.format ("%3d %-16s", monsterID, realName));
+    StringBuilder line = new StringBuilder (String.format ("%3d %-16s", monsterID, realName));
     int lo = block == 0 ? 64 : block == 1 ? 88 : block == 2 ? 112 : 136;
     int hi = lo + 24;
     if (hi > buffer.length)

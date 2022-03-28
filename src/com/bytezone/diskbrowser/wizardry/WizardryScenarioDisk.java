@@ -277,9 +277,10 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       int nameLength = buffer[ptr] & 0xFF;
       if (nameLength == 0xC3)
-        // || buffer[ptr + 40] == 0x07)     7 = LOST
         continue;
       String name = HexFormatter.getString (buffer, ptr + 1, nameLength);
+      if ("UNSET".equals (name) && buffer[ptr + 40] == 0x07)     // 7 = LOST
+        continue;
 
       byte[] data2 = new byte[recLen];
       System.arraycopy (buffer, ptr, data2, 0, recLen);

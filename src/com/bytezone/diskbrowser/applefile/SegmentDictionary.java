@@ -33,8 +33,8 @@ public class SegmentDictionary
       ptr += 8;
     }
 
-    for (int seg = 0; seg < 16; seg++)
-      System.out.printf ("%04X  %04X  %s%n", codeAddress[seg], codeLength[seg], segName[seg]);
+    //    for (int seg = 0; seg < 16; seg++)
+    //      System.out.printf ("%04X  %04X  %s%n", codeAddress[seg], codeLength[seg], segName[seg]);
   }
 
   // ---------------------------------------------------------------------------------//

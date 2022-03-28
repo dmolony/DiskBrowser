@@ -52,6 +52,7 @@ abstract class CatalogEntry implements AppleFileSource
     for (DiskAddress sector : blocks)
       if (sector.matches (da))
         return true;
+
     return false;
   }
 
@@ -85,8 +86,8 @@ abstract class CatalogEntry implements AppleFileSource
   // ---------------------------------------------------------------------------------//
   {
     int size = lastBlock - firstBlock;
-    String fileTypeText = fileType < 0 || fileType >= parent.fileTypes.length ? "????"
-        : parent.fileTypes[fileType];
+    String fileTypeText =
+        fileType < 0 || fileType >= parent.fileTypes.length ? "????" : parent.fileTypes[fileType];
     return String.format ("%03d  %s  %-15s", size, fileTypeText, name);
   }
 }

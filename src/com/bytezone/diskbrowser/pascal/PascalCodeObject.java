@@ -66,6 +66,7 @@ class PascalCodeObject implements AppleFileSource
     for (DiskAddress sector : blocks)
       if (sector.matches (da))
         return true;
+
     return false;
   }
 

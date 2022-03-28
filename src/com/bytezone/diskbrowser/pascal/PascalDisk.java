@@ -47,8 +47,8 @@ public class PascalDisk extends AbstractFormattedDisk
   SectorType fotoSector = new SectorType ("Foto", Color.gray);
   SectorType badSector = new SectorType ("Bad", Color.darkGray);
 
-  SectorType[] sectors = { catalogSector, badSector, codeSector, textSector, infoSector,
-      dataSector, grafSector, fotoSector };
+  SectorType[] sectors = { catalogSector, badSector, codeSector, textSector, infoSector, dataSector,
+      grafSector, fotoSector };
 
   // ---------------------------------------------------------------------------------//
   public PascalDisk (Disk disk)
@@ -99,8 +99,7 @@ public class PascalDisk extends AbstractFormattedDisk
       freeBlocks.set (i, false);
     }
 
-    diskCatalogSector =
-        new PascalCatalogSector (disk, disk.readBlocks (sectors), sectors);
+    diskCatalogSector = new PascalCatalogSector (disk, disk.readBlocks (sectors), sectors);
 
     // read the catalog
     List<DiskAddress> addresses = new ArrayList<> ();
@@ -143,14 +142,16 @@ public class PascalDisk extends AbstractFormattedDisk
     disk.setInterleave (1);                 // should only ever be Prodos
     if (checkFormat (disk, debug))
       return true;
+
     disk.setInterleave (0);                 // see SANE Disk 2.po
     if (checkFormat (disk, debug))
       return true;
+
     return false;
   }
 
   // ---------------------------------------------------------------------------------//
-  public static boolean checkFormat (AppleDisk disk, boolean debug)
+  private static boolean checkFormat (AppleDisk disk, boolean debug)
   // ---------------------------------------------------------------------------------//
   {
     byte[] buffer = disk.readBlock (2);
@@ -277,16 +278,14 @@ public class PascalDisk extends AbstractFormattedDisk
   {
     String newLine = String.format ("%n");
     String newLine2 = newLine + newLine;
-    String line = "----   ---------------   ----   --------  -------   ----   ----   ----"
-        + newLine;
-    String date =
-        volumeEntry.date == null ? "--" : df.format (volumeEntry.date.getTime ());
+    String line =
+        "----   ---------------   ----   --------  -------   ----   ----   ----" + newLine;
+    String date = volumeEntry.date == null ? "--" : df.format (volumeEntry.date.getTime ());
     StringBuilder text = new StringBuilder ();
     text.append ("File : " + getDisplayPath () + newLine2);
     text.append ("Volume : " + volumeEntry.name + newLine);
     text.append ("Date   : " + date + newLine2);
-    text.append (
-        "Blks   Name              Type     Date     Length   Frst   Last   Blks\n");
+    text.append ("Blks   Name              Type     Date     Length   Frst   Last   Blks\n");
     text.append (line);
 
     int usedBlocks = 6;
@@ -297,15 +296,14 @@ public class PascalDisk extends AbstractFormattedDisk
       usedBlocks += size;
       date = ce.date == null ? "--" : df.format (ce.date.getTime ());
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
-      String fileType = ce.fileType < 0 || ce.fileType >= fileTypes.length ? "????"
-          : fileTypes[ce.fileType];
-      text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X   $%03X%n",
-          size, ce.name, fileType, date, bytes, ce.firstBlock, ce.lastBlock, size));
+      String fileType =
+          ce.fileType < 0 || ce.fileType >= fileTypes.length ? "????" : fileTypes[ce.fileType];
+      text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X   $%03X%n", size,
+          ce.name, fileType, date, bytes, ce.firstBlock, ce.lastBlock, size));
     }
     text.append (line);
-    text.append (
-        String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
-            (volumeEntry.totalBlocks - usedBlocks), usedBlocks, volumeEntry.totalBlocks));
+    text.append (String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
+        (volumeEntry.totalBlocks - usedBlocks), usedBlocks, volumeEntry.totalBlocks));
     return new DefaultAppleFileSource (volumeEntry.name, text.toString (), this);
   }
 }

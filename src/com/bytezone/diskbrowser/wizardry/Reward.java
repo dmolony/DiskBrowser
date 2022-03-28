@@ -11,8 +11,10 @@ class Reward extends AbstractFile
 {
   static String[] types = { "gold", "item" };
   static final int SEGMENT_LENGTH = 18;
+
   int id;
   int totalElements;
+
   List<RewardElement> elements;
   List<Item> items;
   List<Monster> goldMonsters = new ArrayList<> ();
@@ -23,8 +25,10 @@ class Reward extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
+
     this.id = id;
     this.items = items;
+
     totalElements = buffer[4];
     elements = new ArrayList<> (totalElements);
 
@@ -130,11 +134,13 @@ class Reward extends AbstractFile
         case 0:
           text.append ("Gold ............ " + buffer[10] + "d" + buffer[12] + "\n");
           break;
+
         case 1:
           int lo = buffer[10] & 0xFF;
           int qty = buffer[16] & 0xFF;
           boolean title = true;
           String[] lineItem = new String[4];
+
           for (int i = lo, max = lo + qty; i <= max; i += lineItem.length)
           {
             String lineTitle = title ? "Items ..........." : "";
@@ -145,6 +151,7 @@ class Reward extends AbstractFile
                 lineItem[1], lineItem[2], lineItem[3]));
           }
           break;
+
         default:
           System.out.println ("Unknown reward type " + type);
       }

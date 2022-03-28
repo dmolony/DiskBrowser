@@ -357,6 +357,8 @@ public class DiskFactory
             if (disk == null)
               disk = checkProdos (new AppleDisk (wozFile, 35, 8));
             if (disk == null)
+              disk = checkPascalDisk (new AppleDisk (wozFile, 35, 8));
+            if (disk == null)
               disk = new DataDisk (appleDisk256);
           }
         }
@@ -409,8 +411,7 @@ public class DiskFactory
 
     if (length != DISK_143K)          // 16 sector floppy disk
     {
-      System.out.printf ("%s: invalid file length : %,d%n", file.getName (),
-          file.length ());
+      System.out.printf ("%s: invalid file length : %,d%n", file.getName (), file.length ());
       return null;
     }
 
@@ -570,8 +571,8 @@ public class DiskFactory
       disk = new DataDisk (appleDisk256);
 
     if (debug)
-      System.out.println (
-          "Factory creating disk : " + disk.getDisk ().getFile ().getAbsolutePath ());
+      System.out
+          .println ("Factory creating disk : " + disk.getDisk ().getFile ().getAbsolutePath ());
 
     if (disk != null && compressed)
       disk.setOriginalPath (originalPath);
@@ -583,7 +584,7 @@ public class DiskFactory
   private static FormattedDisk check (FormattedDisk disk)
   // ---------------------------------------------------------------------------------//
   {
-    if (disk.getDisk ()instanceof AppleDisk appleDisk)
+    if (disk.getDisk () instanceof AppleDisk appleDisk)
     {
       if (nuFX != null)
         appleDisk.setNuFX (nuFX);

@@ -48,31 +48,6 @@ class Monster extends AbstractFile
   public static String[] monsterClass = { "Fighter", "Mage", "Priest", "Thief", "Midget", "Giant",
       "Mythical", "Dragon", "Animal", "Were", "Undead", "Demon", "Insect", "Enchanted" };
 
-  private static int[] experience = {                                     //
-      55, 235, 415, 230, 380, 620, 840, 520, 550, 350,                    // 00-09
-      475, 515, 920, 600, 735, 520, 795, 780, 990, 795,                   // 10-19
-      1360, 1320, 1275, 680, 960, 600, 755, 1120, 2075, 870,              // 20-29
-      960, 600, 1120, 2435, 1080, 2280, 975, 875, 1135, 1200,             // 30-39
-      620, 740, 1460, 1245, 960, 1405, 1040, 1220, 1520, 1000,            // 40-49
-      960, 2340, 2160, 2395, 790, 1140, 1235, 1790, 1720, 2240,           // 50-59
-      1475, 1540, 1720, 1900, 1240, 1220, 1020, 20435, 5100, 3515,        // 60-69
-      2115, 2920, 2060, 2140, 1400, 1640, 1280, 4450, 42840, 3300,        // 70-79
-      40875, 5000, 3300, 2395, 1935, 1600, 3330, 44090, 40840, 5200,      // 80-89
-      4155, 3000, 9200, 3160, 7460, 7320, 15880, 1600, 2200, 1000,        // 90-99
-      1900                                                                // 100 
-  };
-
-  int expHitPoints;
-  int expMage;
-  int expPriest;
-  int expDrain;
-  int expHeal;
-  int expAc;
-  int expDamage;
-  int expUnaffect;
-  int expFlags1;
-  int expFlags2;
-
   // ---------------------------------------------------------------------------------//
   Monster (String name, byte[] buffer, List<Reward> rewards, List<Monster> monsters)
   // ---------------------------------------------------------------------------------//
@@ -127,7 +102,7 @@ class Monster extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    int totalExperience = setExperience ();
+    int totalExperience = getExperience ();
 
     text.append ("ID .............. " + monsterID);
     text.append ("\nMonster name .... " + realName);
@@ -162,8 +137,7 @@ class Monster extends AbstractFile
     text.append ("\n\nResistance ...... " + String.format ("%02X", resistance));
     text.append ("\nAbilities ....... " + String.format ("%02X", abilities));
 
-    text.append (
-        String.format ("%n%nExperience ...... %,7d  %,7d", totalExperience, experience[monsterID]));
+    text.append (String.format ("%n%nExperience ...... %-,7d", totalExperience));
 
     text.append ("\n\n===== Gold reward ======");
     //		text.append ("\nTable ........... " + rewardTable1);
@@ -179,23 +153,23 @@ class Monster extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private int setExperience ()
+  private int getExperience ()
   // ---------------------------------------------------------------------------------//
   {
-    expHitPoints = hitPoints.qty * hitPoints.sides * (breathe == 0 ? 20 : 40);
+    int expHitPoints = hitPoints.qty * hitPoints.sides * (breathe == 0 ? 20 : 40);
 
-    expMage = getBonus (35, mageSpellLevel);
-    expPriest = getBonus (35, priestSpellLevel);
-    expDrain = getBonus (200, levelDrain);
-    expHeal = getBonus (90, healPts);
+    int expMage = getBonus (35, mageSpellLevel);
+    int expPriest = getBonus (35, priestSpellLevel);
+    int expDrain = getBonus (200, levelDrain);
+    int expHeal = getBonus (90, healPts);
 
-    expAc = 40 * (11 - armourClass);
+    int expAc = 40 * (11 - armourClass);
 
-    expDamage = recsn <= 1 ? 0 : getBonus (30, recsn);
-    expUnaffect = unaffect == 0 ? 0 : getBonus (40, (unaffect / 10 + 1));
+    int expDamage = recsn <= 1 ? 0 : getBonus (30, recsn);
+    int expUnaffect = unaffect == 0 ? 0 : getBonus (40, (unaffect / 10 + 1));
 
-    expFlags1 = getBonus (35, Integer.bitCount (resistance & 0x7E));
-    expFlags2 = getBonus (40, Integer.bitCount (abilities & 0x7F));
+    int expFlags1 = getBonus (35, Integer.bitCount (resistance & 0x7E));
+    int expFlags2 = getBonus (40, Integer.bitCount (abilities & 0x7F));
 
     return expHitPoints + expMage + expPriest + expDrain + expHeal + expAc + expDamage + expUnaffect
         + expFlags1 + expFlags2;
@@ -265,10 +239,8 @@ class Monster extends AbstractFile
       line.append (String.format ("%02X ", buffer[i]));
     if (block == 3)
     {
-      int exp = setExperience ();
+      int exp = getExperience ();
       line.append (String.format (" %,6d", exp));
-      if (exp != experience[monsterID])
-        line.append (String.format ("  %,6d", experience[monsterID]));
     }
     return line.toString ();
   }

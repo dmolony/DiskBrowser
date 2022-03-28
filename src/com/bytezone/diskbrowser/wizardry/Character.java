@@ -318,7 +318,8 @@ class Character extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("%s%-15s (%d)", equipped ? "*" : " ", item.getName (), item.getCost ());
+      return String.format ("%s%-15s %,10d", equipped ? "*" : " ", item.getName (),
+          item.getCost ());
     }
   }
 

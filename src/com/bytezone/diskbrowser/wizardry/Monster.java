@@ -52,7 +52,7 @@ class Monster extends AbstractFile
       55, 235, 415, 230, 380, 620, 840, 520, 550, 350,                    // 00-09
       475, 515, 920, 600, 735, 520, 795, 780, 990, 795,                   // 10-19
       1360, 1320, 1275, 680, 960, 600, 755, 1120, 2075, 870,              // 20-29
-      960, 1120, 1120, 2435, 1080, 2280, 975, 875, 1135, 1200,            // 30-39
+      960, 600, 1120, 2435, 1080, 2280, 975, 875, 1135, 1200,             // 30-39
       620, 740, 1460, 1245, 960, 1405, 1040, 1220, 1520, 1000,            // 40-49
       960, 2340, 2160, 2395, 790, 1140, 1235, 1790, 1720, 2240,           // 50-59
       1475, 1540, 1720, 1900, 1240, 1220, 1020, 20435, 5100, 3515,        // 60-69
@@ -127,30 +127,6 @@ class Monster extends AbstractFile
   {
     StringBuilder text = new StringBuilder ();
 
-    // these values definitely affect the damage a monster does (when breathing?)
-    //    int exp2 = ((buffer[72] & 0xFF) * (buffer[74] & 0xFF) - 1) * 20;
-    //    int exp2 = hitPoints.qty * hitPoints.sides;
-    //    exp2 *= breathe == 0 ? 20 : 40;
-
-    //    int exp3 = weight2[recsn];                                          // 1-6
-    //    int exp3 = 0;
-    //    if (recsn > 1)
-    //      exp3 = recsn * 30;
-
-    //    int exp4 = (11 - armourClass) * 40;
-
-    //    int exp5 = getBonus (35, mageSpellLevel);         // correct
-    //    int exp6 = getBonus (35, priestSpellLevel);       // correct
-    //    int exp10 = getBonus (200, levelDrain);           // correct
-    //    int exp8 = getBonus (90, healPts);                // correct
-
-    //    int exp7 = weight1[unaffect / 10] * 80;
-    //    int exp7 = unaffect > 0 ? (unaffect / 10 + 1) * 40 : 0;
-
-    //    int exp11 = breathe > 0 ? exp2 + 20 : 0;
-    //    int exp12 = getBonus (35, Integer.bitCount (resistance & 0x7E));
-    //    int exp9 = getBonus (40, Integer.bitCount (abilities & 0x7F));
-
     int totalExperience = setExperience ();
 
     text.append ("ID .............. " + monsterID);
@@ -160,26 +136,16 @@ class Monster extends AbstractFile
     text.append ("\n\nImage ID ........ " + imageID);
     text.append ("\nGroup size ...... " + groupSize);
     text.append ("\nHit points ...... " + hitPoints);
-    if (debug)
-      text.append ("           " + expHitPoints);
 
     text.append ("\n\nMonster class ... " + type + "   " + monsterClass[type]);
     text.append ("\nArmour class .... " + armourClass);
-    if (debug)
-      text.append ("           " + expAc);
 
     text.append ("\n\n# damage ........ " + recsn);
-    if (debug)
-      text.append ("           " + expDamage);
 
     text.append ("\nDamage .......... " + getDamage ());
 
     text.append ("\n\nLevel drain ..... " + levelDrain);
-    if (debug)
-      text.append ("           " + expDrain);
     text.append ("\nHeal pts? ....... " + healPts);
-    if (debug)
-      text.append ("           " + expHeal);
 
     text.append ("\n\nPartner ID ...... " + partnerID);
     if (partnerOdds > 0)
@@ -187,26 +153,14 @@ class Monster extends AbstractFile
     text.append ("\nPartner odds .... " + partnerOdds + "%");
 
     text.append ("\n\nMage level ...... " + mageSpellLevel);
-    if (debug)
-      text.append ("           " + expMage);
     text.append ("\nPriest level .... " + priestSpellLevel);
-    if (debug)
-      text.append ("           " + expPriest);
 
     text.append ("\n\nUnique .......... " + unique);
     text.append ("\nBreathe ......... " + breathe);
-    //    if (debug)
-    //      text.append ("           " + expBreathe);
     text.append ("\nUnaffect ........ " + unaffect);
-    if (debug)
-      text.append ("           " + expUnaffect);
 
     text.append ("\n\nResistance ...... " + String.format ("%02X", resistance));
-    if (debug)
-      text.append ("           " + expFlags1);
     text.append ("\nAbilities ....... " + String.format ("%02X", abilities));
-    if (debug)
-      text.append ("           " + expFlags2);
 
     text.append (
         String.format ("%n%nExperience ...... %,7d  %,7d", totalExperience, experience[monsterID]));
@@ -225,32 +179,10 @@ class Monster extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private int setExperience2 ()
-  // ---------------------------------------------------------------------------------//
-  {
-    expHitPoints = hitPoints.qty * hitPoints.sides * breathe == 0 ? 20 : 40;
-
-    expMage = 35 * mageSpellLevel;
-    expPriest = 35 * priestSpellLevel;
-    expDrain = 200 * levelDrain;
-    expHeal = 90 * healPts;
-
-    expAc = 40 * (11 - armourClass);
-
-    expDamage = recsn <= 1 ? 0 : 30 * recsn;
-    expUnaffect = unaffect == 0 ? 0 : 40 * (unaffect / 10 + 1);
-    expFlags1 = 35 * Integer.bitCount (resistance & 0x7E);
-    expFlags2 = 40 * Integer.bitCount (abilities & 0x7F);
-
-    return expHitPoints + expMage + expPriest + expDrain + expHeal + expAc + expDamage + expUnaffect
-        + expFlags1 + expFlags2;
-  }
-
-  // ---------------------------------------------------------------------------------//
   private int setExperience ()
   // ---------------------------------------------------------------------------------//
   {
-    expHitPoints = hitPoints.qty * hitPoints.sides * breathe == 0 ? 20 : 40;
+    expHitPoints = hitPoints.qty * hitPoints.sides * (breathe == 0 ? 20 : 40);
 
     expMage = getBonus (35, mageSpellLevel);
     expPriest = getBonus (35, priestSpellLevel);
@@ -261,6 +193,7 @@ class Monster extends AbstractFile
 
     expDamage = recsn <= 1 ? 0 : getBonus (30, recsn);
     expUnaffect = unaffect == 0 ? 0 : getBonus (40, (unaffect / 10 + 1));
+
     expFlags1 = getBonus (35, Integer.bitCount (resistance & 0x7E));
     expFlags2 = getBonus (40, Integer.bitCount (abilities & 0x7F));
 
@@ -269,35 +202,17 @@ class Monster extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private int getExperienceOld ()
+  private int getBonus (int base, int multiplier)
   // ---------------------------------------------------------------------------------//
   {
-    // these values definitely affect the damage a monster does (when breathing?)
-    //    int exp2 = ((buffer[72] & 0xFF) * (buffer[74] & 0xFF) - 1) * 20;
-    int exp2 = hitPoints.qty * hitPoints.sides;
-    exp2 *= breathe == 0 ? 20 : 40;
+    if (multiplier == 0)
+      return 0;
 
-    int exp3 = weight2[recsn];
-    int exp4 = (11 - armourClass) * 40;
+    int total = base;
+    for (int i = 1; i < multiplier; i++)
+      total *= 2;
 
-    int exp5 = getBonus (35, mageSpellLevel);
-    int exp6 = getBonus (35, priestSpellLevel);
-    int exp10 = getBonus (200, levelDrain);
-    int exp8 = getBonus (90, healPts);
-
-    int exp7 = weight1[unaffect / 10] * 80;
-    int exp11 = breathe > 0 ? exp2 + 20 : 0;
-    int exp12 = getBonus (35, Integer.bitCount (resistance & 0x7E));
-    int exp9 = getBonus (40, Integer.bitCount (abilities & 0x7F));
-
-    return exp2 + exp3 + exp4 + exp5 + exp6 + exp7 + exp8 + exp9 + exp10 + exp11 + exp12;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private int getBonus (int base, int value)
-  // ---------------------------------------------------------------------------------//
-  {
-    return base * pwr[value];
+    return total + total / 10000 * 10000;
   }
 
   // ---------------------------------------------------------------------------------//

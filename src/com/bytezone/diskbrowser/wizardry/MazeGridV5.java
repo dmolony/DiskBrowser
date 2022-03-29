@@ -38,8 +38,7 @@ class MazeGridV5 extends AbstractFile
         for (int col = 0; col < 8; col++)
           grid[row][col] = getLayout (i, row, col);
 
-      MazeGrid mazeGrid =
-          new MazeGrid (grid, buffer[528 + i] & 0xFF, buffer[512 + i] & 0xFF);
+      MazeGrid mazeGrid = new MazeGrid (grid, buffer[528 + i] & 0xFF, buffer[512 + i] & 0xFF);
       grids.add (mazeGrid);
 
       minX = Math.min (minX, mazeGrid.xOffset);
@@ -60,11 +59,10 @@ class MazeGridV5 extends AbstractFile
     int gridWidth = (maxX - minX + 8) * cellSize.width;
     int gridHeight = (maxY - minY + 7) * cellSize.height;
 
-    image = new BufferedImage (gridWidth + 1, gridHeight + fudge,
-        BufferedImage.TYPE_USHORT_555_RGB);
+    image =
+        new BufferedImage (gridWidth + 1, gridHeight + fudge, BufferedImage.TYPE_USHORT_555_RGB);
     Graphics2D g = image.createGraphics ();
-    g.setRenderingHint (RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    g.setRenderingHint (RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     g.setColor (Color.LIGHT_GRAY);
     g.fillRect (0, 0, gridWidth + 1, gridHeight + fudge);
@@ -183,8 +181,7 @@ class MazeGridV5 extends AbstractFile
         {
           List<String> messages = messageBlock.getMessageLines (msg);
           if (messages.size () > 0)
-            text.append (
-                String.format ("%n%4d  %02X  %04X  %s%n", i, i, msg, messages.get (0)));
+            text.append (String.format ("%n%4d  %02X  %04X  %s%n", i, i, msg, messages.get (0)));
           else
             text.append (String.format ("Message not found: %04X%n", msg));
 

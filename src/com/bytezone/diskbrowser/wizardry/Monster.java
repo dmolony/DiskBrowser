@@ -23,12 +23,14 @@ class Monster extends AbstractFile
   public final int imageID;
   int rewardTable1;
   int rewardTable2;
+
   public final int partnerID;
   public final int partnerOdds;
   public final int armourClass;
   public final int recsn;
   public final int mageSpellLevel;
   public final int priestSpellLevel;
+
   int levelDrain;
   int healPts;
   int breathe;
@@ -40,13 +42,23 @@ class Monster extends AbstractFile
   List<Dice> damage = new ArrayList<> ();
 
   static int counter = 0;
-  static boolean debug = true;
-  static int[] pwr = { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 0, 0, 0, 0, 0 };
-  static int[] weight1 = { 0, 1, 2, 4, 8, 16, 32, 64, 253, 506, 0 };
-  static int[] weight2 = { 0, 60, 120, 180, 300, 540, 1020, 0 };
 
   public static String[] monsterClass = { "Fighter", "Mage", "Priest", "Thief", "Midget", "Giant",
       "Mythical", "Dragon", "Animal", "Were", "Undead", "Demon", "Insect", "Enchanted" };
+
+  private static int[] experience = {                                     //
+      55, 235, 415, 230, 380, 620, 840, 520, 550, 350,                    // 00-09
+      475, 515, 920, 600, 735, 520, 795, 780, 990, 795,                   // 10-19
+      1360, 1320, 1275, 680, 960, 600, 755, 1120, 2075, 870,              // 20-29
+      960, 600, 1120, 2435, 1080, 2280, 975, 875, 1135, 1200,             // 30-39
+      620, 740, 1460, 1245, 960, 1405, 1040, 1220, 1520, 1000,            // 40-49
+      960, 2340, 2160, 2395, 790, 1140, 1235, 1790, 1720, 2240,           // 50-59
+      1475, 1540, 1720, 1900, 1240, 1220, 1020, 20435, 5100, 3515,        // 60-69
+      2115, 2920, 2060, 2140, 1400, 1640, 1280, 4450, 42840, 3300,        // 70-79
+      40875, 5000, 3300, 2395, 1935, 1600, 3330, 44090, 40840, 5200,      // 80-89
+      4155, 3000, 9200, 3160, 7460, 7320, 15880, 1600, 2200, 1000,        // 90-99
+      1900                                                                // 100 
+  };
 
   // ---------------------------------------------------------------------------------//
   Monster (String name, byte[] buffer, List<Reward> rewards, List<Monster> monsters)
@@ -134,8 +146,8 @@ class Monster extends AbstractFile
     text.append ("\nBreathe ......... " + breathe);
     text.append ("\nUnaffect ........ " + unaffect);
 
-    text.append ("\n\nResistance ...... " + String.format ("%02X", resistance));
-    text.append ("\nAbilities ....... " + String.format ("%02X", abilities));
+    text.append ("\n\nResistance ...... " + String.format ("%3d  %<02X", resistance));
+    text.append ("\nAbilities ....... " + String.format ("%3d  %<02X", abilities));
 
     text.append (String.format ("%n%nExperience ...... %-,7d", totalExperience));
 
@@ -157,13 +169,12 @@ class Monster extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     int expHitPoints = hitPoints.qty * hitPoints.sides * (breathe == 0 ? 20 : 40);
+    int expAc = 40 * (11 - armourClass);
 
     int expMage = getBonus (35, mageSpellLevel);
     int expPriest = getBonus (35, priestSpellLevel);
     int expDrain = getBonus (200, levelDrain);
     int expHeal = getBonus (90, healPts);
-
-    int expAc = 40 * (11 - armourClass);
 
     int expDamage = recsn <= 1 ? 0 : getBonus (30, recsn);
     int expUnaffect = unaffect == 0 ? 0 : getBonus (40, (unaffect / 10 + 1));
@@ -171,7 +182,7 @@ class Monster extends AbstractFile
     int expFlags1 = getBonus (35, Integer.bitCount (resistance & 0x7E));
     int expFlags2 = getBonus (40, Integer.bitCount (abilities & 0x7F));
 
-    return expHitPoints + expMage + expPriest + expDrain + expHeal + expAc + expDamage + expUnaffect
+    return expHitPoints + expAc + expMage + expPriest + expDrain + expHeal + expDamage + expUnaffect
         + expFlags1 + expFlags2;
   }
 
@@ -183,10 +194,13 @@ class Monster extends AbstractFile
       return 0;
 
     int total = base;
-    for (int i = 1; i < multiplier; i++)
-      total *= 2;
+    while (multiplier > 1)
+    {
+      multiplier--;
+      total += total;        // double the value
+    }
 
-    return total + total / 10000 * 10000;
+    return total + total / 10000 * 10000;       // mimics the Wizardry bug
   }
 
   // ---------------------------------------------------------------------------------//
@@ -231,17 +245,21 @@ class Monster extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder (String.format ("%3d %-16s", monsterID, realName));
+
     int lo = block == 0 ? 64 : block == 1 ? 88 : block == 2 ? 112 : 136;
     int hi = lo + 24;
     if (hi > buffer.length)
       hi = buffer.length;
+
     for (int i = lo; i < hi; i++)
       line.append (String.format ("%02X ", buffer[i]));
+
     if (block == 3)
     {
       int exp = getExperience ();
-      line.append (String.format (" %,6d", exp));
+      line.append (String.format (" %,6d  %,6d", exp, exp - experience[monsterID]));
     }
+
     return line.toString ();
   }
 

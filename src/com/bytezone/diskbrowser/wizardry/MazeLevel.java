@@ -247,6 +247,7 @@ public class MazeLevel extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     text.append ("\n\n");
+    int savePtr = ptr;
 
     text.append (String.format ("MINENEMY   %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
         Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
@@ -262,6 +263,28 @@ public class MazeLevel extends AbstractFile
     ptr += 2;
     text.append (String.format ("PERCWORS   %04X  %04X  %04X%n", Utility.getShort (buffer, ptr),
         Utility.getShort (buffer, ptr + 10), Utility.getShort (buffer, ptr + 20)));
+
+    ptr = savePtr;
+    for (int i = 0; i < 3; i++)
+    {
+      String pct = i == 0 ? "75" : i == 1 ? "18.75" : "6.25";
+      text.append (String.format ("%nEnemy #%d  %s%%%n%n", (i + 1), pct));
+      int minenemy = Utility.getShort (buffer, ptr);
+      int multwors = Utility.getShort (buffer, ptr + 2);
+      int worse01 = Utility.getShort (buffer, ptr + 4);
+      int range0n = Utility.getShort (buffer, ptr + 6);
+      int percwors = Utility.getShort (buffer, ptr + 8);
+      ptr += 10;
+
+      int max = multwors * worse01;
+
+      for (int id = minenemy; id < minenemy + range0n + max; id++)
+      {
+        if (id == minenemy + range0n)
+          text.append ("\n");
+        text.append (String.format ("%3d  %-16s  %n", id, monsters.get (id)));
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------------//

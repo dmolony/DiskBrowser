@@ -165,7 +165,9 @@ public class WizLong
       return high > other.high ? 1 : -1;
   }
 
+  // ---------------------------------------------------------------------------------//
   public int value ()
+  // ---------------------------------------------------------------------------------//
   {
     return high * 10000 * 10000 + mid * 10000 + low;
   }
@@ -229,7 +231,7 @@ public class WizLong
     int heal = 0;
     int breathe = 0;
     int unaffect = 85;
-    int wepsty = 0x40;
+    int wepsty = 64;
     int sppc = 0;
 
     // Werdna
@@ -243,8 +245,8 @@ public class WizLong
     //    int heal = 5;
     //    int breathe = 0;
     //    int unaffect = 70;
-    //    int wepsty = 0x0E;         
-    //    int sppc = 0x0F;
+    //    int wepsty = 14;         
+    //    int sppc = 15;
 
     // Will O Wisp
     //    int hpSides = 10;
@@ -272,6 +274,7 @@ public class WizLong
     multAddKX (killExp, priestSpells, 35);
     multAddKX (killExp, drain, 200);
     multAddKX (killExp, heal, 90);
+
     killExp.printLong ();
 
     killExpx = new WizLong (40 * (11 - ac));
@@ -280,16 +283,41 @@ public class WizLong
 
     if (recsn > 1)
       multAddKX (killExp, recsn, 30);
+
     killExp.printLong ();
 
     if (unaffect > 0)
       multAddKX (killExp, (unaffect / 10 + 1), 40);
+
     killExp.printLong ();
 
     multAddKX (killExp, Integer.bitCount (wepsty & 0x7E), 35);      // 6 bits
-    //    System.out.println (Integer.bitCount (wepsty));
     multAddKX (killExp, Integer.bitCount (sppc & 0x7F), 40);        // 7 bits
 
     killExp.printLong ();
+
+    System.out.println ();
+
+    WizLong a = new WizLong (1000);
+    a.multLong (54);
+    a.printLong ();
+    a.addLong (a);
+    a.printLong ();
+
+    System.out.println ();
+
+    a = new WizLong (1000);
+    a.multLong (500);
+    a.printLong ();
+    a.addLong (a);
+    a.printLong ();
+
+    System.out.println ();
+
+    a = new WizLong (1000);
+    a.multLong (505);
+    a.printLong ();
+    a.addLong (a);
+    a.printLong ();
   }
 }

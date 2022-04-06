@@ -366,10 +366,12 @@ public class WizardryScenarioDisk extends PascalDisk
     }
 
     StringBuilder text = new StringBuilder ();
-    for (int block = 0; block < 3; block++)
+    for (int block = 0; block < 2; block++)
     {
-      text.append (" ID    Name\n");
-      text.append ("--- ---------------");
+      text.append (" ID    Name         ");
+      for (int i = 0; i < 24; i++)
+        text.append (String.format ("%2d ", i));
+      text.append ("\n--- ---------------");
       for (int i = 0; i < 24; i++)
         text.append (" --");
       text.append ("\n");

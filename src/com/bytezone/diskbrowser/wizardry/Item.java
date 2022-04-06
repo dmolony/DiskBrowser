@@ -24,13 +24,13 @@ class Item extends AbstractFile implements Comparable<Item>
   {
     super (name, buffer);
     itemID = counter++;
+    genericName = HexFormatter.getPascalString (buffer, 16);
     type = buffer[32];
     cost = Utility.getShort (buffer, 44) + Utility.getShort (buffer, 46) * 10000
         + Utility.getShort (buffer, 48) * 100000000L;
-    genericName = HexFormatter.getPascalString (buffer, 16);
-    damage = new Dice (buffer, 66);
     armourClass = buffer[62];
-    speed = buffer[72];
+    damage = new Dice (buffer, 66);
+    speed = buffer[72];                           // 14 flags
   }
 
   // ---------------------------------------------------------------------------------//
@@ -142,14 +142,16 @@ class Item extends AbstractFile implements Comparable<Item>
   public String getDump (int block)
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder line =
-        new StringBuilder (String.format ("%3d %-16s", itemID, getName ()));
-    int lo = block == 0 ? 32 : block == 1 ? 46 : 70;
+    StringBuilder line = new StringBuilder (String.format ("%3d %-16s", itemID, getName ()));
+
+    int lo = block == 0 ? 32 : block == 1 ? 56 : 80;
     int hi = lo + 24;
     if (hi > buffer.length)
       hi = buffer.length;
+
     for (int i = lo; i < hi; i++)
       line.append (String.format ("%02X ", buffer[i]));
+
     return line.toString ();
   }
 

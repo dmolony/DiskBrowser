@@ -13,8 +13,8 @@ class Image extends AbstractImage
   {
     super (name, buffer);
 
-    if (buffer[0] == -61 && buffer[1] == -115)
-      fixSlime (buffer);
+    //    if (buffer[0] == -61 && buffer[1] == -115)
+    //      fixSlime (buffer);
 
     image = new BufferedImage (70, 50, BufferedImage.TYPE_BYTE_GRAY); // width/height
     DataBuffer db = image.getRaster ().getDataBuffer ();
@@ -30,8 +30,10 @@ class Image extends AbstractImage
           element += 7 - m;
           break;
         }
+
         if ((bits & 1) == 1)
           db.setElem (element, 255);
+
         bits >>= 1;
         element++;
       }
@@ -44,6 +46,7 @@ class Image extends AbstractImage
   {
     for (int i = 0; i < 208; i++)
       buffer[i] = 0;
+
     buffer[124] = -108;
     buffer[134] = -43;
     buffer[135] = -128;

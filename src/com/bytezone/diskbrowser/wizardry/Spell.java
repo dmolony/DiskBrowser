@@ -12,6 +12,7 @@ class Spell extends AbstractFile
   private String translation;
   private SpellTarget target;
   private String description;
+  private int value;
 
   public enum SpellType
   {
@@ -35,6 +36,7 @@ class Spell extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     super (spellName, buffer);
+
     this.spellType = type;
     this.level = level;
 
@@ -60,6 +62,7 @@ class Spell extends AbstractFile
     this.description = descriptions[spellNo];
     this.whenCast = when[spellNo];
     this.target = affects[spellNo];
+    value = spellValue[spellNo];
   }
 
   // ---------------------------------------------------------------------------------//
@@ -189,24 +192,8 @@ class Spell extends AbstractFile
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder (getName ());
-    while (text.length () < 14)
-      text.append (" ");
-    if (spellType == SpellType.PRIEST)
-      text.append ("P");
-    else
-      text.append ("M");
-    text.append (level);
-    while (text.length () < 20)
-      text.append (" ");
-    text.append (translation);
-    while (text.length () < 40)
-      text.append (" ");
-    text.append (getArea ());
-    while (text.length () < 60)
-      text.append (" ");
-    text.append (getWhenCast ());
-    return text.toString ();
+    return String.format ("%-16s %-6s  %d  %-20s %-20s %-20s %5d  %<04X", getName (), spellType,
+        level, translation, getArea (), getWhenCast (), value);
   }
 
   private static String[] spellNames = { "KALKI", "DIOS", "BADIOS", "MILWA", "PORFIC", "MATU",
@@ -260,6 +247,13 @@ class Spell extends AbstractFile
       SpellTarget.MONSTER_GROUP, SpellTarget.ALL_MONSTERS, SpellTarget.ALL_MONSTERS,
       SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER_GROUP, SpellTarget.MONSTER, SpellTarget.PARTY,
       SpellTarget.VARIABLE, SpellTarget.PARTY, SpellTarget.PARTY, SpellTarget.ALL_MONSTERS };
+
+  private static int[] spellValue =
+      { 1449, 2301, 3675, 2889, 2287, 3139, 1717, 2619, 5970, 5333, 2718, 6491, 5169, 761, 1253,
+          9463, 4322, 1614, 2446, 4396, 1885, 180, 382, 4296, 547, 759, 8330, 5514, 6673,
+
+          4178, 2409, 3983, 3245, 3340, 1953, 6181, 4731, 4744, 3180, 6156, 7525, 6612, 4925, 6587,
+          4573, 3990, 1562, 3128, 2597, 11157 };
 
   private static String[] descriptions = {
       "KALKI reduces the AC of all party members by one, and thus makes" + " them harder to hit.",

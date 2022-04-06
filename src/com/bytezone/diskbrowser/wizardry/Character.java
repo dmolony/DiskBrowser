@@ -45,12 +45,14 @@ class Character extends AbstractFile
     stats.status = statuses[stats.statusValue];
     stats.alignment = alignments[buffer[42] & 0xFF];
 
-    stats.gold = Utility.getShort (buffer, 52) + Utility.getShort (buffer, 54) * 10000;
+    stats.gold = Utility.getShort (buffer, 52) + Utility.getShort (buffer, 54) * 10000
+        + Utility.getShort (buffer, 56) * 100000000L;
     stats.experience = Utility.getShort (buffer, 124) + Utility.getShort (buffer, 126) * 10000;
     stats.level = Utility.getShort (buffer, 132);
 
     stats.hitsLeft = Utility.getShort (buffer, 134);
     stats.hitsMax = Utility.getShort (buffer, 136);
+
     stats.armourClass = buffer[176];
 
     attributes.strength = (buffer[44] & 0xFF) % 16;
@@ -113,17 +115,20 @@ class Character extends AbstractFile
   public void linkSpells (List<Spell> spellList)
   // ---------------------------------------------------------------------------------//
   {
+    System.out.println (name);
+    int index = 0;
     for (int i = 138; i < 145; i++)
       for (int bit = 0; bit < 8; bit++)
-        if (((buffer[i] >>> bit) & 1) == 1)
+      {
+        if (((buffer[i] >>> bit) & 0x01) != 0)
         {
-          int index = (i - 138) * 8 + bit;
-          if (index > 0 && index <= spellList.size ())
-            spellBook.add (spellList.get (index - 1));
-          else
-            System.out.println ("LinkSpell: " + getName () + " SpellID : " + index
-                + " is outside range 1:" + spellList.size ());
+          spellBook.add (spellList.get (index));
+          System.out.println (spellList.get (index));
         }
+
+        if (++index >= spellList.size ())
+          break;
+      }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -333,7 +338,7 @@ class Character extends AbstractFile
     public String status;
     public int typeInt;
     public int statusValue;
-    public int gold;
+    public long gold;
     public int experience;
     public long nextLevel;
     public int level;
@@ -344,7 +349,9 @@ class Character extends AbstractFile
     public int assetValue;
   }
 
+  // ---------------------------------------------------------------------------------//
   public class Attributes
+  // ---------------------------------------------------------------------------------//
   {
     public int strength;
     public int intelligence;
@@ -352,11 +359,6 @@ class Character extends AbstractFile
     public int vitality;
     public int agility;
     public int luck;
-    public int[] array;
-
-    public Attributes ()
-    {
-      array = new int[6];
-    }
+    public int[] array = new int[6];
   }
 }

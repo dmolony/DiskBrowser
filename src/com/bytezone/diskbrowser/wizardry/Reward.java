@@ -111,6 +111,7 @@ class Reward extends AbstractFile
     public RewardElement (byte[] buffer)
     {
       this.buffer = buffer;
+
       type = buffer[8];
       odds = buffer[6];
     }

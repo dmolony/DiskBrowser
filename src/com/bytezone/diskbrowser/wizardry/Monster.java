@@ -91,7 +91,7 @@ class Monster extends AbstractFile
       damage.add (new Dice (buffer, ptr));
     }
 
-    experiencePoints = Utility.readTriple (buffer, 126);
+    experiencePoints = getWizLong (buffer, 126);
     levelDrain = buffer[132];
     healPts = buffer[134];
     goldReward = rewards.get (buffer[136]);
@@ -110,6 +110,17 @@ class Monster extends AbstractFile
 
     goldReward.addMonster (this, 0);
     chestReward.addMonster (this, 1);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private int getWizLong (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
+  {
+    int low = Utility.getShort (buffer, offset);
+    int mid = Utility.getShort (buffer, offset + 2);
+    int high = Utility.getShort (buffer, offset + 4);
+
+    return high * 100000000 + mid * 10000 + low;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -267,11 +278,14 @@ class Monster extends AbstractFile
     for (int i = lo; i < hi; i++)
       line.append (String.format ("%02X ", buffer[i]));
 
-    if (block == 3 && scenarioId == 1)
-    {
-      int exp = getExperience ();
-      line.append (String.format (" %,6d  %,6d", exp, exp - experience[monsterID]));
-    }
+    if (block == 3)
+      if (scenarioId == 1)
+      {
+        int exp = getExperience ();
+        line.append (String.format (" %,6d  %,6d", exp, exp - experience[monsterID]));
+      }
+      else
+        line.append (String.format (" %,6d", experiencePoints));
 
     return line.toString ();
   }

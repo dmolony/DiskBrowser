@@ -115,7 +115,6 @@ class Character extends AbstractFile
   public void linkSpells (List<Spell> spellList)
   // ---------------------------------------------------------------------------------//
   {
-    System.out.println (name);
     int index = 0;
     for (int i = 138; i < 145; i++)
       for (int bit = 0; bit < 8; bit++)

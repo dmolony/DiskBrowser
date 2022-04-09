@@ -47,7 +47,7 @@ class Reward extends AbstractFile
     if (location == 0)
       goldMonsters.add (monster);
     else
-      chestMonsters.add (monster);
+      chestMonsters.add (monster);        // lair
   }
 
   // ---------------------------------------------------------------------------------//

@@ -346,9 +346,10 @@ public class DiskFactory
             {
               if (debug)
                 System.out.println ("  --> PRODOS hard disk");
-              return new ProdosDisk (disk800);
+              disk = new ProdosDisk (disk800);
             }
-            disk = new DataDisk (disk800);
+            else
+              disk = new DataDisk (disk800);
           }
           else
           {
@@ -362,6 +363,8 @@ public class DiskFactory
               disk = new DataDisk (appleDisk256);
           }
         }
+
+        disk.setOriginalPath (originalPath);          // allow Save converted disk...
 
         return disk;
       }

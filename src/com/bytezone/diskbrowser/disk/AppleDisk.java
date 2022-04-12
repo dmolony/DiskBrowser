@@ -157,7 +157,8 @@ public class AppleDisk implements Disk
       tracks = blocks / 8;          // change parameter!
       sectors = 8;                  // change parameter!
     }
-    else if (suffix.equalsIgnoreCase ("HDV") || (suffix.equalsIgnoreCase ("po") && tracks > 50)) // ULTIMATE APPLE1 CFFA 3.5.po
+    else if (suffix.equalsIgnoreCase ("HDV") //
+        || (suffix.equalsIgnoreCase ("po") && tracks > 50)) // ULTIMATE APPLE1 CFFA 3.5.po
     {
       //this.blocks = (int) file.length () / 4096 * 8; // reduce blocks to a multiple of 8
       this.blocks = tracks * sectors;

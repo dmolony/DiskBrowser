@@ -15,10 +15,8 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class WozFile
 //-----------------------------------------------------------------------------------//
 {
-  private static final byte[] address16prologue =
-      { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
-  private static final byte[] address13prologue =
-      { (byte) 0xD5, (byte) 0xAA, (byte) 0xB5 };
+  private static final byte[] address16prologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0x96 };
+  private static final byte[] address13prologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xB5 };
   private static final byte[] dataPrologue = { (byte) 0xD5, (byte) 0xAA, (byte) 0xAD };
   private static final byte[] epilogue = { (byte) 0xDE, (byte) 0xAA, (byte) 0xEB };
   // apparently it can be DE AA Ex
@@ -29,9 +27,9 @@ public class WozFile
   private static final int TRK_SIZE = 0x1A00;
   private static final int DATA_SIZE = TRK_SIZE - 10;
 
-  private static int[][] interleave =
-      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },       // 13 sector
-        { 0, 7, 14, 6, 13, 5, 12, 4, 11, 3, 10, 2, 9, 1, 8, 15 } };     // 16 sector
+  private static int[][] interleave = //
+      { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },         // 13 sector
+          { 0, 7, 14, 6, 13, 5, 12, 4, 11, 3, 10, 2, 9, 1, 8, 15 } };     // 16 sector
 
   public final File file;
 
@@ -146,8 +144,7 @@ public class WozFile
       {
         if (info != null)
           System.out.println (info);
-        throw new DiskNibbleException (
-            String.format ("Invalid chunk name character: %02X%n", val));
+        throw new DiskNibbleException (String.format ("Invalid chunk name character: %02X%n", val));
       }
     }
 
@@ -302,9 +299,9 @@ public class WozFile
     String wozBase2 = home + "Dropbox/Examples/woz test images/WOZ 2.0/";
     String wozBase3 = home + "Dropbox/Examples/woz test images/WOZ 2.0/3.5/";
     File[] files = { new File (home + "code/python/wozardry-2.0/bill.woz"),
-                     new File (wozBase2 + "DOS 3.3 System Master.woz"),
-                     new File (wozBase1 + "DOS 3.3 System Master.woz"),
-                     new File (wozBase3 + "Apple IIgs System Disk 1.1.woz") };
+        new File (wozBase2 + "DOS 3.3 System Master.woz"),
+        new File (wozBase1 + "DOS 3.3 System Master.woz"),
+        new File (wozBase3 + "Apple IIgs System Disk 1.1.woz") };
     try
     {
       new WozFile (files[3]);
@@ -369,8 +366,7 @@ public class WozFile
       String diskTypeText = diskType == 1 ? "5.25" : "3.5";
 
       text.append (String.format ("Version ............. %d%n", wozVersion));
-      text.append (
-          String.format ("Disk type ........... %d  (%s\")%n", diskType, diskTypeText));
+      text.append (String.format ("Disk type ........... %d  (%s\")%n", diskType, diskTypeText));
       text.append (String.format ("Write protected ..... %d%n", writeProtected));
       text.append (String.format ("Synchronized ........ %d%n", synchronised));
       text.append (String.format ("Cleaned ............. %d%n", cleaned));
@@ -378,9 +374,8 @@ public class WozFile
 
       if (wozVersion > 1)
       {
-        String bootSectorFormatText =
-            bootSectorFormat == 0 ? "Unknown" : bootSectorFormat == 1 ? "16 sector"
-                : bootSectorFormat == 2 ? "13 sector" : "Hybrid";
+        String bootSectorFormatText = bootSectorFormat == 0 ? "Unknown"
+            : bootSectorFormat == 1 ? "16 sector" : bootSectorFormat == 2 ? "13 sector" : "Hybrid";
 
         text.append (String.format ("%nSides ............... %d%n", sides));
         text.append (String.format ("Boot sector format .. %d  (%s)%n", bootSectorFormat,
@@ -468,8 +463,7 @@ public class WozFile
         bitCount = val16 (rawBuffer, ptr + DATA_SIZE + 2);
 
         if (debug1)
-          System.out.println (
-              (String.format ("Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount)));
+          System.out.println ((String.format ("Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount)));
       }
       else
       {
@@ -612,10 +606,8 @@ public class WozFile
       for (Sector sector : sectors)
         if (sector.dataOffset > 0)
         {
-          byte[] decodedBuffer =
-              diskReader.decodeSector (newBuffer, sector.dataOffset + 3);
-          int ptr = SECTOR_SIZE
-              * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]);
+          byte[] decodedBuffer = diskReader.decodeSector (newBuffer, sector.dataOffset + 3);
+          int ptr = SECTOR_SIZE * (sector.trackNo * diskSectors + interleave[ndx][sector.sectorNo]);
           System.arraycopy (decodedBuffer, 0, diskBuffer, ptr, decodedBuffer.length);
         }
     }
@@ -627,8 +619,7 @@ public class WozFile
     {
       StringBuilder text = new StringBuilder ();
       if (info.wozVersion == 1)
-        text.append (
-            String.format ("WOZ1: Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount));
+        text.append (String.format ("WOZ1: Bytes: %2d,  Bits: %,8d%n%n", bytesUsed, bitCount));
       else
         text.append (String.format ("WOZ2: Start: %4d,  Blocks: %2d,  Bits: %,8d%n%n",
             startingBlock, blockCount, bitCount));
@@ -728,9 +719,8 @@ public class WozFile
       String fld = info.diskType == 1 ? "Vol" : info.diskType == 2 ? "Sde" : "???";
       String dataOffsetText = dataOffset < 0 ? "" : String.format ("%04X", dataOffset);
 
-      return String.format (
-          "%s: %02X  Trk: %02X  Sct: %02X  Chk: %02X  Add: %04X  Dat: %s", fld, volume,
-          trackNo, sectorNo, checksum, addressOffset, dataOffsetText);
+      return String.format ("%s: %02X  Trk: %02X  Sct: %02X  Chk: %02X  Add: %04X  Dat: %s", fld,
+          volume, trackNo, sectorNo, checksum, addressOffset, dataOffsetText);
     }
 
     // ---------------------------------------------------------------------------------//

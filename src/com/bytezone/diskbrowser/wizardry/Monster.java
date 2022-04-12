@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.wizardry;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -225,11 +224,11 @@ class Monster extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public void setImage (BufferedImage image)
-  // ---------------------------------------------------------------------------------//
-  {
-    this.image = image;
-  }
+  //  public void setImage (BufferedImage image)
+  //  // ---------------------------------------------------------------------------------//
+  //  {
+  //    this.image = image;
+  //  }
 
   // ---------------------------------------------------------------------------------//
   @Override

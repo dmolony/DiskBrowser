@@ -174,12 +174,12 @@ public class PascalDisk extends AbstractFormattedDisk
     if (from != 0 || to != 6)
     {
       if (debug)
-        System.out.printf ("from: %d, to: %d%n", from, to);
+        System.out.printf ("from: %d to: %d%n", from, to);
       return false;                         // will only work for floppies!
     }
 
     int blocks = Utility.getShort (buffer, 14);
-    if (blocks != 280 && blocks != 1600)
+    if (blocks != 280 && blocks != 1600 && blocks != 2048 && blocks != 1272)
     {
       if (debug)
         System.out.printf ("Blocks > 280: %d%n", blocks);
@@ -208,18 +208,35 @@ public class PascalDisk extends AbstractFormattedDisk
       int firstBlock = Utility.getShort (buffer, ptr);
       int lastBlock = Utility.getShort (buffer, ptr + 2);
       int kind = Utility.getShort (buffer, ptr + 4);
+
       if (lastBlock < firstBlock)
+      {
+        if (debug)
+          System.out.printf ("  %d  %d  lastBlock < firstBlock%n", lastBlock, firstBlock);
         return false;
-      if (kind == 0)
-        return false;
+      }
+
+      //      if (kind == 0)
+      //      {
+      //        if (debug)
+      //          System.out.printf ("  kind = 0%n");
+      //        return false;
+      //      }
+
       nameLength = buffer[ptr + 6] & 0xFF;
       if (nameLength < 1 || nameLength > 15)
+      {
+        if (debug)
+          System.out.printf ("  %d  nameLength < 1 or > 15%n", nameLength);
         return false;
+      }
+
       int lastByte = Utility.getShort (buffer, ptr + 22);
       GregorianCalendar date = Utility.getPascalDate (buffer, 24);
+      String dateString = date == null ? "" : date.toString ();
       if (debug)
         System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,
-            new String (buffer, ptr + 7, nameLength), lastByte, date);
+            new String (buffer, ptr + 7, nameLength), lastByte, dateString);
     }
 
     return true;
@@ -298,7 +315,7 @@ public class PascalDisk extends AbstractFormattedDisk
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
       String fileType =
           ce.fileType < 0 || ce.fileType >= fileTypes.length ? "????" : fileTypes[ce.fileType];
-      text.append (String.format ("%4d   %-15s   %s   %8s %,8d   $%03X   $%03X   $%03X%n", size,
+      text.append (String.format ("%4d   %-15s   %-6s %8s %,8d   $%03X   $%03X   $%03X%n", size,
           ce.name, fileType, date, bytes, ce.firstBlock, ce.lastBlock, size));
     }
     text.append (line);

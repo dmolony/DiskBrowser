@@ -25,7 +25,7 @@ public class Relocator extends AbstractFile
   {
     super (name, buffer);
 
-    checkByte = Utility.getShort (buffer, 0);
+    checkByte = Utility.getShort (buffer, 0);       // no of blocks?
 
     int ptr = 2;            // skip checkByte
 
@@ -38,22 +38,24 @@ public class Relocator extends AbstractFile
 
     for (DiskRecord diskRecord : diskRecords)
       for (DiskSegment diskSegment : diskRecord.diskSegments)
-        addLogicalBlock ((byte) diskRecord.diskNumber, diskSegment);
-  }
+      {
+        int lo = diskSegment.logicalBlock;
+        int hi = diskSegment.logicalBlock + diskSegment.segmentLength;
 
-  // ---------------------------------------------------------------------------------//
-  private void addLogicalBlock (byte disk, DiskSegment diskSegment)
-  // ---------------------------------------------------------------------------------//
-  {
-    int lo = diskSegment.logicalBlock;
-    int hi = diskSegment.logicalBlock + diskSegment.segmentLength;
-
-    for (int i = lo, count = 0; i < hi; i++, count++)
-    //      if (diskBlocks[i] == 0)       // doesn't matter either way
-    {
-      diskBlocks[i] = disk;
-      diskOffsets[i] = diskSegment.physicalBlock + count;
-    }
+        for (int i = lo, count = 0; i < hi; i++, count++)
+        //          if (diskBlocks[i] == 0)       // doesn't matter either way
+        {
+          if (diskBlocks[i] != 0 && false)
+          {
+            System.out.print ("was: ");
+            System.out.printf ("diskBlocks[%d] = %d%n", i, diskBlocks[i]);
+            System.out.print ("now: ");
+            System.out.printf ("diskBlocks[%d] = %d%n", i, diskRecord.diskNumber);
+          }
+          diskBlocks[i] = diskRecord.diskNumber;
+          diskOffsets[i] = diskSegment.physicalBlock + count;
+        }
+      }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -109,14 +111,15 @@ public class Relocator extends AbstractFile
     int first = 0;
     int lastDisk = diskBlocks[0];
     int lastOffset = diskOffsets[0];
+
     for (int i = 0; i < diskBlocks.length; i++)
     {
       if (diskBlocks[i] != lastDisk || diskOffsets[i] != lastOffset + i - first)
       {
         int size = i - first;
         if (lastDisk > 0)
-          lines.add (String.format ("%03X - %03X   %03X    %d   %03X - %03X", first,
-              i - 1, size, lastDisk, lastOffset, lastOffset + size - 1));
+          lines.add (String.format ("%03X - %03X   %03X    %d   %03X - %03X", first, i - 1, size,
+              lastDisk, lastOffset, lastOffset + size - 1));
         else
           lines.add (String.format ("%03X - %03X   %03X", first, i - 1, size));
 
@@ -130,8 +133,8 @@ public class Relocator extends AbstractFile
     {
       int max = diskBlocks.length;
       int size = max - first;
-      lines.add (String.format ("%03X - %03X   %03X    %d   %03X - %03X", first, max - 1,
-          size, lastDisk, lastOffset, lastOffset + size - 1));
+      lines.add (String.format ("%03X - %03X   %03X    %d   %03X - %03X", first, max - 1, size,
+          lastDisk, lastOffset, lastOffset + size - 1));
     }
 
     for (int i = lines.size () - 1; i >= 0; i--)
@@ -142,17 +145,14 @@ public class Relocator extends AbstractFile
       lines.remove (i);
     }
 
-    text.append (String.format ("   %s        %s%n   %s       %s%n", heading, heading,
-        underline, underline));
+    text.append (String.format ("   %s        %s%n   %s       %s%n", heading, heading, underline,
+        underline));
     int offset = (lines.size () + 1) / 2;
-    //    boolean oddLines = lines.size () % 2 == 1;
     int pairs = lines.size () / 2;
 
     for (int i = 0; i < pairs; i++)
-    {
-      text.append (
-          String.format ("   %-35s    %s%n", lines.get (i), lines.get (i + offset)));
-    }
+      text.append (String.format ("   %-35s    %s%n", lines.get (i), lines.get (i + offset)));
+
     if (offset != pairs)
       text.append (String.format ("   %s%n", lines.get (pairs)));
 
@@ -165,12 +165,14 @@ public class Relocator extends AbstractFile
   {
     int diskNumber;
     int totDiskSegments;
-    List<DiskSegment> diskSegments = new ArrayList<> ();
+    List<DiskSegment> diskSegments;
 
     public DiskRecord (byte[] buffer, int ptr)
     {
       diskNumber = Utility.getShort (buffer, ptr);
-      totDiskSegments = Utility.intValue (buffer[ptr + 2], buffer[ptr + 4]);
+      //      totDiskSegments = Utility.intValue (buffer[ptr + 2], buffer[ptr + 4]);
+      totDiskSegments = Utility.getShort (buffer, ptr + 2);
+      diskSegments = new ArrayList<> (totDiskSegments);
 
       ptr += 4;
       for (int i = 0; i < totDiskSegments; i++)
@@ -192,22 +194,22 @@ public class Relocator extends AbstractFile
 
       text.append (String.format ("Disk number.... %04X%n", diskNumber));
       text.append (String.format ("Segments....... %04X%n%n", totDiskSegments));
-      text.append (String.format (" Seg   Skip   Size     Logical      Physical%n"));
-      text.append (String.format (" ---   ----   ----   -----------   -----------%n"));
+      text.append (String.format (" Seg    Physical       Logical     Size    Gap%n"));
+      text.append (String.format (" ---   -----------   -----------   ----   ----%n"));
 
       int count = 1;
       int last = 0;
       int skip = 0;
 
-      for (DiskSegment segment : diskSegments)
+      for (DiskSegment diskSegment : diskSegments)
       {
-        if (segment.logicalBlock > last)
+        if (diskSegment.logicalBlock > last)
         {
-          int end = segment.logicalBlock - 1;
+          int end = diskSegment.logicalBlock - 1;
           skip = end - last + 1;
         }
-        last = segment.logicalBlock + segment.segmentLength;
-        text.append (String.format ("  %02X   %04X  %s %n", count++, skip, segment));
+        last = diskSegment.logicalBlock + diskSegment.segmentLength;
+        text.append (String.format ("  %02X  %s   %04X%n", count++, diskSegment, skip));
       }
 
       return text.toString ();
@@ -232,9 +234,9 @@ public class Relocator extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format (" %04X   %04X - %04X   %04X - %04X", segmentLength,
-          logicalBlock, (logicalBlock + segmentLength - 1), physicalBlock,
-          (physicalBlock + segmentLength - 1));
+      return String.format (" %04X - %04X   %04X - %04X   %04X", physicalBlock,
+          (physicalBlock + segmentLength - 1), logicalBlock, (logicalBlock + segmentLength - 1),
+          segmentLength);
     }
   }
 }

@@ -279,7 +279,7 @@ public class DiskFactory
       }
 
       if (debug)
-        System.out.printf ("  Checking po or dsk hard drive: %,d%n", file.length ());
+        System.out.printf ("Checking po or dsk hard drive: %,d%n", file.length ());
 
       disk = checkHardDisk (file);
       if (disk != null)
@@ -681,7 +681,7 @@ public class DiskFactory
   {
     if (debug)
     {
-      System.out.println ("\nChecking Prodos hard disk");
+      System.out.println ("\nChecking Prodos/Pascal hard disk");
       System.out.printf ("Total blocks : %f%n", (float) file.length () / 512);
       System.out.printf ("Total tracks : %f%n", (float) file.length () / 4096);
       System.out.printf ("File length  : %d%n", file.length ());
@@ -716,6 +716,7 @@ public class DiskFactory
           System.out.println ("  --> PRODOS hard disk");
         return new ProdosDisk (disk);
       }
+
       if (PascalDisk.isCorrectFormat (disk, debug))
       {
         if (debug)
@@ -731,7 +732,7 @@ public class DiskFactory
     }
 
     if (debug)
-      System.out.println ("  not a Prodos hard disk\n");
+      System.out.println ("  not a Prodos/Pascal hard disk\n");
 
     return null;
   }
@@ -856,10 +857,12 @@ public class DiskFactory
 
     if (Wizardry4BootDisk.isWizardryIVorV (disk, debug))
     {
+      if (debug)
+        System.out.println ("checking Wizardry IV or V");
+
       String fileName = file.getAbsolutePath ().toLowerCase ();
       int pos = file.getAbsolutePath ().indexOf ('.');
       char c = fileName.charAt (pos - 1);
-      // String suffix = fileName.substring (pos + 1);
       int requiredDisks = c == '1' ? 6 : c == 'a' ? 10 : 0;
 
       if (requiredDisks > 0)
@@ -903,9 +906,8 @@ public class DiskFactory
       if (!f.exists () || !f.isFile ())
         return false;
 
-      AppleDisk dataDisk = new AppleDisk (f, 35, 8);
-      dataDisk.setInterleave (1);
-      disks[i] = dataDisk;
+      disks[i] = new AppleDisk (f, 35, 8);
+      disks[i].setInterleave (1);
     }
 
     return true;

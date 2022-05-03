@@ -22,7 +22,6 @@ public class Wizardry4BootDisk extends PascalDisk
 // -----------------------------------------------------------------------------------//
 {
   public Header scenarioHeader;
-  //  private final List<AppleDisk> disks = new ArrayList<> ();
   private Relocator relocator;
   private MessageBlock messageBlock;
   private Huffman huffman;
@@ -44,9 +43,8 @@ public class Wizardry4BootDisk extends PascalDisk
     FileEntry fileEntry = (FileEntry) relocNode.getUserObject ();
     if (fileEntry != null)
     {
-      relocator =
-          new Relocator (fileEntry.getUniqueName (), fileEntry.getDataSource ().buffer);
-      relocator.createNewBuffer (dataDisks);    // create new data buffer
+      relocator = new Relocator (fileEntry.getUniqueName (), fileEntry.getDataSource ().buffer);
+      relocator.createNewBuffer (dataDisks);
       fileEntry.setFile (relocator);
     }
 
@@ -63,10 +61,7 @@ public class Wizardry4BootDisk extends PascalDisk
     fileEntry = (FileEntry) huffNode.getUserObject ();
     if (fileEntry != null)
     {
-
-      byte[] buffer = fileEntry.getDataSource ().buffer;
-
-      huffman = new Huffman ("Huffman tree", buffer);
+      huffman = new Huffman ("Huffman tree", fileEntry.getDataSource ().buffer);
       fileEntry.setFile (huffman);
     }
 
@@ -138,14 +133,12 @@ public class Wizardry4BootDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode,
-      FileEntry fileEntry)
+  private void linkMonsterImages4 (DefaultMutableTreeNode monstersNode, FileEntry fileEntry)
   // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
 
-    Wiz4Monsters w4monsters =
-        new Wiz4Monsters ("monsters", fileEntry.getDataSource ().buffer);
+    Wiz4Monsters w4monsters = new Wiz4Monsters ("monsters", fileEntry.getDataSource ().buffer);
     fileEntry.setFile (w4monsters);
 
     int count = 0;
@@ -158,14 +151,12 @@ public class Wizardry4BootDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void linkMonsterImages5 (DefaultMutableTreeNode monstersNode,
-      FileEntry fileEntry)
+  private void linkMonsterImages5 (DefaultMutableTreeNode monstersNode, FileEntry fileEntry)
   // ---------------------------------------------------------------------------------//
   {
     List<DiskAddress> pictureBlocks = fileEntry.getSectors ();
 
-    Wiz5Monsters w5monsters =
-        new Wiz5Monsters ("monsters", fileEntry.getDataSource ().buffer);
+    Wiz5Monsters w5monsters = new Wiz5Monsters ("monsters", fileEntry.getDataSource ().buffer);
     fileEntry.setFile (w5monsters);
 
     for (Wiz5Monsters.Monster monster : w5monsters)
@@ -255,8 +246,7 @@ public class Wizardry4BootDisk extends PascalDisk
           HexFormatter.getHexString (buffer, offset + i * length, length)));
     }
 
-    DefaultMutableTreeNode oracleNode =
-        linkNode ("Block1", text.toString (), scenarioNode);
+    DefaultMutableTreeNode oracleNode = linkNode ("Block1", text.toString (), scenarioNode);
     oracleNode.setAllowsChildren (false);
     DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
     afs.setSectors (allBlocks);
@@ -284,8 +274,7 @@ public class Wizardry4BootDisk extends PascalDisk
           HexFormatter.getHexString (buffer, offset + i * length, length)));
     }
 
-    DefaultMutableTreeNode oracleNode =
-        linkNode ("Block2", text.toString (), scenarioNode);
+    DefaultMutableTreeNode oracleNode = linkNode ("Block2", text.toString (), scenarioNode);
     oracleNode.setAllowsChildren (false);
     DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
     afs.setSectors (allBlocks);
@@ -306,8 +295,8 @@ public class Wizardry4BootDisk extends PascalDisk
       int offset = 0x08600 + i * 32 + 18;
       int key = Utility.getShort (buffer, offset);
       if (key > 0)
-        text.append (String.format ("%04X  %04X  * %s%n", offset, key,
-            messageBlock.getMessageText (key)));
+        text.append (
+            String.format ("%04X  %04X  * %s%n", offset, key, messageBlock.getMessageText (key)));
       key = Utility.getShort (buffer, offset + 8);
       if (key > 0)
         text.append (String.format ("%04X  %04X    %s%n", offset + 8, key,
@@ -320,28 +309,24 @@ public class Wizardry4BootDisk extends PascalDisk
       allOracleBlocks.add (blocks.get (67 + i));
     }
 
-    DefaultMutableTreeNode oracleNode =
-        linkNode ("Oracle", text.toString (), scenarioNode);
+    DefaultMutableTreeNode oracleNode = linkNode ("Oracle", text.toString (), scenarioNode);
     oracleNode.setAllowsChildren (false);
     DefaultAppleFileSource afs = (DefaultAppleFileSource) oracleNode.getUserObject ();
     afs.setSectors (allOracleBlocks);
   }
 
   // ---------------------------------------------------------------------------------//
-  private void addToNode (AbstractFile af, DefaultMutableTreeNode node,
-      List<DiskAddress> blocks)
+  private void addToNode (AbstractFile af, DefaultMutableTreeNode node, List<DiskAddress> blocks)
   // ---------------------------------------------------------------------------------//
   {
-    DefaultAppleFileSource dafs =
-        new DefaultAppleFileSource (af.getName (), af, this, blocks);
+    DefaultAppleFileSource dafs = new DefaultAppleFileSource (af.getName (), af, this, blocks);
     DefaultMutableTreeNode childNode = new DefaultMutableTreeNode (dafs);
     childNode.setAllowsChildren (false);
     node.add (childNode);
   }
 
   // ---------------------------------------------------------------------------------//
-  private DefaultMutableTreeNode linkNode (String name, String text,
-      DefaultMutableTreeNode parent)
+  private DefaultMutableTreeNode linkNode (String name, String text, DefaultMutableTreeNode parent)
   // ---------------------------------------------------------------------------------//
   {
     DefaultAppleFileSource afs = new DefaultAppleFileSource (name, text, this);
@@ -362,9 +347,6 @@ public class Wizardry4BootDisk extends PascalDisk
       return false;
 
     buffer = disk.readBlock (1);
-    if (buffer[510] != 1 || buffer[511] != 0)       // disk #1
-      return false;
-
-    return true;
+    return buffer[510] == 1 && buffer[511] == 0;          // disk #1
   }
 }

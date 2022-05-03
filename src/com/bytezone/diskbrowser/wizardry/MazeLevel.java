@@ -191,6 +191,12 @@ public class MazeLevel extends AbstractFile
       List<MazeAddress> monsterList)
   // ---------------------------------------------------------------------------------//
   {
+    if (monsters == null)
+    {
+      System.out.println ("monsters is null");
+      return;
+    }
+
     text.append ("\n\nSQREXTRA  SQRTYPE   TSQUARE           AUX0  AUX1  AUX2\n");
     for (int j = 0; j < 16; j++)
     {
@@ -282,7 +288,8 @@ public class MazeLevel extends AbstractFile
       {
         if (id == minenemy + range0n)
           text.append ("\n");
-        text.append (String.format ("%3d  %-16s  %n", id, monsters.get (id)));
+        Monster monster = monsters == null ? null : monsters.get (id);
+        text.append (String.format ("%3d  %-16s  %n", id, monster));
       }
     }
   }

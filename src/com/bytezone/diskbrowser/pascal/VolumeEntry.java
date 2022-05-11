@@ -17,9 +17,9 @@ class VolumeEntry extends CatalogEntry
   {
     super (parent, buffer);
 
-    totalBlocks = Utility.getShort (buffer, 14);         // 280
+    totalBlocks = Utility.getShort (buffer, 14);              // 280
     totalFiles = Utility.getShort (buffer, 16);
-    date = Utility.getPascalDate (buffer, 20);                       // 2 bytes
+    localDate = Utility.getPascalLocalDate (buffer, 20);      // 2 bytes
   }
 
   // ---------------------------------------------------------------------------------//

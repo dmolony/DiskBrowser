@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -230,7 +230,6 @@ public final class Utility
   public static LocalDateTime getAppleDate (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    // int yymmdd = readShort (buffer, offset);
     int yymmdd = getShort (buffer, offset);
     if (yymmdd != 0)
     {
@@ -429,7 +428,7 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  public static GregorianCalendar getPascalDate (byte[] buffer, int offset)
+  public static LocalDate getPascalLocalDate (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
     int date = Utility.getShort (buffer, offset);
@@ -446,7 +445,7 @@ public final class Utility
     else
       year += 1900;
 
-    return new GregorianCalendar (year, month - 1, day);
+    return LocalDate.of (year, month, day);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -1,7 +1,8 @@
 package com.bytezone.diskbrowser.pascal;
 
-import java.text.DateFormat;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
 import com.bytezone.diskbrowser.disk.AbstractSector;
@@ -14,7 +15,8 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class PascalCatalogSector extends AbstractSector
 // -----------------------------------------------------------------------------------//
 {
-  private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
+  //  private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
+  private final DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate (FormatStyle.SHORT);
   private static String[] fileTypes =
       { "Volume", "Bad", "Code", "Text", "Info", "Data", "Graf", "Foto", "SecureDir" };
 
@@ -44,8 +46,9 @@ class PascalCatalogSector extends AbstractSector
     addTextAndDecimal (text, buffer, 16, 2, "Files on disk");
     addTextAndDecimal (text, buffer, 18, 2, "First block of volume");
 
-    GregorianCalendar calendar = Utility.getPascalDate (buffer, 20);
-    String date = calendar == null ? "--" : df.format (calendar.getTime ());
+    LocalDate localDate = Utility.getPascalLocalDate (buffer, 20);
+    String date = localDate == null ? "--" : localDate.format (dtf);
+
     addText (text, buffer, 20, 2, "Most recent date setting : " + date);
     addTextAndDecimal (text, buffer, 22, 4, "Reserved");
 
@@ -71,8 +74,8 @@ class PascalCatalogSector extends AbstractSector
       addText (text, buffer, ptr + 18, 4, "File name : " + name);
       addTextAndDecimal (text, buffer, ptr + 22, 2, "Bytes in file's last block");
 
-      calendar = Utility.getPascalDate (buffer, ptr + 24);
-      date = calendar == null ? "--" : df.format (calendar.getTime ());
+      localDate = Utility.getPascalLocalDate (buffer, ptr + 24);
+      date = localDate == null ? "--" : localDate.format (dtf);
       addText (text, buffer, ptr + 24, 2, "Date : " + date);
 
       ptr += PascalDisk.CATALOG_ENTRY_SIZE;

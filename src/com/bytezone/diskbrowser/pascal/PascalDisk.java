@@ -2,8 +2,10 @@ package com.bytezone.diskbrowser.pascal;
 
 import java.awt.Color;
 import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -29,6 +31,7 @@ public class PascalDisk extends AbstractFormattedDisk
 {
   static final int CATALOG_ENTRY_SIZE = 26;
   private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
+  private final DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate (FormatStyle.SHORT);
   private final VolumeEntry volumeEntry;
   private final PascalCatalogSector diskCatalogSector;
 
@@ -232,8 +235,10 @@ public class PascalDisk extends AbstractFormattedDisk
       }
 
       int lastByte = Utility.getShort (buffer, ptr + 22);
-      GregorianCalendar date = Utility.getPascalDate (buffer, 24);
-      String dateString = date == null ? "" : date.toString ();
+      //      GregorianCalendar date = Utility.getPascalDate (buffer, 24);
+      LocalDate localDate = Utility.getPascalLocalDate (buffer, 24);
+      String dateString = localDate == null ? ""
+          : localDate.format (DateTimeFormatter.ofLocalizedDate (FormatStyle.SHORT));
       if (debug)
         System.out.printf ("%4d  %4d  %d  %-15s %d %s%n", firstBlock, lastBlock, kind,
             new String (buffer, ptr + 7, nameLength), lastByte, dateString);
@@ -297,7 +302,9 @@ public class PascalDisk extends AbstractFormattedDisk
     String newLine2 = newLine + newLine;
     String line =
         "----   ---------------   ----   --------  -------   ----   ----   ----" + newLine;
-    String date = volumeEntry.date == null ? "--" : df.format (volumeEntry.date.getTime ());
+
+    String date = volumeEntry.localDate == null ? "--" : volumeEntry.localDate.format (dtf);
+
     StringBuilder text = new StringBuilder ();
     text.append ("File : " + getDisplayPath () + newLine2);
     text.append ("Volume : " + volumeEntry.name + newLine);
@@ -311,16 +318,20 @@ public class PascalDisk extends AbstractFormattedDisk
       FileEntry ce = (FileEntry) fe;
       int size = ce.lastBlock - ce.firstBlock;
       usedBlocks += size;
-      date = ce.date == null ? "--" : df.format (ce.date.getTime ());
+
+      date = ce.localDate == null ? "--" : ce.localDate.format (dtf);
+
       int bytes = (size - 1) * 512 + ce.bytesUsedInLastBlock;
       String fileType =
           ce.fileType < 0 || ce.fileType >= fileTypes.length ? "????" : fileTypes[ce.fileType];
       text.append (String.format ("%4d   %-15s   %-6s %8s %,8d   $%03X   $%03X   $%03X%n", size,
           ce.name, fileType, date, bytes, ce.firstBlock, ce.lastBlock, size));
     }
+
     text.append (line);
     text.append (String.format ("Blocks free : %3d  Blocks used : %3d  Total blocks : %3d%n",
         (volumeEntry.totalBlocks - usedBlocks), usedBlocks, volumeEntry.totalBlocks));
+
     return new DefaultAppleFileSource (volumeEntry.name, text.toString (), this);
   }
 }

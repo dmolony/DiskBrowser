@@ -1,5 +1,6 @@
 package com.bytezone.diskbrowser.pascal;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -23,6 +24,7 @@ abstract class CatalogEntry implements AppleFileSource
   protected int lastBlock;                      // block AFTER last used block
   protected int fileType;
   protected GregorianCalendar date;
+  protected LocalDate localDate;
   protected int bytesUsedInLastBlock;
   protected final List<DiskAddress> blocks = new ArrayList<> ();
 

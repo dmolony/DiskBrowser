@@ -32,6 +32,7 @@ class Character extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
+
     this.scenario = scenario;
 
     attributes = new Attributes ();

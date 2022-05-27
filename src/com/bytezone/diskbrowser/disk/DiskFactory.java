@@ -861,9 +861,12 @@ public class DiskFactory
         System.out.println ("checking Wizardry IV or V");
 
       String fileName = file.getAbsolutePath ().toLowerCase ();
-      int pos = file.getAbsolutePath ().indexOf ('.');
-      char c = fileName.charAt (pos - 1);
-      int requiredDisks = c == '1' ? 6 : c == 'a' ? 10 : 0;
+      int pos = fileName.lastIndexOf ('.');
+      char c = fileName.charAt (pos - 1);                     // '1' (wiz4) or 'a' (wiz5)
+      int requiredDisks = c == '1' ? 7 : c == 'a' ? 10 : 0;
+
+      if (debug)
+        System.out.printf ("Required disks: %d%n", requiredDisks);
 
       if (requiredDisks > 0)
       {
@@ -884,7 +887,7 @@ public class DiskFactory
       }
     }
     if (debug)
-      System.out.println ("Not a Wizardry IV disk");
+      System.out.println ("Not a Wizardry IV or V disk");
 
     PascalDisk pascalDisk = new PascalDisk (disk);
     return pascalDisk;
@@ -894,6 +897,9 @@ public class DiskFactory
   private static boolean collectDataDisks (String fileName, int dotPos, AppleDisk[] disks)
   // ---------------------------------------------------------------------------------//
   {
+    if (debug)
+      System.out.println ("Collecting Wizardry disks");
+
     char c = fileName.charAt (dotPos - 1);
     String suffix = fileName.substring (dotPos + 1);
 
@@ -901,8 +907,11 @@ public class DiskFactory
     {
       String old = new String (c + "." + suffix);
       String rep = new String ((char) (c + i - 1) + "." + suffix);
-
       File f = new File (fileName.replace (old, rep));
+
+      if (debug)
+        System.out.println (f);
+
       if (!f.exists () || !f.isFile ())
         return false;
 

@@ -40,21 +40,21 @@ public class Relocator extends AbstractFile
       for (DiskSegment diskSegment : diskRecord.diskSegments)
       {
         int lo = diskSegment.logicalBlock;
-        int hi = diskSegment.logicalBlock + diskSegment.segmentLength;
+        int hi = lo + diskSegment.segmentLength;
 
         for (int i = lo, count = 0; i < hi; i++, count++)
-        //          if (diskBlocks[i] == 0)       // doesn't matter either way
-        {
-          if (diskBlocks[i] != 0 && false)
+          if (diskBlocks[i] == 0)       // doesn't matter either way
           {
-            System.out.print ("was: ");
-            System.out.printf ("diskBlocks[%d] = %d%n", i, diskBlocks[i]);
-            System.out.print ("now: ");
-            System.out.printf ("diskBlocks[%d] = %d%n", i, diskRecord.diskNumber);
+            if (diskBlocks[i] != 0 && false)
+            {
+              System.out.print ("was: ");
+              System.out.printf ("diskBlocks[%d] = %d%n", i, diskBlocks[i]);
+              System.out.print ("now: ");
+              System.out.printf ("diskBlocks[%d] = %d%n", i, diskRecord.diskNumber);
+            }
+            diskBlocks[i] = diskRecord.diskNumber;
+            diskOffsets[i] = diskSegment.physicalBlock + count;
           }
-          diskBlocks[i] = diskRecord.diskNumber;
-          diskOffsets[i] = diskSegment.physicalBlock + count;
-        }
       }
   }
 
@@ -62,6 +62,8 @@ public class Relocator extends AbstractFile
   public void createNewBuffer (Disk[] dataDisks)
   // ---------------------------------------------------------------------------------//
   {
+    System.out.println (getText ());
+
     AppleDisk master = (AppleDisk) dataDisks[0];
     //    byte[] key1 = { 0x55, 0x55, 0x15, 0x55 };
     //    byte[] key2 = { 0x00, 0x00, 0x01, 0x41 };

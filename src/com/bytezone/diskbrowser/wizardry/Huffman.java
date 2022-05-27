@@ -1,5 +1,8 @@
 package com.bytezone.diskbrowser.wizardry;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
 // Based on a pascal routine by Tom Ewers
@@ -29,18 +32,51 @@ class Huffman extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
+  byte[] decodeMessage (byte[] buffer, int offset, int length)
+  // ---------------------------------------------------------------------------------//
+  {
+    this.message = buffer;
+    List<Byte> decoded = new ArrayList<> ();
+    int retPtr = 0;
+    int max = offset + length;
+
+    depth = 0;
+    msgPtr = offset;
+    currentByte = 0;
+
+    while (msgPtr < max)
+      decoded.add (getChar ());
+
+    byte[] returnBuffer = new byte[decoded.size ()];
+    for (byte b : decoded)
+      returnBuffer[retPtr++] = b;
+
+    return returnBuffer;
+  }
+
+  // ---------------------------------------------------------------------------------//
   String decodeMessage (byte[] message)
   // ---------------------------------------------------------------------------------//
   {
     this.message = message;
+
     depth = 0;
     msgPtr = 0;
     currentByte = 0;
 
-    int len = getChar ();
+    int len = getChar () & 0xFF;
     StringBuilder text = new StringBuilder ();
     for (int i = 0; i < len; i++)
-      text.append ((char) getChar ());
+    {
+      int c = getChar () & 0xFF;
+      text.append (switch (c)
+      {
+        case 0x09 -> " OF ";
+        case 0x0A -> "POTION";
+        case 0x0B -> "STAFF";
+        default -> c < 32 ? '?' : (char) c;
+      });
+    }
 
     return text.toString ();
   }

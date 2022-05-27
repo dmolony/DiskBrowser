@@ -165,7 +165,7 @@ public class AppleDisk implements Disk
       this.sectorSize = 512;
       this.trackSize = sectors * sectorSize;
     }
-    else if (file.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4
+    else if (file.length () == 143360 && tracks == 256 && sectors == 8)    // wiz4 or wiz5
     {
       this.blocks = tracks * sectors;
       this.sectorSize = 512;

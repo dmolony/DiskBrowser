@@ -11,7 +11,7 @@ public class CharacterV4 extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
   int id;
-  int nextCharacter;
+  int nextCharacterId;
   String slogan = "";
 
   // ---------------------------------------------------------------------------------//
@@ -21,7 +21,7 @@ public class CharacterV4 extends AbstractFile
     super (name, buffer);
 
     this.id = id;
-    nextCharacter = Utility.getShort (buffer, 0x7D);
+    nextCharacterId = Utility.getShort (buffer, 0x7D);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -29,15 +29,17 @@ public class CharacterV4 extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     String text = getPartialSlogan ();
-    int nextCharacterId = this.nextCharacter;
+    int nextCharacterId = this.nextCharacterId;
 
-    while (nextCharacterId > 0 && nextCharacterId != id)
+    while (nextCharacterId != id)
     {
-      CharacterV4 next = characters.get (nextCharacterId);
-      if (!next.slogan.isEmpty ())
+      CharacterV4 nextCharacter = characters.get (nextCharacterId);
+
+      if (!nextCharacter.slogan.isEmpty ())       // this group has been processed already
         return;
-      text += next.getPartialSlogan ();
-      nextCharacterId = next.nextCharacter;
+
+      text += nextCharacter.getPartialSlogan ();
+      nextCharacterId = nextCharacter.nextCharacterId;
     }
 
     slogan = text.replace ("\\", " - ");
@@ -60,7 +62,7 @@ public class CharacterV4 extends AbstractFile
     text.append (String.format ("Id ............. %3d%n", id));
     text.append (String.format ("Name ........... %s%n", name));
     text.append (String.format ("Slogan ......... %s%n", slogan));
-    text.append (String.format ("Next ........... %d%n%n", nextCharacter));
+    text.append (String.format ("Next ........... %d%n%n", nextCharacterId));
 
     text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
 

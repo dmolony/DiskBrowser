@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.wizardry;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
-class PlainMessage extends Message
+class PlainMessage extends MessageV1
 // -----------------------------------------------------------------------------------//
 {
   // ---------------------------------------------------------------------------------//

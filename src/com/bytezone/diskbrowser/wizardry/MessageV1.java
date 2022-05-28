@@ -6,7 +6,7 @@ import java.util.List;
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 
 // -----------------------------------------------------------------------------------//
-abstract class Message extends AbstractFile
+abstract class MessageV1 extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
   private static int nextId = 0;
@@ -16,7 +16,7 @@ abstract class Message extends AbstractFile
   List<String> lines = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  Message (byte[] buffer)
+  MessageV1 (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     super ("Message " + nextId, buffer);

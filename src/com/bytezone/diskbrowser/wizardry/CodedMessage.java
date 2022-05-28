@@ -3,7 +3,7 @@ package com.bytezone.diskbrowser.wizardry;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
-class CodedMessage extends Message
+class CodedMessage extends MessageV1
 // -----------------------------------------------------------------------------------//
 {
   public static int codeOffset = 185;

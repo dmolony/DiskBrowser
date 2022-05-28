@@ -24,7 +24,7 @@ public class MazeLevel extends AbstractFile
           "Rock/Water", "Fizzle", "Message/Item", "Monster" };
 
   public final int level;
-  private List<Message> messages;
+  private List<MessageV1> messages;
   private List<Monster> monsters;
   private List<Item> items;
 
@@ -94,7 +94,7 @@ public class MazeLevel extends AbstractFile
     text.append ("\n\n");
     for (MazeAddress address : messageList)
     {
-      Message message = getMessage (address.row);
+      MessageV1 message = getMessage (address.row);
       if (message != null)
       {
         text.append (String.format ("%nMessage: %04X  (%d)%n", address.row, address.row));
@@ -318,7 +318,7 @@ public class MazeLevel extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public void setMessages (List<Message> messages)
+  public void setMessages (List<MessageV1> messages)
   // ---------------------------------------------------------------------------------//
   {
     this.messages = messages;
@@ -448,7 +448,7 @@ public class MazeLevel extends AbstractFile
 
       case 11:        // screen message
         MazeAddress messageAddress = getAddress (b);
-        Message m = getMessage (messageAddress.row);
+        MessageV1 m = getMessage (messageAddress.row);
         if (m != null)
           cell.message = m;
 
@@ -513,13 +513,13 @@ public class MazeLevel extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private Message getMessage (int messageNo)
+  private MessageV1 getMessage (int messageNo)
   // ---------------------------------------------------------------------------------//
   {
     if (messages == null)
       return null;
 
-    for (Message m : messages)
+    for (MessageV1 m : messages)
       if (m.match (messageNo))
         return m;
 

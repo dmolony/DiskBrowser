@@ -33,14 +33,27 @@ class MessageBlock extends AbstractFile implements Iterable<MessageDataBlock>
       int firstMessageNo = Utility.getShort (buffer, ptr + i * 2);
       byte[] data = new byte[512];
       System.arraycopy (buffer, i * 512, data, 0, data.length);
-      MessageDataBlock messageDataBlock = new MessageDataBlock (
-          " Message " + firstMessageNo, data, firstMessageNo, huffman);
+      MessageDataBlock messageDataBlock =
+          new MessageDataBlock (" Message " + firstMessageNo, data, firstMessageNo, huffman);
       messageDataBlocks.add (messageDataBlock);
     }
   }
 
   // ---------------------------------------------------------------------------------//
-  public String getMessageText (int messageNo)
+  public byte[] getMessage (int messageNo)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = 0; i < messageDataBlocks.size (); i++)
+    {
+      MessageDataBlock messageDataBlock = messageDataBlocks.get (i);
+      if (messageDataBlock.firstMessageNo > messageNo)
+        return messageDataBlocks.get (i - 1).getMessage (messageNo);
+    }
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public String getMessageLine (int messageNo)
   // ---------------------------------------------------------------------------------//
   {
     for (int i = 0; i < messageDataBlocks.size (); i++)
@@ -81,37 +94,24 @@ class MessageBlock extends AbstractFile implements Iterable<MessageDataBlock>
   }
 
   // ---------------------------------------------------------------------------------//
-  public byte[] getMessage (int messageNo)
-  // ---------------------------------------------------------------------------------//
-  {
-    for (int i = 0; i < messageDataBlocks.size (); i++)
-    {
-      MessageDataBlock messageDataBlock = messageDataBlocks.get (i);
-      if (messageDataBlock.firstMessageNo > messageNo)
-        return messageDataBlocks.get (i - 1).getMessage (messageNo);
-    }
-    return null;
-  }
-
-  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    if (text != null)
-      return text;
-
-    StringBuilder text = new StringBuilder ();
-
-    for (MessageDataBlock mdb : messageDataBlocks)
+    if (text == null)
     {
-      text.append (mdb);
-      text.append ("\n");
+      StringBuilder sb = new StringBuilder ();
+
+      for (MessageDataBlock mdb : messageDataBlocks)
+      {
+        sb.append (mdb);
+        sb.append ("\n");
+      }
+
+      text = sb.toString ();
     }
 
-    this.text = text.toString ();
-
-    return this.text;
+    return text;
   }
 
   // ---------------------------------------------------------------------------------//

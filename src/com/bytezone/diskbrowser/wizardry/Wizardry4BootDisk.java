@@ -95,6 +95,8 @@ public class Wizardry4BootDisk extends PascalDisk
         scenarioHeader = new Header (scenarioNode, this);
         linkCharacters4 (scenarioNode, fileEntry);
         linkMazeLevels4 (scenarioNode, fileEntry);
+        linkMonstersV4 (scenarioNode, fileEntry);
+        linkItemsV4 (scenarioNode, fileEntry);
       }
     }
     else if (version == 5)
@@ -171,6 +173,90 @@ public class Wizardry4BootDisk extends PascalDisk
 
     DefaultAppleFileSource afs = (DefaultAppleFileSource) charactersNode.getUserObject ();
     afs.setSectors (allCharacterBlocks);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void linkMonstersV4 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
+  {
+    ScenarioData sd = scenarioHeader.get (Header.MONSTER_AREA);
+
+    byte[] buffer = fileEntry.getDataSource ().buffer;
+    List<DiskAddress> blocks = fileEntry.getSectors ();
+
+    DefaultMutableTreeNode monstersNode = linkNode ("Monsters", "Monsters", scenarioNode);
+    List<DiskAddress> allMonsterBlocks = new ArrayList<> ();
+
+    String[] monsterNames = new String[4];
+
+    int ptr = sd.dataOffset * 512;
+
+    for (int i = 0; i < sd.total; i++)
+    {
+      byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
+
+      for (int j = 0; j < 4; j++)
+        monsterNames[j] = messageBlock.getMessageLine (i * 4 + 13000 + j);
+
+      MonsterV4 monster = new MonsterV4 (monsterNames, out, i);
+
+      List<DiskAddress> monsterBlocks = new ArrayList<> ();
+      DiskAddress da = blocks.get (ptr / 512);
+      monsterBlocks.add (da);
+      addToNode (monster, monstersNode, monsterBlocks);
+
+      if (!allMonsterBlocks.contains (da))
+        allMonsterBlocks.add (da);
+
+      ptr += sd.totalBlocks;
+    }
+
+    DefaultAppleFileSource afs = (DefaultAppleFileSource) monstersNode.getUserObject ();
+    afs.setSectors (allMonsterBlocks);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void linkItemsV4 (DefaultMutableTreeNode scenarioNode, FileEntry fileEntry)
+  // ---------------------------------------------------------------------------------//
+  {
+    ScenarioData sd = scenarioHeader.get (Header.ITEM_AREA);
+
+    byte[] buffer = fileEntry.getDataSource ().buffer;
+    List<DiskAddress> blocks = fileEntry.getSectors ();
+
+    DefaultMutableTreeNode itemsNode = linkNode ("Items", "Items", scenarioNode);
+    List<DiskAddress> allItemBlocks = new ArrayList<> ();
+
+    String[] itemNames = new String[2];
+
+    int ptr = sd.dataOffset * 512;
+
+    for (int i = 0; i < sd.total; i++)
+    {
+      byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
+
+      for (int j = 0; j < 2; j++)
+      {
+        itemNames[j] = messageBlock.getMessageLine (i * 2 + 14000 + j);
+        if (itemNames[j] == null)
+          itemNames[j] = "Not found";
+      }
+
+      ItemV4 item = new ItemV4 (itemNames, out, i);
+
+      List<DiskAddress> itemBlocks = new ArrayList<> ();
+      DiskAddress da = blocks.get (ptr / 512);
+      itemBlocks.add (da);
+      addToNode (item, itemsNode, itemBlocks);
+
+      if (!allItemBlocks.contains (da))
+        allItemBlocks.add (da);
+
+      ptr += sd.totalBlocks;
+    }
+
+    DefaultAppleFileSource afs = (DefaultAppleFileSource) itemsNode.getUserObject ();
+    afs.setSectors (allItemBlocks);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -343,11 +429,11 @@ public class Wizardry4BootDisk extends PascalDisk
       int key = Utility.getShort (buffer, offset);
       if (key > 0)
         text.append (
-            String.format ("%04X  %04X  * %s%n", offset, key, messageBlock.getMessageText (key)));
+            String.format ("%04X  %04X  * %s%n", offset, key, messageBlock.getMessageLine (key)));
       key = Utility.getShort (buffer, offset + 8);
       if (key > 0)
         text.append (String.format ("%04X  %04X    %s%n", offset + 8, key,
-            messageBlock.getMessageText (key)));
+            messageBlock.getMessageLine (key)));
     }
 
     List<DiskAddress> allOracleBlocks = new ArrayList<> ();

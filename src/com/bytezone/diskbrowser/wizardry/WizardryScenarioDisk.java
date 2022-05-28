@@ -33,7 +33,7 @@ public class WizardryScenarioDisk extends PascalDisk
   public List<Item> items;
   public List<Character> characters;
   public List<Spell> spells;
-  public List<Message> messages;
+  public List<MessageV1> messages;
   public List<Monster> monsters;
   public List<MazeLevel> levels;
   List<ExperienceLevel> experiences;
@@ -448,7 +448,7 @@ public class WizardryScenarioDisk extends PascalDisk
   private void extractMessages (DefaultMutableTreeNode node, List<DiskAddress> sectors)
   // ---------------------------------------------------------------------------------//
   {
-    Message.resetMessageId ();
+    MessageV1.resetMessageId ();
     messages = new ArrayList<> ();
 
     // Copy first 504 bytes from each sector to a single contiguous buffer
@@ -479,7 +479,7 @@ public class WizardryScenarioDisk extends PascalDisk
         int messageStart = messageEnd - totalBytes;
         System.arraycopy (buffer, messageStart, newBuffer, 0, totalBytes);
 
-        Message m;
+        MessageV1 m;
         if (scenarioHeader.scenarioID == 1)
           m = new PlainMessage (newBuffer);
         else

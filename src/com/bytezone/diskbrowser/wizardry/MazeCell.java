@@ -49,7 +49,7 @@ class MazeCell
   MazeAddress address;
   MazeAddress addressTo;                    // if teleport/stairs/chute
 
-  public Message message;
+  public MessageV1 message;
   public List<Monster> monsters;
   public Item itemRequired;
   public Item itemObtained;

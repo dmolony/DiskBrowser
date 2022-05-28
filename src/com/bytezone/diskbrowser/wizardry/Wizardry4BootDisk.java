@@ -27,6 +27,8 @@ public class Wizardry4BootDisk extends PascalDisk
   private Huffman huffman;
   private final int version;
 
+  private List<CharacterV4> characters = new ArrayList<> ();
+
   // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
   // ---------------------------------------------------------------------------------//
@@ -159,7 +161,9 @@ public class Wizardry4BootDisk extends PascalDisk
 
       String name = HexFormatter.getPascalString (out, 1);
 
-      Character4 c = new Character4 (name, out);
+      CharacterV4 c = new CharacterV4 (name, out, i);
+      characters.add (c);
+
       List<DiskAddress> characterBlocks = new ArrayList<> ();
       DiskAddress da = blocks.get (ptr / 512);
       characterBlocks.add (da);
@@ -173,6 +177,9 @@ public class Wizardry4BootDisk extends PascalDisk
 
     DefaultAppleFileSource afs = (DefaultAppleFileSource) charactersNode.getUserObject ();
     afs.setSectors (allCharacterBlocks);
+
+    for (CharacterV4 character : characters)
+      character.link (characters);
   }
 
   // ---------------------------------------------------------------------------------//

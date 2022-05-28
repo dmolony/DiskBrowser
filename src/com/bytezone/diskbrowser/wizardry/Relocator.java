@@ -62,13 +62,7 @@ public class Relocator extends AbstractFile
   public void createNewBuffer (Disk[] dataDisks)
   // ---------------------------------------------------------------------------------//
   {
-    System.out.println (getText ());
-
     AppleDisk master = (AppleDisk) dataDisks[0];
-    //    byte[] key1 = { 0x55, 0x55, 0x15, 0x55 };
-    //    byte[] key2 = { 0x00, 0x00, 0x01, 0x41 };
-    //    byte[] key3 = { 0x01, 0x00, 0x01, 0x41 };
-    //    byte[] key4 = { 0x00, 0x00, 0x15, 0x55 };
 
     for (int logicalBlock = 0; logicalBlock < diskBlocks.length; logicalBlock++)
     {
@@ -79,13 +73,6 @@ public class Relocator extends AbstractFile
         byte[] temp = disk.readBlock (diskOffsets[logicalBlock]);
         DiskAddress da = master.getDiskAddress (logicalBlock);
         master.writeBlock (da, temp);
-        //        if (da.getBlock () == 0x126)
-        //          System.out.println (HexFormatter.format (buffer));
-        //        if (Utility.find (temp, key1))
-        //          if (Utility.find (temp, key2))
-        //            if (Utility.find (temp, key3))
-        //              if (Utility.find (temp, key4))
-        //                System.out.println (da);
       }
     }
   }
@@ -158,6 +145,12 @@ public class Relocator extends AbstractFile
     if (offset != pairs)
       text.append (String.format ("   %s%n", lines.get (pairs)));
 
+    // show gaps
+    if (false)
+      for (int i = 0; i < 0x22C; i++)
+        if (diskBlocks[i] == 0)
+          text.append (String.format ("%04X  %3d  %3d%n", i, diskBlocks[i], diskOffsets[i]));
+
     return text.toString ();
   }
 
@@ -172,7 +165,6 @@ public class Relocator extends AbstractFile
     public DiskRecord (byte[] buffer, int ptr)
     {
       diskNumber = Utility.getShort (buffer, ptr);
-      //      totDiskSegments = Utility.intValue (buffer[ptr + 2], buffer[ptr + 4]);
       totDiskSegments = Utility.getShort (buffer, ptr + 2);
       diskSegments = new ArrayList<> (totDiskSegments);
 

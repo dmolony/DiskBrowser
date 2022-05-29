@@ -63,6 +63,7 @@ For the truly retro look, programs can be displayed in the [original 40-column l
 #### Wizardry
 Wizardry scenarios 1 to 3 are reasonably complete, Wizardry IV and V are partially done. For a dedicated Wizardry application see [WizardryApp](https://github.com/dmolony/MazeWalker)
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
+Scenarios 4 and 5 come on multiple disks, and they need to be named so that the only difference between disk names is the identifier before the '.dsk' suffix.
 ![Wizardry](resources/wizardry4.png?raw=true "Wizardry IV")
 #### Visicalc
 DiskBrowser has an inbuilt Visicalc processor which will evaluate the sheet and display the results.

@@ -146,8 +146,10 @@ class CharacterV1 extends Character
     text.append ("\nMaximum hits ....... " + stats.hitsMax);
     text.append ("\nArmour class ....... " + stats.armourClass);
     text.append ("\nAsset value ........ " + String.format ("%,d", stats.assetValue));
+
     text.append ("\nAwards ............. " + getAwardString ());
     text.append ("\nOut ................ " + isOut ());
+
     text.append ("\n\nStrength ........... " + attributes.strength);
     text.append ("\nIntelligence ....... " + attributes.intelligence);
     text.append ("\nPiety .............. " + attributes.piety);

@@ -11,17 +11,9 @@ public class CharacterV4 extends Character
 // -----------------------------------------------------------------------------------//
 {
   private static int MAX_POSSESSIONS = 8;
+  private static int MAX_SPELLS = 50;
   static int MAGE_SPELLS = 0;
   static int PRIEST_SPELLS = 1;
-
-  public static final String[] spells = { "Halito", "Mogref", "Katino", "Dumapic", "Dilto", "Sopic",
-      "Mahalito", "Molito", "Morlis", "Dalto", "Lahalito", "Mamorlis", "Makanito", "Madalto",
-      "Lakanito", "Zilwan", "Masopic", "Haman", "Malor", "Mahaman", "Tiltowait",
-
-      "Kalki", "Dios", "Badios", "Milwa", "Porfic", "Matu", "Calfo", "Manifo", "Montino", "Lomilwa",
-      "Dialko", "Latumapic", "Bamatu", "Dial", "Badial", "Latumofis", "Maporfic", "Dialma",
-      "Badialma", "Litokan", "Kandi", "Di", "Badi", "Lorto", "Madi", "Mabadi", "Loktofeit",
-      "Malikto", "Kadorto" };
 
   int id;
   int nextCharacterId;
@@ -154,7 +146,7 @@ public class CharacterV4 extends Character
           if (index >= 0)
             spellsKnown[index] = true;
 
-        if (++index >= spells.length)
+        if (++index >= MAX_SPELLS)
           break;
       }
 
@@ -278,8 +270,8 @@ public class CharacterV4 extends Character
       text.append (party);
     }
 
-    text.append ("\n\n");
-    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
+    //    text.append ("\n\n");
+    //    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
 
     return text.toString ();
   }

@@ -61,7 +61,9 @@ For the truly retro look, programs can be displayed in the [original 40-column l
 #### Infocom
 ![Infocom](resources/zork.png?raw=true "Infocom")
 #### Wizardry
+Wizardry scenarios 1 to 3 are reasonably complete, Wizardry IV and V are partially done. For a dedicated Wizardry application see [WizardryApp](https://github.com/dmolony/MazeWalker)
 ![Wizardry](resources/wizardry.png?raw=true "Wizardry")
+![Wizardry](resources/wizardry4.png?raw=true "Wizardry IV")
 #### Visicalc
 DiskBrowser has an inbuilt Visicalc processor which will evaluate the sheet and display the results.
 ![Visicalc](resources/visicalc.png?raw=true "Visicalc")

@@ -27,10 +27,13 @@ public class CharacterParty
     StringBuilder text = new StringBuilder ();
 
     text.append (slogan.replace ("\\", " - "));
-    text.append ("\n");
+    text.append ("\n\n");
 
     for (CharacterV4 character : characters)
-      text.append (String.format ("  %3d  %s%n", character.id, character.getName ()));
+      text.append (
+          String.format ("  %3d  %-15s %17s  %13s  %13s%n", character.id, character.getName (),
+              character.getAttributeString (), character.getSpellsString (CharacterV4.MAGE_SPELLS),
+              character.getSpellsString (CharacterV4.PRIEST_SPELLS)));
 
     return text.toString ();
   }

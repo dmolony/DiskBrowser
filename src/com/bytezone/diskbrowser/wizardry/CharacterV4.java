@@ -39,7 +39,8 @@ public class CharacterV4 extends AbstractFile
   public final long gold;
 
   public final int possessionsCount;
-  public final List<Integer> possessions = new ArrayList<> (MAX_POSSESSIONS);
+  public final List<Integer> possessionIds = new ArrayList<> (MAX_POSSESSIONS);
+  public final List<ItemV4> possessions = new ArrayList<> (MAX_POSSESSIONS);
 
   public final long experience;
   public final int maxlevac;                       // max level armour class?
@@ -50,7 +51,6 @@ public class CharacterV4 extends AbstractFile
   public final boolean mysteryBit;                 // first bit in spellsKnown
   public final boolean[] spellsKnown = new boolean[50];
   public final int[][] spellAllowance = new int[2][7];
-  //  public final int[] priestSpells = new int[7];
 
   public final int hpCalCmd;
   public final int armourClass;
@@ -98,7 +98,6 @@ public class CharacterV4 extends AbstractFile
     super (name, buffer);
 
     this.id = id;
-    nextCharacterId = Utility.getShort (buffer, 0x7D);
 
     inMaze = Utility.getShort (buffer, 33) != 0;
     race = Race.values ()[Utility.getShort (buffer, 35)];
@@ -136,10 +135,11 @@ public class CharacterV4 extends AbstractFile
       //      boolean identified = Utility.getShort (buffer, 65 + i * 8) == 1;
       int itemNo = Utility.getShort (buffer, 67 + i * 8);
       //      Possession p = new Possession (itemNo, equipped, cursed, identified);
-      possessions.add (itemNo);
+      possessionIds.add (itemNo);
     }
 
     experience = 0;
+    nextCharacterId = Utility.getShort (buffer, 125);
     maxlevac = Utility.getShort (buffer, 131);
     charlev = Utility.getShort (buffer, 133);
     hpLeft = Utility.getShort (buffer, 135);
@@ -172,6 +172,16 @@ public class CharacterV4 extends AbstractFile
     swingCount = Utility.getShort (buffer, 183);
     hpdamrc = new Dice (buffer, 185);
 
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void addPossessions (List<ItemV4> items)
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int itemId : possessionIds)
+    {
+      possessions.add (items.get (itemId));
+    }
   }
 
   // ---------------------------------------------------------------------------------//
@@ -229,17 +239,38 @@ public class CharacterV4 extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
+  String getTypeString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return String.format ("%1.1s-%3.3s", alignment, characterClass);
+  }
+
+  // ---------------------------------------------------------------------------------//
   @Override
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format ("Id ............. %3d%n", id));
-    text.append (String.format ("Name ........... %s%n", name));
-    text.append (String.format ("Attributes ..... %s%n", getAttributeString ()));
-    text.append (String.format ("Mage spells .... %s%n", getSpellsString (MAGE_SPELLS)));
-    text.append (String.format ("Priest spells .. %s%n", getSpellsString (PRIEST_SPELLS)));
+    text.append (String.format ("Id ................ %d%n", id));
+    text.append (String.format ("Name .............. %s%n", name));
+    text.append (String.format ("Race .............. %s%n", race));
+    text.append (String.format ("Character class ... %s%n", characterClass));
+    text.append (String.format ("Alignment ......... %s%n", alignment));
+    text.append (String.format ("Status ............ %s%n", status));
+    text.append (String.format ("Level ? ........... %d%n", charlev));
+    text.append (String.format ("Hit points ........ %d/%d%n", hpLeft, hpMax));
+    text.append (String.format ("Armour class ...... %d%n", armourClass));
+    text.append (String.format ("Attributes ........ %s%n", getAttributeString ()));
+    text.append (String.format ("Mage spells ....... %s%n", getSpellsString (MAGE_SPELLS)));
+    text.append (String.format ("Priest spells ..... %s%n", getSpellsString (PRIEST_SPELLS)));
+
+    if (possessionsCount > 0)
+    {
+      text.append ("\nPossessions:\n");
+      for (ItemV4 item : possessions)
+        text.append ("  " + item + "\n");
+    }
 
     if (!party.slogan.isEmpty () || party.characters.size () > 1)
     {

@@ -29,6 +29,7 @@ public class Wizardry4BootDisk extends PascalDisk
 
   private List<CharacterV4> characters = new ArrayList<> ();
   private List<CharacterParty> parties = new ArrayList<> ();
+  private List<ItemV4> items = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
@@ -280,6 +281,7 @@ public class Wizardry4BootDisk extends PascalDisk
       }
 
       ItemV4 item = new ItemV4 (itemNames, out, i);
+      items.add (item);
 
       List<DiskAddress> itemBlocks = new ArrayList<> ();
       DiskAddress da = blocks.get (ptr / 512);
@@ -294,6 +296,9 @@ public class Wizardry4BootDisk extends PascalDisk
 
     DefaultAppleFileSource afs = (DefaultAppleFileSource) itemsNode.getUserObject ();
     afs.setSectors (allItemBlocks);
+
+    for (CharacterV4 character : characters)
+      character.addPossessions (items);
   }
 
   // ---------------------------------------------------------------------------------//

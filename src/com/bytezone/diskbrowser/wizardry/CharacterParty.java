@@ -30,10 +30,10 @@ public class CharacterParty
     text.append ("\n\n");
 
     for (CharacterV4 character : characters)
-      text.append (
-          String.format ("  %3d  %-15s %17s  %13s  %13s%n", character.id, character.getName (),
-              character.getAttributeString (), character.getSpellsString (CharacterV4.MAGE_SPELLS),
-              character.getSpellsString (CharacterV4.PRIEST_SPELLS)));
+      text.append (String.format ("%3d  %-15s %s  %3d  %3d  %17s  %13s  %13s%n", character.id,
+          character.getName (), character.getTypeString (), character.armourClass, character.hpLeft,
+          character.getAttributeString (), character.getSpellsString (CharacterV4.MAGE_SPELLS),
+          character.getSpellsString (CharacterV4.PRIEST_SPELLS)));
 
     return text.toString ();
   }

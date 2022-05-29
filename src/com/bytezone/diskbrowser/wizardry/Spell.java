@@ -192,8 +192,8 @@ class Spell extends AbstractFile
   public String toString ()
   // ---------------------------------------------------------------------------------//
   {
-    return String.format ("%-16s %-6s  %d  %-20s %-20s %-20s %5d  %<04X", getName (), spellType,
-        level, translation, getArea (), getWhenCast (), value);
+    return String.format ("%-16s %-6s  %d  %-20s %-20s %-20s", getName (), spellType, level,
+        translation, getArea (), getWhenCast ());
   }
 
   private static String[] spellNames = { "KALKI", "DIOS", "BADIOS", "MILWA", "PORFIC", "MATU",

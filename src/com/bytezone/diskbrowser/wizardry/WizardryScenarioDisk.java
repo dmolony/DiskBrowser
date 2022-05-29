@@ -18,8 +18,8 @@ import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
-import com.bytezone.diskbrowser.wizardry.Character.Attributes;
-import com.bytezone.diskbrowser.wizardry.Character.Statistics;
+import com.bytezone.diskbrowser.wizardry.CharacterV1.Attributes;
+import com.bytezone.diskbrowser.wizardry.CharacterV1.Statistics;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 import com.bytezone.diskbrowser.wizardry.Spell.SpellType;
 
@@ -31,7 +31,7 @@ public class WizardryScenarioDisk extends PascalDisk
 
   public List<AbstractImage> images;
   public List<Item> items;
-  public List<Character> characters;
+  public List<CharacterV1> characters;
   public List<Spell> spells;
   public List<MessageV1> messages;
   public List<Monster> monsters;
@@ -111,7 +111,7 @@ public class WizardryScenarioDisk extends PascalDisk
     //		makeNodeVisible (node);
 
     // add information about each characters' baggage, spells known etc.
-    for (Character c : characters)
+    for (CharacterV1 c : characters)
     {
       c.linkItems (items);
       c.linkSpells (spells);
@@ -252,7 +252,7 @@ public class WizardryScenarioDisk extends PascalDisk
         + "HP  St  In  Pi  Vi  Ag  Lu Status\n");
     text.append ("-------------  ---- -------- -------- ---------- "
         + "--  --  --  --  --  --  -- ------\n");
-    for (Character ch : characters)
+    for (CharacterV1 ch : characters)
     {
       Statistics stats = ch.getStatistics ();
       Attributes att = ch.getAttributes ();
@@ -287,7 +287,7 @@ public class WizardryScenarioDisk extends PascalDisk
       byte[] data2 = new byte[recLen];
       System.arraycopy (buffer, ptr, data2, 0, recLen);
 
-      Character c = new Character (name, data2, scenarioHeader.scenarioID);
+      CharacterV1 c = new CharacterV1 (name, data2, scenarioHeader.scenarioID);
       characters.add (c);
       addToNode (c, node, blocks, characterSector);
     }

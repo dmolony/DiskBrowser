@@ -3,12 +3,11 @@ package com.bytezone.diskbrowser.wizardry;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-public class CharacterV4 extends AbstractFile
+public class CharacterV4 extends Character
 // -----------------------------------------------------------------------------------//
 {
   private static int MAX_POSSESSIONS = 8;
@@ -98,6 +97,7 @@ public class CharacterV4 extends AbstractFile
     super (name, buffer);
 
     this.id = id;
+    scenario = 4;
 
     inMaze = Utility.getShort (buffer, 33) != 0;
     race = Race.values ()[Utility.getShort (buffer, 35)];

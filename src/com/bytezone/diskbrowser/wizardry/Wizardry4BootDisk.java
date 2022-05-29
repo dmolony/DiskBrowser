@@ -28,6 +28,7 @@ public class Wizardry4BootDisk extends PascalDisk
   private final int version;
 
   private List<CharacterV4> characters = new ArrayList<> ();
+  private List<CharacterParty> parties = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
@@ -96,6 +97,7 @@ public class Wizardry4BootDisk extends PascalDisk
         scenarioNode.setAllowsChildren (true);
         scenarioHeader = new Header (scenarioNode, this);
         linkCharacters4 (scenarioNode, fileEntry);
+        linkParties ();
         linkMazeLevels4 (scenarioNode, fileEntry);
         linkMonstersV4 (scenarioNode, fileEntry);
         linkItemsV4 (scenarioNode, fileEntry);
@@ -164,22 +166,50 @@ public class Wizardry4BootDisk extends PascalDisk
       CharacterV4 c = new CharacterV4 (name, out, i);
       characters.add (c);
 
-      List<DiskAddress> characterBlocks = new ArrayList<> ();
-      DiskAddress da = blocks.get (ptr / 512);
-      characterBlocks.add (da);
-      addToNode (c, charactersNode, characterBlocks);
+      if (!name.isEmpty ())
+      {
+        List<DiskAddress> characterBlocks = new ArrayList<> ();
+        DiskAddress da = blocks.get (ptr / 512);
+        characterBlocks.add (da);
+        addToNode (c, charactersNode, characterBlocks);
 
-      if (!allCharacterBlocks.contains (da))
-        allCharacterBlocks.add (da);
+        if (!allCharacterBlocks.contains (da))
+          allCharacterBlocks.add (da);
+      }
 
       ptr += sd.totalBlocks;
     }
 
     DefaultAppleFileSource afs = (DefaultAppleFileSource) charactersNode.getUserObject ();
     afs.setSectors (allCharacterBlocks);
+  }
 
+  // ---------------------------------------------------------------------------------//
+  private void linkParties ()
+  // ---------------------------------------------------------------------------------//
+  {
     for (CharacterV4 character : characters)
-      character.link (characters);
+    {
+      if (character.isInParty () || character.getName ().isEmpty ())
+        continue;
+
+      CharacterParty party = new CharacterParty ();
+      parties.add (party);
+      link (character, party);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void link (CharacterV4 character, CharacterParty party)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (character.isInParty ())
+      return;
+
+    party.add (character);
+
+    if (character.nextCharacterId > 0)
+      link (characters.get (character.nextCharacterId), party);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -202,7 +232,7 @@ public class Wizardry4BootDisk extends PascalDisk
     {
       byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
 
-      for (int j = 0; j < 4; j++)
+      for (int j = 0; j < monsterNames.length; j++)
         monsterNames[j] = messageBlock.getMessageLine (i * 4 + 13000 + j);
 
       MonsterV4 monster = new MonsterV4 (monsterNames, out, i);
@@ -242,7 +272,7 @@ public class Wizardry4BootDisk extends PascalDisk
     {
       byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
 
-      for (int j = 0; j < 2; j++)
+      for (int j = 0; j < itemNames.length; j++)
       {
         itemNames[j] = messageBlock.getMessageLine (i * 2 + 14000 + j);
         if (itemNames[j] == null)

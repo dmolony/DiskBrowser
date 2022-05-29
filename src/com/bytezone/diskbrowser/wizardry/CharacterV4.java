@@ -1,7 +1,5 @@
 package com.bytezone.diskbrowser.wizardry;
 
-import java.util.List;
-
 import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
@@ -12,7 +10,7 @@ public class CharacterV4 extends AbstractFile
 {
   int id;
   int nextCharacterId;
-  String slogan = "";
+  CharacterParty party;
 
   // ---------------------------------------------------------------------------------//
   CharacterV4 (String name, byte[] buffer, int id)
@@ -25,24 +23,17 @@ public class CharacterV4 extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  void link (List<CharacterV4> characters)
+  void setParty (CharacterParty party)
   // ---------------------------------------------------------------------------------//
   {
-    String text = getPartialSlogan ();
-    int nextCharacterId = this.nextCharacterId;
+    this.party = party;
+  }
 
-    while (nextCharacterId != id)
-    {
-      CharacterV4 nextCharacter = characters.get (nextCharacterId);
-
-      if (!nextCharacter.slogan.isEmpty ())       // this group has been processed already
-        return;
-
-      text += nextCharacter.getPartialSlogan ();
-      nextCharacterId = nextCharacter.nextCharacterId;
-    }
-
-    slogan = text.replace ("\\", " - ");
+  // ---------------------------------------------------------------------------------//
+  boolean isInParty ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return party != null;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -61,10 +52,14 @@ public class CharacterV4 extends AbstractFile
 
     text.append (String.format ("Id ............. %3d%n", id));
     text.append (String.format ("Name ........... %s%n", name));
-    text.append (String.format ("Slogan ......... %s%n", slogan));
+    //        text.append (String.format ("Slogan ......... %s%n", slogan));
     text.append (String.format ("Next ........... %d%n%n", nextCharacterId));
 
     text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
+    text.append ("\n\n");
+
+    if (!party.slogan.isEmpty () || party.characters.size () > 1)
+      text.append (party);
 
     return text.toString ();
   }

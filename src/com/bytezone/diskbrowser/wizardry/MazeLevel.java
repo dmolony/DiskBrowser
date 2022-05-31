@@ -25,8 +25,8 @@ public class MazeLevel extends AbstractFile
 
   public final int level;
   private List<MessageV1> messages;
-  private List<Monster> monsters;
-  private List<Item> items;
+  private List<MonsterV1> monsters;
+  private List<ItemV1> items;
 
   // ---------------------------------------------------------------------------------//
   public MazeLevel (byte[] buffer, int level)
@@ -105,7 +105,7 @@ public class MazeLevel extends AbstractFile
 
     for (MazeAddress address : monsterList)
     {
-      Monster monster = getMonster (address.column);
+      MonsterV1 monster = getMonster (address.column);
       if (monster != null)
       {
         text.append (String.format ("%nMonster: %04X%n", address.column));
@@ -222,7 +222,7 @@ public class MazeLevel extends AbstractFile
         if (messageType == 4)
         {
           if (address.level < monsters.size ())
-            extraText += monsters.get (address.level).realName;
+            extraText += monsters.get (address.level).getName ();
           else
             extraText += "Obtained: " + items.get ((address.level - 64536) * -1).getName ();
         }
@@ -240,7 +240,7 @@ public class MazeLevel extends AbstractFile
         monsterList.add (address);
         extraText = "Encounter: ";
         if (monsters != null)
-          extraText += monsters.get (address.column).realName;
+          extraText += monsters.get (address.column).getName ();
       }
 
       text.append (String.format ("    %X   -->   %X     %-15s   %04X  %04X  %04X  %s%n", j,
@@ -288,7 +288,7 @@ public class MazeLevel extends AbstractFile
       {
         if (id == minenemy + range0n)
           text.append ("\n");
-        Monster monster = monsters == null ? null : monsters.get (id);
+        MonsterV1 monster = monsters == null ? null : monsters.get (id);
         text.append (String.format ("%3d  %-16s  %n", id, monster));
       }
     }
@@ -325,14 +325,14 @@ public class MazeLevel extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public void setMonsters (List<Monster> monsters)
+  public void setMonsters (List<MonsterV1> monsters)
   // ---------------------------------------------------------------------------------//
   {
     this.monsters = monsters;
   }
 
   // ---------------------------------------------------------------------------------//
-  public void setItems (List<Item> items)
+  public void setItems (List<ItemV1> items)
   // ---------------------------------------------------------------------------------//
   {
     this.items = items;
@@ -527,13 +527,13 @@ public class MazeLevel extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  private Monster getMonster (int monsterNo)
+  private MonsterV1 getMonster (int monsterNo)
   // ---------------------------------------------------------------------------------//
   {
     if (monsters == null)
       return null;
 
-    for (Monster m : monsters)
+    for (MonsterV1 m : monsters)
       if (m.match (monsterNo))
         return m;
 

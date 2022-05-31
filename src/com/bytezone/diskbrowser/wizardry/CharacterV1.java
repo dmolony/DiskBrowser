@@ -75,7 +75,7 @@ class CharacterV1 extends Character
   }
 
   // ---------------------------------------------------------------------------------//
-  public void linkItems (List<Item> itemList)
+  public void linkItems (List<ItemV1> itemList)
   // ---------------------------------------------------------------------------------//
   {
     boolean equipped;
@@ -90,12 +90,12 @@ class CharacterV1 extends Character
         itemID = (itemID + 24) % 256;
       if (itemID >= 0 && itemID < itemList.size ())
       {
-        Item item = itemList.get (itemID);
+        ItemV1 item = itemList.get (itemID);
         equipped = (buffer[ptr] == 1);
         identified = (buffer[ptr + 4] == 1);
         baggageList.add (new Baggage (item, equipped, identified));
         stats.assetValue += item.getCost ();
-        item.partyOwns++;
+        //        item.partyOwns++;
       }
       else
         System.out.println (
@@ -302,11 +302,11 @@ class CharacterV1 extends Character
   public class Baggage
   // ---------------------------------------------------------------------------------//
   {
-    public Item item;
+    public ItemV1 item;
     public boolean equipped;
     public boolean identified;
 
-    public Baggage (Item item, boolean equipped, boolean identified)
+    public Baggage (ItemV1 item, boolean equipped, boolean identified)
     {
       this.item = item;
       this.equipped = equipped;

@@ -270,8 +270,8 @@ public class CharacterV4 extends Character
       text.append (party);
     }
 
-    //    text.append ("\n\n");
-    //    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
+    text.append ("\n\n");
+    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
 
     return text.toString ();
   }

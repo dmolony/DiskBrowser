@@ -50,9 +50,9 @@ class MazeCell
   MazeAddress addressTo;                    // if teleport/stairs/chute
 
   public MessageV1 message;
-  public List<Monster> monsters;
-  public Item itemRequired;
-  public Item itemObtained;
+  public List<MonsterV1> monsters;
+  public ItemV1 itemRequired;
+  public ItemV1 itemObtained;
 
   // ---------------------------------------------------------------------------------//
   MazeCell (MazeAddress address)
@@ -345,7 +345,7 @@ class MazeCell
         sign.append ("&nbsp;Monster&nbsp;");
       else
       {
-        Monster monster = monsters.get (monsterID);
+        MonsterV1 monster = monsters.get (monsterID);
         sign.append ("&nbsp;<b>" + monster.getRealName () + "&nbsp;</b>");
         while (monster.partnerOdds == 100)
         {

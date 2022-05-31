@@ -1,14 +1,11 @@
 package com.bytezone.diskbrowser.wizardry;
 
-import com.bytezone.diskbrowser.applefile.AbstractFile;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
 // -----------------------------------------------------------------------------------//
-public class ItemV4 extends AbstractFile
+public class ItemV4 extends Item
 // -----------------------------------------------------------------------------------//
 {
-  String name;
-  String nameGeneric;
 
   // ---------------------------------------------------------------------------------//
   ItemV4 (String[] names, byte[] buffer, int id)
@@ -16,8 +13,12 @@ public class ItemV4 extends AbstractFile
   {
     super (names[1], buffer);
 
+    itemId = id;
     name = names[1];
-    nameGeneric = names[0];
+    genericName = names[0];
+
+    price = getWizLong (buffer, 13);
+    wephpdam = new Dice (buffer, 35);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -25,7 +26,12 @@ public class ItemV4 extends AbstractFile
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    return HexFormatter.format (buffer, 1, buffer[0] & 0xFF);
+    StringBuilder text = new StringBuilder (super.getText ());
+
+    text.append ("\n\n");
+    text.append (HexFormatter.format (buffer));
+
+    return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//

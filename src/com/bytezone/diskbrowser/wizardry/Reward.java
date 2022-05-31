@@ -16,12 +16,12 @@ class Reward extends AbstractFile
   int totalElements;
 
   List<RewardElement> elements;
-  List<Item> items;
-  List<Monster> goldMonsters = new ArrayList<> ();
-  List<Monster> chestMonsters = new ArrayList<> ();
+  List<ItemV1> items;
+  List<MonsterV1> goldMonsters = new ArrayList<> ();
+  List<MonsterV1> chestMonsters = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
-  Reward (String name, byte[] buffer, int id, List<Item> items)
+  Reward (String name, byte[] buffer, int id, List<ItemV1> items)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
@@ -41,7 +41,7 @@ class Reward extends AbstractFile
   }
 
   // ---------------------------------------------------------------------------------//
-  public void addMonster (Monster monster, int location)
+  public void addMonster (MonsterV1 monster, int location)
   // ---------------------------------------------------------------------------------//
   {
     if (location == 0)
@@ -71,14 +71,14 @@ class Reward extends AbstractFile
       if (goldMonsters.size () > 0)
       {
         text.append ("Without chest:\n\n");
-        for (Monster m : goldMonsters)
+        for (MonsterV1 m : goldMonsters)
           text.append ("   " + m + "\n");
         text.append ("\n");
       }
       if (chestMonsters.size () > 0)
       {
         text.append ("With chest:\n\n");
-        for (Monster m : chestMonsters)
+        for (MonsterV1 m : chestMonsters)
           text.append ("   " + m + "\n");
       }
     }

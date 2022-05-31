@@ -30,6 +30,7 @@ public class Wizardry4BootDisk extends PascalDisk
   private List<CharacterV4> characters = new ArrayList<> ();
   private List<CharacterParty> parties = new ArrayList<> ();
   private List<ItemV4> items = new ArrayList<> ();
+  private List<MonsterV4> monsters = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
@@ -232,11 +233,15 @@ public class Wizardry4BootDisk extends PascalDisk
     for (int i = 0; i < sd.total; i++)
     {
       byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
+      int len = out[0] & 0xFF;
+      if (len > out.length)
+        System.out.printf ("Decoded array too short: (#%3d)  %3d > %3d%n", i, len, out.length);
 
       for (int j = 0; j < monsterNames.length; j++)
         monsterNames[j] = messageBlock.getMessageLine (i * 4 + 13000 + j);
 
       MonsterV4 monster = new MonsterV4 (monsterNames, out, i);
+      monsters.add (monster);
 
       List<DiskAddress> monsterBlocks = new ArrayList<> ();
       DiskAddress da = blocks.get (ptr / 512);
@@ -299,6 +304,9 @@ public class Wizardry4BootDisk extends PascalDisk
 
     for (CharacterV4 character : characters)
       character.addPossessions (items);
+
+    //    for (ItemV4 item : items)
+    //      item.link (items, spells);
   }
 
   // ---------------------------------------------------------------------------------//

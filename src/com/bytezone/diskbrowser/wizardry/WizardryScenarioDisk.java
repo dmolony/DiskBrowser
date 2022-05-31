@@ -30,11 +30,11 @@ public class WizardryScenarioDisk extends PascalDisk
   public Header scenarioHeader;
 
   public List<AbstractImage> images;
-  public List<Item> items;
+  public List<ItemV1> items;
   public List<CharacterV1> characters;
   public List<Spell> spells;
   public List<MessageV1> messages;
-  public List<Monster> monsters;
+  public List<MonsterV1> monsters;
   public List<MazeLevel> levels;
   List<ExperienceLevel> experiences;
   List<Reward> rewards;
@@ -70,8 +70,8 @@ public class WizardryScenarioDisk extends PascalDisk
     }
 
     CodedMessage.codeOffset = 185;
-    Monster.counter = 0;
-    Item.counter = 0;
+    MonsterV1.counter = 0;
+    ItemV1.counter = 0;
 
     DefaultTreeModel model = (DefaultTreeModel) catalogTree.getModel ();
     DefaultMutableTreeNode currentRoot = (DefaultMutableTreeNode) model.getRoot ();
@@ -118,6 +118,9 @@ public class WizardryScenarioDisk extends PascalDisk
       int type = c.getStatistics ().typeInt;
       c.linkExperience (experiences.get (type));
     }
+
+    for (ItemV1 item : items)
+      item.link (items, spells);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -318,7 +321,7 @@ public class WizardryScenarioDisk extends PascalDisk
       for (int i = 0; i < 24; i++)
         text.append (" --");
       text.append ("\n");
-      for (Monster m : monsters)
+      for (MonsterV1 m : monsters)
         text.append (m.getDump (block) + "\n");
       text.append ("\n");
     }
@@ -343,7 +346,7 @@ public class WizardryScenarioDisk extends PascalDisk
       byte[] data2 = new byte[recLen];
       System.arraycopy (buffer, ptr, data2, 0, recLen);
 
-      Monster m = new Monster (itemName, data2, rewards, monsters, scenarioHeader.scenarioID);
+      MonsterV1 m = new MonsterV1 (itemName, data2, rewards, monsters, scenarioHeader.scenarioID);
       monsters.add (m);
       addToNode (m, node, blocks, monsterSector);
     }
@@ -376,7 +379,7 @@ public class WizardryScenarioDisk extends PascalDisk
       for (int i = 0; i < 24; i++)
         text.append (" --");
       text.append ("\n");
-      for (Item item : items)
+      for (ItemV1 item : items)
         text.append (item.getDump (block) + "\n");
       text.append ("\n");
     }
@@ -400,7 +403,7 @@ public class WizardryScenarioDisk extends PascalDisk
       byte[] data2 = new byte[recLen];
       System.arraycopy (buffer, ptr, data2, 0, recLen);
 
-      Item i = new Item (itemName, data2);
+      ItemV1 i = new ItemV1 (itemName, data2);
       items.add (i);
       addToNode (i, node, blocks, itemSector);
     }
@@ -559,7 +562,7 @@ public class WizardryScenarioDisk extends PascalDisk
       System.arraycopy (buffer, 0, exactBuffer, 0, exactBuffer.length);
 
       String name = "Unknown";
-      for (Monster m : monsters)
+      for (MonsterV1 m : monsters)
         if (m.imageID == i)
         {
           name = m.genericName;

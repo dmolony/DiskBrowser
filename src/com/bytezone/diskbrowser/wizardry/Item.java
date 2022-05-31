@@ -1,36 +1,53 @@
 package com.bytezone.diskbrowser.wizardry;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
-class Item extends AbstractFile implements Comparable<Item>
+public class Item extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
-  public final int itemID;
-  private final int type;
-  private final long cost;
-  public int partyOwns;
+  int itemId;
   String genericName;
-  static int counter = 0;
-  public final Dice damage;
-  public final int armourClass;
-  public final int speed;
+  protected long price;
+  public Dice wephpdam;
+  public int armourClass;
+  public int xtraSwing;
+  boolean cursed;
+  int changeTo;
+  int changeChance;
+  int special;
+  int boltac;
+  int spellPwr;
+  int classUseFlags;
+  int healPts;
+  int wepvstyFlags;
+  int wepvsty2Flags;
+  int wepvsty3Flags;
+  int wephitmd;
+  boolean crithitm;
+
+  ObjectType type;
+  Alignment alignment;
+
+  Item changeToItem;
+  Spell spell;
+
+  public enum Alignment
+  {
+    UNALIGN, GOOD, NEUTRAL, EVIL
+  }
+
+  public enum ObjectType
+  {
+    WEAPON, ARMOR, SHIELD, HELMET, GAUNTLET, SPECIAL, MISC
+  }
 
   // ---------------------------------------------------------------------------------//
   Item (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
-    itemID = counter++;
-    genericName = HexFormatter.getPascalString (buffer, 16);
-    type = buffer[32];
-    cost = Utility.getShort (buffer, 44) + Utility.getShort (buffer, 46) * 10000
-        + Utility.getShort (buffer, 48) * 100000000L;
-    armourClass = buffer[62];
-    damage = new Dice (buffer, 66);
-    speed = buffer[72];                           // 14 flags
   }
 
   // ---------------------------------------------------------------------------------//
@@ -40,127 +57,48 @@ class Item extends AbstractFile implements Comparable<Item>
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Name ......... : " + getName ());
-    //		int length = HexFormatter.intValue (buffer[16]);
-    text.append ("\nGeneric name . : " + genericName);
-    text.append ("\nType ......... : " + type);
-    text.append ("\nCost ......... : " + cost);
-    text.append ("\nArmour class . : " + armourClass);
-    text.append ("\nDamage ....... : " + damage);
-    text.append ("\nSpeed ........ : " + speed);
-    text.append ("\nCursed? ...... : " + isCursed ());
-    int stock = getStockOnHand ();
-    text.append ("\nStock on hand  : " + stock);
-    if (stock < 0)
-      text.append (" (always in stock)");
+    text.append (String.format ("ID ............... %s%n%n", itemId));
+    text.append (String.format ("Name ............. %s%n", name));
+    text.append (String.format ("Generic name ..... %s%n", genericName));
+
+    text.append (String.format ("Cost ............. %,d%n", price));
+    text.append (String.format ("Damage ........... %s%n", wephpdam));
+    text.append (String.format ("Hit mod .......... %d%n", wephitmd));
+    text.append (String.format ("Critical hit ..... %s%n", crithitm));
+
+    text.append (String.format ("Type ............. %s%n", type));
+    text.append (String.format ("Alignment ........ %s%n", alignment));
+    text.append (String.format ("Armour class ..... %d%n", armourClass));
+    text.append (String.format ("Speed ............ %d%n", xtraSwing));
+    text.append (String.format ("Cursed? .......... %s%n", cursed));
+
+    String changeItemName = changeToItem == null ? "" : changeToItem.getName ();
+    text.append (String.format ("Decay odds ....... %d%%%n", changeChance));
+    text.append (String.format ("Decay to ......... %s%n", changeItemName));
+
+    text.append (String.format ("Special .......... %d%n", special));
+    text.append (String.format ("Boltac ........... %d%n", boltac));
+
+    String spellName = spell == null ? "" : spell.getName ();
+    text.append (String.format ("Spell ............ %s%n", spellName));
+
+    text.append (String.format ("Heal ............. %d%n", healPts));
+    text.append (String.format ("Class use ........ %d%n", classUseFlags));
+    text.append (String.format ("Flags ............ %d%n", wepvstyFlags));
+    text.append (String.format ("Flags2 ........... %d%n", wepvsty2Flags));
+    text.append (String.format ("Flags3 ........... %d%n", wepvsty3Flags));
 
     return text.toString ();
   }
 
   // ---------------------------------------------------------------------------------//
-  public int getType ()
+  int getWizLong (byte[] buffer, int offset)
   // ---------------------------------------------------------------------------------//
   {
-    return type;
-  }
+    int low = Utility.getShort (buffer, offset);
+    int mid = Utility.getShort (buffer, offset + 2);
+    int high = Utility.getShort (buffer, offset + 4);
 
-  //	public int getArmourClass ()
-  //	{
-  //		return buffer[62];
-  //	}
-
-  //	public int getSpeed ()
-  //	{
-  //		return HexFormatter.intValue (buffer[72]);
-  //	}
-
-  // ---------------------------------------------------------------------------------//
-  public long getCost ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return cost;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public boolean isCursed ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return buffer[36] != 0;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public int getStockOnHand ()
-  // ---------------------------------------------------------------------------------//
-  {
-    if (buffer[50] == -1 && buffer[51] == -1)
-      return -1;
-
-    return Utility.getShort (buffer, 50);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public boolean canUse (int type2)
-  // ---------------------------------------------------------------------------------//
-  {
-    int users = buffer[54] & 0xFF;
-    return ((users >>> type2) & 1) == 1;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  public String toString ()
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuilder line = new StringBuilder ();
-    line.append (String.format ("%-16s", getName ()));
-    if (buffer[36] == -1)
-      line.append ("(c) ");
-    else
-      line.append ("    ");
-    line.append (String.format ("%02X ", buffer[62]));
-    line.append (String.format ("%02X ", buffer[34]));
-    line.append (String.format ("%02X %02X", buffer[50], buffer[51]));
-
-    //		if (buffer[50] == -1 && buffer[51] == -1)
-    //			line.append ("* ");
-    //		else
-    //			line.append (HexFormatter.intValue (buffer[50], buffer[51]) + " ");
-
-    for (int i = 38; i < 44; i++)
-      line.append (HexFormatter.format2 (buffer[i]) + " ");
-    for (int i = 48; i < 50; i++)
-      line.append (HexFormatter.format2 (buffer[i]) + " ");
-    for (int i = 52; i < 62; i++)
-      line.append (HexFormatter.format2 (buffer[i]) + " ");
-    //		for (int i = 64; i < 78; i++)
-    //			line.append (HexFormatter.format2 (buffer[i]) + " ");
-
-    return line.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public String getDump (int block)
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuilder line = new StringBuilder (String.format ("%3d %-16s", itemID, getName ()));
-
-    int lo = block == 0 ? 32 : block == 1 ? 56 : 80;
-    int hi = lo + 24;
-    if (hi > buffer.length)
-      hi = buffer.length;
-
-    for (int i = lo; i < hi; i++)
-      line.append (String.format ("%02X ", buffer[i]));
-
-    return line.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  public int compareTo (Item otherItem)
-  // ---------------------------------------------------------------------------------//
-  {
-    Item item = otherItem;
-    return this.type - item.type;
+    return high * 100000000 + mid * 10000 + low;
   }
 }

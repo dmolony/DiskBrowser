@@ -266,12 +266,13 @@ public class CharacterV4 extends Character
 
     if (!party.slogan.isEmpty () || party.characters.size () > 1)
     {
-      text.append ("\n");
+      for (int i = possessionsCount; i < 9; i++)
+        text.append ("\n");
       text.append (party);
     }
 
-    text.append ("\n\n");
-    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
+    //    text.append ("\n\n");
+    //    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
 
     return text.toString ();
   }

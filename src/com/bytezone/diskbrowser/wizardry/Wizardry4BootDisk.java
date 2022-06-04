@@ -31,6 +31,7 @@ public class Wizardry4BootDisk extends PascalDisk
   private List<CharacterParty> parties = new ArrayList<> ();
   private List<ItemV4> items = new ArrayList<> ();
   private List<MonsterV4> monsters = new ArrayList<> ();
+  public List<String> spellNames = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)
@@ -98,6 +99,7 @@ public class Wizardry4BootDisk extends PascalDisk
         fileEntry.setFile (null);
         scenarioNode.setAllowsChildren (true);
         scenarioHeader = new Header (scenarioNode, this);
+        readSpells ();
         linkCharacters4 (scenarioNode, fileEntry);
         linkParties ();
         linkMazeLevels4 (scenarioNode, fileEntry);
@@ -161,7 +163,7 @@ public class Wizardry4BootDisk extends PascalDisk
 
     for (int i = 0; i < 500; i++)
     {
-      byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
+      byte[] out = huffman.decodeMessage (buffer, ptr);
 
       String name = HexFormatter.getPascalString (out, 1);
 
@@ -202,6 +204,19 @@ public class Wizardry4BootDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
+  private void readSpells ()
+  // ---------------------------------------------------------------------------------//
+  {
+    for (int i = 0; i < 51; i++)
+    {
+      String spellName = messageBlock.getMessageLine (i + 5000);
+      if (spellName.startsWith ("*"))
+        spellName = spellName.substring (1);
+      spellNames.add (spellName);
+    }
+  }
+
+  // ---------------------------------------------------------------------------------//
   private void link (CharacterV4 character, CharacterParty party)
   // ---------------------------------------------------------------------------------//
   {
@@ -232,7 +247,7 @@ public class Wizardry4BootDisk extends PascalDisk
 
     for (int i = 0; i < sd.total; i++)
     {
-      byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
+      byte[] out = huffman.decodeMessage (buffer, ptr);
       int len = out[0] & 0xFF;
       if (len > out.length)
         System.out.printf ("Decoded array too short: (#%3d)  %3d > %3d%n", i, len, out.length);
@@ -242,6 +257,7 @@ public class Wizardry4BootDisk extends PascalDisk
 
       MonsterV4 monster = new MonsterV4 (monsterNames, out, i);
       monsters.add (monster);
+      //      System.out.println (monster.getName ());
 
       List<DiskAddress> monsterBlocks = new ArrayList<> ();
       DiskAddress da = blocks.get (ptr / 512);
@@ -276,13 +292,13 @@ public class Wizardry4BootDisk extends PascalDisk
 
     for (int i = 0; i < sd.total; i++)
     {
-      byte[] out = huffman.decodeMessage (buffer, ptr, sd.totalBlocks);
+      byte[] out = huffman.decodeMessage (buffer, ptr);
 
       for (int j = 0; j < itemNames.length; j++)
       {
         itemNames[j] = messageBlock.getMessageLine (i * 2 + 14000 + j);
         if (itemNames[j] == null)
-          itemNames[j] = "Not found";
+          itemNames[j] = "Broken Item";
       }
 
       ItemV4 item = new ItemV4 (itemNames, out, i);
@@ -305,8 +321,11 @@ public class Wizardry4BootDisk extends PascalDisk
     for (CharacterV4 character : characters)
       character.addPossessions (items);
 
-    //    for (ItemV4 item : items)
-    //      item.link (items, spells);
+    //    for (int i = 0; i < items.size (); i++)
+    //      System.out.printf ("%3d  %s%n", i, items.get (i));
+
+    for (ItemV4 item : items)
+      item.link (items, spellNames);
   }
 
   // ---------------------------------------------------------------------------------//

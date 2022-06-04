@@ -1,6 +1,5 @@
 package com.bytezone.diskbrowser.wizardry;
 
-import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
@@ -41,19 +40,5 @@ public class MonsterV4 extends Monster
 
     resistance = Utility.getShort (buffer, 73);     // bit flags
     abilities = Utility.getShort (buffer, 75);      // bit flags
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  public String getText ()
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuilder text = new StringBuilder (super.getText ());
-
-    text.append ("\n\n");
-    //    text.append (HexFormatter.format (buffer, 1, buffer[0] & 0xFF));
-    text.append (HexFormatter.format (buffer));
-
-    return text.toString ();
   }
 }

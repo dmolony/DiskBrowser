@@ -21,9 +21,9 @@ public class Item extends AbstractFile
   int spellPwr;
   int classUseFlags;
   int healPts;
-  int wepvstyFlags;
-  int wepvsty2Flags;
-  int wepvsty3Flags;
+  int flags1;
+  int flags2;
+  int flags3;
   int wephitmd;
   boolean crithitm;
 
@@ -32,6 +32,7 @@ public class Item extends AbstractFile
 
   Item changeToItem;
   Spell spell;
+  String spellName;
 
   public enum Alignment
   {
@@ -80,13 +81,15 @@ public class Item extends AbstractFile
     text.append (String.format ("Boltac ........... %d%n", boltac));
 
     String spellName = spell == null ? "" : spell.getName ();
+    if (this.spellName != null)
+      spellName = this.spellName;
     text.append (String.format ("Spell ............ %s%n", spellName));
 
     text.append (String.format ("Heal ............. %d%n", healPts));
     text.append (String.format ("Class use ........ %d%n", classUseFlags));
-    text.append (String.format ("Flags ............ %d%n", wepvstyFlags));
-    text.append (String.format ("Flags2 ........... %d%n", wepvsty2Flags));
-    text.append (String.format ("Flags3 ........... %d%n", wepvsty3Flags));
+    text.append (String.format ("Flags ............ %d%n", flags1));
+    text.append (String.format ("Flags2 ........... %d%n", flags2));
+    text.append (String.format ("Flags3 ........... %d%n", flags3));
 
     return text.toString ();
   }

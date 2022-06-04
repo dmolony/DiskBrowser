@@ -21,14 +21,6 @@ class ItemV1 extends Item // implements Comparable<ItemV1>
     itemId = counter++;
     genericName = HexFormatter.getPascalString (buffer, 16);
 
-    //    type = buffer[32];
-    //    cost = getWizLong (buffer, 44);
-    //    cost = Utility.getShort (buffer, 44) + Utility.getShort (buffer, 46) * 10000
-    //        + Utility.getShort (buffer, 48) * 100000000L;
-    //    armourClass = buffer[62];
-    //    wephpdam = new Dice (buffer, 66);
-    //    xtraSwing = buffer[72];                           // 14 flags
-
     type = ObjectType.values ()[buffer[32]];
     alignment = Alignment.values ()[buffer[34]];
     cursed = Utility.signedShort (buffer, 36) == -1;
@@ -41,14 +33,14 @@ class ItemV1 extends Item // implements Comparable<ItemV1>
     classUseFlags = Utility.getShort (buffer, 54);       // 8 flags
 
     healPts = Utility.signedShort (buffer, 56);
-    wepvsty2Flags = Utility.getShort (buffer, 58);       // 16 flags
-    wepvsty3Flags = Utility.getShort (buffer, 60);       // 16 flags
+    flags2 = Utility.getShort (buffer, 58);       // 16 flags
+    flags3 = Utility.getShort (buffer, 60);       // 16 flags
     armourClass = Utility.signedShort (buffer, 62);
     wephitmd = Utility.signedShort (buffer, 64);
     wephpdam = new Dice (buffer, 66);                    // Dice
     xtraSwing = Utility.getShort (buffer, 72);
     crithitm = Utility.getShort (buffer, 74) == 1;       // boolean
-    wepvstyFlags = Utility.getShort (buffer, 76);        // 14 flags
+    flags1 = Utility.getShort (buffer, 76);        // 14 flags
   }
 
   // ---------------------------------------------------------------------------------//

@@ -23,20 +23,20 @@ class ItemV1 extends Item // implements Comparable<ItemV1>
 
     type = ObjectType.values ()[buffer[32]];
     alignment = Alignment.values ()[buffer[34]];
-    cursed = Utility.signedShort (buffer, 36) == -1;
-    special = Utility.signedShort (buffer, 38);
+    cursed = Utility.getSignedShort (buffer, 36) == -1;
+    special = Utility.getSignedShort (buffer, 38);
     changeTo = Utility.getShort (buffer, 40);            // decay #
     changeChance = Utility.getShort (buffer, 42);
-    price = getWizLong (buffer, 44);
-    boltac = Utility.signedShort (buffer, 50);
+    price = Utility.getWizLong (buffer, 44);
+    boltac = Utility.getSignedShort (buffer, 50);
     spellPwr = Utility.getShort (buffer, 52);
     classUseFlags = Utility.getShort (buffer, 54);       // 8 flags
 
-    healPts = Utility.signedShort (buffer, 56);
+    healPts = Utility.getSignedShort (buffer, 56);
     flags2 = Utility.getShort (buffer, 58);       // 16 flags
     flags3 = Utility.getShort (buffer, 60);       // 16 flags
-    armourClass = Utility.signedShort (buffer, 62);
-    wephitmd = Utility.signedShort (buffer, 64);
+    armourClass = Utility.getSignedShort (buffer, 62);
+    wephitmd = Utility.getSignedShort (buffer, 64);
     wephpdam = new Dice (buffer, 66);                    // Dice
     xtraSwing = Utility.getShort (buffer, 72);
     crithitm = Utility.getShort (buffer, 74) == 1;       // boolean

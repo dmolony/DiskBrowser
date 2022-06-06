@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
-import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public abstract class Monster extends AbstractFile
@@ -97,16 +96,5 @@ public abstract class Monster extends AbstractFile
     }
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  int getWizLong (byte[] buffer, int offset)
-  // ---------------------------------------------------------------------------------//
-  {
-    int low = Utility.getShort (buffer, offset);
-    int mid = Utility.getShort (buffer, offset + 2);
-    int high = Utility.getShort (buffer, offset + 4);
-
-    return high * 100000000 + mid * 10000 + low;
   }
 }

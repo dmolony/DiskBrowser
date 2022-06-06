@@ -21,7 +21,7 @@ public class MonsterV4 extends Monster
     groupSize = new Dice (buffer, 1);
     hitPoints = new Dice (buffer, 7);
     type = Utility.getShort (buffer, 13);
-    armourClass = Utility.signedShort (buffer, 15);
+    armourClass = Utility.getSignedShort (buffer, 15);
 
     recsn = buffer[17];                               // number of dice
     for (int i = 0, ptr = 19; i < 7; i++, ptr += 6)

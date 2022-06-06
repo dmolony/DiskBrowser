@@ -21,25 +21,25 @@ public class ItemV4 extends Item
 
     type = ObjectType.values ()[buffer[1]];
     alignment = Alignment.values ()[buffer[3]];
-    cursed = Utility.signedShort (buffer, 5) == -1;
-    special = Utility.signedShort (buffer, 7);
+    cursed = Utility.getSignedShort (buffer, 5) == -1;
+    special = Utility.getSignedShort (buffer, 7);
     changeTo = Utility.getShort (buffer, 9);            // decay #
     changeChance = Utility.getShort (buffer, 11);
-    price = getWizLong (buffer, 13);
-    boltac = Utility.signedShort (buffer, 19);
+    price = Utility.getWizLong (buffer, 13);
+    boltac = Utility.getSignedShort (buffer, 19);
     spellPwr = Utility.getShort (buffer, 21);
-    classUseFlags = Utility.getShort (buffer, 23);       // 8 flags
+    classUseFlags = Utility.getShort (buffer, 23);      // 8 flags
 
-    healPts = Utility.signedShort (buffer, 25);
-    flags2 = Utility.getShort (buffer, 27);       // 16 flags
-    flags3 = Utility.getShort (buffer, 29);       // 16 flags
-    armourClass = Utility.signedShort (buffer, 31);
-    wephitmd = Utility.signedShort (buffer, 33);
+    healPts = Utility.getSignedShort (buffer, 25);
+    flags2 = Utility.getShort (buffer, 27);             // 16 flags
+    flags3 = Utility.getShort (buffer, 29);             // 16 flags
+    armourClass = Utility.getSignedShort (buffer, 31);
+    wephitmd = Utility.getSignedShort (buffer, 33);
     wephpdam = new Dice (buffer, 35);
 
     xtraSwing = Utility.getShort (buffer, 41);
-    crithitm = Utility.getShort (buffer, 43) == 1;       // boolean
-    flags1 = Utility.getShort (buffer, 45);        // 14 flags
+    crithitm = Utility.getShort (buffer, 43) == 1;      // boolean
+    flags1 = Utility.getShort (buffer, 45);             // 14 flags
   }
 
   // ---------------------------------------------------------------------------------//

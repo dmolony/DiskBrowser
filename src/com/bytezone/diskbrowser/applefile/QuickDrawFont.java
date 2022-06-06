@@ -88,8 +88,8 @@ public class QuickDrawFont extends CharacterList
     firstChar = Utility.getShort (buffer, ptr + 2);
     lastChar = Utility.getShort (buffer, ptr + 4);
     widMax = Utility.getShort (buffer, ptr + 6);
-    kernMax = Utility.signedShort (buffer, ptr + 8);
-    nDescent = Utility.signedShort (buffer, ptr + 10);
+    kernMax = Utility.getSignedShort (buffer, ptr + 8);
+    nDescent = Utility.getSignedShort (buffer, ptr + 10);
     fRectWidth = Utility.getShort (buffer, ptr + 12);
     fRectHeight = Utility.getShort (buffer, ptr + 14);
 

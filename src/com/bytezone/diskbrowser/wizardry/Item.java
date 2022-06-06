@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.wizardry;
 
 import com.bytezone.diskbrowser.applefile.AbstractFile;
-import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class Item extends AbstractFile
@@ -92,16 +91,5 @@ public class Item extends AbstractFile
     text.append (String.format ("Flags3 ........... %d%n", flags3));
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  int getWizLong (byte[] buffer, int offset)
-  // ---------------------------------------------------------------------------------//
-  {
-    int low = Utility.getShort (buffer, offset);
-    int mid = Utility.getShort (buffer, offset + 2);
-    int high = Utility.getShort (buffer, offset + 4);
-
-    return high * 100000000 + mid * 10000 + low;
   }
 }

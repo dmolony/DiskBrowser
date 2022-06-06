@@ -198,7 +198,7 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
-  public static int signedShort (byte[] buffer, int ptr)
+  public static int getSignedShort (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
     try
@@ -445,6 +445,17 @@ public final class Utility
       year += 1900;
 
     return LocalDate.of (year, month, day);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static int getWizLong (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
+  {
+    int low = Utility.getShort (buffer, offset);
+    int mid = Utility.getShort (buffer, offset + 2);
+    int high = Utility.getShort (buffer, offset + 4);
+
+    return high * 100000000 + mid * 10000 + low;
   }
 
   // ---------------------------------------------------------------------------------//

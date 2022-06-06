@@ -21,7 +21,7 @@ import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 public class Wizardry4BootDisk extends PascalDisk
 // -----------------------------------------------------------------------------------//
 {
-  public Header scenarioHeader;
+  private Header scenarioHeader;
   private Relocator relocator;
   private MessageBlock messageBlock;
   private Huffman huffman;
@@ -31,7 +31,7 @@ public class Wizardry4BootDisk extends PascalDisk
   private List<CharacterParty> parties = new ArrayList<> ();
   private List<ItemV4> items = new ArrayList<> ();
   private List<MonsterV4> monsters = new ArrayList<> ();
-  public List<String> spellNames = new ArrayList<> ();
+  private List<String> spellNames = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   public Wizardry4BootDisk (AppleDisk[] dataDisks)

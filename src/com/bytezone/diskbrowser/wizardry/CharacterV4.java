@@ -95,7 +95,7 @@ public class CharacterV4 extends Character
     race = Race.values ()[Utility.getShort (buffer, 35)];
     characterClass = CharacterClass.values ()[Utility.getShort (buffer, 37)];
     age = 0;
-    armourClass = Utility.signedShort (buffer, 39);
+    armourClass = Utility.getSignedShort (buffer, 39);
 
     status = CharacterStatus.values ()[Utility.getShort (buffer, 41)];
     alignment = Alignment.values ()[Utility.getShort (buffer, 43)];
@@ -156,7 +156,7 @@ public class CharacterV4 extends Character
       spellAllowance[PRIEST_SPELLS][i] = Utility.getShort (buffer, 161 + i * 2);
     }
 
-    hpCalCmd = Utility.signedShort (buffer, 175);
+    hpCalCmd = Utility.getSignedShort (buffer, 175);
     //    armourClass = Utility.getSignedShort (buffer, 177);   // see offset 39
     healPts = Utility.getShort (buffer, 179);
 

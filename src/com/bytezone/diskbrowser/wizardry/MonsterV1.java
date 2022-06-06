@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.wizardry;
 import java.util.List;
 
 import com.bytezone.diskbrowser.utilities.HexFormatter;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 class MonsterV1 extends Monster
@@ -70,7 +71,7 @@ class MonsterV1 extends Monster
       damage.add (new Dice (buffer, ptr));
     }
 
-    experiencePoints = getWizLong (buffer, 126);
+    experiencePoints = Utility.getWizLong (buffer, 126);
     levelDrain = buffer[132];
     healPts = buffer[134];
     goldReward = rewards.get (buffer[136]);

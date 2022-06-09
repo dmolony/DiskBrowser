@@ -97,4 +97,12 @@ public abstract class Monster extends AbstractFile
 
     return text.toString ();
   }
+
+  // ---------------------------------------------------------------------------------//
+  @Override
+  public String toString ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return name;
+  }
 }

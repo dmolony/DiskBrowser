@@ -39,6 +39,9 @@ public class WizardryScenarioDisk extends PascalDisk
   List<ExperienceLevel> experiences;
   List<Reward> rewards;
 
+  private int monsterId;
+  private int itemId;
+
   // leave these here until I decide whether to use them or not
   SectorType mazeSector = new SectorType ("Maze", Color.lightGray);
   SectorType monsterSector = new SectorType ("Monsters", Color.black);
@@ -70,8 +73,6 @@ public class WizardryScenarioDisk extends PascalDisk
     }
 
     CodedMessage.codeOffset = 185;
-    MonsterV1.counter = 0;
-    ItemV1.counter = 0;
 
     DefaultTreeModel model = (DefaultTreeModel) catalogTree.getModel ();
     DefaultMutableTreeNode currentRoot = (DefaultMutableTreeNode) model.getRoot ();
@@ -111,12 +112,12 @@ public class WizardryScenarioDisk extends PascalDisk
     //		makeNodeVisible (node);
 
     // add information about each characters' baggage, spells known etc.
-    for (CharacterV1 c : characters)
+    for (CharacterV1 character : characters)
     {
-      c.linkItems (items);
-      c.linkSpells (spells);
-      int type = c.getStatistics ().typeInt;
-      c.linkExperience (experiences.get (type));
+      character.linkItems (items);
+      character.linkSpells (spells);
+      int type = character.getStatistics ().typeInt;
+      character.linkExperience (experiences.get (type));
     }
 
     for (ItemV1 item : items)
@@ -346,7 +347,8 @@ public class WizardryScenarioDisk extends PascalDisk
       byte[] data2 = new byte[recLen];
       System.arraycopy (buffer, ptr, data2, 0, recLen);
 
-      MonsterV1 m = new MonsterV1 (itemName, data2, rewards, monsters, scenarioHeader.scenarioID);
+      MonsterV1 m = new MonsterV1 (monsterId++, itemName, data2, rewards, monsters,
+          scenarioHeader.scenarioID);
       monsters.add (m);
       addToNode (m, node, blocks, monsterSector);
     }
@@ -403,7 +405,7 @@ public class WizardryScenarioDisk extends PascalDisk
       byte[] data2 = new byte[recLen];
       System.arraycopy (buffer, ptr, data2, 0, recLen);
 
-      ItemV1 i = new ItemV1 (itemName, data2);
+      ItemV1 i = new ItemV1 (itemId++, itemName, data2);
       items.add (i);
       addToNode (i, node, blocks, itemSector);
     }

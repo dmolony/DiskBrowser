@@ -10,15 +10,16 @@ class ItemV1 extends Item // implements Comparable<ItemV1>
 // -----------------------------------------------------------------------------------//
 {
   //  public int partyOwns;
-  static int counter = 0;
+  //  static int counter = 0;
 
   // ---------------------------------------------------------------------------------//
-  ItemV1 (String name, byte[] buffer)
+  ItemV1 (int itemId, String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
 
-    itemId = counter++;
+    //    itemId = counter++;
+    this.itemId = itemId;
     genericName = HexFormatter.getPascalString (buffer, 16);
 
     type = ObjectType.values ()[buffer[32]];

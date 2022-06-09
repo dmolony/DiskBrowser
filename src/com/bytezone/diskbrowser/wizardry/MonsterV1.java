@@ -24,7 +24,7 @@ class MonsterV1 extends Monster
   int experiencePoints;
   int unique;
 
-  static int counter = 0;
+  //  static int counter = 0;
 
   // Scenario #1 values
   private static int[] experience = {                                     //
@@ -42,7 +42,7 @@ class MonsterV1 extends Monster
   };
 
   // ---------------------------------------------------------------------------------//
-  MonsterV1 (String name, byte[] buffer, List<Reward> rewards, List<MonsterV1> monsters,
+  MonsterV1 (int id, String name, byte[] buffer, List<Reward> rewards, List<MonsterV1> monsters,
       int scenarioId)
   // ---------------------------------------------------------------------------------//
   {
@@ -54,7 +54,8 @@ class MonsterV1 extends Monster
     genericNamePlural = HexFormatter.getPascalString (buffer, 16);
     namePlural = HexFormatter.getPascalString (buffer, 48);
 
-    this.monsterID = counter++;
+    //    this.monsterID = counter++;
+    this.monsterID = id;
     this.monsters = monsters;
 
     imageID = buffer[64];
@@ -185,19 +186,13 @@ class MonsterV1 extends Monster
   }
 
   // ---------------------------------------------------------------------------------//
-  public String getRealName ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return name;
-  }
-
-  // ---------------------------------------------------------------------------------//
   public String getDump (int block)
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder line = new StringBuilder (String.format ("%3d %-16s", monsterID, name));
 
-    int lo = block == 0 ? 64 : block == 1 ? 88 : block == 2 ? 112 : 136;
+    //    int lo = block == 0 ? 64 : block == 1 ? 88 : block == 2 ? 112 : 136;
+    int lo = 64 + block * 24;
     int hi = lo + 24;
     if (hi > buffer.length)
       hi = buffer.length;
@@ -218,17 +213,9 @@ class MonsterV1 extends Monster
   }
 
   // ---------------------------------------------------------------------------------//
-  public boolean match (int monsterID)
+  boolean match (int monsterID)
   // ---------------------------------------------------------------------------------//
   {
     return this.monsterID == monsterID;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  @Override
-  public String toString ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return name;
   }
 }

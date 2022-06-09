@@ -346,11 +346,11 @@ class MazeCell
       else
       {
         MonsterV1 monster = monsters.get (monsterID);
-        sign.append ("&nbsp;<b>" + monster.getRealName () + "&nbsp;</b>");
+        sign.append ("&nbsp;<b>" + monster.getName () + "&nbsp;</b>");
         while (monster.partnerOdds == 100)
         {
           monster = monsters.get (monster.partnerID);
-          sign.append ("<br>&nbsp;<b>" + monster.getRealName () + "&nbsp;</b>");
+          sign.append ("<br>&nbsp;<b>" + monster.getName () + "&nbsp;</b>");
         }
       }
     if (itemRequired != null)

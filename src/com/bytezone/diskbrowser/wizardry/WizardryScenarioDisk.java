@@ -18,7 +18,6 @@ import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
-import com.bytezone.diskbrowser.wizardry.CharacterV1.Attributes;
 import com.bytezone.diskbrowser.wizardry.CharacterV1.Statistics;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 import com.bytezone.diskbrowser.wizardry.Spell.SpellType;
@@ -78,11 +77,13 @@ public class WizardryScenarioDisk extends PascalDisk
     DefaultMutableTreeNode currentRoot = (DefaultMutableTreeNode) model.getRoot ();
     DefaultMutableTreeNode dataNode = findNode (currentRoot, "SCENARIO.DATA");
     DefaultMutableTreeNode msgNode = findNode (currentRoot, "SCENARIO.MESGS");
+
     if (dataNode == null || msgNode == null)
     {
       System.out.println ("Wizardry data or msg node not found");
       return;
     }
+
     dataNode.setAllowsChildren (true);
     msgNode.setAllowsChildren (true);
 
@@ -90,9 +91,7 @@ public class WizardryScenarioDisk extends PascalDisk
 
     // Process SCENARIO.MESGS (requires scenario)
     AppleFileSource afs = (AppleFileSource) msgNode.getUserObject ();
-    //    DefaultMutableTreeNode node = linkNode ("Messages", "Messages string", msgNode);
     extractMessages (msgNode, afs.getSectors ());
-    //		makeNodeVisible (node);
 
     // Process SCENARIO.DATA (requires scenario and messages)
     afs = (AppleFileSource) dataNode.getUserObject ();
@@ -104,12 +103,9 @@ public class WizardryScenarioDisk extends PascalDisk
     extractCharacters (linkNode ("Characters", "Characters string", dataNode), sectors);
     extractImages (linkNode ("Images", "Images string", dataNode), sectors);
     extractExperienceLevels (linkNode ("Experience", "Experience string", dataNode), sectors);
-    //		node = linkNode ("Spells", "Spells string", dataNode);
-    DefaultMutableTreeNode node = null;
-    extractSpells (node, sectors);
+
+    extractSpells (sectors);
     extractLevels (linkNode ("Maze", "Levels string", dataNode), sectors);
-    // Make the Spells node (and its siblings) visible
-    //		makeNodeVisible (node);
 
     // add information about each characters' baggage, spells known etc.
     for (CharacterV1 character : characters)
@@ -131,6 +127,7 @@ public class WizardryScenarioDisk extends PascalDisk
     DefaultAppleFileSource afs = new DefaultAppleFileSource (name, text, this);
     DefaultMutableTreeNode node = new DefaultMutableTreeNode (afs);
     parent.add (node);
+
     return node;
   }
 
@@ -151,6 +148,7 @@ public class WizardryScenarioDisk extends PascalDisk
           && !text.equals ("WIZARDRY.CODE"))
         return false;
     }
+
     return true;
   }
 
@@ -259,11 +257,11 @@ public class WizardryScenarioDisk extends PascalDisk
     for (CharacterV1 ch : characters)
     {
       Statistics stats = ch.getStatistics ();
-      Attributes att = ch.getAttributes ();
+      int[] att = ch.getAttributes ();
       text.append (String.format ("%-15s %2d  %-8s %-8s %-8s  %3d", ch, (stats.ageInWeeks / 52),
           stats.alignment, stats.race, stats.type, stats.hitsMax));
-      text.append (String.format ("  %2d  %2d  %2d  %2d  %2d  %2d", att.strength, att.intelligence,
-          att.piety, att.vitality, att.agility, att.luck));
+      text.append (String.format ("  %2d  %2d  %2d  %2d  %2d  %2d", att[0], att[1], att[2], att[3],
+          att[4], att[5]));
       text.append (String.format ("  %5s  %s%n", stats.status, ch.isOut () ? "* OUT *" : ""));
     }
 
@@ -412,7 +410,7 @@ public class WizardryScenarioDisk extends PascalDisk
   }
 
   // ---------------------------------------------------------------------------------//
-  private void extractSpells (DefaultMutableTreeNode node, List<DiskAddress> sectors)
+  private void extractSpells (List<DiskAddress> sectors)
   // ---------------------------------------------------------------------------------//
   {
     spells = new ArrayList<> ();
@@ -427,6 +425,7 @@ public class WizardryScenarioDisk extends PascalDisk
       byte[] buffer = disk.readBlock (da);
       int level = 1;
       int ptr = -1;
+
       while (ptr < 255)
       {
         ptr++;
@@ -435,15 +434,17 @@ public class WizardryScenarioDisk extends PascalDisk
           ptr++;
         if (ptr == start)
           break;
+
         String spell = HexFormatter.getString (buffer, start, ptr - start);
+
         if (spell.startsWith ("*"))
         {
           spell = spell.substring (1);
           ++level;
         }
+
         Spell s = Spell.getSpell (spell, spellType, level, buffer);
         spells.add (s);
-        //				addToNode (s, node, da, spellSector);
       }
       spellType = SpellType.PRIEST;
     }

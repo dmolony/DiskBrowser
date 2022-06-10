@@ -10,9 +10,9 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class CharacterV1 extends Character
 // -----------------------------------------------------------------------------------//
 {
-  private static char[] awardsText = ">!$#&*<?BCPKODG@".toCharArray ();
+  public final int[] attributes = new int[6];      // 0:18
+  public final int[] saveVs = new int[5];          // 0:31
 
-  private final Attributes attributes;
   private final Statistics stats;
 
   private final List<Spell> spellBook = new ArrayList<> ();
@@ -26,7 +26,6 @@ class CharacterV1 extends Character
 
     this.scenario = scenario;
 
-    attributes = new Attributes ();
     stats = new Statistics ();
 
     stats.race = races[buffer[34] & 0xFF];
@@ -37,9 +36,18 @@ class CharacterV1 extends Character
     stats.status = statuses[stats.statusValue];
     stats.alignment = alignments[buffer[42] & 0xFF];
 
-    stats.gold = Utility.getShort (buffer, 52) + Utility.getShort (buffer, 54) * 10000
-        + Utility.getShort (buffer, 56) * 100000000L;
-    stats.experience = Utility.getShort (buffer, 124) + Utility.getShort (buffer, 126) * 10000;
+    int attr1 = Utility.getShort (buffer, 44);
+    int attr2 = Utility.getShort (buffer, 46);
+
+    attributes[0] = attr1 & 0x001F;
+    attributes[1] = (attr1 & 0x03E0) >>> 5;
+    attributes[2] = (attr1 & 0x7C00) >>> 10;
+    attributes[3] = attr2 & 0x001F;
+    attributes[4] = (attr2 & 0x03E0) >>> 5;
+    attributes[5] = (attr2 & 0x7C00) >>> 10;
+
+    stats.gold = Utility.getWizLong (buffer, 52);
+    stats.experience = Utility.getWizLong (buffer, 124);
     stats.level = Utility.getShort (buffer, 132);
 
     stats.hitsLeft = Utility.getShort (buffer, 134);
@@ -47,31 +55,15 @@ class CharacterV1 extends Character
 
     stats.armourClass = buffer[176];
 
-    attributes.strength = (buffer[44] & 0xFF) % 16;
-    if (attributes.strength < 3)
-      attributes.strength += 16;
-    attributes.array[0] = attributes.strength;
+    // saving throws
+    attr1 = Utility.getShort (buffer, 48);
+    attr2 = Utility.getShort (buffer, 50);
 
-    int i1 = (buffer[44] & 0xFF) / 16;
-    int i2 = (buffer[45] & 0xFF) % 4;
-    attributes.intelligence = i1 / 2 + i2 * 8;
-    attributes.array[1] = attributes.intelligence;
-
-    attributes.piety = (buffer[45] & 0xFF) / 4;
-    attributes.array[2] = attributes.piety;
-
-    attributes.vitality = (buffer[46] & 0xFF) % 16;
-    if (attributes.vitality < 3)
-      attributes.vitality += 16;
-    attributes.array[3] = attributes.vitality;
-
-    int a1 = (buffer[46] & 0xFF) / 16;
-    int a2 = (buffer[47] & 0xFF) % 4;
-    attributes.agility = a1 / 2 + a2 * 8;
-    attributes.array[4] = attributes.agility;
-
-    attributes.luck = (buffer[47] & 0xFF) / 4;
-    attributes.array[5] = attributes.luck;
+    saveVs[0] = attr1 & 0x001F;
+    saveVs[1] = (attr1 & 0x03E0) >>> 5;
+    saveVs[2] = (attr1 & 0x7C00) >>> 10;
+    saveVs[3] = attr2 & 0x001F;
+    saveVs[4] = (attr2 & 0x03E0) >>> 5;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -95,7 +87,6 @@ class CharacterV1 extends Character
         identified = (buffer[ptr + 4] == 1);
         baggageList.add (new Baggage (item, equipped, identified));
         stats.assetValue += item.getCost ();
-        //        item.partyOwns++;
       }
       else
         System.out.println (
@@ -112,10 +103,7 @@ class CharacterV1 extends Character
       for (int bit = 0; bit < 8; bit++)
       {
         if (((buffer[i] >>> bit) & 0x01) != 0)
-        {
           spellBook.add (spellList.get (index));
-          //          System.out.println (spellList.get (index));
-        }
 
         if (++index >= spellList.size ())
           break;
@@ -134,8 +122,6 @@ class CharacterV1 extends Character
     text.append ("\nType ............... " + stats.type);
     text.append ("\nAlignment .......... " + stats.alignment);
     text.append ("\nStatus ............. " + stats.status);
-    //    text.append ("\nType ............... " + stats.typeInt);
-    //    text.append ("\nStatus ............. " + stats.statusValue);
     text.append ("\nGold ............... " + String.format ("%,d", stats.gold));
     text.append ("\nExperience ......... " + String.format ("%,d", stats.experience));
     text.append ("\nNext level ......... " + String.format ("%,d", stats.nextLevel));
@@ -150,12 +136,12 @@ class CharacterV1 extends Character
     text.append ("\nAwards ............. " + getAwardString ());
     text.append ("\nOut ................ " + isOut ());
 
-    text.append ("\n\nStrength ........... " + attributes.strength);
-    text.append ("\nIntelligence ....... " + attributes.intelligence);
-    text.append ("\nPiety .............. " + attributes.piety);
-    text.append ("\nVitality ........... " + attributes.vitality);
-    text.append ("\nAgility ............ " + attributes.agility);
-    text.append ("\nLuck ............... " + attributes.luck);
+    text.append ("\n\nStrength ........... " + attributes[0]);
+    text.append ("\nIntelligence ....... " + attributes[1]);
+    text.append ("\nPiety .............. " + attributes[2]);
+    text.append ("\nVitality ........... " + attributes[3]);
+    text.append ("\nAgility ............ " + attributes[4]);
+    text.append ("\nLuck ............... " + attributes[5]);
 
     int[] spellPoints = getMageSpellPoints ();
     text.append ("\n\nMage spell points ..");
@@ -217,24 +203,6 @@ class CharacterV1 extends Character
   }
 
   // ---------------------------------------------------------------------------------//
-  public String getAwardString ()
-  // ---------------------------------------------------------------------------------//
-  {
-    StringBuilder text = new StringBuilder ();
-
-    int awards = Utility.getShort (buffer, 206);
-
-    for (int i = 0; i < 16; i++)
-    {
-      if ((awards & 0x01) != 0)
-        text.append (awardsText[i]);
-      awards >>>= 1;
-    }
-
-    return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
   public boolean isOut ()
   // ---------------------------------------------------------------------------------//
   {
@@ -263,7 +231,7 @@ class CharacterV1 extends Character
   }
 
   // ---------------------------------------------------------------------------------//
-  public Attributes getAttributes ()
+  int[] getAttributes ()
   // ---------------------------------------------------------------------------------//
   {
     return attributes;
@@ -340,18 +308,5 @@ class CharacterV1 extends Character
     public int hitsMax;
     public int armourClass;
     public int assetValue;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public class Attributes
-  // ---------------------------------------------------------------------------------//
-  {
-    public int strength;
-    public int intelligence;
-    public int piety;
-    public int vitality;
-    public int agility;
-    public int luck;
-    public int[] array = new int[6];
   }
 }

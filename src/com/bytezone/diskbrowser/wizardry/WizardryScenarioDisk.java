@@ -18,7 +18,6 @@ import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.pascal.PascalDisk;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 import com.bytezone.diskbrowser.utilities.Utility;
-import com.bytezone.diskbrowser.wizardry.CharacterV1.Statistics;
 import com.bytezone.diskbrowser.wizardry.Header.ScenarioData;
 import com.bytezone.diskbrowser.wizardry.Spell.SpellType;
 
@@ -112,7 +111,7 @@ public class WizardryScenarioDisk extends PascalDisk
     {
       character.linkItems (items);
       character.linkSpells (spells);
-      int type = character.getStatistics ().typeInt;
+      int type = character.typeInt;
       character.linkExperience (experiences.get (type));
     }
 
@@ -256,13 +255,12 @@ public class WizardryScenarioDisk extends PascalDisk
         + "--  --  --  --  --  --  -- ------\n");
     for (CharacterV1 ch : characters)
     {
-      Statistics stats = ch.getStatistics ();
       int[] att = ch.getAttributes ();
-      text.append (String.format ("%-15s %2d  %-8s %-8s %-8s  %3d", ch, (stats.ageInWeeks / 52),
-          stats.alignment, stats.race, stats.type, stats.hitsMax));
+      text.append (String.format ("%-15s %2d  %-8s %-8s %-8s  %3d", ch, (ch.ageInWeeks / 52),
+          ch.getAlignment (), ch.getRace (), ch.getType (), ch.hpMax));
       text.append (String.format ("  %2d  %2d  %2d  %2d  %2d  %2d", att[0], att[1], att[2], att[3],
           att[4], att[5]));
-      text.append (String.format ("  %5s  %s%n", stats.status, ch.isOut () ? "* OUT *" : ""));
+      text.append (String.format ("  %5s  %s%n", ch.getStatus (), ch.isOut () ? "* OUT *" : ""));
     }
 
     DefaultAppleFileSource afs = (DefaultAppleFileSource) node.getUserObject ();

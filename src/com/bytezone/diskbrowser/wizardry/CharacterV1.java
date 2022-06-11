@@ -10,13 +10,22 @@ import com.bytezone.diskbrowser.utilities.Utility;
 class CharacterV1 extends Character
 // -----------------------------------------------------------------------------------//
 {
-  public final int[] attributes = new int[6];      // 0:18
-  public final int[] saveVs = new int[5];          // 0:31
+  private String race;
+  private String type;
+  private String alignment;
+  private String status;
 
-  private final Statistics stats;
+  public int typeInt;
+  public int statusInt;
+
+  public long gold;
+  public int experience;
+  public long nextLevel;
+  public int ageInWeeks;
+  public int assetValue;
 
   private final List<Spell> spellBook = new ArrayList<> ();
-  private final List<Baggage> baggageList = new ArrayList<> ();
+  private final List<Possession> possessions = new ArrayList<> ();
 
   // ---------------------------------------------------------------------------------//
   CharacterV1 (String name, byte[] buffer, int scenario)
@@ -26,71 +35,57 @@ class CharacterV1 extends Character
 
     this.scenario = scenario;
 
-    stats = new Statistics ();
+    inMaze = Utility.getShort (buffer, 32) != 0;
+    race = races[buffer[34] & 0xFF];
 
-    stats.race = races[buffer[34] & 0xFF];
-    stats.typeInt = buffer[36] & 0xFF;
-    stats.type = types[stats.typeInt];
-    stats.ageInWeeks = Utility.getShort (buffer, 38);
-    stats.statusValue = buffer[40];
-    stats.status = statuses[stats.statusValue];
-    stats.alignment = alignments[buffer[42] & 0xFF];
+    typeInt = buffer[36] & 0xFF;
+    type = types[typeInt];
 
-    int attr1 = Utility.getShort (buffer, 44);
-    int attr2 = Utility.getShort (buffer, 46);
+    ageInWeeks = Utility.getShort (buffer, 38);
 
-    attributes[0] = attr1 & 0x001F;
-    attributes[1] = (attr1 & 0x03E0) >>> 5;
-    attributes[2] = (attr1 & 0x7C00) >>> 10;
-    attributes[3] = attr2 & 0x001F;
-    attributes[4] = (attr2 & 0x03E0) >>> 5;
-    attributes[5] = (attr2 & 0x7C00) >>> 10;
+    statusInt = buffer[40];
+    status = statuses[statusInt];
 
-    stats.gold = Utility.getWizLong (buffer, 52);
-    stats.experience = Utility.getWizLong (buffer, 124);
-    stats.level = Utility.getShort (buffer, 132);
+    alignment = alignments[buffer[42] & 0xFF];
 
-    stats.hitsLeft = Utility.getShort (buffer, 134);
-    stats.hitsMax = Utility.getShort (buffer, 136);
+    get3x5Bits (attributes, 0, Utility.getShort (buffer, 44));
+    get3x5Bits (attributes, 3, Utility.getShort (buffer, 46));
+    get3x5Bits (saveVs, 0, Utility.getShort (buffer, 48));
+    get2x5Bits (saveVs, 3, Utility.getShort (buffer, 50));
 
-    stats.armourClass = buffer[176];
+    gold = Utility.getWizLong (buffer, 52);
 
-    // saving throws
-    attr1 = Utility.getShort (buffer, 48);
-    attr2 = Utility.getShort (buffer, 50);
+    possessionsCount = Utility.getShort (buffer, 58);
+    for (int i = 0; i < possessionsCount; i++)
+    {
+      boolean equipped = Utility.getShort (buffer, 60 + i * 8) == 1;
+      boolean cursed = Utility.getShort (buffer, 62 + i * 8) == 1;
+      boolean identified = Utility.getShort (buffer, 64 + i * 8) == 1;
 
-    saveVs[0] = attr1 & 0x001F;
-    saveVs[1] = (attr1 & 0x03E0) >>> 5;
-    saveVs[2] = (attr1 & 0x7C00) >>> 10;
-    saveVs[3] = attr2 & 0x001F;
-    saveVs[4] = (attr2 & 0x03E0) >>> 5;
+      int itemId = Utility.getShort (buffer, 66 + i * 8);
+      if (scenario == 3 && itemId >= 1000)
+        itemId -= 1000;             // why?
+
+      possessions.add (new Possession (itemId, equipped, cursed, identified));
+    }
+
+    experience = Utility.getWizLong (buffer, 124);
+
+    characterLevel = Utility.getShort (buffer, 132);
+    hpLeft = Utility.getShort (buffer, 134);
+    hpMax = Utility.getShort (buffer, 136);
+
+    armourClass = buffer[176];
   }
 
   // ---------------------------------------------------------------------------------//
   public void linkItems (List<ItemV1> itemList)
   // ---------------------------------------------------------------------------------//
   {
-    boolean equipped;
-    boolean identified;
-    int totItems = buffer[58];
-    stats.assetValue = 0;
-
-    for (int ptr = 60; totItems > 0; ptr += 8, totItems--)
+    for (Possession baggage : possessions)
     {
-      int itemID = buffer[ptr + 6] & 0xFF;
-      if (scenario == 3)
-        itemID = (itemID + 24) % 256;
-      if (itemID >= 0 && itemID < itemList.size ())
-      {
-        ItemV1 item = itemList.get (itemID);
-        equipped = (buffer[ptr] == 1);
-        identified = (buffer[ptr + 4] == 1);
-        baggageList.add (new Baggage (item, equipped, identified));
-        stats.assetValue += item.getCost ();
-      }
-      else
-        System.out.println (
-            getName () + " ItemID : " + itemID + " is outside range 0:" + (itemList.size () - 1));
+      baggage.item = itemList.get (baggage.itemId);
+      assetValue += baggage.item.getCost ();
     }
   }
 
@@ -118,20 +113,20 @@ class CharacterV1 extends Character
     StringBuilder text = new StringBuilder ();
 
     text.append ("Character name ..... " + getName ());
-    text.append ("\n\nRace ............... " + stats.race);
-    text.append ("\nType ............... " + stats.type);
-    text.append ("\nAlignment .......... " + stats.alignment);
-    text.append ("\nStatus ............. " + stats.status);
-    text.append ("\nGold ............... " + String.format ("%,d", stats.gold));
-    text.append ("\nExperience ......... " + String.format ("%,d", stats.experience));
-    text.append ("\nNext level ......... " + String.format ("%,d", stats.nextLevel));
-    text.append ("\nLevel .............. " + stats.level);
-    text.append ("\nAge in weeks ....... "
-        + String.format ("%,d  (%d)", stats.ageInWeeks, (stats.ageInWeeks / 52)));
-    text.append ("\nHit points left .... " + stats.hitsLeft);
-    text.append ("\nMaximum hits ....... " + stats.hitsMax);
-    text.append ("\nArmour class ....... " + stats.armourClass);
-    text.append ("\nAsset value ........ " + String.format ("%,d", stats.assetValue));
+    text.append ("\n\nRace ............... " + race);
+    text.append ("\nType ............... " + type);
+    text.append ("\nAlignment .......... " + alignment);
+    text.append ("\nStatus ............. " + status);
+    text.append ("\nGold ............... " + String.format ("%,d", gold));
+    text.append ("\nExperience ......... " + String.format ("%,d", experience));
+    text.append ("\nNext level ......... " + String.format ("%,d", nextLevel));
+    text.append ("\nLevel .............. " + characterLevel);
+    text.append (
+        "\nAge in weeks ....... " + String.format ("%,d  (%d)", ageInWeeks, (ageInWeeks / 52)));
+    text.append ("\nHit points left .... " + hpLeft);
+    text.append ("\nMaximum hits ....... " + hpMax);
+    text.append ("\nArmour class ....... " + armourClass);
+    text.append ("\nAsset value ........ " + String.format ("%,d", assetValue));
 
     text.append ("\nAwards ............. " + getAwardString ());
     text.append ("\nOut ................ " + isOut ());
@@ -158,7 +153,7 @@ class CharacterV1 extends Character
       text.append ("\n" + s);
 
     text.append ("\n\nItems :");
-    for (Baggage b : baggageList)
+    for (Possession b : possessions)
       text.append ("\n" + b);
 
     return text.toString ();
@@ -168,7 +163,7 @@ class CharacterV1 extends Character
   public void linkExperience (ExperienceLevel exp)
   // ---------------------------------------------------------------------------------//
   {
-    stats.nextLevel = exp.getExperiencePoints (stats.level);
+    nextLevel = exp.getExperiencePoints (characterLevel);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -199,35 +194,42 @@ class CharacterV1 extends Character
   public Long getNextLevel ()
   // ---------------------------------------------------------------------------------//
   {
-    return stats.nextLevel;
+    return nextLevel;
   }
 
   // ---------------------------------------------------------------------------------//
   public boolean isOut ()
   // ---------------------------------------------------------------------------------//
   {
-    return (buffer[32] == 1);
+    return inMaze;
   }
 
   // ---------------------------------------------------------------------------------//
   public String getType ()
   // ---------------------------------------------------------------------------------//
   {
-    return stats.type;
+    return type;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public String getStatus ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return status;
   }
 
   // ---------------------------------------------------------------------------------//
   public String getRace ()
   // ---------------------------------------------------------------------------------//
   {
-    return stats.race;
+    return race;
   }
 
   // ---------------------------------------------------------------------------------//
   public String getAlignment ()
   // ---------------------------------------------------------------------------------//
   {
-    return stats.alignment;
+    return alignment;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -238,17 +240,10 @@ class CharacterV1 extends Character
   }
 
   // ---------------------------------------------------------------------------------//
-  public Statistics getStatistics ()
+  public Iterator<Possession> getBaggage ()
   // ---------------------------------------------------------------------------------//
   {
-    return stats;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public Iterator<Baggage> getBaggage ()
-  // ---------------------------------------------------------------------------------//
-  {
-    return baggageList.iterator ();
+    return possessions.iterator ();
   }
 
   // ---------------------------------------------------------------------------------//
@@ -267,18 +262,21 @@ class CharacterV1 extends Character
   }
 
   // ---------------------------------------------------------------------------------//
-  public class Baggage
+  public class Possession
   // ---------------------------------------------------------------------------------//
   {
     public ItemV1 item;
+    int itemId;
+    public boolean cursed;
     public boolean equipped;
     public boolean identified;
 
-    public Baggage (ItemV1 item, boolean equipped, boolean identified)
+    public Possession (int itemId, boolean equipped, boolean cursed, boolean identified)
     {
-      this.item = item;
+      this.itemId = itemId;
       this.equipped = equipped;
       this.identified = identified;
+      this.cursed = cursed;
     }
 
     @Override
@@ -287,26 +285,5 @@ class CharacterV1 extends Character
       return String.format ("%s%-15s %,10d", equipped ? "*" : " ", item.getName (),
           item.getCost ());
     }
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public class Statistics implements Cloneable
-  // ---------------------------------------------------------------------------------//
-  {
-    public String race;
-    public String type;
-    public String alignment;
-    public String status;
-    public int typeInt;
-    public int statusValue;
-    public long gold;
-    public int experience;
-    public long nextLevel;
-    public int level;
-    public int ageInWeeks;
-    public int hitsLeft;
-    public int hitsMax;
-    public int armourClass;
-    public int assetValue;
   }
 }

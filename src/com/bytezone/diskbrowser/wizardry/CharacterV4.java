@@ -19,32 +19,24 @@ public class CharacterV4 extends Character
   int nextCharacterId;
   CharacterParty party;
 
-  public final boolean inMaze;
   public final Race race;
   public final CharacterClass characterClass;
   public final int age;
   public final CharacterStatus status;
   public final Alignment alignment;
-  public final int[] attributes = new int[6];      // 0:18
-  public final int[] saveVs = new int[5];          // 0:31
   public final long gold;
 
-  public final int possessionsCount;
   public final List<Integer> possessionIds = new ArrayList<> (MAX_POSSESSIONS);
   public final List<ItemV4> possessions = new ArrayList<> (MAX_POSSESSIONS);
 
   public final long experience;
   public final int maxlevac;                       // max level armour class?
-  public final int charlev;                        // character level?
-  public final int hpLeft;
-  public final int hpMax;
 
   public final boolean mysteryBit;                 // first bit in spellsKnown
   public final boolean[] spellsKnown = new boolean[50];
   public final int[][] spellAllowance = new int[2][7];
 
   public final int hpCalCmd;
-  public final int armourClass;
   public final int healPts;
 
   public final boolean crithitm;
@@ -56,31 +48,6 @@ public class CharacterV4 extends Character
   int unknown3;
   int unknown4;
   int unknown5;
-
-  public enum Race
-  {
-    NORACE, HUMAN, ELF, DWARF, GNOME, HOBBIT
-  }
-
-  public enum Alignment
-  {
-    UNALIGN, GOOD, NEUTRAL, EVIL
-  }
-
-  public enum CharacterStatus
-  {
-    OK, AFRAID, ASLEEP, PLYZE, STONED, DEAD, ASHES, LOST
-  }
-
-  public enum CharacterClass
-  {
-    FIGHTER, MAGE, PRIEST, THIEF, BISHOP, SAMURAI, LORD, NINJA
-  }
-
-  public enum Status
-  {
-    OK, AFRAID, ASLEEP, PLYZE, STONED, DEAD, ASHES, LOST
-  }
 
   // ---------------------------------------------------------------------------------//
   CharacterV4 (String name, byte[] buffer, int id)
@@ -100,19 +67,12 @@ public class CharacterV4 extends Character
     status = CharacterStatus.values ()[Utility.getShort (buffer, 41)];
     alignment = Alignment.values ()[Utility.getShort (buffer, 43)];
 
-    int attr1 = Utility.getShort (buffer, 45);
-    int attr2 = Utility.getShort (buffer, 47);
-
-    attributes[0] = attr1 & 0x001F;
-    attributes[1] = (attr1 & 0x03E0) >>> 5;
-    attributes[2] = attr1 & (0x7C00) >>> 10;
-    attributes[3] = attr2 & 0x001F;
-    attributes[4] = attr2 & (0x03E0) >>> 5;
-    attributes[5] = attr2 & (0x7C00) >>> 10;
+    get3x5Bits (attributes, 0, Utility.getShort (buffer, 45));
+    get3x5Bits (attributes, 3, Utility.getShort (buffer, 47));
 
     gold = 0;
 
-    unknown1 = Utility.getShort (buffer, 49);     // was luck/skill (4 bytes)
+    unknown1 = Utility.getShort (buffer, 49);     // was saveVs (4 bytes)
     unknown2 = Utility.getShort (buffer, 51);
     unknown3 = Utility.getShort (buffer, 53);     // was gold (6 bytes)
     unknown4 = Utility.getShort (buffer, 55);
@@ -133,7 +93,8 @@ public class CharacterV4 extends Character
     experience = 0;
     nextCharacterId = Utility.getShort (buffer, 125);
     maxlevac = Utility.getShort (buffer, 131);
-    charlev = Utility.getShort (buffer, 133);
+
+    characterLevel = Utility.getShort (buffer, 133);
     hpLeft = Utility.getShort (buffer, 135);
     hpMax = Utility.getShort (buffer, 137);
 
@@ -250,7 +211,7 @@ public class CharacterV4 extends Character
     text.append (String.format ("Character class ... %s%n", characterClass));
     text.append (String.format ("Alignment ......... %s%n", alignment));
     text.append (String.format ("Status ............ %s%n", status));
-    text.append (String.format ("Level ? ........... %d%n", charlev));
+    text.append (String.format ("Level ? ........... %d%n", characterLevel));
     text.append (String.format ("Hit points ........ %d/%d%n", hpLeft, hpMax));
     text.append (String.format ("Armour class ...... %d%n", armourClass));
     text.append (String.format ("Attributes ........ %s%n", getAttributeString ()));

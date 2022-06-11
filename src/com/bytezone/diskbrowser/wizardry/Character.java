@@ -17,11 +17,57 @@ public abstract class Character extends AbstractFile
 
   int scenario;
 
+  public boolean inMaze;
+  public int hpLeft;
+  public int hpMax;
+  public int armourClass;
+  public final int[] attributes = new int[6];      // 0:18
+  public final int[] saveVs = new int[5];          // 0:31
+  public int characterLevel;
+  public int possessionsCount;
+
+  public enum Race
+  {
+    NORACE, HUMAN, ELF, DWARF, GNOME, HOBBIT
+  }
+
+  public enum Alignment
+  {
+    UNALIGN, GOOD, NEUTRAL, EVIL
+  }
+
+  public enum CharacterStatus
+  {
+    OK, AFRAID, ASLEEP, PLYZE, STONED, DEAD, ASHES, LOST
+  }
+
+  public enum CharacterClass
+  {
+    FIGHTER, MAGE, PRIEST, THIEF, BISHOP, SAMURAI, LORD, NINJA
+  }
+
   // ---------------------------------------------------------------------------------//
   Character (String name, byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void get3x5Bits (int[] attributes, int ptr, int value)
+  // ---------------------------------------------------------------------------------//
+  {
+    attributes[ptr] = value & 0x001F;
+    attributes[ptr + 1] = (value & 0x03E0) >>> 5;
+    attributes[ptr + 2] = (value & 0x7C00) >>> 10;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  void get2x5Bits (int[] attributes, int ptr, int value)
+  // ---------------------------------------------------------------------------------//
+  {
+    attributes[ptr] = value & 0x001F;
+    attributes[ptr + 1] = (value & 0x03E0) >>> 5;
   }
 
   // ---------------------------------------------------------------------------------//

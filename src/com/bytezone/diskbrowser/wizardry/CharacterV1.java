@@ -24,6 +24,9 @@ class CharacterV1 extends Character
   public int ageInWeeks;
   public int assetValue;
 
+  int[] mageSpells = new int[7];
+  int[] priestSpells = new int[7];
+
   private final List<Spell> spellBook = new ArrayList<> ();
   private final List<Possession> possessions = new ArrayList<> ();
 
@@ -75,11 +78,18 @@ class CharacterV1 extends Character
     hpLeft = Utility.getShort (buffer, 134);
     hpMax = Utility.getShort (buffer, 136);
 
+    for (int i = 0; i < 7; i++)
+      mageSpells[i] = buffer[146 + i * 2];
+
+    for (int i = 0; i < 7; i++)
+      priestSpells[i] = buffer[160 + i * 2];
+
     armourClass = buffer[176];
   }
 
   // ---------------------------------------------------------------------------------//
-  public void linkItems (List<ItemV1> itemList)
+  public void link (List<ItemV1> itemList, List<Spell> spellList,
+      List<ExperienceLevel> experienceLevels)
   // ---------------------------------------------------------------------------------//
   {
     for (Possession baggage : possessions)
@@ -87,12 +97,7 @@ class CharacterV1 extends Character
       baggage.item = itemList.get (baggage.itemId);
       assetValue += baggage.item.getCost ();
     }
-  }
 
-  // ---------------------------------------------------------------------------------//
-  public void linkSpells (List<Spell> spellList)
-  // ---------------------------------------------------------------------------------//
-  {
     int index = 0;
     for (int i = 138; i < 145; i++)
       for (int bit = 0; bit < 8; bit++)
@@ -103,6 +108,8 @@ class CharacterV1 extends Character
         if (++index >= spellList.size ())
           break;
       }
+
+    nextLevel = experienceLevels.get (typeInt).getExperiencePoints (characterLevel + 1);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -112,8 +119,8 @@ class CharacterV1 extends Character
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append ("Character name ..... " + getName ());
-    text.append ("\n\nRace ............... " + race);
+    text.append (String.format ("Character name ..... %s%n", getName ()));
+    text.append ("\nRace ............... " + race);
     text.append ("\nType ............... " + type);
     text.append ("\nAlignment .......... " + alignment);
     text.append ("\nStatus ............. " + status);
@@ -138,15 +145,13 @@ class CharacterV1 extends Character
     text.append ("\nAgility ............ " + attributes[4]);
     text.append ("\nLuck ............... " + attributes[5]);
 
-    int[] spellPoints = getMageSpellPoints ();
     text.append ("\n\nMage spell points ..");
-    for (int i = 0; i < spellPoints.length; i++)
-      text.append (" " + spellPoints[i]);
+    for (int i = 0; i < mageSpells.length; i++)
+      text.append (" " + mageSpells[i]);
 
-    spellPoints = getPriestSpellPoints ();
     text.append ("\nPriest spell points ");
-    for (int i = 0; i < spellPoints.length; i++)
-      text.append (" " + spellPoints[i]);
+    for (int i = 0; i < priestSpells.length; i++)
+      text.append (" " + priestSpells[i]);
 
     text.append ("\n\nSpells :");
     for (Spell s : spellBook)
@@ -157,37 +162,6 @@ class CharacterV1 extends Character
       text.append ("\n" + b);
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public void linkExperience (ExperienceLevel exp)
-  // ---------------------------------------------------------------------------------//
-  {
-    nextLevel = exp.getExperiencePoints (characterLevel);
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public int[] getMageSpellPoints ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int[] spells = new int[7];
-
-    for (int i = 0; i < 7; i++)
-      spells[i] = buffer[146 + i * 2];
-
-    return spells;
-  }
-
-  // ---------------------------------------------------------------------------------//
-  public int[] getPriestSpellPoints ()
-  // ---------------------------------------------------------------------------------//
-  {
-    int[] spells = new int[7];
-
-    for (int i = 0; i < 7; i++)
-      spells[i] = buffer[160 + i * 2];
-
-    return spells;
   }
 
   // ---------------------------------------------------------------------------------//

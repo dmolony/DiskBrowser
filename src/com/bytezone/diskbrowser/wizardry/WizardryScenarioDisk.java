@@ -34,7 +34,7 @@ public class WizardryScenarioDisk extends PascalDisk
   public List<MessageV1> messages;
   public List<MonsterV1> monsters;
   public List<MazeLevel> levels;
-  List<ExperienceLevel> experiences;
+  List<ExperienceLevel> experienceLevels;
   List<Reward> rewards;
 
   private int monsterId;
@@ -108,12 +108,7 @@ public class WizardryScenarioDisk extends PascalDisk
 
     // add information about each characters' baggage, spells known etc.
     for (CharacterV1 character : characters)
-    {
-      character.linkItems (items);
-      character.linkSpells (spells);
-      int type = character.typeInt;
-      character.linkExperience (experiences.get (type));
-    }
+      character.link (items, spells, experienceLevels);
 
     for (ItemV1 item : items)
       item.link (items, spells);
@@ -592,7 +587,7 @@ public class WizardryScenarioDisk extends PascalDisk
   {
     List<DiskAddress> nodeSectors = new ArrayList<> ();
     ScenarioData sd = scenarioHeader.data.get (Header.EXPERIENCE_AREA);
-    experiences = new ArrayList<> (sd.total);
+    experienceLevels = new ArrayList<> (sd.total);
     int max = sd.totalBlocks / 2;
 
     int count = 0;
@@ -613,7 +608,7 @@ public class WizardryScenarioDisk extends PascalDisk
         byte[] newBuffer = new byte[78];
         System.arraycopy (buffer, ptr, newBuffer, 0, newBuffer.length);
         ExperienceLevel el = new ExperienceLevel (classes[count++], newBuffer);
-        experiences.add (el);
+        experienceLevels.add (el);
         addToNode (el, node, blocks, experienceSector);
       }
     }

@@ -18,6 +18,7 @@ public class CharacterV4 extends Character
   int id;
   int nextCharacterId;
   CharacterParty party;
+  String partialSlogan;
 
   public final Race race;
   public final CharacterClass characterClass;
@@ -57,6 +58,8 @@ public class CharacterV4 extends Character
 
     this.id = id;
     scenario = 4;
+
+    partialSlogan = buffer[17] == 0 ? "" : HexFormatter.getPascalString (buffer, 17);
 
     inMaze = Utility.getShort (buffer, 33) != 0;
     race = Race.values ()[Utility.getShort (buffer, 35)];
@@ -155,7 +158,8 @@ public class CharacterV4 extends Character
   String getPartialSlogan ()
   // ---------------------------------------------------------------------------------//
   {
-    return buffer[17] == 0 ? "" : HexFormatter.getPascalString (buffer, 17);
+    //    return buffer[17] == 0 ? "" : HexFormatter.getPascalString (buffer, 17);
+    return partialSlogan;
   }
 
   // ---------------------------------------------------------------------------------//

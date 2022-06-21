@@ -7,6 +7,9 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public abstract class Character extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
+  static int MAGE_SPELLS = 0;
+  static int PRIEST_SPELLS = 1;
+
   static String[] races = { "No race", "Human", "Elf", "Dwarf", "Gnome", "Hobbit" };
   static String[] alignments = { "Unalign", "Good", "Neutral", "Evil" };
   static String[] types =
@@ -78,6 +81,12 @@ public abstract class Character extends AbstractFile
   protected void checkKnownSpells (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
+    for (int i = 0; i < 7; i++)
+    {
+      spellAllowance[MAGE_SPELLS][i] = Utility.getShort (buffer, ptr + 8 + i * 2);
+      spellAllowance[PRIEST_SPELLS][i] = Utility.getShort (buffer, ptr + 22 + i * 2);
+    }
+
     int bit = 1;                  // skip first bit
     int val = buffer[ptr];
     mysteryBit = (val & 0x01) == 1;

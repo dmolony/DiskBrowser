@@ -24,8 +24,8 @@ class CharacterV1 extends Character
   public int ageInWeeks;
   public int assetValue;
 
-  int[] mageSpells = new int[7];
-  int[] priestSpells = new int[7];
+  //  int[] mageSpells = new int[7];
+  //  int[] priestSpells = new int[7];
 
   private final List<Spell> spellBook = new ArrayList<> ();
   private final List<Possession> possessions = new ArrayList<> ();
@@ -79,12 +79,6 @@ class CharacterV1 extends Character
     hpMax = Utility.getShort (buffer, 136);
 
     checkKnownSpells (buffer, 138);
-
-    for (int i = 0; i < 7; i++)
-      mageSpells[i] = buffer[146 + i * 2];
-
-    for (int i = 0; i < 7; i++)
-      priestSpells[i] = buffer[160 + i * 2];
 
     armourClass = buffer[176];
   }
@@ -141,12 +135,12 @@ class CharacterV1 extends Character
     text.append ("\nLuck ............... " + attributes[5]);
 
     text.append ("\n\nMage spell points ..");
-    for (int i = 0; i < mageSpells.length; i++)
-      text.append (" " + mageSpells[i]);
+    for (int i = 0; i < spellAllowance[MAGE_SPELLS].length; i++)
+      text.append (" " + spellAllowance[MAGE_SPELLS][i]);
 
     text.append ("\nPriest spell points ");
-    for (int i = 0; i < priestSpells.length; i++)
-      text.append (" " + priestSpells[i]);
+    for (int i = 0; i < spellAllowance[PRIEST_SPELLS].length; i++)
+      text.append (" " + spellAllowance[PRIEST_SPELLS][i]);
 
     text.append ("\n\nSpells :");
     for (Spell s : spellBook)

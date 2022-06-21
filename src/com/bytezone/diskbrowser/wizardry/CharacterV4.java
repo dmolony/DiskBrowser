@@ -99,12 +99,6 @@ public class CharacterV4 extends Character
 
     checkKnownSpells (buffer, 139);
 
-    for (int i = 0; i < 7; i++)
-    {
-      spellAllowance[MAGE_SPELLS][i] = Utility.getShort (buffer, 147 + i * 2);
-      spellAllowance[PRIEST_SPELLS][i] = Utility.getShort (buffer, 161 + i * 2);
-    }
-
     hpCalCmd = Utility.getSignedShort (buffer, 175);
     //    armourClass = Utility.getSignedShort (buffer, 177);   // see offset 39
     healPts = Utility.getShort (buffer, 179);

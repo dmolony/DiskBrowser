@@ -33,10 +33,6 @@ public class CharacterV4 extends Character
   public final long experience;
   public final int maxlevac;                       // max level armour class?
 
-  public final boolean mysteryBit;                 // first bit in spellsKnown
-  public final boolean[] spellsKnown = new boolean[50];
-  public final int[][] spellAllowance = new int[2][7];
-
   public final int hpCalCmd;
   public final int healPts;
 
@@ -101,18 +97,7 @@ public class CharacterV4 extends Character
     hpLeft = Utility.getShort (buffer, 135);
     hpMax = Utility.getShort (buffer, 137);
 
-    mysteryBit = (buffer[139] & 0x01) == 1;
-    int index = -1;                         // skip mystery bit
-    for (int i = 139; i < 146; i++)
-      for (int bit = 0; bit < 8; bit++)
-      {
-        if (((buffer[i] >>> bit) & 0x01) != 0)
-          if (index >= 0)
-            spellsKnown[index] = true;
-
-        if (++index >= MAX_SPELLS)
-          break;
-      }
+    checkKnownSpells (buffer, 139);
 
     for (int i = 0; i < 7; i++)
     {

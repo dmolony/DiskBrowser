@@ -78,6 +78,8 @@ class CharacterV1 extends Character
     hpLeft = Utility.getShort (buffer, 134);
     hpMax = Utility.getShort (buffer, 136);
 
+    checkKnownSpells (buffer, 138);
+
     for (int i = 0; i < 7; i++)
       mageSpells[i] = buffer[146 + i * 2];
 
@@ -98,16 +100,9 @@ class CharacterV1 extends Character
       assetValue += baggage.item.getCost ();
     }
 
-    int index = 0;
-    for (int i = 138; i < 145; i++)
-      for (int bit = 0; bit < 8; bit++)
-      {
-        if (((buffer[i] >>> bit) & 0x01) != 0)
-          spellBook.add (spellList.get (index));
-
-        if (++index >= spellList.size ())
-          break;
-      }
+    for (int i = 0; i < spellsKnown.length; i++)
+      if (spellsKnown[i])
+        spellBook.add (spellList.get (i));
 
     nextLevel = experienceLevels.get (typeInt).getExperiencePoints (characterLevel + 1);
   }

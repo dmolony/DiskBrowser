@@ -26,6 +26,10 @@ public abstract class Character extends AbstractFile
   public int characterLevel;
   public int possessionsCount;
 
+  public boolean mysteryBit;                 // first bit in spellsKnown
+  public final boolean[] spellsKnown = new boolean[50];
+  public final int[][] spellAllowance = new int[2][7];
+
   public enum Race
   {
     NORACE, HUMAN, ELF, DWARF, GNOME, HOBBIT
@@ -68,6 +72,25 @@ public abstract class Character extends AbstractFile
   {
     attributes[ptr] = value & 0x001F;
     attributes[ptr + 1] = (value & 0x03E0) >>> 5;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  protected void checkKnownSpells (byte[] buffer, int ptr)
+  // ---------------------------------------------------------------------------------//
+  {
+    int bit = 1;                  // skip first bit
+    int val = buffer[ptr];
+    mysteryBit = (val & 0x01) == 1;
+
+    for (int i = 0; i < spellsKnown.length; i++)
+    {
+      if (bit == 8)
+      {
+        val = buffer[++ptr];
+        bit = 0;
+      }
+      spellsKnown[i] = ((val >>> bit++) & 0x01) != 0;
+    }
   }
 
   // ---------------------------------------------------------------------------------//

@@ -29,3 +29,5 @@ Compress . . . . . . . . . . .  | .Z   | U | Unix Systems
 
 see also:
 http://fileformats.archiveteam.org/wiki/Squeeze
+http://fileformats.archiveteam.org/wiki/LBR
+http://www.seasip.info/Cpm/ludef5.html

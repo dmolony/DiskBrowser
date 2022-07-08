@@ -101,6 +101,7 @@ class FileEntry extends CatalogEntry implements ProdosConstants
 
       case GSOS_EXTENDED_FILE:
         readForks ();
+        //        System.out.printf ("%s has forks%n", getUniqueName ());
         break;
 
       case SUBDIRECTORY:
@@ -143,7 +144,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
     {
       int storageType = buffer2[i] & 0x0F;
       int keyBlock = Utility.getShort (buffer2, i + 1);
-      int eof = Utility.readTriple (buffer2, i + 3);
+      int size = Utility.getShort (buffer2, i + 3);
+      int eof = Utility.readTriple (buffer2, i + 5);
 
       if (i < 256)
         addDataBlocks (storageType, keyBlock, dataBlocks);
@@ -162,40 +164,40 @@ class FileEntry extends CatalogEntry implements ProdosConstants
   // ---------------------------------------------------------------------------------//
   {
     DiskAddress emptyDiskAddress = disk.getDiskAddress (0);
-    List<Integer> blocks = new ArrayList<> ();
+    List<Integer> blockNos = new ArrayList<> ();
 
     switch (storageType)
     {
       case SEEDLING:
         if (isValid (keyPtr))
-          blocks.add (keyPtr);
+          blockNos.add (keyPtr);
         break;
 
       case SAPLING:
         if (isValid (keyPtr))
-          blocks.addAll (readIndex (keyPtr));
+          blockNos.addAll (readIndex (keyPtr));
         break;
 
       case TREE:
         if (isValid (keyPtr))
           for (Integer indexBlock : readMasterIndex (keyPtr))
             if (isValid (indexBlock))
-              blocks.addAll (readIndex (indexBlock));
+              blockNos.addAll (readIndex (indexBlock));
         break;
     }
 
     // remove trailing empty blocks
-    while (blocks.size () > 0 && blocks.get (blocks.size () - 1) == 0)
-      blocks.remove (blocks.size () - 1);
+    while (blockNos.size () > 0 && blockNos.get (blockNos.size () - 1) == 0)
+      blockNos.remove (blockNos.size () - 1);
 
-    for (Integer block : blocks)
+    for (Integer blockNo : blockNos)
     {
-      if (block == 0)
+      if (blockNo == 0)
         dataBlocks.add (emptyDiskAddress);
       else
       {
-        parentDisk.setSectorType (block, parentDisk.dataSector);
-        dataBlocks.add (disk.getDiskAddress (block));
+        parentDisk.setSectorType (blockNo, parentDisk.dataSector);
+        dataBlocks.add (disk.getDiskAddress (blockNo));
       }
     }
   }

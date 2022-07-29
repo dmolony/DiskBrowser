@@ -17,8 +17,7 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
 {
   static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
   static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
-  static final String UNDERLINE =
-      "----------------------------------------------------\n";
+  static final String UNDERLINE = "----------------------------------------------------\n";
 
   private static final String NO_DATE = "<NO DATE>";
 
@@ -28,8 +27,8 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
   private final int usedBlocks;
 
   // ---------------------------------------------------------------------------------//
-  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer,
-      int totalBlocks, int freeBlocks, int usedBlocks)
+  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer, int totalBlocks,
+      int freeBlocks, int usedBlocks)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
@@ -86,7 +85,6 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
       int nameLength = buffer[i] & 0x0F;
       String filename = HexFormatter.getString (buffer, i + 1, nameLength);
       String subType = "";
-      String locked;
 
       switch (storageType)
       {
@@ -111,22 +109,20 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
           LocalDateTime createdDate = Utility.getAppleDate (buffer, i + 24);
           LocalDateTime modifiedDate = Utility.getAppleDate (buffer, i + 33);
 
-          String dateC =
-              createdDate == null ? NO_DATE : createdDate.format (df).toUpperCase ();
-          String dateM =
-              modifiedDate == null ? NO_DATE : modifiedDate.format (df).toUpperCase ();
+          String dateC = createdDate == null ? NO_DATE : createdDate.format (df).toUpperCase ();
+          String dateM = modifiedDate == null ? NO_DATE : modifiedDate.format (df).toUpperCase ();
 
           String timeC = createdDate == null ? "" : createdDate.format (tf);
           String timeM = modifiedDate == null ? "" : modifiedDate.format (tf);
 
           int eof = Utility.intValue (buffer[i + 21], buffer[i + 22], buffer[i + 23]);
           int fileType = buffer[i + 16] & 0xFF;
-          locked = (buffer[i + 30] & 0xE0) == 0xE0 ? " " : "*";
+          String locked = (buffer[i + 30] & 0xE0) == 0xE0 ? " " : "*";
+          int aux = Utility.getShort (buffer, i + 31);
 
           switch (fileType)
           {
             case FILE_TYPE_TEXT:
-              int aux = Utility.getShort (buffer, i + 31);
               subType = String.format ("R=%5d", aux);
               break;
 
@@ -134,14 +130,13 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
             case FILE_TYPE_PNT:
             case FILE_TYPE_PIC:
             case FILE_TYPE_FOT:
-              aux = Utility.getShort (buffer, i + 31);
               subType = String.format ("A=$%4X", aux);
               break;
 
             case FILE_TYPE_AWP:
-              aux = Utility.intValue (buffer[i + 32], buffer[i + 31]);      // backwards!
-              if (aux != 0)
-                filename = convert (filename, aux);
+              int flags = Utility.intValue (buffer[i + 32], buffer[i + 31]);  // aux backwards!
+              if (flags != 0)
+                filename = convert (filename, flags);
               break;
 
             default:
@@ -149,9 +144,9 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
           }
 
           String forkFlag = storageType == 5 ? "+" : " ";
-          text.append (String.format ("%s%-15s %3s%s  %5d  %9s %5s  %9s %5s %8d %7s%n",
-              locked, filename, ProdosConstants.fileTypes[type], forkFlag, blocks, dateM,
-              timeM, dateC, timeC, eof, subType));
+          text.append (String.format ("%s%-15s %3s%s  %5d  %9s %5s  %9s %5s %8d %7s    %04X%n",
+              locked, filename, ProdosConstants.fileTypes[type], forkFlag, blocks, dateM, timeM,
+              dateC, timeC, eof, subType, aux));
           break;
 
         default:
@@ -159,9 +154,8 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
       }
     }
 
-    text.append (
-        String.format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
-            freeBlocks, usedBlocks, totalBlocks));
+    text.append (String.format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
+        freeBlocks, usedBlocks, totalBlocks));
 
     return text.toString ();
   }

@@ -444,7 +444,14 @@ public final class Utility
     else
       year += 1900;
 
-    return LocalDate.of (year, month, day);
+    try
+    {
+      return LocalDate.of (year, month, day);
+    }
+    catch (DateTimeException e)
+    {
+      return null;
+    }
   }
 
   // ---------------------------------------------------------------------------------//

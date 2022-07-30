@@ -3,6 +3,8 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
@@ -12,12 +14,15 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
 //-----------------------------------------------------------------------------------//
 {
   AppleFileSource appleFileSource;
+  private JCheckBox formatted = new JCheckBox ("Formatted");
 
   // ---------------------------------------------------------------------------------//
   SaveFileAction ()
   // ---------------------------------------------------------------------------------//
   {
     super ("Save file...", "Save currently selected file", "Save File");
+
+    fileChooser.setAccessory (formatted);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -31,8 +36,13 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
       return;
     }
 
-    setSelectedFile (new File (appleFileSource.getUniqueName () + ".bin"));
-    saveBuffer (appleFileSource.getDataSource ().getBuffer ());
+    if (fileChooser.showSaveDialog (null) != JFileChooser.APPROVE_OPTION)
+      return;
+
+    if (formatted.isSelected ())
+      saveBuffer (appleFileSource.getDataSource ().getText ().getBytes ());
+    else
+      saveBuffer (appleFileSource.getDataSource ().getBuffer ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -41,8 +51,9 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
   // ---------------------------------------------------------------------------------//
   {
     this.appleFileSource = event.appleFileSource;
-    setEnabled (
-        event.appleFileSource != null && event.appleFileSource.getDataSource () != null
-            && event.appleFileSource.getDataSource ().getBuffer () != null);
+    setSelectedFile (new File (appleFileSource.getUniqueName () + ".bin"));
+
+    setEnabled (appleFileSource != null && appleFileSource.getDataSource () != null
+        && appleFileSource.getDataSource ().getBuffer () != null);
   }
 }

@@ -88,7 +88,7 @@ public class CPMDisk extends AbstractFormattedDisk
       if (b1 > 31 && b1 != EMPTY_BYTE_VALUE)
         break;
 
-      if (b2 < 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
+      if (b2 <= 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
         break;
 
       for (int i = 0; i < buffer.length; i += 32)
@@ -99,7 +99,7 @@ public class CPMDisk extends AbstractFormattedDisk
         if (b1 == EMPTY_BYTE_VALUE)         // deleted file??
           continue;
 
-        if (b2 < 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
+        if (b2 <= 32 || (b2 > 126 && b2 != EMPTY_BYTE_VALUE))
           break;
 
         DirectoryEntry entry = new DirectoryEntry (this, buffer, i);
@@ -188,9 +188,8 @@ public class CPMDisk extends AbstractFormattedDisk
   public AppleFileSource getCatalog ()
   // ---------------------------------------------------------------------------------//
   {
-    String line =
-        "----  ---------  --- - -  --   --   --   --   ----------------------------"
-            + "-------------------\n";
+    String line = "----  ---------  --- - -  --   --   --   --   ----------------------------"
+        + "-------------------\n";
     StringBuilder text = new StringBuilder ();
     text.append (String.format ("File : %s%n%n", getDisplayPath ()));
     text.append ("User  Name       Typ R S  Ex   S2   S1   RC   Blocks\n");

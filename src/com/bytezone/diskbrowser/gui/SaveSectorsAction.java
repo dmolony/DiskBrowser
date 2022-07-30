@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import com.bytezone.diskbrowser.disk.Disk;
@@ -41,7 +42,9 @@ class SaveSectorsAction extends AbstractSaveAction implements SectorSelectionLis
         blocks.size () == 1 ? disk.readBlock (blocks.get (0)) : disk.readBlocks (blocks);
 
     setSelectedFile (new File ("SavedSectors.bin"));
-    saveBuffer (buffer);
+
+    if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
+      saveBuffer (buffer);
   }
 
   // ---------------------------------------------------------------------------------//

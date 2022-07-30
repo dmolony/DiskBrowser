@@ -15,27 +15,21 @@ import com.bytezone.diskbrowser.utilities.DefaultAction;
 public abstract class AbstractSaveAction extends DefaultAction
 // -----------------------------------------------------------------------------------//
 {
-  private JFileChooser fileChooser;
-  private String dialogTitle;
+  protected JFileChooser fileChooser = new JFileChooser ();
 
   // ---------------------------------------------------------------------------------//
   public AbstractSaveAction (String menuText, String tip, String dialogTitle)
   // ---------------------------------------------------------------------------------//
   {
     super (menuText, tip);
-    this.dialogTitle = dialogTitle;
+
+    fileChooser.setDialogTitle (dialogTitle);
   }
 
   // ---------------------------------------------------------------------------------//
   void setSelectedFile (File file)
   // ---------------------------------------------------------------------------------//
   {
-    if (fileChooser == null)
-    {
-      fileChooser = new JFileChooser ();
-      fileChooser.setDialogTitle (dialogTitle);
-    }
-
     fileChooser.setSelectedFile (file);
   }
 
@@ -43,26 +37,22 @@ public abstract class AbstractSaveAction extends DefaultAction
   void saveBuffer (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {
-    if (fileChooser.showSaveDialog (null) != JFileChooser.APPROVE_OPTION)
-      return;
-
     File file = fileChooser.getSelectedFile ();
     try
     {
       Files.write (file.toPath (), buffer, StandardOpenOption.CREATE_NEW);
-      JOptionPane.showMessageDialog (null,
-          String.format ("File %s saved", file.getName ()));
+      JOptionPane.showMessageDialog (null, String.format ("File %s saved", file.getName ()));
     }
     catch (FileAlreadyExistsException e)
     {
-      JOptionPane.showMessageDialog (null, "File " + file.getName () + " already exists",
-          "Failed", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog (null, "File " + file.getName () + " already exists", "Failed",
+          JOptionPane.ERROR_MESSAGE);
     }
     catch (IOException e)
     {
       e.printStackTrace ();
-      JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (),
-          "Failed", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog (null, "File failed to save - " + e.getMessage (), "Failed",
+          JOptionPane.ERROR_MESSAGE);
     }
   }
 }

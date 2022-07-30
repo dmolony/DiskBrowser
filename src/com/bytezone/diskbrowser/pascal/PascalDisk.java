@@ -1,7 +1,6 @@
 package com.bytezone.diskbrowser.pascal;
 
 import java.awt.Color;
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -30,7 +29,6 @@ public class PascalDisk extends AbstractFormattedDisk
 // -----------------------------------------------------------------------------------//
 {
   static final int CATALOG_ENTRY_SIZE = 26;
-  private final DateFormat df = DateFormat.getDateInstance (DateFormat.SHORT);
   private final DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate (FormatStyle.SHORT);
   private final VolumeEntry volumeEntry;
   private final PascalCatalogSector diskCatalogSector;
@@ -235,7 +233,6 @@ public class PascalDisk extends AbstractFormattedDisk
       }
 
       int lastByte = Utility.getShort (buffer, ptr + 22);
-      //      GregorianCalendar date = Utility.getPascalDate (buffer, 24);
       LocalDate localDate = Utility.getPascalLocalDate (buffer, 24);
       String dateString = localDate == null ? ""
           : localDate.format (DateTimeFormatter.ofLocalizedDate (FormatStyle.SHORT));

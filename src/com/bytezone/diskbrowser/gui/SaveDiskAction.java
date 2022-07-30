@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.gui;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import com.bytezone.diskbrowser.disk.AppleDisk;
@@ -40,7 +41,9 @@ class SaveDiskAction extends AbstractSaveAction implements DiskSelectionListener
       String suffix = blocks <= 560 ? ".dsk" : ".hdv";
 
       setSelectedFile (new File (formattedDisk.getName () + suffix));
-      saveBuffer (appleDisk.getBuffer ());
+
+      if (fileChooser.showSaveDialog (null) == JFileChooser.APPROVE_OPTION)
+        saveBuffer (appleDisk.getBuffer ());
     }
     else
       System.out.println ("Not an AppleDisk");        // impossible

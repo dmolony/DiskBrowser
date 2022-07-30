@@ -41,7 +41,7 @@ public final class Utility
   private static MathContext mathContext8 = new MathContext (15);
 
   private static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv", "2mg",
-      "d13", "sdk", "shk", "bxy", "bny", "woz", "img", "dimg");
+      "d13", "sdk", "shk", "bxy", "bny", "bqy", "woz", "img", "dimg");
 
   // ---------------------------------------------------------------------------------//
   private Utility ()
@@ -452,6 +452,19 @@ public final class Utility
     {
       return null;
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public static String getCString (byte[] buffer, int offset)
+  // ---------------------------------------------------------------------------------//
+  {
+    int length = 0;
+    int ptr = offset;
+
+    while (buffer[ptr++] != 0)
+      ++length;
+
+    return new String (buffer, offset, length);
   }
 
   // ---------------------------------------------------------------------------------//

@@ -10,14 +10,14 @@ import com.bytezone.diskbrowser.prodos.write.DiskFullException;
 import com.bytezone.diskbrowser.prodos.write.FileAlreadyExistsException;
 import com.bytezone.diskbrowser.prodos.write.ProdosDisk;
 import com.bytezone.diskbrowser.prodos.write.VolumeCatalogFullException;
+import com.bytezone.diskbrowser.utilities.Utility;
 
 // -----------------------------------------------------------------------------------//
 public class Binary2
 // -----------------------------------------------------------------------------------//
 {
   private static final String UNDERLINE =
-      "------------------------------------------------------"
-          + "-----------------------";
+      "------------------------------------------------------" + "-----------------------";
 
   Binary2Header binary2Header;
   byte[] buffer;
@@ -43,7 +43,6 @@ public class Binary2
     do
     {
       binary2Header = new Binary2Header (buffer, ptr);
-      System.out.println (binary2Header);
       headers.add (binary2Header);
 
       totalBlocks += binary2Header.totalBlocks;
@@ -53,19 +52,33 @@ public class Binary2
   }
 
   // ---------------------------------------------------------------------------------//
-  public byte[] getDiskBuffer () throws DiskFullException, VolumeCatalogFullException,
-      FileAlreadyExistsException, IOException
+  public byte[] getDiskBuffer ()
+      throws DiskFullException, VolumeCatalogFullException, FileAlreadyExistsException, IOException
   // ---------------------------------------------------------------------------------//
   {
     ProdosDisk disk = new ProdosDisk (800, "DiskBrowser");
 
     for (Binary2Header header : headers)
     {
-      byte[] dataBuffer = new byte[header.eof];       // this sux
-      System.arraycopy (buffer, header.ptr + 128, dataBuffer, 0, dataBuffer.length);
+      if (header.compressed && buffer[header.ptr + 128] == 0x76
+          && buffer[header.ptr + 129] == (byte) 0xFF)
+      {
+        byte[] tmp = new byte[header.eof];       // this sux
+        System.arraycopy (buffer, header.ptr + 128, tmp, 0, tmp.length);
+        String name = Utility.getCString (tmp, 4);
 
-      disk.addFile (header.fileName, header.fileType, header.auxType, header.created,
-          header.modified, dataBuffer, header.eof);
+        Squeeze squeeze = new Squeeze ();
+        byte[] dataBuffer = squeeze.unSqueeze (tmp);
+        disk.addFile (name, header.fileType, header.auxType, header.created, header.modified,
+            dataBuffer, header.eof);
+      }
+      else
+      {
+        byte[] dataBuffer = new byte[header.eof];       // this sux
+        System.arraycopy (buffer, header.ptr + 128, dataBuffer, 0, dataBuffer.length);
+        disk.addFile (header.fileName, header.fileType, header.auxType, header.created,
+            header.modified, dataBuffer, header.eof);
+      }
 
     }
     disk.close ();
@@ -80,12 +93,12 @@ public class Binary2
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (String.format (
-        " %-15.15s                                                  Files:%5d%n%n",
-        fileName, headers.size ()));
+    text.append (
+        String.format (" %-15.15s                                                  Files:%5d%n%n",
+            fileName, headers.size ()));
 
-    text.append (" Name                              Type Auxtyp Modified"
-        + "         Fmat   Length\n");
+    text.append (
+        " Name                              Type Auxtyp Modified" + "         Fmat   Length\n");
 
     text.append (String.format ("%s%n", UNDERLINE));
 

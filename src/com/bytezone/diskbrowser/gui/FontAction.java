@@ -36,6 +36,7 @@ public class FontAction extends DefaultAction implements QuitListener
   {
     super ("Set Font...", "Set display to a different font or font size",
         "/com/bytezone/loadlister/");
+
     int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMaskEx ();
     putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_F, mask));
   }
@@ -146,8 +147,7 @@ public class FontAction extends DefaultAction implements QuitListener
   // ---------------------------------------------------------------------------------//
   {
     FontChangeEvent fontChangeEvent = new FontChangeEvent (font);
-    FontChangeListener[] listeners =
-        (listenerList.getListeners (FontChangeListener.class));
+    FontChangeListener[] listeners = (listenerList.getListeners (FontChangeListener.class));
     for (FontChangeListener listener : listeners)
       listener.changeFont (fontChangeEvent);
   }

@@ -14,10 +14,9 @@ public class Binary2Header
 // -----------------------------------------------------------------------------------//
 {
   static DateTimeFormatter formatter = DateTimeFormatter.ofPattern ("dd-LLL-yy HH:mm");
-  static String[] osTypes =
-      { "Prodos", "DOS 3.3", "Reserved", "DOS 3.2 or 3.1", "Pascal", "Macintosh MFS",
-        "Macintosh HFS", "Lisa", "CPM", "Reserved", "MS-DOS", "High Sierra (CD-ROM)",
-        "ISO 9660 (CD-ROM)", "AppleShare" };
+  static String[] osTypes = { "Prodos", "DOS 3.3", "Reserved", "DOS 3.2 or 3.1", "Pascal",
+      "Macintosh MFS", "Macintosh HFS", "Lisa", "CPM", "Reserved", "MS-DOS", "High Sierra (CD-ROM)",
+      "ISO 9660 (CD-ROM)", "AppleShare" };
 
   int ptr;
   byte[] buffer;
@@ -89,8 +88,8 @@ public class Binary2Header
   public String getLine ()
   // ---------------------------------------------------------------------------------//
   {
-    return String.format (" %-33s %3s  $%04X  %s  unc   %7d", fileName,
-        fileTypes[fileType], auxType, modified.format (formatter), eof);
+    return String.format (" %-33s %3s  $%04X  %s  unc   %7d", fileName, fileTypes[fileType],
+        auxType, modified.format (formatter), eof);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -117,12 +116,13 @@ public class Binary2Header
     text.append (String.format ("Prodos storage type ... %02X%n", prodos16storageType));
     text.append (String.format ("Prodos total blocks ... %02X%n", prodos16totalBlocks));
     text.append (String.format ("Prodos eof ............ %06X  %<,d%n", prodos16eof));
-    text.append (
-        String.format ("Disk space needed ..... %08X  %<,d%n", diskSpaceRequired));
-    text.append (
-        String.format ("OS type ............... %02X  %s%n", osType, osTypes[osType]));
+    text.append (String.format ("Disk space needed ..... %08X  %<,d%n", diskSpaceRequired));
+    text.append (String.format ("OS type ............... %02X  %s%n", osType, osTypes[osType]));
     text.append (String.format ("Native file type ...... %02X%n", nativeFileType));
     text.append (String.format ("Data flags ............ %02X%n", dataFlags));
+    text.append (String.format ("  compressed .......... %s%n", compressed));
+    text.append (String.format ("  encrypted ........... %s%n", encrypted));
+    text.append (String.format ("  sparse .............. %s%n", sparsePacked));
     text.append (String.format ("Version ............... %02X%n", version));
     text.append (String.format ("Following files ....... %02X%n", filesToFollow));
 

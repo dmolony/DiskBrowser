@@ -148,7 +148,7 @@ public class DiskFactory
 
     if ("sdk".equals (suffix)         // NuFX disk
         || "shk".equals (suffix)      // NuFX files or disk
-        || "bxy".equals (suffix))     // NuFX in Binary2
+        || "bxy".equals (suffix))     // NuFX in Bin2
     {
       if (debug)
         System.out.println (" ** sdk/shk/bxy **");
@@ -156,7 +156,11 @@ public class DiskFactory
       {
         nuFX = new NuFX (file.toPath ());
         if (nuFX.getTotalDisks () == 0 && nuFX.getTotalFiles () == 0)
+        {
+          if (debug)
+            System.out.println ("Empty NuFX file");
           return null;
+        }
 
         byte[] diskBuffer = nuFX.getDiskBuffer ();
         if (diskBuffer == null)
@@ -183,10 +187,10 @@ public class DiskFactory
         return null;
       }
     }
-    else if ("bny".equals (suffix))     // Binary2 uncompressed files
+    else if ("bny".equals (suffix) || "bqy".equals (suffix))     // Binary2 uncompressed files
     {
       if (debug)
-        System.out.println (" ** bny **");
+        System.out.println (" ** bny/bqy **");
       try
       {
         binary2 = new Binary2 (file.toPath ());

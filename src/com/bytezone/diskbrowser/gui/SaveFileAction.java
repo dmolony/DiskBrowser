@@ -1,11 +1,15 @@
 package com.bytezone.diskbrowser.gui;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 
 import com.bytezone.diskbrowser.applefile.AppleFileSource;
 
@@ -23,6 +27,8 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
     super ("Save file...", "Save currently selected file", "Save File");
 
     fileChooser.setAccessory (formatted);
+    int mask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMaskEx ();
+    putValue (Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke (KeyEvent.VK_S, mask));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -35,6 +41,11 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
       JOptionPane.showMessageDialog (null, "No file selected");
       return;
     }
+
+    if (formatted.isSelected ())
+      setSelectedFile (new File (appleFileSource.getUniqueName () + ".txt"));
+    else
+      setSelectedFile (new File (appleFileSource.getUniqueName () + ".bin"));
 
     if (fileChooser.showSaveDialog (null) != JFileChooser.APPROVE_OPTION)
       return;
@@ -51,7 +62,6 @@ class SaveFileAction extends AbstractSaveAction implements FileSelectionListener
   // ---------------------------------------------------------------------------------//
   {
     this.appleFileSource = event.appleFileSource;
-    setSelectedFile (new File (appleFileSource.getUniqueName () + ".bin"));
 
     setEnabled (appleFileSource != null && appleFileSource.getDataSource () != null
         && appleFileSource.getDataSource ().getBuffer () != null);

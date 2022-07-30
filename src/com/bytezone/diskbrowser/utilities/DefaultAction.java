@@ -17,6 +17,7 @@ public abstract class DefaultAction extends AbstractAction
   // ---------------------------------------------------------------------------------//
   {
     super (text);
+
     this.baseURL = null;
     putValue (Action.SHORT_DESCRIPTION, tip);
   }
@@ -26,6 +27,7 @@ public abstract class DefaultAction extends AbstractAction
   // ---------------------------------------------------------------------------------//
   {
     super (text);
+
     this.baseURL = baseURL;
     putValue (Action.SHORT_DESCRIPTION, tip);
   }
@@ -39,6 +41,7 @@ public abstract class DefaultAction extends AbstractAction
       System.out.println ("Base URL not set");
       return;
     }
+
     URL url = this.getClass ().getResource (baseURL + iconName);
     if (url != null)
       putValue (iconType, new ImageIcon (url));

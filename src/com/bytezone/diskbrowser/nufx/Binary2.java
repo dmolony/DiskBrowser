@@ -19,11 +19,11 @@ public class Binary2
   private static final String UNDERLINE =
       "------------------------------------------------------" + "-----------------------";
 
-  Binary2Header binary2Header;
-  byte[] buffer;
-  List<Binary2Header> headers = new ArrayList<> ();
-  int totalBlocks;
-  String fileName;
+  private Binary2Header binary2Header;
+  private byte[] buffer;
+  private List<Binary2Header> headers = new ArrayList<> ();
+  private int totalBlocks;
+  private String fileName;
 
   // ---------------------------------------------------------------------------------//
   public Binary2 (Path path) throws IOException

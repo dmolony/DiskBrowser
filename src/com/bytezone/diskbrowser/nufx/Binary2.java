@@ -43,10 +43,14 @@ public class Binary2
     do
     {
       binary2Header = new Binary2Header (buffer, ptr);
-      headers.add (binary2Header);
 
       totalBlocks += binary2Header.totalBlocks;
       ptr += ((binary2Header.eof - 1) / 128 + 2) * 128;
+
+      if (ptr > buffer.length)      // not enough blocks for this file
+        break;
+
+      headers.add (binary2Header);
     } while (binary2Header.filesToFollow > 0);
 
   }

@@ -9,8 +9,7 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class MasterHeader
 // -----------------------------------------------------------------------------------//
 {
-  private static final byte[] NuFile =
-      { 0x4E, (byte) 0xF5, 0x46, (byte) 0xE9, 0x6C, (byte) 0xE5 };
+  private static final byte[] NuFile = { 0x4E, (byte) 0xF5, 0x46, (byte) 0xE9, 0x6C, (byte) 0xE5 };
   private static final byte[] BIN2 = { 0x0A, 0x47, 0x4C };
 
   private final int crc;
@@ -34,15 +33,6 @@ public class MasterHeader
     {
       if (Utility.isMagic (buffer, ptr, NuFile))
         break;
-
-      // internet.shk has 0x2000 bytes of text at the start
-      //      if (Utility.isMagic (buffer, 0x2000, NuFile))
-      //      {
-      //        System.out.println ("found it");
-      //        ptr = 0x2000;
-      //        bin2 = true;
-      //        break;
-      //      }
 
       if (isBin2 (buffer, ptr))
       {

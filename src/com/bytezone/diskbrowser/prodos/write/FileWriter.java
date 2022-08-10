@@ -7,7 +7,8 @@ import static com.bytezone.diskbrowser.prodos.ProdosConstants.TREE;
 
 // Assumptions:
 // - file does not already exist
-// - disk has no interleave
+// - disk is not interleaved 
+// - blocks are 512 contiguous bytes
 // -----------------------------------------------------------------------------------//
 public class FileWriter
 // -----------------------------------------------------------------------------------//
@@ -99,30 +100,23 @@ public class FileWriter
   private int getActualBlockNo (int logicalBlockNo) throws DiskFullException
   // ---------------------------------------------------------------------------------//
   {
-    int actualBlockNo = 0;
-
     switch (storageType)
     {
       case TREE:
-        actualBlockNo =
-            masterIndexBlock.get (logicalBlockNo / 0x100).getPosition (logicalBlockNo % 0x100);
-        break;
+        return masterIndexBlock.get (logicalBlockNo / 0x100).getPosition (logicalBlockNo % 0x100);
 
       case SAPLING:
         if (logicalBlockNo < 0x100)
-          actualBlockNo = indexBlock.getPosition (logicalBlockNo);
+          return indexBlock.getPosition (logicalBlockNo);
         break;
 
       case SEEDLING:
         if (logicalBlockNo == 0)
-          actualBlockNo = keyPointer;
+          return keyPointer;
         break;
     }
 
-    if (actualBlockNo == 0)
-      actualBlockNo = register (logicalBlockNo);
-
-    return actualBlockNo;
+    return register (logicalBlockNo);
   }
 
   // ---------------------------------------------------------------------------------//

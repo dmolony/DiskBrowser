@@ -5,9 +5,9 @@ import static com.bytezone.diskbrowser.prodos.ProdosConstants.SAPLING;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.SEEDLING;
 import static com.bytezone.diskbrowser.prodos.ProdosConstants.TREE;
 
-//Assumptions:
-//- file does not already exist
-//- disk has no interleave
+// Assumptions:
+// - file does not already exist
+// - disk has no interleave
 // -----------------------------------------------------------------------------------//
 public class FileWriter
 // -----------------------------------------------------------------------------------//

@@ -549,6 +549,8 @@ class FileEntry extends CatalogEntry implements ProdosConstants
         case FILE_TYPE_NON:
           if (name.endsWith (".TIFF") && HiResImage.isTiff (exactBuffer))
             file = new OriginalHiResImage (name, exactBuffer, auxType);
+          else if (name.endsWith (".JAVA"))
+            file = new BasicTextFile (name, exactBuffer, auxType, endOfFile);
           else
             file = new DefaultAppleFile (name, exactBuffer);
           break;

@@ -10,7 +10,7 @@ public class ApplesoftBasicProgram extends BasicProgram implements ApplesoftCons
 // -----------------------------------------------------------------------------------//
 {
   private final List<SourceLine> sourceLines = new ArrayList<> ();
-  private int ptr;          // end-of-program marker
+  private int ptr = 0;          // end-of-program marker
 
   private final UserBasicFormatter userBasicFormatter;
   private final AppleBasicFormatter appleBasicFormatter;

@@ -22,10 +22,19 @@
 0035  YSAV1
 0036  CSWL
 0037  CSHW
-0044  A5L - volume number?
+003D  A1H
+003C  A1L
+003F  A2H
+003E  A2L
+0041  A3H
+0040  A3L
+0043  A4H
+0042  A4L
+0045  A5H
+0044  A5L
 004E  RND-LO
 004F  RND-HI
-0050  LINNUM
+0050  LINNUM vine number, unsigned word
 0067  Basic program address LO
 0068  Basic program address HI
 0069  Basic variables address LO
@@ -52,8 +61,48 @@
 0200  Input buffer
 
 03D0  Applesoft warm start
-03EA  VECT
-A56E  catalog routine
+
+03F2  RST: Control-reset vector
+03F3  RST: Control-reset vector
+03F4  RST: Control-reset checksum (EOR #$A5)
+03FB  NMI: Non-Maskable Interrupt vector
+03FC  NMI: Non-Maskable Interrupt vector
+03F8  USR: user vector (Control-Y)
+03F9  USR: user vector (Control-Y)
+03FE  IRQ: Interrupt Request/BRK vector
+03FF  IRQ: Interrupt Request/BRK vector
+
+A54F  DOS 3.3 INIT
+A413  DOS 3.3 LOAD
+A397  DOS 3.3 SAVE
+A4D1  DOS 3.3 RUN
+A4F0  DOS 3.3 CHAIN
+A263  DOS 3.3 DELETE
+A271  DOS 3.3 LOCK
+A275  DOS 3.3 UNLOCK
+A2EA  DOS 3.3 CLOSE
+A51B  DOS 3.3 READ
+A5C6  DOS 3.3 EXEC
+A510  DOS 3.3 WRITE
+A5DD  DOS 3.3 POSITION
+A2A3  DOS 3.3 OPEN
+A298  DOS 3.3 APPEND
+A281  DOS 3.3 RENAME
+A56E  DOS 3.3 CATALOG
+A233  DOS 3.3 MON
+A23D  DOS 3.3 NOMON
+A229  DOS 3.3 PR#
+A22E  DOS 3.3 IN#
+A251  DOS 3.3 MAXFILES
+A57A  DOS 3.3 FP
+A59E  DOS 3.3 INT
+A331  DOS 3.3 BSAVE
+A35D  DOS 3.3 BLOAD
+A38E  DOS 3.3 BRUN
+A27D  DOS 3.3 VERIFY
+
+BF00  ProDOS MLI entry point
+BF98  ProDOS Machine ID Byte
 
 * C000  80STOREOFF      Allow page2 to switch video page1 page2
 C001  80STOREON       Allow page2 to switch main & aux video memory
@@ -68,8 +117,12 @@ C009  ALTZPON         Enable aux memory from $0000-$01FF & avl BSR
 C00A  SLOTC3ROMOFF    Enable main ROM from $C300-$C3FF
 C00B  SLOTC3ROMON     Enable slot ROM from $C300-$C3FF
 
-C000  KYBD - last key pressed
-C010  STROBE - Clear KYBD
+C000  KBD - Last key pressed
+C010  KBDSTRB - Clear KYBD
+C019  VBL - Vertical Blank
+C020  TAPEOUT - Toggle cassette output
+C030  SPKR - Toggle speaker
+C040  STROBE - Output strobe pulse to game I/O connector
 C050  TXTCLR - Display Graphics
 C051  TXTSET - Display Text
 C052  MIXCLR - Display Full Screen
@@ -78,6 +131,15 @@ C054  TXTPAGE1 - Display Page 1
 C055  TXTPAGE2 - If 80STORE Off: Display Page 2, If 80STORE On: Read/Write Aux Display Mem
 C056  LORES - Display LoRes Graphics
 C057  HIRES - Display HiRes Graphics
+C060  TAPEIN - Read audio from cassette input
+C061  PB0 - Read joystick button 0/Open-Apple key
+C062  PB1 - Read joystick button 1/Closed-Apple key
+C063  PB2 - Read joystick button 2
+C064  PADDL0 - Read paddle/joystick 0
+C065  PADDL1 - Read paddle/joystick 1
+C066  PADDL2 - Read paddle/joystick 2
+C067  PADDL3 - Read paddle/joystick 3
+C070  PTRIG - Clear paddle/joystick timer
 
 C080  Read RAM bank 2; no write
 C081  ROMIN - Read ROM; write RAM bank 2
@@ -96,6 +158,9 @@ C08D  Read ROM; write RAM bank 1
 C08E  Read ROM; no write
 C08F  Read/write RAM bank 1
 
+C600  BOOT0 - Disk II controller ROM
+0801  BOOT1 - Disk II bootstrap RAM
+
 D52C  INLIN numeric input
 DB3A  STROUT - output a string
 DB5C  output a character
@@ -106,6 +171,7 @@ DEC0  SYNCHR
 DEC9  syntax error
 DFE3  PTRGET
 
+E000  Applesoft BASIC entry
 E053  find a variable
 E10C  convert FP to INT
 E2F2  GIVAYF - convert (A,Y) to FP
@@ -177,15 +243,16 @@ F941  PRINTAX - print AX registers in hex
 F948  PRBLNK - print 3 spaces
 F94A  PRBL2 - print X blank spaces
 
-FAA6  reboot DOS
+FAA6  PWRUP
 FAFF  0 = Autostart ROM, 1 = Old Monitor
 
 FB1E  PREAD - read game paddle
-FB2F  initialise text screen
+FB2F  INIT - initialise text screen
 FB39  text mode - SETTXT
 FB40  SETGR
 FB5B  TABV - monitor tab routine
-FB6F  set powerup checksum
+FB6F  SETPWRC - set powerup checksum
+FBB3  VERSION - monitor ROM ID byte
 FBC1  BASCALC - calculate video address
 FBDD  BELL1 - beep speaker
 FBF4  CURSRIT - move cursor right
@@ -193,6 +260,7 @@ FBF4  CURSRIT - move cursor right
 FC10  CURSLFT - move cursor left
 FC1A  CURSUP - move cursor up
 FC22  VTAB
+FC24  VTABZ
 FC42  CLREOP - clear to end of page
 FC58  HOME - clear screen
 FC62  CR
@@ -215,12 +283,13 @@ FDE3  PRHEX - print a hex digit
 FDED  COUT - print a character (in Acc)
 FDF0  COUT1 - print character to screen
 
-FE2C  move a block of memory
+FE1F  IDROUTINE - detect //gs
+FE2C  MOVE - move a block of memory
 FE80  SETINV - set inverse mode
 FE84  SETNORM - set normal mode
-FE89  disconnect DOS from I/O links
+FE89  SETKBD - disconnect DOS from I/O links
 FE8B  INPORT
-FE93  disconnect DOS from I/O links
+FE93  SETVID - disconnect DOS from I/O links
 FE95  OUTPORT
 FECD  WRITE
 FEFD  READ
@@ -231,6 +300,14 @@ FF3A  BELL
 FF3F  IOREST - restore all registers
 FF4A  IOSAVE - save all registers
 FF58  RTS - jump to <address on stack> + 1
-FF59  Monitor cold entry point
+FF59  MON - Monitor cold entry point (w/BELL)
+FF69  MONZ - Monitor entry point from BASIC (CALL -151)
 FFA7  GETNUM - move num to A2L.A2H
 FFC7  ZMODE - monitor get ASCII return
+
+FFFA  NMI_VECTOR
+FFFB  NMI_VECTOR
+FFFC  RESET_VECTOR
+FFFD  RESET_VECTOR
+FFFE  IRQ_VECTOR
+FFFF  IRQ_VECTOR

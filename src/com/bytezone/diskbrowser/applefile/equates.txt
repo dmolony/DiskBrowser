@@ -34,7 +34,7 @@
 0044  A5L
 004E  RND-LO
 004F  RND-HI
-0050  LINNUM vine number, unsigned word
+0050  LINNUM line number, unsigned word
 0067  Basic program address LO
 0068  Basic program address HI
 0069  Basic variables address LO
@@ -243,7 +243,7 @@ F941  PRINTAX - print AX registers in hex
 F948  PRBLNK - print 3 spaces
 F94A  PRBL2 - print X blank spaces
 
-FAA6  PWRUP
+FAA6  PWRUP - reboot
 FAFF  0 = Autostart ROM, 1 = Old Monitor
 
 FB1E  PREAD - read game paddle

@@ -30,6 +30,7 @@ public class BasicTextFile extends TextFile
     super (name, buffer);
 
     this.eof = eof;
+
     recordLength = auxType;
     prodosFile = true;
   }

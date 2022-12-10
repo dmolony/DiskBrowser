@@ -8,8 +8,8 @@ import com.bytezone.diskbrowser.utilities.HexFormatter;
 public class BasicTextFile extends TextFile
 // -----------------------------------------------------------------------------------//
 {
-  private static String underline = "------------------------------------------"
-      + "------------------------------------\n";
+  private static String underline =
+      "------------------------------------------" + "------------------------------------\n";
   private static String fullUnderline = "----------  -------  " + underline;
   private int recordLength;                   // prodos aux
   private List<TextBuffer> buffers;           // only used if it is a Prodos text file
@@ -42,6 +42,7 @@ public class BasicTextFile extends TextFile
 
     this.buffers = buffers;
     this.eof = eof;
+
     recordLength = auxType;
     prodosFile = true;
   }
@@ -167,8 +168,7 @@ public class BasicTextFile extends TextFile
       if (textPreferences.showTextOffsets)
       {
         line = line.replaceAll ("\\n", "\n                     ");
-        text.append (
-            String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo, line));
+        text.append (String.format ("%,10d %,8d  %s%n", recNo * recordLength, recNo, line));
       }
       else
         text.append (String.format ("%s%n", line));

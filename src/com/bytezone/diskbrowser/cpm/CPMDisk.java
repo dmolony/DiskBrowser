@@ -16,6 +16,7 @@ import com.bytezone.diskbrowser.disk.SectorType;
 import com.bytezone.diskbrowser.gui.DataSource;
 import com.bytezone.diskbrowser.utilities.HexFormatter;
 
+// https://www.retrotechnology.com/dri/howto_cpm.html
 // -----------------------------------------------------------------------------------//
 public class CPMDisk extends AbstractFormattedDisk
 // -----------------------------------------------------------------------------------//

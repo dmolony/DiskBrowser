@@ -51,6 +51,9 @@ public class Prefix2mg
     if (format == 0 && flagsVolume == 0)
       flagsVolume = 254;
 
+    if (length == 0)
+      length = 512 * blocks;
+
     // see /Asimov disks/images/gs/os/prodos16/ProDOS 16v1_3.2mg
     //    System.out.println (this);
   }

@@ -206,8 +206,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
 
     DefaultMutableTreeNode root = getCatalogTreeRoot ();
     if (root.getUserObject () == null)
-      root.setUserObject (
-          new DefaultAppleFileSource (getName (), disk.toString (), this));
+      root.setUserObject (new DefaultAppleFileSource (getName (), disk.toString (), this));
   }
 
   // ---------------------------------------------------------------------------------//
@@ -234,15 +233,15 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
   public String getDisplayPath ()
   // ---------------------------------------------------------------------------------//
   {
-    //    if (originalPath != null)
-    //      return originalPath.toString ();
-
     String home = System.getProperty ("user.home");
 
-    String path = originalPath != null ? originalPath.toString ()
-        : disk.getFile ().getAbsolutePath ();
-    if (path.startsWith (home))
-      return "~" + path.substring (home.length ());
+    String path =
+        originalPath != null ? originalPath.toString () : disk.getFile ().getAbsolutePath ();
+
+    int pos = path.indexOf (home);
+
+    if (pos == 0 || (path.startsWith ("/Volumes/") && pos > 0))
+      return "~" + path.substring (home.length () + pos);
 
     return disk.getFile ().getAbsolutePath ();
   }
@@ -327,8 +326,7 @@ public abstract class AbstractFormattedDisk implements FormattedDisk
     if (children != null)
       while (children.hasMoreElements ())
       {
-        DefaultMutableTreeNode childNode =
-            (DefaultMutableTreeNode) children.nextElement ();
+        DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) children.nextElement ();
         if (childNode.getUserObject ().toString ().indexOf (name) > 0)
           return childNode;
       }

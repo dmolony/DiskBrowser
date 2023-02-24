@@ -566,6 +566,23 @@ public final class Utility
   }
 
   // ---------------------------------------------------------------------------------//
+  public static String getShortPath (String path)
+  // ---------------------------------------------------------------------------------//
+  {
+    String home = System.getProperty ("user.home");
+    if (path.startsWith (home))
+      path = "~" + path.substring (home.length ());
+    else if (path.startsWith ("/Volumes/"))
+    {
+      int pos = path.indexOf (home);
+      if (pos > 0)
+        path = "~" + path.substring (home.length () + pos);
+    }
+
+    return path;
+  }
+
+  // ---------------------------------------------------------------------------------//
   public static void reverse (byte[] buffer)
   // ---------------------------------------------------------------------------------//
   {

@@ -15,13 +15,12 @@ class Record
 // -----------------------------------------------------------------------------------//
 {
   private static final byte[] NuFX = { 0x4E, (byte) 0xF5, 0x46, (byte) 0xD8 };
-  private static String[] fileSystems =
-      { "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2", "Apple II Pascal", "Macintosh HFS",
-        "Macintosh MFS", "Lisa File System", "Apple CP/M", "", "MS-DOS", "High Sierra",
-        "ISO 9660", "AppleShare" };
+  private static String[] fileSystems = { "", "ProDOS/SOS", "DOS 3.3", "DOS 3.2",
+      "Apple II Pascal", "Macintosh HFS", "Macintosh MFS", "Lisa File System",
+      "Apple CP/M", "", "MS-DOS", "High Sierra", "ISO 9660", "AppleShare" };
 
   private static String[] storage = { "", "Seedling", "Sapling", "Tree", "", "Extended",
-                                      "", "", "", "", "", "", "", "Subdirectory" };
+      "", "", "", "", "", "", "", "Subdirectory" };
 
   private static String[] accessChars = { "D", "R", "B", "", "", "I", "W", "R" };
   private static String threadFormats[] = { "unc", "sq ", "lz1", "lz2", "", "" };
@@ -255,6 +254,13 @@ class Record
   }
 
   // ---------------------------------------------------------------------------------//
+  String getThreadFormatText ()
+  // ---------------------------------------------------------------------------------//
+  {
+    return threadFormats[getThreadFormat ()];
+  }
+
+  // ---------------------------------------------------------------------------------//
   int getUncompressedSize ()
   // ---------------------------------------------------------------------------------//
   {
@@ -281,6 +287,17 @@ class Record
         size += thread.getCompressedEOF ();
 
     return size;
+  }
+
+  // ---------------------------------------------------------------------------------//
+  public float getCompressedPct ()
+  // ---------------------------------------------------------------------------------//
+  {
+    float pct = 100;
+    if (getUncompressedSize () > 0)
+      pct = getCompressedSize () * 100 / getUncompressedSize ();
+
+    return pct;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -313,9 +330,9 @@ class Record
     if (name.length () > 27)
       name = ".." + name.substring (name.length () - 25);
 
-    float pct = 100;
-    if (getUncompressedSize () > 0)
-      pct = getCompressedSize () * 100 / getUncompressedSize ();
+    //    float pct = 100;
+    //    if (getUncompressedSize () > 0)
+    //      pct = getCompressedSize () * 100 / getUncompressedSize ();
 
     String lockedFlag = (access | 0xC3) == 1 ? "+" : " ";
     String forkedFlag = hasResource () ? "+" : " ";
@@ -323,11 +340,11 @@ class Record
     if (hasDisk ())
       return String.format ("%s%-27.27s %-4s %-6s %-15s  %s  %3.0f%%   %7d", lockedFlag,
           name, "Disk", (getUncompressedSize () / 1024) + "k", archived.format2 (),
-          threadFormats[getThreadFormat ()], pct, getUncompressedSize ());
+          getThreadFormatText (), getCompressedPct (), getUncompressedSize ());
 
     return String.format ("%s%-27.27s %s%s $%04X  %-15s  %s  %3.0f%%   %7d", lockedFlag,
         name, fileTypes[fileType], forkedFlag, auxType, archived.format2 (),
-        threadFormats[getThreadFormat ()], pct, getUncompressedSize ());
+        getThreadFormatText (), getCompressedPct (), getUncompressedSize ());
   }
 
   // ---------------------------------------------------------------------------------//

@@ -21,7 +21,8 @@ public class NuFX
 // -----------------------------------------------------------------------------------//
 {
   private static final String UNDERLINE =
-      "------------------------------------------------------" + "-----------------------";
+      "------------------------------------------------------"
+          + "-----------------------";
   private MasterHeader masterHeader;
   private final byte[] buffer;
   private final boolean debug = false;
@@ -39,6 +40,7 @@ public class NuFX
   {
     buffer = Files.readAllBytes (path);
     volumeName = new VolumeName (path.getFileName ().toString ());
+
     read (buffer);
   }
 
@@ -94,6 +96,7 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
+    System.out.println (toString ());
   }
 
   // ---------------------------------------------------------------------------------//
@@ -181,14 +184,14 @@ public class NuFX
             }
 
             if (debug)
-              System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count, fileName,
-                  fileType, auxType, eof, buffer.length, created, modified);
+              System.out.printf ("%3d %-35s %02X %,7d %,7d %,7d  %s  %s%n", ++count,
+                  fileName, fileType, auxType, eof, buffer.length, created, modified);
 
             FileEntry fileEntry;
             try
             {
-              fileEntry =
-                  disk.addFile (fileName, fileType, auxType, created, modified, buffer, eof);
+              fileEntry = disk.addFile (fileName, fileType, auxType, created, modified,
+                  buffer, eof);
             }
             catch (FileAlreadyExistsException e)
             {
@@ -266,8 +269,8 @@ public class NuFX
         volumeName.volumeName, masterHeader.getCreated2 (), masterHeader.getModified2 (),
         masterHeader.getTotalRecords ()));
 
-    text.append (
-        " Name                        Type Auxtyp Archived" + "         Fmat Size Un-Length\n");
+    text.append (" Name                        Type Auxtyp Archived"
+        + "         Fmat Size Un-Length\n");
 
     text.append (String.format ("%s%n", UNDERLINE));
 

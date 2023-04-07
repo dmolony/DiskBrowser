@@ -15,8 +15,8 @@ import com.bytezone.diskbrowser.utilities.Utility;
 abstract class CatalogEntry implements AppleFileSource
 // -----------------------------------------------------------------------------------//
 {
-  static String[] storageTypes =
-      { "Del", "Sdl", "Sap", "Tre", "Pas", "Ext", "", "", "", "", "", "", "", "DIR", "SDH", "VDH" };
+  static String[] storageTypes = { "Del", "Sdl", "Sap", "Tre", "Pas", "Ext", "", "", "",
+      "", "", "", "", "DIR", "SDH", "VDH" };
   Disk disk;
   ProdosDisk parentDisk;
 

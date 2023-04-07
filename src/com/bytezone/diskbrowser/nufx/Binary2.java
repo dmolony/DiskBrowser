@@ -17,7 +17,8 @@ public class Binary2
 // -----------------------------------------------------------------------------------//
 {
   private static final String UNDERLINE =
-      "------------------------------------------------------" + "-----------------------";
+      "------------------------------------------------------"
+          + "-----------------------";
 
   private Binary2Header binary2Header;
   private byte[] buffer;
@@ -54,8 +55,8 @@ public class Binary2
   }
 
   // ---------------------------------------------------------------------------------//
-  public byte[] getDiskBuffer ()
-      throws DiskFullException, VolumeCatalogFullException, FileAlreadyExistsException, IOException
+  public byte[] getDiskBuffer () throws DiskFullException, VolumeCatalogFullException,
+      FileAlreadyExistsException, IOException
   // ---------------------------------------------------------------------------------//
   {
     ProdosDisk disk = new ProdosDisk (800, "DiskBrowser");
@@ -72,8 +73,8 @@ public class Binary2
         Squeeze squeeze = new Squeeze ();
         byte[] tmp = squeeze.unSqueeze (dataBuffer);
 
-        disk.addFile (name, header.fileType, header.auxType, header.created, header.modified, tmp,
-            tmp.length);
+        disk.addFile (name, header.fileType, header.auxType, header.created,
+            header.modified, tmp, tmp.length);
       }
       else
         disk.addFile (header.fileName, header.fileType, header.auxType, header.created,
@@ -91,12 +92,12 @@ public class Binary2
   {
     StringBuilder text = new StringBuilder ();
 
-    text.append (
-        String.format (" %-15.15s                                                  Files:%5d%n%n",
-            fileName, headers.size ()));
+    text.append (String.format (
+        " %-15.15s                                                  Files:%5d%n%n",
+        fileName, headers.size ()));
 
-    text.append (
-        " Name                              Type Auxtyp Modified" + "         Fmat   Length\n");
+    text.append (" Name                              Type Auxtyp Modified"
+        + "         Fmat   Length\n");
 
     text.append (String.format ("%s%n", UNDERLINE));
 

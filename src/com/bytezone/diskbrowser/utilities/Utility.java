@@ -40,8 +40,8 @@ public final class Utility
   private static MathContext mathContext4 = new MathContext (6);
   private static MathContext mathContext8 = new MathContext (15);
 
-  private static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv", "2mg",
-      "d13", "sdk", "shk", "bxy", "bny", "bqy", "woz", "img", "dimg");
+  private static final List<String> suffixes = Arrays.asList ("po", "dsk", "do", "hdv",
+      "2mg", "d13", "sdk", "shk", "bxy", "bny", "bqy", "woz", "img", "dimg");
 
   // ---------------------------------------------------------------------------------//
   private Utility ()
@@ -255,7 +255,8 @@ public final class Utility
       }
       catch (DateTimeException e)
       {
-        System.out.printf ("Bad date/time: %d %d %d %d %d %n", year, month, day, hour, minute);
+        System.out.printf ("Bad date/time: %d %d %d %d %d %n", year, month, day, hour,
+            minute);
       }
     }
 
@@ -315,7 +316,8 @@ public final class Utility
   public static int readTriple (byte[] buffer, int ptr)
   // ---------------------------------------------------------------------------------//
   {
-    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8 | (buffer[ptr + 2] & 0xFF) << 16;
+    return (buffer[ptr] & 0xFF) | (buffer[ptr + 1] & 0xFF) << 8
+        | (buffer[ptr + 2] & 0xFF) << 16;
   }
 
   // ---------------------------------------------------------------------------------//
@@ -384,8 +386,8 @@ public final class Utility
     if (exponent == 0)
       return 0.0;
 
-    int mantissa =
-        (buffer[ptr + 2] & 0x7F) << 16 | (buffer[ptr + 1] & 0xFF) << 8 | (buffer[ptr] & 0xFF);
+    int mantissa = (buffer[ptr + 2] & 0x7F) << 16 | (buffer[ptr + 1] & 0xFF) << 8
+        | (buffer[ptr] & 0xFF);
     boolean negative = (buffer[ptr + 2] & 0x80) != 0;
     double value = 0.5;
 
@@ -408,9 +410,10 @@ public final class Utility
     if (exponent == 0)
       return 0.0;
 
-    long mantissa = (long) (buffer[ptr + 6] & 0x7F) << 48 | (long) (buffer[ptr + 5] & 0xFF) << 40
-        | (long) (buffer[ptr + 4] & 0xFF) << 32 | (long) (buffer[ptr + 3] & 0xFF) << 24
-        | (buffer[ptr + 2] & 0xFF) << 16 | (buffer[ptr + 1] & 0xFF) << 8 | (buffer[ptr] & 0xFF);
+    long mantissa = (long) (buffer[ptr + 6] & 0x7F) << 48
+        | (long) (buffer[ptr + 5] & 0xFF) << 40 | (long) (buffer[ptr + 4] & 0xFF) << 32
+        | (long) (buffer[ptr + 3] & 0xFF) << 24 | (buffer[ptr + 2] & 0xFF) << 16
+        | (buffer[ptr + 1] & 0xFF) << 8 | (buffer[ptr] & 0xFF);
     boolean negative = (buffer[ptr + 6] & 0x80) != 0;
     double value = 0.5;
 
@@ -519,10 +522,11 @@ public final class Utility
     {
       int[] val = new int[6];
       for (int i = 0; i < 6; i++)
-        //        val[i] = Integer.parseInt (String.format ("%02X", buffer[ptr + i] & 0xFF));
+        //    val[i] = Integer.parseInt (String.format ("%02X", buffer[ptr + i] & 0xFF));
         val[i] = buffer[ptr + i] & 0xFF;
 
-      LocalDateTime date = LocalDateTime.of (val[3] + 2000, val[5], val[4], val[2], val[1], val[0]);
+      LocalDateTime date =
+          LocalDateTime.of (val[3] + 2000, val[5], val[4], val[2], val[1], val[0]);
       return date;
     }
     catch (DateTimeException e)
@@ -630,7 +634,8 @@ public final class Utility
   public static boolean isPossibleVariable (byte value)
   // ---------------------------------------------------------------------------------//
   {
-    return isDigit (value) || isLetter (value) || value == ASCII_DOLLAR || value == ASCII_PERCENT;
+    return isDigit (value) || isLetter (value) || value == ASCII_DOLLAR
+        || value == ASCII_PERCENT;
   }
 
   // ---------------------------------------------------------------------------------//

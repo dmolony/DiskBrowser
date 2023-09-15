@@ -243,7 +243,7 @@ public class SHRPictureFile1 extends HiResImage
           colorTables[i] = new ColorTable (i, data, ptr);
         else
           colorTables[i] = new ColorTable (i, 0x00);      // default empty table !! not
-                                                          // finished
+                                                    // finished
         ptr += 32;
       }
     }

@@ -202,7 +202,7 @@ public class SubLine implements ApplesoftConstants
   private void checkFunction (String var, byte terminator)
   // ---------------------------------------------------------------------------------//
   {
-    assert terminator == ASCII_LEFT_BRACKET;
+    //    assert terminator == ASCII_LEFT_BRACKET;
 
     if (!functions.contains (var))
       functions.add (var);

@@ -4,8 +4,8 @@
 
   <property name="srcDir" location="src" />
   <property name="binDir" location="bin" />
-  <property name="jarFolder" location="${user.home}/Dropbox/Java" />
-  <property name="jarFile" location="${jarFolder}/DiskBrowser.jar" />
+  <property name="jarDir" location="${user.home}/Dropbox/Java" />
+  <property name="jarFile" location="${jarDir}/DiskBrowser.jar" />
 
   <target name="version">
     <echo>DiskBrowser.jar</echo>
@@ -30,7 +30,7 @@
   <target name="jar" depends="compile">
     <jar destfile="${jarFile}">
       <fileset dir="${binDir}" />
-      <zipfileset src="${jarFolder}/InputPanel.jar" />
+      <zipfileset src="${jarDir}/InputPanel.jar" />
       <manifest>
         <attribute name="Main-Class" value="com.bytezone.diskbrowser.gui.DiskBrowser" />
       </manifest>

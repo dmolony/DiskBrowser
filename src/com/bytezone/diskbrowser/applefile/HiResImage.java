@@ -16,9 +16,10 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public abstract class HiResImage extends AbstractFile
 // -----------------------------------------------------------------------------------//
 {
-  static final String[] auxTypes = { "Paintworks Packed SHR Image", "Packed Super Hi-Res Image",
-      "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
-      "Packed Super Hi-Res 3200 color image", "DreamGraphix" };
+  static final String[] auxTypes =
+      { "Paintworks Packed SHR Image", "Packed Super Hi-Res Image",
+          "Super Hi-Res Image (Apple Preferred Format)", "Packed QuickDraw II PICT File",
+          "Packed Super Hi-Res 3200 color image", "DreamGraphix" };
 
   static final int COLOR_TABLE_SIZE = 32;
   static final int COLOR_TABLE_OFFSET_AUX_0 = 32_256;
@@ -115,7 +116,8 @@ public abstract class HiResImage extends AbstractFile
 
   static PaletteFactory paletteFactory = new PaletteFactory ();
 
-  static final byte[] pngHeader = { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+  static final byte[] pngHeader =
+      { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
   static boolean colourQuirks;
   static boolean monochrome;
@@ -275,8 +277,8 @@ public abstract class HiResImage extends AbstractFile
   {
     String auxText = "";
     StringBuilder text = new StringBuilder ();
-    text.append (String.format ("Image File : %s%nFile type  : $%02X    %s%n", name, fileType,
-        ProdosConstants.fileTypes[fileType]));
+    text.append (String.format ("Image File : %s%nFile type  : $%02X    %s%n", name,
+        fileType, ProdosConstants.fileTypes[fileType]));
 
     switch (fileType)
     {
@@ -393,7 +395,8 @@ public abstract class HiResImage extends AbstractFile
   {
     if (dataBuffer.getSize () < rgbList.length + element)
     {
-      System.out.printf ("Bollocks: %d %d %d%n", dataBuffer.getSize (), rgbList.length, element);
+      System.out.printf ("Bollocks: %d %d %d%n", dataBuffer.getSize (), rgbList.length,
+          element);
       return element;
     }
 
@@ -462,12 +465,13 @@ public abstract class HiResImage extends AbstractFile
       int type = (buffer[ptr] & 0xC0) >>> 6;        // 0-3
       int count = (buffer[ptr++] & 0x3F) + 1;       // 1-64
 
-      text.append (String.format ("%04X/%04d: %02X  (%d,%2d)  ", ptr - 1, size, buffer[ptr - 1],
-          type, count));
+      text.append (String.format ("%04X/%04d: %02X  (%d,%2d)  ", ptr - 1, size,
+          buffer[ptr - 1], type, count));
 
       if (type == 0)
       {
-        text.append (String.format ("%s%n", HexFormatter.getHexString (buffer, ptr, count)));
+        text.append (
+            String.format ("%s%n", HexFormatter.getHexString (buffer, ptr, count)));
         ptr += count;
         size += count;
       }
@@ -651,8 +655,8 @@ public abstract class HiResImage extends AbstractFile
     if (buffer.length < 4)
       return false;
 
-    return buffer[0] == (byte) 0xC1 && buffer[1] == (byte) 0xD0 && buffer[2] == (byte) 0xD0
-        && buffer[3] == 0;
+    return buffer[0] == (byte) 0xC1 && buffer[1] == (byte) 0xD0
+        && buffer[2] == (byte) 0xD0 && buffer[3] == 0;
   }
 
   // ---------------------------------------------------------------------------------//

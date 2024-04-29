@@ -522,8 +522,8 @@ public final class Utility
     {
       int[] val = new int[6];
       for (int i = 0; i < 6; i++)
-        //    val[i] = Integer.parseInt (String.format ("%02X", buffer[ptr + i] & 0xFF));
-        val[i] = buffer[ptr + i] & 0xFF;
+        val[i] = Integer.parseInt (String.format ("%02X", buffer[ptr + i] & 0xFF));
+      //        val[i] = buffer[ptr + i] & 0xFF;
 
       LocalDateTime date =
           LocalDateTime.of (val[3] + 2000, val[5], val[4], val[2], val[1], val[0]);

@@ -3,6 +3,7 @@ package com.bytezone.diskbrowser.applefile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import com.bytezone.diskbrowser.disk.FormattedDisk;
 import com.bytezone.diskbrowser.prodos.DirectoryHeader;
@@ -15,9 +16,11 @@ import com.bytezone.diskbrowser.utilities.Utility;
 public class ProdosDirectory extends AbstractFile implements ProdosConstants
 // -----------------------------------------------------------------------------------//
 {
-  static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
+  private static Locale US = Locale.US;                 // to force 3 character months
+  static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy", US);
   static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
-  static final String UNDERLINE = "----------------------------------------------------\n";
+  static final String UNDERLINE =
+      "----------------------------------------------------\n";
 
   private static final String NO_DATE = "<NO DATE>";
 
@@ -27,8 +30,8 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
   private final int usedBlocks;
 
   // ---------------------------------------------------------------------------------//
-  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer, int totalBlocks,
-      int freeBlocks, int usedBlocks)
+  public ProdosDirectory (FormattedDisk parent, String name, byte[] buffer,
+      int totalBlocks, int freeBlocks, int usedBlocks)
   // ---------------------------------------------------------------------------------//
   {
     super (name, buffer);
@@ -109,8 +112,10 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
           LocalDateTime createdDate = Utility.getAppleDate (buffer, i + 24);
           LocalDateTime modifiedDate = Utility.getAppleDate (buffer, i + 33);
 
-          String dateC = createdDate == null ? NO_DATE : createdDate.format (df).toUpperCase ();
-          String dateM = modifiedDate == null ? NO_DATE : modifiedDate.format (df).toUpperCase ();
+          String dateC =
+              createdDate == null ? NO_DATE : createdDate.format (df).toUpperCase ();
+          String dateM =
+              modifiedDate == null ? NO_DATE : modifiedDate.format (df).toUpperCase ();
 
           String timeC = createdDate == null ? "" : createdDate.format (tf);
           String timeM = modifiedDate == null ? "" : modifiedDate.format (tf);
@@ -144,9 +149,10 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
           }
 
           String forkFlag = storageType == 5 ? "+" : " ";
-          text.append (String.format ("%s%-15s %3s%s  %5d  %9s %5s  %9s %5s %8d %7s    %04X%n",
-              locked, filename, ProdosConstants.fileTypes[type], forkFlag, blocks, dateM, timeM,
-              dateC, timeC, eof, subType, aux));
+          text.append (
+              String.format ("%s%-15s %3s%s  %5d  %9s %5s  %9s %5s %8d %7s    %04X%n",
+                  locked, filename, ProdosConstants.fileTypes[type], forkFlag, blocks,
+                  dateM, timeM, dateC, timeC, eof, subType, aux));
           break;
 
         default:
@@ -154,8 +160,9 @@ public class ProdosDirectory extends AbstractFile implements ProdosConstants
       }
     }
 
-    text.append (String.format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
-        freeBlocks, usedBlocks, totalBlocks));
+    text.append (
+        String.format ("%nBLOCKS FREE:%5d     BLOCKS USED:%5d     TOTAL BLOCKS:%5d%n",
+            freeBlocks, usedBlocks, totalBlocks));
 
     return text.toString ();
   }

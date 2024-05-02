@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -31,7 +32,8 @@ public class ProdosDisk extends AbstractFormattedDisk
 {
   static ProdosPreferences prodosPreferences;     // set by MenuHandler
 
-  static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy");
+  private static Locale US = Locale.US;                 // to force 3 character months
+  static final DateTimeFormatter df = DateTimeFormatter.ofPattern ("d-LLL-yy", US);
   static final DateTimeFormatter tf = DateTimeFormatter.ofPattern ("H:mm");
 
   final SectorType dosSector = new SectorType ("Bootstrap Loader", Color.lightGray);

@@ -1,6 +1,6 @@
 # Apple II Disk Browser
 ### Alternative
-There is a beta release of [DiskBrowser2](https://github.com/dmolony/diskbrowser2) available.
+There is a new release of [DiskBrowser2](https://github.com/dmolony/diskbrowser2) available.
 ### Features
 - Cross-platform (Windows, MacOS, Linux)
 - Disk formats

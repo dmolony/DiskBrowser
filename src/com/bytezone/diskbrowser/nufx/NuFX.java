@@ -96,7 +96,7 @@ public class NuFX
       if (record.hasDisk ())
         ++totalDisks;
     }
-    System.out.println (toString ());
+    //    System.out.println (toString ());
   }
 
   // ---------------------------------------------------------------------------------//

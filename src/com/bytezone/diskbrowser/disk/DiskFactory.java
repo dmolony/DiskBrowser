@@ -418,7 +418,8 @@ public class DiskFactory
 
     if (length != DISK_143K)          // 16 sector floppy disk
     {
-      System.out.printf ("%s: invalid file length : %,d%n", file.getName (), file.length ());
+      System.out.printf ("%s: invalid file length : %,d%n", file.getName (),
+          file.length ());
       return null;
     }
 
@@ -578,8 +579,8 @@ public class DiskFactory
       disk = new DataDisk (appleDisk256);
 
     if (debug)
-      System.out
-          .println ("Factory creating disk : " + disk.getDisk ().getFile ().getAbsolutePath ());
+      System.out.println (
+          "Factory creating disk : " + disk.getDisk ().getFile ().getAbsolutePath ());
 
     if (disk != null && compressed)
       disk.setOriginalPath (originalPath);

@@ -15,7 +15,6 @@ public class PascalSegment extends AbstractFile implements PascalConstants
   final int segmentNoHeader;
   private int segmentNoBody;
   //  private final int blockOffset;
-  //  private final Relocator relocator;
   boolean debug = false;
 
   public int blockNo;
@@ -41,7 +40,6 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     this.slot = seq;
     //    this.blockOffset = blockOffset;
-    //    this.relocator = relocator;
 
     this.blockNo = Utility.getShort (fullBuffer, seq * 4);
     this.size = Utility.getShort (fullBuffer, seq * 4 + 2);
@@ -68,24 +66,6 @@ public class PascalSegment extends AbstractFile implements PascalConstants
 
     int offset = blockNo * 512;
 
-    //    if (relocator != null)
-    //    {
-    //      //      if (segmentNoHeader > 1)
-    //      //      {
-    //      int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
-    //      int targetBlock = blockNo + blockOffset;
-    //      addresses = relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
-    //      if (addresses.size () > 0)
-    //      {
-    //        MultiDiskAddress multiDiskAddress = addresses.get (0);
-    //        if (multiDiskAddress.diskNumber == 1)
-    //          offset = (multiDiskAddress.physicalBlockNumber - blockOffset) * BLOCK_SIZE;
-    //        else
-    //          offset = -1;
-    //      }
-    //      //      }
-    //    }
-
     if (offset < 0)
     {
       buffer = new byte[0];
@@ -110,11 +90,6 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     }
   }
 
-  //  void setMultiDiskAddresses (List<MultiDiskAddress> addresses)
-  //  {
-  //    this.addresses = addresses;
-  //  }
-
   // ---------------------------------------------------------------------------------//
   private void buildProcedureList ()
   // ---------------------------------------------------------------------------------//
@@ -132,10 +107,9 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
 
     return String.format (
-        " %2d   %02X   %02X  %04X  %-8s  %-15s%3d   " + "%02X  %d   %d   %d   %d  %s",
-        slot, blockNo, sizeInBlocks, size, name, SegmentKind[segKind], textAddress,
-        segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2,
-        getMultiDiskAddresses ());
+        " %2d   %02X   %02X  %04X  %-8s  %-15s%3d   " + "%02X  %d   %d   %d   %d", slot,
+        blockNo, sizeInBlocks, size, name, SegmentKind[segKind], textAddress,
+        segmentNoHeader, machineType, version, intrinsSegs1, intrinsSegs2);
   }
 
   // ---------------------------------------------------------------------------------//
@@ -152,14 +126,13 @@ public class PascalSegment extends AbstractFile implements PascalConstants
         + "===============================".substring (0, title.length ()) + "\n\n");
     String warning = segmentNoBody == segmentNoHeader ? ""
         : String.format (" (%02X in routine)", segmentNoBody);
-    text.append (String.format ("Address........ %02X%n", blockNo));
-    //    if (addresses != null)
-    text.append (String.format ("Multi disk .... %s%n", getMultiDiskAddresses ()));
+    text.append (
+        String.format ("Segment........     %02X%s%n", segmentNoHeader, warning));
+    text.append (String.format ("Address........     %02X%n", blockNo));
     text.append (String.format ("Length......... %04X%n", buffer.length));
-    text.append (String.format ("Machine type... %d%n", machineType));
-    text.append (String.format ("Version........ %d%n", version));
-    text.append (String.format ("Segment........ %02X%s%n", segmentNoHeader, warning));
-    text.append (String.format ("Total procs.... %d%n", procedures.size ()));
+    text.append (String.format ("Machine type...     %d%n", machineType));
+    text.append (String.format ("Version........     %d%n", version));
+    text.append (String.format ("Total procs....     %2d%n", procedures.size ()));
 
     text.append ("\nProcedure Dictionary\n====================\n\n");
 
@@ -174,7 +147,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
     {
       if (procedure.valid)
       {
-        int address = size - procedure.slot * 2 - 2;
+        int address = size - procedure.procNo * 2 - 2;
         text.append (String.format (
             " %3d   %04X   %3d   %04X   %04X   %04X   %04X   (%04X - %04X = %04X)%n",
             procedure.procedureNo, procedure.offset, procedure.procLevel,
@@ -182,7 +155,7 @@ public class PascalSegment extends AbstractFile implements PascalConstants
             procedure.dataSize, address, procedure.offset, procedure.procOffset));
       }
       else
-        text.append (String.format (" %3d   %04X%n", procedure.slot, procedure.offset));
+        text.append (String.format (" %3d   %04X%n", procedure.procNo, procedure.offset));
     }
 
     text.append ("\nStrings\n=======\n");
@@ -199,40 +172,5 @@ public class PascalSegment extends AbstractFile implements PascalConstants
         text.append (procedure);
 
     return text.toString ();
-  }
-
-  // ---------------------------------------------------------------------------------//
-  private String getMultiDiskAddresses ()
-  // ---------------------------------------------------------------------------------//
-  {
-    String multiDiskAddressText = "";
-    //    int sizeInBlocks = (size - 1) / BLOCK_SIZE + 1;
-
-    //    if (segmentNoHeader == 1)           // main segment
-    //    {
-    //      multiDiskAddressText = String.format ("1:%03X", (blockNo + blockOffset));
-    //    }
-    //    else
-    //    if (relocator != null)
-    //    {
-    //      int targetBlock = blockNo + blockOffset;
-    //      List<MultiDiskAddress> addresses =
-    //          relocator.getMultiDiskAddress (name, targetBlock, sizeInBlocks);
-    //      if (addresses.isEmpty ())
-    //        multiDiskAddressText = ".";
-    //      else
-    //      {
-    //        StringBuilder locations = new StringBuilder ();
-    //        for (MultiDiskAddress multiDiskAddress : addresses)
-    //          locations.append (multiDiskAddress.toString () + ", ");
-    //        if (locations.length () > 2)
-    //        {
-    //          locations.deleteCharAt (locations.length () - 1);
-    //          locations.deleteCharAt (locations.length () - 1);
-    //        }
-    //        multiDiskAddressText = locations.toString ();
-    //      }
-    //    }
-    return multiDiskAddressText;
   }
 }

@@ -15,7 +15,7 @@ public class PascalProcedure
   byte[] buffer;
   int procOffset;
   int offset;
-  int slot;
+  int procNo;
   boolean valid;
 
   // only valid procedures have these fields
@@ -30,12 +30,13 @@ public class PascalProcedure
   int jumpTable = -8;
 
   // ---------------------------------------------------------------------------------//
-  public PascalProcedure (byte[] buffer, int slot)
+  public PascalProcedure (byte[] buffer, int procNo)
   // ---------------------------------------------------------------------------------//
   {
     this.buffer = buffer;
-    this.slot = slot;
-    int p = buffer.length - 2 - slot * 2;
+    this.procNo = procNo;
+
+    int p = buffer.length - 2 - procNo * 2;
     offset = Utility.getShort (buffer, p);
     procOffset = p - offset;
     valid = procOffset > 0;
@@ -57,6 +58,7 @@ public class PascalProcedure
   {
     if (statements.size () > 0 || assembler != null)
       return;
+
     int ptr = procOffset - codeStart - 2;
     int max = procOffset + jumpTable;
 

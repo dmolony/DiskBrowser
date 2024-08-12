@@ -25,6 +25,7 @@ public class PascalProcedure
   int codeEnd;
   int parmSize;
   int dataSize;
+
   List<PascalCodeStatement> statements = new ArrayList<> ();
   AssemblerProgram assembler;
   int jumpTable = -8;
@@ -45,6 +46,7 @@ public class PascalProcedure
     {
       procedureNo = buffer[procOffset] & 0xFF;
       procLevel = buffer[procOffset + 1] & 0xFF;
+
       codeStart = Utility.getShort (buffer, procOffset - 2);
       codeEnd = Utility.getShort (buffer, procOffset - 4);
       parmSize = Utility.getShort (buffer, procOffset - 6);

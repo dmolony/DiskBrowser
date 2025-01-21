@@ -37,7 +37,8 @@ class AttributeManager extends AbstractFile
     for (Statistic stat : list)
     {
       DefaultMutableTreeNode child = new DefaultMutableTreeNode (
-          new DefaultAppleFileSource (("Attribute " + count++), stat.getText (), disk));
+          new DefaultAppleFileSource ((ZObject.attrName[count]), stat.getText (), disk));
+      count++;
       node.add (child);
       child.setAllowsChildren (false);
     }
@@ -48,8 +49,8 @@ class AttributeManager extends AbstractFile
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder ("Attribute  Frequency\n");
-    text.append ("---------  ---------\n");
+    StringBuilder text = new StringBuilder ("Attribute    Freq\n");
+    text.append ("-----------  ----\n");
 
     for (Statistic stat : list)
       text.append (String.format ("%s%n", stat));
@@ -63,33 +64,35 @@ class AttributeManager extends AbstractFile
   // ---------------------------------------------------------------------------------//
   {
     int id;
-    List<ZObject> list = new ArrayList<> ();
+    List<ZObject> objects = new ArrayList<> ();
 
     public Statistic (int id)
     {
       this.id = id;
-      for (ZObject o : header.objectManager)
-        if (o.attributes.get (id))
-          list.add (o);
+      for (ZObject object : header.objectManager)
+        if (object.attributes.get (id))
+          objects.add (object);
     }
 
     String getText ()
     {
-      StringBuilder text =
-          new StringBuilder ("Objects with attribute " + id + " set:\n\n");
-      for (ZObject o : list)
+      StringBuilder text = new StringBuilder (
+          "Objects with attribute " + ZObject.attrName[id] + " set:\n\n");
+      for (ZObject o : objects)
       {
         text.append (String.format ("%3d  %-28s%n", o.getId (), o.getName ()));
       }
+
       if (text.length () > 0)
         text.deleteCharAt (text.length () - 1);
+
       return text.toString ();
     }
 
     @Override
     public String toString ()
     {
-      return String.format ("   %2d        %3d", id, list.size ());
+      return String.format ("%-12s  %3d", ZObject.attrName[id], objects.size ());
     }
   }
 }

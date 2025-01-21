@@ -12,6 +12,10 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
 // -----------------------------------------------------------------------------------//
 {
   static final int HEADER_SIZE = 9;
+  static final String[] attrName = { "0", "1", "2", "TOUCH", "WATER", "MAZE", "LAND",
+      "INVISIBLE", "SEARCH", "OUTSIDE", "SURFACE", "OPEN", "TRANSPARENT", "TRYTAKE",
+      "NODESC", "TURN", "READ", "TAKE", "18", "CONTAINER", "ON", "FOOD", "DRINK", "DOOR",
+      "CLIMB", "FLAME", "BURN", "VEHICLE", "TOOL", "WEAPON", "CHARACTER", "LIGHT" };
 
   private final Header header;
   private final int id;
@@ -57,7 +61,7 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     propertyTablePtr = header.getWord (offset + 7);
     int ptr = propertyTablePtr;
     int nameLength = header.getByte (ptr) * 2;
-    setName (nameLength == 0 ? "<<" + id + ">>" : new ZString (header, ++ptr).value);
+    setName (nameLength == 0 ? "Object " + id : new ZString (header, ++ptr).value);
     ptr += nameLength;
 
     // read each property
@@ -94,9 +98,23 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     text.append (String.format ("Sibling  : %02X  (%<3d)  %s%n", sibling, obj2));
     text.append (String.format ("Child    : %02X  (%<3d)  %s%n%n", child, obj3));
 
-    text.append ("Attributes : ");
-    text.append (HexFormatter.getHexString (buffer, startPtr, 4));
-    text.append ("   " + attributes.toString () + "\n\n");
+    text.append ("Attrs    : ");
+
+    if (!attributes.isEmpty ())
+    {
+      for (int i = 0; i < 32; i++)
+      {
+        if (attributes.get (i))
+          text.append (attrName[i] + ", ");
+      }
+
+      if (text.charAt (text.length () - 2) == ',')
+        text.deleteCharAt (text.length () - 2);
+
+      text.append ("   " + attributes.toString () + "   ");
+    }
+
+    text.append ("\n\n");
 
     for (Property prop : properties)
       text.append (prop + "\n");

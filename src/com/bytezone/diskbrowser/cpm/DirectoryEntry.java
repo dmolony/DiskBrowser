@@ -139,8 +139,9 @@ class DirectoryEntry implements AppleFileSource
     char ro = readOnly ? '*' : ' ';
     char sf = systemFile ? '*' : ' ';
 
-    String text = String.format ("%3d   %-8s   %-3s %s %s  %02X   %02X   %02X   %02X   %s",
-        userNumber, name, type, ro, sf, extent, s2, s1, recordsUsed, bytes);
+    String text =
+        String.format ("%3d   %-8s   %-3s %s %s  %02X   %02X   %02X   %02X   %s",
+            userNumber, name, type, ro, sf, extent, s2, s1, recordsUsed, bytes);
     for (DirectoryEntry entry : entries)
       text = text + "\n" + entry.line ();
 
@@ -217,13 +218,15 @@ class DirectoryEntry implements AppleFileSource
     else if ("DVR".equals (type))
       appleFile = new DefaultAppleFile (name, exactBuffer, "DVR File");
     else if ("ASM".equals (type) || "DOC".equals (type) || "COB".equals (type)
-        || "HLP".equals (type) || "TXT".equals (type) || "LET".equals (type) || "ALX".equals (type)
-        || "SRC".equals (type) || "H".equals (type) || exactBuffer[len - 1] == 0x1A)
+        || "HLP".equals (type) || "TXT".equals (type) || "LET".equals (type)
+        || "ALX".equals (type) || "SRC".equals (type) || "H".equals (type)
+        || exactBuffer[len - 1] == 0x1A)
       appleFile = new CPMTextFile (name, exactBuffer);
     else if ("BAS".equals (type))
       appleFile = new CPMBasicFile (name, exactBuffer);
     else
-      appleFile = new DefaultAppleFile (name, exactBuffer, "CPM File : " + name + "." + type);
+      appleFile =
+          new DefaultAppleFile (name, exactBuffer, "CPM File : " + name + "." + type);
 
     return appleFile;
   }

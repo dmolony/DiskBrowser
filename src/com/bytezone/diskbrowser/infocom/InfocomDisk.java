@@ -23,6 +23,8 @@ import com.bytezone.diskbrowser.utilities.Utility;
 // https://mud.co.uk/richard/htflpism.htm
 // https://inform-fiction.org/zmachine/standards/
 // https://github.com/historicalsource?tab=repositories
+// https://medium.com/swlh/zork-the-great-inner-workings-b68012952bdc
+// https://github.com/ZoBoRf/ZILCH-How-to
 
 // -----------------------------------------------------------------------------------//
 public class InfocomDisk extends AbstractFormattedDisk
@@ -216,6 +218,7 @@ public class InfocomDisk extends AbstractFormattedDisk
     DefaultMutableTreeNode node = new DefaultMutableTreeNode (dafs);
     node.setAllowsChildren (allowsChildren);
     root.add (node);
+
     return node;
   }
 

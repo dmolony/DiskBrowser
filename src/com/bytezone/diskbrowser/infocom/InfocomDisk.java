@@ -147,6 +147,7 @@ public class InfocomDisk extends AbstractFormattedDisk
 
     int blockNo = sectorFrom / disk.getBlockSize () + 48;
     int blockTo = sectorTo / disk.getBlockSize () + 48;
+
     while (blockNo <= blockTo)
     {
       blocks.add (disk.getDiskAddress (blockNo));
@@ -154,6 +155,7 @@ public class InfocomDisk extends AbstractFormattedDisk
         sectorTypes[blockNo] = type;
       blockNo++;
     }
+
     dafs.setSectors (blocks);
   }
 
@@ -181,6 +183,7 @@ public class InfocomDisk extends AbstractFormattedDisk
       while (buffer[ptr--] == 0)
         fileSize--;
     }
+
     return fileSize;
   }
 
@@ -197,13 +200,16 @@ public class InfocomDisk extends AbstractFormattedDisk
       {
         byte[] temp = disk.readBlock (track, sector);
         int spaceLeft = fileSize - ptr;
+
         if (spaceLeft <= BLOCK_SIZE)
         {
           System.arraycopy (temp, 0, data, ptr, spaceLeft);
           return data;
         }
+
         System.arraycopy (temp, 0, data, ptr, BLOCK_SIZE);
       }
+
     return data;
   }
 

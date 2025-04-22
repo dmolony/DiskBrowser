@@ -89,8 +89,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
       lastModified = Utility.getDateTime (entryBuffer, 0x1B);
 
     // CATALOG command only formats the LO byte - see Beneath Apple DOS pp4-6
-    String base =
-        String.format ("%s%s %03d ", locked ? "*" : " ", getFileType (), reportedSize & 0xFF);
+    String base = String.format ("%s%s %03d ", locked ? "*" : " ", getFileType (),
+        reportedSize & 0xFF);
     catalogName = getName (base, entryBuffer);
     displayName = getDisplayName (entryBuffer);
   }
@@ -266,8 +266,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           reportedLength = Utility.getShort (buffer, 2);
           if (reportedLength == 0)
           {
-            System.out.println (
-                name.trim () + " reported length : 0 - reverting to " + (buffer.length - 4));
+            System.out.println (name.trim () + " reported length : 0 - reverting to "
+                + (buffer.length - 4));
             reportedLength = buffer.length - 4;
           }
 
@@ -278,8 +278,9 @@ abstract class AbstractCatalogEntry implements AppleFileSource
             exactBuffer = new byte[buffer.length - 4];  // reported length is too long
           System.arraycopy (buffer, 4, exactBuffer, 0, exactBuffer.length);
 
-          if ((name.endsWith (".FONT") || name.endsWith (" FONT") || name.endsWith (".SET")
-              || name.startsWith ("ASCII.")) && FontFile.isFont (exactBuffer))
+          if ((name.endsWith (".FONT") || name.endsWith (" FONT")
+              || name.endsWith (".SET") || name.startsWith ("ASCII."))
+              && FontFile.isFont (exactBuffer))
             appleFile = new FontFile (name, exactBuffer, loadAddress);
           else if (name.endsWith (".MW"))
             appleFile = new MagicWindowText (name, exactBuffer);
@@ -314,7 +315,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
               appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
           }
           else if (reportedLength == 0x240          //
-              && (loadAddress == 0x5800 || loadAddress == 0x6000 || loadAddress == 0x7800))
+              && (loadAddress == 0x5800 || loadAddress == 0x6000
+                  || loadAddress == 0x7800))
             appleFile = new PrintShopGraphic (name, exactBuffer);
           else if (isRunCommand (exactBuffer))
           {
@@ -327,8 +329,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
           {
             appleFile = new AssemblerProgram (name, exactBuffer, loadAddress);
             if ((exactBuffer.length + 4) < buffer.length)
-              ((AssemblerProgram) appleFile).setExtraBuffer (buffer, exactBuffer.length + 4,
-                  buffer.length - (exactBuffer.length + 4));
+              ((AssemblerProgram) appleFile).setExtraBuffer (buffer,
+                  exactBuffer.length + 4, buffer.length - (exactBuffer.length + 4));
           }
           break;
 
@@ -370,8 +372,8 @@ abstract class AbstractCatalogEntry implements AppleFileSource
     int reportedLength = Utility.getShort (buffer, 2);
     if (reportedLength == 0)
     {
-      System.out
-          .println (name.trim () + " reported length : 0 - reverting to " + (buffer.length - 4));
+      System.out.println (
+          name.trim () + " reported length : 0 - reverting to " + (buffer.length - 4));
       reportedLength = buffer.length - 4;
     }
 

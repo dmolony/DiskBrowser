@@ -17,6 +17,17 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
       "NODESC", "TURN", "READ", "TAKE", "18", "CONTAINER", "ON", "FOOD", "DRINK", "DOOR",
       "CLIMB", "FLAME", "BURN", "VEHICLE", "TOOL", "WEAPON", "CHARACTER", "LIGHT" };
 
+  // OUTSIDE = SACRED : thief will not go there
+
+  // Flags: 32   (from Zork1.record)
+
+  // ACTORBIT    FIGHTBIT    NDESCBIT    RMUNGBIT    TOOLBIT       WEAPONBIT
+  // BURNBIT     FLAMEBIT    NONLANDBIT  SACREDBIT   TOUCHBIT      WEARBIT
+  // CLIMBBIT    FOODBIT     ONBIT       SEARCHBIT   TRANSBIT
+  // CONTBIT     INVISIBLE   OPENBIT     STAGGERED   TRYTAKEBIT
+  // DOORBIT     LIGHTBIT    READBIT     SURFACEBIT  TURNBIT
+  // DRINKBIT    MAZEBIT     RLANDBIT    TAKEBIT     VEHBIT
+
   private final Header header;
   private final int id;
   private final int startPtr;
@@ -67,10 +78,11 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
     // read each property
     while (buffer[ptr] != 0)
     {
-      Property p = new Property (ptr);
-      properties.add (p);
-      ptr += p.length + 1;
+      Property property = new Property (ptr);
+      properties.add (property);
+      ptr += property.length + 1;
     }
+
     propertyTableLength = ptr - propertyTablePtr;
   }
 
@@ -128,10 +140,12 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   // ---------------------------------------------------------------------------------//
   {
     StringBuilder text = new StringBuilder ("Header :\n\n");
+
     text.append (HexFormatter.formatNoHeader (buffer, startPtr, HEADER_SIZE));
     text.append ("\n\nProperty table:\n\n");
     text.append (
         HexFormatter.formatNoHeader (buffer, propertyTablePtr, propertyTableLength));
+
     return text.toString ();
   }
 
@@ -139,9 +153,10 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
   Property getProperty (int id)
   // ---------------------------------------------------------------------------------//
   {
-    for (Property p : properties)
-      if (p.propertyNumber == id)
-        return p;
+    for (Property property : properties)
+      if (property.propertyNumber == id)
+        return property;
+
     return null;
   }
 
@@ -301,9 +316,9 @@ class ZObject extends AbstractFile implements Comparable<ZObject>
 
     private void appendRoutine (StringBuilder text, int offset)
     {
-      Routine r = header.codeManager.getRoutine (offset);
-      if (r != null)
-        text.append ("\n\n" + r.getText ());
+      Routine routine = header.codeManager.getRoutine (offset);
+      if (routine != null)
+        text.append ("\n\n" + routine.getText ());
       else                  // this can happen if the property is mislabelled as code
         text.append ("\n\n****** null routine\n");
     }

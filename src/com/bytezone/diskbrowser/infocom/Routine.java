@@ -63,11 +63,8 @@ class Routine extends InfocomAbstractFile
       if (instruction.isPrint ())
         strings++;
 
-      if (instruction.isBranch () && !targets.contains (instruction.target ()))
-        targets.add (instruction.target ());
-
-      if (instruction.isJump () && !targets.contains (instruction.target ()))
-        targets.add (instruction.target ());
+      if (instruction.isBranch () || instruction.isJump ())
+        addTarget (instruction.target ());
 
       for (Operand operand : instruction.opcode.operands)
         if (operand.operandType == OperandType.VAR_GLOBAL)
@@ -106,6 +103,15 @@ class Routine extends InfocomAbstractFile
           System.out.println (instruction);
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------------//
+  private void addTarget (int target)
+  // ---------------------------------------------------------------------------------//
+  {
+    if (target > 1 && !targets.contains (target))
+      targets.add (target);
+
   }
 
   // ---------------------------------------------------------------------------------//
@@ -176,11 +182,22 @@ class Routine extends InfocomAbstractFile
     {
       text.append (instruction.getHex ());
       int offset = instruction.startPtr;
-      if (targets.contains (offset))
-        text.append ("  L000 ");
+
+      int label = targets.indexOf (offset);
+      if (label >= 0)
+        text.append (String.format ("  L%03d ", label + 1));
       else
         text.append ("       ");
-      text.append (instruction + "\n");
+
+      String extra = "";
+      if (instruction.isBranch () || instruction.isJump ())
+      {
+        label = targets.indexOf (instruction.target ());
+        if (label >= 0)
+          extra = String.format (" (L%03d)", label + 1);
+      }
+
+      text.append (instruction + extra + "\n");
     }
 
     if (calledBy.size () > 0)

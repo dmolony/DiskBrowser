@@ -49,11 +49,12 @@ class AttributeManager extends AbstractFile
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder ("Attribute    Freq\n");
-    text.append ("-----------  ----\n");
+    StringBuilder text = new StringBuilder ("Attr  Type         Freq\n");
+    text.append ("----  -----------  ----\n");
 
+    int count = 0;
     for (Statistic stat : list)
-      text.append (String.format ("%s%n", stat));
+      text.append (String.format (" %2d   %s%n", count++, stat));
     if (text.length () > 0)
       text.deleteCharAt (text.length () - 1);
     return text.toString ();

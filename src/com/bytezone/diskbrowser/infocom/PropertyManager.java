@@ -52,8 +52,8 @@ class PropertyManager extends AbstractFile
   public String getText ()
   // ---------------------------------------------------------------------------------//
   {
-    StringBuilder text = new StringBuilder ("Property   Type    Frequency\n");
-    text.append ("--------   -----   ---------\n");
+    StringBuilder text = new StringBuilder ("Prop  Type         Freq\n");
+    text.append ("----  -----------  ----\n");
 
     for (Statistic stat : list)
       text.append (String.format ("%s%n", stat));
@@ -98,7 +98,7 @@ class PropertyManager extends AbstractFile
     @Override
     public String toString ()
     {
-      return String.format ("   %2d      %-6s    %3d", id, header.getPropertyName (id),
+      return String.format (" %2d   %-6s        %3d", id, header.getPropertyName (id),
           list.size ());
     }
   }

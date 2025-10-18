@@ -25,11 +25,12 @@ public class PascalArea extends AbstractFile
     size = Utility.getShort (buffer, 0);
     volumes = Utility.getShort (buffer, 2);
     ppmName = HexFormatter.getPascalString (buffer, 4);
+
     start = Utility.getShort (buffer, 8);
-    length = Utility.getShort (buffer, 11);
-    defaultUnit = buffer[13] & 0xFF;
+    length = Utility.getShort (buffer, 10);
+    defaultUnit = buffer[12] & 0xFF;
+    writeProtected = (buffer[13] & 0x80) != 0;
     oldDriver = Utility.getShort (buffer, 14);
-    //    writeProtected = buffer[12] != 0;
   }
 
   // ---------------------------------------------------------------------------------//
